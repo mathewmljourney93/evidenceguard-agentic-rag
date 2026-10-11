@@ -149,7 +149,10 @@ def test_importing_persistence_needs_no_database_configuration() -> None:
     env = {key: value for key, value in os.environ.items() if not key.startswith("EG_")}
     code = (
         "import evidenceguard_persistence.db, evidenceguard_persistence.models, "
-        "evidenceguard_persistence.migration_config, evidenceguard_api.app; "
+        "evidenceguard_persistence.migration_config, evidenceguard_persistence.auth, "
+        "evidenceguard_persistence.accounts, evidenceguard_persistence.credentials, "
+        "evidenceguard_api.admin, evidenceguard_api.app; "
+        "from evidenceguard_api.app import create_app; create_app(); "
         "print('imported')"
     )
 

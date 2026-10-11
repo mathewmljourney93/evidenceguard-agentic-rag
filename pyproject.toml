@@ -20,6 +20,7 @@ dependencies = [
 
 [project.scripts]
 eg-api = "evidenceguard_api.__main__:main"
+eg-admin = "evidenceguard_api.admin:main"
 
 [dependency-groups]
 dev = [

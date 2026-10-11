@@ -1,6 +1,6 @@
 # ADR-0004: Persistence foundation
 
-- **Status:** Accepted (M2a). Verified in CI at commit `9ad7dae` on branch `feat/persistence-foundation`; not yet merged into `main`. See *Consequences and limits*.
+- **Status:** Accepted (M2a). Verified in CI at commit `9ad7dae` on branch `feat/persistence-foundation`, then fast-forwarded onto `main` at `e2dee5c`, where CI passed again. See *Consequences and limits*.
 - **Date:** 2026-10-11
 - **Builds on:** plan decisions D2 and D7, and the M2 decisions recorded under Prompt 24 in [prompts.md](../../prompts.md)
 
@@ -89,6 +89,7 @@ Authentication, admin commands, vendor endpoints and `/readyz` arrive in later M
     - the cross-tenant, missing-tenant, uniqueness, role and secret-hash constraints.
   - The database-independent checks, including the URL policy and the guard's refusal paths, passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070324) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070158). The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076261) passed.
   - The integration log was retrieved by the external reviewer.
+  - **On `main` at `e2dee5c`** (`e2dee5cf199cfa2b0ecbdc4d55a2cd7ea5865c00`): [CI run 38159547345](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38159547345) passed, including the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38159547345/job/114529402973). Its log, retrieved by the external reviewer, reports `10 passed, 250 deselected in 2.64s`. The [secret-scan run 38159547321](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38159547321) also passed.
 - **Not verified locally.** Docker is not installed on the development machine, and the existing local PostgreSQL 16 service is deliberately not used. So `docker-compose.yml` has **never been run**.
 - **No pgvector functionality tested.** M2a creates no vector extension. The pgvector image is used only as the PostgreSQL server.
 - **Guard limits.** URL comparison cannot prove that two different DNS names, or a name and an IP address, reach different servers. Nothing is resolved. The `_test` suffix and the identity check are a safety net; the test database must still be one that can be lost. The URL policy also does not control libpq environment variables (for example `PGHOSTADDR`, `PGOPTIONS` or `PGSERVICEFILE`) set in the process that runs the tests or the application.

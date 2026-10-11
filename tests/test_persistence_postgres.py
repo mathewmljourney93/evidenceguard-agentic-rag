@@ -15,11 +15,25 @@ from uuid import UUID, uuid4
 import pytest
 from alembic import command
 from alembic.config import Config
-from sqlalchemy import Engine, create_engine, insert, inspect, text
+from fastapi.testclient import TestClient
+from sqlalchemy import Engine, create_engine, func, insert, inspect, select, text, update
 from sqlalchemy.engine import URL
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.pool import NullPool
 
+from evidenceguard_api.app import create_app
+from evidenceguard_domain.context import ActorContext, Role
+from evidenceguard_persistence.accounts import (
+    DatabaseAdminStore,
+    DemoUserConflictError,
+    RevokeOutcome,
+    UserNotInTenantError,
+    demo_tenant_id,
+    demo_user_id,
+)
+from evidenceguard_persistence.auth import ApiKeyAuthenticator
+from evidenceguard_persistence.credentials import generate_api_key
+from evidenceguard_persistence.db import create_session_factory
 from evidenceguard_persistence.migration_config import alembic_config
 from evidenceguard_persistence.models import ApiKey, Tenant, User, UserRole, Vendor
 from evidenceguard_persistence.safety import (
@@ -224,3 +238,135 @@ def test_secret_hash_must_be_sha256_hex(migrated: Engine) -> None:
             )
         )
     assert _sqlstate(exc_info.value) == CHECK_VIOLATION
+
+
+# --- API-key authentication and eg-admin operations (M2b) -------------------------------
+
+
+def _store(engine: Engine) -> tuple[DatabaseAdminStore, ApiKeyAuthenticator]:
+    session_factory = create_session_factory(engine)
+    return DatabaseAdminStore(session_factory), ApiKeyAuthenticator(session_factory)
+
+
+def test_created_key_authenticates_until_it_is_revoked(migrated: Engine) -> None:
+    store, authenticator = _store(migrated)
+    store.seed_demo()
+    tenant, other_tenant = demo_tenant_id("halverson-freight"), demo_tenant_id("marisol-clinics")
+    user = demo_user_id("halverson-freight", UserRole.APPROVER)
+    key = generate_api_key()
+    plaintext = key.plaintext.get_secret_value()
+
+    key_id = store.create_api_key(tenant, user, key)
+
+    with migrated.connect() as connection:
+        stored = connection.execute(select(ApiKey).where(ApiKey.id == key_id)).one()
+    assert (stored.tenant_id, stored.user_id, stored.prefix) == (tenant, user, key.prefix)
+    assert stored.secret_sha256 == key.secret_sha256
+    assert all(plaintext[21:] not in str(value) for value in stored)
+    expected = ActorContext(tenant_id=tenant, actor_id=user, role=Role.APPROVER)
+    assert authenticator(plaintext) == expected
+    assert (
+        authenticator(plaintext[:21] + generate_api_key().plaintext.get_secret_value()[21:]) is None
+    )
+    with TestClient(create_app(authenticator=authenticator)) as client:
+        response = client.get("/v1/me", headers={"Authorization": f"Bearer {plaintext}"})
+    assert response.status_code == 200
+    assert response.json() == {"tenant_id": str(tenant), "actor_id": str(user), "role": "approver"}
+
+    assert store.revoke_api_key(other_tenant, key.prefix) is RevokeOutcome.NOT_FOUND
+    assert authenticator(plaintext) == expected
+    assert store.revoke_api_key(tenant, key.prefix) is RevokeOutcome.REVOKED
+    assert authenticator(plaintext) is None
+    with migrated.connect() as connection:
+        revoked_at = connection.execute(
+            select(ApiKey.revoked_at).where(ApiKey.id == key_id)
+        ).scalar_one()
+    assert revoked_at is not None
+    assert store.revoke_api_key(tenant, key.prefix) is RevokeOutcome.ALREADY_REVOKED
+    with migrated.connect() as connection:
+        assert (
+            connection.execute(select(ApiKey.revoked_at).where(ApiKey.id == key_id)).scalar_one()
+            == revoked_at
+        )
+
+
+def test_create_key_rejects_a_user_from_another_tenant(migrated: Engine) -> None:
+    store, _ = _store(migrated)
+    store.seed_demo()
+
+    with pytest.raises(UserNotInTenantError):
+        store.create_api_key(
+            demo_tenant_id("halverson-freight"),
+            demo_user_id("marisol-clinics", UserRole.ADMIN),
+            generate_api_key(),
+        )
+    with migrated.connect() as connection:
+        assert connection.execute(select(func.count()).select_from(ApiKey)).scalar_one() == 0
+
+
+def test_seed_demo_is_idempotent_and_never_resets_roles_or_revocations(migrated: Engine) -> None:
+    store, _ = _store(migrated)
+    first = store.seed_demo()
+    assert len(first) == 6 and all(user.created for user in first)
+    assert {user.role for user in first} == set(UserRole)
+
+    tenant = demo_tenant_id("marisol-clinics")
+    reviewer = demo_user_id("marisol-clinics", UserRole.REVIEWER)
+    with migrated.begin() as connection:
+        connection.execute(update(User).where(User.id == reviewer).values(role="approver"))
+    key = generate_api_key()
+    store.create_api_key(tenant, reviewer, key)
+    store.revoke_api_key(tenant, key.prefix)
+
+    second = store.seed_demo()
+
+    (reported,) = [user for user in second if user.user_id == reviewer]
+    assert (reported.tenant_id, reported.role) == (tenant, UserRole.APPROVER)
+    assert [(u.tenant_id, u.user_id) for u in second] == [(u.tenant_id, u.user_id) for u in first]
+    assert [u.role for u in second if u.user_id != reviewer] == [
+        u.role for u in first if u.user_id != reviewer
+    ]
+    assert not any(user.created for user in second)
+    with migrated.connect() as connection:
+        assert connection.execute(select(func.count()).select_from(Tenant)).scalar_one() == 2
+        assert connection.execute(select(func.count()).select_from(User)).scalar_one() == 6
+        assert connection.execute(select(func.count()).select_from(ApiKey)).scalar_one() == 1
+        assert (
+            connection.execute(select(User.role).where(User.id == reviewer)).scalar_one()
+            == "approver"
+        )
+        assert connection.execute(select(ApiKey.revoked_at)).scalar_one() is not None
+
+
+def test_authentication_reflects_the_current_stored_role(migrated: Engine) -> None:
+    store, authenticator = _store(migrated)
+    store.seed_demo()
+    tenant = demo_tenant_id("halverson-freight")
+    user = demo_user_id("halverson-freight", UserRole.REVIEWER)
+    key = generate_api_key()
+    store.create_api_key(tenant, user, key)
+    plaintext = key.plaintext.get_secret_value()
+
+    first = authenticator(plaintext)
+    with migrated.begin() as connection:
+        connection.execute(update(User).where(User.id == user).values(role="admin"))
+    second = authenticator(plaintext)
+
+    assert first is not None and first.role is Role.REVIEWER
+    assert second is not None and second.role is Role.ADMIN
+    assert (second.tenant_id, second.actor_id) == (tenant, user)
+
+
+def test_seed_demo_refuses_a_demo_user_id_owned_by_another_tenant(migrated: Engine) -> None:
+    store, _ = _store(migrated)
+    other_tenant = _tenant(migrated, "unrelated-tenant")
+    taken = demo_user_id("halverson-freight", UserRole.ADMIN)
+    with migrated.begin() as connection:
+        connection.execute(insert(User).values(id=taken, tenant_id=other_tenant, role="admin"))
+
+    with pytest.raises(DemoUserConflictError):
+        store.seed_demo()
+
+    with migrated.connect() as connection:
+        assert connection.execute(select(Tenant.slug)).scalars().all() == ["unrelated-tenant"]
+        assert connection.execute(select(User.id, User.tenant_id)).all() == [(taken, other_tenant)]

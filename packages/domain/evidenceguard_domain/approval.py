@@ -45,6 +45,7 @@ from evidenceguard_domain.report import (
     content_sha256 as compute_content_sha256,
 )
 
+# Role.ADMIN is in neither set: administering accounts grants no report or approval rights.
 _EDITORS = frozenset({Role.REVIEWER, Role.APPROVER})
 _APPROVERS = frozenset({Role.APPROVER})
 

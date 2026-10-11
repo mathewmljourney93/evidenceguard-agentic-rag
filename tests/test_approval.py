@@ -552,7 +552,34 @@ def test_decision_from_another_tenant_is_rejected(
         approved.model_copy(update={"decisions": (forged,)})
 
 
-def test_admin_role_does_not_exist(tenant_a: UUID) -> None:
-    with pytest.raises(ValidationError):
-        ActorContext.model_validate({"tenant_id": tenant_a, "actor_id": uuid4(), "role": "admin"})
-    assert {role.value for role in Role} == {"reviewer", "approver"}
+def test_roles_are_reviewer_approver_and_admin() -> None:
+    assert {role.value for role in Role} == {"reviewer", "approver", "admin"}
+
+
+@pytest.fixture
+def admin(tenant_a: UUID) -> ActorContext:
+    return ActorContext(tenant_id=tenant_a, actor_id=uuid4(), role=Role.ADMIN)
+
+
+@pytest.mark.parametrize("action", [_approve, _reject, _finalize])
+def test_admin_cannot_approve_reject_or_finalize(
+    draft: Report,
+    approver: ActorContext,
+    admin: ActorContext,
+    now: datetime,
+    action: Callable[[Report, ActorContext, datetime], Report],
+) -> None:
+    report = _approve(draft, approver, now) if action is _finalize else draft
+
+    with pytest.raises(PermissionDeniedError):
+        action(report, admin, now)
+    assert report.status is (ReportStatus.APPROVED if action is _finalize else ReportStatus.DRAFT)
+
+
+def test_admin_cannot_create_or_revise_a_report(
+    draft: Report, admin: ActorContext, content: ReportContent, now: datetime
+) -> None:
+    with pytest.raises(PermissionDeniedError):
+        create_draft(admin, report_id=uuid4(), content=content, now=now)
+    with pytest.raises(PermissionDeniedError):
+        _revise(draft, admin, now, "Edited by an administrator")

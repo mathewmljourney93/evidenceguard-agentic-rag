@@ -545,15 +545,25 @@ Each question entry contains:
 
 *Progress record:*
 - **M2a** (persistence foundation): `evidenceguard_persistence` (settings, engine and sessions, the tenants/users/api_keys/vendors schema, migration `0001`, the URL policy and the destructive-test guard), Compose, the CI integration job and [ADR-0004](decisions/0004-persistence-foundation.md).
-  - **Status:** reviewed and **verified in CI** on branch `feat/persistence-foundation` at commit `9ad7dae` (`9ad7daefc6372786e1da2a636b9419b4ca7df89d`). Not yet merged into `main`.
+  - **Status:** reviewed and **verified in CI** on branch `feat/persistence-foundation` at commit `9ad7dae` (`9ad7daefc6372786e1da2a636b9419b4ca7df89d`); the record for that commit follows. It was later fast-forwarded onto `main` at `e2dee5c` (see *On `main`* below).
   - **[CI run 38158076257](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257):**
     - `verify` passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070324) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070158).
     - The [PostgreSQL 17 + pgvector integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070229) passed. Its log, retrieved by the external reviewer, reports `10 passed, 250 deselected`, so all ten integration tests passed and none was skipped.
   - **[Secret-scan run 38158076261](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076261):** the full-history scan passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076261/job/114525070253)).
+  - **On `main`:** `main` was fast-forwarded to `e2dee5c` (`e2dee5cf199cfa2b0ecbdc4d55a2cd7ea5865c00`), which adds only documentation after `9ad7dae`.
+    - [CI run 38159547345](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38159547345) passed: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38159547345/job/114529403167) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38159547345/job/114529403100) verification, and the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38159547345/job/114529402973). Its log, retrieved by the external reviewer, reports `10 passed, 250 deselected in 2.64s`.
+    - The [secret-scan run 38159547321](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38159547321) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38159547321/job/114529402942)).
   - **Still not verified:**
     - Compose has never been run, because there is no local Docker.
     - No pgvector functionality has been tested; M2a creates no vector extension.
-- **Next slices:** M2b (API-key authentication, tenant context, `eg-admin`), then M2c (vendor endpoints) with `/readyz` and the API database wiring, following the decisions under Prompt 24 in [prompts.md](../prompts.md). Both are pending, and **M2 is not complete** until they land and meet the acceptance criteria below.
+- **M2b** (API-key authentication and tenant context, [ADR-0005](decisions/0005-api-key-authentication.md)): **implemented on branch `feat/api-key-authentication`, under review, not merged.** It adds:
+  - key primitives;
+  - `ApiKeyAuthenticator`;
+  - `GET /v1/me` with Bearer-only parsing and generic 401s;
+  - the `admin` role, with no report or approval rights;
+  - `eg-admin` (`seed-demo`, `create-key`, `revoke-key`);
+  - database-independent tests, and PostgreSQL integration tests whose CI verification is **pending**.
+- **Next slice:** M2c (vendor endpoints) with `/readyz` and the general API database wiring, following the decisions under Prompt 24 in [prompts.md](../prompts.md). It is pending, and **M2 is not complete** until M2b is accepted and verified and M2c lands and meets the acceptance criteria below.
 - *Acceptance:*
   - Migrations upgrade and downgrade cleanly.
   - Composite foreign keys reject cross-tenant references.

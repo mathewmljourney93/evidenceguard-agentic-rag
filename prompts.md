@@ -2795,3 +2795,311 @@ Do not change application code, start Docker, contact a local database or change
   No force-push, merge commit, squash, rebase, amend, branch deletion or tag push is authorized.
 - **Not yet recorded here:** the push, the CI results and the `main` update happen after this commit, so they are reported in the session handoff.
 - **Still open:** Compose remains unverified (never run). M2b, M2c and overall M2 completion remain pending.
+
+## Prompt 33: Implement M2b API-key authentication and tenant context
+
+- **Stage:** Implementation, milestone M2b (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Prompt 33 — Implement M2b API-key authentication and tenant context
+
+Work only in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md, the implementation plan, relevant ADRs and existing contracts before editing.
+
+Verify:
+- Local main and origin/main:
+  e2dee5cf199cfa2b0ecbdc4d55a2cd7ea5865c00
+- Working tree clean.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+
+Create feat/api-key-authentication from that exact main commit.
+
+Implement M2b only. Leave all work staged and uncommitted for external review. Do not push, merge, rewrite history, install system tools, start Docker or connect to the existing local PostgreSQL service.
+
+Scope
+
+1. API-key primitives
+- Use Python secrets to generate a cryptographically random secret with at least 256 bits of entropy and a separately generated lookup prefix.
+- Define one strict, bounded key format and document it.
+- Store only the prefix and SHA-256 digest of the secret in the existing api_keys table.
+- Verify the digest using hmac.compare_digest.
+- Never log credentials or include them in representations, errors or API responses.
+- Use a secret wrapper for any object carrying the plaintext key.
+- Avoid new dependencies unless necessary.
+
+2. Persistence authentication
+- Look up keys by their globally unique prefix.
+- Reject unknown, malformed, incorrect and revoked keys uniformly.
+- Join the owning user using both tenant_id and user_id.
+- Derive tenant, actor and role only from stored records.
+- Read current role and revocation state on authentication; do not introduce credential caching.
+- Manage sessions explicitly and close them on every outcome.
+- Keep database code in persistence and preserve package import boundaries.
+
+3. Authenticated API boundary
+- Add GET /v1/me returning only tenant_id, actor_id and role.
+- Accept credentials only through Authorization: Bearer.
+- Reject duplicate Authorization headers and malformed or oversized credentials.
+- Missing or invalid credentials return generic 401 problem+json with WWW-Authenticate: Bearer.
+- Preserve request-ID correlation and existing privacy-safe logging.
+- Tenant headers, query parameters and other submitted values must not override the authenticated scope.
+- Document the security scheme in OpenAPI.
+- Add only the database/session wiring required for authentication and /v1/me. General vendor wiring and /readyz remain M2c.
+- Provide an explicit injection seam for tests.
+- Importing modules, constructing the app and calling /healthz must still work without database configuration or a database connection.
+- Manage any app-owned engine lifecycle explicitly. Configuration or database failures must not expose URLs or exception text.
+
+4. Roles
+- Add ADMIN to the domain Role enum and map stored roles explicitly.
+- Preserve existing approval authorization: only APPROVER can approve or finalize. ADMIN gets no approval bypass.
+- Update the ActorContext documentation to distinguish authenticated API construction from trusted direct domain callers.
+
+5. Admin CLI
+Register eg-admin in the existing distribution, under the API application package, with:
+- seed-demo: create a minimal deterministic synthetic tenant/user fixture for two tenants and the three roles.
+- create-key: require explicit tenant and user IDs; verify ownership; create the key transactionally.
+- revoke-key: require explicit tenant scope and key identifier; revoke without deleting history.
+
+Rules:
+- seed-demo is idempotent, creates no API keys, and never resets existing roles or revocations.
+- No sample document corpus or ingestion work yet.
+- Print a newly created plaintext key only once, to stdout, after its database transaction succeeds.
+- Do not accept plaintext secrets as command-line arguments.
+- CLI help and module imports need no database configuration.
+- Use generic safe errors and nonzero exit codes.
+- Do not execute these commands against a real database locally.
+
+6. Tests
+Keep unit/API tests database-independent through explicit test doubles.
+
+Cover:
+- Key generation, format, bounded parsing and secret-safe representations.
+- Wrong secret, unknown prefix, malformed input and revoked key.
+- Duplicate authorization headers.
+- Authenticated tenant/user/role mapping and tenant-header spoofing.
+- Generic 401 bodies, challenge headers and matching request IDs.
+- Health and imports without database settings.
+- Session cleanup and failure paths.
+- ADMIN cannot approve or finalize.
+- CLI output only after successful commit, safe failure output and help without settings.
+
+Add real PostgreSQL integration tests for:
+- Key creation, successful authentication and revocation.
+- Cross-tenant ownership rejection.
+- seed-demo idempotency.
+- Current stored role reflected in authentication.
+
+Use the existing disposable-database guard and CI integration job. Do not weaken required-integration enforcement. Local PostgreSQL checks remain skipped until publication is authorized and CI passes.
+
+7. Documentation
+- Add ADR-0005 for API-key authentication and its limits.
+- Update README, plan and threat model for M2b's implemented scope.
+- Correct current-status statements saying M2a is not merged.
+- Record M2a main at e2dee5c:
+  CI run 38159547345, secret-scan run 38159547321.
+  The external reviewer retrieved the main integration log:
+  "10 passed, 250 deselected in 2.64s".
+- Preserve the earlier 9ad7dae verification record.
+- Keep Compose unverified, M2b's new integration verification pending, M2c pending and overall M2 incomplete.
+- State remaining API-key limitations plainly, including possession-based access and no rate limiting yet.
+- Append this prompt verbatim to prompts.md with truthful outcomes. Preserve earlier entries.
+
+Verification
+Run locked synchronization, Ruff formatting/linting, strict Mypy, the full local database-independent suite, build, isolated installed-wheel imports/CLI-help checks, git diff --cached --check and staged Gitleaks scanning.
+
+Do not print newly generated real credentials in the review handoff. Use clearly synthetic test markers.
+
+Final handoff
+- Explain behavior, architectural choices and remaining limits.
+- Include the COMPLETE staged diff excluding prompts.md directly in fenced diff blocks.
+- Never truncate. Split into numbered parts at file boundaries and provide every part.
+- Use a gitignored .local/ diff file only if response limits prevent full inclusion.
+- Report prompt-history additions, exact verification results, skipped checks, staged paths, HEAD and Git status separately.
+- Confirm nothing was committed or pushed and no local database was contacted.
+````
+
+**Outcome (M2b implementation pending review; staged, not committed or pushed):**
+- **Starting state verified:** local `main` and `origin/main` at `e2dee5c`, a clean tree, the expected origin. Branch `feat/api-key-authentication` was created from `e2dee5c`.
+- **Persistence:**
+  - `credentials` holds the key primitives: the 64-character format `egk_<16-hex prefix>_<43-character secret>`, with 256-bit secrets from `secrets`, SHA-256 digests, `hmac.compare_digest`, and `SecretStr` wrappers;
+  - `auth.ApiKeyAuthenticator` looks keys up by prefix, joins the user on `tenant_id` and `user_id`, maps roles explicitly, rejects every failure uniformly, does no caching, and closes its session on every outcome;
+  - `accounts.DatabaseAdminStore` provides the idempotent synthetic `seed-demo`, ownership-checked transactional key creation, and revocation that keeps the row.
+- **API:**
+  - `GET /v1/me` returns only `tenant_id`, `actor_id` and `role`;
+  - credentials are accepted only from one Bearer header. Duplicate, oversized, non-ASCII and malformed headers are rejected;
+  - authentication failures get a generic 401 with `WWW-Authenticate: Bearer`, and database or configuration failures a generic 503;
+  - OpenAPI documents the `ApiKey` scheme;
+  - `create_app(authenticator=...)` is the injection seam. The default app-owned authenticator creates its engine lazily and disposes it on shutdown.
+- **Domain:** `Role.ADMIN` was added, with no report-editing or approval rights, and the `ActorContext` documentation was updated.
+- **`eg-admin`** is registered, with `seed-demo`, `create-key` and `revoke-key`.
+- **Documentation:** ADR-0005 was added. README, plan, threat model and ADR-0004 were updated, correcting the statements that M2a was not merged and recording `main` at `e2dee5c` (CI run 38159547345, secret-scan run 38159547321, reviewer-retrieved integration log `10 passed, 250 deselected in 2.64s`). The `9ad7dae` record is preserved.
+- **Tests:** database-independent tests were added for the key primitives, the authenticator (through a session double), the API boundary (through an injected authenticator) and `eg-admin` (through a fake store). Four PostgreSQL integration tests were added to the existing guarded module.
+- **Verified locally** (Windows, Python 3.12.15): the locked sync, Ruff format and lint, strict Mypy (48 files), and the full suite (344 passed, 14 PostgreSQL integration tests skipped). Also the integration collection (14) and the required-mode usage error (exit 4), the build, and the isolated installed-wheel imports with `/healthz`, `/v1/me` 401 and CLI help without database settings, plus the staged whitespace and Gitleaks checks. Exact results are in the session handoff.
+- **Not verified:**
+  - The four new PostgreSQL integration tests and the `eg-admin` database operations have **not** run against PostgreSQL. They are pending an authorized publication and CI.
+  - Compose remains unverified, M2c is pending, and M2 is incomplete.
+  - No `eg-admin` command was run against a database, and no local database was contacted.
+
+## Prompt 34: Correct M2b CLI error privacy and demo-role reporting
+
+- **Stage:** Correction, milestone M2b (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Prompt 34 — Correct M2b CLI error privacy and demo-role reporting
+
+Work only in D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+Verify:
+- Branch feat/api-key-authentication
+- HEAD e2dee5cf199cfa2b0ecbdc4d55a2cd7ea5865c00
+- The reported 23 M2b files staged.
+- Nothing unstaged or untracked.
+
+Record the pre-edit staged tree for the incremental review diff. Preserve the existing implementation.
+
+Do not commit, push, merge, start Docker or contact any database.
+
+Correction 1: CLI usage-error privacy
+
+admin.main calls argparse before its safe error handling. Default argparse errors echo invalid UUID values and unrecognized arguments, including a mistakenly submitted key.
+
+Make usage errors safe across the root parser and every subparser:
+- Retain exit code 2 and useful static usage/help.
+- Never print supplied argument values or argparse's raw diagnostic message.
+- Handle invalid UUIDs, unknown commands/options, extra positional arguments and missing required arguments through the safe boundary.
+- Keep --help working with exit code 0 and without database configuration.
+- Do not allow parsing failures to open the store.
+- Avoid a new dependency.
+
+Add regression tests with synthetic secret markers in invalid UUID values and unknown/extra arguments. Assert the marker is absent from stdout and stderr, exit code is 2, and the store was never opened.
+
+Correction 2: seed-demo reports actual stored records
+
+DatabaseAdminStore.seed_demo currently appends DemoUser using the requested role even when ON CONFLICT DO NOTHING preserves a different stored role.
+
+After ensuring each user exists:
+- Read its actual tenant and role.
+- Return the actual stored role in DemoUser and CLI output.
+- Preserve existing roles, keys and revocations.
+- If an existing deterministic user ID belongs to another tenant, refuse with a fixed safe AccountError rather than reporting it as belonging to the demo tenant.
+- Preserve transactional rollback and idempotency.
+
+Update the PostgreSQL idempotency test:
+- Change a stored reviewer's role to approver.
+- Reseed and assert both the returned record and stored row remain approver.
+- Preserve assertions about row counts and revocation.
+- Add coverage for a conflicting deterministic user ID owned by another tenant.
+
+Add appropriate database-independent coverage for CLI reporting of the role returned by the store.
+
+Documentation and history:
+- Update ADR-0005 and relevant privacy/reporting descriptions narrowly.
+- Append this prompt verbatim and a truthful outcome note to prompts.md.
+- Record that the reviewer inspected the diff and reproduced argparse echoing in isolation, but did not run the project suite.
+- Preserve earlier entries and keep new PostgreSQL verification pending.
+
+Verification:
+- Demonstrate the new relevant regression tests fail against the previous behavior, without contacting a database.
+- Run Ruff format/lint, strict Mypy and the full local suite with PostgreSQL tests skipped.
+- Build and repeat installed-wheel CLI help and safe usage-error checks.
+- Run git diff --cached --check and the staged Gitleaks scan.
+
+Leave the work staged and uncommitted.
+
+Final handoff:
+- Explain the corrections and verification limits.
+- Include the COMPLETE incremental diff against the recorded pre-edit staged tree, excluding prompts.md, directly in fenced diff blocks.
+- Do not truncate; split into numbered parts at file boundaries if needed.
+- Report prompt-history additions, exact check results, staged paths, HEAD and Git status separately.
+- Correct the added/modified file-count breakdown: the previous handoff's category counts did not match its listed paths.
+````
+
+**Outcome (correction pending review; staged, not committed or pushed):**
+- **Starting state verified:** branch `feat/api-key-authentication`, HEAD `e2dee5c`, 23 M2b files staged (10 added, 13 modified), nothing unstaged or untracked. The pre-edit staged tree was `8444eb3f523322df0755392567910349db34b24f`.
+- **Review findings:** argparse usage errors in `eg-admin` echoed submitted values, and `seed_demo` reported the requested role instead of the stored one. The reviewer inspected the diff and reproduced the argparse echoing in isolation, but did not run the project suite.
+- **Correction 1:** `SafeArgumentParser` is used by the root parser and, through inheritance, by every subparser.
+  - Usage errors print only the static usage line and a fixed message, exit 2, and never open the store.
+  - Option abbreviations are disabled, and `--help` is unchanged.
+- **Correction 2:** `seed_demo` reads back each user's stored tenant and role and reports the stored role. A demo user ID owned by another tenant now raises `DemoUserConflictError`, rolling back the whole transaction. The demo-tenant slug check now also handles a missing slug.
+- **Tests:**
+  - CLI tests cover usage errors with synthetic markers (invalid UUIDs, unknown options, abbreviations, extra positionals, unknown commands), missing arguments, a key pasted by mistake, and reporting of store-returned roles.
+  - A new `tests/test_accounts.py` exercises the real `seed_demo` against an in-memory session double.
+  - The PostgreSQL idempotency test now expects the stored `approver` role in both the returned record and the row. A new PostgreSQL test covers the cross-tenant demo user conflict.
+- **Comparison with the previous code:** the pre-edit `admin.py` and `accounts.py` were restored temporarily in the working tree, then restored with matching SHA-256. No database was contacted.
+  - With the previous `admin.py`, 19 of the 20 selected CLI tests failed. Store-returned role reporting already passed, because that bug was in the store.
+  - With the previous `accounts.py` (only `DemoUserConflictError` shimmed so the tests import), the stored-role and conflict tests failed. The first-seed and tenant-slug tests passed.
+- **Documentation:** ADR-0005, the README and the threat model were updated narrowly.
+- **Verified locally** (Windows, Python 3.12.15): Ruff format and lint, strict Mypy (49 files), and the full suite (368 passed, 15 PostgreSQL tests skipped). Also the build, the installed-wheel CLI help and safe usage-error checks, and the staged whitespace and Gitleaks checks. Exact results are in the session handoff.
+- **Not verified:** the new and updated PostgreSQL tests have not run, and are pending an authorized publication and CI. Compose remains unverified, M2c is pending, and M2 is incomplete.
+
+## Prompt 35: Complete parser consistency and commit reviewed M2b locally
+
+- **Stage:** Final parser adjustment and local commit of reviewed milestone M2b (no push)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Prompt 35 — Complete parser consistency and commit reviewed M2b locally
+
+Work only in D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+Verify:
+- Branch feat/api-key-authentication
+- HEAD e2dee5cf199cfa2b0ecbdc4d55a2cd7ea5865c00
+- Exactly the reported 24 files staged.
+- Nothing unstaged or untracked.
+- Expected origin and noreply author/committer identity.
+
+Record the accepted staged tree before editing.
+
+The reviewer accepts the Prompt 34 privacy and stored-role corrections for a local commit, subject to this precise parser adjustment:
+- Pass allow_abbrev=False explicitly to the seed-demo, create-key and revoke-key subparser constructors.
+- The root setting does not propagate to them.
+- Add focused tests showing abbreviated --tenant-id, --user-id and --prefix options are refused without opening the store. Supply all other required arguments so rejection cannot be caused by an unrelated missing argument.
+- Preserve generic usage errors and unchanged help behavior.
+
+Make no other application, dependency or architecture changes.
+
+Run the CLI tests, full local suite with PostgreSQL tests skipped, Ruff formatting/linting and strict Mypy.
+
+Update prompts.md:
+- Record acceptance based on the original and correction diffs and reported Windows checks.
+- State that the reviewer reproduced argparse behavior in isolation but did not run the project suite.
+- Record this final parser adjustment and its actual verification results.
+- Append this prompt verbatim and a truthful outcome note.
+- Preserve earlier entries.
+- Keep PostgreSQL verification, Compose, M2c and overall M2 pending.
+
+Inspect the complete staged diff and private-content checks. Run git diff --cached --check and the staged Gitleaks scan. Commit only if all checks pass.
+
+This prompt authorizes one local commit:
+feat: add API-key authentication and tenant administration
+
+After committing, run the full-history Gitleaks scan.
+
+Final handoff:
+- Full commit SHA, parent, subject and committed paths.
+- COMPLETE incremental diff against the recorded accepted staged tree, excluding prompts.md, directly in fenced diff blocks.
+- Exact verification results and remaining limits.
+- Prompt-history additions and final Git status.
+- Confirm that changes outside the specified parser adjustment, its tests and prompts.md were absent.
+
+Do not push, merge, amend, rebase, change global configuration, start Docker or contact any database. Leave the working tree clean.
+````
+
+**Review note (recorded with Prompt 35):** the external reviewer accepted M2b, including the Prompt 34 CLI-privacy and stored-role corrections, for a local commit. The acceptance relied on the original Prompt 33 diff, the Prompt 34 incremental diff and Claude's reported Windows checks (Prompt 34: 368 passed, 15 PostgreSQL tests skipped). The reviewer reproduced the argparse behaviour in isolation but did not run the project suite. One final adjustment was required: subparsers do not inherit the root parser's `allow_abbrev=False`.
+
+**Outcome (committed locally; not pushed):**
+- **Starting state verified:** branch `feat/api-key-authentication`, HEAD `e2dee5c`, exactly 24 files staged, nothing unstaged or untracked, the expected origin and the noreply identity. The accepted staged tree was `859e078ab6ec9ae28a3f4e89fc4187426d3a388e`.
+- **The finding was reproduced first:** `create-key --tenant <uuid> --user-id <uuid>` was accepted and reached the store.
+- **Parser adjustment:** `allow_abbrev=False` is now passed explicitly to the `seed-demo`, `create-key` and `revoke-key` subparser constructors.
+- **Tests:**
+  - 7 focused cases abbreviate exactly one of `--tenant-id`, `--user-id` or `--prefix`, with every other required argument valid. Each must exit 2 with the generic usage error, without echoing anything or opening the store.
+  - A control test confirms that the same arguments spelled in full reach the store.
+  - A test confirms that every subparser is a `SafeArgumentParser` with abbreviations disabled.
+- **Against the accepted `admin.py`** (restored temporarily in the working tree, then restored with a matching SHA-256), 8 of these tests failed and the control passed.
+- **No other change:** no application, dependency or architecture change beyond this adjustment and its tests.
+- **Verified locally** (Windows, Python 3.12.15): CLI tests (51 passed), the full suite (377 passed, 15 PostgreSQL tests skipped), Ruff format and lint, strict Mypy (49 files). The staged whitespace check, the private-content check and the staged Gitleaks scan were run before committing, and a full-history Gitleaks scan after. Exact results are in the session handoff.
+- **Commit:** one local commit, `feat: add API-key authentication and tenant administration`, whose parent is `e2dee5c`. It contains this note, so its SHA is reported in the session handoff.
+- **Pending:** the M2b PostgreSQL integration tests (15 in total locally skipped, including M2a's) await an authorized publication and CI. Compose remains unverified, M2c is pending, and M2 is incomplete. Nothing was pushed or merged, and no database was contacted.
