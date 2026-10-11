@@ -1,0 +1,55 @@
+# --- Python: virtual environments, caches, build artifacts ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# --- Local environment and secret-bearing configuration ---
+# Real .env files never belong in Git; the documented template does.
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.pfx
+
+# --- Local runtime data (uploads, databases, logs) ---
+# Synthetic fixtures live under sample_data/ and are tracked; these are local-only.
+# /.local/ is also where session exports and scratch files go (see CLAUDE.md).
+/.local/
+/uploads/
+/pgdata/
+*.sqlite
+*.sqlite3
+*.db
+*.log
+
+# --- Secret-scanner reports (may quote findings) ---
+gitleaks-report*.json
+*.sarif
+
+# --- Local Claude Code files (documented local-only locations) ---
+# Shared files stay tracked: CLAUDE.md, .claude/settings.json, .claude/agents/,
+# .claude/skills/, .claude/rules/ and project-scope .claude/agent-memory/.
+# Transcripts and auto memory are stored outside the repository (~/.claude/projects/).
+/.claude/settings.local.json
+/CLAUDE.local.md
+/.claude/agent-memory-local/
+/.claude/worktrees/
+
+# --- OS and editor files ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
