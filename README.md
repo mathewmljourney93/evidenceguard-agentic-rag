@@ -10,17 +10,36 @@ EvidenceGuard is a planned vendor-risk review copilot. It is intended to:
 
 It is evidence-based decision support, not legal advice or compliance certification.
 
-## Status: milestone M1a (pre-alpha)
+## Status: milestone M1b (pre-alpha)
 
 **What works now:**
-- One installable Python 3.12 package (`evidenceguard`), managed with uv, with a committed lockfile.
-- A minimal FastAPI app with one endpoint: `GET /healthz` returns `{"status": "ok"}`. This is a **process-liveness** check only. It does not check databases or any other dependency, and it does not mean the product works.
-- An `eg-api` command that serves the app with Uvicorn, plus FastAPI's generated OpenAPI docs at `/docs` and `/openapi.json`.
+- One installable Python 3.12 package (`evidenceguard`), managed with uv, with a committed lockfile (M1a).
+- A minimal FastAPI app with one endpoint: `GET /healthz` returns `{"status": "ok"}`. This is a **process-liveness** check only. It does not check databases or any other dependency, and it does not mean the product works (M1a).
+- An `eg-api` command that serves the app with Uvicorn, plus FastAPI's generated OpenAPI docs at `/docs` and `/openapi.json` (M1a).
+- **Typed evidence contracts** in `evidenceguard_domain` (M1b):
+  - actor context, evidence questions, citations, verification results, findings and report content;
+  - the permitted verdict/status combinations;
+  - citation rules for each status;
+  - tenant consistency across everything a report contains;
+  - every report question either answered by a finding or listed as unresolved; any question named by a missing-evidence finding is always listed as unresolved.
+- **Pure report-approval transitions** (M1b):
+  - draft, approve, reject, revise, finalize and export eligibility;
+  - approval is bound to the exact revision and its SHA-256 content hash;
+  - any revision removes the effective approval;
+  - rejections must state a reason;
+  - identical retries are idempotent, and changed retries are refused as conflicts;
+  - only finalized reports can be exported.
 - Tests, Ruff and strict Mypy. A CI workflow is configured for Ubuntu and Windows but **has not yet run in GitHub Actions**.
 
+**Limits of M1b:**
+- These are in-memory domain rules only. There is no authentication, database, tenancy enforcement in storage, or protection against concurrent requests yet.
+- No API endpoint uses them yet.
+- A citation's shape is validated. Whether the tenant may see the chunk, whether the quote is really in it, and whether it supports the claim are **not** checked yet.
+- Human approval in EvidenceGuard does not establish document authenticity or certify compliance. See [docs/responsible-ai.md](docs/responsible-ai.md) and [docs/threat-model.md](docs/threat-model.md).
+
 **Still planned** (see [docs/plan.md](docs/plan.md)):
-- The rest of M1: domain state machines, structured logging and redaction.
-- Everything after it: authentication, tenancy, persistence, ingestion, retrieval, model providers, the review workflow, the approval gate and evaluation.
+- The rest of M1: structured logging and redaction.
+- Everything after it: authentication, tenancy, persistence, ingestion, retrieval, model providers, the review workflow, API endpoints for the approval gate, and evaluation.
 
 No retrieval, agent workflow, evaluation results, security guarantees or benchmarks are claimed. Any future results will be published with their committed inputs, configuration and the command that reproduces them.
 

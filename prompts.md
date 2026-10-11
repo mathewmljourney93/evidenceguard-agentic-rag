@@ -891,3 +891,378 @@ Return:
 - `prompts.md` was re-staged. `git diff --cached --check` and the Gitleaks staged scan were run before committing.
 - One local commit was created on `feat/python-api-foundation`. The SHA and post-commit history scan are in the session handoff.
 - Not pushed. GitHub Actions and Linux remain unverified.
+
+---
+
+## Prompt 9: M1b, evidence contracts and report-approval transitions
+
+- **Stage:** Implementation, milestone M1b (staged for review, no commit)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Implement M1b only: essential typed evidence contracts and pure report-approval state transitions.
+
+Inspect CLAUDE.md, docs/plan.md, the existing domain package, tests, Git status, branch, remotes and HEAD first.
+
+Expected starting commit:
+d196afc41734bfe14ea55f91632f99d9cb2e0a61
+
+Expected root:
+D:\Claude\evidenceguard_agentic_rag
+
+Expected origin:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+
+Preserve existing code. If the state differs, explain the difference before proceeding.
+
+Append this prompt verbatim to prompts.md. From the clean current commit, create branch feat/evidence-contracts-approval.
+
+SCOPE
+
+Add contracts and pure domain behavior under evidenceguard_domain, with meaningful unit tests.
+
+No database, authentication implementation, new API endpoints, worker, model calls, retrieval, observability package or frontend in this milestone. Preserve the existing API behavior.
+
+Do not implement every entity from the plan. Introduce only what these contracts and approval transitions need.
+
+1. Evidence contracts
+
+Use Pydantic v2, explicit enums/literals, forbidden extra fields and appropriately immutable values.
+
+Define small contracts for:
+- Tenant/principal context, including actor ID and role.
+- Bounded evidence question.
+- Citation with tenant, document revision, chunk identity and nonempty quotation.
+- Verification result.
+- Risk finding.
+- Report content composed from findings and unresolved questions.
+
+Follow the approved evidence semantics:
+- Verdict: supported, contradicted or insufficient evidence.
+- Evidence status: vendor_claim, documentary_support, conflicting or missing.
+- Authenticity: not_established in v1.
+
+Explain and validate the permitted verdict/status combinations. Supported and contradictory assertions need citations. Missing evidence can still cite an incomplete policy, so do not require every insufficient-evidence result to have zero citations.
+
+A citation contract does not itself establish authorization, quote membership, semantic support or document authenticity. Those checks belong to later components; state this plainly.
+
+Keep relationships internally consistent:
+- Findings reference known evidence questions.
+- Report evidence belongs to the report's tenant.
+- Cross-tenant references are rejected.
+- Unsupported assertions cannot be represented as supported findings without citations.
+
+Prefer typed fields over arbitrary dictionaries. Avoid creating a general-purpose compliance schema.
+
+2. Immutable report revisions and content hashing
+
+Define an immutable report revision and a small report state/aggregate sufficient for approval.
+
+Use deterministic SHA-256 over explicitly defined canonical report content. Document exactly what is hashed.
+
+- Stable serialization must not depend on incidental dictionary insertion order.
+- A substantive content change changes the hash.
+- Actor, timestamp and decision metadata should not accidentally alter the content hash.
+- Bind decisions separately to tenant ID, report ID, revision number and content hash.
+- Reject a supplied hash that does not match the actual content.
+
+Do not introduce a mutable nested list/dictionary that can change content after hashing. Pydantic frozen=True is shallow; choose immutable collections or another explicit defensible approach.
+
+Do not use model_copy(update=...) or similar bypasses to create invalid validated states.
+
+3. Pure approval transitions
+
+Implement small pure functions that return validated new state and do not mutate their inputs:
+
+- Create draft revision.
+- Approve an exact current revision.
+- Reject an exact current revision.
+- Revise from an expected current revision.
+- Finalize an exact approved revision.
+- Check export eligibility.
+
+Use the approved states:
+draft, changes_requested, approved, finalized.
+
+Rules:
+- The context tenant must match the report tenant.
+- Only the approver role can approve, reject or finalize in this milestone. Do not invent an implicit admin approval bypass.
+- Reviewer and approver roles may revise an unfinalized report.
+- Approval/rejection requests must identify the current revision and matching hash.
+- Revision changes invalidate the effective approval while preserving decision history.
+- An approval for another report, tenant or revision cannot authorize finalization.
+- Rejection removes any effective approval.
+- Finalization requires a matching current approval.
+- Finalized reports cannot be revised, rejected or otherwise changed.
+- Export is allowed only for finalized reports.
+- Repeated identical approval/finalization requests are idempotent where the state permits them.
+- Invalid transitions produce explicit domain errors.
+- Pure functions do not claim database atomicity or protection against concurrent requests. That enforcement comes with persistence.
+
+Ensure callers cannot construct an apparently approved/finalized valid aggregate without the corresponding matching decision.
+
+Keep approval history compact and typed. Do not add event sourcing or a workflow framework.
+
+4. Meaningful tests
+
+Cover:
+- Valid supported, contradictory and insufficient evidence.
+- Invalid verdict/status combinations.
+- Claims lacking required citations.
+- Cross-tenant evidence and report access.
+- Stable hashes and substantive content changes.
+- Resistance to nested mutation after revision creation.
+- Approval of the exact current revision.
+- Wrong revision, wrong hash and another report's approval.
+- Reviewer attempts to approve/finalize.
+- Approve → revise → finalize failing until the new revision is approved.
+- Approve → reject preventing finalization.
+- Finalization without approval.
+- Finalized immutability and export eligibility.
+- Idempotent repeated requests.
+- Inputs remaining unchanged after transitions.
+- Invalid approved/finalized aggregate construction.
+
+Use behavior-focused tests. Avoid snapshotting incidental field ordering or hard-coding implementation details.
+
+5. Documentation
+
+Add initial docs/threat-model.md and docs/responsible-ai.md as concise drafts.
+
+Distinguish:
+- Domain invariants implemented and tested now.
+- Authentication, database tenancy and atomic transitions not yet implemented.
+- Semantic evidence validation and prompt-injection evaluation still pending.
+- Human approval does not establish document authenticity or certify compliance.
+
+Update README with M1b behavior and limitations. Preserve accurate M1a instructions.
+
+Update the milestone record and prompt outcome note without rewriting historical prompts.
+
+6. Verification and handoff
+
+Run locked dependency sync, Ruff formatting/lint, strict Mypy and the test suite. Build and repeat the isolated wheel import check because the packaged domain code changed.
+
+No new runtime dependencies should be necessary. Justify any dependency change explicitly.
+
+Inspect the diff, stage only this milestone's files, run staged whitespace checking and the redacted staged Gitleaks scan.
+
+Do not commit or push.
+
+Return:
+- Contract and state-transition design, including hashing and immutability choices.
+- Full new/changed domain implementation.
+- New tests and relevant configuration changes.
+- Actual verification commands, results and exit codes.
+- Files changed, staged paths and final Git status.
+- Honest limitations.
+
+Do not reproduce the entire prompts.md. Stop after the review handoff.
+````
+
+**Outcome (pending review; staged for inspection, not committed or pushed):**
+- Branch `feat/evidence-contracts-approval` was created from `d196afc`, with a clean working tree.
+- New in `evidenceguard_domain`:
+  - `_base.DomainModel`: frozen models, tuple-only collections, extra fields forbidden, validating `model_copy`.
+  - `context`: `ActorContext`; roles are reviewer and approver only.
+  - `evidence`: questions, citations, verifications, findings and report content, with the verdict/status/citation rules.
+  - `report`: canonical SHA-256 content hashing, immutable revisions, bound decisions and a status derived from history.
+  - `approval`: pure transitions.
+  - `errors`: explicit domain errors.
+- Added tests for evidence, hashing and approval, plus shared fixtures. Added initial `docs/threat-model.md` and `docs/responsible-ai.md`. Updated the README and the M1 progress record in `docs/plan.md`.
+- No dependency or API changes.
+- **Verified locally** (Windows, Python 3.12.15): the locked sync, Ruff, strict Mypy, pytest, build and isolated wheel import check were run before staging. Results are in the session handoff.
+- **Not verified:** GitHub Actions and Linux.
+
+**Review note (added with Prompt 10):** the external review identified issues in the M1b work: the conflicting-evidence rule, report question coverage, and rejection and retry validation. They are corrected under Prompt 10 below. The M1b work above remains uncommitted.
+
+---
+
+## Prompt 10: M1b review corrections
+
+- **Stage:** Corrections to staged M1b work (no commit, no push)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Correct the identified M1b issues and provide the complete review diff. Do not commit, push or start another milestone.
+
+Inspect current repository instructions, status and staged changes. Expected branch is feat/evidence-contracts-approval, with HEAD d196afc41734bfe14ea55f91632f99d9cb2e0a61 and the M1b changes staged.
+
+Preserve existing work and append this prompt verbatim to prompts.md.
+
+1. Conflicting evidence within one chunk
+
+Replace the requirement for two distinct chunk IDs with a requirement for at least two distinct evidence quotations.
+
+Two different quotations from the same chunk may describe conflicting claims. Exact duplicate quotations from that chunk must not count twice.
+
+Keep tenant consistency and duplicate-citation checks. Do not claim that counting quotations proves a semantic contradiction.
+
+Add tests for:
+- Two different quotations from one chunk accepted as structurally valid conflicting evidence.
+- An exact duplicate citation not satisfying the requirement.
+- A single quotation rejected.
+- Different chunks continuing to work.
+
+Update the relevant documentation.
+
+2. Report question coverage
+
+Every known report question must be accounted for by a finding or explicitly listed as unresolved. Reject silently omitted questions.
+
+A finding with evidence_status=missing must not by itself make a question appear resolved: its referenced questions must also be listed as unresolved.
+
+If a question requires_documentary_support and has only vendor_claim findings, it must remain unresolved. A vendor claim may still be shown as a finding.
+
+Do not impose a blanket ban on a question appearing in both findings and the unresolved list; partial evidence can coexist with an unresolved question.
+
+Add tests for these cases. Keep the schema small.
+
+3. Consistent rejection validation
+
+Require a nonblank comment whenever ApprovalDecision.decision is REJECT, including direct model construction.
+
+Validate rejection inputs before returning an idempotent result. A repeated rejection with an invalid comment must not silently succeed.
+
+Clarify repeated-decision behavior:
+- An identical retry must preserve the original decision and attribution.
+- A different actor or comment must not be described as an identical retry.
+- Choose and document a narrow explicit behavior for such changed requests: reject the conflict or record another validated decision.
+- Do not silently discard changed decision information.
+
+Apply the same distinction to approval retries where relevant, and add behavior-focused tests.
+
+4. Verify and provide review evidence
+
+Run Ruff formatting/lint, strict Mypy and the full tests after these changes.
+
+Rebuild and check the installed wheel because packaged domain behavior changed.
+
+Update prompt outcome notes, stage only authorized M1b changes, and rerun staged whitespace checking and the redacted staged Gitleaks scan.
+
+Return:
+- What changed and why.
+- Actual verification output and exit codes.
+- The complete staged diff excluding prompts.md, including all domain code, test fixtures, tests and documentation.
+- Final Git status.
+
+If the diff is too long for one response, provide it in numbered parts or save it under .local/m1b-review.diff for me to bring to the external reviewer. Do not substitute test summaries for the test source.
+
+Do not commit or push.
+````
+
+**Outcome (pending review; staged for inspection, not committed or pushed):**
+- **Conflicting evidence** now needs at least two distinct quotations. Two different quotations from one chunk are accepted; identical text counts once; exact duplicate citations are still rejected. The docs state that this is structural, not proof of a contradiction.
+- **Question coverage.** `ReportContent` now requires every question to be resolved by a finding or listed as unresolved:
+  - a `missing` finding never resolves a question;
+  - a `vendor_claim` does not resolve a question that requires documentary support;
+  - a question may appear both in a finding and in the unresolved list.
+- **Rejections.** `ApprovalDecision` requires a non-blank comment for every rejection, including direct construction.
+- **Retries.** Decision inputs are validated before any retry is recognised:
+  - an identical retry (same actor and comment) returns the report unchanged, with the original decision and time;
+  - a changed approval, rejection or finalization raises the new `DecisionConflictError`.
+- Five existing tests were adjusted only where their fixtures now violated the coverage rule or relied on the old two-chunk rule. New tests cover each rule. The threat model, responsible-AI notes and README were updated.
+- **Verified locally** (Windows, Python 3.12.15): Ruff, strict Mypy, the full pytest suite, the build and the isolated wheel check were run before staging. Results are in the session handoff.
+- The complete review diff, excluding `prompts.md`, is saved to the gitignored `.local/m1b-review.diff`.
+- **Not verified:** GitHub Actions and Linux.
+
+---
+
+## Prompt 11: M1b coverage fix for missing-evidence findings
+
+- **Stage:** Narrow correction to staged M1b work (no commit, no push)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Fix one remaining M1b report-coverage issue. Do not commit or push.
+
+Inspect the current staged work and repository instructions. Stay on feat/evidence-contracts-approval and preserve existing changes. Append this prompt verbatim to prompts.md.
+
+In ReportContent, the current coverage check accepts a question whenever any finding resolves it. Consequently, a question with both a supported finding and a missing-evidence finding can omit its unresolved entry.
+
+Correct this narrowly:
+- Every question referenced by any finding with evidence_status=MISSING must appear in unresolved_question_ids, even when another finding supports that question.
+- Preserve the existing rules for omitted questions and questions requiring documentary support.
+- Continue allowing supported findings and unresolved entries to coexist.
+- Do not change the schema or approval behavior.
+
+Add regression tests:
+1. Supported and missing findings for the same question, without an unresolved entry: rejected.
+2. The same findings with the unresolved entry: accepted.
+3. A missing finding referencing multiple questions: every referenced question must be listed as unresolved, including any that also has supported evidence.
+
+Update the coverage documentation to state this rule accurately.
+
+Run formatting, lint, strict typing and the full test suite. Rebuild the wheel and repeat the isolated domain import check.
+
+Update the outcome note, re-stage only the authorized files, and run staged whitespace checking and the redacted staged Gitleaks scan.
+
+Return:
+- The incremental diff against the previously supplied M1b review, including implementation, tests and documentation.
+- Actual verification output and exit codes.
+- Final Git status.
+
+Do not resend the entire 2,314-line diff. Do not commit or push.
+````
+
+**Outcome (pending review; staged, not committed or pushed):**
+- `ReportContent` now requires every question named by any `missing` finding to be listed in `unresolved_question_ids`, even when another finding supports it. The rules for omitted questions and questions requiring documentary support are unchanged. Supported findings and unresolved entries can still coexist. No schema or approval changes.
+- Added three regression tests. Two of them were confirmed to fail against the previous implementation and pass with the fix; the third is an acceptance case that passes under both.
+- The coverage wording in `evidence.py`, the threat model, the responsible-AI notes and the README was updated.
+- **Verified locally** (Windows, Python 3.12.15): Ruff, strict Mypy, the full pytest suite, the build and the isolated wheel check were run before staging. Results are in the session handoff.
+- **Not verified:** GitHub Actions and Linux.
+
+**Review note (added with Prompt 12):**
+- The external reviewer accepted M1b for a local commit after reviewing the supplied implementation and the incremental coverage fix.
+- The acceptance relied on Claude's reported Windows verification, including 109 passing tests. The reviewer did not run those commands independently.
+- Linux and GitHub Actions remain unverified.
+
+---
+
+## Prompt 12: Local M1b commit
+
+- **Stage:** Commit of reviewed M1b work (no code changes, no push)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Commit the reviewed M1b implementation locally.
+
+Work only in `D:\Claude\evidenceguard_agentic_rag`. Do not push, merge, amend commits, change branches, modify global configuration, or begin the next milestone.
+
+1. Verify the starting state:
+   - Git root is this project.
+   - Branch is `feat/evidence-contracts-approval`.
+   - HEAD is `d196afc41734bfe14ea55f91632f99d9cb2e0a61`.
+   - Origin is `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`.
+   - Exactly the previously reported 15 M1b files are staged, with nothing unstaged or untracked.
+   If anything differs, stop and report it.
+
+2. Append this prompt verbatim to `prompts.md` using the next sequential prompt number. Add a separate review note recording:
+   - The external reviewer accepted M1b for a local commit after reviewing the supplied implementation and incremental coverage fix.
+   - Acceptance relied on Claude’s reported Windows verification, including 109 passing tests.
+   - The reviewer did not run those commands independently.
+   - Linux and GitHub Actions remain unverified.
+   Preserve all earlier prompts and outcome notes.
+
+3. Make no application, dependency, configuration, or test changes. Stage the prompt-history update alongside the existing reviewed files.
+
+4. Inspect the staged paths and check for secrets and private content without displaying credential values. Run:
+   - `git diff --cached --check`
+   - `gitleaks git --pre-commit --staged --redact --verbose .`
+
+   Stop if either check fails. Application checks need not be repeated if only `prompts.md` changed since the successful verification.
+
+5. Create one local commit with subject:
+   `feat: add evidence contracts and revision-bound approval gate`
+
+6. Run the full-history secret scan:
+   `gitleaks git --redact --verbose .`
+
+7. Report the commit SHA, branch, committed paths, check results, and final Git status. State explicitly that nothing was pushed. If a post-commit check fails, report it without amending or rewriting history.
+````
+
+**Outcome (pending review):**
+- Only `prompts.md` changed: this prompt and the review note above. No application, dependency, configuration or test changes, so the application checks were not rerun.
+- `git diff --cached --check` and the Gitleaks staged scan were run before committing.
+- One local commit was created on `feat/evidence-contracts-approval`. The SHA and post-commit history scan are in the session handoff.
+- Not pushed. Linux and GitHub Actions remain unverified.

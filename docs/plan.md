@@ -502,6 +502,16 @@ Each question entry contains:
 - Git and the GitHub repository are already set up; nothing to do there.
 
 **M1 – Foundations**
+
+*Progress record:*
+- **M1a:** packaging, minimal API, CI configuration. Committed locally as `d196afc`; CI has not run on GitHub.
+- **M1b:** evidence contracts and pure report-approval transitions (`evidenceguard_domain.evidence`, `.report`, `.approval`), plus initial threat-model and responsible-AI drafts. Under review.
+- **Pending:** observability (logging, redaction), request IDs, problem+json errors and ADR-0002.
+- Decisions made during M1b:
+  - Roles are only `reviewer` and `approver`; `admin` arrives with authentication in M2, and gets no approval bypass.
+  - Report transitions live in `evidenceguard_domain.approval` rather than a single `state` module.
+  - Revision and job state machines arrive with their milestones (M3).
+
 - `pyproject.toml`, `uv.lock`, `.python-version`, and `.env.example` (only the settings M1 introduces).
 - Domain contracts and state machines, including `evidence_status`, `authenticity` and the revision states.
 - Observability: logging and redaction.
