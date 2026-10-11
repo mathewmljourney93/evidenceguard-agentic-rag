@@ -1498,3 +1498,186 @@ Nothing should be pushed or merged.
 - `git diff --cached --check` and the Gitleaks staged scan were run before committing.
 - One local commit was created on `feat/api-observability`. The SHA and post-commit history scan are in the session handoff.
 - Not pushed. Linux and GitHub Actions remain unverified.
+
+---
+
+## Prompt 16: ADR-0003, plain-Python workflow
+
+- **Stage:** Documentation, remaining M1 architecture record (staged for review, no commit)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Implement the remaining M1 documentation task: ADR-0003 for the plain-Python workflow.
+
+Work only in `D:\Claude\evidenceguard_agentic_rag`. Read `CLAUDE.md`, `docs/plan.md`, existing ADRs and README first.
+
+Do not commit, push, merge, modify global configuration, install tools, or implement later milestones.
+
+Verify the starting state:
+- Branch: `feat/api-observability`
+- HEAD: `32b1cc630ddef1296f5d8a59eedac0197dbf5bc5`
+- Origin: `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`
+- Clean working tree.
+
+Stop and report any difference. Create `docs/plain-python-workflow` from this HEAD.
+
+1. Add `docs/decisions/0003-plain-python-workflow.md`.
+
+Document the workflow already approved in the plan, without introducing a new architecture:
+- Plain Python orchestration with explicit, bounded transitions.
+- Deterministic planning and report rendering.
+- Model-driven verification and risk analysis with structured contracts.
+- PostgreSQL-backed durable jobs and persistent workflow state when those milestones arrive.
+- Retry limits, idempotency, failure handling and human approval bound to the exact report revision and content hash.
+- Why a dedicated agent framework is unnecessary for the initial scope.
+- Alternatives considered, tradeoffs, and concrete conditions that would justify reconsidering the decision.
+
+Clearly distinguish what is implemented today from planned orchestration and persistence. Do not invent guarantees about crash recovery, concurrency, provenance or evaluation.
+
+2. Update README and docs/plan.md narrowly:
+- Link ADR-0003.
+- Record that the remaining M1 architecture documentation is under review.
+- Keep Linux and GitHub Actions explicitly unverified.
+- Do not declare M1 acceptance complete while its CI requirement remains unmet.
+
+3. Append this entire prompt verbatim to prompts.md using the next sequential number, with a separate truthful outcome note. Preserve earlier entries.
+
+4. Verify the documentation links and consistency with the approved plan and current implementation. Inspect the staged content for secrets and private material without displaying credential values. Run:
+- `git diff --cached --check`
+- `gitleaks git --pre-commit --staged --redact --verbose .`
+
+Application tests and package builds need not be rerun for documentation-only changes.
+
+Stage only the intended documentation files. Leave everything uncommitted.
+
+In your final response, include the complete staged diff excluding prompts.md directly inside fenced diff blocks. Never truncate or replace it with a summary. If necessary, split it into numbered parts at file boundaries and provide every part.
+
+Report verification results, staged paths and final Git status separately. Summarize prompt-history additions. State explicitly that nothing was committed or pushed.
+````
+
+**Outcome (pending review; staged, not committed or pushed):**
+- Branch `docs/plain-python-workflow` was created from `32b1cc6`, with a clean working tree.
+- Added `docs/decisions/0003-plain-python-workflow.md`. It records plan decisions D4–D7 and D9 and corrections B and E without new architecture, and separates what is implemented (M1b contracts and pure approval transitions, M1c observability) from what is planned (stages, PostgreSQL jobs, fencing, snapshots, provider calls). It makes no crash-recovery, concurrency, provenance or evaluation claims.
+- `docs/plan.md` and `README.md` now link ADR-0003, mark it as under review, and state that M1 acceptance is incomplete because CI has not run. Linux and GitHub Actions remain unverified. The plan's M1c entry now records its local commit `32b1cc6`.
+- **Consistency note:** the plan names the Verifier's field `assessment`, while the implemented contract uses `verdict`. The ADR uses `verdict`; the plan text was not changed.
+- Documentation only, so the application tests and build were not rerun. The relative-link check, the staged whitespace check and the staged Gitleaks scan were run; results are in the session handoff.
+
+**Review note (added with Prompt 17):** the external reviewer reviewed the staged ADR-0003 diff and requested two documentation corrections:
+- use `verdict` in the plan where it describes the implemented Verifier output;
+- correct the ADR's framework rationale, which mischaracterised graph frameworks.
+
+The ADR remains under review and M1 acceptance remains pending.
+
+---
+
+## Prompt 17: ADR-0003 documentation corrections
+
+- **Stage:** Corrections to staged documentation (no commit, no push)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Make two narrow documentation corrections to the staged ADR-0003 work.
+
+Work only in `D:\Claude\evidenceguard_agentic_rag`, on `docs/plain-python-workflow`, with HEAD `32b1cc630ddef1296f5d8a59eedac0197dbf5bc5`.
+
+Preserve the existing staged documentation. Do not commit, push, change branches, change application code, or implement later milestones.
+
+1. Reconcile `assessment` versus `verdict`.
+- Where docs/plan.md describes the implemented Verification output field, use `verdict`, matching the domain contract.
+- Do not replace unrelated uses of “assessment”.
+- Record this naming clarification without changing the contract or architecture.
+
+2. Correct the framework rationale in ADR-0003.
+- Remove the claim that a graph runtime’s main feature is model-driven routing.
+- Acknowledge that graph frameworks can support fixed workflows, persistence and human intervention.
+- Explain the project-specific choice: the initial bounded workflow can be expressed directly in Python, with explicit PostgreSQL state and fewer dependencies.
+- Retain the tradeoff that we must implement and test job recovery, stage resumption and fencing ourselves.
+- Describe explicit storage as our chosen approach; do not claim framework checkpoint storage is inherently opaque or must duplicate our state.
+- Preserve the existing reconsideration criteria and distinction between implemented and planned behaviour.
+
+Leave the ADR under review and M1 acceptance pending. Linux and GitHub Actions remain unverified.
+
+Append this prompt verbatim to prompts.md using the next sequential number. Add a separate truthful review and outcome note. Preserve earlier history.
+
+Check documentation links and consistency. Stage only intended documentation changes, then run:
+- `git diff --cached --check`
+- `gitleaks git --pre-commit --staged --redact --verbose .`
+
+No application tests or build are needed for documentation-only changes.
+
+Include the complete incremental diff against the previously reviewed staged version, excluding prompts.md, directly in fenced diff blocks. Do not truncate or summarize it; split into numbered parts at file boundaries if necessary.
+
+Report checks, staged paths and final Git status separately. Leave everything staged and uncommitted. Nothing should be pushed.
+````
+
+**Outcome (pending review; staged, not committed or pushed):**
+- **`docs/plan.md`:** every reference to the Verifier's output field now says `verdict`, matching the implemented `Verification` contract. That covers the field definition, the status-derivation table, the model-judgment row and the evidence endpoint description. A naming-clarification note was added to the M1 progress record. The contract and architecture are unchanged.
+- **ADR-0003:** the framework rationale was rewritten. It now:
+  - acknowledges that graph frameworks support fixed workflows, persistence and human intervention;
+  - presents plain Python with explicit PostgreSQL state and fewer dependencies as a project-specific choice;
+  - keeps the tradeoff that job recovery, stage resumption and fencing must be built and tested in-house.
+
+  The claims that model-driven routing is a graph runtime's main feature and that framework checkpoints are opaque duplicates were removed, including from the alternatives table. The status, the implemented-versus-planned table and the reconsideration criteria are unchanged.
+- The ADR stays under review and M1 acceptance stays pending. Linux and GitHub Actions remain unverified.
+- Documentation only, so no tests or build were run. The link check, the staged whitespace check and the staged Gitleaks scan were run; results are in the session handoff.
+
+**Review note (added with Prompt 18):** the external reviewer accepted the original ADR-0003 documentation and both incremental corrections for a local commit. The acceptance was based on inspecting the supplied diffs and on Claude's reported documentation checks; the reviewer did not run those checks independently. M1 acceptance remains pending because Linux and GitHub Actions are unverified.
+
+---
+
+## Prompt 18: Local ADR-0003 commit
+
+- **Stage:** Status updates and commit of reviewed documentation (no application changes, no push)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Commit the reviewed ADR-0003 documentation locally.
+
+Work only in `D:\Claude\evidenceguard_agentic_rag`. Do not push, merge, amend, change branches, modify global configuration, or begin another milestone.
+
+Verify:
+- Branch: `docs/plain-python-workflow`
+- HEAD: `32b1cc630ddef1296f5d8a59eedac0197dbf5bc5`
+- Origin: `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`
+- Exactly these four files are staged, with nothing unstaged or untracked:
+  - README.md
+  - docs/decisions/0003-plain-python-workflow.md
+  - docs/plan.md
+  - prompts.md
+
+Stop and report any difference.
+
+The external reviewer has accepted the original documentation and both incremental corrections for a local commit.
+
+Make these narrow status updates:
+- Mark ADR-0003 as accepted.
+- Update its README and plan references from “under review” to accepted.
+- Keep M1 acceptance explicitly pending because Linux and GitHub Actions remain unverified.
+- Do not change architecture, application code or other milestone requirements.
+
+Append this entire prompt verbatim to prompts.md using the next sequential number. Add a separate review note recording acceptance based on inspection of the supplied diffs and your reported documentation checks. Preserve earlier history.
+
+Stage the documentation updates. Check relative links and inspect staged content for secrets and private material without displaying credential values.
+
+Run:
+- `git diff --cached --check`
+- `gitleaks git --pre-commit --staged --redact --verbose .`
+
+If checks pass, create one local commit:
+`docs: record plain Python workflow architecture`
+
+Then run:
+`gitleaks git --redact --verbose .`
+
+Report the commit SHA, committed paths, checks and final Git status. Include the complete incremental documentation diff introduced in this step, excluding prompts.md, directly in fenced diff blocks. Never truncate it; split into numbered parts if necessary.
+
+Application tests and builds are unnecessary for these documentation-only changes. If a post-commit check fails, report it without rewriting history.
+
+State explicitly that nothing was pushed or merged.
+````
+
+**Outcome (pending review):**
+- ADR-0003 is marked accepted, and its README and plan references now say accepted. M1 acceptance remains explicitly pending because Linux and GitHub Actions are unverified. No architecture, application or milestone-requirement changes.
+- Documentation only, so no tests or build were run. The relative-link check, the staged whitespace check and the staged Gitleaks scan were run before committing.
+- One local commit was created on `docs/plain-python-workflow`. The SHA and post-commit history scan are in the session handoff.
+- Not pushed or merged.

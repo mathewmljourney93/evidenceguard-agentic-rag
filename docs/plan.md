@@ -178,7 +178,7 @@ Every row carries `tenant_id` unless marked global. Cross-table references use c
 - **EvidenceQuestion**: question_id, text, search_queries, `requires_documentary_support`, stage ∈ {pending, retrieved, verified, analyzed, failed}.
 - **RetrievedPassage**: chunk_id, rank, scores, provenance snapshot.
 - **Verification** (correction C):
-  - `assessment` ∈ {supported, contradicted, insufficient_evidence}, chosen by the model.
+  - `verdict` ∈ {supported, contradicted, insufficient_evidence}, chosen by the model.
   - claims: a list of `{text, citations: [{chunk_id, quote}]}`.
   - `evidence_status`, derived deterministically (see below).
   - `provenance_check` ∈ {passed, citation_rejected, invalid_output}.
@@ -205,14 +205,14 @@ Every row carries `tenant_id` unless marked global. Cross-table references use c
 
 These checks prove **provenance only**: the quoted text exists in an authorized document. They do not prove the passage entails the claim, and they do not prove the document is authentic. Whether a passage supports a claim is the model's judgment, measured by the evaluation in §7.
 
-**Evidence status.** `evidence_status` has four values, derived from the model's `assessment` and the cited documents' `source_type`:
+**Evidence status.** `evidence_status` has four values, derived from the model's `verdict` and the cited documents' `source_type`:
 
 | evidence_status | Rule | Report wording |
 |---|---|---|
-| `vendor_claim` | assessment `supported`, and every supporting citation comes from a `vendor_statement` | "The vendor states …" |
-| `documentary_support` | assessment `supported`, and at least one supporting citation comes from a `contract` or `third_party_report` | "Documented in … (authenticity not established)" |
-| `conflicting` | assessment `contradicted`: current evidence in the snapshot disagrees | "Conflicting evidence: …" |
-| `missing` | assessment `insufficient_evidence`, or the question is unresolved (refusal, invalid output, exhausted retries) | "No sufficient evidence found" / "Unresolved: …" |
+| `vendor_claim` | verdict `supported`, and every supporting citation comes from a `vendor_statement` | "The vendor states …" |
+| `documentary_support` | verdict `supported`, and at least one supporting citation comes from a `contract` or `third_party_report` | "Documented in … (authenticity not established)" |
+| `conflicting` | verdict `contradicted`: current evidence in the snapshot disagrees | "Conflicting evidence: …" |
+| `missing` | verdict `insufficient_evidence`, or the question is unresolved (refusal, invalid output, exhausted retries) | "No sufficient evidence found" / "Unresolved: …" |
 
 **Authenticity** is a separate field, independent of status. In v1 it is always `not_established`, and every cited document shows it. A `third_party_report` is never called independently verified.
 
@@ -267,7 +267,7 @@ Each lifecycle is a pure function in `evidenceguard_domain.state`, tested exhaus
 | Authorization, validation, routing, state transitions, jobs | Deterministic code |
 | Planner | Deterministic expansion of the template (D4) |
 | Retriever | Deterministic hybrid search over the review snapshot |
-| **Evidence Verifier** | **Claude.** Returns an assessment and claims with citations, which then pass the provenance checks and the status derivation. Invalid output gets one repair attempt; after that the question is unresolved. |
+| **Evidence Verifier** | **Claude.** Returns a verdict and claims with citations, which then pass the provenance checks and the status derivation. Invalid output gets one repair attempt; after that the question is unresolved. |
 | **Risk Analyst** | **Claude.** Returns findings (severity, statement, follow-up questions) that may cite only citations the Verifier already validated. |
 | Report Composer | Deterministic rendering, including unresolved questions and authenticity labels (D4) |
 | Human Approval Gate | Deterministic |
@@ -338,7 +338,7 @@ All endpoints except `/healthz` and `/readyz` are under `/v1` and need `Authoriz
 | GET `/v1/review-templates` | List templates | → `list[TemplateSummary]` | reviewer+ | — |
 | POST `/v1/reviews` | Start a review; snapshots eligible revisions (`Idempotency-Key`) | `ReviewCreate` → 202 `ReviewAccepted{review_id, job_id, revision_ids, excluded_pending}` | reviewer+ | 409 if the vendor has no active revisions; a repeated key returns the original review |
 | GET `/v1/reviews/{id}` | Progress and snapshot | → `ReviewDetail` | reviewer+ | 404 |
-| GET `/v1/reviews/{id}/evidence` | Passages, assessments, claims, provenance checks | → `ReviewEvidence` | reviewer+ | 404 |
+| GET `/v1/reviews/{id}/evidence` | Passages, verdicts, claims, provenance checks | → `ReviewEvidence` | reviewer+ | 404 |
 | GET `/v1/reviews/{id}/trace` | Spans and provider-call metadata | → `TraceView` | reviewer+ | 404 |
 | GET `/v1/reports/{id}` | Current revision (`ETag: "r{n}-{sha}"`) | → `ReportView` | reviewer+ | 404 |
 | POST `/v1/reports/{id}/revisions` | Reviewer edits (accept or dismiss findings, notes) | `ReportRevise` with `If-Match` → 201 | reviewer+ | 409 stale or finalized; 422 |
@@ -506,8 +506,11 @@ Each question entry contains:
 *Progress record:*
 - **M1a:** packaging, minimal API, CI configuration. Committed locally as `d196afc`; CI has not run on GitHub.
 - **M1b:** evidence contracts and pure report-approval transitions (`evidenceguard_domain.evidence`, `.report`, `.approval`), plus initial threat-model and responsible-AI drafts. Committed locally as `da108e5`.
-- **M1c:** request IDs, JSON request logging and problem+json errors (`evidenceguard_observability`, API middleware and handlers), ADR-0002. Under review.
-- **Pending:** ADR-0003 (plain-Python workflow, renumbered from ADR-0002 because ADR-0002 now records the M1c observability decisions).
+- **M1c:** request IDs, JSON request logging and problem+json errors (`evidenceguard_observability`, API middleware and handlers), ADR-0002. Committed locally as `32b1cc6`.
+- **M1 architecture documentation:** [ADR-0003](decisions/0003-plain-python-workflow.md) (plain-Python workflow) is accepted. It was renumbered from ADR-0002, which now records the M1c observability decisions.
+- **M1 acceptance is not complete:**
+  - The checks pass locally on Windows only. The CI requirement is unmet: neither Linux nor GitHub Actions has run.
+  - The revision activation and supersession state-machine tests arrive with M3 (see below).
 - M1c notes:
   - The plan's "logs redact secrets" is met by an allowlist formatter rather than pattern-based redaction.
   - No `.env.example` yet, because M1c adds no settings.
@@ -515,6 +518,7 @@ Each question entry contains:
   - Roles are only `reviewer` and `approver`; `admin` arrives with authentication in M2, and gets no approval bypass.
   - Report transitions live in `evidenceguard_domain.approval` rather than a single `state` module.
   - Revision and job state machines arrive with their milestones (M3).
+- Naming clarification: the Verifier's output field is `verdict`, as in the implemented `Verification` contract. Earlier plan text called it `assessment`. Only the name changed, not the contract or architecture.
 
 - `pyproject.toml`, `uv.lock`, `.python-version`, and `.env.example` (only the settings M1 introduces).
 - Domain contracts and state machines, including `evidence_status`, `authenticity` and the revision states.
