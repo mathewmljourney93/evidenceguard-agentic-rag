@@ -59,4 +59,4 @@ The full design and limits are in [ADR-0002](decisions/0002-request-ids-logging-
 - **Prompt injection.** Uploaded documents are untrusted and may contain instructions aimed at the model. The planned mitigations (delimited evidence, no model tools, validated structured output, human approval) reduce but cannot eliminate the risk. Paired clean/injected evaluation is planned for M7; nothing is measured yet.
 - **Semantic support.** No component yet checks whether a cited passage actually supports a claim. That needs model judgment plus human review.
 - **Document authenticity.** Not established anywhere in v1 (see [responsible-ai.md](responsible-ai.md)).
-- **Secrets in the repository.** Mitigated by Gitleaks locally and in CI. The CI workflows have not yet run on GitHub.
+- **Secrets in the repository.** Mitigated by Gitleaks locally and in CI. The full-history scan [passed](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996460) for the published baseline `6d64fb3`. Pattern scanners cannot detect every secret.

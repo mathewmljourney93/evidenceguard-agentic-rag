@@ -43,11 +43,12 @@ Labels: **[FACT]** observed or verified; **[DECISION]** accepted in review; **[R
 
 | Item | Status |
 |---|---|
-| Repository | [FACT] Initialized by cloning the GitHub repository `mathewmljourney93/evidenceguard-agentic-rag`. `origin` is correct. Branch `chore/repository-foundation` holds the foundation files. There are no commits yet. |
-| Python | [FACT] 3.13 and 3.11 are installed. **3.12 is not.** |
-| uv | [FACT] **Not installed.** |
-| Docker | [FACT] **Not installed.** No WSL distribution is listed. |
-| PostgreSQL / gh CLI | [FACT] Not installed. |
+| Repository | [FACT] Published to GitHub. `main` is at `6d64fb3`. |
+| Python | [FACT] 3.12 (uv-managed) for the project; 3.13 and 3.11 are also installed. |
+| uv | [FACT] 0.13.0. |
+| Docker | [FACT] **Not installed** (no Docker, Docker Compose or Podman). No WSL distribution is listed. |
+| PostgreSQL | [FACT] A local PostgreSQL **16** Windows service is installed and running. **pgvector is not installed** in it, and its tools are not on PATH. The plan's CI target remains `pgvector/pgvector:0.8.7-pg17`. Rechecked 2026-10-11 for M2. |
+| gh CLI | [FACT] Not installed. |
 | Gitleaks | [FACT] 8.30.1 installed (by the user, via winget). |
 | Hardware | [FACT] A modest Windows 11 laptop: 2-core i3, 7.8 GB RAM, integrated GPU, and limited free space on the system drive (about 9 GB). A second drive has ample space. |
 | API keys | [FACT] Anthropic and Voyage keys are not configured. Only their presence was checked. |
@@ -76,7 +77,7 @@ Labels: **[FACT]** observed or verified; **[DECISION]** accepted in review; **[R
   - HNSW filters after the index scan, so tenant-filtered queries need `hnsw.iterative_scan`.
 
 **Still to verify during implementation:**
-- Hatchling editable installs for the multi-root layout (an M1 acceptance check).
+- ~~Hatchling editable installs for the multi-root layout~~: verified in M1. The editable install imports every package, and CI installs and imports the built wheel.
 - Docker Desktop disk usage on Windows 11 Home.
 - Model prices on the date of each live evaluation run.
 
@@ -504,13 +505,19 @@ Each question entry contains:
 **M1 – Foundations**
 
 *Progress record:*
-- **M1a:** packaging, minimal API, CI configuration. Committed locally as `d196afc`; CI has not run on GitHub.
+- **M1a:** packaging, minimal API, CI configuration. Committed locally as `d196afc`. CI first ran on the published baseline (below).
 - **M1b:** evidence contracts and pure report-approval transitions (`evidenceguard_domain.evidence`, `.report`, `.approval`), plus initial threat-model and responsible-AI drafts. Committed locally as `da108e5`.
 - **M1c:** request IDs, JSON request logging and problem+json errors (`evidenceguard_observability`, API middleware and handlers), ADR-0002. Committed locally as `32b1cc6`.
 - **M1 architecture documentation:** [ADR-0003](decisions/0003-plain-python-workflow.md) (plain-Python workflow) is accepted. It was renumbered from ADR-0002, which now records the M1c observability decisions.
-- **M1 acceptance is not complete:**
-  - The checks pass locally on Windows only. The CI requirement is unmet: neither Linux nor GitHub Actions has run.
-  - The revision activation and supersession state-machine tests arrive with M3 (see below).
+- **M1 accepted, with its documented scope.** The published baseline `6d64fb3` (`6d64fb362c25c28908e38b5d0a06f8c393bf6096`) passed:
+  - [CI](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996464): `verify (ubuntu-24.04, Python 3.12)` and `verify (windows-2025, Python 3.12)`, each running the locked sync, format, lint, strict Mypy, pytest, build and clean wheel install;
+  - the [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996460).
+
+  The external reviewer independently checked these run and job results and the remote `main`. They verify that commit only; later changes need their own runs.
+- **Not part of M1, despite the original checklist:**
+  - Revision activation and supersession state-machine tests are deferred to M3, with those state machines; they do not exist yet.
+  - No `.env.example`, because M1 introduced no settings.
+- SHAs in this progress record name the commits as they were made. Before publication their author email was rewritten; see the migration note in [prompts.md](../prompts.md) for the published SHAs.
 - M1c notes:
   - The plan's "logs redact secrets" is met by an allowlist formatter rather than pattern-based redaction.
   - No `.env.example` yet, because M1c adds no settings.

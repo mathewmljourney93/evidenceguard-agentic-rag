@@ -10,7 +10,7 @@ EvidenceGuard is a planned vendor-risk review copilot. It is intended to:
 
 It is evidence-based decision support, not legal advice or compliance certification.
 
-## Status: milestone M1c (pre-alpha)
+## Status: M1 foundation accepted (pre-alpha)
 
 **What works now:**
 - One installable Python 3.12 package (`evidenceguard`), managed with uv, with a committed lockfile (M1a).
@@ -37,7 +37,9 @@ It is evidence-based decision support, not legal advice or compliance certificat
   - error responses never echo submitted values or exception text. Specific error messages come only from a reviewed catalogue.
 
   See [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md), including what these guarantees do not cover.
-- Tests, Ruff and strict Mypy. A CI workflow is configured for Ubuntu and Windows but **has not yet run in GitHub Actions**.
+- Tests, Ruff and strict Mypy, run in GitHub Actions on Ubuntu and Windows.
+
+**Verified baseline:** commit `6d64fb3` (`6d64fb362c25c28908e38b5d0a06f8c393bf6096`) passed [CI on Ubuntu and Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996464) and the [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996460). These results cover that commit only; every later change needs its own passing runs.
 
 **Limits:**
 - The M1b domain rules are in-memory only. There is no authentication, database, tenancy enforcement in storage, or protection against concurrent requests yet.
@@ -46,7 +48,7 @@ It is evidence-based decision support, not legal advice or compliance certificat
 - Human approval in EvidenceGuard does not establish document authenticity or certify compliance. See [docs/responsible-ai.md](docs/responsible-ai.md) and [docs/threat-model.md](docs/threat-model.md).
 
 **Still planned** (see [docs/plan.md](docs/plan.md)):
-- M1 acceptance, which still needs CI to run on GitHub Actions; Linux is unverified. The remaining M1 architecture record, [ADR-0003](docs/decisions/0003-plain-python-workflow.md) (plain-Python workflow), is accepted.
+- Revision activation and supersession tests, deferred from M1 to M3, where those state machines are built.
 - Everything after M1: authentication, tenancy, persistence, ingestion, retrieval, model providers, the review workflow, API endpoints for the approval gate, and evaluation.
 
 No retrieval, agent workflow, evaluation results, security guarantees or benchmarks are claimed. Any future results will be published with their committed inputs, configuration and the command that reproduces them.
@@ -91,7 +93,7 @@ The request ID is for correlating logs only. It is not authentication and says n
 
 ## Secret scanning
 
-A GitHub Actions workflow ([secret-scan.yml](.github/workflows/secret-scan.yml)) is configured to run [Gitleaks](https://github.com/gitleaks/gitleaks) v8.30.1 over the full Git history on every push and pull request. **It has not yet run in GitHub Actions.**
+A GitHub Actions workflow ([secret-scan.yml](.github/workflows/secret-scan.yml)) runs [Gitleaks](https://github.com/gitleaks/gitleaks) v8.30.1 over the full Git history on every push and pull request. It [passed](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996460) for the published baseline `6d64fb3`.
 
 A CI scan runs only after code has reached GitHub, so it cannot stop a secret from being published. Scan locally before every commit and push.
 

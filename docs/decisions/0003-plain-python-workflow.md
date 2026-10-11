@@ -71,7 +71,7 @@ Approval, rejection and finalization are bound to the exact report revision numb
 | Model provider interface, Claude calls, timeouts, retries, budgets | **Planned** (M5) |
 | Database atomicity and concurrency control for approval transitions | **Planned** (with persistence). The pure functions give none. |
 
-The status rows describe local verification on Windows. Linux and GitHub Actions have not run. Nothing here claims crash recovery, concurrency safety, provenance checking or evaluation results; those claims will need their own tests and committed evidence when the planned parts exist.
+The implemented rows were verified locally on Windows and, for the published baseline `6d64fb3`, by CI on Ubuntu and Windows. Nothing here claims crash recovery, concurrency safety, provenance checking or evaluation results; those claims will need their own tests and committed evidence when the planned parts exist.
 
 ## Why not a dedicated agent framework
 

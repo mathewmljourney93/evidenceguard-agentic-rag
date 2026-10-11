@@ -1939,3 +1939,175 @@ Do not make another commit or push to record the publication outcome in this tas
 - The external reviewer explicitly authorized publication after reviewing the history and the verified commit email migration. All six reachable commits use the noreply address for both author and committer.
 - The plan is to create local `main` at this entry's commit and push only `main` to `origin` with one normal push. No other branches, tags, `.local/` files or original-history objects are to be published.
 - Publication has **not** happened when this entry is written. As instructed, its result (remote SHA match and GitHub Actions status) will be recorded in the next prompt-history update, not in this commit.
+
+**Publication outcome (added with Prompt 23):**
+- Local `main` was created at `6d64fb362c25c28908e38b5d0a06f8c393bf6096` and published with one normal `git push -u origin main`. No authentication or email-protection rejection occurred.
+- Only `main` was pushed: no other branches, tags, `.local/` files or original-history objects. `origin/main` was confirmed to match the local HEAD exactly.
+- GitHub Actions for that SHA succeeded on the first attempt:
+  - CI, Ubuntu and Windows jobs: https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996464
+  - Full-history secret scan: https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996460
+- Nothing was merged or deployed.
+
+---
+
+## Prompt 22: Report the GitHub Actions results
+
+- **Stage:** Read-only results report (no file changes permitted, so recorded here at the next documentation update)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Report the final GitHub Actions results for the commit just pushed: Ubuntu CI, Windows CI and secret-scan. Include the commit SHA and run links. For failures, include the failing step and relevant error output. Do not change files, commit or push anything.
+````
+
+**Outcome:** Claude re-queried the public GitHub Actions API, read-only, for `6d64fb3`:
+- `verify (ubuntu-24.04, Python 3.12)`: success, all 13 steps passed.
+- `verify (windows-2025, Python 3.12)`: success, all 13 steps passed.
+- `Gitleaks (full history)`: success, all 6 steps passed.
+
+There were no failures to report. No files were changed.
+
+---
+
+## Prompt 23: Record M1 results and plan M2
+
+- **Stage:** Documentation update and M2 planning (staged for review; no commit, no push)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Record the verified M1 publication results and prepare a bounded implementation plan for M2.
+
+Work only in `D:\Claude\evidenceguard_agentic_rag`. Read CLAUDE.md, docs/plan.md, the ADRs, README, packaging configuration and workflows.
+
+Do not commit, push, install tools, change global configuration, start services, or implement M2 yet.
+
+Verify:
+- Branch: main
+- Local HEAD and origin/main: `6d64fb362c25c28908e38b5d0a06f8c393bf6096`
+- Expected origin and clean working tree.
+
+Stop on unexpected differences. Create `docs/m1-results-m2-plan` from this HEAD.
+
+1. Record the verified publication results:
+- Ubuntu and Windows CI succeeded:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996464
+- Full-history secret scanning succeeded:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996460
+- All results apply to the exact SHA above.
+- The external reviewer independently checked the GitHub run and job results and remote main.
+
+Update README and docs/plan.md narrowly. Remove stale statements that Linux and GitHub Actions have never run. Distinguish verification of this baseline from verification of future changes.
+
+Record the implemented M1 foundation as accepted with its documented scope. Keep revision activation and supersession testing explicitly deferred to M3; do not claim those tests exist or that every original checklist item has been implemented.
+
+2. Prepare M2 implementation slices based on the approved plan:
+- Persistence package, database configuration and migrations.
+- API-key authentication, tenant context and administrative CLI.
+- Vendor endpoints and PostgreSQL integration tests.
+
+For each slice, propose exact scope, expected files, dependencies, meaningful tests and acceptance criteria. Keep later job, ingestion, retrieval and approval-persistence work in their assigned milestones. Identify any unresolved decision that materially affects implementation.
+
+3. Check database readiness using read-only commands:
+- Check whether Docker, Docker Compose and PostgreSQL client tools are available on PATH.
+- If Docker exists, check whether its daemon is accessible.
+- Do not search unrelated folders, inspect other projects, read credentials, connect to an unspecified database or enumerate personal environment variables.
+- Do not install or start anything.
+
+Report whether we can run the planned PostgreSQL/pgvector integration tests locally. If not, explain the specific missing prerequisite and practical options without silently changing the architecture.
+
+4. Append this entire prompt verbatim to prompts.md using the next sequential number. Record the publication outcome and this task’s results truthfully. Preserve earlier history.
+
+Stage only intended documentation changes. Check links, staged whitespace and secrets. No application tests or build are needed for documentation-only changes.
+
+Include the complete staged diff excluding prompts.md directly in fenced diff blocks. Do not truncate; split into numbered parts at file boundaries if necessary.
+
+Report the M2 slices, database-readiness findings, verification results and final Git status separately. Leave everything staged and uncommitted. Nothing should be pushed.
+````
+
+**Outcome (pending review; staged, not committed or pushed):**
+- **Starting state verified:** branch `main`, local HEAD and `origin/main` both `6d64fb3`, the expected origin, a clean tree. Branch `docs/m1-results-m2-plan` was created from it.
+- **Documentation updated:**
+  - The verified publication results were recorded in the README and `docs/plan.md`, scoped to that exact commit; later changes need their own runs.
+  - Stale "CI has not run" statements were removed from the README, the plan, ADR-0003 and the threat model.
+  - M1 is recorded as accepted with its documented scope. Revision activation and supersession tests remain explicitly deferred to M3 and are not claimed to exist.
+  - The plan's environment table was refreshed with current facts.
+- **Database readiness** (read-only; nothing installed, started or connected to):
+  - Docker, Docker Compose and Podman are not installed, and no WSL distribution exists.
+  - A PostgreSQL 16 Windows service is installed and running, with port 5432 listening. Its client tools are not on PATH, and the pgvector extension is not installed in it.
+  - The planned pgvector integration tests therefore cannot run locally as specified. Options are in the session handoff; the architecture was not changed.
+- **M2 plan:** three proposed slices and the unresolved decisions are in the session handoff. They are not yet written into `docs/plan.md`, pending review.
+- Documentation only, so no tests or build were run. The link check, the staged whitespace check and the staged secret scan were run; results are in the session handoff.
+
+**Review note (added with Prompt 24):** the external reviewer accepted the Prompt 23 documentation diff without further redesign. Its decisions on the M2 questions are recorded under Prompt 24 below.
+
+---
+
+## Prompt 24: Commit M1 results documentation; record M2 decisions
+
+- **Stage:** Commit of reviewed documentation (no application changes, no push)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Commit the reviewed M1 results documentation locally.
+
+Work only in `D:\Claude\evidenceguard_agentic_rag`. Do not push, merge, change branches, modify global configuration, install tools, or implement M2.
+
+Verify:
+- Branch: `docs/m1-results-m2-plan`
+- HEAD: `6d64fb362c25c28908e38b5d0a06f8c393bf6096`
+- Expected origin.
+- Exactly these five documentation files are staged, with nothing unstaged or untracked:
+  - README.md
+  - docs/decisions/0003-plain-python-workflow.md
+  - docs/plan.md
+  - docs/threat-model.md
+  - prompts.md
+
+Stop on unexpected differences.
+
+The external reviewer accepted the supplied documentation diff. Preserve it without further redesign.
+
+Append this entire prompt verbatim to prompts.md using the next sequential number. Record the review acceptance and these decisions for the next implementation prompt:
+- M2 integration tests will run against real PostgreSQL/pgvector in CI; local unit tests remain database-independent. Integration verification stays pending until a reviewed branch is explicitly authorized for publication and its CI passes.
+- Retain the approved admin role in M2, with no approval bypass.
+- Tenants is the root table; composite tenant constraints apply to tenant-scoped tables.
+- Database settings belong in persistence.
+- Unexpected tenant fields in request bodies are rejected; tenant headers cannot override authenticated scope.
+- Use bounded limit/offset vendor pagination.
+- Defer vector-extension creation until a migration actually needs it.
+- Keep the planned Postgres-only Compose configuration, clearly marking local Docker verification unavailable.
+- Implement /readyz with the API database wiring in a later M2 slice.
+
+Preserve earlier prompt history. Make no application changes.
+
+Check documentation links, staged paths and private content without displaying credentials. Run:
+- `git diff --cached --check`
+- `gitleaks git --pre-commit --staged --redact --verbose .`
+
+If checks pass, commit:
+`docs: record verified M1 baseline and M2 preparation`
+
+Then run:
+`gitleaks git --redact --verbose .`
+
+Report the commit SHA, paths, checks and final Git status. No application tests or build are needed for documentation-only changes.
+
+If any file outside prompts.md changes in this step, include its complete incremental diff directly in fenced diff blocks without truncation.
+
+Nothing should be pushed or merged.
+````
+
+**M2 decisions recorded for the next implementation prompt** (made by the external reviewer):
+1. **Integration tests:** they run against real PostgreSQL with pgvector in CI, and local unit tests stay database-independent. Integration verification remains **pending** until a reviewed branch is explicitly authorized for publication and its CI passes.
+2. **Admin role:** the approved `admin` role is kept in M2. It gets **no approval bypass**.
+3. **Tenancy:** `tenants` is the root table. Composite tenant constraints apply to tenant-scoped tables.
+4. **Database settings** belong in the persistence package.
+5. **Tenant input:** unexpected tenant fields in request bodies are rejected, and tenant headers cannot override the authenticated scope.
+6. **Vendor pagination:** bounded limit/offset.
+7. **The vector extension** is created only when a migration actually needs it.
+8. **Compose:** the planned Postgres-only configuration is kept, clearly marked as not verified locally because Docker is unavailable.
+9. **`/readyz`** is implemented with the API database wiring, in a later M2 slice.
+
+**Outcome (pending review):**
+- Only `prompts.md` changed in this step: this prompt, the review note and the recorded decisions. The accepted documentation diff was preserved without redesign, and there were no application changes.
+- The link check, the staged whitespace check and the staged secret scan were run before committing. One local commit was created on `docs/m1-results-m2-plan`; its SHA and the post-commit history scan are in the session handoff.
+- Not pushed or merged.
