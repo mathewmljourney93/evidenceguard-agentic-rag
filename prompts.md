@@ -1681,3 +1681,186 @@ State explicitly that nothing was pushed or merged.
 - Documentation only, so no tests or build were run. The relative-link check, the staged whitespace check and the staged Gitleaks scan were run before committing.
 - One local commit was created on `docs/plain-python-workflow`. The SHA and post-commit history scan are in the session handoff.
 - Not pushed or merged.
+
+---
+
+## Prompt 19: Pre-publication inspection
+
+- **Stage:** Read-only publication readiness check; only this prompt-history entry is staged (no commit, no push)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Prepare the reviewed repository for its first GitHub publication. Do not push yet.
+
+Work only in `D:\Claude\evidenceguard_agentic_rag`. Read CLAUDE.md first. Do not change application code, dependencies, workflows, branches, global configuration or Git history.
+
+Verify:
+- Branch: `docs/plain-python-workflow`
+- HEAD: `48872f41fad88c8eef40402e3be34d42fe864f84`
+- Origin: `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`
+- Clean working tree.
+- History contains the five reviewed commits.
+- `git ls-remote origin` still shows no refs.
+
+Stop and report unexpected differences.
+
+1. Inspect `.github/workflows/ci.yml` and `secret-scan.yml`.
+- Include both complete files in your response.
+- Explain whether a first push to `main` would trigger both workflows.
+- Identify the configured operating systems, checks and workflow permissions.
+- Report any publication blocker without changing the workflows.
+
+2. Inspect the tracked file list and full Git history for secrets and unintended private content.
+- Run `gitleaks git --redact --verbose .`.
+- Check for tracked environment files, credentials, local artifacts, logs, database files and build outputs.
+- Do not display credential values.
+- Distinguish intentionally recorded local paths in verbatim prompts from accidental private content.
+
+3. Inspect local branch refs and whether GitHub CLI is available.
+- Do not install tools or initiate authentication.
+- Do not print tokens or credential configuration.
+- Report whether local `main` exists and its commit, if any.
+
+4. Propose the exact commands to publish the reviewed history as remote `main`, preserving all commits.
+- Account for the actual local branch state.
+- Do not use force push, rebase or amend.
+- Do not execute the publication commands.
+- Note that subsequent work will still be reviewed here before pushing.
+
+5. Append this entire prompt verbatim to prompts.md using the next sequential number, with a truthful outcome note. Preserve earlier history. Stage only this prompt-history update.
+
+Run staged whitespace and redacted secret checks. Leave the update uncommitted.
+
+Report results, the proposed publication commands and final Git status. If any other change becomes necessary, provide its complete proposed diff directly in fenced diff blocks for review.
+
+Nothing should be committed, pushed or merged.
+````
+
+**Outcome (pending review; only this entry staged; nothing committed, pushed or merged):**
+- **State verified:** branch `docs/plain-python-workflow` at `48872f4`, a clean tree, five linear reviewed commits, and an empty remote (no refs).
+- **Branches:** no local `main`. The five local branches point at the five commits. Local Git config still holds a `branch.main` upstream (`origin`, `refs/heads/main`) left over from the original clone.
+- **Tooling and remote:** the GitHub CLI is not installed. An unauthenticated read of GitHub's public metadata shows the repository is **public** and empty.
+- **Workflows:** both `ci.yml` and `secret-scan.yml` trigger on every `push` (no branch filter), `pull_request` and `workflow_dispatch`, with `contents: read` permissions. Neither has run yet.
+- **Secrets and artifacts:** the full-history Gitleaks scan found no leaks. No credential patterns or email addresses appear in any commit's content. No environment, key, log, database, build, cache or `.local/` files were ever tracked: 45 paths, all of them current.
+- **Local paths:** the 16 in `prompts.md` are all inside verbatim prompt text (15 are the project path; 1 is the Claude plan-storage path quoted in Prompt 2). They are intentional records, not accidental content.
+- **For the user to decide before publishing:**
+  - every commit's author and committer address is a personal email, which becomes public on push;
+  - `docs/plan.md` describes the development laptop's hardware in general terms;
+  - nothing was changed for either, and changing the commit email would require rewriting history.
+- Proposed publication commands are in the session handoff; none were run. The staged whitespace check and the staged Gitleaks scan were run on this entry.
+
+---
+
+## Prompt 20: Commit email privacy rewrite
+
+- **Stage:** Authorized metadata-only rewrite of unpublished history, plus one prompt-history commit (no push, no merge)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Replace my personal email in this repository’s unpublished commit history with:
+
+257921624+mathewmljourney93@users.noreply.github.com
+
+I explicitly authorize this metadata-only history rewrite and one local prompt-history commit. Do not push or merge.
+
+Work only in `D:\Claude\evidenceguard_agentic_rag`. Read CLAUDE.md first. Do not modify global Git configuration, install tools, or change application code.
+
+1. Verify the starting state:
+- Branch: `docs/plain-python-workflow`
+- HEAD: `48872f41fad88c8eef40402e3be34d42fe864f84`
+- Origin: `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`
+- Exactly prompts.md is staged from the publication preflight, with nothing unstaged or untracked.
+- Remote still has no refs.
+- Five commits form the reviewed linear history:
+  `52acebd` → `d196afc` → `da108e5` → `32b1cc6` → `48872f4`
+
+Verify the existing local branches and their commit positions. Stop and report unexpected differences.
+
+2. Create a recovery backup inside gitignored `.local/`:
+- A Git bundle containing the original local branches and history.
+- A copy of the staged prompts.md changes.
+- Verify that the bundle is valid.
+- Do not create backup branches or tags that could accidentally be published.
+- The backup contains the old email, so keep it local and never stage or upload it.
+
+3. Set repository-local `user.email` to the noreply address above. Leave user.name and global configuration unchanged.
+
+4. Rewrite only the author and committer email addresses in the five reviewed commits.
+- Preserve each commit’s exact file tree, full message, author and committer names, timestamps and timezone offsets.
+- Preserve the Claude co-author trailers.
+- Preserve the linear parent relationships using the rewritten parent SHAs.
+- Use a controlled Git plumbing method with the tools already available; do not install a history-rewriting utility.
+- Update all five existing local branch tips to their corresponding rewritten commits.
+- Use expected-old-SHA checks when updating refs.
+- Preserve the staged prompts.md changes throughout. Do not use a destructive reset or discard any working-tree content.
+
+5. Verify every old/new commit pair:
+- File-tree IDs are identical.
+- Full commit messages are identical.
+- Names and dates are identical.
+- Both author and committer emails use the supplied noreply address.
+- Parent relationships match the original history.
+- All existing branch tips point to their correct rewritten counterparts.
+
+Do not replace historical SHAs inside prompts.md or docs. They truthfully describe the commits that existed at that time. Add an old-to-new SHA mapping as a separate migration note.
+
+6. Append this entire prompt verbatim to prompts.md using the next sequential number. Preserve the staged preflight entry and all earlier history.
+
+Add a truthful outcome note recording the privacy rewrite, backup location, verification results and SHA mapping. Do not record checks as passed before running them.
+
+Inspect and stage only prompts.md. Run:
+- `git diff --cached --check`
+- `gitleaks git --pre-commit --staged --redact --verbose .`
+- `gitleaks git --redact --verbose .`
+
+Stop on failure. If checks pass, create one local commit:
+`docs: record publication preflight and commit email privacy migration`
+
+Run the full-history redacted secret scan again after this commit.
+
+7. Report:
+- The five old-to-new SHA mappings.
+- The new prompt-history commit SHA.
+- Verification that the original file trees and messages were preserved.
+- Repository-local email configuration.
+- Branch tips, check results and final Git status.
+- Confirmation that the remote is still empty.
+
+Include any changes outside prompts.md as a complete fenced diff. None are expected. Summarize prompt-history additions separately.
+
+Application tests and builds are unnecessary because application content must remain identical.
+
+Do not push, merge, amend further, delete the recovery backup, or begin another milestone. If anything fails, report the state without improvising another history rewrite.
+````
+
+**Outcome (pending review; local only, not pushed or merged):**
+- **Starting state verified:** branch, HEAD `48872f4`, origin, only `prompts.md` staged, an empty remote, five linear commits, the five branch tips at their expected commits, and no tags or stash.
+- **Recovery backup** in the gitignored `.local/backup-email-rewrite/`:
+  - `pre-email-rewrite.bundle`: all five original branches; `git bundle verify` reported it valid with complete history;
+  - `prompts.md.staged` and `prompts.md.staged.diff`: the staged preflight entry;
+  - `original-branch-tips.txt`, plus the rewrite and verification scripts.
+
+  The backup contains the old email. It is not tracked or staged and must not be uploaded.
+- **Repository-local `user.email`** is set to the noreply address. `user.name` and the global configuration were left unchanged.
+- **The rewrite.** A Python script used `git cat-file commit` and `git hash-object -t commit -w`. Only the author and committer email bytes were replaced, and each parent line was pointed at the rewritten parent. The five branch tips were then moved with `git update-ref`, each guarded by its expected old SHA. No reset was used, and the staged `prompts.md` stayed byte-identical to the backup throughout.
+- **Verification, run before the refs were moved.** For every pair:
+  - the tree, the full message bytes, the author and committer names, timestamps and timezone offsets, and the Co-Authored-By trailer are identical;
+  - both emails are the noreply address;
+  - the parents map to the rewritten parents;
+  - the object differs from the original only by the email and parent substitution.
+
+  All branch tips point to their rewritten counterparts. No branch commit contains the old email.
+- **Not changed:** historical SHAs elsewhere in this file and in the docs describe the commits as they existed then. The mapping is recorded in the migration note below.
+- The staged whitespace check and both Gitleaks scans run before the commit, and the post-commit history scan, are reported in the session handoff. The original commits remain in the local object store and reflogs until Git garbage-collects them. They are not reachable from any branch, so they would not be pushed.
+
+### Migration note: commit email privacy rewrite (2026-10-11)
+
+Before first publication, the five unpublished commits were rewritten to replace the personal author and committer email with GitHub's noreply address. Trees, messages, names and dates are unchanged. SHAs quoted in earlier entries refer to the original commits:
+
+| Original commit | Rewritten commit | Subject |
+|---|---|---|
+| `52acebd1eb33946970a60549cc4366743687ce72` | `6c095738613b1da76240496c58a26e3a4ab07174` | chore: establish repository foundation and engineering record |
+| `d196afc41734bfe14ea55f91632f99d9cb2e0a61` | `7961c885d30da0433f9a78c5f3d637bc23f72039` | feat: add Python packaging and minimal health API |
+| `da108e5a4e87ae1afcc9acd818a6ee3fe4d1e564` | `ea1c74f099cb3aa9503869a667c6bc020913085d` | feat: add evidence contracts and revision-bound approval gate |
+| `32b1cc630ddef1296f5d8a59eedac0197dbf5bc5` | `c69ccd62929ebbb38a4df113ae363111b26021a1` | feat: add request correlation and privacy-safe API observability |
+| `48872f41fad88c8eef40402e3be34d42fe864f84` | `3ea97f5451eba0bb4bb42fca27deb45711f4099e` | docs: record plain Python workflow architecture |
