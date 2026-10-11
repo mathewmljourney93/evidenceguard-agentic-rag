@@ -1,0 +1,226 @@
+"""PostgreSQL integration tests for the M2a schema and migrations.
+
+They run only against the disposable database named by ``EG_TEST_DATABASE_URL``, and they drop
+and recreate its ``public`` schema. Before any engine is created, the target must pass
+``require_disposable_test_database``: a valid URL, a database name ending in ``_test``, and a
+host, port and database different from ``EG_DATABASE_URL`` when that is set. No other URL is
+ever used. Without the variable these tests are skipped; with ``EG_REQUIRE_INTEGRATION=1`` (as
+in CI) a missing URL or a run where no integration test passes is a failure.
+"""
+
+import os
+from collections.abc import Iterator
+from uuid import UUID, uuid4
+
+import pytest
+from alembic import command
+from alembic.config import Config
+from sqlalchemy import Engine, create_engine, insert, inspect, text
+from sqlalchemy.engine import URL
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.pool import NullPool
+
+from evidenceguard_persistence.migration_config import alembic_config
+from evidenceguard_persistence.models import ApiKey, Tenant, User, UserRole, Vendor
+from evidenceguard_persistence.safety import (
+    TEST_DATABASE_URL_ENV,
+    require_disposable_test_database,
+)
+from evidenceguard_persistence.settings import DATABASE_URL_ENV, DatabaseConfigurationError
+
+pytestmark = pytest.mark.integration
+
+M2A_TABLES = {"tenants", "users", "api_keys", "vendors"}
+FOREIGN_KEY_VIOLATION = "23503"
+UNIQUE_VIOLATION = "23505"
+CHECK_VIOLATION = "23514"
+
+
+@pytest.fixture(scope="session")
+def test_database_url() -> URL:
+    """The validated disposable target. Every fixture that connects depends on this one."""
+    try:
+        return require_disposable_test_database(
+            os.environ.get(TEST_DATABASE_URL_ENV), os.environ.get(DATABASE_URL_ENV)
+        )
+    except DatabaseConfigurationError as exc:
+        message = f"refusing to run: {exc}"
+    pytest.fail(message, pytrace=False)
+
+
+@pytest.fixture
+def empty_database(test_database_url: URL) -> Iterator[Engine]:
+    """Reset the disposable test database to an empty public schema."""
+    engine = create_engine(test_database_url, poolclass=NullPool, hide_parameters=True)
+    with engine.begin() as connection:
+        connection.exec_driver_sql("DROP SCHEMA public CASCADE")
+        connection.exec_driver_sql("CREATE SCHEMA public")
+    try:
+        yield engine
+    finally:
+        engine.dispose()
+
+
+@pytest.fixture
+def config(test_database_url: URL) -> Config:
+    return alembic_config(database_url=test_database_url)
+
+
+@pytest.fixture
+def migrated(empty_database: Engine, config: Config) -> Engine:
+    command.upgrade(config, "head")
+    return empty_database
+
+
+def _tables(engine: Engine) -> set[str]:
+    return set(inspect(engine).get_table_names())
+
+
+def _sqlstate(error: IntegrityError) -> str | None:
+    return getattr(error.orig, "sqlstate", None)
+
+
+def _tenant(engine: Engine, slug: str) -> UUID:
+    tenant_id = uuid4()
+    with engine.begin() as connection:
+        connection.execute(insert(Tenant).values(id=tenant_id, slug=slug, name=slug.title()))
+    return tenant_id
+
+
+def _user(engine: Engine, tenant_id: UUID, role: str = UserRole.REVIEWER) -> UUID:
+    user_id = uuid4()
+    with engine.begin() as connection:
+        connection.execute(insert(User).values(id=user_id, tenant_id=tenant_id, role=role))
+    return user_id
+
+
+def _api_key(engine: Engine, tenant_id: UUID, user_id: UUID, prefix: str) -> None:
+    with engine.begin() as connection:
+        connection.execute(
+            insert(ApiKey).values(
+                id=uuid4(),
+                tenant_id=tenant_id,
+                user_id=user_id,
+                prefix=prefix,
+                secret_sha256="0" * 64,
+            )
+        )
+
+
+def _vendor(engine: Engine, tenant_id: UUID, slug: str) -> None:
+    with engine.begin() as connection:
+        connection.execute(
+            insert(Vendor).values(id=uuid4(), tenant_id=tenant_id, slug=slug, name=slug.title())
+        )
+
+
+# --- migrations -------------------------------------------------------------------------
+
+
+def test_upgrade_downgrade_upgrade_on_an_empty_database(
+    empty_database: Engine, config: Config
+) -> None:
+    assert _tables(empty_database) == set()
+
+    command.upgrade(config, "head")
+    assert _tables(empty_database) == M2A_TABLES | {"alembic_version"}
+    with empty_database.connect() as connection:
+        assert (
+            connection.execute(text("SELECT version_num FROM alembic_version")).scalar() == "0001"
+        )
+
+    command.downgrade(config, "base")
+    assert _tables(empty_database) == {"alembic_version"}
+
+    command.upgrade(config, "head")
+    assert _tables(empty_database) == M2A_TABLES | {"alembic_version"}
+
+
+def test_models_and_migrations_do_not_drift(migrated: Engine, config: Config) -> None:
+    command.check(config)  # raises AutogenerateDiffsDetected on any difference
+
+
+def test_no_extensions_are_created(migrated: Engine) -> None:
+    with migrated.connect() as connection:
+        extensions = set(connection.execute(text("SELECT extname FROM pg_extension")).scalars())
+    assert extensions == {"plpgsql"}
+
+
+# --- tenant constraints -----------------------------------------------------------------
+
+
+def test_api_key_cannot_reference_another_tenants_user(migrated: Engine) -> None:
+    tenant_a = _tenant(migrated, "tenant-a")
+    tenant_b = _tenant(migrated, "tenant-b")
+    user_in_b = _user(migrated, tenant_b)
+
+    with pytest.raises(IntegrityError) as exc_info:
+        _api_key(migrated, tenant_a, user_in_b, "crosstenant01")
+    assert _sqlstate(exc_info.value) == FOREIGN_KEY_VIOLATION
+    assert "fk_api_keys_tenant_id_user_id_users" in str(exc_info.value)
+
+    _api_key(migrated, tenant_b, user_in_b, "sametenant001")  # the same user in its own tenant
+
+
+@pytest.mark.parametrize("table", ["users", "vendors"])
+def test_rows_cannot_reference_a_missing_tenant(migrated: Engine, table: str) -> None:
+    missing_tenant = uuid4()
+
+    with pytest.raises(IntegrityError) as exc_info:
+        if table == "users":
+            _user(migrated, missing_tenant)
+        else:
+            _vendor(migrated, missing_tenant, "orphan")
+    assert _sqlstate(exc_info.value) == FOREIGN_KEY_VIOLATION
+
+
+def test_vendor_slug_is_unique_within_a_tenant_and_reusable_across_tenants(
+    migrated: Engine,
+) -> None:
+    tenant_a = _tenant(migrated, "tenant-a")
+    tenant_b = _tenant(migrated, "tenant-b")
+    _vendor(migrated, tenant_a, "lumenvale-cloud")
+
+    with pytest.raises(IntegrityError) as exc_info:
+        _vendor(migrated, tenant_a, "lumenvale-cloud")
+    assert _sqlstate(exc_info.value) == UNIQUE_VIOLATION
+
+    _vendor(migrated, tenant_b, "lumenvale-cloud")
+
+
+def test_api_key_prefixes_are_unique_across_tenants(migrated: Engine) -> None:
+    tenant_a = _tenant(migrated, "tenant-a")
+    tenant_b = _tenant(migrated, "tenant-b")
+    _api_key(migrated, tenant_a, _user(migrated, tenant_a), "sharedprefix1")
+
+    with pytest.raises(IntegrityError) as exc_info:
+        _api_key(migrated, tenant_b, _user(migrated, tenant_b), "sharedprefix1")
+    assert _sqlstate(exc_info.value) == UNIQUE_VIOLATION
+
+
+def test_unknown_role_is_rejected(migrated: Engine) -> None:
+    tenant = _tenant(migrated, "tenant-a")
+
+    with pytest.raises(IntegrityError) as exc_info:
+        _user(migrated, tenant, role="superuser")
+    assert _sqlstate(exc_info.value) == CHECK_VIOLATION
+
+    for role in UserRole:
+        _user(migrated, tenant, role=role)
+
+
+def test_secret_hash_must_be_sha256_hex(migrated: Engine) -> None:
+    tenant = _tenant(migrated, "tenant-a")
+    user = _user(migrated, tenant)
+
+    with pytest.raises(IntegrityError) as exc_info, migrated.begin() as connection:
+        connection.execute(
+            insert(ApiKey).values(
+                id=uuid4(),
+                tenant_id=tenant,
+                user_id=user,
+                prefix="badhash00001",
+                secret_sha256="not-a-sha256-digest",
+            )
+        )
+    assert _sqlstate(exc_info.value) == CHECK_VIOLATION

@@ -1,0 +1,33 @@
+# Local PostgreSQL with pgvector, for development and integration tests only.
+#
+# NOT VERIFIED LOCALLY: Docker is not available on the development machine, so this file has
+# not been run. CI uses the same image as a service container instead (see ci.yml).
+#
+# The credentials below are disposable and for local use only. They are documented in the
+# README and must never be reused anywhere else. The port is bound to 127.0.0.1 only, and uses
+# 5433 so it cannot collide with a PostgreSQL server already listening on 5432.
+#
+#   docker compose up -d
+#   EG_DATABASE_URL=postgresql+psycopg://evidenceguard:evidenceguard-local-dev@127.0.0.1:5433/evidenceguard_dev
+#   EG_TEST_DATABASE_URL=postgresql+psycopg://evidenceguard:evidenceguard-local-dev@127.0.0.1:5433/evidenceguard_test
+
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.7-pg17@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d
+    environment:
+      POSTGRES_USER: evidenceguard
+      POSTGRES_PASSWORD: evidenceguard-local-dev
+      POSTGRES_DB: evidenceguard_dev
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - evidenceguard-pgdata:/var/lib/postgresql/data
+      - ./infra/docker/postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evidenceguard -d evidenceguard_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  evidenceguard-pgdata:

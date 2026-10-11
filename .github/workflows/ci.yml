@@ -64,3 +64,53 @@ jobs:
           cd "${RUNNER_TEMP}"
           "${bin}/python" -I -c "import evidenceguard_api, evidenceguard_domain; from evidenceguard_api.app import create_app; create_app(); print(evidenceguard_api.__file__); assert 'site-packages' in evidenceguard_api.__file__"
           "${bin}/eg-api" --help
+          "${bin}/python" -I -c "import io; from alembic import command; from evidenceguard_persistence.migration_config import alembic_config; buf = io.StringIO(); command.upgrade(alembic_config(output_buffer=buf), 'head', sql=True); assert 'CREATE TABLE api_keys' in buf.getvalue(); print('offline migration SQL rendered from the installed wheel')"
+
+  integration:
+    # PostgreSQL integration tests. Service containers run only on Linux runners, so this job
+    # is Ubuntu-only; the verify job keeps the database-independent checks on both systems.
+    name: integration (ubuntu-24.04, PostgreSQL 17 + pgvector)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.7-pg17@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d
+        env:
+          # Disposable credentials for this throwaway CI container only.
+          POSTGRES_USER: evidenceguard
+          POSTGRES_PASSWORD: evidenceguard-ci-only
+          POSTGRES_DB: evidenceguard_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U evidenceguard -d evidenceguard_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      EG_TEST_DATABASE_URL: postgresql+psycopg://evidenceguard:evidenceguard-ci-only@localhost:5432/evidenceguard_test
+      EG_REQUIRE_INTEGRATION: "1"
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up uv and Python 3.12
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.13.0"
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: uv sync --locked
+
+      - name: Confirm the database is ready
+        run: docker exec "${{ job.services.postgres.id }}" pg_isready -U evidenceguard -d evidenceguard_test
+
+      - name: Run integration tests
+        run: uv run --locked pytest -m integration

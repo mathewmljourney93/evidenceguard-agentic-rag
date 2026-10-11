@@ -47,8 +47,15 @@ The full design and limits are in [ADR-0002](decisions/0002-request-ids-logging-
 
 ## Not implemented yet
 
-- **Authentication.** `ActorContext` is trusted as given. Nothing yet derives it from a credential. Planned: hashed per-user API keys (M2).
-- **Database tenancy.** No database exists. Planned: composite `(tenant_id, id)` foreign keys and tenant-filtered queries (M2), with row-level security as a later enhancement.
+- **Authentication.** `ActorContext` is trusted as given. Nothing yet derives it from a credential. Planned: hashed per-user API keys (M2b). The M2a schema stores only a key prefix and the SHA-256 of the secret ([ADR-0004](decisions/0004-persistence-foundation.md)).
+- **Database tenancy.** The M2a schema adds tenant foreign keys, unique `(tenant_id, id)` keys, and a composite `(tenant_id, user_id)` key from API keys to users. These are **not yet verified against PostgreSQL** (CI pending). Tenant-filtered queries arrive with the API in M2b/M2c. Row-level security is a later enhancement.
+- **Database credentials and URLs.** `EG_DATABASE_URL` is read only from the environment and held as a secret.
+  - **Query parameters:** only `sslmode` and `connect_timeout` are accepted, each once. So a URL cannot use the query to override the validated database or host, or to carry credentials and server options that password masking would not hide.
+  - **Errors:** configuration errors from `load_database_settings()` never include the URL, its query values or its credentials. That wrapper is the supported boundary, because pydantic's `hide_input_in_errors` does not make structured `ValidationError` dumps safe. Representations and engine logs mask the password.
+  - **Logging:** SQL echo is off and SQL parameters are hidden.
+  - **Process environment:** libpq environment variables (such as `PGHOSTADDR`) are outside this validation.
+  - **Disposable credentials:** the Compose and CI credentials are disposable and documented as such.
+- **Destructive integration tests.** The PostgreSQL tests drop the `public` schema of `EG_TEST_DATABASE_URL`. Before any engine exists, they refuse a missing or invalid URL, a database name without the `_test` suffix, an invalid `EG_DATABASE_URL`, or a target with the same host, port and database as `EG_DATABASE_URL` (ignoring credentials, spelling and loopback aliases). URL comparison cannot detect two different DNS names for one server, so the test database must be explicitly disposable. **Not yet exercised against PostgreSQL** (CI pending).
 - **Atomic, concurrent-safe transitions.** The transitions are pure functions. Two simultaneous requests could both pass validation; persistence must serialize them (for example with a row lock or compare-and-set on revision and hash).
 - **Upload limits and untrusted-file handling** (M3).
 - **Provenance checks:** that a cited chunk was actually retrieved for the review and that the quote occurs in it (M5).

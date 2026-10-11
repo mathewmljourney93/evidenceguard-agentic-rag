@@ -7,6 +7,7 @@ import pytest
 
 import evidenceguard_domain
 import evidenceguard_observability
+import evidenceguard_persistence
 from evidenceguard_api.__main__ import main
 
 
@@ -45,8 +46,12 @@ def _top_level_imports(package_dir: Path) -> set[str]:
 @pytest.mark.parametrize(
     ("package", "forbidden"),
     [
-        (evidenceguard_domain, {"evidenceguard_api", "evidenceguard_observability"}),
-        (evidenceguard_observability, {"evidenceguard_api"}),
+        (
+            evidenceguard_domain,
+            {"evidenceguard_api", "evidenceguard_observability", "evidenceguard_persistence"},
+        ),
+        (evidenceguard_observability, {"evidenceguard_api", "evidenceguard_persistence"}),
+        (evidenceguard_persistence, {"evidenceguard_api"}),
     ],
 )
 def test_package_import_boundaries(package: ModuleType, forbidden: set[str]) -> None:

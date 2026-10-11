@@ -64,7 +64,7 @@ uv python install 3.12
 uv sync --locked
 ```
 
-Check:
+Check (no database needed; PostgreSQL integration tests are skipped unless `EG_TEST_DATABASE_URL` is set):
 
 ```powershell
 uv run --locked ruff format --check .
@@ -83,7 +83,49 @@ uv run --locked eg-api --port 8765
 
 Then open `http://127.0.0.1:8000/healthz` or `http://127.0.0.1:8000/docs`. The same commands work in a POSIX shell.
 
-Packaging layout: [ADR-0001](docs/decisions/0001-packaging-and-layout.md). Request IDs, logging and error format: [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md). Workflow orchestration: [ADR-0003](docs/decisions/0003-plain-python-workflow.md).
+### Database (M2a, under review)
+
+The persistence package (`evidenceguard_persistence`) adds PostgreSQL settings, the tenancy schema (tenants, users, API keys and vendors) and Alembic migrations. See [ADR-0004](docs/decisions/0004-persistence-foundation.md).
+
+> **Not verified locally.** Docker is not available on the development machine, so neither the Compose file nor the migrations have been run against PostgreSQL. That verification is pending the CI integration job.
+
+1. Start a disposable PostgreSQL 17 + pgvector server. `docker-compose.yml` binds it to `127.0.0.1:5433` with **disposable local-only credentials**: user `evidenceguard`, password `evidenceguard-local-dev`, databases `evidenceguard_dev` and `evidenceguard_test`. Never reuse these anywhere else.
+
+   ```powershell
+   docker compose up -d
+   ```
+
+2. Set the database URLs in your shell. Variable names are listed in `.env.example`; EvidenceGuard does not read a `.env` file automatically. URLs must name exactly one host, an optional port (5432 if omitted) and a database. The only query parameters accepted are `sslmode` and `connect_timeout` (1–600 seconds), each at most once. Anything else, such as `dbname`, `host`, `service`, `password` or `options`, is rejected with an error that never repeats the URL.
+
+   ```powershell
+   $env:EG_DATABASE_URL = "postgresql+psycopg://evidenceguard:evidenceguard-local-dev@127.0.0.1:5433/evidenceguard_dev"
+   $env:EG_TEST_DATABASE_URL = "postgresql+psycopg://evidenceguard:evidenceguard-local-dev@127.0.0.1:5433/evidenceguard_test"
+   ```
+
+3. Run migrations:
+
+   ```powershell
+   uv run --locked alembic upgrade head          # apply (uses EG_DATABASE_URL)
+   uv run --locked alembic downgrade base        # remove every table
+   uv run --locked alembic upgrade head --sql    # print the SQL only; needs no database
+   ```
+
+4. Run the integration tests. They use **only** `EG_TEST_DATABASE_URL`, and drop and recreate the `public` schema of that database. **Point it only at a database you can lose.** Before creating any engine, they refuse to run if:
+   - the URL is invalid;
+   - the database name doesn't end in `_test`;
+   - `EG_DATABASE_URL` is set but invalid;
+   - `EG_DATABASE_URL` targets the same host, port and database. This ignores credentials, driver spelling, host case, an omitted default port and loopback spellings such as `localhost`, `127.0.0.1` and `[::1]`.
+
+   The check compares URLs only. It cannot tell that two different DNS names (or a name and an IP address) reach the same server.
+
+   ```powershell
+   $env:EG_REQUIRE_INTEGRATION = "1"   # fail, rather than skip, if the URL is missing or nothing runs
+   uv run --locked pytest -m integration
+   ```
+
+CI runs step 4 on Ubuntu against a PostgreSQL 17 + pgvector service container. Database-independent checks still run on Ubuntu and Windows.
+
+Packaging layout: [ADR-0001](docs/decisions/0001-packaging-and-layout.md). Request IDs, logging and error format: [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md). Workflow orchestration: [ADR-0003](docs/decisions/0003-plain-python-workflow.md). Persistence (under review): [ADR-0004](docs/decisions/0004-persistence-foundation.md).
 
 The request ID is for correlating logs only. It is not authentication and says nothing about who made a request. Logs are local JSON lines on stderr; there is no monitoring or telemetry service.
 

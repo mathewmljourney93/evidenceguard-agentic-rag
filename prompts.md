@@ -2111,3 +2111,353 @@ Nothing should be pushed or merged.
 - Only `prompts.md` changed in this step: this prompt, the review note and the recorded decisions. The accepted documentation diff was preserved without redesign, and there were no application changes.
 - The link check, the staged whitespace check and the staged secret scan were run before committing. One local commit was created on `docs/m1-results-m2-plan`; its SHA and the post-commit history scan are in the session handoff.
 - Not pushed or merged.
+
+---
+
+## Prompt 25: M2a, persistence foundation
+
+- **Stage:** Implementation, milestone M2a (staged for review, no commit)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Implement M2a only: the persistence foundation.
+
+Work only in `D:\Claude\evidenceguard_agentic_rag`. Read CLAUDE.md, docs/plan.md, existing ADRs, packaging configuration, tests and workflows first. Follow the M2 decisions recorded under Prompt 24.
+
+Do not commit, push, merge, install system tools, change global configuration, or connect to the laptop’s existing PostgreSQL service.
+
+Starting state:
+- Branch: `docs/m1-results-m2-plan`
+- HEAD: `6d05e12475e27795398f2af8aa5463f6079cb217`
+- origin/main: `6d64fb362c25c28908e38b5d0a06f8c393bf6096`
+- Expected origin and clean working tree.
+
+Verify these. Stop on unexpected differences. Create `feat/persistence-foundation` from the current HEAD, preserving the local documentation commit.
+
+Scope
+
+1. Persistence package
+- Add the typed `evidenceguard_persistence` package following ADR-0001.
+- Use synchronous SQLAlchemy 2 and psycopg 3, with Alembic and pydantic-settings.
+- Resolve dependency versions according to the repository’s policy and update uv.lock.
+- Keep domain independent of persistence and API.
+- Imports must not connect to a database or require database configuration.
+- `/healthz` and existing tests must work without a database.
+
+2. Database configuration and lifecycle
+- Database settings live in persistence and use EG_DATABASE_URL.
+- Require a valid PostgreSQL URL only when database functionality is explicitly requested.
+- Protect credentials from representations, validation errors and logs. Disable SQL echo and hide SQL parameter values.
+- Provide explicit engine/session creation and cleanup with clear transaction ownership.
+- Do not silently load configuration from outside the project.
+
+3. Initial schema
+Implement only tenants, users, api_keys and vendors:
+- Tenants is the root table.
+- Tenant-scoped tables reference tenants and expose the composite uniqueness needed for tenant-safe references.
+- API keys reference users through `(tenant_id, user_id)`.
+- Roles include reviewer, approver and admin. Do not alter approval behaviour or add an admin bypass.
+- Vendor slugs are unique within each tenant.
+- API-key prefixes must support unambiguous lookup. Store only the planned secret hash and metadata, never plaintext secrets.
+- Use the approved plan for column definitions and constraints.
+
+Do not implement key generation, authentication, administrative commands, vendor endpoints, report persistence or later-milestone tables.
+
+4. Migrations and packaging
+- Add the initial reversible Alembic migration and configuration.
+- Package migration files and templates so migrations work from an installed wheel, outside the source checkout.
+- Avoid duplicating schema definitions in ways that hide model/migration drift.
+- Do not create the vector extension yet.
+- Extend package import-boundary checks.
+
+5. Database test configuration
+- Add the planned Postgres-only Compose configuration using the approved pgvector/PostgreSQL image. Bind any published database port to localhost.
+- Use explicitly documented disposable development credentials only.
+- Add an Ubuntu CI integration job with a PostgreSQL/pgvector service and readiness checks, following existing action-pin and permission conventions.
+- Keep Ubuntu and Windows database-independent checks.
+- Integration tests must require an explicit dedicated test database URL. Never fall back to another URL or the existing local PostgreSQL service.
+- Without that URL, normal local tests may skip integration tests with a clear reason. The explicit CI integration command must fail if the URL is missing or no integration tests execute.
+- Destructive migration tests must be restricted to the disposable test database.
+
+Meaningful integration tests:
+- Upgrade an empty database, downgrade, then upgrade again.
+- Check model/migration drift with Alembic.
+- Prove the database rejects an API key referencing another tenant’s user.
+- Prove missing tenant references fail.
+- Prove vendor slug uniqueness within a tenant and reuse across tenants.
+
+Do not substitute SQLite, mocked database calls or metadata inspection for these PostgreSQL checks.
+
+6. Documentation and history
+- Document setup, migration commands, local unit-test commands and the explicit integration command.
+- Clearly state that local Docker and PostgreSQL integration verification are unavailable and CI is pending.
+- Record narrow persistence decisions in ADR-0004 and update milestone progress.
+- Add a placeholder-only .env.example without real credentials.
+- Append this entire prompt verbatim to prompts.md using the next sequential number, with a truthful outcome note. Preserve earlier history.
+
+Verification and handoff
+
+Run locked sync, formatting, lint, strict Mypy, the full locally runnable test suite, build and isolated wheel checks. Verify installed migration resources and offline migration generation without connecting to a database.
+
+Report passed, skipped and unrun checks separately. Do not claim migrations, tenant constraints or Compose have been verified against a live database.
+
+Stage only intended files. Run staged whitespace and redacted secret scans. Leave everything staged and uncommitted.
+
+Include the complete staged diff excluding prompts.md directly in fenced diff blocks. Never truncate or summarize it. Split into numbered parts at file boundaries and provide all parts when necessary.
+
+Report dependency changes, design decisions, verification commands and results, staged paths and final Git status separately.
+
+Nothing should be committed or pushed.
+````
+
+**Outcome (pending review; staged, not committed or pushed):**
+- **Starting state verified:** branch, HEAD `6d05e12`, `origin/main` `6d64fb3`, the expected origin, a clean tree. Branch `feat/persistence-foundation` was created from `6d05e12`.
+- **Added `evidenceguard_persistence`:**
+  - environment-only `EG_DATABASE_URL` settings, held as a secret, with validation errors that never echo the URL;
+  - explicit engine and session lifecycle with `transaction()` ownership, no SQL echo and hidden SQL parameters;
+  - the tenants/users/api_keys/vendors schema, with composite tenant constraints;
+  - packaged Alembic migrations and `alembic_config()`;
+  - root `alembic.ini`, Postgres-only `docker-compose.yml` (localhost-bound, disposable credentials), a test-database init script, a placeholder-only `.env.example`, an Ubuntu CI integration job, ADR-0004, and README, plan and threat-model updates.
+- **Dependencies:** SQLAlchemy 2.1.1, Alembic 1.20.0, psycopg[binary] 3.3.6 and pydantic-settings 2.15.0 were added, with five transitive packages. They were resolved under a two-week age cutoff applied only to the new packages; no existing locked version changed. The pinned pgvector image digest is younger than two weeks and is flagged for review.
+- **Verified locally** (Windows, Python 3.12.15): the locked sync, Ruff, strict Mypy, the database-independent tests, offline migration SQL, the build and the isolated wheel checks. Exact results are in the session handoff.
+- **Not verified:**
+  - The PostgreSQL integration tests were **skipped** because no test database exists locally.
+  - Migrations, tenant constraints, the drift check and Compose have **not** been run against PostgreSQL.
+  - CI integration verification is pending an authorized publication.
+- No connection was made to the laptop's existing PostgreSQL service.
+
+## Prompt 26: Correct M2a database URL validation and destructive-test safeguards
+
+- **Stage:** Correction, milestone M2a (staged for review, no commit)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Prompt 26 — Correct M2a database URL validation and destructive-test safeguards
+
+Work only in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and the relevant project instructions.
+
+Expected starting state:
+- Branch: feat/persistence-foundation
+- HEAD: 6d05e12475e27795398f2af8aa5463f6079cb217
+- origin/main: 6d64fb362c25c28908e38b5d0a06f8c393bf6096
+- The reported M2a implementation is staged and uncommitted.
+
+Verify the starting state. Preserve the existing staged implementation. Record its tree ID before editing so the final incremental diff can be measured against this reviewed version.
+
+Do not commit, push, merge, rewrite history, install system tools, start Docker, or connect to any database. PostgreSQL integration verification remains pending until an authorized publication and successful CI run.
+
+The reviewer identified two issues:
+
+1. tests/test_persistence_postgres.py compares EG_TEST_DATABASE_URL and EG_DATABASE_URL as raw strings. Different credentials or equivalent URL spellings can target the same database and bypass the safeguard before DROP SCHEMA public CASCADE.
+
+2. parse_postgres_url accepts unrestricted query parameters. SQLAlchemy's psycopg dialect merges URL query parameters into connection arguments. A dbname parameter can override the database name validated in the URL path. Other parameters can override routing or introduce credentials that ordinary URL password masking does not hide.
+
+Make these narrow corrections:
+
+A. Database URL policy
+- Enforce an explicit, small query-parameter allowlist in the shared parser. Permit only validated sslmode and connect_timeout parameters for this slice, if needed.
+- Reject all other query parameters, including database/routing overrides, service configuration, credentials and arbitrary options.
+- Reject repeated parameters and malformed allowed values.
+- Require a single explicit host and database; reject unsupported multi-host forms.
+- Validate ports and use a consistent default-port interpretation.
+- Keep configuration errors generic. Never include submitted URLs, query values or credentials in error messages.
+- Do not introduce a new dependency.
+
+B. Destructive integration-test guard
+- Extract a database-independent validation helper and run it before creating an engine or opening a connection.
+- Retain the required explicit test URL and _test database-name suffix.
+- Compare parsed database identities: host, effective port and database. Ignore credentials and accepted driver spelling when determining whether two URLs target the same database.
+- Normalize hostname case, omitted/default port and known loopback spellings conservatively.
+- If EG_DATABASE_URL is present but invalid, fail closed with a safe message.
+- Reject a test target matching the configured application database even when credentials or URL spelling differ.
+- Preserve CI's disposable database setup and the required-integration enforcement.
+- Document that arbitrary DNS aliases cannot be proven distinct through URL comparison and that the test database must be explicitly disposable.
+
+C. Regression tests
+Add database-independent tests covering:
+- Same target with different credentials.
+- Equivalent driver spelling, hostname case and omitted/explicit default port.
+- Relevant loopback aliases.
+- Invalid application URL.
+- Missing test URL and a database without the _test suffix.
+- Query database/routing overrides, query credentials, duplicate parameters and invalid allowed values.
+- A valid distinct disposable target.
+- Rejected targets cannot reach engine creation or database connection.
+- Safe configuration errors do not reveal synthetic credential markers.
+
+Demonstrate that the relevant new regression tests catch the previous implementation using a temporary local restoration or equivalent controlled comparison. Restore the corrected files afterwards. Do not connect to PostgreSQL during this demonstration.
+
+D. Documentation and prompt history
+- Update the relevant README, ADR and threat-model statements to describe the actual safeguards and their limits.
+- Clarify that Pydantic hide_input_in_errors controls printed validation errors; it does not make arbitrary structured ValidationError dumps safe. Keep the generic configuration-error wrapper as the supported boundary.
+- Append this prompt verbatim to prompts.md with a truthful outcome note.
+- Record the review findings without claiming the reviewer ran the application suite or reproduced the issue.
+- Preserve all earlier prompt text and outcome notes.
+
+Verification:
+Run the relevant database-independent tests, the full local suite with PostgreSQL tests skipped, locked dependency synchronization, Ruff formatting and linting, strict Mypy, build and isolated installed-wheel checks. Run git diff --cached --check and the staged secret scan after staging.
+Report exact commands, results and skipped checks. Do not claim Linux, Compose, PostgreSQL or GitHub Actions verification.
+
+Leave the corrected work staged and uncommitted.
+
+Final handoff:
+1. Explain the corrections and remaining limitations.
+2. Include the COMPLETE incremental diff against the recorded pre-edit staged tree, excluding prompts.md, directly in fenced diff blocks.
+3. Split large diffs into numbered parts at file boundaries and provide every part without truncation. Use a gitignored .local/ diff file only if response limits prevent complete inclusion.
+4. Report prompt-history additions, verification results, staged paths, HEAD and final Git status separately.
+5. Confirm that nothing was committed, pushed or connected to a database.
+````
+
+**Outcome (correction pending review; staged, not committed or pushed):**
+- **Starting state verified:** branch, HEAD `6d05e12`, `origin/main` `6d64fb3`, M2a staged and uncommitted. The pre-edit staged tree was `9ff1b77765cf121332a9ae1c46ef6e484ec7f810`.
+- **Review findings recorded:**
+  1. The integration-test guard compared `EG_TEST_DATABASE_URL` and `EG_DATABASE_URL` as raw strings.
+  2. `parse_postgres_url` accepted unrestricted query parameters, which SQLAlchemy's psycopg dialect passes to the driver.
+
+  The findings came from code review. They do not record that the reviewer ran the application suite or reproduced the issue.
+- **URL policy** (`settings.py`):
+  - exactly one host, a DNS name or an IP literal;
+  - a port from 1 to 65535, with an omitted port made explicit as 5432;
+  - a restricted database-name character set;
+  - only `sslmode` (a libpq mode) and `connect_timeout` (1–600) as query parameters, each at most once; everything else is rejected;
+  - generic errors that never contain the URL, its query values or its credentials.
+
+  A new `database_identity()` helper compares host, effective port and database. It ignores credentials, driver spelling and options, folds case, and treats every loopback or unspecified address as one host.
+- **Destructive-test guard:** the new `evidenceguard_persistence.safety.require_disposable_test_database` runs in the session fixture before any engine exists. It requires a valid test URL with the `_test` suffix, fails closed on an invalid `EG_DATABASE_URL`, and refuses a matching database identity.
+- **Tests:** 74 database-independent tests in `tests/test_persistence_safety.py`. They include a child-pytest run of the real fixture, with engine creation and psycopg connections forced to fail, plus a positive control.
+- **Previous implementation, controlled comparison** (pre-edit files restored temporarily in the working tree, then restored with matching SHA-256):
+  - With the previous fixture, 3 of 4 rejected-target cases failed. The same-target and invalid-app-URL cases reached engine creation.
+  - With the previous parser, 28 of 30 unsafe URLs were accepted, and 5 further guard and policy tests failed.
+  - No database was contacted.
+- **Documentation:** README, ADR-0004 and the threat model now describe:
+  - the URL policy;
+  - the guard and its limits: no DNS-alias detection, libpq environment variables not controlled, and the test database must be explicitly disposable;
+  - that `hide_input_in_errors` covers only *printed* `ValidationError`s, and that the generic configuration-error wrapper is the supported boundary.
+- **Verified locally** (Windows, Python 3.12.15): the locked sync, Ruff, strict Mypy (39 files), and the full suite (247 passed, 10 PostgreSQL integration tests skipped). Also the required-integration usage error, the build, and the isolated installed-wheel checks. Exact results are in the session handoff.
+- **Not verified:**
+  - Linux, Compose, PostgreSQL and GitHub Actions were not exercised.
+  - The integration tests remain **pending** CI on an authorized publication.
+  - No connection was made to any database.
+
+## Prompt 27: Distinguish an unset application database URL from an empty one
+
+- **Stage:** Correction, milestone M2a (staged for review, no commit)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Prompt 27 — Distinguish an unset application database URL from an empty one
+
+Work only in D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+Expected state:
+- Branch feat/persistence-foundation
+- HEAD 6d05e12475e27795398f2af8aa5463f6079cb217
+- All 29 M2a files staged; nothing unstaged or untracked.
+
+Verify this state and record the current staged tree before editing. Preserve the staged implementation.
+
+The reviewer accepts the main Prompt 26 corrections but found one remaining edge case:
+
+require_disposable_test_database currently uses `if app_raw:`, treating an empty EG_DATABASE_URL as unset. The acceptance test also explicitly permits "". This contradicts the requirement to fail closed when EG_DATABASE_URL is configured but invalid.
+
+Make only this correction:
+- Treat None as unset.
+- Validate every supplied application URL, including "".
+- An empty or whitespace-only application URL must produce the existing generic DatabaseConfigurationError.
+- Remove "" from the accepted-target cases.
+- Add empty and whitespace-only values to the invalid-application-URL cases.
+- Add an empty application URL to the real-fixture test proving rejection occurs before engine creation.
+- Preserve acceptance when the application URL is genuinely unset.
+
+Append this prompt verbatim and a truthful outcome note to prompts.md. Preserve earlier entries. Record that the reviewer inspected the diff but did not run the application tests.
+
+Do not commit, push, merge, start Docker or connect to any database.
+
+Run the relevant persistence and safety tests, the full local suite with PostgreSQL tests skipped, Ruff formatting/linting, strict Mypy, git diff --cached --check and the staged secret scan. Report exact results and remaining verification limits.
+
+Leave the work staged and uncommitted.
+
+Include the COMPLETE incremental diff against the recorded pre-edit staged tree, excluding prompts.md, directly in fenced diff blocks. Do not truncate; split into numbered parts at file boundaries if necessary. Report prompt-history additions, verification results and final Git status separately.
+````
+
+**Outcome (correction pending review; staged, not committed or pushed):**
+- **Starting state verified:** branch, HEAD `6d05e12`, 29 files staged, nothing unstaged or untracked. The pre-edit staged tree was `5923351fe0214448dfc54f8745ceb4c77b7b2023`.
+- **Review finding:** `require_disposable_test_database` used `if app_raw:`, so an empty `EG_DATABASE_URL` was treated as unset and accepted. The reviewer inspected the diff and did not run the application tests.
+- **Correction:**
+  - Only `None` now means unset. Every supplied application URL is validated, including `""`.
+  - An empty or whitespace-only value raises the existing generic `DatabaseConfigurationError` ("EG_DATABASE_URL is not a valid PostgreSQL URL").
+  - A genuinely unset application URL is still accepted.
+- **Tests:**
+  - `""` was removed from the accepted-target cases.
+  - `""`, `" "` and a tab-newline value were added to the invalid-application-URL cases.
+  - An empty application URL was added to the real-fixture test. Its child process ran with `EG_DATABASE_URL` set to `""` and was refused before engine creation.
+  - Against the pre-edit `safety.py` (restored temporarily in the working tree, then restored with a matching SHA-256), the two empty-string cases failed. The whitespace cases already passed, because a blank string is truthy.
+- **Verified locally** (Windows, Python 3.12.15): the persistence and safety tests, the full suite with the PostgreSQL tests skipped, Ruff, strict Mypy, the staged whitespace check and the staged secret scan. Exact results are in the session handoff.
+- **Not verified:** Linux, Compose, PostgreSQL and GitHub Actions were not exercised. The integration tests remain pending CI on an authorized publication. No database was contacted.
+
+**Review note (added with Prompt 28):** the external reviewer accepted M2a for a local commit. The decision covers the original M2a staged diff (Prompt 25) and the incremental correction diffs from Prompts 26 and 27. It relied on inspecting those diffs and on Claude's reported Windows checks: the full suite gave 250 passed, with the 10 PostgreSQL integration tests skipped. The reviewer did not run the application checks. PostgreSQL, Linux, Compose and GitHub Actions verification all remain **pending**.
+
+## Prompt 28: Commit the reviewed M2a persistence foundation locally
+
+- **Stage:** Local commit of reviewed milestone M2a (no push)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Prompt 28 — Commit the reviewed M2a persistence foundation locally
+
+Work only in D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+This prompt authorizes one local commit of the reviewed M2a work. It does not authorize pushing, merging or rewriting history.
+
+Verify:
+- Branch: feat/persistence-foundation
+- HEAD: 6d05e12475e27795398f2af8aa5463f6079cb217
+- Origin: https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Exactly the 29 reported M2a files are staged.
+- Nothing is unstaged or untracked; no .local/ paths are staged.
+
+Inspect the staged paths and complete staged diff. Do not modify application code, tests, dependencies, configuration or architecture.
+
+Update prompts.md only:
+- Add a separate review note under Prompt 27 recording acceptance of M2a for a local commit, based on the original and correction diffs and your reported Windows checks: 250 passed, 10 PostgreSQL tests skipped.
+- State that the reviewer did not run the application checks.
+- Keep PostgreSQL, Linux, Compose and GitHub Actions verification marked pending.
+- Append this prompt verbatim and a truthful outcome note.
+- Preserve every earlier prompt and outcome note.
+
+Stage prompts.md. Confirm all other staged files remain byte-identical to the accepted staged state.
+
+Before committing:
+- Confirm the effective author and committer email is:
+  257921624+mathewmljourney93@users.noreply.github.com
+- Inspect staged content for credentials and unintended private information without printing secret values.
+- Run git diff --cached --check.
+- Run gitleaks git --pre-commit --staged --redact --verbose .
+- If any check fails, correct only within this task's scope or report the blocker; do not commit failed checks.
+
+Create one local commit:
+feat: add PostgreSQL persistence foundation and migration checks
+
+After committing:
+- Run gitleaks git --redact --verbose . against the full history.
+- Report the full commit SHA, parent, subject, committed paths, checks and final Git status.
+- Report prompt-history additions separately.
+- Include any incremental diff outside prompts.md in full, directly in fenced diff blocks. If none exists, explicitly say so.
+
+Application checks need not be repeated if only prompts.md changed. Do not start Docker or contact any database.
+
+Do not push, merge, amend, rebase or change global configuration. Leave the working tree clean.
+````
+
+**Outcome (committed locally; not pushed):**
+- **Starting state verified:** branch `feat/persistence-foundation`, HEAD `6d05e12`, the expected origin, exactly the 29 M2a paths staged (accepted staged tree `0501a903deeeb6bcccc061a9b0332a76c2036944`), no `.local/` paths staged, nothing unstaged or untracked.
+- **Only `prompts.md` changed** in this step: the review note above, and this prompt with its outcome note. Every other staged file was confirmed byte-identical to the accepted staged tree before committing.
+- **Pre-commit checks:**
+  - the effective author and committer email is the GitHub noreply address;
+  - the staged content was inspected for credentials and private information. Only documented disposable Compose and CI credentials and obviously fake test markers were found;
+  - `git diff --cached --check` and the staged Gitleaks scan both passed.
+
+  Exact results are in the session handoff.
+- **Commit:** one local commit, `feat: add PostgreSQL persistence foundation and migration checks`, whose parent is `6d05e12`. It contains this note, so its SHA is reported in the session handoff rather than here. A full-history Gitleaks scan was run after committing.
+- **Application checks** were not rerun, because only `prompts.md` changed since the reported run of 250 passed and 10 skipped.
+- **Still pending:** PostgreSQL integration, Linux, Compose and GitHub Actions verification, until an authorized publication and a successful CI run. Nothing was pushed or merged, and no database was contacted.

@@ -1,3 +1,4 @@
+import os
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
@@ -84,3 +85,47 @@ def content(tenant_a: UUID) -> ReportContent:
         ),
         unresolved_question_ids=("BCP-01",),
     )
+
+
+# --- PostgreSQL integration-test gating (see ADR-0004) ------------------------------------
+
+TEST_DATABASE_URL_ENV = "EG_TEST_DATABASE_URL"
+REQUIRE_INTEGRATION_ENV = "EG_REQUIRE_INTEGRATION"
+_integration_passed: list[str] = []
+
+
+def _integration_required() -> bool:
+    return os.environ.get(REQUIRE_INTEGRATION_ENV) == "1"
+
+
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+    """Skip integration tests without a test database, unless they are explicitly required."""
+    integration = [item for item in items if item.get_closest_marker("integration")]
+    if _integration_required():
+        if not os.environ.get(TEST_DATABASE_URL_ENV):
+            raise pytest.UsageError(
+                f"{REQUIRE_INTEGRATION_ENV}=1 but {TEST_DATABASE_URL_ENV} is not set"
+            )
+        if not integration:
+            raise pytest.UsageError(
+                f"{REQUIRE_INTEGRATION_ENV}=1 but no integration tests were collected"
+            )
+        return
+    if not os.environ.get(TEST_DATABASE_URL_ENV):
+        reason = (
+            f"{TEST_DATABASE_URL_ENV} is not set; integration tests need a disposable "
+            "PostgreSQL test database (see README)"
+        )
+        for item in integration:
+            item.add_marker(pytest.mark.skip(reason=reason))
+
+
+def pytest_runtest_logreport(report: pytest.TestReport) -> None:
+    if report.when == "call" and report.passed and "integration" in report.keywords:
+        _integration_passed.append(report.nodeid)
+
+
+def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
+    """When integration tests are required, fail the run if none of them actually passed."""
+    if _integration_required() and exitstatus == 0 and not _integration_passed:
+        session.exitstatus = pytest.ExitCode.TESTS_FAILED

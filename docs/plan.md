@@ -542,6 +542,11 @@ Each question entry contains:
 
 **M2 – Persistence, auth and tenancy**
 - Persistence package, Alembic, compose (Postgres only), `seed-demo`/`create-key`, `/v1/me`, vendor endpoints.
+
+*Progress record:*
+- **M2a** (persistence foundation): `evidenceguard_persistence` (settings, engine and sessions, the tenants/users/api_keys/vendors schema, migration `0001`), Compose, the CI integration job and [ADR-0004](decisions/0004-persistence-foundation.md). Under review.
+  - **Not verified against PostgreSQL:** local Docker is unavailable, and integration verification is pending CI on an authorized, published branch.
+- **Next slices:** M2b (API-key authentication, tenant context, `eg-admin`), then M2c (vendor endpoints) with `/readyz` and the API database wiring, following the decisions under Prompt 24 in [prompts.md](../prompts.md).
 - *Acceptance:*
   - Migrations upgrade and downgrade cleanly.
   - Composite foreign keys reject cross-tenant references.
