@@ -2700,3 +2700,98 @@ Do not push, merge, amend, rebase, change global configuration, start Docker or 
   Exact results are in the session handoff.
 - **Commit:** one local commit, `docs: record verified M2a persistence results`, whose parent is `9ad7dae`. It contains this note, so its SHA is reported in the session handoff. A full-history Gitleaks scan was run after committing.
 - **No application checks were run;** only documentation changed. Nothing was pushed or merged, Docker was not started, and no database was contacted. Compose remains unverified, and M2b, M2c and overall M2 completion remain pending.
+
+## Prompt 32: Publish verified M2a documentation and fast-forward main
+
+- **Stage:** Publication of `feat/persistence-foundation` and an authorized fast-forward of `main`
+- **Date:** 2026-10-12 (session date)
+
+````text
+Prompt 32 — Publish verified M2a documentation and fast-forward main
+
+Work only in D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+This prompt explicitly authorizes:
+- Publishing the reviewed feat/persistence-foundation branch.
+- After successful CI, fast-forwarding local main to that exact branch tip.
+- Publishing only that main update.
+
+Verify:
+- Branch feat/persistence-foundation
+- HEAD 7cf15e7398b0aed91ef8702e468c6463e381f9e0
+- Working tree clean.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Remote feature branch:
+  9ad7daefc6372786e1da2a636b9419b4ca7df89d
+- Remote main:
+  6d64fb362c25c28908e38b5d0a06f8c393bf6096
+
+Read current remote refs before proceeding. Stop if either has changed unexpectedly or history diverges. Never force-push.
+
+Change prompts.md only:
+- Append this prompt verbatim.
+- Add a truthful preflight note recording the verified starting state and publication/fast-forward authorization.
+- Preserve all earlier entries, including historical statements that the branch was not yet merged.
+- Do not record future actions as completed.
+
+Verify the noreply author and committer identity. Inspect the additions, run git diff --cached --check and the staged Gitleaks scan.
+
+Commit only prompts.md:
+docs: record M2a main publication authorization
+
+Run the full-history Gitleaks scan. Proceed only if all checks pass.
+
+Publish only the feature branch:
+git push origin refs/heads/feat/persistence-foundation:refs/heads/feat/persistence-foundation
+
+Confirm its remote SHA matches local HEAD.
+
+Inspect GitHub Actions for that exact SHA. Require success for:
+- Ubuntu verification.
+- Windows verification.
+- PostgreSQL integration.
+- Full-history secret scan.
+
+If any job fails, report its failing step and relevant redacted output. Do not change code or merge.
+If checks remain pending, report their current status and leave main unchanged.
+
+Once all four jobs have passed:
+- Fetch main and the feature branch.
+- Reconfirm remote main is still the expected baseline.
+- Confirm main is an ancestor of the verified feature tip.
+- Switch to local main and ensure it has no divergent local history.
+- Fast-forward main using git merge --ff-only to the exact verified feature commit.
+- Push only main with an explicit refspec:
+  git push origin refs/heads/main:refs/heads/main
+
+Do not create a merge commit, squash commits, rebase, amend, delete branches or push tags.
+
+Confirm local main, remote main and the verified feature tip match. Inspect the new main workflow runs for that exact SHA and report their actual results. Do not claim success while checks are pending.
+
+Final handoff:
+- Prompt-history commit and additions.
+- Published SHA and remote refs.
+- Feature-branch and main workflow links/results.
+- Scan results and final Git status.
+- Any incremental diff outside prompts.md in full; otherwise say none exists.
+- Preserve Compose as unverified and M2b/M2c as pending.
+
+Do not change application code, start Docker, contact a local database or change global configuration.
+````
+
+**Preflight note (recorded before publication and before any change to `main`):**
+- **Starting state verified:** branch `feat/persistence-foundation`, HEAD `7cf15e7`, a clean tree, the expected origin. The noreply identity is the effective author and committer.
+- **Remote refs, read before this commit:**
+  - `refs/heads/feat/persistence-foundation` is `9ad7dae`;
+  - `refs/heads/main` is `6d64fb3`, and local `main` matches it;
+  - both remote refs are ancestors of local HEAD, so history has not diverged.
+- **Commits to be published on the feature branch and then fast-forwarded onto `main`:** `6d05e12`, `32eea73`, `9ad7dae`, `7cf15e7` and this prompt-history commit.
+- **Authorization:** Prompt 32 authorizes three things, in order:
+  1. pushing the feature branch;
+  2. **only after** the Ubuntu verification, Windows verification, PostgreSQL integration and full-history secret-scan jobs pass for the exact pushed SHA, fast-forwarding local `main` to that commit with `git merge --ff-only`;
+  3. pushing only `main` with an explicit refspec.
+
+  No force-push, merge commit, squash, rebase, amend, branch deletion or tag push is authorized.
+- **Not yet recorded here:** the push, the CI results and the `main` update happen after this commit, so they are reported in the session handoff.
+- **Still open:** Compose remains unverified (never run). M2b, M2c and overall M2 completion remain pending.
