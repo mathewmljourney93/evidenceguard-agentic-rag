@@ -3103,3 +3103,89 @@ Do not push, merge, amend, rebase, change global configuration, start Docker or 
 - **Verified locally** (Windows, Python 3.12.15): CLI tests (51 passed), the full suite (377 passed, 15 PostgreSQL tests skipped), Ruff format and lint, strict Mypy (49 files). The staged whitespace check, the private-content check and the staged Gitleaks scan were run before committing, and a full-history Gitleaks scan after. Exact results are in the session handoff.
 - **Commit:** one local commit, `feat: add API-key authentication and tenant administration`, whose parent is `e2dee5c`. It contains this note, so its SHA is reported in the session handoff.
 - **Pending:** the M2b PostgreSQL integration tests (15 in total locally skipped, including M2a's) await an authorized publication and CI. Compose remains unverified, M2c is pending, and M2 is incomplete. Nothing was pushed or merged, and no database was contacted.
+
+**Review note (added with Prompt 36):** the external reviewer accepted the final Prompt 35 parser diff, which passes `allow_abbrev=False` to each subparser and adds focused tests. The acceptance relied on that diff and on Claude's reported Windows checks: 377 passed, 15 PostgreSQL integration tests skipped. The reviewer did not run the project suite.
+
+## Prompt 36: Publish reviewed M2b and verify branch CI
+
+- **Stage:** Publication of branch `feat/api-key-authentication` (no merge, `main` untouched)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Prompt 36 — Publish reviewed M2b and verify branch CI
+
+Work only in D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+This prompt authorizes publishing feat/api-key-authentication only. It does not authorize merging or pushing main.
+
+Verify:
+- Branch feat/api-key-authentication
+- HEAD cfe5e3274d0461801f72cdb2b3e96afa51cd323f
+- Parent e2dee5cf199cfa2b0ecbdc4d55a2cd7ea5865c00
+- Working tree clean.
+- Expected origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Author and committer use:
+  257921624+mathewmljourney93@users.noreply.github.com
+
+Read remote refs. Confirm main remains e2dee5c and the new feature branch does not exist remotely. Stop on unexpected changes or divergence.
+
+Inspect everything that will become public relative to remote main:
+- Commit identities, tracked paths and full diff, including prompts.md.
+- No .local/ files, backups, real credentials or unintended private information.
+- Confirm both workflows trigger on this branch and required integration enforcement remains enabled.
+
+Change prompts.md only:
+- Record the reviewer's acceptance of the final parser diff, based on the diff and reported Windows checks: 377 passed, 15 skipped.
+- State that the reviewer did not run the project suite.
+- Append this prompt verbatim and a truthful publication preflight note.
+- Preserve earlier entries.
+- Do not record publication or CI success before they happen.
+
+Inspect and stage that update. Run git diff --cached --check and the staged Gitleaks scan.
+
+Create one documentation commit:
+docs: record M2b branch publication authorization
+
+Run gitleaks git --redact --verbose . against full history. Proceed only if all checks pass.
+
+Push this single explicit ref:
+git push --set-upstream origin refs/heads/feat/api-key-authentication:refs/heads/feat/api-key-authentication
+
+Confirm the remote feature SHA matches local HEAD and remote main is unchanged.
+
+Inspect Actions runs for the exact published SHA. Report:
+- Ubuntu verification.
+- Windows verification.
+- PostgreSQL integration.
+- Full-history secret scan.
+
+Obtain the integration test count from the job log if accessible. If logs are unavailable, distinguish successful job status from an inferred test count.
+
+If a check fails, report its failing step and relevant redacted output. Do not change code or push fixes in this task.
+If checks remain pending, report their actual status without claiming continued monitoring unless a persistent process exists.
+
+Final handoff:
+- Published SHA, branch and remote refs.
+- Prompt-history commit and additions.
+- Scan results.
+- Workflow and job links/results for that exact SHA.
+- Integration test count and its evidence, or the access limitation.
+- Final Git status.
+- Complete incremental diff outside prompts.md, if any; otherwise state none exists.
+
+Do not merge, push main, force-push, rewrite history, start Docker, contact a local database or change global configuration. Keep Compose unverified, M2c pending and overall M2 incomplete.
+````
+
+**Preflight note (recorded before publication):**
+- **Starting state verified:** branch `feat/api-key-authentication`, HEAD `cfe5e32` (parent `e2dee5c`), a clean tree, the expected origin. The noreply identity is the effective author and committer.
+- **Remote refs, read before this commit:** `main` and `feat/persistence-foundation` are both `e2dee5c`, and `feat/api-key-authentication` does not exist on the remote. Remote `main` is an ancestor of local HEAD, so history has not diverged.
+- **Content to be published** (relative to remote `main`: commit `cfe5e32` plus this prompt-history commit; 24 files in `cfe5e32`):
+  - the noreply identity throughout;
+  - no `.local/` files, bundles or backups tracked;
+  - no key-shaped literals or personal identifiers;
+  - the only credential-like value is a labelled fake test marker, and every email-pattern match is a code decorator.
+- **Workflows:** both `ci.yml` and `secret-scan.yml` trigger on `push` to any branch. The workflows and `tests/conftest.py` are unchanged from `main`, so the integration job still runs with `EG_REQUIRE_INTEGRATION=1`.
+- **Authorization:** Prompt 36 authorizes pushing only `feat/api-key-authentication`. It does not authorize merging, pushing `main`, force-pushing or rewriting history.
+- **Not yet recorded here:** the push and CI results happen after this commit, so they are reported in the session handoff.
+- **Still open:** M2b's PostgreSQL integration verification is pending until CI passes. Compose remains unverified, M2c is pending, and M2 is incomplete.
