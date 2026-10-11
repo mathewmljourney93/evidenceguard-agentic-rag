@@ -1864,3 +1864,78 @@ Before first publication, the five unpublished commits were rewritten to replace
 | `da108e5a4e87ae1afcc9acd818a6ee3fe4d1e564` | `ea1c74f099cb3aa9503869a667c6bc020913085d` | feat: add evidence contracts and revision-bound approval gate |
 | `32b1cc630ddef1296f5d8a59eedac0197dbf5bc5` | `c69ccd62929ebbb38a4df113ae363111b26021a1` | feat: add request correlation and privacy-safe API observability |
 | `48872f41fad88c8eef40402e3be34d42fe864f84` | `3ea97f5451eba0bb4bb42fca27deb45711f4099e` | docs: record plain Python workflow architecture |
+
+---
+
+## Prompt 21: First repository publication
+
+- **Stage:** Authorized first publication of `main` (one normal push; no other branches, tags, force, merge or deploy)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Publish the reviewed repository to GitHub for the first time.
+
+I authorize one normal push of the reviewed history, plus this prompt-history entry, to `origin/main`. Do not push other branches or tags, force push, merge, deploy, or change application code.
+
+Work only in `D:\Claude\evidenceguard_agentic_rag`. Read CLAUDE.md first.
+
+1. Verify:
+- Branch: `docs/plain-python-workflow`
+- HEAD: `2f3aadc6095992c414d6fa56c38e5f2d93dd9a8f`
+- Origin: `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`
+- Clean working tree.
+- Remote has no refs.
+- No local main branch exists.
+- All six reachable commits use `257921624+mathewmljourney93@users.noreply.github.com` for both author and committer.
+
+Stop and report unexpected differences. Do not publish the original-history backup, any `.local/` files, or old commit refs.
+
+2. Append this entire prompt verbatim to prompts.md using the next sequential number. Preserve earlier history.
+
+Record that publication is explicitly authorized after external review and the verified email migration. Before the push, describe publication as pending; do not claim success in advance.
+
+Stage only prompts.md. Inspect its additions for secrets and private content, then run:
+- `git diff --cached --check`
+- `gitleaks git --pre-commit --staged --redact --verbose .`
+
+If checks pass, create one local commit:
+`docs: record authorization for first repository publication`
+
+Run:
+`gitleaks git --redact --verbose .`
+
+Stop if any check fails.
+
+3. Create and switch to local main at the new HEAD, preserving all existing branches:
+`git switch -c main`
+
+Immediately recheck that origin is correct and the remote is still empty. If it has changed, stop.
+
+Publish only main:
+`git push -u origin main`
+
+Do not use --all, --mirror, --tags or any force option.
+
+If authentication or GitHub email protection blocks the push, report the failure. Do not change account security settings, install tools, expose credentials or rewrite history again.
+
+4. Verify that `refs/heads/main` on origin matches the exact local HEAD SHA. Report final branch, upstream and working-tree status.
+
+Check the GitHub Actions runs for that exact SHA using available read-only access. GitHub CLI is not installed; do not install it. Report CI and secret-scan run links and their actual status. If results are unavailable or still pending, say so. Do not claim Linux verification or M1 acceptance until the relevant jobs pass.
+
+5. Final handoff:
+- Published commit SHA and repository link.
+- Confirmation that remote main matches local HEAD.
+- Prompt-history commit and verification results.
+- Actual Actions statuses and links, if accessible.
+- Final Git status.
+- Confirmation that only main was pushed and nothing was merged or deployed.
+
+No application changes are authorized. If any unexpected tracked change occurs, stop and provide its complete diff directly in fenced diff blocks for review. Never truncate it.
+
+Do not make another commit or push to record the publication outcome in this task; report that outcome here, and we will record it in the next prompt-history update.
+````
+
+**Outcome (recorded before the push; publication pending):**
+- The external reviewer explicitly authorized publication after reviewing the history and the verified commit email migration. All six reachable commits use the noreply address for both author and committer.
+- The plan is to create local `main` at this entry's commit and push only `main` to `origin` with one normal push. No other branches, tags, `.local/` files or original-history objects are to be published.
+- Publication has **not** happened when this entry is written. As instructed, its result (remote SHA match and GitHub Actions status) will be recorded in the next prompt-history update, not in this commit.
