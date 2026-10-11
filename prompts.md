@@ -2461,3 +2461,84 @@ Do not push, merge, amend, rebase or change global configuration. Leave the work
 - **Commit:** one local commit, `feat: add PostgreSQL persistence foundation and migration checks`, whose parent is `6d05e12`. It contains this note, so its SHA is reported in the session handoff rather than here. A full-history Gitleaks scan was run after committing.
 - **Application checks** were not rerun, because only `prompts.md` changed since the reported run of 250 passed and 10 skipped.
 - **Still pending:** PostgreSQL integration, Linux, Compose and GitHub Actions verification, until an authorized publication and a successful CI run. Nothing was pushed or merged, and no database was contacted.
+
+## Prompt 29: Publish the reviewed M2a branch and verify CI
+
+- **Stage:** Publication of reviewed branch `feat/persistence-foundation` (no merge)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Prompt 29 — Publish the reviewed M2a branch and verify CI
+
+Work only in D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+This prompt explicitly authorizes publishing the reviewed feat/persistence-foundation branch. It does not authorize merging, pushing main, force-pushing or rewriting history.
+
+Verify the starting state:
+- Branch: feat/persistence-foundation
+- HEAD: 32eea73d5cc35eae4016dcab3aecb088a1574e39
+- Parent: 6d05e12475e27795398f2af8aa5463f6079cb217
+- Origin: https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Working tree clean.
+- Effective author and committer email:
+  257921624+mathewmljourney93@users.noreply.github.com
+
+Publication preflight:
+1. Inspect both workflow files. Confirm publishing this branch will trigger CI and the full-history secret scan, including Ubuntu verification, Windows verification and the PostgreSQL integration job.
+2. If workflow triggers need changing, leave that narrow change staged, provide its complete diff and stop before committing or pushing. It needs review first.
+3. Read the remote refs. Confirm remote main remains 6d64fb362c25c28908e38b5d0a06f8c393bf6096. If the feature branch already exists remotely, inspect its relationship to local history before proceeding; never overwrite divergent history.
+4. Inspect all changes that will become public relative to remote main, including prompts.md and commit identities. Check for unintended private information without printing sensitive values. Confirm no .local/ files or backup bundle are tracked.
+
+If preflight passes:
+- Append this prompt verbatim to prompts.md.
+- Add a truthful note recording the successful preflight and authorization to publish. Do not record a push or CI success before it happens.
+- Preserve all earlier prompt text and outcome notes.
+- Commit only this prompt-history update locally with subject:
+  docs: record M2a branch publication authorization
+
+Before publication, run:
+- git diff --cached --check before the documentation commit.
+- The staged Gitleaks scan before that commit.
+- gitleaks git --redact --verbose . after the commit.
+
+Only if all checks pass, push this single explicit ref and establish its upstream:
+git push --set-upstream origin refs/heads/feat/persistence-foundation:refs/heads/feat/persistence-foundation
+
+Do not push any other branch or tag.
+
+Verify the remote branch SHA equals the published local HEAD, and remote main is unchanged.
+
+Using available GitHub tooling or its public read-only Actions API, inspect workflow runs for that exact published SHA. Do not install system tools.
+- Report run and job links.
+- Check Ubuntu verification, Windows verification, PostgreSQL integration and full-history secret scanning.
+- Confirm the PostgreSQL tests actually ran and were not skipped.
+- If a job fails, return its failing step and relevant redacted output. Do not change code or publish another fix in this task.
+- If runs are still pending, report their actual current status. Do not claim continued background monitoring unless a real persistent process exists.
+
+Application checks need not be repeated if only prompts.md changed. Do not start Docker or contact the machine's PostgreSQL service.
+
+Final handoff:
+- Published commit SHA and branch.
+- Prompt-history commit and additions.
+- Preflight and scan results.
+- Workflow/job results for the exact published SHA, with any checks still pending.
+- Final Git status and confirmation that main was unchanged.
+- Complete incremental diff outside prompts.md, if any; otherwise explicitly state there was none.
+
+Do not merge or mark M2a integration verification complete unless the relevant CI job has actually passed.
+````
+
+**Preflight note (recorded before publication):**
+- **Starting state verified:** branch `feat/persistence-foundation`, HEAD `32eea73` (parent `6d05e12`), the expected origin, a clean working tree. The effective author and committer email is the GitHub noreply address.
+- **Workflows:** both `ci.yml` and `secret-scan.yml` trigger on `push` to any branch, as well as on `pull_request` and `workflow_dispatch`.
+  - `ci` runs `verify` on `ubuntu-24.04` and `windows-2025`, plus the Ubuntu `integration` job with the PostgreSQL 17 + pgvector service and `EG_REQUIRE_INTEGRATION=1`.
+  - `secret-scan` checks out the full history (`fetch-depth: 0`) and runs a checksum-verified Gitleaks 8.30.1.
+  - No trigger change was needed.
+- **Remote refs:** `refs/heads/main` is `6d64fb3`, and `feat/persistence-foundation` does not exist on the remote yet.
+- **Content to be published** (relative to remote `main`: commits `6d05e12` and `32eea73`, 30 files):
+  - both commits use the noreply identity for author and committer;
+  - no `.local/` files, bundles or backups are tracked;
+  - credential-like matches are limited to the documented disposable Compose and CI passwords, the `.env.example` placeholder and labelled fake test markers;
+  - the only email address is the noreply one, and no personal paths or identifiers were found.
+- **Authorization:** Prompt 29 authorizes publishing this single branch. It does not authorize a merge, a push to `main`, a force-push or a history rewrite.
+- **Not yet recorded here:** the push result and CI results happen after this commit, so they are reported in the session handoff. M2a PostgreSQL integration verification stays **pending** until the CI integration job has actually passed.
