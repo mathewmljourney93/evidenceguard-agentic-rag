@@ -10,15 +10,55 @@ EvidenceGuard is a planned vendor-risk review copilot. It is intended to:
 
 It is evidence-based decision support, not legal advice or compliance certification.
 
-## Status
+## Status: milestone M1a (pre-alpha)
 
-**Planning and repository foundation only.** No application code exists yet. No retrieval, agent workflow, evaluation results, security guarantees or benchmarks are claimed. Any future results will be published together with their committed inputs, configuration and the command that reproduces them.
+**What works now:**
+- One installable Python 3.12 package (`evidenceguard`), managed with uv, with a committed lockfile.
+- A minimal FastAPI app with one endpoint: `GET /healthz` returns `{"status": "ok"}`. This is a **process-liveness** check only. It does not check databases or any other dependency, and it does not mean the product works.
+- An `eg-api` command that serves the app with Uvicorn, plus FastAPI's generated OpenAPI docs at `/docs` and `/openapi.json`.
+- Tests, Ruff and strict Mypy. A CI workflow is configured for Ubuntu and Windows but **has not yet run in GitHub Actions**.
 
-The planned stack is Python 3.12 with uv, FastAPI, PostgreSQL with pgvector, Anthropic Claude behind a typed provider interface, and a deterministic fake provider for tests and CI.
+**Still planned** (see [docs/plan.md](docs/plan.md)):
+- The rest of M1: domain state machines, structured logging and redaction.
+- Everything after it: authentication, tenancy, persistence, ingestion, retrieval, model providers, the review workflow, the approval gate and evaluation.
+
+No retrieval, agent workflow, evaluation results, security guarantees or benchmarks are claimed. Any future results will be published with their committed inputs, configuration and the command that reproduces them.
+
+## Development (Windows, PowerShell)
+
+**Prerequisite:** [uv](https://docs.astral.sh/uv/) 0.13 or later. uv provides Python 3.12; the repository pins it in `.python-version`.
+
+Set up:
+
+```powershell
+uv python install 3.12
+uv sync --locked
+```
+
+Check:
+
+```powershell
+uv run --locked ruff format --check .
+uv run --locked ruff check .
+uv run --locked mypy
+uv run --locked pytest
+uv build
+```
+
+Run the API (Ctrl+C to stop):
+
+```powershell
+uv run --locked eg-api            # http://127.0.0.1:8000
+uv run --locked eg-api --port 8765
+```
+
+Then open `http://127.0.0.1:8000/healthz` or `http://127.0.0.1:8000/docs`. The same commands work in a POSIX shell.
+
+Packaging layout and the reasons behind it: [ADR-0001](docs/decisions/0001-packaging-and-layout.md).
 
 ## Engineering record
 
-[prompts.md](prompts.md) records, verbatim and in order, every prompt that directed this project, with a short note on each outcome. [CLAUDE.md](CLAUDE.md) holds the standing development rules.
+[prompts.md](prompts.md) records, verbatim and in order, every prompt given to the Claude Code implementation session, with a short note on each outcome. [CLAUDE.md](CLAUDE.md) holds the standing development rules.
 
 ## Secret scanning
 

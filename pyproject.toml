@@ -1,0 +1,68 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "evidenceguard"
+version = "0.1.0.dev0"
+description = "Auditable multi-agent RAG for vendor risk review (pre-alpha)."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.143.0",
+    "pydantic>=2.14.0",
+    "uvicorn>=0.54.0",
+]
+
+[project.scripts]
+eg-api = "evidenceguard_api.__main__:main"
+
+[dependency-groups]
+dev = [
+    "httpx2>=2.13.1",
+    "mypy>=2.4.0",
+    "pytest>=9.1.1",
+    "ruff>=0.17.0",
+]
+
+# One distribution, nested layout: each package lives under its approved
+# directory and is installed at the top level of the wheel (see ADR-0001).
+[tool.hatch.build.targets.wheel]
+packages = [
+    "apps/api/evidenceguard_api",
+    "packages/domain/evidenceguard_domain",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/apps/api/evidenceguard_api",
+    "/packages/domain/evidenceguard_domain",
+    "/tests",
+    "/docs/decisions",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["evidenceguard_api", "evidenceguard_domain"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["apps/api/evidenceguard_api", "packages/domain/evidenceguard_domain", "tests"]
+plugins = ["pydantic.mypy"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers", "--strict-config", "--import-mode=importlib"]
+filterwarnings = ["error"]

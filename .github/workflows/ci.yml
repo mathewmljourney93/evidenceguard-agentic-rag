@@ -1,0 +1,66 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify (${{ matrix.os }}, Python 3.12)
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up uv and Python 3.12
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.13.0"
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: uv sync --locked
+
+      - name: Check formatting
+        run: uv run --locked ruff format --check .
+
+      - name: Lint
+        run: uv run --locked ruff check .
+
+      - name: Type-check
+        run: uv run --locked mypy
+
+      - name: Test
+        run: uv run --locked pytest
+
+      - name: Build distribution
+        run: uv build
+
+      - name: Install the wheel in a clean environment and import it
+        run: |
+          set -euo pipefail
+          uv venv "${RUNNER_TEMP}/wheel-check" --python 3.12
+          uv pip install --python "${RUNNER_TEMP}/wheel-check" dist/evidenceguard-*.whl
+          if [ -x "${RUNNER_TEMP}/wheel-check/Scripts/python.exe" ]; then
+            bin="${RUNNER_TEMP}/wheel-check/Scripts"
+          else
+            bin="${RUNNER_TEMP}/wheel-check/bin"
+          fi
+          cd "${RUNNER_TEMP}"
+          "${bin}/python" -I -c "import evidenceguard_api, evidenceguard_domain; from evidenceguard_api.app import create_app; create_app(); print(evidenceguard_api.__file__); assert 'site-packages' in evidenceguard_api.__file__"
+          "${bin}/eg-api" --help
