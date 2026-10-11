@@ -1,4 +1,4 @@
-# Threat model (initial draft, M1b)
+# Threat model (initial draft, M1c)
 
 **Status:** draft. This document grows with each milestone and must be complete before v0.1 ([plan](plan.md) correction F). It describes the planned system; most of it is **not implemented yet**.
 
@@ -32,6 +32,19 @@ These are **domain invariants** in `evidenceguard_domain`, enforced by validatio
 
 These invariants hold only for code that goes through the domain models and transitions. Pydantic's `model_construct` and `object.__setattr__` can bypass validation; domain code never uses them.
 
+## API request handling (M1c, implemented and tested)
+
+| Threat | Mitigation |
+|---|---|
+| Submitted values, credentials or quotations leaking into logs | Records rendered by the configured JSON formatter carry only a fixed event identifier (from a reviewed template table; message text and arguments are never formatted) and allowlisted fields: request ID, method, route template, status, duration and exception class. Uvicorn's access log is off. Handlers configured outside `logging_config()` are not covered. |
+| Exception text or tracebacks leaking to clients or logs | Unexpected errors return a generic 500 problem. Logs record the exception class only, with no message and no traceback. |
+| Validation errors echoing input | 422 problems list only `loc` and `type` for at most 20 errors. Values, messages and context are omitted. |
+| `HTTPException.detail` echoing submitted values or internal text | Ordinary HTTP errors get a generic detail for their status class. A specific message must come from the reviewed `PublicMessage` catalogue through `PublicHTTPException`. |
+| A client-chosen request ID being trusted | Only a single valid UUID is accepted, and it is used purely for correlation, never for identity or authorization. |
+| Request context bleeding between concurrent requests | The request ID is held in a per-task `ContextVar`; tested with ten interleaved requests. |
+
+The full design and limits are in [ADR-0002](decisions/0002-request-ids-logging-and-errors.md). A client-chosen extra field *name* can still appear, capped, in a 422 body.
+
 ## Not implemented yet
 
 - **Authentication.** `ActorContext` is trusted as given. Nothing yet derives it from a credential. Planned: hashed per-user API keys (M2).
@@ -39,7 +52,7 @@ These invariants hold only for code that goes through the domain models and tran
 - **Atomic, concurrent-safe transitions.** The transitions are pure functions. Two simultaneous requests could both pass validation; persistence must serialize them (for example with a row lock or compare-and-set on revision and hash).
 - **Upload limits and untrusted-file handling** (M3).
 - **Provenance checks:** that a cited chunk was actually retrieved for the review and that the quote occurs in it (M5).
-- **Log redaction and secret handling in code** (observability, still pending in M1).
+- **Secret handling in settings code** (no settings exist yet). Request logging (M1c) writes only allowlisted fields; see ADR-0002.
 
 ## Open risks
 

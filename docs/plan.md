@@ -505,8 +505,12 @@ Each question entry contains:
 
 *Progress record:*
 - **M1a:** packaging, minimal API, CI configuration. Committed locally as `d196afc`; CI has not run on GitHub.
-- **M1b:** evidence contracts and pure report-approval transitions (`evidenceguard_domain.evidence`, `.report`, `.approval`), plus initial threat-model and responsible-AI drafts. Under review.
-- **Pending:** observability (logging, redaction), request IDs, problem+json errors and ADR-0002.
+- **M1b:** evidence contracts and pure report-approval transitions (`evidenceguard_domain.evidence`, `.report`, `.approval`), plus initial threat-model and responsible-AI drafts. Committed locally as `da108e5`.
+- **M1c:** request IDs, JSON request logging and problem+json errors (`evidenceguard_observability`, API middleware and handlers), ADR-0002. Under review.
+- **Pending:** ADR-0003 (plain-Python workflow, renumbered from ADR-0002 because ADR-0002 now records the M1c observability decisions).
+- M1c notes:
+  - The plan's "logs redact secrets" is met by an allowlist formatter rather than pattern-based redaction.
+  - No `.env.example` yet, because M1c adds no settings.
 - Decisions made during M1b:
   - Roles are only `reviewer` and `approver`; `admin` arrives with authentication in M2, and gets no approval bypass.
   - Report transitions live in `evidenceguard_domain.approval` rather than a single `state` module.
@@ -518,7 +522,7 @@ Each question entry contains:
 - API: app factory, `/healthz`, request IDs, problem+json errors.
 - Tests: unit tests and the import-boundary test.
 - `.github/workflows/ci.yml`.
-- ADR-0001 (packaging) and ADR-0002 (plain-Python workflow).
+- ADR-0001 (packaging), ADR-0002 (request IDs, logging and errors) and ADR-0003 (plain-Python workflow).
 - **Initial drafts of `docs/threat-model.md` and `docs/responsible-ai.md`.**
 - *Acceptance:*
   - `uv sync --locked`, ruff, format, strict mypy and pytest pass on Windows and in CI.

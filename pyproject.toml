@@ -31,12 +31,14 @@ dev = [
 packages = [
     "apps/api/evidenceguard_api",
     "packages/domain/evidenceguard_domain",
+    "packages/observability/evidenceguard_observability",
 ]
 
 [tool.hatch.build.targets.sdist]
 include = [
     "/apps/api/evidenceguard_api",
     "/packages/domain/evidenceguard_domain",
+    "/packages/observability/evidenceguard_observability",
     "/tests",
     "/docs/decisions",
 ]
@@ -49,12 +51,17 @@ target-version = "py312"
 select = ["E", "W", "F", "I", "B", "UP", "SIM", "RUF"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["evidenceguard_api", "evidenceguard_domain"]
+known-first-party = ["evidenceguard_api", "evidenceguard_domain", "evidenceguard_observability"]
 
 [tool.mypy]
 python_version = "3.12"
 strict = true
-files = ["apps/api/evidenceguard_api", "packages/domain/evidenceguard_domain", "tests"]
+files = [
+    "apps/api/evidenceguard_api",
+    "packages/domain/evidenceguard_domain",
+    "packages/observability/evidenceguard_observability",
+    "tests",
+]
 plugins = ["pydantic.mypy"]
 
 [tool.pydantic-mypy]

@@ -1266,3 +1266,235 @@ Work only in `D:\Claude\evidenceguard_agentic_rag`. Do not push, merge, amend co
 - `git diff --cached --check` and the Gitleaks staged scan were run before committing.
 - One local commit was created on `feat/evidence-contracts-approval`. The SHA and post-commit history scan are in the session handoff.
 - Not pushed. Linux and GitHub Actions remain unverified.
+
+---
+
+## Prompt 13: M1c, API observability and consistent error responses
+
+- **Stage:** Implementation, milestone M1c (staged for review, no commit)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Implement M1c only: API observability and consistent error responses.
+
+Work in `D:\Claude\evidenceguard_agentic_rag`. Read `CLAUDE.md`, `docs/plan.md`, the existing API, tests, packaging configuration and CI workflow first. Keep work within this project.
+
+Do not commit, push, merge, change global configuration, install system tools, or implement later milestones.
+
+Starting state
+- Branch: `feat/evidence-contracts-approval`
+- HEAD: `da108e5a4e87ae1afcc9acd818a6ee3fe4d1e564`
+- Origin: `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`
+- Clean working tree.
+
+Verify these before changing anything. If they differ, stop and report the difference. Create `feat/api-observability` from this HEAD.
+
+Scope
+
+1. Request IDs
+- Associate each request with a request ID.
+- Accept an incoming `X-Request-ID` only when it is a valid UUID; normalize it. Otherwise generate a fresh UUID.
+- Return `X-Request-ID` on successful and error responses, including unexpected server errors.
+- Make the ID available to handlers and logging without leaking context across concurrent requests.
+- Treat it only as a correlation identifier, never as authentication or evidence of identity.
+
+2. Structured logging
+- Use a small standard-library implementation unless the existing plan justifies a dependency.
+- Emit JSON request-completion logs containing the request ID, HTTP method, route template where available, response status and elapsed time.
+- Avoid logging raw URL paths when no route matches. Do not log query strings, bodies, headers, credentials, evidence quotations, or validation input values.
+- Do not expose exception messages or tracebacks in public responses. Keep default logs free of arbitrary exception text.
+- Avoid duplicate handlers or duplicate completion logs when multiple app instances are created.
+- Do not add telemetry services or claim production monitoring.
+
+3. Consistent errors
+- Implement `application/problem+json` responses following the relevant standard and current FastAPI/Starlette public APIs.
+- Handle HTTP errors, request-validation failures and unexpected exceptions.
+- Include the same request ID in the response header and problem body.
+- Return useful, bounded validation details without echoing submitted input, arbitrary exception text or sensitive context.
+- Preserve HTTP status codes and required exception headers.
+- Unexpected errors return a generic 500 response.
+- Keep `/healthz` success behaviour unchanged. Do not expose domain approval operations as new endpoints.
+- Do not suppress unexpected exceptions merely to make tests pass.
+
+4. Tests
+Add focused tests for:
+- Generated, accepted and invalid incoming request IDs.
+- IDs on success, 404, validation failure and unexpected 500 responses.
+- Concurrent requests retaining their own IDs.
+- Correct problem content type, status and preserved required headers.
+- Sensitive submitted values and exception messages absent from public errors and default logs.
+- Structured completion logs and no duplicate logging across app instances.
+
+Use test-only routes where needed; do not add diagnostic endpoints to the application.
+
+5. Documentation and prompt history
+- Add ADR-0002 explaining request-ID handling, logging choices, error format and privacy limits.
+- Update README and milestone status accurately.
+- Append this entire prompt verbatim to `prompts.md` using the next sequential number, with a separate truthful outcome note. Preserve earlier entries.
+- Check the existing plan for M1c-specific requirements. Report material conflicts instead of silently redesigning the plan.
+
+Verification
+Run locked dependency sync, Ruff formatting and lint checks, strict Mypy, the full test suite, package build, and isolated wheel-import verification. Run staged whitespace checks and the staged redacted Gitleaks scan.
+
+Stage only intended M1c files. Leave everything uncommitted.
+
+Handoff
+Report changed paths, design decisions, exact verification commands and results, and final Git status. State what remains unverified.
+
+Provide the complete staged diff excluding `prompts.md`. If too large to paste, save it under the already gitignored `.local/` directory and give me its path so I can bring it to the reviewer. Never truncate the review diff or stage that local artifact.
+
+Nothing should be committed or pushed.
+````
+
+**Outcome (pending review; staged, not committed or pushed):**
+- Branch `feat/api-observability` was created from `da108e5`, with a clean working tree.
+- Added the planned `evidenceguard_observability` package (`context.py`, `jsonlog.py`), standard library only. Added `RequestContextMiddleware` (`middleware.py`) and problem+json handlers (`problems.py`) to the API. `eg-api` now runs Uvicorn with the JSON logging config and with the access log disabled.
+- `/healthz` success behaviour is unchanged, apart from the added `X-Request-ID` header. No new application endpoints; the tests use test-only routes.
+- **Plan conflicts, reported and resolved narrowly:**
+  - The plan reserved ADR-0002 for the plain-Python workflow. As this prompt instructs, ADR-0002 now records the observability decisions, and the workflow ADR is renumbered ADR-0003 in `docs/plan.md`.
+  - The plan's "logs redact secrets" is met by an allowlist formatter rather than pattern redaction.
+- `pyproject.toml` registers the new package for the wheel, sdist, Ruff and Mypy. No dependency or lockfile changes.
+- The first staged Gitleaks scan **failed**. Rule `generic-api-key` flagged the synthetic, key-shaped test marker in `tests/test_problems.py` and `tests/test_logging.py`. It was replaced with an obviously fake, low-entropy marker rather than allowlisted, and the checks were rerun.
+- **Verified locally** (Windows, Python 3.12.15): the locked sync, Ruff, strict Mypy, the full pytest suite, the build, the isolated wheel check and real-server smoke checks were run before staging. Results are in the session handoff.
+- **Not verified:** GitHub Actions and Linux.
+
+**Review note (added with Prompt 14):** the external reviewer inspected the M1c diff and found two privacy issues:
+- `JsonFormatter` wrote log messages verbatim;
+- `HTTPException.detail` strings were published automatically.
+
+The reviewer reproduced the formatter leak in isolation but did not run the full application suite. Both issues are corrected under Prompt 14 below. The M1c work remains uncommitted.
+
+---
+
+## Prompt 14: M1c privacy fixes
+
+- **Stage:** Corrections to staged M1c work (no commit, no push)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Fix the two M1c privacy findings before committing.
+
+Remain in `D:\Claude\evidenceguard_agentic_rag`, on `feat/api-observability`, with HEAD `da108e5a4e87ae1afcc9acd818a6ee3fe4d1e564`. Preserve the existing staged implementation. Do not commit, push, change branches, or modify global configuration.
+
+1. Close the unrestricted log-message path.
+- JsonFormatter currently writes record.getMessage() verbatim as "event". This bypasses the structured-field allowlist.
+- Emit reviewed, fixed event identifiers. Unknown messages must become a generic fixed identifier without copying their message, arguments, exception text or traceback.
+- Apply this protection to both EvidenceGuard and Uvicorn records handled by this formatter.
+- Keep useful safe fields and existing request-completion behaviour. Do not replace this with heuristic secret-pattern matching.
+- Correct documentation claiming third-party messages are safe because they use fixed templates.
+
+Add regression tests showing that:
+- A directly embedded sensitive marker is absent from formatted output.
+- A marker supplied through logging interpolation arguments is absent.
+- An exception interpolated into a message is absent, even without exc_info.
+- The fixed request.completed event and its safe fields remain intact.
+
+2. Make HTTP problem details explicitly safe.
+- Do not automatically publish arbitrary HTTPException.detail strings.
+- Ordinary HTTP exceptions should receive generic public details while preserving status and required headers.
+- If useful application-specific messages remain supported, provide an explicit mechanism for reviewed public messages. Document that submitted values and internal exception text must never enter it.
+- Update the existing authentication-detail test to reflect the chosen mechanism.
+
+Add a test-only route that raises HTTPException with a submitted marker in its string detail. Verify that the marker is absent from the response while status, problem content type, request ID and required headers remain correct.
+
+3. Update README, ADR-0002 and the threat model to describe the actual guarantees and remaining limits accurately. Avoid absolute claims extending to logging handlers outside this configuration.
+
+Append this prompt verbatim to prompts.md with the next sequential number. Add a separate review note explaining that the reviewer inspected the diff and reproduced the formatter leak in isolation, but did not run the full application suite. Record the fixes and verification truthfully without changing earlier history.
+
+Run formatting, lint, strict Mypy, the full test suite, build and isolated installed-wheel checks. Run staged whitespace and redacted secret scans.
+
+Leave intended changes staged and uncommitted. Provide the complete incremental diff against the previously reviewed M1c staged version, excluding prompts.md, plus verification results and final status. Save the untruncated diff under gitignored .local/ if needed; do not stage it.
+
+Nothing should be committed or pushed.
+````
+
+**Outcome (pending review; staged, not committed or pushed):**
+- **Logging.** `JsonFormatter` no longer formats record messages.
+  - `event` is looked up from a reviewed table keyed by the unformatted template. The table holds `request.completed` and Uvicorn 0.54's lifecycle templates.
+  - Anything else becomes `log.unreviewed_message`. Message text, arguments and interpolated exceptions are never written, for EvidenceGuard and Uvicorn records alike.
+  - Safe allowlisted fields are unchanged. No pattern-based secret matching was added.
+- **HTTP errors.**
+  - Ordinary `HTTPException` details are replaced with a generic sentence for the status class; status and headers are preserved.
+  - Specific messages now require `PublicHTTPException` with a member of the reviewed `PublicMessage` enum (only `AUTHENTICATION_REQUIRED` so far). The authentication test was updated to use it.
+  - A test-only route raises `HTTPException` with submitted input in its detail; the input does not reach the response.
+- ADR-0002, the threat model and the README were updated. They now scope the logging guarantees to records rendered through `logging_config()`, and no longer claim that third-party messages are safe.
+- **Verified locally** (Windows, Python 3.12.15):
+  - The new and updated tests were run against the previously staged implementation: 13 failed and showed the leaks. With the fix, all pass.
+  - Ruff, strict Mypy, the full pytest suite, the build, the isolated installed-wheel check, a real-server smoke check and the staged scans were run before staging. Results are in the session handoff.
+- **Not verified:** GitHub Actions and Linux.
+
+**Review note (added with Prompt 15):**
+- The external reviewer inspected the original and incremental M1c diffs and accepted both privacy corrections for a local commit.
+- The reviewer reproduced the original formatter leak in isolation, but did not independently run the revised application suite.
+- The acceptance also relied on Claude's reported Windows verification of 155 passing tests.
+- Linux and GitHub Actions remain unverified.
+
+---
+
+## Prompt 15: Local M1c commit and review-handoff guidance
+
+- **Stage:** Commit of reviewed M1c work, plus a `CLAUDE.md` workflow update (no application changes, no push)
+- **Date:** 2026-10-11 (session date)
+
+````text
+Commit the reviewed M1c implementation locally.
+
+Work only in `D:\Claude\evidenceguard_agentic_rag`. Do not push, merge, amend commits, change branches, modify global configuration, or begin another milestone.
+
+1. Verify the starting state:
+- Branch: `feat/api-observability`
+- HEAD: `da108e5a4e87ae1afcc9acd818a6ee3fe4d1e564`
+- Origin: `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`
+- The expected 18 M1c files are staged, with nothing unstaged or untracked.
+- No `.local/` artifacts are staged.
+
+Stop and report any difference.
+
+2. Append this entire prompt verbatim to `prompts.md` using the next sequential number. Add a separate review note recording:
+- The external reviewer inspected the original and incremental M1c diffs and accepted both privacy corrections for a local commit.
+- The reviewer reproduced the original formatter leak in isolation, but did not independently run the revised application suite.
+- Acceptance also relied on your reported Windows verification of 155 passing tests.
+- Linux and GitHub Actions remain unverified.
+
+Preserve all earlier prompts and outcome notes. Make no application, test, dependency or configuration changes.
+
+3. Record our review handoff preference in the existing workflow guidance in `CLAUDE.md`:
+- Future implementation handoffs must include the complete staged diff, excluding `prompts.md`, directly in the response inside fenced `diff` blocks.
+- Future correction handoffs must include the complete incremental diff against the previously reviewed staged version, excluding `prompts.md`.
+- Never truncate or replace the diff with a summary. Split large diffs into numbered parts at file boundaries and provide all parts.
+- Include verification results and Git status separately.
+- Attachments are a fallback if response limits prevent providing the complete diff.
+- Implementation and correction work remains staged and uncommitted until reviewed. Commit and push require explicit authorization.
+
+Keep this edit narrow and consistent with existing instructions. This prompt authorizes the local commit below only.
+
+4. Stage the `prompts.md` and `CLAUDE.md` updates alongside the reviewed M1c files. Inspect staged content for secrets and private material without displaying credential values.
+
+Run:
+- `git diff --cached --check`
+- `gitleaks git --pre-commit --staged --redact --verbose .`
+
+Stop if either check fails. Application checks need not be repeated if only these documentation files changed since the successful verification.
+
+5. Create one local commit with subject:
+`feat: add request correlation and privacy-safe API observability`
+
+6. Run the full-history secret scan:
+`gitleaks git --redact --verbose .`
+
+If a post-commit check fails, report it without amending or rewriting history.
+
+7. In your final response:
+- Report the commit SHA, branch, committed paths, check results and final Git status.
+- Include the complete `CLAUDE.md` diff introduced in this step in a fenced `diff` block. The previously reviewed application diff need not be repeated.
+- Summarize the appended prompt-history entries separately.
+- State explicitly that nothing was pushed.
+
+Nothing should be pushed or merged.
+````
+
+**Outcome (pending review):**
+- Only `prompts.md` (this prompt and the review note above) and `CLAUDE.md` changed. `CLAUDE.md` gained a "Review handoffs" section, and its commit rule now keeps work staged until reviewed. No application, test, dependency or configuration changes, so the application checks were not rerun.
+- `git diff --cached --check` and the Gitleaks staged scan were run before committing.
+- One local commit was created on `feat/api-observability`. The SHA and post-commit history scan are in the session handoff.
+- Not pushed. Linux and GitHub Actions remain unverified.

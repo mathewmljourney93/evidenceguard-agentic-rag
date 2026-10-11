@@ -1,10 +1,12 @@
 import ast
 from importlib.metadata import distribution, entry_points
 from pathlib import Path
+from types import ModuleType
 
 import pytest
 
 import evidenceguard_domain
+import evidenceguard_observability
 from evidenceguard_api.__main__ import main
 
 
@@ -29,14 +31,24 @@ def test_eg_api_help_exits_cleanly(capsys: pytest.CaptureFixture[str]) -> None:
     assert "usage: eg-api" in capsys.readouterr().out
 
 
-def test_domain_does_not_import_api() -> None:
-    package_dir = Path(evidenceguard_domain.__file__).parent
+def _top_level_imports(package_dir: Path) -> set[str]:
     imported: set[str] = set()
     for source in package_dir.rglob("*.py"):
         for node in ast.walk(ast.parse(source.read_text(encoding="utf-8"))):
             if isinstance(node, ast.Import):
-                imported.update(alias.name for alias in node.names)
+                imported.update(alias.name.split(".")[0] for alias in node.names)
             elif isinstance(node, ast.ImportFrom) and node.module:
-                imported.add(node.module)
+                imported.add(node.module.split(".")[0])
+    return imported
 
-    assert not any(name.split(".")[0] == "evidenceguard_api" for name in imported)
+
+@pytest.mark.parametrize(
+    ("package", "forbidden"),
+    [
+        (evidenceguard_domain, {"evidenceguard_api", "evidenceguard_observability"}),
+        (evidenceguard_observability, {"evidenceguard_api"}),
+    ],
+)
+def test_package_import_boundaries(package: ModuleType, forbidden: set[str]) -> None:
+    assert package.__file__ is not None
+    assert not _top_level_imports(Path(package.__file__).parent) & forbidden

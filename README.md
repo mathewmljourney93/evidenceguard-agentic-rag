@@ -10,7 +10,7 @@ EvidenceGuard is a planned vendor-risk review copilot. It is intended to:
 
 It is evidence-based decision support, not legal advice or compliance certification.
 
-## Status: milestone M1b (pre-alpha)
+## Status: milestone M1c (pre-alpha)
 
 **What works now:**
 - One installable Python 3.12 package (`evidenceguard`), managed with uv, with a committed lockfile (M1a).
@@ -29,17 +29,25 @@ It is evidence-based decision support, not legal advice or compliance certificat
   - rejections must state a reason;
   - identical retries are idempotent, and changed retries are refused as conflicts;
   - only finalized reports can be exported.
+- **API request handling** (M1c):
+  - every response carries an `X-Request-ID` (a valid incoming UUID is reused, otherwise a new one is generated);
+  - errors are `application/problem+json` (RFC 9457) with the same request ID;
+  - `eg-api` writes one JSON log line per request with the route template, status and duration;
+  - log lines carry only fixed, reviewed event names and allowlisted fields. Message text, raw paths, query strings, bodies and exception messages are not written by this logging configuration;
+  - error responses never echo submitted values or exception text. Specific error messages come only from a reviewed catalogue.
+
+  See [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md), including what these guarantees do not cover.
 - Tests, Ruff and strict Mypy. A CI workflow is configured for Ubuntu and Windows but **has not yet run in GitHub Actions**.
 
-**Limits of M1b:**
-- These are in-memory domain rules only. There is no authentication, database, tenancy enforcement in storage, or protection against concurrent requests yet.
-- No API endpoint uses them yet.
+**Limits:**
+- The M1b domain rules are in-memory only. There is no authentication, database, tenancy enforcement in storage, or protection against concurrent requests yet.
+- No API endpoint uses them yet; the only application endpoint is `/healthz`.
 - A citation's shape is validated. Whether the tenant may see the chunk, whether the quote is really in it, and whether it supports the claim are **not** checked yet.
 - Human approval in EvidenceGuard does not establish document authenticity or certify compliance. See [docs/responsible-ai.md](docs/responsible-ai.md) and [docs/threat-model.md](docs/threat-model.md).
 
 **Still planned** (see [docs/plan.md](docs/plan.md)):
-- The rest of M1: structured logging and redaction.
-- Everything after it: authentication, tenancy, persistence, ingestion, retrieval, model providers, the review workflow, API endpoints for the approval gate, and evaluation.
+- ADR-0003 (plain-Python workflow), which completes M1.
+- Everything after M1: authentication, tenancy, persistence, ingestion, retrieval, model providers, the review workflow, API endpoints for the approval gate, and evaluation.
 
 No retrieval, agent workflow, evaluation results, security guarantees or benchmarks are claimed. Any future results will be published with their committed inputs, configuration and the command that reproduces them.
 
@@ -73,7 +81,9 @@ uv run --locked eg-api --port 8765
 
 Then open `http://127.0.0.1:8000/healthz` or `http://127.0.0.1:8000/docs`. The same commands work in a POSIX shell.
 
-Packaging layout and the reasons behind it: [ADR-0001](docs/decisions/0001-packaging-and-layout.md).
+Packaging layout: [ADR-0001](docs/decisions/0001-packaging-and-layout.md). Request IDs, logging and error format: [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md).
+
+The request ID is for correlating logs only. It is not authentication and says nothing about who made a request. Logs are local JSON lines on stderr; there is no monitoring or telemetry service.
 
 ## Engineering record
 

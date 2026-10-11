@@ -25,6 +25,14 @@ These rules apply to every Claude session in this repository.
 
 - Never claim a check passed unless it actually ran in this session; report the command and its result.
 - Before any commit: inspect `git status`, the staged paths and the staged diff, run the relevant checks, and run a secret scan (see README).
-- Do not commit unless the prompt asks for it.
+- Leave implementation and correction work staged and uncommitted until it has been reviewed. Commit only when a prompt explicitly authorizes it.
 - Never push, merge or deploy without Mathew's explicit approval.
 - Do not amend, rebase or otherwise rewrite existing history without explicit instruction.
+
+## Review handoffs
+
+- An implementation handoff includes the complete staged diff, excluding `prompts.md`, directly in the response inside fenced `diff` blocks.
+- A correction handoff includes the complete incremental diff against the previously reviewed staged version, excluding `prompts.md`.
+- Never truncate a diff or replace it with a summary. Split a large diff into numbered parts at file boundaries and provide every part.
+- Report verification results and Git status separately from the diff.
+- Attach the diff as a file under `.local/` only as a fallback, when response limits prevent including it in full.

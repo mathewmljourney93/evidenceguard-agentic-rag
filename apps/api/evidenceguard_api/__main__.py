@@ -6,6 +6,7 @@ from collections.abc import Sequence
 import uvicorn
 
 from evidenceguard_api.app import create_app
+from evidenceguard_observability.jsonlog import logging_config
 
 
 def main(argv: Sequence[str] | None = None) -> None:
@@ -19,7 +20,15 @@ def main(argv: Sequence[str] | None = None) -> None:
         "--port", type=int, default=8000, help="port to bind (default: %(default)s)"
     )
     args = parser.parse_args(argv)
-    uvicorn.run(create_app(), host=args.host, port=args.port)
+    # Uvicorn applies the JSON logging configuration. Its access log is off because it records
+    # raw paths and query strings; RequestContextMiddleware logs each request instead.
+    uvicorn.run(
+        create_app(),
+        host=args.host,
+        port=args.port,
+        log_config=logging_config(),
+        access_log=False,
+    )
 
 
 if __name__ == "__main__":
