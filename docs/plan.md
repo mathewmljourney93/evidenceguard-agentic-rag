@@ -544,9 +544,16 @@ Each question entry contains:
 - Persistence package, Alembic, compose (Postgres only), `seed-demo`/`create-key`, `/v1/me`, vendor endpoints.
 
 *Progress record:*
-- **M2a** (persistence foundation): `evidenceguard_persistence` (settings, engine and sessions, the tenants/users/api_keys/vendors schema, migration `0001`), Compose, the CI integration job and [ADR-0004](decisions/0004-persistence-foundation.md). Under review.
-  - **Not verified against PostgreSQL:** local Docker is unavailable, and integration verification is pending CI on an authorized, published branch.
-- **Next slices:** M2b (API-key authentication, tenant context, `eg-admin`), then M2c (vendor endpoints) with `/readyz` and the API database wiring, following the decisions under Prompt 24 in [prompts.md](../prompts.md).
+- **M2a** (persistence foundation): `evidenceguard_persistence` (settings, engine and sessions, the tenants/users/api_keys/vendors schema, migration `0001`, the URL policy and the destructive-test guard), Compose, the CI integration job and [ADR-0004](decisions/0004-persistence-foundation.md).
+  - **Status:** reviewed and **verified in CI** on branch `feat/persistence-foundation` at commit `9ad7dae` (`9ad7daefc6372786e1da2a636b9419b4ca7df89d`). Not yet merged into `main`.
+  - **[CI run 38158076257](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257):**
+    - `verify` passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070324) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070158).
+    - The [PostgreSQL 17 + pgvector integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070229) passed. Its log, retrieved by the external reviewer, reports `10 passed, 250 deselected`, so all ten integration tests passed and none was skipped.
+  - **[Secret-scan run 38158076261](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076261):** the full-history scan passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076261/job/114525070253)).
+  - **Still not verified:**
+    - Compose has never been run, because there is no local Docker.
+    - No pgvector functionality has been tested; M2a creates no vector extension.
+- **Next slices:** M2b (API-key authentication, tenant context, `eg-admin`), then M2c (vendor endpoints) with `/readyz` and the API database wiring, following the decisions under Prompt 24 in [prompts.md](../prompts.md). Both are pending, and **M2 is not complete** until they land and meet the acceptance criteria below.
 - *Acceptance:*
   - Migrations upgrade and downgrade cleanly.
   - Composite foreign keys reject cross-tenant references.

@@ -1,6 +1,6 @@
 # ADR-0004: Persistence foundation
 
-- **Status:** Proposed, under review (M2a)
+- **Status:** Accepted (M2a). Verified in CI at commit `9ad7dae` on branch `feat/persistence-foundation`; not yet merged into `main`. See *Consequences and limits*.
 - **Date:** 2026-10-11
 - **Builds on:** plan decisions D2 and D7, and the M2 decisions recorded under Prompt 24 in [prompts.md](../../prompts.md)
 
@@ -80,7 +80,17 @@ Authentication, admin commands, vendor endpoints and `/readyz` arrive in later M
 
 ## Consequences and limits
 
-- **Not run against PostgreSQL yet.** Docker is not installed on the development machine, and the existing local PostgreSQL 16 service is deliberately not used. So the migrations, constraints, drift check and Compose file have **not** been run against PostgreSQL. That verification is **pending** until a reviewed branch is authorized for publication and its CI integration job passes.
+- **Verified against PostgreSQL in CI.** The tested commit is `9ad7dae` (`9ad7daefc6372786e1da2a636b9419b4ca7df89d`) on branch `feat/persistence-foundation`.
+  - The [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070229) in [CI run 38158076257](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257) ran against a PostgreSQL 17 + pgvector service container. Its log reports `10 passed, 250 deselected`, so none was skipped.
+  - It covered:
+    - migration upgrade, downgrade and re-upgrade;
+    - the `alembic check` drift check;
+    - that no extension is created;
+    - the cross-tenant, missing-tenant, uniqueness, role and secret-hash constraints.
+  - The database-independent checks, including the URL policy and the guard's refusal paths, passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070324) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070158). The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076261) passed.
+  - The integration log was retrieved by the external reviewer.
+- **Not verified locally.** Docker is not installed on the development machine, and the existing local PostgreSQL 16 service is deliberately not used. So `docker-compose.yml` has **never been run**.
+- **No pgvector functionality tested.** M2a creates no vector extension. The pgvector image is used only as the PostgreSQL server.
 - **Guard limits.** URL comparison cannot prove that two different DNS names, or a name and an IP address, reach different servers. Nothing is resolved. The `_test` suffix and the identity check are a safety net; the test database must still be one that can be lost. The URL policy also does not control libpq environment variables (for example `PGHOSTADDR`, `PGOPTIONS` or `PGSERVICEFILE`) set in the process that runs the tests or the application.
 - **Image age.** The pinned image digest was published on 2026-10-01, under two weeks before it was pinned. The registry does not list older digests for this tag, so the dependency-age rule could not be applied to it.
 - **Pagination.** Bounded limit/offset pagination, `/readyz`, authentication and key handling are later M2 slices.

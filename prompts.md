@@ -2542,3 +2542,161 @@ Do not merge or mark M2a integration verification complete unless the relevant C
   - the only email address is the noreply one, and no personal paths or identifiers were found.
 - **Authorization:** Prompt 29 authorizes publishing this single branch. It does not authorize a merge, a push to `main`, a force-push or a history rewrite.
 - **Not yet recorded here:** the push result and CI results happen after this commit, so they are reported in the session handoff. M2a PostgreSQL integration verification stays **pending** until the CI integration job has actually passed.
+
+**Outcome (Prompt 29, publication and CI; added with Prompt 30):**
+- **Published:** the branch `feat/persistence-foundation` was pushed as `9ad7daefc6372786e1da2a636b9419b4ca7df89d`, with its upstream set, using `git push --set-upstream origin refs/heads/feat/persistence-foundation:refs/heads/feat/persistence-foundation` (exit 0).
+  - The remote branch SHA matched local HEAD.
+  - Remote `main` stayed at `6d64fb3`.
+  - No other branch or tag was pushed, and nothing was merged or force-pushed.
+- **Checks before the push:** `git diff --cached --check`, the staged Gitleaks scan, and a full-history Gitleaks scan after the documentation commit `9ad7dae` all passed.
+- **CI for `9ad7dae`, all successful:**
+  - [ci run 38158076257](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257), with jobs:
+    - [`verify (ubuntu-24.04, Python 3.12)` 114525070324](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070324);
+    - [`verify (windows-2025, Python 3.12)` 114525070158](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070158);
+    - [`integration (ubuntu-24.04, PostgreSQL 17 + pgvector)` 114525070229](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070229).
+  - [secret-scan run 38158076261](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076261), with job [`Gitleaks (full history)` 114525070253](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076261/job/114525070253).
+- **Integration-test evidence:**
+  - Claude could not read the integration job log. The public Actions API refused an anonymous log download (HTTP 403, "Must have admin rights to Repository"), and `gh` was not installed. Claude therefore inferred, from the `EG_REQUIRE_INTEGRATION=1` gating, that integration tests had run, and did not confirm the count.
+  - The external reviewer later retrieved the integration log independently. It reports `10 passed, 250 deselected in 2.07s`, so all ten PostgreSQL integration tests passed and none was skipped.
+  - The reviewer inspected GitHub evidence, not a locally run application suite.
+- **Still open:** Compose has never been run, and nothing has been merged into `main`.
+
+## Prompt 30: Record independently verified M2a CI results
+
+- **Stage:** Documentation update (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Prompt 30 — Record independently verified M2a CI results
+
+Work only in D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+Verify:
+- Branch feat/persistence-foundation
+- HEAD 9ad7daefc6372786e1da2a636b9419b4ca7df89d
+- Upstream origin/feat/persistence-foundation matches HEAD.
+- Working tree is clean.
+- Remote main remains 6d64fb362c25c28908e38b5d0a06f8c393bf6096.
+
+Update documentation only. Do not change application code, tests, dependencies, workflows or database configuration.
+
+Verified evidence for published commit 9ad7dae:
+- CI run 38158076257 succeeded.
+- Ubuntu verification job 114525070324 succeeded.
+- Windows verification job 114525070158 succeeded.
+- PostgreSQL integration job 114525070229 succeeded.
+- Secret-scan run 38158076261 and job 114525070253 succeeded.
+- The external reviewer independently retrieved the integration log. It reports:
+  "10 passed, 250 deselected in 2.07s"
+- Therefore all ten PostgreSQL integration tests passed; none was skipped.
+- The reviewer inspected GitHub evidence, not a locally executed application suite.
+- Compose has still never been run.
+- Nothing has been merged into main.
+
+Update README.md, docs/plan.md, ADR-0004 and docs/threat-model.md narrowly:
+- Replace obsolete M2a CI/PostgreSQL-pending statements with the verified results.
+- Mark ADR-0004 accepted and M2a's implemented persistence foundation verified in CI.
+- Link the exact runs/jobs and identify the tested commit.
+- Preserve the Compose limitation and all other unresolved limitations.
+- Keep M2b authentication, M2c vendor endpoints/readiness and overall M2 completion pending.
+- Do not claim pgvector retrieval or vector-extension functionality was tested; M2a deliberately creates no vector extension.
+
+In prompts.md:
+- Add a separate outcome note under Prompt 29 recording the actual publication and CI results.
+- Preserve Claude's earlier anonymous-log access limitation as a historical fact.
+- Record that the external reviewer subsequently obtained the log and directly confirmed the ten passing tests.
+- Append this prompt verbatim with a truthful outcome note.
+- Preserve all earlier text and outcome notes.
+
+Check documentation links, consistency, git diff --cached --check, staged private-content checks and the staged Gitleaks scan.
+
+Leave the changes staged and uncommitted. Do not push, merge, rewrite history, start Docker or contact any database.
+
+Final handoff:
+- Include the COMPLETE staged diff excluding prompts.md directly in fenced diff blocks.
+- Never truncate; split into numbered parts at file boundaries if necessary.
+- Report prompt-history additions, verification results, staged paths and final Git status separately.
+````
+
+**Outcome (documentation update pending review; staged, not committed):**
+- **Starting state verified:** branch `feat/persistence-foundation`, HEAD `9ad7dae` equal to `origin/feat/persistence-foundation`, a clean tree, remote `main` `6d64fb3`.
+- **Prompt history:** a separate outcome note under Prompt 29 now records the publication and CI results. It keeps Claude's earlier anonymous-log limitation (HTTP 403) as historical fact, and records that the external reviewer then retrieved the integration log and confirmed `10 passed, 250 deselected`.
+- **Documentation:** README, `docs/plan.md`, ADR-0004 and `docs/threat-model.md` were updated narrowly.
+  - The obsolete M2a pending statements are replaced with the verified CI results for commit `9ad7dae`, with links to the exact runs and jobs.
+  - ADR-0004 is marked Accepted.
+  - The Compose limitation (never run) is kept, along with the statement that no pgvector functionality was tested.
+  - The documents say the work is not merged into `main`, and that M2b, M2c and overall M2 completion remain pending.
+- **Checks:** the six Actions links returned HTTP 200, relative links resolve, no stale M2a pending wording remains, `git diff --cached --check` passed, the staged private-content check passed, and the staged Gitleaks scan passed. Exact results are in the session handoff.
+- **No application checks were run;** only documentation changed. No application code, tests, dependencies, workflows or database configuration changed. Nothing was committed or pushed, Docker was not started, and no database was contacted.
+
+**Review note (added with Prompt 31):** the external reviewer accepted the Prompt 30 documentation diff. The acceptance relied on the reviewed diff and on GitHub CI evidence that the reviewer retrieved independently, including the integration log reporting `10 passed, 250 deselected`. Compose remains unverified because it has never been run. M2b (authentication), M2c (vendor endpoints and readiness) and overall M2 completion remain pending. Nothing has been merged into `main`.
+
+## Prompt 31: Commit the reviewed M2a verification documentation
+
+- **Stage:** Local documentation commit (no push)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Prompt 31 — Commit the reviewed M2a verification documentation
+
+Work only in D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+This prompt authorizes one local documentation commit. Do not push or merge.
+
+Verify:
+- Branch feat/persistence-foundation
+- HEAD 9ad7daefc6372786e1da2a636b9419b4ca7df89d
+- Upstream matches HEAD.
+- Exactly these five files are staged:
+  README.md
+  docs/decisions/0004-persistence-foundation.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Origin is the expected evidenceguard-agentic-rag repository.
+
+Record the accepted staged tree before editing.
+
+Update prompts.md only:
+- Add a separate review note under Prompt 30 recording acceptance of its documentation diff.
+- State that acceptance relied on the reviewed diff and the reviewer's independently retrieved GitHub CI evidence.
+- Preserve Compose as unverified and M2b/M2c as pending.
+- Append this prompt verbatim with a truthful outcome note.
+- Preserve all earlier entries.
+
+Stage prompts.md and confirm every other file remains byte-identical to the accepted staged state.
+
+Before committing:
+- Verify author and committer use:
+  257921624+mathewmljourney93@users.noreply.github.com
+- Inspect staged content for unintended private information.
+- Run git diff --cached --check.
+- Run gitleaks git --pre-commit --staged --redact --verbose .
+- Do not commit if checks fail.
+
+Create one local commit:
+docs: record verified M2a persistence results
+
+After committing:
+- Run gitleaks git --redact --verbose . against full history.
+- Report the full SHA, parent, subject, committed paths, checks and final Git status.
+- Summarize prompt-history additions separately.
+- Include any incremental diff outside prompts.md completely in fenced diff blocks. If none exists, say so.
+
+No application checks are needed because only documentation changed.
+
+Do not push, merge, amend, rebase, change global configuration, start Docker or contact any database. Leave the working tree clean.
+````
+
+**Outcome (committed locally; not pushed):**
+- **Starting state verified:** branch `feat/persistence-foundation`, HEAD `9ad7dae` equal to its upstream, the expected origin, exactly the five accepted files staged (accepted staged tree `bd223db9e2a73e5db42832f93555f1678ade3ec7`), nothing unstaged or untracked.
+- **Only `prompts.md` changed** in this step: the review note above, and this prompt with its outcome note. The other four staged files were confirmed byte-identical to the accepted staged tree.
+- **Pre-commit checks:**
+  - the author and committer email is the GitHub noreply address;
+  - the staged content was inspected for private information;
+  - `git diff --cached --check` and the staged Gitleaks scan both passed.
+
+  Exact results are in the session handoff.
+- **Commit:** one local commit, `docs: record verified M2a persistence results`, whose parent is `9ad7dae`. It contains this note, so its SHA is reported in the session handoff. A full-history Gitleaks scan was run after committing.
+- **No application checks were run;** only documentation changed. Nothing was pushed or merged, Docker was not started, and no database was contacted. Compose remains unverified, and M2b, M2c and overall M2 completion remain pending.
