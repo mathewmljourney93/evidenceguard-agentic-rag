@@ -45,7 +45,7 @@ These invariants hold only for code that goes through the domain models and tran
 
 The full design and limits are in [ADR-0002](decisions/0002-request-ids-logging-and-errors.md). A client-chosen extra field *name* can still appear, capped, in a 422 body.
 
-## API-key authentication (M2b, implemented and unit-tested; under review, PostgreSQL verification pending)
+## API-key authentication (M2b, verified in CI on its branch; not yet merged into `main`)
 
 | Threat | Mitigation |
 |---|---|
@@ -61,7 +61,7 @@ The full design and limits are in [ADR-0002](decisions/0002-request-ids-logging-
 - **No rate limiting or lockout.**
 - **Residual timing:** the database lookup can take different time for known and unknown prefixes; prefixes are not secret.
 - **Transport:** keys are bearer tokens, so non-local deployments need TLS in front.
-- **Verification:** the new PostgreSQL integration tests have not run yet (CI pending).
+- **Verification:** at commit `b2f7f23` on `feat/api-key-authentication`, the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418432) passed with all fifteen PostgreSQL tests (`15 passed, 377 deselected`). M2b is not yet on `main`, and Compose has never been run.
 
 ## Not implemented yet
 

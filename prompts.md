@@ -3189,3 +3189,198 @@ Do not merge, push main, force-push, rewrite history, start Docker, contact a lo
 - **Authorization:** Prompt 36 authorizes pushing only `feat/api-key-authentication`. It does not authorize merging, pushing `main`, force-pushing or rewriting history.
 - **Not yet recorded here:** the push and CI results happen after this commit, so they are reported in the session handoff.
 - **Still open:** M2b's PostgreSQL integration verification is pending until CI passes. Compose remains unverified, M2c is pending, and M2 is incomplete.
+
+**Outcome (Prompt 36, publication and CI; added with Prompt 37):**
+- **Published:** the branch `feat/api-key-authentication` was pushed as `b2f7f2310cb265dcaab9a5c3055b3d762fa02d46`, with its upstream set, using `git push --set-upstream origin refs/heads/feat/api-key-authentication:refs/heads/feat/api-key-authentication` (exit 0).
+  - The remote branch SHA matched local HEAD.
+  - Remote `main` stayed at `e2dee5c`.
+  - No other ref was pushed, and nothing was merged or force-pushed.
+- **Checks before the push:** `git diff --cached --check`, the staged Gitleaks scan, and a full-history Gitleaks scan after the documentation commit `b2f7f23` all passed.
+- **CI for `b2f7f23`, all successful:**
+  - [ci run 38166627885](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885), with jobs:
+    - [`verify (ubuntu-24.04, Python 3.12)` 114550418430](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418430);
+    - [`verify (windows-2025, Python 3.12)` 114550418222](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418222);
+    - [`integration (ubuntu-24.04, PostgreSQL 17 + pgvector)` 114550418432](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418432).
+  - [secret-scan run 38166627930](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627930), with job [`Gitleaks (full history)` 114550418550](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627930/job/114550418550).
+- **Integration-test evidence:**
+  - Claude again could not read the integration job log: the anonymous log download was refused with HTTP 403 ("Must have admin rights to Repository"), and `gh` was not installed. Claude therefore reported the successful job status separately from an inferred count of 15 passed.
+  - The external reviewer later retrieved the log independently. It reports `15 passed, 377 deselected in 2.49s`, so all fifteen integration tests passed and none was skipped. The reviewer inspected GitHub evidence and did not run the project suite locally.
+- **Correction:** Claude's session handoff for Prompt 36 predicted `15 passed, 362 deselected`. That was wrong. The deselected count is the 377 non-integration tests, as the log shows. The prediction was in the handoff only, not in this file.
+- **Still open:** M2b is not merged into `main`. Compose remains unverified, M2c is pending, and M2 is incomplete.
+
+## Prompt 37: Record verified M2b CI results
+
+- **Stage:** Documentation update (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Prompt 37 — Record verified M2b CI results
+
+Work only in D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+Verify:
+- Branch feat/api-key-authentication
+- HEAD and upstream:
+  b2f7f2310cb265dcaab9a5c3055b3d762fa02d46
+- Working tree clean.
+- Remote main remains:
+  e2dee5cf199cfa2b0ecbdc4d55a2cd7ea5865c00
+
+Update documentation only. Do not change application code, tests, dependencies, workflows or configuration.
+
+Verified evidence for b2f7f23:
+- CI run 38166627885 succeeded.
+- Ubuntu job 114550418430 succeeded.
+- Windows job 114550418222 succeeded.
+- PostgreSQL integration job 114550418432 succeeded.
+- Secret-scan run 38166627930 and job 114550418550 succeeded.
+- The external reviewer independently retrieved the integration log:
+  "15 passed, 377 deselected in 2.49s"
+- All fifteen integration tests passed; none was skipped.
+- The reviewer inspected GitHub evidence and did not run the project suite locally.
+
+Update README.md, docs/plan.md, ADR-0005 and docs/threat-model.md narrowly:
+- Mark M2b reviewed and verified in CI, and ADR-0005 accepted.
+- Identify the exact tested commit and link the runs/jobs.
+- Replace obsolete M2b PostgreSQL-pending statements.
+- Keep M2b not yet merged into main.
+- Preserve API-key limitations, Compose as unverified, M2c as pending and overall M2 incomplete.
+
+Update prompts.md:
+- Add a separate outcome note under Prompt 36 recording publication and CI results.
+- Preserve the earlier anonymous-log access limitation as historical fact.
+- Record that the external reviewer subsequently retrieved the log.
+- Correct the earlier inferred count through the new note: the actual result is 15 passed, 377 deselected, not 362 deselected. Do not rewrite the historical entry.
+- Append this prompt verbatim with a truthful outcome note.
+- Preserve earlier entries.
+
+Check documentation links, consistency, staged private content, git diff --cached --check and the staged Gitleaks scan.
+
+Leave changes staged and uncommitted. Do not push, merge, rewrite history, start Docker or contact a database.
+
+Final handoff:
+- Include the COMPLETE staged diff excluding prompts.md directly in fenced diff blocks.
+- Never truncate; split into numbered parts at file boundaries if necessary.
+- Report prompt-history additions, exact verification results, staged paths, HEAD and final Git status separately.
+````
+
+**Outcome (documentation update pending review; staged, not committed):**
+- **Starting state verified:** branch `feat/api-key-authentication`, HEAD and upstream `b2f7f23`, a clean tree, remote `main` `e2dee5c`.
+- **Prompt history:** a separate outcome note under Prompt 36 records the publication and CI results.
+  - It keeps Claude's anonymous-log limitation (HTTP 403) as historical fact.
+  - It records that the reviewer later retrieved the log, which reports `15 passed, 377 deselected in 2.49s`.
+  - It corrects Claude's handoff prediction of 362 deselected to the actual 377.
+- **Documentation:** README, `docs/plan.md`, ADR-0005 and `docs/threat-model.md` were updated narrowly.
+  - M2b is marked reviewed and verified in CI at `b2f7f23`, with links to the exact runs and jobs, and ADR-0005 is marked Accepted.
+  - The obsolete pending statements for M2b's PostgreSQL tests were replaced.
+  - The documents say M2b is not yet merged into `main`, keep the API-key limitations and Compose as unverified, and keep M2c pending and M2 incomplete.
+- **Checks:** the six Actions links returned HTTP 200, relative links and anchors resolve, no stale M2b wording remains, `git diff --cached --check` passed, the private-content check passed, and the staged Gitleaks scan passed. Exact results are in the session handoff.
+- **No application checks were run;** only documentation changed. Nothing was committed or pushed, Docker was not started, and no database was contacted.
+
+**Review note (added with Prompt 38):** the external reviewer accepted the Prompt 37 documentation diff. The acceptance relied on the reviewed diff and on GitHub evidence the reviewer retrieved independently: CI run 38166627885 and secret-scan run 38166627930 for `b2f7f23`, with the integration log reporting `15 passed, 377 deselected in 2.49s`. The reviewer did not run the project suite locally. Compose remains unverified, M2c is pending and M2 is incomplete.
+
+## Prompt 38: Commit verified M2b documentation and fast-forward main
+
+- **Stage:** Local documentation commit, publication of `feat/api-key-authentication`, and an authorized fast-forward of `main`
+- **Date:** 2026-10-12 (session date)
+
+````text
+Prompt 38 — Commit verified M2b documentation and fast-forward main
+
+Work only in D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+This prompt authorizes:
+- One local commit of the reviewed documentation.
+- Publishing feat/api-key-authentication.
+- Fast-forwarding and publishing main only after all required feature-branch checks pass.
+
+Verify:
+- Branch feat/api-key-authentication
+- HEAD and upstream:
+  b2f7f2310cb265dcaab9a5c3055b3d762fa02d46
+- Exactly these five files staged:
+  README.md
+  docs/decisions/0005-api-key-authentication.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Expected origin.
+- Remote main:
+  e2dee5cf199cfa2b0ecbdc4d55a2cd7ea5865c00
+
+Read current remote refs. Stop on unexpected changes or divergence.
+
+Record the accepted staged tree. Modify prompts.md only:
+- Add a separate acceptance note under Prompt 37, based on the reviewed documentation diff and the GitHub evidence independently retrieved by the reviewer.
+- Append this prompt verbatim and a truthful preflight note.
+- Preserve earlier entries.
+- Do not record future publication, merge or CI results as completed.
+
+Confirm the four other documentation files remain byte-identical to their accepted staged versions.
+
+Verify author and committer use:
+257921624+mathewmljourney93@users.noreply.github.com
+
+Inspect staged private content, run git diff --cached --check and the staged Gitleaks scan. Commit only if all checks pass:
+docs: record verified M2b results and main publication authorization
+
+Run the full-history Gitleaks scan before publication.
+
+Push only:
+git push origin refs/heads/feat/api-key-authentication:refs/heads/feat/api-key-authentication
+
+Confirm the remote SHA matches local HEAD.
+
+Inspect Actions for that exact SHA. Require successful:
+- Ubuntu verification.
+- Windows verification.
+- PostgreSQL integration.
+- Full-history secret scan.
+
+If a check fails, report the failing step and relevant redacted output; do not change code or merge.
+If checks remain pending, report their actual status and leave main unchanged.
+
+After all four checks pass:
+- Fetch main and the feature branch.
+- Reconfirm remote main is still the expected baseline.
+- Confirm main is an ancestor of the verified feature tip.
+- Switch to local main and ensure no divergent local commits exist.
+- Fast-forward with git merge --ff-only to the exact verified feature SHA.
+- Push only:
+  git push origin refs/heads/main:refs/heads/main
+
+Never force-push, create a merge commit, squash, rebase, amend, delete branches or push tags.
+
+Confirm local main, remote main and the verified feature tip match. Inspect the main workflows for that exact SHA and report their actual results.
+
+Final handoff:
+- Commit SHA, parent, subject and committed paths.
+- Prompt-history additions.
+- Feature and main workflow/job links and results.
+- Integration count if logs are accessible; otherwise distinguish inference from direct evidence.
+- Scan results, remote refs and final Git status.
+- Complete incremental diff outside prompts.md against the accepted staged tree, if any; otherwise state none exists.
+
+Application checks need not be rerun locally because only documentation changed.
+
+Do not change application code, start Docker, contact a local database or change global configuration. Keep Compose unverified, M2c pending and overall M2 incomplete.
+````
+
+**Preflight note (recorded before the commit, publication and any change to `main`):**
+- **Starting state verified:** branch `feat/api-key-authentication`, HEAD and upstream `b2f7f23`, the expected origin, the noreply identity.
+  - Exactly the five reviewed documentation files were staged, with nothing unstaged or untracked.
+  - The accepted staged tree was `46dc757e6b6adf0a3bc52b9613d1a3dfb4487d82`.
+- **Remote refs, read before this commit:**
+  - `main` (and `feat/persistence-foundation`) is `e2dee5c`, and local `main` matches it;
+  - `feat/api-key-authentication` is `b2f7f23`;
+  - remote `main` is an ancestor of the local feature HEAD, so history has not diverged.
+- **This commit** adds only the reviewed Prompt 37 documentation and this prompt-history update.
+- **Authorization:** Prompt 38 authorizes three things, in order:
+  1. pushing the feature branch;
+  2. **only after** Ubuntu verification, Windows verification, PostgreSQL integration and the full-history secret scan all pass for the exact pushed SHA, fast-forwarding local `main` to that commit with `git merge --ff-only`;
+  3. pushing only `main`.
+
+  No force-push, merge commit, squash, rebase, amend, branch deletion or tag push is authorized.
+- **Not yet recorded here:** the push, the CI results and the `main` update happen after this commit, so they are reported in the session handoff.
+- **Still open:** Compose remains unverified, M2c is pending, and M2 is incomplete.

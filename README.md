@@ -10,7 +10,7 @@ EvidenceGuard is a planned vendor-risk review copilot. It is intended to:
 
 It is evidence-based decision support, not legal advice or compliance certification.
 
-## Status: M1 accepted, M2a persistence on `main`, M2b authentication under review (pre-alpha)
+## Status: M1 accepted, M2a persistence on `main`, M2b authentication verified in CI on its branch (pre-alpha)
 
 **What works now:**
 - One installable Python 3.12 package (`evidenceguard`), managed with uv, with a committed lockfile (M1a).
@@ -38,12 +38,12 @@ It is evidence-based decision support, not legal advice or compliance certificat
 
   See [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md), including what these guarantees do not cover.
 - **PostgreSQL persistence foundation** (M2a, on `main`): settings, engine and session lifecycle, the tenants/users/API keys/vendors schema with composite tenant constraints, Alembic migration `0001`, and a guarded PostgreSQL integration-test job. See [ADR-0004](docs/decisions/0004-persistence-foundation.md) and [Database](#database-m2a).
-- **API-key authentication** (M2b, **implemented on branch `feat/api-key-authentication`, under review, not merged**):
+- **API-key authentication** (M2b, **reviewed and verified in CI on branch `feat/api-key-authentication`; not yet merged into `main`**):
   - `GET /v1/me` returns the tenant, user and role behind an `Authorization: Bearer` API key;
   - the `admin` role exists, with no report or approval rights;
   - an `eg-admin` command seeds a synthetic demo fixture and creates and revokes keys.
 
-  Its new PostgreSQL integration tests have not run yet. See [ADR-0005](docs/decisions/0005-api-key-authentication.md) and [Authentication](#authentication-and-eg-admin-m2b-under-review).
+  At commit `b2f7f23`, all 15 PostgreSQL integration tests passed in CI, M2a's and M2b's ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418432)). See [ADR-0005](docs/decisions/0005-api-key-authentication.md) and [Authentication](#authentication-and-eg-admin-m2b).
 - Tests, Ruff and strict Mypy, run in GitHub Actions on Ubuntu and Windows, plus a PostgreSQL 17 + pgvector integration job on Ubuntu.
 
 **Verified baseline:** `main` at commit `e2dee5c` (`e2dee5cf199cfa2b0ecbdc4d55a2cd7ea5865c00`, M2a) passed:
@@ -54,14 +54,14 @@ The earlier M1 baseline `6d64fb3` passed [CI](https://github.com/mathewmljourney
 
 **Limits:**
 - The M1b report rules are still in-memory only. Nothing persists reports yet, and there is no protection against concurrent requests.
-- Apart from `/healthz`, the only endpoint is `/v1/me` (M2b, under review). No endpoint uses the report rules yet, and there are no vendor endpoints or `/readyz` (M2c).
+- Apart from `/healthz`, the only endpoint is `/v1/me` (M2b, on its branch, not yet on `main`). No endpoint uses the report rules yet, and there are no vendor endpoints or `/readyz` (M2c).
 - API keys are possession-based bearer credentials, with no rate limiting, lockout, expiry or scopes yet (see ADR-0005).
 - A citation's shape is validated. Whether the tenant may see the chunk, whether the quote is really in it, and whether it supports the claim are **not** checked yet.
 - Human approval in EvidenceGuard does not establish document authenticity or certify compliance. See [docs/responsible-ai.md](docs/responsible-ai.md) and [docs/threat-model.md](docs/threat-model.md).
 
 **Still planned** (see [docs/plan.md](docs/plan.md)):
 - Revision activation and supersession tests, deferred from M1 to M3, where those state machines are built.
-- The rest of M2: review and CI verification of M2b, then M2c (vendor endpoints, `/readyz` and the general API database wiring). M2 is not complete.
+- The rest of M2: merging M2b into `main` once authorized, then M2c (vendor endpoints, `/readyz` and the general API database wiring). M2 is not complete.
 - After M2: ingestion, retrieval, model providers, the review workflow, API endpoints for the approval gate, and evaluation.
 
 No retrieval, agent workflow, evaluation results, security guarantees or benchmarks are claimed. Any future results will be published with their committed inputs, configuration and the command that reproduces them.
@@ -143,9 +143,17 @@ The persistence package (`evidenceguard_persistence`) adds PostgreSQL settings, 
 
 CI runs step 4 on Ubuntu against a PostgreSQL 17 + pgvector service container. Database-independent checks still run on Ubuntu and Windows.
 
-### Authentication and `eg-admin` (M2b, under review)
+### Authentication and `eg-admin` (M2b)
 
-> **Implemented on branch `feat/api-key-authentication`; not reviewed, merged or verified against PostgreSQL yet.** Its new integration tests (key creation, authentication, revocation, cross-tenant ownership, `seed-demo` idempotency, current-role reads) are **pending** a published CI run. Do not run these commands against a database you care about.
+> **Reviewed and verified in CI on branch `feat/api-key-authentication`; not yet merged into `main`.**
+> - **Tested commit:** `b2f7f23` (`b2f7f2310cb265dcaab9a5c3055b3d762fa02d46`).
+> - **[CI run 38166627885](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885)** passed:
+>   - verification on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418430) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418222);
+>   - the [PostgreSQL 17 + pgvector integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418432). Its log, retrieved by the external reviewer, reports `15 passed, 377 deselected in 2.49s`, so none was skipped. The tests cover key creation, authentication, revocation, cross-tenant ownership, `seed-demo` idempotency and conflicts, and current-role reads.
+> - **The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627930)** passed.
+> - **Compose** has never been run.
+>
+> Do not run these commands against a database you care about.
 
 API keys look like `egk_<16 hex prefix>_<43-character secret>` (64 characters). Only the prefix and the SHA-256 of the secret are stored. A key is sent as `Authorization: Bearer <key>`. The tenant, user and role always come from the stored records, never from request headers, query parameters or bodies. Design and limits: [ADR-0005](docs/decisions/0005-api-key-authentication.md).
 
@@ -160,7 +168,7 @@ uv run --locked eg-admin revoke-key --tenant-id <tenant-id> --prefix <16-hex-pre
 - **`create-key`** prints the new key **once**, to stdout, only after it is stored. Store it securely; it cannot be shown again. No command accepts a secret as an argument, and usage errors print only static usage, never the arguments given.
 - **`GET /v1/me`** returns `tenant_id`, `actor_id` and `role` for a valid key. Missing, malformed, unknown and revoked keys all get the same `401` with `WWW-Authenticate: Bearer`. If the database is not configured or not reachable, it returns a generic `503`. `/healthz` never needs a database.
 
-Packaging layout: [ADR-0001](docs/decisions/0001-packaging-and-layout.md). Request IDs, logging and error format: [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md). Workflow orchestration: [ADR-0003](docs/decisions/0003-plain-python-workflow.md). Persistence: [ADR-0004](docs/decisions/0004-persistence-foundation.md). API-key authentication (under review): [ADR-0005](docs/decisions/0005-api-key-authentication.md).
+Packaging layout: [ADR-0001](docs/decisions/0001-packaging-and-layout.md). Request IDs, logging and error format: [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md). Workflow orchestration: [ADR-0003](docs/decisions/0003-plain-python-workflow.md). Persistence: [ADR-0004](docs/decisions/0004-persistence-foundation.md). API-key authentication: [ADR-0005](docs/decisions/0005-api-key-authentication.md).
 
 The request ID is for correlating logs only. It is not authentication and says nothing about who made a request. Logs are local JSON lines on stderr; there is no monitoring or telemetry service.
 

@@ -556,14 +556,20 @@ Each question entry contains:
   - **Still not verified:**
     - Compose has never been run, because there is no local Docker.
     - No pgvector functionality has been tested; M2a creates no vector extension.
-- **M2b** (API-key authentication and tenant context, [ADR-0005](decisions/0005-api-key-authentication.md)): **implemented on branch `feat/api-key-authentication`, under review, not merged.** It adds:
+- **M2b** (API-key authentication and tenant context, [ADR-0005](decisions/0005-api-key-authentication.md)): **reviewed and verified in CI on branch `feat/api-key-authentication`; not yet merged into `main`.** It adds:
   - key primitives;
   - `ApiKeyAuthenticator`;
   - `GET /v1/me` with Bearer-only parsing and generic 401s;
   - the `admin` role, with no report or approval rights;
   - `eg-admin` (`seed-demo`, `create-key`, `revoke-key`);
-  - database-independent tests, and PostgreSQL integration tests whose CI verification is **pending**.
-- **Next slice:** M2c (vendor endpoints) with `/readyz` and the general API database wiring, following the decisions under Prompt 24 in [prompts.md](../prompts.md). It is pending, and **M2 is not complete** until M2b is accepted and verified and M2c lands and meets the acceptance criteria below.
+  - database-independent tests, and PostgreSQL integration tests.
+  - **Tested commit:** `b2f7f23` (`b2f7f2310cb265dcaab9a5c3055b3d762fa02d46`).
+  - **[CI run 38166627885](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885):**
+    - `verify` passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418430) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418222);
+    - the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418432) passed. Its log, retrieved by the external reviewer, reports `15 passed, 377 deselected in 2.49s`, so all fifteen integration tests (M2a's ten and M2b's five) passed and none was skipped.
+  - **[Secret-scan run 38166627930](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627930):** passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627930/job/114550418550)).
+  - **Still not verified:** Compose has never been run.
+- **Next slice:** M2c (vendor endpoints) with `/readyz` and the general API database wiring, following the decisions under Prompt 24 in [prompts.md](../prompts.md). It is pending, and **M2 is not complete** until M2b is merged and M2c lands and meets the acceptance criteria below.
 - *Acceptance:*
   - Migrations upgrade and downgrade cleanly.
   - Composite foreign keys reject cross-tenant references.

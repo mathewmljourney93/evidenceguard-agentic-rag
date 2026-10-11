@@ -1,6 +1,6 @@
 # ADR-0005: API-key authentication and tenant context
 
-- **Status:** Proposed, under review (M2b)
+- **Status:** Accepted (M2b). Verified in CI at commit `b2f7f23` on branch `feat/api-key-authentication`; not yet merged into `main`. See *Consequences and limits*.
 - **Date:** 2026-10-12
 - **Builds on:** [ADR-0002](0002-request-ids-logging-and-errors.md) (problem responses and logging), [ADR-0004](0004-persistence-foundation.md) (the `api_keys` and `users` tables), plan decision G12, and the M2 decisions recorded under Prompt 24 in [prompts.md](../../prompts.md)
 
@@ -93,4 +93,8 @@ M2a stored tenants, users and API keys but nothing authenticated a request: the 
 - **No usage or audit trail beyond timestamps.** Only `created_at` and `revoked_at` are kept; there is no `last_used_at` or administrative audit log yet.
 - **Demo identities are public.** The `seed-demo` IDs are deterministic and documented. They are for demonstrations only.
 - **Revocation and in-flight requests.** Revocation takes effect on the next authentication; requests already authenticated finish.
-- **Verification status.** The PostgreSQL integration tests added in M2b have not run yet: no local database is used. They are **pending** until a reviewed branch is published and its CI integration job passes. Compose has never been run.
+- **Verified in CI.** The tested commit is `b2f7f23` (`b2f7f2310cb265dcaab9a5c3055b3d762fa02d46`) on branch `feat/api-key-authentication`.
+  - In [CI run 38166627885](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885), the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418432) ran against a PostgreSQL 17 + pgvector service container. Its log, retrieved by the external reviewer, reports `15 passed, 377 deselected in 2.49s`, so none was skipped. That covers M2a's ten tests and M2b's five.
+  - The database-independent checks passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418430) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418222), and the [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627930) passed.
+  - M2b is not yet merged into `main`.
+- **Not verified locally.** No local database is used, and Compose has never been run.
