@@ -10,7 +10,7 @@ EvidenceGuard is a planned vendor-risk review copilot. It is intended to:
 
 It is evidence-based decision support, not legal advice or compliance certification.
 
-## Status: M1 accepted, M2a persistence on `main`, M2b authentication verified in CI on its branch (pre-alpha)
+## Status: M1 accepted; M2a persistence and M2b authentication on `main`; M2c vendors and readiness under review (pre-alpha)
 
 **What works now:**
 - One installable Python 3.12 package (`evidenceguard`), managed with uv, with a committed lockfile (M1a).
@@ -38,30 +38,41 @@ It is evidence-based decision support, not legal advice or compliance certificat
 
   See [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md), including what these guarantees do not cover.
 - **PostgreSQL persistence foundation** (M2a, on `main`): settings, engine and session lifecycle, the tenants/users/API keys/vendors schema with composite tenant constraints, Alembic migration `0001`, and a guarded PostgreSQL integration-test job. See [ADR-0004](docs/decisions/0004-persistence-foundation.md) and [Database](#database-m2a).
-- **API-key authentication** (M2b, **reviewed and verified in CI on branch `feat/api-key-authentication`; not yet merged into `main`**):
+- **API-key authentication** (M2b, on `main`):
   - `GET /v1/me` returns the tenant, user and role behind an `Authorization: Bearer` API key;
   - the `admin` role exists, with no report or approval rights;
   - an `eg-admin` command seeds a synthetic demo fixture and creates and revokes keys.
 
   At commit `b2f7f23`, all 15 PostgreSQL integration tests passed in CI, M2a's and M2b's ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418432)). See [ADR-0005](docs/decisions/0005-api-key-authentication.md) and [Authentication](#authentication-and-eg-admin-m2b).
+- **Tenant-scoped vendors and readiness** (M2c, **implemented on branch `feat/vendor-api-readiness`, under review, not merged**):
+  - `POST /v1/vendors`, `GET /v1/vendors` (bounded pages) and `GET /v1/vendors/{id}`, always scoped to the API key's tenant;
+  - `GET /readyz`, which checks database connectivity and migration revisions;
+  - one shared, lazily started database resource for the whole API.
+
+  Its new PostgreSQL integration tests have not run yet. See [ADR-0006](docs/decisions/0006-vendor-api-and-readiness.md) and [Vendors and readiness](#vendors-and-readiness-m2c-under-review).
 - Tests, Ruff and strict Mypy, run in GitHub Actions on Ubuntu and Windows, plus a PostgreSQL 17 + pgvector integration job on Ubuntu.
 
-**Verified baseline:** `main` at commit `e2dee5c` (`e2dee5cf199cfa2b0ecbdc4d55a2cd7ea5865c00`, M2a) passed:
+**Verified baseline:** `main` at commit `277dfea` (`277dfeaec7c1c64fa5ee92a3ce892823acc787fb`, M2a and M2b) passed:
+- [CI run 38167398488](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488): verification on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488/job/114552700669) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488/job/114552700864), and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488/job/114552700841), whose log (retrieved by the external reviewer) reports `15 passed, 377 deselected in 3.77s`;
+- the [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398504).
+
+Earlier, `main` at commit `e2dee5c` (`e2dee5cf199cfa2b0ecbdc4d55a2cd7ea5865c00`, M2a) passed:
 - [CI run 38159547345](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38159547345): verification on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38159547345/job/114529403167) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38159547345/job/114529403100), and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38159547345/job/114529402973), whose log (retrieved by the external reviewer) reports `10 passed, 250 deselected in 2.64s`;
 - the [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38159547321).
 
-The earlier M1 baseline `6d64fb3` passed [CI](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996464) and the [secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996460). These results cover those commits only; every later change, including M2b, needs its own passing runs.
+The earlier M1 baseline `6d64fb3` passed [CI](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996464) and the [secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996460). These results cover those commits only; every later change, including M2c, needs its own passing runs.
 
 **Limits:**
 - The M1b report rules are still in-memory only. Nothing persists reports yet, and there is no protection against concurrent requests.
-- Apart from `/healthz`, the only endpoint is `/v1/me` (M2b, on its branch, not yet on `main`). No endpoint uses the report rules yet, and there are no vendor endpoints or `/readyz` (M2c).
+- On `main`, the endpoints are `/healthz` and `/v1/me`. The vendor endpoints and `/readyz` exist only on the M2c branch, under review. No endpoint uses the report rules yet.
+- Vendor pages use offset pagination, which is not a snapshot under concurrent changes (see ADR-0006).
 - API keys are possession-based bearer credentials, with no rate limiting, lockout, expiry or scopes yet (see ADR-0005).
 - A citation's shape is validated. Whether the tenant may see the chunk, whether the quote is really in it, and whether it supports the claim are **not** checked yet.
 - Human approval in EvidenceGuard does not establish document authenticity or certify compliance. See [docs/responsible-ai.md](docs/responsible-ai.md) and [docs/threat-model.md](docs/threat-model.md).
 
 **Still planned** (see [docs/plan.md](docs/plan.md)):
 - Revision activation and supersession tests, deferred from M1 to M3, where those state machines are built.
-- The rest of M2: merging M2b into `main` once authorized, then M2c (vendor endpoints, `/readyz` and the general API database wiring). M2 is not complete.
+- The rest of M2: review, CI verification and merging of M2c. M2 is not complete.
 - After M2: ingestion, retrieval, model providers, the review workflow, API endpoints for the approval gate, and evaluation.
 
 No retrieval, agent workflow, evaluation results, security guarantees or benchmarks are claimed. Any future results will be published with their committed inputs, configuration and the command that reproduces them.
@@ -145,7 +156,7 @@ CI runs step 4 on Ubuntu against a PostgreSQL 17 + pgvector service container. D
 
 ### Authentication and `eg-admin` (M2b)
 
-> **Reviewed and verified in CI on branch `feat/api-key-authentication`; not yet merged into `main`.**
+> **Reviewed and verified in CI, and on `main`** since the fast-forward to `277dfea` ([CI run 38167398488](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488), [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488/job/114552700841): `15 passed, 377 deselected in 3.77s`). The branch record follows.
 > - **Tested commit:** `b2f7f23` (`b2f7f2310cb265dcaab9a5c3055b3d762fa02d46`).
 > - **[CI run 38166627885](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885)** passed:
 >   - verification on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418430) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418222);
@@ -168,7 +179,24 @@ uv run --locked eg-admin revoke-key --tenant-id <tenant-id> --prefix <16-hex-pre
 - **`create-key`** prints the new key **once**, to stdout, only after it is stored. Store it securely; it cannot be shown again. No command accepts a secret as an argument, and usage errors print only static usage, never the arguments given.
 - **`GET /v1/me`** returns `tenant_id`, `actor_id` and `role` for a valid key. Missing, malformed, unknown and revoked keys all get the same `401` with `WWW-Authenticate: Bearer`. If the database is not configured or not reachable, it returns a generic `503`. `/healthz` never needs a database.
 
-Packaging layout: [ADR-0001](docs/decisions/0001-packaging-and-layout.md). Request IDs, logging and error format: [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md). Workflow orchestration: [ADR-0003](docs/decisions/0003-plain-python-workflow.md). Persistence: [ADR-0004](docs/decisions/0004-persistence-foundation.md). API-key authentication: [ADR-0005](docs/decisions/0005-api-key-authentication.md).
+### Vendors and readiness (M2c, under review)
+
+> **Implemented on branch `feat/vendor-api-readiness`; not reviewed, merged or verified against PostgreSQL yet.** Its new integration tests (API create/list/get, two-tenant isolation with identical slugs, duplicate rollback, pagination, and readiness when ready, unmigrated or mismatched) are **pending** a published CI run.
+
+With a reviewer or approver key (admins get `403`):
+
+```powershell
+$h = @{ Authorization = "Bearer <your API key>" }
+Invoke-RestMethod -Method Post http://127.0.0.1:8000/v1/vendors -Headers $h -ContentType "application/json" -Body '{"slug": "lumenvale-cloud", "name": "Lumenvale Cloud"}'
+Invoke-RestMethod "http://127.0.0.1:8000/v1/vendors?limit=20&offset=0" -Headers $h
+Invoke-RestMethod http://127.0.0.1:8000/readyz   # no key needed
+```
+
+- **Vendors belong to the key's tenant.** The body takes only `slug` (lowercase letters and digits joined by single hyphens, at most 64 characters) and `name` (1–200 characters, not blank). Any other field is a `422`. A duplicate slug in the same tenant is a `409`; another tenant may reuse it. Another tenant's vendor and a missing one both return `404`.
+- **Pages** are ordered by slug, then ID, with `limit` 1–100 (default 20) and `offset` 0–10,000. They are not a snapshot when vendors are added concurrently.
+- **`GET /readyz`** returns `200 {"status": "ready", ...}` only when the database answers and its migrations exactly match this release; otherwise `503` with fixed check states. It never migrates or changes the database. `/healthz` is unaffected.
+
+Packaging layout: [ADR-0001](docs/decisions/0001-packaging-and-layout.md). Request IDs, logging and error format: [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md). Workflow orchestration: [ADR-0003](docs/decisions/0003-plain-python-workflow.md). Persistence: [ADR-0004](docs/decisions/0004-persistence-foundation.md). API-key authentication: [ADR-0005](docs/decisions/0005-api-key-authentication.md). Vendors, shared database lifecycle and readiness (under review): [ADR-0006](docs/decisions/0006-vendor-api-and-readiness.md).
 
 The request ID is for correlating logs only. It is not authentication and says nothing about who made a request. Logs are local JSON lines on stderr; there is no monitoring or telemetry service.
 

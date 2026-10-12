@@ -16,6 +16,7 @@ from sqlalchemy import Engine
 from sqlalchemy.exc import OperationalError
 
 from evidenceguard_api import auth as api_auth
+from evidenceguard_api import database as api_database
 from evidenceguard_api.app import create_app
 from evidenceguard_domain.context import ActorContext, Role
 from evidenceguard_observability.jsonlog import JsonFormatter
@@ -330,21 +331,22 @@ def test_default_app_creates_its_engine_lazily_and_disposes_it_on_shutdown(
         disposed.append(engine)
         dispose_engine(engine)
 
-    monkeypatch.setattr(api_auth, "dispose_engine", recording_dispose)
+    monkeypatch.setattr(api_database, "dispose_engine", recording_dispose)
 
     app = create_app()
-    owned = app.state.authenticator
-    assert isinstance(owned, api_auth.DatabaseAuthenticator)
+    assert isinstance(app.state.authenticator, api_auth.DatabaseAuthenticator)
+    shared = app.state.database
+    assert isinstance(shared, api_database.AppDatabase)
     with TestClient(app) as client:
         assert client.get("/healthz").status_code == 200
-        assert owned._engine is None  # not created by construction, startup or /healthz
+        assert not shared.started  # not created by construction, startup or /healthz
         _assert_generic_401(client.get("/v1/me", headers=_bearer(_new_key())))
-        engine = owned._engine
-        assert engine is not None
+        assert shared.started
+        engine = shared.engine()
         assert FAILURE_MARKER not in repr(engine)
 
     assert disposed == [engine]
-    assert owned._engine is None
+    assert not shared.started
 
 
 def test_injected_authenticator_is_not_closed_by_the_app(key: str) -> None:

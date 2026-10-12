@@ -7,27 +7,26 @@ all produce the same 401 problem response with ``WWW-Authenticate: Bearer``. The
 supply or override its tenant, actor or role.
 
 ``create_app`` takes an ``Authenticator``, a callable from credential to ``ActorContext`` or
-``None``. Tests inject a double. By default the app owns a ``DatabaseAuthenticator``, which
-reads ``EG_DATABASE_URL`` and creates its engine only on the first well-formed credential, never
-at import or app construction, so ``/healthz`` needs no database. The app disposes that engine
-when it shuts down. If the database is not configured or fails, the request gets a generic 503:
-no URL, exception text or credential is ever returned or logged here.
+``None``. Tests inject a double. By default the app uses a ``DatabaseAuthenticator`` on the
+app's shared ``AppDatabase`` (ADR-0006), which starts only on the first well-formed credential,
+never at import or app construction, so ``/healthz`` needs no database. If the database is not
+configured or fails, the request gets a generic 503: no URL, exception text or credential is
+ever returned or logged here. This dependency is synchronous, so FastAPI runs it, and its
+database work, in a worker thread rather than on the event loop.
 """
 
-import threading
 from typing import Annotated, Protocol
 
 from fastapi import HTTPException, Request, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import Engine
 from sqlalchemy.exc import SQLAlchemyError
 
+from evidenceguard_api.database import AppDatabase
 from evidenceguard_api.problems import PublicHTTPException, PublicMessage
 from evidenceguard_domain.context import ActorContext
 from evidenceguard_persistence.auth import ApiKeyAuthenticator
 from evidenceguard_persistence.credentials import KEY_LENGTH, parse_api_key
-from evidenceguard_persistence.db import create_db_engine, create_session_factory, dispose_engine
-from evidenceguard_persistence.settings import DatabaseConfigurationError, load_database_settings
+from evidenceguard_persistence.settings import DatabaseConfigurationError
 
 BEARER_SCHEME = "Bearer"
 # "Bearer " plus one key, with generous headroom; anything longer is rejected unparsed.
@@ -49,32 +48,15 @@ class Authenticator(Protocol):
 
 
 class DatabaseAuthenticator:
-    """The app-owned authenticator. Creates its engine lazily and disposes it in ``close``."""
+    """Authenticates against the app's shared database. The app, not this class, owns it."""
 
-    def __init__(self) -> None:
-        self._lock = threading.Lock()
-        self._engine: Engine | None = None
-        self._delegate: ApiKeyAuthenticator | None = None
+    def __init__(self, database: AppDatabase) -> None:
+        self._database = database
 
     def __call__(self, credential: str) -> ActorContext | None:
         if parse_api_key(credential) is None:
             return None  # malformed: no need to configure or touch the database
-        return self._authenticator()(credential)
-
-    def _authenticator(self) -> ApiKeyAuthenticator:
-        with self._lock:
-            if self._delegate is None:
-                engine = create_db_engine(load_database_settings())
-                self._engine = engine
-                self._delegate = ApiKeyAuthenticator(create_session_factory(engine))
-            return self._delegate
-
-    def close(self) -> None:
-        with self._lock:
-            if self._engine is not None:
-                dispose_engine(self._engine)
-            self._engine = None
-            self._delegate = None
+        return ApiKeyAuthenticator(self._database.session_factory())(credential)
 
 
 def _unauthorized() -> PublicHTTPException:

@@ -22,6 +22,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.pool import NullPool
 
 from evidenceguard_api.app import create_app
+from evidenceguard_api.database import AppDatabase
 from evidenceguard_domain.context import ActorContext, Role
 from evidenceguard_persistence.accounts import (
     DatabaseAdminStore,
@@ -370,3 +371,138 @@ def test_seed_demo_refuses_a_demo_user_id_owned_by_another_tenant(migrated: Engi
     with migrated.connect() as connection:
         assert connection.execute(select(Tenant.slug)).scalars().all() == ["unrelated-tenant"]
         assert connection.execute(select(User.id, User.tenant_id)).all() == [(taken, other_tenant)]
+
+
+# --- vendors and readiness through the API (M2c) ----------------------------------------
+
+
+def _client(engine: Engine) -> TestClient:
+    """An app whose shared database is the disposable test engine (not owned by the app)."""
+    return TestClient(create_app(database=AppDatabase(lambda: engine)))
+
+
+def _reviewer_keys(engine: Engine) -> dict[str, dict[str, str]]:
+    store, _ = _store(engine)
+    store.seed_demo()
+    headers = {}
+    for slug in ("halverson-freight", "marisol-clinics"):
+        key = generate_api_key()
+        store.create_api_key(demo_tenant_id(slug), demo_user_id(slug, UserRole.REVIEWER), key)
+        headers[slug] = {"Authorization": f"Bearer {key.plaintext.get_secret_value()}"}
+    return headers
+
+
+def _vendor_rows(engine: Engine) -> list[tuple[UUID, str]]:
+    with engine.connect() as connection:
+        return [(r.tenant_id, r.slug) for r in connection.execute(select(Vendor)).all()]
+
+
+def test_vendor_api_is_tenant_scoped_and_allows_identical_slugs(migrated: Engine) -> None:
+    keys = _reviewer_keys(migrated)
+    a, b = keys["halverson-freight"], keys["marisol-clinics"]
+    body = {"slug": "lumenvale-cloud", "name": "Lumenvale Cloud"}
+
+    with _client(migrated) as client:
+        created_a = client.post("/v1/vendors", json=body, headers=a)
+        created_b = client.post("/v1/vendors", json=body, headers=b)
+        list_a = client.get("/v1/vendors", headers=a).json()
+        own = client.get(f"/v1/vendors/{created_a.json()['id']}", headers=a)
+        foreign = client.get(f"/v1/vendors/{created_a.json()['id']}", headers=b)
+        missing = client.get(f"/v1/vendors/{uuid4()}", headers=b)
+
+    assert created_a.status_code == created_b.status_code == 201
+    assert created_a.json()["id"] != created_b.json()["id"]
+    assert list_a["total"] == 1 and [v["id"] for v in list_a["items"]] == [created_a.json()["id"]]
+    assert own.status_code == 200 and own.json() == created_a.json()
+    assert foreign.status_code == missing.status_code == 404
+    assert sorted(_vendor_rows(migrated)) == sorted(
+        [
+            (demo_tenant_id("halverson-freight"), "lumenvale-cloud"),
+            (demo_tenant_id("marisol-clinics"), "lumenvale-cloud"),
+        ]
+    )
+
+
+def test_duplicate_vendor_slug_is_409_and_rolled_back(migrated: Engine) -> None:
+    a = _reviewer_keys(migrated)["halverson-freight"]
+
+    with _client(migrated) as client:
+        first = client.post(
+            "/v1/vendors", json={"slug": "ferrowick", "name": "Ferrowick"}, headers=a
+        )
+        duplicate = client.post(
+            "/v1/vendors", json={"slug": "ferrowick", "name": "Other"}, headers=a
+        )
+        after = client.post(
+            "/v1/vendors", json={"slug": "lumenvale", "name": "Lumenvale"}, headers=a
+        )
+
+    assert first.status_code == 201 and after.status_code == 201
+    assert duplicate.status_code == 409
+    assert duplicate.headers["content-type"] == "application/problem+json"
+    assert sorted(slug for _, slug in _vendor_rows(migrated)) == ["ferrowick", "lumenvale"]
+
+
+def test_vendor_pagination_is_ordered_and_bounded(migrated: Engine) -> None:
+    a = _reviewer_keys(migrated)["halverson-freight"]
+    slugs = ["echo", "alpha", "delta", "charlie", "bravo"]
+
+    with _client(migrated) as client:
+        for slug in slugs:
+            assert (
+                client.post(
+                    "/v1/vendors", json={"slug": slug, "name": slug.title()}, headers=a
+                ).status_code
+                == 201
+            )
+        pages = [
+            client.get(f"/v1/vendors?limit=2&offset={offset}", headers=a).json()
+            for offset in (0, 2, 4, 6)
+        ]
+
+    assert [[item["slug"] for item in page["items"]] for page in pages] == [
+        ["alpha", "bravo"],
+        ["charlie", "delta"],
+        ["echo"],
+        [],
+    ]
+    assert {page["total"] for page in pages} == {5}
+
+
+def test_readyz_is_ready_on_a_migrated_database(migrated: Engine) -> None:
+    with _client(migrated) as client:
+        response = client.get("/readyz")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ready", "checks": {"database": "ok", "migrations": "ok"}}
+
+
+def test_readyz_is_not_ready_on_an_unmigrated_database_and_changes_nothing(
+    empty_database: Engine,
+) -> None:
+    with _client(empty_database) as client:
+        response = client.get("/readyz")
+        health = client.get("/healthz")
+
+    assert response.status_code == 503
+    assert response.json() == {
+        "status": "not_ready",
+        "checks": {"database": "ok", "migrations": "failed"},
+    }
+    assert health.status_code == 200
+    assert _tables(empty_database) == set()
+    with empty_database.connect() as connection:
+        extensions = set(connection.execute(text("SELECT extname FROM pg_extension")).scalars())
+    assert extensions == {"plpgsql"}
+
+
+def test_readyz_is_not_ready_when_the_applied_revision_differs(migrated: Engine) -> None:
+    with migrated.begin() as connection:
+        connection.execute(text("UPDATE alembic_version SET version_num = 'ffffffffffff'"))
+
+    with _client(migrated) as client:
+        response = client.get("/readyz")
+
+    assert response.status_code == 503
+    assert response.json()["checks"] == {"database": "ok", "migrations": "failed"}
+    assert "ffffffffffff" not in response.text and "0001" not in response.text

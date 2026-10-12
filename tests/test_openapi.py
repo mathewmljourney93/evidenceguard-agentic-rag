@@ -12,8 +12,14 @@ def _openapi() -> dict[str, Any]:
     return schema
 
 
-def test_openapi_lists_healthz_and_me() -> None:
-    assert list(_openapi()["paths"]) == ["/healthz", "/v1/me"]
+def test_openapi_lists_every_route() -> None:
+    assert list(_openapi()["paths"]) == [
+        "/healthz",
+        "/readyz",
+        "/v1/me",
+        "/v1/vendors",
+        "/v1/vendors/{vendor_id}",
+    ]
 
 
 def test_openapi_documents_the_bearer_api_key_scheme() -> None:
@@ -53,3 +59,37 @@ def test_openapi_describes_healthz_response() -> None:
 
 def test_openapi_reports_package_version() -> None:
     assert _openapi()["info"]["version"] == "0.1.0.dev0"
+
+
+def test_openapi_documents_vendor_routes() -> None:
+    schema = _openapi()
+    paths = schema["paths"]
+
+    create = paths["/v1/vendors"]["post"]
+    assert create["security"] == [{"ApiKey": []}]
+    assert set(create["responses"]) == {"201", "401", "403", "409", "422", "503"}
+    listing = paths["/v1/vendors"]["get"]
+    assert {p["name"] for p in listing["parameters"]} == {"limit", "offset"}
+    limit = next(p for p in listing["parameters"] if p["name"] == "limit")["schema"]
+    offset = next(p for p in listing["parameters"] if p["name"] == "offset")["schema"]
+    assert (limit["minimum"], limit["maximum"], limit["default"]) == (1, 100, 20)
+    assert (offset["minimum"], offset["maximum"], offset["default"]) == (0, 10_000, 0)
+    assert "not a snapshot" in listing["description"]
+    get_one = paths["/v1/vendors/{vendor_id}"]["get"]
+    assert {"404", "401", "403"} <= set(get_one["responses"])
+
+    components = schema["components"]["schemas"]
+    assert set(components["VendorCreate"]["properties"]) == {"slug", "name"}
+    assert components["VendorCreate"]["additionalProperties"] is False
+    assert set(components["VendorOut"]["properties"]) == {"id", "slug", "name"}
+    assert set(components["VendorPageOut"]["properties"]) == {"items", "total", "limit", "offset"}
+
+
+def test_openapi_documents_readyz_without_security() -> None:
+    schema = _openapi()
+    readyz = schema["paths"]["/readyz"]["get"]
+
+    assert "security" not in readyz
+    assert set(readyz["responses"]) == {"200", "503"}
+    checks = schema["components"]["schemas"]["ReadinessChecks"]["properties"]
+    assert set(checks) == {"database", "migrations"}

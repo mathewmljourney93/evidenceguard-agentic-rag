@@ -20,4 +20,4 @@ def test_create_app_returns_independent_instances() -> None:
 def test_unknown_path_is_not_found() -> None:
     client = TestClient(create_app())
 
-    assert client.get("/readyz").status_code == 404
+    assert client.get("/v1/does-not-exist").status_code == 404

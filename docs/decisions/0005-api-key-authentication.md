@@ -1,6 +1,6 @@
 # ADR-0005: API-key authentication and tenant context
 
-- **Status:** Accepted (M2b). Verified in CI at commit `b2f7f23` on branch `feat/api-key-authentication`; not yet merged into `main`. See *Consequences and limits*.
+- **Status:** Accepted (M2b). Verified in CI at commit `b2f7f23` on branch `feat/api-key-authentication`, then fast-forwarded onto `main` at `277dfea`, where CI passed again. See *Consequences and limits*. The default database wiring below is superseded, under review, by the shared `AppDatabase` in [ADR-0006](0006-vendor-api-and-readiness.md).
 - **Date:** 2026-10-12
 - **Builds on:** [ADR-0002](0002-request-ids-logging-and-errors.md) (problem responses and logging), [ADR-0004](0004-persistence-foundation.md) (the `api_keys` and `users` tables), plan decision G12, and the M2 decisions recorded under Prompt 24 in [prompts.md](../../prompts.md)
 
@@ -96,5 +96,5 @@ M2a stored tenants, users and API keys but nothing authenticated a request: the 
 - **Verified in CI.** The tested commit is `b2f7f23` (`b2f7f2310cb265dcaab9a5c3055b3d762fa02d46`) on branch `feat/api-key-authentication`.
   - In [CI run 38166627885](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885), the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418432) ran against a PostgreSQL 17 + pgvector service container. Its log, retrieved by the external reviewer, reports `15 passed, 377 deselected in 2.49s`, so none was skipped. That covers M2a's ten tests and M2b's five.
   - The database-independent checks passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418430) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418222), and the [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627930) passed.
-  - M2b is not yet merged into `main`.
+  - **On `main` at `277dfea`** (`277dfeaec7c1c64fa5ee92a3ce892823acc787fb`): [CI run 38167398488](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488) passed, including the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488/job/114552700841). Its log, retrieved by the external reviewer, reports `15 passed, 377 deselected in 3.77s`. The [secret-scan run 38167398504](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398504) also passed.
 - **Not verified locally.** No local database is used, and Compose has never been run.

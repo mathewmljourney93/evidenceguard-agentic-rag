@@ -3384,3 +3384,459 @@ Do not change application code, start Docker, contact a local database or change
   No force-push, merge commit, squash, rebase, amend, branch deletion or tag push is authorized.
 - **Not yet recorded here:** the push, the CI results and the `main` update happen after this commit, so they are reported in the session handoff.
 - **Still open:** Compose remains unverified, M2c is pending, and M2 is incomplete.
+
+## Prompt 39: Implement tenant-scoped vendors and database readiness
+
+- **Stage:** Implementation, milestone M2c (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Prompt 39 — Implement tenant-scoped vendors and database readiness
+
+Work only in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md, the plan, relevant ADRs and existing authentication/persistence code.
+
+Verify:
+- Local main and origin/main:
+  277dfeaec7c1c64fa5ee92a3ce892823acc787fb
+- Working tree clean.
+- Expected origin.
+
+Create feat/vendor-api-readiness from that exact commit.
+
+Implement M2c only. Leave changes staged and uncommitted for external review. Do not push, merge, rewrite history, install system tools, start Docker or contact any local database.
+
+1. Shared API database lifecycle
+- Consolidate the minimal M2b database wiring into an app-owned resource shared by authentication, vendor operations and readiness.
+- Initialize lazily; importing modules, constructing/starting the app and serving /healthz must still need no database configuration or connection.
+- Dispose app-owned engines on shutdown.
+- Preserve create_app(authenticator=...) compatibility and provide explicit database-independent test injection seams.
+- Close sessions on every outcome. Writes commit before a successful response and roll back on failure.
+- Keep synchronous database work off the async event loop.
+- Set bounded connection and readiness-query timeouts.
+- Preserve safe errors, secret masking and package import boundaries.
+
+2. Vendor persistence
+Use the existing vendors table; no schema migration is expected.
+- Create, list and retrieve vendors through persistence code.
+- Require an authenticated tenant scope for every operation.
+- Get by both tenant_id and vendor ID; never retrieve globally and filter afterwards.
+- List and total-count queries must both filter by tenant.
+- Create takes tenant_id only from the authenticated actor.
+- Translate only the specific vendor tenant/slug unique-constraint violation into a duplicate-slug conflict. Do not classify every IntegrityError as a duplicate.
+- No update/delete, ingestion, jobs or report endpoints in this slice.
+
+3. Vendor API
+Implement:
+- POST /v1/vendors → 201.
+- GET /v1/vendors → a documented page object.
+- GET /v1/vendors/{id} → vendor or generic 404.
+
+Authorization:
+- REVIEWER and APPROVER can use these routes.
+- ADMIN receives generic 403, consistent with the plan's reviewer+ policy and existing lack of report rights.
+- Missing/invalid credentials retain the existing generic 401.
+
+Contracts:
+- VendorCreate accepts only slug and name; reject extra fields, including tenant_id, actor_id and role, with 422.
+- Bound slug/name to existing database lengths; use a documented lowercase slug grammar and reject blank names.
+- Do not silently truncate values.
+- Return only documented vendor fields.
+- Duplicate slug within one tenant returns generic 409; the same slug in another tenant is valid.
+- Foreign-tenant and nonexistent IDs return indistinguishable 404 responses.
+- Tenant headers and query parameters never override authenticated scope.
+
+Pagination:
+- limit defaults to 20, allowed 1–100.
+- offset defaults to 0, allowed 0–10,000.
+- Return items, total, limit and offset.
+- Use deterministic ordering with a unique tie-breaker.
+- Document that offset pagination does not provide a snapshot during concurrent changes.
+
+Preserve problem+json, request IDs, fixed public error messages, privacy-safe route-template logging and OpenAPI documentation.
+
+4. GET /readyz
+Unauthenticated, as specified in the plan:
+- Return {status, checks}.
+- Check database connectivity and whether the applied Alembic revision set matches the packaged migration heads.
+- Return 200 only when both pass.
+- Return 503 for missing/invalid configuration, unreachable database, missing version table or mismatched migration revisions.
+- Expose only fixed check names/status values; never URLs, revision values, SQL or exception text.
+- Never apply migrations or create extensions.
+- Keep /healthz independent and successful when readiness fails.
+- A reachable but unmigrated database must not be reported ready.
+
+5. Tests
+Unit/API tests remain database-independent using explicit doubles.
+
+Cover:
+- Authorization for every role.
+- Tenant-scoped create/list/get/count.
+- Body tenant-field rejection and header/query spoofing.
+- Same-tenant duplicate versus cross-tenant identical slug.
+- Foreign/nonexistent ID parity.
+- Validation and pagination bounds/order.
+- Commit, rollback and session cleanup, including commit failure.
+- Safe readiness failure paths and migration mismatch.
+- Health independence, lazy shared resources and shutdown disposal.
+- Request-ID/problem responses and absence of submitted markers in logs/errors.
+
+Add real PostgreSQL integration tests using the existing disposable guard for:
+- Authenticated create/list/get through the API.
+- Two-tenant isolation and identical slugs.
+- Duplicate creation and rollback.
+- Pagination.
+- Ready, unmigrated and revision-mismatch cases.
+
+Preserve existing migration/authentication tests and required-integration enforcement. Do not run integration tests locally.
+
+6. Documentation and history
+- Add ADR-0006 for tenant-scoped vendor access, shared lifecycle and readiness.
+- Update README, plan and threat model for the implemented M2c scope and limits.
+- Correct current-status wording saying M2b is not merged.
+- Record main at 277dfea:
+  CI run 38167398488, secret-scan run 38167398504.
+  The external reviewer retrieved its integration log:
+  "15 passed, 377 deselected in 3.77s".
+- Preserve earlier verification records.
+- Keep M2c integration verification and overall M2 acceptance pending.
+- Preserve Compose as unverified and existing API-key limitations.
+- Append this prompt verbatim to prompts.md with truthful outcomes; preserve earlier entries.
+
+Verification
+Run locked synchronization, Ruff formatting/linting, strict Mypy, the full local suite with integration tests skipped, build, isolated installed-wheel API/CLI/import checks, git diff --cached --check and staged Gitleaks scanning.
+
+Final handoff
+- Explain behavior, architectural choices and remaining limits.
+- Include the COMPLETE staged diff excluding prompts.md directly in fenced diff blocks.
+- Never truncate; split into numbered parts at file boundaries and provide every part.
+- Use a gitignored .local/ file only if response limits prevent full inclusion.
+- Report prompt-history additions, exact check results, skipped tests, staged paths, HEAD and Git status separately.
+- Confirm nothing was committed or pushed and no local database was contacted.
+````
+
+**Outcome (M2c implementation pending review; staged, not committed or pushed):**
+- **Starting state verified:** local `main` and `origin/main` at `277dfea`, a clean tree, the expected origin. Branch `feat/vendor-api-readiness` was created from `277dfea`.
+- **Shared lifecycle:**
+  - `evidenceguard_api.database.AppDatabase` is one lazily started engine and session factory, shared by authentication, vendors and readiness. It replaces M2b's authenticator-private engine and is disposed on shutdown when app-owned.
+  - The injection seams are `create_app(authenticator=, vendor_store=, readiness=, database=)` and `AppDatabase(engine_factory)`.
+  - Bounded waits: connect 5 s (unless the URL sets `connect_timeout`), pool 10 s, readiness statement 2 s.
+  - Routes and dependencies are synchronous, so they run in worker threads.
+- **Vendors:**
+  - `evidenceguard_persistence.vendors` queries are scoped by the actor's tenant in SQL: get by `(tenant_id, id)`, list and count with the same filter, ordering by `(slug, id)`.
+  - Only the `uq_vendors_tenant_id_slug` violation becomes a duplicate.
+  - The routes are `POST /v1/vendors` (201), `GET /v1/vendors` (page object, `limit` 1–100 default 20, `offset` 0–10,000) and `GET /v1/vendors/{id}` (generic 404 for foreign or missing IDs). Reviewers and approvers may use them; admins get a generic 403.
+  - Only `slug` (pattern-bounded, 1–64) and `name` (1–200, not blank) are accepted, without truncation; a duplicate slug is a generic 409. There is no schema change.
+- **`/readyz`:** unauthenticated; returns `{status, checks}` with fixed values. It is 200 only when `SELECT 1` succeeds and the applied Alembic revisions equal the packaged heads, and 503 otherwise. It is read-only and rolled back, and it never migrates.
+- **Tests:**
+  - Database-independent tests were added for the vendor API (injected authenticator and in-memory store), vendor persistence and store transactions (recording session), and readiness and the shared lifecycle.
+  - Three existing tests were adapted to the new structure: the lazy-engine test in `tests/test_auth_api.py`, the unknown-path test in `tests/test_health.py`, which used `/readyz`, and the OpenAPI path list.
+  - Six PostgreSQL integration tests were added to the existing guarded module.
+- **Documentation:** ADR-0006 was added. README, plan, threat model and ADR-0005 were updated.
+  - The statements that M2b was not merged were corrected.
+  - `main` is recorded at `277dfea`: CI run 38167398488, secret-scan run 38167398504, and the reviewer-retrieved integration log `15 passed, 377 deselected in 3.77s`. Earlier verification records are preserved.
+- **Verified locally** (Windows, Python 3.12.15): the locked sync, Ruff format and lint, strict Mypy (57 files), and the full suite (455 passed, 21 PostgreSQL integration tests skipped). Also the integration collection (21), the required-mode usage error (exit 4), the build, and the isolated installed-wheel API, CLI and import checks without database settings. Link checks, the staged whitespace check, the private-content check and the staged Gitleaks scan were also run. Exact results are in the session handoff.
+- **Not verified:**
+  - The six new PostgreSQL integration tests have **not** run against PostgreSQL. They are pending an authorized publication and CI.
+  - Compose remains unverified, and M2c review and overall M2 acceptance are pending.
+  - No local database was contacted.
+
+## Prompt 40: Read-only resume and M2c review handoff
+
+- **Stage:** Context restoration and review handoff for staged M2c (read-only; no file changes)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Resume EvidenceGuard after an overnight pause. This is a context-restoration and review handoff task, not an implementation task.
+
+Read the repository’s CLAUDE.md first and follow its boundaries. Work only in:
+D:\Claude\evidenceguard_agentic_rag
+
+Do not inspect other projects or global Claude configuration.
+
+Expected saved state
+- Branch: feat/vendor-api-readiness
+- HEAD: 277dfeaec7c1c64fa5ee92a3ce892823acc787fb
+- Origin: https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- 22 M2c files staged.
+- Nothing unstaged or untracked.
+- M2c is uncommitted and has never been pushed.
+- main was last verified at the same HEAD, with M2a and M2b complete.
+- The external reviewer received the M2c handoff but has NOT completed its review or approved a commit.
+
+First verify
+Run read-only Git commands to confirm:
+1. Working directory and Git root.
+2. Current branch and full HEAD SHA.
+3. Origin URL.
+4. Git status, staged file list and staged diff summary.
+5. Whether unstaged changes or untracked files exist.
+
+If the state differs, report the differences and stop. Do not attempt to repair it, switch branches, discard changes or restage anything.
+
+Restore project context
+Read the current README.md, docs/plan.md, ADR-0005, ADR-0006 and the latest relevant entries in prompts.md. Use the repository’s actual contents as the source of truth.
+
+M2c’s reported scope:
+- Shared lazy application database resource for authentication, vendors and readiness.
+- Tenant-scoped vendor persistence and authenticated create/list/get endpoints.
+- Reviewer and approver access; admin has no bypass.
+- Bounded limit/offset pagination.
+- Generic privacy-safe errors.
+- Unauthenticated /readyz checking database connectivity and exact Alembic revision agreement.
+- /healthz remains database-independent.
+- Updated documentation and six new PostgreSQL integration tests.
+
+Previous-session verification was reported as:
+- 455 tests passed; 21 PostgreSQL integration tests skipped.
+- Ruff formatting, lint and strict Mypy passed.
+- Build and isolated installed-wheel checks passed.
+- Staged Gitleaks scan passed.
+These are historical reported results, not checks you ran in this session. Do not claim otherwise.
+
+Still pending:
+- External review of the complete M2c diff.
+- M2c PostgreSQL and GitHub Actions verification.
+- Compose verification.
+- Overall M2 acceptance.
+
+Produce the review handoff
+- Include the COMPLETE current staged diff, excluding prompts.md, directly in your response inside fenced diff blocks.
+- Split it into numbered parts at file boundaries if needed.
+- Do not truncate files or replace any portion with a summary.
+- If response limits prevent a complete inline handoff, explicitly identify the omitted files and save the complete diff under the gitignored .local/ directory as a fallback.
+- Separately summarize the latest prompt-history entries without reproducing the entire prompts.md.
+- Report current Git state separately from historical verification results.
+- Run git diff --cached --check and report its actual result.
+
+Restrictions
+- Do not change any tracked files, including prompts.md, during this read-only resume task.
+- Do not implement fixes or add features.
+- Do not commit, push, merge, amend, rebase, reset, stash or unstage.
+- Do not install tools or dependencies, start servers or Docker, or contact any database.
+- Do not rerun the application suite merely to restore context.
+- Leave all existing staged work exactly as found.
+
+Finish by confirming that M2c remains staged and uncommitted, awaiting external review.
+````
+
+**Outcome (read-only; recorded with Prompt 41 because Prompt 40 forbade file changes):**
+- **State verified as expected:**
+  - branch `feat/vendor-api-readiness`, HEAD `277dfea`, the expected origin;
+  - the 22 M2c files staged, with nothing unstaged or untracked;
+  - no remote `feat/vendor-api-readiness` branch;
+  - local `main` at `277dfea`.
+- **Handoff:** the complete staged diff, excluding `prompts.md`, was given inline in eight parts.
+- **Checks:** `git diff --cached --check` printed nothing and exited 0. No tracked file was changed, and no test, server, Docker or database was run or contacted.
+
+**Review note (added with Prompt 41):** the external reviewer inspected the supplied M2c diff and found two issues:
+- `create_app()` chose `authenticator`, `vendor_store` and `readiness` with `or`, so an injected component that evaluates as false would be replaced by the database-backed default;
+- `VendorCreate.name` did not reject the null character U+0000 before persistence.
+
+The reviewer did not run the project suite. Both issues are corrected under Prompt 41 below. M2c remains uncommitted and is not accepted.
+
+## Prompt 41: Correct M2c injected-component selection and null characters in vendor names
+
+- **Stage:** Corrections to staged M2c work (no commit, no push)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Correct two findings from the external M2c review. Leave the result staged and uncommitted for another review.
+
+Follow CLAUDE.md. Work only inside:
+D:\Claude\evidenceguard_agentic_rag
+
+Expected starting state
+- Branch: feat/vendor-api-readiness
+- HEAD: 277dfeaec7c1c64fa5ee92a3ce892823acc787fb
+- Origin: https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- The existing 22 M2c files are staged.
+- Nothing is unstaged or untracked.
+- Nothing from M2c is committed or pushed.
+
+Verify the state first. If it differs, report the difference and stop without repairing it.
+
+Record the pre-edit staged tree so the correction handoff can show an exact incremental diff. Keep any review artifacts in gitignored .local/.
+
+Correction 1: honour injected components regardless of truthiness
+In create_app(), use explicit “is not None” checks when selecting authenticator, vendor_store and readiness.
+
+A supplied component must be retained even if its __bool__ returns False or its __len__ returns zero. Only None selects the database-backed default.
+
+Add a focused regression test supplying valid false-valued doubles for all three components:
+- Assert app.state retains each exact supplied object.
+- Exercise their corresponding routes to confirm the doubles are used.
+- Confirm the shared database never starts.
+- Preserve the existing ownership and shutdown behaviour.
+
+Correction 2: reject null characters in vendor names
+VendorCreate.name must reject U+0000 before persistence, in addition to its existing non-blank and length rules.
+
+Do not strip, replace or truncate the submitted value. Do not impose a general ASCII restriction or redesign the name rules.
+
+Add a regression test submitting a valid slug and a non-blank name containing an embedded null character:
+- Response is 422 application/problem+json.
+- The request-ID body/header contract holds.
+- The vendor store is never called.
+- The submitted name is absent from the error response.
+
+Add or retain a positive test proving an ordinary Unicode display name is accepted unchanged.
+
+Update ADR-0006’s name-validation description to include the null-character restriction. Keep the documentation edit narrow.
+
+Regression verification
+Run the new focused tests against the pre-edit implementation to demonstrate that they detect these findings, then restore the corrected files and verify restoration. Use the recorded staged tree as the baseline; do not rewrite commits or disturb unrelated work.
+
+Then run:
+- uv run --locked ruff format --check .
+- uv run --locked ruff check .
+- uv run --locked mypy
+- uv run --locked pytest
+- uv build
+- git diff --cached --check
+- gitleaks git --pre-commit --staged --redact --verbose .
+
+Stage only the intended corrections and prompt-history additions before the staged checks. PostgreSQL tests should remain skipped locally; do not contact a database or start Docker.
+
+Prompt history
+- Preserve earlier prompts and outcome notes.
+- Append the preceding read-only resume prompt verbatim if it is available in this session and has not yet been recorded.
+- Append this correction prompt verbatim, using the next available sequential prompt number.
+- Add a separate review note recording these two findings.
+- State accurately that the reviewer inspected the supplied diff but did not run the project suite.
+- Record actual verification results and keep M2c PostgreSQL verification, Compose and overall M2 acceptance pending.
+- Do not invent missing prompt text or record acceptance of the corrections before the next review.
+
+Final handoff
+Include:
+1. A brief explanation of the corrections.
+2. The COMPLETE incremental staged diff against the recorded pre-edit staged tree, excluding prompts.md, directly inside fenced diff blocks.
+3. Numbered parts split at file boundaries if needed; no truncation or summary replacing diff content.
+4. A separate summary of prompt-history additions.
+5. Commands actually run, results and skipped checks.
+6. Current branch, full HEAD, staged paths and Git status.
+
+If response limits prevent the complete inline diff, explicitly identify any omitted files and save the complete diff under gitignored .local/ as a fallback.
+
+Do not commit, push, merge, amend, rebase, reset, start servers, install tools or contact a database. Leave the corrections staged for external review.
+````
+
+**Outcome (corrections pending review; staged, not committed or pushed):**
+- **Starting state verified:**
+  - branch `feat/vendor-api-readiness`, HEAD `277dfea`, the expected origin;
+  - the 22 M2c files staged, with nothing unstaged or untracked.
+  - The pre-edit staged tree, `005fa5cc95c7784ad5c0b10aa723a0edf01dd903`, was recorded under `.local/`.
+- **Correction 1:** `create_app()` now selects each of `authenticator`, `vendor_store` and `readiness` with `is not None`, so only `None` selects the database-backed default. Ownership and shutdown are unchanged.
+  - The new test `test_falsy_injected_components_are_kept_and_the_database_never_starts` in `tests/test_readiness.py` injects doubles whose `__bool__` is `False` or whose `__len__` is 0.
+  - It checks that `app.state` holds each exact object, exercises `/v1/me`, `/v1/vendors` and `/readyz` through them, and checks that the shared database never starts.
+- **Correction 2:** `VendorCreate.name` now rejects U+0000 with a 422. The value is not stripped, replaced or truncated, and the other name rules are unchanged.
+  - New tests in `tests/test_vendors_api.py`: an embedded null gives a 422 problem response with the request-ID contract, the store is never called, and the submitted name is absent from the response; an ordinary Unicode display name is accepted and stored unchanged.
+  - ADR-0006's name rule now mentions the null character.
+- **Regression demonstration:** the staged pre-edit `app.py` and `vendors.py` were temporarily restored, after confirming that they matched the index.
+  - Against them, the falsy-component and null-character tests **failed**: `app.state.authenticator` was a `DatabaseAuthenticator`, and the response was 201 instead of 422. The Unicode test passed, as a positive test should.
+  - The falsy-component test stops at its first assertion, so only the authenticator substitution was observed directly against the pre-edit code.
+  - The corrected files were then restored, confirmed byte-identical with `cmp`, and the three tests passed.
+- **Verified locally** (Windows):
+  - `uv run --locked ruff format --check .`: 69 files already formatted.
+  - `uv run --locked ruff check .`: all checks passed. A first run flagged RUF001 (an en dash in the new Unicode test string); the character was removed and the checks were rerun.
+  - `uv run --locked mypy`: no issues in 57 source files.
+  - `uv run --locked pytest`: 458 passed, 21 PostgreSQL integration tests skipped (`EG_TEST_DATABASE_URL` not set).
+  - `uv build`: the sdist and wheel were built.
+  - After staging only the corrected files and this prompt history: `git diff --cached --check` printed nothing (exit 0), and `gitleaks git --pre-commit --staged --redact --verbose .` found no leaks. Both were rerun after this note was staged.
+  - The installed-wheel checks from Prompt 39 were not rerun.
+- **Not verified:**
+  - The M2c PostgreSQL integration tests have still not run against PostgreSQL; they are pending an authorized publication and CI.
+  - Compose remains unverified.
+  - Review of these corrections and overall M2 acceptance are pending.
+  - No local database was contacted, and Docker was not started.
+
+**Review note (added with Prompt 42):**
+- The external reviewer accepted the original M2c diff (Prompt 39), together with the Prompt 41 correction diff, for a local commit:
+  - explicit `None` checks keep injected components that evaluate as false;
+  - vendor names containing U+0000 are rejected before persistence;
+  - the regression tests and the narrow ADR-0006 clarification.
+- The acceptance rests on the supplied diffs and on Claude's reported Windows checks: 458 passed, with 21 PostgreSQL integration tests skipped. The reviewer did not run the project suite.
+- M2c PostgreSQL verification, Compose and overall M2 acceptance remain pending.
+
+## Prompt 42: Commit reviewed M2c locally
+
+- **Stage:** Local commit of reviewed M2c work (no push, no merge)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Commit the reviewed M2c work locally. This authorizes one local commit only, with no push or merge.
+
+Follow CLAUDE.md. Work only in:
+D:\Claude\evidenceguard_agentic_rag
+
+Verify the expected starting state:
+- Branch: feat/vendor-api-readiness
+- HEAD: 277dfeaec7c1c64fa5ee92a3ce892823acc787fb
+- Origin: https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Staged tree: aecadadb4e6477d1cfead4e0933c54b4e24b0da6
+- Exactly the existing 22 M2c paths staged.
+- Nothing unstaged or untracked.
+- No .local/ paths staged.
+
+If anything differs, report it and stop without changing the state.
+
+The external reviewer accepts the original M2c diff plus Prompt 41’s correction diff for a local commit:
+- explicit None checks preserve false-valued injected components;
+- vendor names containing U+0000 are rejected before persistence;
+- the regression tests and narrow ADR clarification are accepted.
+
+Acceptance rests on the supplied diffs and your reported Windows checks: 458 passed, 21 PostgreSQL integration tests skipped. The reviewer did not run the project suite. M2c PostgreSQL verification, Compose and overall M2 acceptance remain pending.
+
+Changes permitted in this task:
+Only append to prompts.md:
+1. A review note under Prompt 41 recording this acceptance and its verification limits.
+2. This prompt verbatim, using the next sequential number.
+3. A truthful pre-commit outcome note.
+
+Preserve all earlier entries. Do not change application code, tests, dependencies, configuration or other documentation.
+
+Before committing:
+- Confirm every staged file except prompts.md remains byte-identical to the accepted staged tree.
+- Inspect the staged paths and diff.
+- Check the staged content for secrets and private information without printing sensitive values.
+- Confirm effective author and committer use:
+  257921624+mathewmljourney93@users.noreply.github.com
+- Run git diff --cached --check.
+- Run gitleaks git --pre-commit --staged --redact --verbose .
+
+If these checks pass, create one local commit:
+feat: add tenant-scoped vendor API and database readiness
+
+Keep the existing attribution convention. Do not modify global Git configuration or rewrite history.
+
+After committing:
+- Run gitleaks git --redact --verbose . for the full history.
+- Confirm the commit parent, committed paths and clean working tree.
+- Confirm the committed non-prompts.md files match the accepted tree.
+
+Application checks need not be rerun if only prompts.md changed. Report previous checks as historical, not as checks run in this task.
+
+Final handoff:
+- Full commit SHA, parent, subject, author and committer.
+- Committed paths and verification results.
+- Prompt-history additions.
+- Final Git status.
+- Complete incremental diff against the accepted tree, excluding prompts.md, inside fenced diff blocks if any such changes exist. If none, state that explicitly.
+- State that PostgreSQL verification, Compose and overall M2 acceptance remain pending.
+
+Do not push, merge, amend, rebase, delete branches, start Docker or contact any database.
+````
+
+**Pre-commit note (recorded before the commit):**
+- **Starting state verified:**
+  - branch `feat/vendor-api-readiness`, HEAD `277dfea`, the expected origin;
+  - staged tree `aecadadb4e6477d1cfead4e0933c54b4e24b0da6`, with exactly the 22 M2c paths staged, no `.local/` path staged, and nothing unstaged or untracked.
+  - The effective author and committer identity is `257921624+mathewmljourney93@users.noreply.github.com`.
+- **This commit** adds the reviewed M2c work and this prompt-history update. Since the accepted tree, only `prompts.md` has changed.
+- **Checks on the staged content, including this note:** the byte-identity comparison, the private-content check, `git diff --cached --check` and the staged Gitleaks scan run before the commit. The full-history Gitleaks scan runs after the commit. All of their results are reported in the session handoff.
+- **Not rerun in this task:** the application checks, because only `prompts.md` changed. The last results are the historical Prompt 41 results: 458 passed and 21 PostgreSQL integration tests skipped.
+- **Still pending:**
+  - M2c PostgreSQL verification and CI, which need an authorized publication;
+  - Compose verification;
+  - overall M2 acceptance.
+
+  No push or merge is authorized.
