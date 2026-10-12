@@ -10,7 +10,7 @@ EvidenceGuard is a planned vendor-risk review copilot. It is intended to:
 
 It is evidence-based decision support, not legal advice or compliance certification.
 
-## Status: M1 and M2 accepted (persistence, authentication, tenant-scoped vendors and readiness on `main`); M3a durable job core on `main`; M3b worker runtime implemented on a local branch, awaiting review and CI (pre-alpha)
+## Status: M1 and M2 accepted (persistence, authentication, tenant-scoped vendors and readiness on `main`); M3a durable job core on `main`; M3b worker runtime reviewed and verified in CI on branch `feat/worker-runtime`, not yet on `main` (pre-alpha)
 
 **What works now:**
 - One installable Python 3.12 package (`evidenceguard`), managed with uv, with a committed lockfile (M1a).
@@ -56,12 +56,12 @@ It is evidence-based decision support, not legal advice or compliance certificat
   - a fenced transaction that checks the `(job, worker, attempt)` token and the lease with fresh database time before any effect.
 
   On `main` it is a library only, with no worker process, handler or endpoint. At commit `11350e1`, all 63 PostgreSQL integration tests passed in CI ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517485)), including the job concurrency, lease-fencing and lock-timeout tests, and again on `main` at `b3f9845` ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118281)). These results demonstrate the tested behaviour, not a general security or performance guarantee. See [ADR-0007](docs/decisions/0007-durable-job-core.md).
-- **Worker runtime** (M3b, on local branch `feat/worker-runtime`; **awaiting review and CI**):
+- **Worker runtime** (M3b, reviewed and verified in CI on branch `feat/worker-runtime` at `bc5f638`; **not yet merged into `main`**):
   - an `eg-worker` command that claims jobs of its registered kinds, runs one handler at a time, renews leases with heartbeats and records outcomes only through the M3a fence;
   - atomic completion with a handler's final effects, and cooperative cancellation checked at explicit points;
   - a graceful shutdown with bounded supervisor waits that ends the process with exit code 5 if a job thread does not stop. This is not a total shutdown deadline: a blocked database call can delay it (see ADR-0008).
 
-  There are **no production handlers yet**, so `eg-worker` exits with code 4 before reading any settings. Its database-independent tests pass locally; its PostgreSQL integration tests have **not run yet**. See [ADR-0008](docs/decisions/0008-worker-runtime.md).
+  There are **no production handlers yet**, so `eg-worker` exits with code 4 before reading any settings. At commit `bc5f638`, [CI run 38253962690](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690) passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827089007) (`709 passed, 77 skipped in 15.96s`) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827088937) (`708 passed, 78 skipped in 22.18s`), and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827089078) passed all 77 integration tests, M3a's 63 and the worker's 14 (`77 passed, 709 deselected in 19.63s`), all from logs retrieved by the external reviewer. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962775) passed (25 commits scanned, no leaks found). These results demonstrate the tested behaviour, not a general security or performance guarantee. See [ADR-0008](docs/decisions/0008-worker-runtime.md).
 - Tests, Ruff and strict Mypy, run in GitHub Actions on Ubuntu and Windows, plus a PostgreSQL 17 + pgvector integration job on Ubuntu.
 
 **M2 accepted.** The external reviewer accepted M2 against its agreed criteria (see [docs/plan.md](docs/plan.md)), on the basis of the implementation diffs and the CI evidence below; the reviewer did not run the suite locally. This does not claim any vector functionality: the CI database image includes pgvector, but no migration creates the extension. Compose has never been run.
@@ -86,7 +86,7 @@ The earlier M1 baseline `6d64fb3` passed [CI](https://github.com/mathewmljourney
 
 **Limits:**
 - The M1b report rules are still in-memory only. Nothing persists reports yet, and there is no protection against concurrent requests.
-- The endpoints are `/healthz`, `/readyz`, `/v1/me` and the vendor endpoints. No endpoint uses the report rules yet. There are no documents, uploads or production job handlers yet. On `main` the job core (M3a) has no worker process; the M3b worker exists only on its local branch, awaiting review and CI.
+- The endpoints are `/healthz`, `/readyz`, `/v1/me` and the vendor endpoints. No endpoint uses the report rules yet. There are no documents, uploads or production job handlers yet. On `main` the job core (M3a) has no worker process; the M3b worker is verified in CI on its feature branch but not yet merged.
 - Vendor pages use offset pagination, which is not a snapshot under concurrent changes (see ADR-0006).
 - API keys are possession-based bearer credentials, with no rate limiting, lockout, expiry or scopes yet (see ADR-0005).
 - A citation's shape is validated. Whether the tenant may see the chunk, whether the quote is really in it, and whether it supports the claim are **not** checked yet.
@@ -94,7 +94,7 @@ The earlier M1 baseline `6d64fb3` passed [CI](https://github.com/mathewmljourney
 
 **Still planned** (see [docs/plan.md](docs/plan.md)):
 - Revision activation and supersession tests, deferred from M1 to M3, where those state machines are built.
-- The rest of M3 (worker, documents and revisions, parsing and chunking, uploads, Docker), following the accepted slice sequence in [docs/plan.md](docs/plan.md). The M3b worker runtime is implemented on its local branch and awaits review and CI; M3c–M3f are not implemented, Compose is unverified, and overall M3 acceptance is pending.
+- The rest of M3 (worker, documents and revisions, parsing and chunking, uploads, Docker), following the accepted slice sequence in [docs/plan.md](docs/plan.md). The M3b worker runtime is reviewed and verified in CI on `feat/worker-runtime` but not yet merged into `main`; M3c–M3f are not implemented, Compose is unverified, and overall M3 acceptance is pending.
 - After M2: ingestion, retrieval, model providers, the review workflow, API endpoints for the approval gate, and evaluation.
 
 No retrieval, agent workflow, evaluation results, security guarantees or benchmarks are claimed. Any future results will be published with their committed inputs, configuration and the command that reproduces them.
@@ -224,7 +224,7 @@ Invoke-RestMethod http://127.0.0.1:8000/readyz   # no key needed
 - **Pages** are ordered by slug, then ID, with `limit` 1–100 (default 20) and `offset` 0–10,000. They are not a snapshot when vendors are added concurrently.
 - **`GET /readyz`** returns `200 {"status": "ready", ...}` only when the database answers and its migrations exactly match this release; otherwise `503` with fixed check states. It never migrates or changes the database. `/healthz` is unaffected.
 
-Packaging layout: [ADR-0001](docs/decisions/0001-packaging-and-layout.md). Request IDs, logging and error format: [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md). Workflow orchestration: [ADR-0003](docs/decisions/0003-plain-python-workflow.md). Persistence: [ADR-0004](docs/decisions/0004-persistence-foundation.md). API-key authentication: [ADR-0005](docs/decisions/0005-api-key-authentication.md). Vendors, shared database lifecycle and readiness: [ADR-0006](docs/decisions/0006-vendor-api-and-readiness.md). Durable job core: [ADR-0007](docs/decisions/0007-durable-job-core.md). Worker runtime (under review): [ADR-0008](docs/decisions/0008-worker-runtime.md).
+Packaging layout: [ADR-0001](docs/decisions/0001-packaging-and-layout.md). Request IDs, logging and error format: [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md). Workflow orchestration: [ADR-0003](docs/decisions/0003-plain-python-workflow.md). Persistence: [ADR-0004](docs/decisions/0004-persistence-foundation.md). API-key authentication: [ADR-0005](docs/decisions/0005-api-key-authentication.md). Vendors, shared database lifecycle and readiness: [ADR-0006](docs/decisions/0006-vendor-api-and-readiness.md). Durable job core: [ADR-0007](docs/decisions/0007-durable-job-core.md). Worker runtime: [ADR-0008](docs/decisions/0008-worker-runtime.md).
 
 The request ID is for correlating logs only. It is not authentication and says nothing about who made a request. Logs are local JSON lines on stderr; there is no monitoring or telemetry service.
 

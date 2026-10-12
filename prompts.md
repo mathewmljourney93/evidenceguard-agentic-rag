@@ -6946,3 +6946,339 @@ Do not begin M3c.
   - All 77 integration tests are still unverified against this M3b version.
   - The historical local Windows result is 708 passed and 78 skipped: 77 PostgreSQL tests, plus one POSIX-only SIGTERM test.
 - **Authorization:** push `feat/worker-runtime` only. No `main` update, merge, tag or force-push.
+
+**Outcome note for Prompt 63 (added with Prompt 64; publication and CI happened after the Prompt 63 preflight note):**
+- **Commit:** `bc5f6385ce092d1d47f69b4e8a6cd0a453e90451`, with parent `6547e9f`; it changes only `prompts.md`. The full-history Gitleaks scan was clean before the push.
+- **Push:** only `feat/worker-runtime` was pushed, as a new branch tracking `origin/feat/worker-runtime`, at `bc5f638`. `main` stayed at `b3f9845`. Nothing was force-pushed and no tag was pushed.
+- **CI:** for `bc5f638`, [CI run 38253962690](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690) (verify on Ubuntu and Windows, plus integration) and [secret-scan run 38253962775](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962775) succeeded within the 20-minute monitoring bound.
+- **Logs:** Claude saw only job and step conclusions; the unauthenticated log endpoint returned 403.
+
+## Prompt 64: Record the verified M3b feature-branch CI results
+
+- **Stage:** Documentation only, on branch `feat/worker-runtime` (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Record the verified M3b feature-branch CI results. Documentation only; leave changes staged and uncommitted for review.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/worker-runtime
+- HEAD and upstream:
+  bc5f6385ce092d1d47f69b4e8a6cd0a453e90451
+- Working tree clean, nothing untracked.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Local and remote main:
+  b3f984552bf22cf6350702330d30851f3e08b3f4
+
+Check remote refs freshly. Stop without changes if anything differs.
+
+2. Independently retrieved CI evidence
+
+The reviewer retrieved the logs directly from GitHub.
+
+CI run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690
+
+Observed summaries:
+- Ubuntu job 114827089007:
+  709 passed, 77 skipped in 15.96s
+- Windows job 114827088937:
+  708 passed, 78 skipped in 22.18s
+- PostgreSQL integration job 114827089078:
+  77 passed, 709 deselected in 19.63s
+
+Secret-scan run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962775
+
+Job 114827088806:
+25 commits scanned; no leaks found.
+
+Both runs:
+- head_sha: bc5f6385ce092d1d47f69b4e8a6cd0a453e90451
+- head_branch: feat/worker-runtime
+- conclusion: success
+
+All 77 PostgreSQL tests passed: 63 existing plus 14 worker integration tests.
+Ubuntu’s database-independent run has one additional passing test compared with Windows, consistent with the POSIX-only SIGTERM test running on Ubuntu and being skipped on Windows. Do not claim an individually named test log entry was observed.
+
+The reviewer retrieved CI evidence but did not run the project suite locally.
+
+3. Narrow documentation updates
+
+Update only:
+- README.md
+- docs/decisions/0008-worker-runtime.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Record:
+- M3b implementation is reviewed and verified in CI on feat/worker-runtime at bc5f638.
+- Actual summaries and links above.
+- PostgreSQL verification now includes the worker tests.
+- Linux verification has run.
+- M3b is not yet merged into main.
+- Production handler registry remains empty.
+- Compose remains unverified.
+- M3c–M3f remain unimplemented.
+- Overall M3 acceptance remains pending.
+- Existing accepted runtime limitations remain unchanged.
+
+Mark ADR-0008 accepted, following the repository’s accepted-and-CI-verified ADR convention.
+
+Preserve historical evidence and distinguish tested behavior from general security or performance guarantees.
+
+Do not change source, tests, dependencies, migrations, workflows or engineering defaults.
+
+4. Prompt history
+
+Append this prompt verbatim as Prompt 64 if it is the next unused number; otherwise use the next unused number and explain it.
+
+Add a truthful outcome note covering:
+- Reviewer-retrieved evidence.
+- Documentation changes.
+- Checks actually run.
+- No commit, push or merge.
+- Main remains unchanged.
+
+Keep earlier entries unchanged.
+
+5. Checks and handoff
+
+Check documentation links, status consistency and private content.
+Run:
+- git diff --cached --check
+- Staged Gitleaks scan
+
+No application tests or builds are needed for documentation-only changes.
+
+Stage only the five authorized files.
+
+Return:
+- Concise explanation of changes.
+- Actual check commands and results.
+- Staged tree ID, staged paths and Git status.
+- COMPLETE staged diff excluding prompts.md, including all changed documents, directly in fenced diff blocks.
+- Numbered parts at file boundaries if necessary; never silently truncate.
+- Summary of prompts.md additions and confirmation earlier entries are unchanged.
+
+Leave everything staged and uncommitted.
+Do not push, merge, amend, rebase, start Docker or contact a local database.
+Do not begin M3c.
+````
+
+**Outcome (documentation pending review; staged on `feat/worker-runtime`, not committed or pushed):**
+- **Starting state verified, from freshly fetched remote refs:**
+  - branch `feat/worker-runtime`, with HEAD and upstream at `bc5f638`;
+  - a clean tree and the expected origin;
+  - local and remote `main` at `b3f9845`.
+- **Evidence:** the external reviewer retrieved these from GitHub; they did not run the project suite locally.
+  - Ubuntu: `709 passed, 77 skipped in 15.96s`.
+  - Windows: `708 passed, 78 skipped in 22.18s`.
+  - PostgreSQL: `77 passed, 709 deselected in 19.63s`. That is all 77 integration tests: the 63 existing and the 14 worker tests.
+  - Secret scan: 25 commits scanned, no leaks.
+
+  Ubuntu's one extra passing test is consistent with the POSIX-only SIGTERM test; no individual log entry for it was observed.
+- **Documentation changes:**
+  - **ADR-0008:** marked accepted, following the ADR-0007 convention.
+  - **README, plan and threat model:** now say M3b is reviewed and verified in CI on `feat/worker-runtime` at `bc5f638`, and that the PostgreSQL verification includes the worker tests. They also say:
+    - M3b is not merged into `main`;
+    - the production registry is empty;
+    - Compose is unverified;
+    - M3c–M3f are not implemented;
+    - M3 acceptance is pending.
+
+  Historical evidence and the runtime limitations are unchanged. No source, tests, dependencies, migrations, workflows or defaults changed.
+- **Checks run:**
+  - the link and anchor check;
+  - a status-consistency search;
+  - a private-content check of the staged additions;
+  - `git diff --cached --check`;
+  - the staged Gitleaks scan.
+
+  Exact results are in the session handoff. No application tests or builds were run.
+- **No commit, push or merge occurred.** `main` is unchanged at `b3f9845`.
+
+**Acceptance note for Prompt 64 (added with Prompt 65):**
+- **What was accepted:** the external reviewer accepted Prompt 64's complete documentation diff.
+- **Basis:** that diff and the GitHub evidence they retrieved independently for `bc5f638`:
+  - Ubuntu: `709 passed, 77 skipped in 15.96s`;
+  - Windows: `708 passed, 78 skipped in 22.18s`;
+  - PostgreSQL: `77 passed, 709 deselected in 19.63s`;
+  - secret scan: 25 commits scanned, no leaks.
+- **What the reviewer ran:** nothing locally; they did not run the project suite.
+- **Unchanged documents:** the four non-history documents stay byte-identical to the accepted tree `108db3b…`. Their "not yet merged" statements are true before publication.
+
+## Prompt 65: Commit the M3b verification documentation, publish the branch, then fast-forward main
+
+- **Stage:** Commit, publish `feat/worker-runtime`, then fast-forward `main` after all four checks pass
+- **Date:** 2026-10-12 (session date)
+
+````text
+Commit the reviewed M3b verification documentation, publish the feature branch, then fast-forward main only after all four required checks pass.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/worker-runtime
+- HEAD and upstream:
+  bc5f6385ce092d1d47f69b4e8a6cd0a453e90451
+- Staged tree:
+  108db3baf56986276b6e7b5449082590be9ca941
+- Exactly five staged files:
+  README.md
+  docs/decisions/0008-worker-runtime.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Local and remote main:
+  b3f984552bf22cf6350702330d30851f3e08b3f4
+- Remote feature branch matches HEAD.
+- Main is an ancestor of HEAD.
+- Effective author and committer email:
+  257921624+mathewmljourney93@users.noreply.github.com
+
+Check remote refs freshly. Stop without changes if anything differs.
+Record the accepted staged tree before editing.
+
+2. Preserve the reviewed documents
+
+The reviewer accepted Prompt 64’s complete documentation diff, based on that diff and independently retrieved GitHub evidence for bc5f638:
+- Ubuntu: 709 passed, 77 skipped in 15.96s
+- Windows: 708 passed, 78 skipped in 22.18s
+- PostgreSQL: 77 passed, 709 deselected in 19.63s
+- Secret scan: 25 commits scanned, no leaks
+
+The reviewer did not run the project suite locally.
+
+Keep all four non-history documents byte-identical to the accepted tree. Their “not yet merged” statements are true before publication; do not pre-record future results.
+
+Change only prompts.md, append-only:
+- Add an acceptance note under Prompt 64.
+- Append this prompt verbatim as Prompt 65 if that is the next unused number; otherwise use the next unused number and explain it.
+- Add a truthful preflight note recording verified state, checks, authorization order and stop conditions.
+- Do not pre-record push, CI or main-update success.
+- Keep earlier entries unchanged.
+
+3. Commit and scan
+
+Inspect staged paths, diff, private content and effective identity.
+Run git diff --cached --check and the staged Gitleaks scan.
+
+Create one commit:
+docs: record verified M3b results and main publication authorization
+
+Use the noreply identity and existing attribution convention.
+
+Verify:
+- Parent is bc5f6385ce092d1d47f69b4e8a6cd0a453e90451.
+- Exactly the five authorized files changed.
+- All files except prompts.md match the accepted staged tree.
+- Working tree is clean.
+
+Run the full-history Gitleaks scan before publication. Stop on failure.
+No local application tests or builds need rerunning for documentation-only changes.
+
+4. Publish the feature branch first
+
+Push only:
+git push origin refs/heads/feat/worker-runtime:refs/heads/feat/worker-runtime
+
+Monitor all four checks for the exact new SHA:
+- Ubuntu verification
+- Windows verification
+- PostgreSQL integration
+- Full-history secret scan
+
+Use available read-only GitHub access. Do not install tooling or change authentication configuration.
+
+Bound monitoring to 20 minutes. If anything fails or remains pending, report diagnostics and links, then stop before touching main. Do not automatically fix or repush.
+
+Report actual test summaries if logs are accessible. Otherwise say counts were not observed; do not reuse bc5f638’s summaries as observed results for the new SHA.
+
+5. Fast-forward main after all four checks pass
+
+Fetch main and the feature branch again. Confirm:
+- Remote main remains b3f984552bf22cf6350702330d30851f3e08b3f4.
+- Remote feature branch matches the newly verified SHA.
+- Main is an ancestor of that SHA.
+- Local main equals origin/main and has no independent commits.
+- Working tree is clean.
+
+Stop if any condition differs.
+
+Switch to main, then fast-forward to the verified SHA with git merge --ff-only. Create no merge commit.
+
+Push only:
+git push origin refs/heads/main:refs/heads/main
+
+Monitor all four checks for that exact SHA’s main-push runs, again bounded to 20 minutes.
+
+If a main check fails or remains pending, report it accurately. Do not automatically revert, rewrite history or make fixes.
+
+6. Handoff
+
+Return:
+- Commit SHA, parent, subject and identity.
+- Prompt-history additions.
+- Checks and scan results.
+- Feature and main workflow/job links and conclusions.
+- Observed test summaries, or log-access limitations.
+- Before/after refs and final Git status.
+- Complete incremental diff against the accepted staged tree, excluding prompts.md. If none, explicitly say none.
+- Note that recording the eventual main publication results requires a later documentation update.
+
+Compose remains unverified. No production handlers exist yet. M3c–M3f and overall M3 acceptance remain pending.
+
+Do not change application code, tests, dependencies, migrations or workflows.
+Do not force-push, amend, rebase, squash, delete branches or push tags.
+Do not start Docker or contact a local database.
+Do not begin M3c.
+````
+
+**Preflight note (written before the commit; push, CI and `main` results are not recorded here):**
+- **Verified state, from freshly fetched remote refs:**
+  - branch `feat/worker-runtime`, with HEAD, upstream and the remote feature branch all at `bc5f638`;
+  - staged tree `108db3b…` with exactly the five authorized files, and nothing unstaged or untracked;
+  - the expected origin;
+  - local and remote `main` at `b3f9845`, which is an ancestor of HEAD;
+  - author and committer use the noreply address.
+
+  The accepted staged tree was recorded before editing.
+- **Change:** only `prompts.md`, append-only.
+- **Checks before the commit:**
+  - the staged paths, diff, private content and identity inspected;
+  - `git diff --cached --check`;
+  - the staged Gitleaks scan.
+
+  After the commit, and before any push, the full-history Gitleaks scan runs.
+- **Authorization order:**
+  1. Commit.
+  2. Push only `feat/worker-runtime`.
+  3. Monitor the four required checks (Ubuntu and Windows verification, PostgreSQL integration, full-history secret scan) for the exact new SHA, for at most 20 minutes.
+  4. Only if all four pass, re-fetch and confirm:
+     - remote `main` is still `b3f9845`;
+     - the remote feature branch equals the verified SHA;
+     - `main` is an ancestor of it;
+     - local `main` equals `origin/main`;
+     - the tree is clean.
+  5. Fast-forward `main` with `git merge --ff-only`.
+  6. Push only `main`.
+  7. Monitor its four checks for at most 20 minutes.
+- **Stop conditions:**
+  - any failed or pending check, or any differing ref, stops the run before `main` is touched;
+  - a failure after `main` is pushed is reported, never reverted or rewritten.
+
+  There is no force-push, amend, rebase, squash, branch deletion or tag push.

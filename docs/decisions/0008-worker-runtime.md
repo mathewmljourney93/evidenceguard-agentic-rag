@@ -1,6 +1,8 @@
 # ADR-0008: Sequential worker runtime and `eg-worker`
 
-- **Status:** Implemented on local branch `feat/worker-runtime` (Prompt 60) and corrected after review (Prompt 61: cancellation-check boundaries, exception-safe job-thread cleanup, abnormal exit despite cleanup failures); **implementation under review**. The PostgreSQL integration tests have not run yet: that verification is **pending** authorized publication and CI. The specification itself was accepted at review (Prompt 59).
+- **Status:** Accepted (M3b), following the implementation review and passing CI at commit `bc5f638` on branch `feat/worker-runtime`. It is **not yet merged into `main`**. See *Consequences and limits*.
+  - The implementation came in Prompt 60, with corrections after review in Prompt 61: cancellation-check boundaries, exception-safe job-thread cleanup, and the abnormal exit despite cleanup failures.
+  - The specification was accepted at review in Prompt 59.
 - **Date:** 2026-10-12
 - **Builds on:**
   - [ADR-0001](0001-packaging-and-layout.md): the `apps/worker/evidenceguard_worker` layout and the single distribution;
@@ -148,8 +150,18 @@ The 60 s lease and the 20 s heartbeat interval are M3a's.
 - **Delayed reclaim** is possible after a late heartbeat extended a cancelled attempt's lease, or while a terminated worker's transaction still holds the row lock.
 - **Trusted handlers.** The handler wrapper is not a sandbox.
 - **No production handlers yet.** The command is installable and testable but cannot claim work until M3d.
-- **Verification so far:**
-  - **Local, database-independent:** fake stores, scripted clocks and event-controlled ordering, on Windows, including the regression tests added in Prompt 61.
-  - **Pending:** the PostgreSQL integration tests (`tests/test_worker_postgres.py`) are skipped locally and have not run anywhere yet.
-  - **Platform:** the SIGTERM delivery test runs only on POSIX.
-  - Compose remains unverified; M3c–M3f are not implemented; overall M3 acceptance is pending.
+- **Verified in CI.** The tested commit is `bc5f638` (`bc5f6385ce092d1d47f69b4e8a6cd0a453e90451`) on branch `feat/worker-runtime`. It adds only prompt history after the reviewed M3b commit `6547e9f`.
+  - In [CI run 38253962690](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690), from logs retrieved by the external reviewer:
+    - [verify on Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827089007) reported `709 passed, 77 skipped in 15.96s`;
+    - [verify on Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827088937) reported `708 passed, 78 skipped in 22.18s`;
+    - the [PostgreSQL 17 + pgvector integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827089078) reported `77 passed, 709 deselected in 19.63s`. That is all 77 integration tests, M3a's 63 and the worker's 14 from `tests/test_worker_postgres.py`, with no skips or failures.
+  - Ubuntu passed one more database-independent test than Windows. That is consistent with the POSIX-only SIGTERM delivery test running on Ubuntu and being skipped on Windows; no individual log entry for that test was observed.
+  - The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962775) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962775/job/114827088806): 25 commits scanned, no leaks found).
+  - Earlier local Windows runs used fake stores, scripted clocks and event-controlled ordering, including the regression tests added in Prompt 61.
+- **Not yet verified or delivered:**
+  - M3b is not merged into `main`;
+  - the production handler registry is still empty;
+  - Compose is unverified;
+  - M3c–M3f are not implemented;
+  - overall M3 acceptance is pending.
+- **Scope of the evidence:** passing tests demonstrate the tested behaviour, not a general security or performance guarantee. The limits above are unchanged.
