@@ -7886,3 +7886,505 @@ Do not begin M3c implementation in this task.
   Exact results are in the session handoff. No application tests or builds were run.
 - **After the commit:** the full-history Gitleaks scan and the commit verification are reported in the session handoff, not recorded here.
 - **No code, tests, dependencies, migrations or workflow edits. No push, merge, amend, rebase, Docker or database contact.**
+
+**Outcome after the commit (recorded with Prompt 69):** the local commit `26021c2` (`26021c2daa6e2ad69ace5cfa4517f3b6ef7ce8a3`, parent `dd26c70`) was created on `docs/m3c-revision-spec` and was not pushed. Prompt 69's starting-state check confirmed that HEAD, its parent, a clean working tree, and `main` and `origin/main` still at `dd26c70`. The full-history Gitleaks scan after the commit was reported clean in the Prompt 68 session handoff; it was not re-run for this note.
+
+## Prompt 69: Implement M3c documents, revisions and fenced activation
+
+- **Stage:** M3c implementation on local branch `feat/document-revisions` (staged and uncommitted for review; no commit, push or database)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Implement M3c: tenant-scoped documents, revision lifecycle and fenced activation, following the accepted specification. Leave all implementation work staged and uncommitted for review.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: docs/m3c-revision-spec
+- HEAD:
+  26021c2daa6e2ad69ace5cfa4517f3b6ef7ce8a3
+- Parent:
+  dd26c7099d1007e9ee615204dc0056abe8820c67
+- Working tree clean, nothing untracked.
+- Local main and origin/main:
+  dd26c7099d1007e9ee615204dc0056abe8820c67
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+
+Stop without changes if anything differs.
+
+Create feat/document-revisions from HEAD.
+If that branch already exists, stop and report its state rather than resetting or reusing it.
+
+2. Read the accepted design and actual interfaces
+
+Read:
+- CLAUDE.md
+- The complete accepted M3c section in docs/plan.md
+- ADR-0004, ADR-0007 and ADR-0008
+- Existing domain models, persistence models and migrations
+- Job fencing and worker atomic-finish interfaces
+- Integration fixtures, migration checks and readiness tests
+
+Implement the settled specification, including Prompts 67–68’s corrections. Do not reopen accepted decisions or silently redesign the architecture.
+
+3. Implementation scope
+
+Add:
+- evidenceguard_domain.revisions
+- evidenceguard_persistence.documents
+- Document and DocumentRevision persistence models
+- Migration 0003, following existing naming conventions
+- The accepted read-only recheck_ownership helper
+- Focused unit and PostgreSQL integration tests
+- ADR-0009 and truthful progress documentation
+
+Implement:
+- Exact-byte RevisionContent validation
+- Immutable document/revision snapshots and pure lifecycle rules
+- Tenant-scoped document/revision creation
+- Concurrent revision-number allocation
+- Duplicate-content idempotency and explicit metadata conflicts
+- Fenced start_processing, fail_revision and activate_revision
+- Transactional activation, supersession and pointer updates
+
+Do not add parsing, chunking, ingestion handlers, uploads, endpoints, reconciliation, Docker changes, new dependencies or a storage service.
+
+4. Required invariants
+
+Schema:
+- Composite tenant references to vendors/documents.
+- Active and supersession pointers must belong to the same tenant and document.
+- Named status/field constraints reject partially filled failure or supersession pairs.
+- At most one active revision per document.
+- Circular-reference migration creation and downgrade order are correct.
+- No triggers; distinguish application invariants from database constraints.
+
+Content:
+- Strict UTF-8, nonempty, no NUL.
+- Hash and byte size derive from the exact bytes.
+- No newline, BOM or Unicode normalization before hashing.
+- Stored fields are re-verified when reconstructed.
+- Do not inherit whitespace-stripping behavior that changes content_text.
+- Errors, repr and validation diagnostics must not expose submitted document content.
+
+Creation:
+- Use the actor’s tenant and the accepted role rules.
+- Lock the document before allocating revision numbers.
+- Identical content returns the existing revision, including failed revisions.
+- Metadata conflicts cause no committed changes.
+- The caller owns the transaction; creation never commits.
+- Preserve the seam for revision plus future ingestion-job creation in one transaction.
+
+Lifecycle and activation:
+- Failed replacement preserves the previous active revision.
+- Compare against the currently active revision, not merely the latest uploaded one.
+- Job → document → revisions in ascending ID lock order.
+- Re-read mutable data after locks.
+- Recheck the locked job with fresh database time after additional lock waits.
+- Explicitly verify the re-read job tenant matches revision/document scope.
+- Refuse stale or expired ownership before effects.
+- Demote the previous active revision before promoting the target, then update the pointer.
+- Older late completion changes only the target revision.
+- Duplicate activation changes no links or timestamps.
+- Use caller-owned FencedSession; no internal commit, rollback or transaction-control SQL.
+- Activation and final job success can commit together through ctx.fenced(finish=True).
+- Commit acknowledgment failure remains uncertain, not proof of rollback.
+- A committed succeeded job cannot be reclaimed.
+
+Failure:
+- Keep RevisionFailureCode separate from JobErrorCode.
+- The future seam commits revision INGESTION_FAILED first, then raises PermanentJobError(JobErrorCode.PERMANENT_FAILURE) outside the block.
+- Document the separate-commit gap and recovery of an already-failed revision.
+- Dead-job reconciliation/projection remains a required later M3d/M3e item, not implemented here.
+
+If a genuine implementation conflict requires changing the accepted contract, stop and report the concrete conflict rather than silently changing it.
+
+5. Tests
+
+Implement the accepted verification plan, especially:
+- Pure transition table, invalid transitions, idempotency and aware-time checks.
+- Exact-byte hash/size consistency, CRLF, BOM, Unicode, invalid UTF-8, NUL and content privacy.
+- SQL scoping, lock order and fresh ownership recheck.
+- Migration upgrade/downgrade/re-upgrade and metadata drift.
+- Actual composite constraints and one-active partial index.
+- Concurrent creation of distinct and identical content.
+- Revision plus job transaction rollback.
+- Failed replacement preserves the active revision.
+- Out-of-order and concurrent activations leave one consistent active pointer.
+- Rollback after demotion but before promotion.
+- Rollback when activation or final job success fails.
+- Stale attempt refusal.
+- Lease expiry during a document-lock wait.
+- Lock-timeout mapping.
+- Duplicate activation using a valid fenced invocation.
+- Worker atomic-finish integration with test-only handlers.
+- Both uncertain-commit cases using controlled doubles.
+
+Use guarded disposable fixtures, event-controlled concurrency, bounded waits and test-only statement timeouts.
+
+Do not start Docker or contact a local database. PostgreSQL tests remain pending authorized publication and CI.
+
+Update existing migration-head expectations without weakening historical migration tests.
+
+6. Verification
+
+Run:
+- uv sync --locked
+- uv run --locked ruff format --check .
+- uv run --locked ruff check .
+- uv run --locked mypy
+- uv run --locked pytest
+- uv build
+- Isolated installed-wheel imports and offline migration rendering outside the source tree
+- git diff --cached --check
+- Staged Gitleaks scan
+
+No dependency or workflow change is expected. Report any required packaging adjustment explicitly.
+
+Report actual passing and skipped counts, separating PostgreSQL skips from platform skips. Do not claim database verification from compiled SQL or unit tests.
+
+7. Documentation and history
+
+Create ADR-0009 covering implementation choices, invariants and limits.
+Mark M3c implemented on its local branch, awaiting review and PostgreSQL CI.
+Update README, plan and threat model consistently.
+
+Keep:
+- No production ingestion handler yet.
+- Compose unverified.
+- M3d–M3f unimplemented.
+- Overall M3 acceptance pending.
+
+Append this prompt verbatim as Prompt 69 if it is the next unused number; otherwise use the next unused number and explain it.
+Add a truthful outcome note with actual checks and limitations.
+Preserve earlier prompt history.
+
+8. Review handoff
+
+Stage the complete implementation, excluding generated outputs and local artifacts.
+
+Return:
+- What changed and why.
+- Implementation choices within the accepted specification.
+- Actual commands/results and failures corrected along the way.
+- Staged tree ID, full staged paths and Git status.
+- COMPLETE staged diff excluding prompts.md, including every new source file, migration, test and document.
+- Numbered parts at file boundaries when needed; never silently truncate.
+- If response limits prevent completion, identify exactly which files remain and preserve the complete diff under .local/ for continuation.
+- Prompt-history additions and remaining verification limits.
+
+Leave everything staged and uncommitted.
+Do not push, merge, amend, rebase, start Docker or contact a local database.
+Do not begin M3d.
+````
+
+**Outcome note (written before review; the work is staged and uncommitted):**
+- **Starting state verified:** branch `docs/m3c-revision-spec` at `26021c2` with parent `dd26c70`, a clean tree, local `main` and `origin/main` at `dd26c70`, and the expected origin. `feat/document-revisions` did not exist and was created from HEAD.
+- **Implemented** as specified, without changing an accepted decision:
+  - `evidenceguard_domain.revisions`: exact-byte `RevisionContent`, immutable snapshots that keep strings exactly, and the pure lifecycle rules;
+  - the `Document` and `DocumentRevision` models and migration `0003` (composite tenant references, same-document pointers, named paired checks, the one-active partial index, circular-reference ordering, no triggers);
+  - the read-only `recheck_ownership` helper in `evidenceguard_persistence.jobs`;
+  - `evidenceguard_persistence.documents`: creation in the caller's transaction, and fenced `start_processing`, `fail_revision` and `activate_revision`;
+  - ADR-0009, and status updates to the README, plan and threat model.
+- **Implementation choices** within the specification are listed in ADR-0009 (for example `sha256` as `varchar(64)` with a regex check, activation timestamps from the re-check's fresh time, and no `lock_timeout` on creation's caller-owned document lock).
+- **Tests added or updated:** `tests/test_revisions.py` (60), `tests/test_document_store.py` (38, a scripted database double and a fake job store driving the real worker runtime), two offline migration tests, readiness and head pins, and `tests/test_documents_postgres.py` (55 PostgreSQL integration tests).
+- **Checks run locally in this session (Windows):** `uv sync --locked`; `ruff format --check .`; `ruff check .`; `mypy` (81 source files); `pytest` (`809 passed, 133 skipped`: 132 PostgreSQL integration skips because `EG_TEST_DATABASE_URL` is unset, and 1 Windows platform skip); `uv build`; an installed-wheel check outside the source tree (imports and offline migration rendering of `0003`, upgrade and downgrade); `git diff --cached --check`; the staged Gitleaks scan. Exact output is in the session handoff.
+- **Not verified:** none of the 55 new PostgreSQL tests, nor the updated migration round trip, has run. They are **pending** authorized publication and CI. Compiled SQL, the scripted double and unit tests are not database verification.
+- **Remaining limits:** no production ingestion handler, endpoint or upload; no reconciliation of dead jobs (required before overall M3 acceptance); revision and job failure are separate commits; Compose is unverified; M3d–M3f are not implemented; overall M3 acceptance is pending.
+- **Review status:** pending. No commit, push, merge, Docker or database contact.
+
+**Review note for Prompt 69 (added with Prompt 71):** the external reviewer inspected the complete staged diff (Parts 1–7, Parts 1–6 supplied by Prompt 70) and reported three findings, corrected in Prompt 71. The reviewer reproduced the missing-pointer no-op with the pure functions in isolation and the duplicate-keyword `TypeError` in Python; they did not run the project suite or the PostgreSQL tests.
+
+## Prompt 70: Supply the missing M3c review diff parts (read-only)
+
+- **Stage:** Read-only review handoff on branch `feat/document-revisions` (no repository changes)
+- **Date:** 2026-10-13 (session date)
+- **Numbering:** this request said to defer its own recording to the next authorized history update, so it was not written when it ran. It is recorded now, with Prompt 71, as the next unused number (70).
+
+````text
+Provide the missing M3c review material. Do not change files, staging, history or branches.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+Verify:
+- Branch: feat/document-revisions
+- HEAD: 26021c2daa6e2ad69ace5cfa4517f3b6ef7ce8a3
+- Staged tree: 5eb3e036c43b156b9db68be91fc37c58316d679a
+- The same 16 staged files reported for Prompt 69.
+- Nothing unstaged or untracked.
+
+Stop and report any mismatch.
+
+The external reviewer received only Part 7 of 7 and the verification report. They have not received Parts 1–6.
+
+Return the COMPLETE missing Parts 1–6 of the staged diff, excluding prompts.md, including:
+- All domain and persistence implementation.
+- The ownership-recheck helper.
+- Models and migration 0003.
+- test_document_store.py and test_documents_postgres.py.
+- ADR-0009 and documentation changes.
+
+Use the existing saved diff parts if they reproduce the current staged state exactly; otherwise generate the diff read-only.
+
+Preserve numbered parts and file boundaries. Never silently truncate or substitute summaries for source or tests.
+
+If response limits prevent returning all six parts, clearly identify which parts were supplied and which remain. Supply the remainder in subsequent responses without changing the repository.
+
+Do not repeat Part 7 or rerun verification.
+Do not append this read-only handoff request to prompts.md now; defer recording it until the next authorized history update.
+
+Finish by confirming the staged tree and Git status remain unchanged.
+No edits, commits, pushes, merges, Docker or database contact.
+````
+
+**Outcome note:** the starting state matched (branch, HEAD `26021c2`, staged tree `5eb3e03…`, the 16 staged paths, nothing unstaged or untracked). The saved diff parts under `.local/p69/parts/` were confirmed byte-identical to the staged diff with `cmp`, and Parts 1–6 were returned in full. No files, staging, history or branches changed (`git write-tree` only recorded the existing tree object), and no verification was re-run.
+
+## Prompt 71: Correct three M3c review findings
+
+- **Stage:** M3c correction on local branch `feat/document-revisions` (staged and uncommitted for review; no commit, push or database)
+- **Date:** 2026-10-13 (session date)
+- **Numbering:** 71 is the next unused number after the read-only Prompt 70 recorded above.
+
+````text
+Correct three M3c review findings. Leave everything staged and uncommitted for review.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/document-revisions
+- HEAD:
+  26021c2daa6e2ad69ace5cfa4517f3b6ef7ce8a3
+- Staged tree:
+  5eb3e036c43b156b9db68be91fc37c58316d679a
+- The same 16 staged paths reported for Prompt 69.
+- Nothing unstaged or untracked.
+- Expected origin for evidenceguard-agentic-rag.
+
+Stop without changes if anything differs.
+Record the pre-edit staged tree.
+
+2. PostgreSQL failure-code test
+
+In test_revision_checks_reject_partial_or_invalid_state, this case is structurally valid under the accepted schema:
+
+status="failed", failure_reason="parser_crashed", failed_at=func.now()
+
+The database checks the fixed-code pattern, not RevisionFailureCode enum membership.
+
+Correct the test:
+- Use a genuinely invalid code pattern for the rejection case.
+- Add a separate test demonstrating that a structurally valid pattern code is accepted by PostgreSQL.
+- Keep the application enum restriction explicit.
+- Do not tighten the schema to an enum list merely to make the existing test pass.
+
+Keep database enforcement and application validation distinct in documentation.
+
+3. Metadata-conflict test invocation
+
+test_metadata_conflicts_commit_nothing calls:
+
+_create(..., version_label="v1", **overrides)
+
+The version_label override case supplies that keyword twice and raises TypeError before entering _create.
+
+Build one argument dictionary, apply overrides to it, then call the helper once.
+
+Preserve assertions that:
+- The intended DocumentConflictError or RevisionConflictError is raised.
+- No document/revision state changes commit.
+- Every parameter case actually reaches the persistence operation.
+
+Do not weaken the test to accept TypeError.
+
+4. Pure activation consistency
+
+_require_consistent returns early when active is None and the document pointer is None. Consequently, an ACTIVE target with no active pointer is accepted by settle as an idempotent no-op.
+
+Correct the consistency checks:
+- An ACTIVE target must be the document's pointed-to active revision.
+- A non-null active pointer must have a matching ACTIVE snapshot of the same tenant and document.
+- A PROCESSING target cannot share the active revision's ID or revision number.
+- Target and active revision numbers cannot exceed the document's latest_revision_no.
+- Reject inconsistent combinations with the existing fixed InconsistentDocumentStateError before returning a no-op or constructing transitions.
+- Preserve valid superseded retries and normal activation behavior.
+
+Add focused tests covering these inconsistent cases and valid duplicate activation.
+
+Show that the relevant new pure-rule regression tests fail against the previous revisions.py, then restore the corrected file and verify its identity.
+
+The reviewer inspected Parts 1–6 plus the earlier Part 7, reproduced the missing-pointer no-op using the supplied pure functions in isolation, and reproduced Python's duplicate-keyword TypeError. The reviewer did not run the project suite or PostgreSQL tests.
+
+5. Scope and verification
+
+Make narrow changes to the domain rules, relevant tests and any directly affected documentation.
+No migrations, dependencies or workflow changes should be needed.
+
+Run:
+- uv run --locked ruff format --check .
+- uv run --locked ruff check .
+- uv run --locked mypy
+- uv run --locked pytest
+- uv build
+- Isolated installed-wheel imports and offline migration rendering
+- git diff --cached --check
+- Staged Gitleaks scan
+
+Do not start Docker or contact a local database.
+Keep PostgreSQL and platform skips separate.
+The corrected PostgreSQL tests remain unverified until authorized publication and CI.
+
+6. Prompt history and handoff
+
+Append this prompt verbatim using the next unused prompt number. Explain the numbering, including whether the read-only missing-diff handoff was assigned a number.
+
+Record that the missing Parts 1–6 were supplied without repository changes. Preserve earlier entries and outcomes.
+
+Return:
+- Explanation of each correction.
+- New pure-rule test results against the previous implementation.
+- Actual final verification results.
+- New staged tree ID, staged paths and Git status.
+- COMPLETE incremental diff against the recorded pre-edit staged tree, excluding prompts.md, including all changed tests.
+- Prompt-history additions and remaining verification limits.
+
+Leave everything staged and uncommitted.
+Do not push, merge, amend, rebase, start Docker or contact a local database.
+Do not begin M3d.
+````
+
+**Outcome note (written before review; the work is staged and uncommitted):**
+- **Starting state verified:** branch, HEAD `26021c2`, staged tree `5eb3e036c43b156b9db68be91fc37c58316d679a` (recorded as the pre-edit tree), the 16 staged paths, nothing unstaged or untracked, and the expected origin.
+- **Corrections:**
+  1. *PostgreSQL failure-code test:* the rejection case now uses a code that breaks the pattern (`Not-A-Code`). A new integration test shows that PostgreSQL accepts a well-formed code outside the enum (`parser_crashed`), and a new unit test shows that the application rejects it. The schema is unchanged; ADR-0009 and the model docstring now separate the database pattern check from the application's enum restriction.
+  2. *Metadata-conflict test:* one argument dictionary is built, overrides are applied to it, and the helper is called once. A recording wrapper around `create_revision` asserts that the persistence operation itself raised the expected conflict in every case.
+  3. *Pure activation consistency:* `settle` now refuses, before any no-op or transition, an `active` target without the matching pointer, a pointer without a matching active snapshot (or one that is not the pointed-to `active` revision of the same tenant and document), a `processing` target sharing the active revision's ID or number, and a revision number above `latest_revision_no`.
+- **Regression evidence (local, Windows):** against the previous `revisions.py` (sha256 `47cdfae9…`), 4 of the new pure-rule tests failed (missing pointer, shared ID, shared number, number above the counter; `4 failed, 65 passed`). The corrected file was restored (sha256 `df006d90…`, identity checked) and the module passed (`69 passed`).
+- **Checks run in this session:** `ruff format --check .`, `ruff check .`, `mypy` (81 source files), `pytest` (`818 passed, 134 skipped`: 133 PostgreSQL integration skips and 1 Windows platform skip), `uv build`, an installed-wheel import and offline migration check outside the source tree, `git diff --cached --check` and the staged Gitleaks scan. Exact output is in the session handoff.
+- **Not verified:** the corrected and new PostgreSQL tests have not run; they remain pending authorized publication and CI.
+- **Review status:** pending. No commit, push, merge, Docker or database contact; M3d not started.
+
+**Acceptance note for Prompt 71 (added with Prompt 72):** the external reviewer accepted M3c on the basis of Prompt 69's complete implementation diff (Parts 1–7) and Prompt 71's complete correction diff, together with the reported Windows checks:
+- `pytest`: `818 passed, 134 skipped` (133 PostgreSQL integration skips and one POSIX-only platform skip);
+- format, lint, strict type-check, build, installed-wheel and secret-scan results;
+- four pure-rule regression failures against the earlier `revisions.py`, then 69 passing revision tests after restoration.
+
+The reviewer reproduced the original missing-pointer behaviour and the duplicate-keyword `TypeError` in isolation, but did not run the project suite or the corrected tests. PostgreSQL verification (all 133 integration tests against this version), Linux verification, Compose, dead-job reconciliation or projection (M3d/M3e) and overall M3 acceptance remain pending.
+
+## Prompt 72: Commit the reviewed M3c implementation locally
+
+- **Stage:** Local commit of the accepted M3c staged tree on branch `feat/document-revisions` (local commit authorized; no push or merge)
+- **Date:** 2026-10-13 (session date)
+
+````text
+Commit the reviewed M3c implementation locally. Do not push or merge.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/document-revisions
+- HEAD:
+  26021c2daa6e2ad69ace5cfa4517f3b6ef7ce8a3
+- Staged tree:
+  feed6226ddcb49bea518780d4a33ec643f0e0779
+- Exactly the same 16 staged paths reported for Prompt 71.
+- Nothing unstaged or untracked.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Local main and origin/main:
+  dd26c7099d1007e9ee615204dc0056abe8820c67
+
+Stop without changes if anything differs.
+Record the accepted staged tree before editing.
+
+2. Preserve the reviewed implementation
+
+The reviewer accepts:
+- Prompt 69’s complete implementation diff, Parts 1–7.
+- Prompt 71’s complete correction diff.
+
+Acceptance rests on those diffs and the reported Windows checks:
+- 818 passed, 134 skipped.
+- 133 PostgreSQL integration skips and one POSIX-only platform skip.
+- Format, lint, strict type-check, build, installed-wheel and secret-scan results.
+- Four pure-rule regression failures against the earlier implementation, then 69 passing revision tests after restoration.
+
+The reviewer reproduced the original missing-pointer behavior and duplicate-keyword TypeError in isolation, but did not run the project suite or corrected tests.
+
+Keep every tracked file except prompts.md byte-identical to the accepted staged tree. Do not alter code, tests, migration, configuration or other documents.
+
+3. Prompt history
+
+Change only prompts.md, append-only:
+- Add an acceptance note under Prompt 71 with the evidence and limits above.
+- Append this prompt verbatim as Prompt 72 if that is the next unused number; otherwise use the next unused number and explain it.
+- Add a truthful pre-commit note recording verified state, checks and local-only authorization.
+- Keep earlier entries unchanged.
+- Do not claim publication or PostgreSQL CI verification.
+
+4. Checks and local commit
+
+Inspect staged paths and diff.
+Confirm no local artifacts or generated build outputs are staged.
+Check staged additions for secrets and private information.
+
+Confirm effective author and committer email:
+257921624+mathewmljourney93@users.noreply.github.com
+
+Run:
+- git diff --cached --check
+- Staged Gitleaks scan
+
+Create one LOCAL commit:
+feat: add tenant-scoped document revisions and fenced activation
+
+Use the existing attribution convention.
+
+After committing:
+- Run the full-history Gitleaks scan.
+- Verify parent is 26021c2daa6e2ad69ace5cfa4517f3b6ef7ce8a3.
+- Verify the expected 16 committed paths.
+- Verify every file except prompts.md matches the accepted staged tree.
+- Verify identity and clean working tree.
+- Confirm main remains unchanged.
+
+Application checks need not be rerun because only prompt history changed since the reviewed verification.
+
+5. Handoff
+
+Return:
+- Commit SHA, parent, subject and identity.
+- Committed paths.
+- Actual checks and results.
+- Prompt-history additions and confirmation earlier entries are unchanged.
+- Final Git status.
+- Complete incremental diff against the accepted staged tree, excluding prompts.md. If none, explicitly say none.
+- Remaining verification limits.
+
+Keep these pending:
+- PostgreSQL verification of M3c and the full 133-test integration suite against this version.
+- Linux verification of M3c.
+- Compose.
+- Dead-job reconciliation/projection in M3d/M3e.
+- Overall M3 acceptance.
+
+Do not push, merge, amend, rebase, start Docker or contact a local database.
+Do not begin M3d.
+````
+
+**Pre-commit note (written before the local commit):**
+- **Starting state verified:** branch `feat/document-revisions`, HEAD `26021c2`, staged tree `feed6226ddcb49bea518780d4a33ec643f0e0779` (recorded as the accepted tree), exactly the 16 staged paths of Prompt 71, nothing unstaged or untracked, the expected origin, and local `main` and `origin/main` at `dd26c70`.
+- **Change:** only this append to `prompts.md`; every other tracked file is kept byte-identical to the accepted staged tree. No application checks were re-run, because only prompt history changed since the reviewed verification.
+- **Checks before the commit:** staged paths and diff inspected, no local artifacts or build outputs staged, staged additions checked for secrets and private information, effective author and committer email confirmed, `git diff --cached --check` and the staged Gitleaks scan. Exact results are in the session handoff.
+- **After the commit:** the full-history Gitleaks scan and the commit verification are reported in the session handoff, not recorded here.
+- **Authorization:** one local commit only. No push, merge, amend, rebase, Docker or database contact; M3d not started. Nothing here claims publication or PostgreSQL CI verification.

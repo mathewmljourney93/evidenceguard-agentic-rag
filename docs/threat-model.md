@@ -114,6 +114,23 @@ The full design and limits are in [ADR-0002](decisions/0002-request-ids-logging-
 
 **Verification:** at commit `bc5f638` on `feat/worker-runtime`, [CI run 38253962690](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690) passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827089007) (`709 passed, 77 skipped in 15.96s`) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827088937) (`708 passed, 78 skipped in 22.18s`). The [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827089078) passed with all 77 PostgreSQL tests (`77 passed, 709 deselected in 19.63s`): M3a's 63 and the worker's 14, including lease loss before a fenced write, heartbeats racing atomic completion, and shutdown re-queueing. All counts are from logs retrieved by the external reviewer. M3b was then fast-forwarded onto `main` at `dd26c70`, where the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375219) passed again (`77 passed, 709 deselected in 17.36s`). These results demonstrate the tested behaviour, not a general security or performance guarantee. There are no production handlers yet, and Compose has never been run.
 
+## Documents and revisions (M3c, implemented on a local branch, under review)
+
+Implemented on local branch `feat/document-revisions`, staged for review; not on `main`. The PostgreSQL integration tests have **not run** yet (pending publication and CI), so the database rows below are design intent backed by schema and unit tests, not verified enforcement.
+
+| Threat | Mitigation |
+|---|---|
+| A document or revision linked across tenants | Composite `(tenant_id, …)` foreign keys to vendors and documents; the active and successor pointers reference `(tenant_id, document_id, id)`, so they can only name a revision of the same tenant and document. Every query filters by the actor's or the job's tenant. |
+| A job naming another tenant's revision | The revision is looked up only in the job's tenant and is then not found; after the locks, the re-read job's tenant and the document's tenant must match, or the operation is refused before any write. |
+| A stale or expired worker activating a revision | After the document and revision lock waits, ownership is re-checked against the locked job row with fresh database time; a stale attempt or an expired lease raises `LeaseLostError` before any write. |
+| Two active revisions, or a pointer to a non-active revision | A partial unique index allows one `active` revision per document; activation runs under the document lock and writes demote → promote → pointer in one transaction. Pointer consistency itself is an application invariant (no triggers). |
+| A failed or late replacement replacing good content | A failure touches only its own revision; a late older revision becomes `superseded` without touching the active one or the pointer. |
+| Content altered between upload and hashing | The hash and size come from the exact bytes, with no newline, BOM or Unicode normalization; stored content is re-verified when reconstructed. |
+| Document text leaking through errors or logs | Content types have fixed messages and a content-free `repr`; snapshots and revision reads exclude the text; M3c logs nothing. |
+| Concurrent uploads allocating the same number | Numbers are allocated under the document row lock; unique constraints back this up and map to a fixed error. |
+
+**Limits** (ADR-0009): the re-check is not atomic with the commit (the M3a limit). Revision failure and job failure are separate commits. A `dead` job can leave its revision unsettled until M3d/M3e add reconciliation or a projection, which is required before overall M3 acceptance. There is no production handler, upload or endpoint yet, and document text is untrusted input for later milestones.
+
 ## Not implemented yet
 
 - **Rate limiting, lockout, key expiry and usage auditing** for API keys. Direct domain callers (tests, later the worker) still construct `ActorContext` themselves and are trusted.

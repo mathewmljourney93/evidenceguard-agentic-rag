@@ -450,7 +450,10 @@ def fenced_transaction(
 
 def _checked_state(session: Session, token: JobLeaseToken) -> tuple[JobSnapshot, datetime]:
     """Read the locked row with a fresh database time and require valid ownership."""
-    row = session.execute(current_state_statement(token)).first()
+    return _owned_state(session.execute(current_state_statement(token)).first(), token)
+
+
+def _owned_state(row: Any, token: JobLeaseToken) -> tuple[JobSnapshot, datetime]:
     if row is None:
         raise LeaseLostError()
     data = dict(row._mapping)
@@ -459,6 +462,22 @@ def _checked_state(session: Session, token: JobLeaseToken) -> tuple[JobSnapshot,
     if not lifecycle.holds_lease(job, token, now=now):
         raise LeaseLostError()
     return job, now
+
+
+def recheck_ownership(session: FencedSession, token: JobLeaseToken) -> tuple[JobSnapshot, datetime]:
+    """Re-check ownership inside an open fence, after further lock waits (M3c, ADR-0009).
+
+    Re-reads the job row, which this transaction still holds locked, together with a fresh
+    ``clock_timestamp()`` in one statement, through the fence's own session. It requires the
+    matching token, status ``running`` and an unexpired lease (``holds_lease``), and returns the
+    re-read job and that fresh time; otherwise it raises the fixed ``LeaseLostError``.
+
+    It only reads: it adds no transition and never commits or rolls back. The token carries no
+    tenant, so callers compare the returned job's ``tenant_id`` with their own scope. A
+    transaction that passes this check just before expiry may still commit shortly after it
+    (the accepted M3a limit).
+    """
+    return _owned_state(session.execute(current_state_statement(token)).first(), token)
 
 
 # --- single-purpose fenced operations ------------------------------------------------------

@@ -20,6 +20,11 @@ from sqlalchemy.pool import QueuePool
 from evidenceguard_persistence.db import create_db_engine, transaction
 from evidenceguard_persistence.migration_config import alembic_config
 from evidenceguard_persistence.models import (
+    DOCUMENT_AUTHENTICITY_CHECK,
+    DOCUMENT_KEY_CHECK,
+    DOCUMENT_LATEST_REVISION_NO_CHECK,
+    DOCUMENT_SOURCE_TYPE_CHECK,
+    DOCUMENT_TITLE_CHECK,
     JOB_ATTEMPT_CHECK,
     JOB_FINISHED_CHECK,
     JOB_IDEMPOTENCY_KEY_CHECK,
@@ -31,6 +36,21 @@ from evidenceguard_persistence.models import (
     JOB_QUEUED_INDEX_WHERE,
     JOB_RUNNING_INDEX_WHERE,
     JOB_STATUS_CHECK,
+    REVISION_ACTIVATED_AT_WHEN_ACTIVE_CHECK,
+    REVISION_BYTE_SIZE_CHECK,
+    REVISION_FAILED_AT_WHEN_FAILED_CHECK,
+    REVISION_FAILURE_REASON_CODE_CHECK,
+    REVISION_FAILURE_REASON_WHEN_FAILED_CHECK,
+    REVISION_MEDIA_TYPE_CHECK,
+    REVISION_NO_ACTIVATED_AT_BEFORE_SETTLED_CHECK,
+    REVISION_NO_CHECK,
+    REVISION_NOT_SUPERSEDED_BY_SELF_CHECK,
+    REVISION_ONE_ACTIVE_WHERE,
+    REVISION_SHA256_CHECK,
+    REVISION_STATUS_CHECK,
+    REVISION_SUPERSEDED_AT_WHEN_SUPERSEDED_CHECK,
+    REVISION_SUPERSEDED_BY_WHEN_SUPERSEDED_CHECK,
+    REVISION_VERSION_LABEL_CHECK,
     ROLE_CHECK,
     SECRET_SHA256_CHECK,
     Base,
@@ -188,18 +208,28 @@ def test_migration_resources_are_packaged() -> None:
     assert (migrations / "script.py.mako").is_file()
     assert (migrations / "versions" / "v0001_tenancy.py").is_file()
     assert (migrations / "versions" / "v0002_jobs.py").is_file()
+    assert (migrations / "versions" / "v0003_documents.py").is_file()
 
 
 def test_migration_history_has_one_head() -> None:
     script = ScriptDirectory.from_config(alembic_config())
 
-    assert script.get_heads() == ["0002"]
+    assert script.get_heads() == ["0003"]
+    assert script.get_revision("0003").down_revision == "0002"
     assert script.get_revision("0002").down_revision == "0001"
     assert script.get_revision("0001").down_revision is None
 
 
-def test_schema_tables_are_m2a_and_jobs() -> None:
-    assert set(Base.metadata.tables) == {"tenants", "users", "api_keys", "vendors", "jobs"}
+def test_schema_tables_are_m2a_jobs_and_documents() -> None:
+    assert set(Base.metadata.tables) == {
+        "tenants",
+        "users",
+        "api_keys",
+        "vendors",
+        "jobs",
+        "documents",
+        "document_revisions",
+    }
     assert {role.value for role in UserRole} == {"reviewer", "approver", "admin"}
 
 
@@ -281,3 +311,72 @@ def test_offline_downgrade_sql_drops_every_table(monkeypatch: pytest.MonkeyPatch
 
     for table in ("vendors", "api_keys", "users", "tenants"):
         assert f"DROP TABLE {table};" in sql
+
+
+def test_offline_upgrade_creates_documents_with_the_model_constraints(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Migration 0003's literal constraint text must equal the model's (alembic check does not
+    compare CHECK constraints or partial-index predicates)."""
+    sql = _offline_sql(monkeypatch, upgrade=True)
+
+    assert "CREATE TABLE documents (" in sql
+    assert "CREATE TABLE document_revisions (" in sql
+    assert "content_text TEXT NOT NULL" in sql
+    for check in (
+        DOCUMENT_KEY_CHECK,
+        DOCUMENT_TITLE_CHECK,
+        DOCUMENT_SOURCE_TYPE_CHECK,
+        DOCUMENT_AUTHENTICITY_CHECK,
+        DOCUMENT_LATEST_REVISION_NO_CHECK,
+        REVISION_STATUS_CHECK,
+        REVISION_NO_CHECK,
+        REVISION_VERSION_LABEL_CHECK,
+        REVISION_FAILURE_REASON_CODE_CHECK,
+        REVISION_SHA256_CHECK,
+        REVISION_MEDIA_TYPE_CHECK,
+        REVISION_BYTE_SIZE_CHECK,
+        REVISION_FAILURE_REASON_WHEN_FAILED_CHECK,
+        REVISION_FAILED_AT_WHEN_FAILED_CHECK,
+        REVISION_SUPERSEDED_AT_WHEN_SUPERSEDED_CHECK,
+        REVISION_SUPERSEDED_BY_WHEN_SUPERSEDED_CHECK,
+        REVISION_ACTIVATED_AT_WHEN_ACTIVE_CHECK,
+        REVISION_NO_ACTIVATED_AT_BEFORE_SETTLED_CHECK,
+        REVISION_NOT_SUPERSEDED_BY_SELF_CHECK,
+    ):
+        assert f"CHECK ({check})" in sql
+    assert "FOREIGN KEY(tenant_id, vendor_id) REFERENCES vendors (tenant_id, id)" in sql
+    assert "FOREIGN KEY(tenant_id, document_id) REFERENCES documents (tenant_id, id)" in sql
+    assert (
+        "CONSTRAINT fk_document_revisions_superseded_by FOREIGN KEY(tenant_id, document_id, "
+        "superseded_by_revision_id) REFERENCES document_revisions (tenant_id, document_id, id)"
+        in sql
+    )
+    assert (
+        f"CREATE UNIQUE INDEX uq_document_revisions_one_active ON document_revisions "
+        f"(tenant_id, document_id) WHERE {REVISION_ONE_ACTIVE_WHERE}" in sql
+    )
+    # The circular reference is added after both tables exist.
+    alter = (
+        "ALTER TABLE documents ADD CONSTRAINT fk_documents_active_revision FOREIGN KEY(tenant_id, "
+        "id, active_revision_id) REFERENCES document_revisions (tenant_id, document_id, id)"
+    )
+    assert alter in sql
+    assert sql.index("CREATE TABLE documents (") < sql.index("CREATE TABLE document_revisions (")
+    assert sql.index("CREATE TABLE document_revisions (") < sql.index(alter)
+    assert "UPDATE alembic_version SET version_num='0003'" in sql
+    assert "TRIGGER" not in sql.upper()
+
+
+def test_offline_downgrade_from_0003_drops_the_pointer_first(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sql = _offline_sql(monkeypatch, upgrade=False, revisions="0003:0002")
+
+    drop_fk = "ALTER TABLE documents DROP CONSTRAINT fk_documents_active_revision;"
+    assert drop_fk in sql
+    assert "DROP INDEX uq_document_revisions_one_active;" in sql
+    assert sql.index(drop_fk) < sql.index("DROP TABLE document_revisions;")
+    assert sql.index("DROP TABLE document_revisions;") < sql.index("DROP TABLE documents;")
+    for table in ("jobs", "vendors", "api_keys", "users", "tenants"):
+        assert f"DROP TABLE {table};" not in sql

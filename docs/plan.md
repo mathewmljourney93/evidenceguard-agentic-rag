@@ -634,7 +634,7 @@ Each question entry contains:
     - [CI run 38255786860](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375464) `709 passed, 77 skipped in 18.16s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375444) `708 passed, 78 skipped in 21.20s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375219) `77 passed, 709 deselected in 17.36s`.
     - The [secret-scan run 38255786973](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973/job/114833375056): 26 commits scanned, no leaks found).
   - There are no production handlers yet. Compose is unverified.
-- **M3c** has a detailed specification below, **accepted at review (Prompt 68); implementation pending**. M3c–M3f are not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
+- **M3c** has a detailed specification below, accepted at review (Prompt 68), and is **implemented on local branch `feat/document-revisions` (Prompt 69), staged and uncommitted, awaiting review and PostgreSQL CI** ([ADR-0009](decisions/0009-document-revisions.md)). Its PostgreSQL integration tests have not run. There is no production ingestion handler. M3d–M3f are not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
 
 M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-workflow.md): plain Python, PostgreSQL-backed jobs claimed with `FOR UPDATE SKIP LOCKED`, leases, heartbeats and fenced writes. There is no new orchestration framework or queue dependency. Each slice is reviewed, verified in CI and merged before the next one starts. The M3 acceptance criteria above are split across the slices as follows:
 
@@ -1123,7 +1123,7 @@ The external reviewer inspected the original specification (Prompt 57) and its l
   - The `kinds` filter extends M3a's claim without changing its ordering, locking or sweep.
   - Everything else builds on the accepted M3a lease, heartbeat interval, backoff and attempt cap, without redefining them.
 
-**M3c, documents and revisions, in detail (ACCEPTED at review, Prompt 68; implementation pending, nothing below is implemented):**
+**M3c, documents and revisions, in detail (ACCEPTED at review, Prompt 68; implemented on local branch `feat/document-revisions` in Prompt 69, under review; PostgreSQL verification pending):**
 
 The external reviewer inspected the original specification (Prompt 66) and its corrections (Prompt 67) without running application checks. They accepted it with the final clarifications of Prompt 68. The Prompt 67 corrections cover:
 - fresh lease checks after the additional lock waits;
@@ -1132,7 +1132,7 @@ The external reviewer inspected the original specification (Prompt 66) and its c
 - the permanent-failure seam and exhausted jobs;
 - schema and input precision.
 
-The final clarifications of Prompt 68 cover uncertain-commit recovery, the mapping from revision failure codes to job error codes, and where the tenant is checked. The choices are listed as settled at the end. Implementation has not started.
+The final clarifications of Prompt 68 cover uncertain-commit recovery, the mapping from revision failure codes to job error codes, and where the tenant is checked. The choices are listed as settled at the end. The implementation (Prompt 69) follows them without changes; its implementation choices within the specification are recorded in [ADR-0009](decisions/0009-document-revisions.md).
 
 M3c adds the `documents` and `document_revisions` tables (migration `0003`), the pure revision lifecycle, and tenant-scoped persistence operations. Those operations are:
 - creating a revision, with revision-number allocation;
