@@ -10,7 +10,7 @@ EvidenceGuard is a planned vendor-risk review copilot. It is intended to:
 
 It is evidence-based decision support, not legal advice or compliance certification.
 
-## Status: M1 accepted; M2a persistence and M2b authentication on `main`; M2c vendors and readiness verified in CI on its branch (pre-alpha)
+## Status: M1 and M2 accepted (persistence, authentication, tenant-scoped vendors and readiness on `main`); M3 specification accepted, implementation pending (pre-alpha)
 
 **What works now:**
 - One installable Python 3.12 package (`evidenceguard`), managed with uv, with a committed lockfile (M1a).
@@ -44,15 +44,21 @@ It is evidence-based decision support, not legal advice or compliance certificat
   - an `eg-admin` command seeds a synthetic demo fixture and creates and revokes keys.
 
   At commit `b2f7f23`, all 15 PostgreSQL integration tests passed in CI, M2a's and M2b's ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38166627885/job/114550418432)). See [ADR-0005](docs/decisions/0005-api-key-authentication.md) and [Authentication](#authentication-and-eg-admin-m2b).
-- **Tenant-scoped vendors and readiness** (M2c, **reviewed and verified in CI on branch `feat/vendor-api-readiness`; not yet merged into `main`**):
+- **Tenant-scoped vendors and readiness** (M2c, on `main`):
   - `POST /v1/vendors`, `GET /v1/vendors` (bounded pages) and `GET /v1/vendors/{id}`, always scoped to the API key's tenant;
   - `GET /readyz`, which checks database connectivity and migration revisions;
   - one shared, lazily started database resource for the whole API.
 
-  At commit `a888b6c`, all 21 PostgreSQL integration tests passed in CI, including the six added in M2c ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994147)). See [ADR-0006](docs/decisions/0006-vendor-api-and-readiness.md) and [Vendors and readiness](#vendors-and-readiness-m2c).
+  At commit `a888b6c`, all 21 PostgreSQL integration tests passed in CI, including the six added in M2c ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994147)), and again on `main` at `9d5a93a`. See [ADR-0006](docs/decisions/0006-vendor-api-and-readiness.md) and [Vendors and readiness](#vendors-and-readiness-m2c).
 - Tests, Ruff and strict Mypy, run in GitHub Actions on Ubuntu and Windows, plus a PostgreSQL 17 + pgvector integration job on Ubuntu.
 
-**Verified baseline:** `main` at commit `277dfea` (`277dfeaec7c1c64fa5ee92a3ce892823acc787fb`, M2a and M2b) passed:
+**M2 accepted.** The external reviewer accepted M2 against its agreed criteria (see [docs/plan.md](docs/plan.md)), on the basis of the implementation diffs and the CI evidence below; the reviewer did not run the suite locally. This does not claim any vector functionality: the CI database image includes pgvector, but no migration creates the extension. Compose has never been run.
+
+**Verified baseline:** `main` at commit `9d5a93a` (`9d5a93ab1389d8a2b084c8f669df3bf9941a477f`, M2a, M2b and M2c) passed:
+- [CI run 38214711868](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868): verification on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647399) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647671), and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647728), whose log (retrieved by the external reviewer) reports `21 passed, 458 deselected in 4.92s`;
+- the [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711864).
+
+Earlier, `main` at commit `277dfea` (`277dfeaec7c1c64fa5ee92a3ce892823acc787fb`, M2a and M2b) passed:
 - [CI run 38167398488](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488): verification on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488/job/114552700669) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488/job/114552700864), and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488/job/114552700841), whose log (retrieved by the external reviewer) reports `15 passed, 377 deselected in 3.77s`;
 - the [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398504).
 
@@ -64,7 +70,7 @@ The earlier M1 baseline `6d64fb3` passed [CI](https://github.com/mathewmljourney
 
 **Limits:**
 - The M1b report rules are still in-memory only. Nothing persists reports yet, and there is no protection against concurrent requests.
-- On `main`, the endpoints are `/healthz` and `/v1/me`. The vendor endpoints and `/readyz` exist only on the M2c branch, which is verified in CI but not merged. No endpoint uses the report rules yet.
+- The endpoints are `/healthz`, `/readyz`, `/v1/me` and the vendor endpoints. No endpoint uses the report rules yet, and there are no documents, jobs or worker yet (M3).
 - Vendor pages use offset pagination, which is not a snapshot under concurrent changes (see ADR-0006).
 - API keys are possession-based bearer credentials, with no rate limiting, lockout, expiry or scopes yet (see ADR-0005).
 - A citation's shape is validated. Whether the tenant may see the chunk, whether the quote is really in it, and whether it supports the claim are **not** checked yet.
@@ -72,7 +78,7 @@ The earlier M1 baseline `6d64fb3` passed [CI](https://github.com/mathewmljourney
 
 **Still planned** (see [docs/plan.md](docs/plan.md)):
 - Revision activation and supersession tests, deferred from M1 to M3, where those state machines are built.
-- The rest of M2: merging M2c into `main` once authorized, then the M2 acceptance review. M2 is not complete.
+- M3 (jobs, worker and ingestion). Its slice sequence and the detailed M3a job specification in [docs/plan.md](docs/plan.md) are accepted at review; implementation is pending and no M3 code exists yet.
 - After M2: ingestion, retrieval, model providers, the review workflow, API endpoints for the approval gate, and evaluation.
 
 No retrieval, agent workflow, evaluation results, security guarantees or benchmarks are claimed. Any future results will be published with their committed inputs, configuration and the command that reproduces them.
@@ -181,7 +187,7 @@ uv run --locked eg-admin revoke-key --tenant-id <tenant-id> --prefix <16-hex-pre
 
 ### Vendors and readiness (M2c)
 
-> **Reviewed and verified in CI on branch `feat/vendor-api-readiness`; not yet merged into `main`.**
+> **Reviewed and verified in CI, and on `main`** since the fast-forward to `9d5a93a` ([CI run 38214711868](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868), [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647728): `21 passed, 458 deselected in 4.92s`, from the log retrieved by the external reviewer). The branch record follows.
 > - **Tested commit:** `a888b6c` (`a888b6cbd277fb6a4556899fa630a7c50df14e61`), which adds only documentation after the reviewed M2c commit `73bebf5`.
 > - **[CI run 38212619855](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855)** passed:
 >   - verification on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994050) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689993962);

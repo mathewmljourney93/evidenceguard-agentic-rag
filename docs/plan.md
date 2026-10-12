@@ -43,7 +43,7 @@ Labels: **[FACT]** observed or verified; **[DECISION]** accepted in review; **[R
 
 | Item | Status |
 |---|---|
-| Repository | [FACT] Published to GitHub. `main` is at `6d64fb3`. |
+| Repository | [FACT] Published to GitHub. `main` is at `9d5a93a` (M2 accepted; see §9). |
 | Python | [FACT] 3.12 (uv-managed) for the project; 3.13 and 3.11 are also installed. |
 | uv | [FACT] 0.13.0. |
 | Docker | [FACT] **Not installed** (no Docker, Docker Compose or Podman). No WSL distribution is listed. |
@@ -497,7 +497,7 @@ Each question entry contains:
 ## 9. Milestones
 
 **M0 – Prerequisites (user)**
-- Install uv, then run `uv python install 3.12`.
+- Install uv, then run `uv python install 3.12`. *Done; used since M1.*
 - Before M2: Docker Desktop on WSL2, with its data on the second drive, or rely on CI for integration tests.
 - Before M7: Anthropic and Voyage keys.
 - Git and the GitHub repository are already set up; nothing to do there.
@@ -572,7 +572,7 @@ Each question entry contains:
     - [CI run 38167398488](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488) passed: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488/job/114552700669) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488/job/114552700864) verification, and the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398488/job/114552700841). Its log, retrieved by the external reviewer, reports `15 passed, 377 deselected in 3.77s`.
     - The [secret-scan run 38167398504](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398504) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38167398504/job/114552700756)).
   - **Still not verified:** Compose has never been run.
-- **M2c** (tenant-scoped vendors, shared database lifecycle and `/readyz`, [ADR-0006](decisions/0006-vendor-api-and-readiness.md)): **reviewed and verified in CI on branch `feat/vendor-api-readiness`; not yet merged into `main`.** It adds:
+- **M2c** (tenant-scoped vendors, shared database lifecycle and `/readyz`, [ADR-0006](decisions/0006-vendor-api-and-readiness.md)): **reviewed, verified in CI and on `main`** (see *On `main`* below). It adds:
   - one shared, lazily started `AppDatabase`, with bounded timeouts;
   - tenant-scoped vendor persistence;
   - `POST`/`GET /v1/vendors` and `GET /v1/vendors/{id}` (reviewer and approver; admin 403);
@@ -584,8 +584,17 @@ Each question entry contains:
     - `verify` passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994050) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689993962);
     - the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994147) passed. Its log, retrieved by the external reviewer, reports `21 passed, 458 deselected in 4.65s`, so all twenty-one integration tests (M2a's ten, M2b's five and M2c's six) passed and none was skipped.
   - **[Secret-scan run 38212619867](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619867):** passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619867/job/114689993899)).
+  - **On `main`:** `main` was fast-forwarded to `9d5a93a` (`9d5a93ab1389d8a2b084c8f669df3bf9941a477f`), which adds only documentation after `a888b6c`.
+    - [CI run 38214711868](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868) passed: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647399) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647671) verification, and the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647728). Its log, retrieved by the external reviewer, reports `21 passed, 458 deselected in 4.92s`.
+    - The [secret-scan run 38214711864](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711864) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711864/job/114696647340)).
   - **Still not verified:** Compose has never been run, and no vector functionality has been tested.
-- **M2 is not complete** until M2c is merged into `main` and the M2 acceptance review confirms the criteria below.
+- **M2 accepted** at `9d5a93a`. The external reviewer accepted it against the criteria below, on the basis of the implementation diffs and the CI evidence above; the reviewer did not run the suite locally.
+  - Migrations upgrade and downgrade, and composite tenant constraints reject cross-tenant references (M2a integration tests).
+  - Another tenant's vendor ID returns 404 (M2c).
+  - Client-supplied tenant information cannot override the authenticated scope: tenant headers and query parameters are ignored, and unexpected body fields are rejected (M2b, M2c).
+  - A revoked key returns 401 (M2b).
+  - The integration tests run against the PostgreSQL 17 + pgvector CI image.
+  - **Not claimed:** no vector functionality is implemented or tested, because no migration creates the extension. Compose remains unverified.
 - *Acceptance:*
   - Migrations upgrade and downgrade cleanly.
   - Composite foreign keys reject cross-tenant references.
@@ -603,6 +612,187 @@ Each question entry contains:
   - Two concurrent claims produce one owner.
   - **A stale worker cannot write chunks, activate a revision or complete a job after it has been reclaimed.**
   - Retries reach `dead`.
+
+*M3 breakdown (**sequence accepted at review; M3a specification settled at review, Prompt 47; implementation pending**). Nothing below is implemented yet.*
+
+M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-workflow.md): plain Python, PostgreSQL-backed jobs claimed with `FOR UPDATE SKIP LOCKED`, leases, heartbeats and fenced writes. There is no new orchestration framework or queue dependency. Each slice is reviewed, verified in CI and merged before the next one starts. The M3 acceptance criteria above are split across the slices as follows:
+
+| Slice | Scope | M3 acceptance criteria it carries, or a new *slice check* |
+|---|---|---|
+| **M3a** | Durable job core: the `jobs` table (migration `0002`), the pure job lifecycle, and enqueue, claim, heartbeat, complete, fail, reclaim and the write fence | Two concurrent claims produce one owner; a stale worker cannot complete a job after it has been reclaimed; retries reach `dead` |
+| **M3b** | Worker process: an `eg-worker` command with a polling loop, heartbeats, handler registry, backoff and graceful shutdown, built only on M3a | *Slice check:* lease loss stops a handler before its next fenced write |
+| **M3c** | Documents and revisions: `documents` and `document_revisions` tables (migration `0003`), the revision lifecycle as pure functions, and fenced transactional activation | A failed replacement leaves the previous revision active; two revisions completing out of order leave only the newer one active; a crash during activation rolls back cleanly; a stale worker cannot activate a revision |
+| **M3d** | Parsing and chunking: plain-text and Markdown parsing, the deterministic chunker v1, the `chunks` table (migration `0004`) and the `ingest_revision` job handler | Chunk IDs include tenant and revision, so the same bytes under two tenants produce disjoint chunk IDs; a stale worker cannot write chunks |
+| **M3e** | Upload and document endpoints: upload, list and get, with size and media-type limits; a revision and its ingestion job are created in one transaction | 413, 415 and 422 behave as specified; re-uploads are idempotent |
+| **M3f** | Dockerfile and Compose services for the API, worker and database | *Slice check:* images build in CI. Compose stays unverified locally while Docker is unavailable (§10). |
+
+**M3a, the first slice, in detail (specification settled at review; implementation pending):**
+
+- **Why first:**
+  - Every later slice writes through the job fence, so it must exist and be proven against PostgreSQL first.
+  - It needs no document, chunk or upload code, and its invariants (one owner, a monotonic fencing token, bounded retries) can be tested on their own.
+- **Domain (`evidenceguard_domain.jobs`, pure, no database):**
+  - a `JobStatus` enum: `queued`, `running`, `succeeded`, `failed`, `dead`;
+  - pure transition functions for claim, heartbeat, succeed, retryable failure, permanent failure, lease reclaim and exhausted-lease expiry;
+  - the backoff function;
+  - payload validation and canonicalisation;
+  - the lifecycle invariants, with exhaustive table tests like the existing report and approval rules.
+- **Parameters** [DECISION]. These are engineering defaults for the first implementation, not measured performance claims:
+  - **Lease duration:** 60 seconds.
+  - **Heartbeat interval:** 20 seconds, used by the M3b worker. M3a provides only the heartbeat operation.
+  - **Attempts:** `max_attempts` defaults to 3, with an accepted range of 1–10. `attempt` starts at 0 and increases by one on each successful claim or reclaim.
+  - **Backoff:** after failed attempt *n*, the delay is `min(5 * 2^(n - 1), 60)` seconds, that is 5, 10, 20, 40, then 60 s.
+    - There is no jitter in v1. This is a deliberate simplification: deterministic delays are easier to test, and v1 expects few workers. Jitter can be added if synchronised retries are ever observed.
+  - **Payload cap:** 4,096 bytes, measured on canonical UTF-8 JSON.
+  - **Field lengths:** `kind` at most 64 characters, `idempotency_key` at most 128.
+- **Status semantics** [DECISION]:
+  - `failed` is a permanent, non-retryable handler failure.
+  - `dead` means a retryable failure or lease abandonment has exhausted the attempt cap.
+  - `succeeded`, `failed` and `dead` are terminal. Every transition into a terminal status clears `locked_by` and `lease_expires_at` and sets `finished_at`.
+- **Payload** [DECISION]:
+  - **Shape:** in M3a, a payload is a flat JSON object with string keys and UUID-string values. An empty object is allowed for test-only jobs.
+  - **UUID values:** must already be in canonical lowercase, hyphenated form; anything else is rejected, never rewritten.
+  - **Forbidden content:**
+    - no tenant field;
+    - no nested objects or arrays;
+    - no document text;
+    - no secrets.
+  - **Canonical form:** keys sorted, no insignificant whitespace, UTF-8 encoded. It is used for the size cap and for comparison.
+  - **Kind-specific schemas** arrive with their handlers in later slices.
+- **Schema (migration `0002`, revising `0001`, on the existing naming convention):** a `jobs` table with these columns:
+  - **Keys:**
+    - `id` (UUID primary key);
+    - `tenant_id`, with a foreign key to `tenants` and unique `(tenant_id, id)` for later composite references.
+  - **Identity:**
+    - `kind`;
+    - `payload` (`jsonb`);
+    - `idempotency_key`, with unique `(tenant_id, kind, idempotency_key)`.
+  - **State:**
+    - `status`, checked against the five values;
+    - `attempt` (≥ 0) and `max_attempts` (1–10), with `attempt ≤ max_attempts`;
+    - `run_after`.
+  - **Lease:** `locked_by` and `lease_expires_at`, with a check that both are set exactly when the status is `running`.
+  - **Diagnostics:** `last_error`, a short fixed error code, never exception text, SQL or payload values.
+  - **Timestamps:** `created_at`, `updated_at` and `finished_at`, all timezone-aware, with a check that `finished_at` is set exactly for terminal statuses.
+  - **Indexes:** partial indexes for claiming queued jobs by `run_after` and for finding expired leases.
+  - **Not included:** no extension, and no change to existing tables.
+- **Tenant scope:**
+  - A job carries its tenant in `tenant_id`.
+  - Handlers take the tenant only from the claimed row, never from the payload.
+  - Claiming is a trusted, system-level operation across tenants. No API endpoint exposes jobs in M3a.
+  - Enqueueing from a request takes the tenant from the authenticated `ActorContext`.
+- **Time** [DECISION]:
+  - **Database time only:** every lease and scheduling decision uses PostgreSQL `clock_timestamp()`, evaluated freshly at the moment of the decision. That covers claim eligibility, lease validity, a new `lease_expires_at` and a new `run_after`.
+  - **What is never used for lease validity:**
+    - worker clocks;
+    - transaction-start time (`now()` or `CURRENT_TIMESTAMP`), because it can be stale after a lock wait or in a longer transaction.
+  - **Audit timestamps** (`created_at`, `updated_at`, `finished_at`) may use ordinary transaction timestamps.
+- **Ownership, lease and fencing rules** [DECISION]:
+  1. **Idempotent enqueue checks the identity of the request.**
+     - The unique key stays `(tenant_id, kind, idempotency_key)`.
+     - Enqueue runs inside the caller-owned transaction, so a later revision and its ingestion job commit together.
+     - It runs `INSERT … ON CONFLICT (tenant_id, kind, idempotency_key) DO NOTHING RETURNING id`. If no row is returned, it reads the committed existing row by its unique key and compares the request with it:
+       - the payload is compared as a parsed object, so the order of JSON object keys cannot create a false conflict;
+       - the immutable `max_attempts` configuration is compared too.
+     - **An identical retry** returns the existing job as it is, including when it is already terminal. It never resets, re-queues or reschedules the job.
+     - **A changed payload or `max_attempts`** under the same key raises a fixed `JobIdempotencyConflictError`. The error contains no values, and the existing row is not changed.
+     - **Concurrent enqueues** with the same key resolve through the unique constraint. Under PostgreSQL's default READ COMMITTED isolation, `ON CONFLICT` waits for a conflicting in-flight insert. The following read then sees the committed row and compares against it. If that row is not visible, enqueue raises a fixed error rather than guessing.
+  2. **Claim** is one short transaction.
+     - **Expired, exhausted jobs:** first, a bounded sweep marks `dead` any `running` job whose lease has expired by `clock_timestamp()` with `attempt = max_attempts`.
+       - The sweep handles at most 10 rows per claim, uses `FOR UPDATE SKIP LOCKED`, sets `last_error` to a fixed code, leaves `attempt` unchanged and never increments it beyond `max_attempts`.
+     - **Selecting a job:** claim then selects the oldest eligible row by `(run_after, id)` with `FOR UPDATE SKIP LOCKED`. Eligible means:
+       - queued, with `run_after ≤ clock_timestamp()`; or
+       - running, with an expired lease and `attempt < max_attempts`.
+     - **Exhausted rows never block the queue:** they are excluded from the selection, so they cannot stop an eligible job from being claimed, however many there are.
+     - **Taking the job:** set `running`, increment `attempt`, set `locked_by` to the worker ID, and set `lease_expires_at` to `clock_timestamp()` plus 60 seconds.
+     - Workers get a unique ID per process start; it is not secret.
+  3. **The fencing token** is `(job id, locked_by, attempt)`.
+     - `attempt` grows on every claim, so a reclaim always invalidates the previous owner, even if the same worker ID reclaims its own job.
+  4. **Every ownership operation follows one strict procedure:** heartbeat, completion, failure and every fenced handler effect.
+     1. Lock the job row by ID (`SELECT … FOR UPDATE`, waiting if necessary).
+     2. *After* the lock is held, check validity in a separate statement, using a fresh `clock_timestamp()`:
+        - status `running`;
+        - a matching token;
+        - `lease_expires_at > clock_timestamp()`.
+
+        No time value or check result captured before a lock wait is reused.
+     3. Only if the check passes, apply the effect in the same transaction. Otherwise raise a fixed `LeaseLostError` and change nothing.
+
+     Fenced transactions set a bounded `lock_timeout` of 5 s [DECISION]. A timeout aborts the transaction with no effect.
+  5. **Heartbeat** follows that procedure, then sets `lease_expires_at` to `clock_timestamp()` plus 60 seconds.
+     - An expired lease cannot be revived, even if no other worker has reclaimed it yet. The worker must stop.
+  6. **Complete and fail** follow the same procedure:
+     - success sets `succeeded`;
+     - a permanent failure sets `failed`;
+     - a retryable failure sets `queued`, with `run_after` = `clock_timestamp()` plus the backoff, while `attempt < max_attempts`, and `dead` otherwise.
+
+     Each records `last_error` as a fixed code. Terminal transitions clear the lease and set `finished_at`; a retry clears the lease.
+  7. **What the fence guarantees, precisely:**
+     - While a transaction holds the job row lock after a valid check, no claimant can reclaim that row: claims skip locked rows, and the sweep uses `SKIP LOCKED` too. The ownership check and the effect are therefore atomic with respect to reclaim.
+     - It does **not** guarantee that the commit happens before `lease_expires_at`. A transaction that passed its check just before expiry may commit shortly after it.
+     - The window is kept small by keeping fenced transactions short. **No provider or network call is ever made while the job lock is held.** Such calls happen outside fenced transactions, and their results are written in a separate short fenced transaction.
+- **Dependencies on later slices:**
+  - M3a defines the fence; M3c's activation and M3d's chunk writes must run inside it.
+  - **Lock order** is fixed now to avoid deadlocks: the job row first, then the document row (`SELECT … FOR UPDATE` in activation).
+  - The `ingest_revision` job kind, its payload (`revision_id`) and its idempotency key (the revision ID) are defined in M3d, not M3a.
+  - M3a's tests use a test-only job kind.
+- **Planned database-independent tests:**
+  - **The lifecycle and its parameters:**
+    - the exhaustive lifecycle table, including terminal transitions clearing the lease and setting `finished_at`;
+    - backoff values for attempts 1–6, including the 60-second cap;
+    - the `max_attempts` default and range, and attempt bounds.
+  - **Payload validation:** a flat object, string keys, canonical UUID-string values, the empty-object case, no tenant field, no nesting, and the 4,096-byte cap measured on canonical UTF-8 JSON.
+  - **Canonicalisation:** objects that differ only in key order compare equal.
+  - **Compiled SQL:**
+    - claim and the sweep use `FOR UPDATE SKIP LOCKED` with deterministic ordering;
+    - lease decisions use `clock_timestamp()`, not `now()`;
+    - every ownership operation locks before it checks.
+  - **Transaction ownership:** a recording session checks commit, rollback and close.
+  - **Error privacy:** `LeaseLostError`, `JobIdempotencyConflictError` and stored errors contain no payload, SQL or exception text.
+- **Planned PostgreSQL integration tests**, using the existing disposable-database guard and required-integration mode:
+  - **Migration and constraints:**
+    - `0002` upgrades and downgrades, and models and migrations do not drift;
+    - the constraints hold: status values, lease consistency, `finished_at` consistency, attempt and `max_attempts` bounds, and the tenant foreign key.
+  - **Idempotent enqueue:**
+    - an identical retry returns the same job and leaves the row unchanged;
+    - the same payload with a different key order is an identical retry;
+    - a changed payload, and separately a changed `max_attempts`, raise `JobIdempotencyConflictError` and leave the row unchanged;
+    - a retry against a `succeeded`, `failed` or `dead` job returns it unchanged, without re-queueing it;
+    - the same key in another tenant creates a separate job;
+    - two concurrent enqueues with the same key, on separate connections synchronised by a barrier, produce exactly one row. Identical requests both get that job; a differing second request gets the conflict error.
+  - **Claim basics:**
+    - claim respects `run_after` and order;
+    - an expired, exhausted job ahead of an eligible queued job is marked `dead` with its attempt unchanged, and the queued job is still claimed in the same call;
+    - with more exhausted rows than the sweep bound, the eligible job is still claimed.
+  - **Concurrency and stale-worker cases that must be verified:**
+    - **two concurrent claimers**, using separate connections synchronised by a barrier, produce exactly one owner; the other gets a different job or none, without blocking;
+    - **a reclaimed job's stale owner** (attempt *n*) cannot heartbeat, complete, fail or make a fenced write after reclaim (attempt *n + 1*), and the row is unchanged;
+    - **the same worker ID reclaiming its own job** is still fenced by `attempt`;
+    - **a fenced write in progress** holds the row lock, so a concurrent claim skips the job instead of reclaiming it mid-write;
+    - **a heartbeat on an expired but unreclaimed lease** fails, and so do a completion and a fenced effect;
+    - **a lease that expires during a lock wait:**
+      - the setup: an ownership operation waits for the job row lock, held by another transaction that does not modify the row, and the lease expires before the operation gets the lock;
+      - the expected result: the operation is refused with `LeaseLostError` and has no effect.
+      - This catches a validity check evaluated before the wait. It is the only test that needs a real, bounded wait of about a second; every other expiry is simulated by setting `lease_expires_at` in the past through SQL.
+    - **an exception inside a fenced transaction** rolls back its writes and leaves the job owned and running;
+    - **repeated retryable failures and lease abandonment** reach `dead` at exactly `max_attempts`, with the backoff delays above; a permanent failure ends `failed`.
+- **Explicit exclusions from M3a:**
+  - the worker process, command, loop or heartbeat timer (M3b);
+  - real handlers;
+  - the documents, revisions and chunks tables (M3c–M3d);
+  - parsing;
+  - upload and document endpoints, and any job API;
+  - Dockerfile and Compose changes;
+  - embeddings and vectors;
+  - `LISTEN/NOTIFY`, cancellation, scheduling, jitter and metrics;
+  - new dependencies.
+- **Review decisions (Prompt 47):** the reviewer settled the four items marked [DECISION] above:
+  - the idempotent-enqueue identity check;
+  - fresh database time with lock-then-check ownership;
+  - the initial parameters;
+  - the terminal semantics, including exhausted claims.
+
+  The 5-second `lock_timeout` and the sweep bound of 10 rows per claim were accepted at review (Prompt 48) as initial engineering defaults, not measured performance claims.
 
 **M4 – Embeddings, retrieval and corpus**
 - Provider interface, `HashingEmbedder`, Voyage adapter (mocked in CI), RRF search over snapshot revisions, `sample_data/` including the injected variant, ground truth with acceptable and wrong claims, and the retrieval contract suite.
@@ -659,11 +849,11 @@ Each question entry contains:
 ## 10. Remaining blockers and open questions
 
 **Blockers:**
-- uv and Python 3.12 are missing. They block M1.
-- Docker is missing and the system drive is short of space. Local integration tests from M2 onward are blocked; CI is unaffected.
+- ~~uv and Python 3.12 are missing. They block M1.~~ Resolved: the project uses uv 0.13.0 and Python 3.12 (see §2), M1 and M2 were built and verified with them, and CI pins the same versions.
+- Docker is missing and the system drive is short of space. Local integration tests are blocked and Compose has never been run; CI runs the PostgreSQL integration tests instead. This also limits M3's Dockerfile and Compose work to what CI can verify.
 - Anthropic and Voyage keys are missing. They block live evaluation in M7.
 
 **Open questions:**
-- [OPEN] Local database: install Docker Desktop (data on the second drive), or rely on CI for integration tests?
+- [OPEN] Local database: install Docker Desktop (data on the second drive), or rely on CI for integration tests? M2 relied on CI throughout.
 - [OPEN] The model-selection thresholds for D10 must be agreed before the first live run.
 - [OPEN] Annotation effort: one person labels the claim-support pairs. Should a second labeller check a sample?

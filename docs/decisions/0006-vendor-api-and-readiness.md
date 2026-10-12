@@ -1,6 +1,6 @@
 # ADR-0006: Tenant-scoped vendors, shared database lifecycle and readiness
 
-- **Status:** Accepted (M2c), following the implementation review and passing CI at commit `a888b6c` on branch `feat/vendor-api-readiness`; not yet merged into `main`. See *Consequences and limits*.
+- **Status:** Accepted (M2c), following the implementation review and passing CI at commit `a888b6c` on branch `feat/vendor-api-readiness`, then fast-forwarded onto `main` at `9d5a93a`, where CI passed again. M2 was accepted at that commit. See *Consequences and limits*.
 - **Date:** 2026-10-12
 - **Builds on:** [ADR-0004](0004-persistence-foundation.md) (the `vendors` table and its constraints), [ADR-0005](0005-api-key-authentication.md) (API-key authentication and roles), plan sections on the API and M2, and the M2 decisions recorded under Prompt 24 in [prompts.md](../../prompts.md)
 
@@ -73,7 +73,7 @@ M2b authenticated requests but only `/v1/me` used the database, through a privat
     - pagination;
     - readiness when ready, unmigrated and on a revision mismatch.
   - The database-independent checks passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994050) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689993962), and the [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619867) passed.
-  - M2c is not yet merged into `main`.
+  - **On `main` at `9d5a93a`** (`9d5a93ab1389d8a2b084c8f669df3bf9941a477f`): [CI run 38214711868](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868) passed, including the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647728). Its log, retrieved by the external reviewer, reports `21 passed, 458 deselected in 4.92s`. The [secret-scan run 38214711864](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711864) also passed.
 - **Not verified locally.** No local database is used. No vector functionality is tested: the CI image includes pgvector, but no migration creates the extension.
 - **The PostgreSQL error code is not checked.** Duplicate detection relies on psycopg reporting the constraint name. If a future driver stopped reporting it, duplicates would surface as 503s rather than 409s, never as false 409s.
 - **Readiness is coarse.** It checks connectivity and revision equality only. It does not prove that every table matches the models; `alembic check` in CI does that.

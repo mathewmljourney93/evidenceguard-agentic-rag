@@ -4205,3 +4205,422 @@ No application checks need to run locally for these documentation-only changes. 
 - **Not yet recorded here:** the push, the CI results and any `main` update happen after this commit, so they are reported in the session handoff.
 - **Not rerun:** application checks, because only documentation changes.
 - **Still open:** Compose remains unverified, and overall M2 acceptance is pending.
+
+**Outcome note for Prompt 45 (added with Prompt 46; publication and CI happened after the Prompt 45 commit):**
+- **Documentation commit:** `9d5a93ab1389d8a2b084c8f669df3bf9941a477f`, with parent `a888b6c` and the noreply author and committer.
+  - Before it: only the six authorized files were staged, the four reviewed documents were byte-identical to the accepted tree, and ADR-0005 changed only by the authorized phrase. The link, whitespace and staged Gitleaks checks passed.
+  - After it, before any push: the full-history Gitleaks scan found no leaks.
+- **Feature push:** `git push origin refs/heads/feat/vendor-api-readiness:refs/heads/feat/vendor-api-readiness` moved the branch from `a888b6c` to `9d5a93a`.
+- **Feature CI for exactly `9d5a93a`:** Claude confirmed the conclusions through the public GitHub REST API.
+  - [CI run 38214461017](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214461017) succeeded:
+    - [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214461017/job/114695840669) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214461017/job/114695840752) verification;
+    - the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214461017/job/114695840580).
+  - [Secret-scan run 38214460994](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214460994) succeeded.
+- **Fast-forward of `main`:** after all four checks passed, a fresh fetch confirmed the preconditions:
+  - remote `main` was still `277dfea`, and it is an ancestor of `9d5a93a`;
+  - local `main` equalled `origin/main`;
+  - the tree was clean.
+
+  Local `main` was then fast-forwarded with `git merge --ff-only`, and `git push origin refs/heads/main:refs/heads/main` moved `main` from `277dfea` to `9d5a93a`. No merge commit, force-push or tag push was made.
+- **`main` CI for exactly `9d5a93a`:**
+  - [CI run 38214711868](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868) succeeded:
+    - [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647399) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647671) verification;
+    - the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647728).
+  - [Secret-scan run 38214711864](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711864) succeeded.
+- **Integration counts:**
+  - Claude could not read the job logs: the unauthenticated log endpoint returned 403.
+  - The external reviewer independently retrieved the `main` integration log, which reports `21 passed, 458 deselected in 4.92s`.
+  - The count for the feature run `38214461017` was not observed.
+
+## Prompt 46: Record M2 acceptance and propose the M3 breakdown
+
+- **Stage:** Documentation only, on branch `docs/m2-acceptance-m3-plan` (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Record M2 acceptance and prepare a bounded M3 implementation plan. Documentation only; leave changes staged and uncommitted for review.
+
+Follow CLAUDE.md. Work only in:
+D:\Claude\evidenceguard_agentic_rag
+
+Verify:
+- Current branch: main
+- HEAD and origin/main:
+  9d5a93ab1389d8a2b084c8f669df3bf9941a477f
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Working tree clean.
+
+If the state differs, report it and stop without repairing it.
+
+Create a local branch:
+docs/m2-acceptance-m3-plan
+
+Verified evidence
+The external reviewer independently confirmed:
+- Main CI run 38214711868 succeeded for the exact SHA above.
+- Main secret-scan run 38214711864 succeeded for that SHA.
+- Integration job 114696647728 reported:
+  21 passed, 458 deselected in 4.92s.
+
+Links:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647728
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711864
+
+M2 acceptance
+The reviewer accepts M2 against the agreed criteria:
+- Migration upgrade/downgrade.
+- Composite tenant constraints.
+- Foreign vendor IDs return 404.
+- Client-supplied tenant information cannot override authenticated scope.
+  Headers/query parameters are ignored; unexpected body fields are rejected.
+- Revoked keys return 401.
+- Integration tests execute against the PostgreSQL + pgvector CI image.
+
+This does not claim vector functionality is implemented or tested.
+Compose remains unverified.
+The reviewer inspected implementation diffs and retrieved CI evidence but did not run the suite locally.
+
+Update documentation
+Make narrow status/evidence updates in:
+- README.md
+- docs/decisions/0006-vendor-api-and-readiness.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Record M2c on main at the verified SHA and mark M2 accepted.
+Preserve historical evidence and limitations.
+In docs/plan.md, correct stale current blockers where repository evidence establishes they are resolved, such as Python/uv being missing. Keep genuine unresolved blockers. Do not inspect system folders or recheck installed tools outside the project.
+
+M3 preparation
+Read the approved plan and relevant ADRs. Propose a small, ordered breakdown of M3, keeping its existing architecture and acceptance criteria.
+
+Describe the first implementation slice precisely:
+- intended schema/domain changes and migration;
+- job ownership, lease, heartbeat and fencing rules;
+- dependencies on later document/revision activation work;
+- database-independent tests versus real PostgreSQL integration tests;
+- concurrency and stale-worker cases that must be verified;
+- explicit exclusions.
+
+Choose the smallest useful slice with coherent invariants. Do not build all of M3 at once or introduce a new orchestration framework.
+Put the proposed breakdown in docs/plan.md, clearly marked as proposed, awaiting review.
+Do not implement code, migrations, worker services, upload endpoints or Docker changes.
+
+Prompt history
+Append a separate outcome note for Prompt 45 recording the actual main publication and CI results.
+Append this prompt verbatim using the next sequential number, plus a truthful outcome note.
+Preserve earlier prompts and outcomes.
+
+Verification
+- Check documentation links and anchors.
+- Inspect staged additions for secrets/private information.
+- Run git diff --cached --check.
+- Run gitleaks git --pre-commit --staged --redact --verbose .
+- Confirm only the five authorized documentation files are staged.
+
+Do not rerun application tests or builds for documentation-only changes.
+
+Final handoff
+- Brief M2 acceptance summary and proposed M3 sequence.
+- COMPLETE staged diff excluding prompts.md directly in fenced diff blocks.
+- Numbered parts at file boundaries if needed; no truncation.
+- Prompt-history additions separately.
+- Actual checks and final Git status.
+
+Do not commit, push, merge, rewrite history, install tools, start Docker or contact a database.
+````
+
+**Outcome (documentation pending review; staged on `docs/m2-acceptance-m3-plan`, not committed or pushed):**
+- **Starting state verified:**
+  - branch `main`, HEAD and `origin/main` `9d5a93a`, the expected origin, a clean tree.
+  - Branch `docs/m2-acceptance-m3-plan` was created from `9d5a93a`.
+- **M2 acceptance recorded:**
+  - README, ADR-0006, the plan and the threat model now record M2c on `main` at `9d5a93a`, with the `main` CI and secret-scan runs and the reviewer-retrieved `21 passed, 458 deselected in 4.92s`.
+  - M2 is marked accepted. Each criterion is mapped to the tests that cover it, the reviewer's verification limits are stated, and it is explicit that no vector functionality is claimed and Compose is unverified.
+  - Earlier verification records and limitations are kept.
+- **Plan corrections:**
+  - the environment table's stale `main` SHA was updated;
+  - the "uv and Python 3.12 are missing" blocker was marked resolved, using repository evidence (§2 records the versions, M1 and M2 used them, and CI pins them);
+  - the Docker blocker, the API-key blocker and the open questions remain. No tools were rechecked outside the project.
+- **M3 proposal:** a breakdown into slices M3a–M3f, marked *PROPOSED, awaiting review*, which maps the existing M3 acceptance criteria to slices. M3a, the durable job core, is described in detail:
+  - schema and migration `0002`;
+  - lifecycle;
+  - ownership, lease, heartbeat and fencing rules;
+  - lock order and dependencies;
+  - database-independent and PostgreSQL tests;
+  - concurrency and stale-worker cases;
+  - exclusions;
+  - decisions requested at review.
+
+  No code, migration, worker, endpoint or Docker change was made.
+- **Checks:** the link and anchor check, the private-content check, `git diff --cached --check` and the staged Gitleaks scan were run on the staged content. Exact results are in the session handoff. Application tests and builds were not rerun.
+
+**Review note (added with Prompt 47):**
+- **Accepted:**
+  - the Prompt 46 M2 acceptance documentation;
+  - the overall M3a–M3f sequence.
+- **Required before implementation:** the detailed M3a specification needed clarifications and parameter decisions.
+  1. **Idempotent enqueue must check the identity of the request.**
+     - An identical retry returns the existing job, even when terminal, without resetting or rescheduling it.
+     - A changed canonical payload or `max_attempts` under the same key raises a fixed `JobIdempotencyConflictError` without changing the row.
+     - JSON key order must not create a false conflict.
+     - Concurrent inserts resolve through the unique constraint and a comparison with the committed row.
+  2. **Lease decisions must use fresh database time.**
+     - `clock_timestamp()` is used, not worker time or transaction-start time.
+     - The job row is locked before ownership and lease validity are checked, and validity is rechecked after any lock wait.
+     - The same strict policy applies to heartbeat, completion, failure and fenced effects. Expired leases cannot be revived.
+     - Fenced transactions are short, with no provider or network calls under the job lock.
+     - The guarantee is stated precisely: no reclaim while a valid fence holds the lock, but no promise that the commit precedes lease expiry.
+  3. **Initial parameters:**
+     - a 60 s lease and a 20 s heartbeat (heartbeat timer in M3b);
+     - `max_attempts` defaults to 3, with a range of 1–10;
+     - `attempt` starts at 0 and increments on each claim or reclaim;
+     - backoff of `min(5 * 2^(n - 1), 60)` s, with no jitter in v1;
+     - a 4,096-byte payload cap on canonical UTF-8 JSON;
+     - a flat object payload with UUID-string values;
+     - `kind` and key lengths of 64 and 128.
+  4. **Terminal semantics:**
+     - `failed` is permanent and `dead` is exhaustion; all three terminal statuses clear the lease and set `finished_at`;
+     - an expired, exhausted job is marked `dead` without incrementing `attempt`;
+     - exhausted rows must not obstruct claiming of other eligible jobs.
+- **Planned tests required** for:
+  - identical, changed, reordered, terminal, cross-tenant and concurrent enqueues;
+  - an operation whose lease expires while it waits for the lock;
+  - an exhausted expired job ahead of an eligible queued job.
+- **Basis of the review:** the reviewer inspected the documentation and retrieved the M2 CI evidence, but did not run the project suite.
+- **Status:** M3a implementation remains pending.
+
+## Prompt 47: Finalize the M3a planning specification after review
+
+- **Stage:** Documentation-only correction on branch `docs/m2-acceptance-m3-plan` (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Finalize the M3 planning specification after external review. Documentation only; leave changes staged and uncommitted.
+
+Follow CLAUDE.md. Work only in:
+D:\Claude\evidenceguard_agentic_rag
+
+Expected starting state:
+- Branch: docs/m2-acceptance-m3-plan
+- HEAD: 9d5a93ab1389d8a2b084c8f669df3bf9941a477f
+- Origin: https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Five files staged: README.md, ADR-0006, docs/plan.md, docs/threat-model.md, prompts.md.
+- Nothing unstaged or untracked.
+
+Verify first. If anything differs, report it and stop without repairing it.
+Record the pre-edit staged tree for the incremental review diff.
+
+Review outcome
+The external reviewer accepts the M2 acceptance documentation and the overall M3a–M3f sequence. The detailed M3a specification requires the following clarifications and parameter decisions before implementation.
+
+Modify docs/plan.md and prompts.md only.
+Keep README, ADR-0006 and the threat model byte-identical to their starting staged versions.
+
+1. Idempotent enqueue must check request identity
+- The unique key remains (tenant_id, kind, idempotency_key).
+- An identical retry returns the existing job, including when it is already terminal. It never resets or reschedules it.
+- Compare canonical payload content and immutable max_attempts configuration.
+- Changed payload or max_attempts under the same key raises a fixed JobIdempotencyConflictError, without exposing values or changing the existing row.
+- JSON object key order must not create a false conflict.
+- Concurrent inserts must resolve safely through the unique constraint and comparison against the committed existing row.
+- Enqueue remains inside the caller-owned transaction.
+
+Add planned tests for identical retries, changed payload/configuration, object key order, terminal-job retries, cross-tenant key reuse and concurrent enqueue.
+
+2. Fresh database time for lease decisions
+- Use PostgreSQL clock_timestamp() for fresh lease/scheduling decisions; do not use worker time or transaction-start now()/CURRENT_TIMESTAMP for lease validity.
+- Acquire the job row lock before evaluating the owner token and current lease validity.
+- Recheck validity after any lock wait. Do not rely on a time value captured before waiting.
+- Heartbeat, completion, failure and fenced effects must use the same strict ownership policy.
+- An expired lease cannot be revived, even if not reclaimed.
+- Keep fenced transactions short; never perform provider/network calls while holding the job lock.
+- Once a valid fence holds the job lock, a claimant cannot reclaim that row before the transaction finishes. State this precisely rather than promising that commit can never occur after lease expiry.
+- Audit timestamps may still use ordinary transaction timestamps where appropriate.
+
+Add a planned PostgreSQL test where an operation waits for a lock and the lease expires before it acquires the lock: the operation must be refused with no effect.
+
+3. Set the initial M3a parameters
+These are engineering defaults for the first implementation, not measured performance claims:
+- Lease duration: 60 seconds.
+- Worker heartbeat interval: 20 seconds, implemented in M3b.
+- max_attempts: default 3; accepted range 1–10.
+- attempt starts at 0 and increments on each successful claim/reclaim.
+- Backoff after failed attempt n:
+  min(5 * 2^(n - 1), 60) seconds.
+- No jitter in v1; document that as a deliberate simplification.
+- Payload cap: 4,096 bytes measured on canonical UTF-8 JSON.
+- M3a payload: a flat JSON object with string keys and UUID-string values. Empty objects are allowed for test-only jobs. No tenant field, nested objects, document text or secrets. Kind-specific schemas arrive with their handlers.
+- Preserve kind length 64 and idempotency-key length 128.
+
+4. Confirm terminal semantics and exhausted claims
+- failed: permanent, non-retryable handler failure.
+- dead: retryable failure or lease abandonment exhausts the attempt cap.
+- succeeded, failed and dead are terminal.
+- Terminal transitions clear lease fields and set finished_at.
+- A claim encountering an expired exhausted job marks it dead without incrementing beyond max_attempts.
+- Claiming must still be able to reach other eligible jobs; exhausted-row cleanup must not indefinitely obstruct the queue.
+- Add a planned test with an exhausted expired job followed by an eligible queued job.
+
+Keep the M3a implementation pending. Record these as review decisions in the proposed specification; do not claim code or tests exist.
+
+Prompt history
+- Add a separate review note under Prompt 46 recording acceptance of the M2 documentation and the M3 sequence, with the detailed clarifications.
+- Append this prompt verbatim using the next sequential number.
+- Add a truthful outcome note.
+- Preserve earlier entries.
+- State that the reviewer inspected the documentation and retrieved M2 CI evidence, but did not run the project suite.
+
+Checks
+- Check documentation links.
+- Confirm only docs/plan.md and prompts.md changed from the recorded starting staged tree.
+- Run git diff --cached --check.
+- Run gitleaks git --pre-commit --staged --redact --verbose .
+- No application tests or builds are needed for this documentation-only task.
+
+Final handoff
+- Briefly list the settled decisions.
+- Include the COMPLETE incremental staged diff against the pre-edit staged tree, excluding prompts.md, directly in fenced diff blocks.
+- Split at file boundaries if necessary; do not truncate.
+- Summarize prompt-history additions separately.
+- Report actual checks, full HEAD and final Git status.
+
+Do not implement M3a, commit, push, merge, install tools, start Docker or contact a database.
+````
+
+**Outcome (documentation pending review; staged, not committed or pushed):**
+- **Starting state verified:**
+  - branch `docs/m2-acceptance-m3-plan`, HEAD `9d5a93a`, the expected origin;
+  - the five files staged, with nothing unstaged or untracked.
+  - The pre-edit staged tree, `5df0dd7ff478d33d4849e17ef4cd183a14e170ee`, was recorded under `.local/`.
+- **`docs/plan.md`:** the M3 section is now marked as "sequence accepted at review; M3a specification settled at review; implementation pending". The M3a specification records the four review decisions:
+  - idempotent enqueue with an identity check, the conflict error, key-order-insensitive comparison, terminal retries and concurrent inserts;
+  - fresh `clock_timestamp()` time, with a lock-then-check procedure shared by heartbeat, completion, failure and fenced effects, no revival of expired leases, no network calls under the lock, and a precise statement of the fence guarantee;
+  - the initial parameters, with no jitter as a deliberate simplification;
+  - the terminal semantics, with a bounded, `SKIP LOCKED` exhausted-job sweep that cannot obstruct eligible jobs.
+- **New planned tests:**
+  - the requested enqueue cases;
+  - the lease that expires during a lock wait;
+  - the exhausted job ahead of a queued job.
+- **Remaining minor proposals,** to confirm at implementation review: the 5 s `lock_timeout` and the sweep bound of 10 rows per claim. No code, migration or test exists.
+- **Unchanged:** README, ADR-0006 and the threat model are byte-identical to their starting staged versions. The README's wording that the M3 breakdown "awaits review" was left as it is, because this prompt keeps the README unchanged.
+- **Checks:** the link check, the comparison with the recorded tree, `git diff --cached --check` and the staged Gitleaks scan were run on the staged content. Exact results are in the session handoff. No application tests or builds were run.
+
+**Acceptance note (added with Prompt 48):**
+- **Accepted by the external reviewer:**
+  - Prompt 46's M2 acceptance documentation and M3 sequence;
+  - Prompt 47's revised M3a specification;
+  - the 5-second `lock_timeout`;
+  - the exhausted-job sweep limit of 10 rows per claim.
+- **Nature of the parameters:** they are initial engineering defaults, not measured performance claims.
+- **Basis of the review:** the reviewer inspected the documentation and independently retrieved the M2 CI evidence, but did not run the project suite.
+- **Status:** M3a remains unimplemented, and Compose remains unverified.
+
+## Prompt 48: Commit the M2 acceptance record and reviewed M3 plan locally
+
+- **Stage:** Local documentation commit on branch `docs/m2-acceptance-m3-plan` (no push, no merge)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Commit the reviewed M2 acceptance record and M3 plan locally. This authorizes one local documentation commit only.
+
+Follow CLAUDE.md. Work only in:
+D:\Claude\evidenceguard_agentic_rag
+
+Verify:
+- Branch: docs/m2-acceptance-m3-plan
+- HEAD: 9d5a93ab1389d8a2b084c8f669df3bf9941a477f
+- Origin: https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Exactly five files staged:
+  README.md
+  docs/decisions/0006-vendor-api-and-readiness.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+
+If anything differs, report it and stop without repairing it.
+Record the accepted staged tree before editing.
+
+Review acceptance
+The external reviewer accepts:
+- Prompt 46’s M2 acceptance documentation and M3 sequence.
+- Prompt 47’s revised M3a specification.
+- The 5-second lock_timeout.
+- The exhausted-job sweep limit of 10 rows per claim.
+
+These are initial engineering defaults, not measured performance claims.
+M3a remains unimplemented. Compose remains unverified.
+The reviewer inspected the documentation and independently retrieved M2 CI evidence, but did not run the project suite.
+
+Only these additional edits are authorized:
+1. README.md:
+   Replace the current claims that the M3 sequence awaits review with wording that the sequence and M3a specification are accepted, while implementation remains pending.
+   Update “M3 proposed” in the status heading accordingly.
+   Do not imply any M3 code exists.
+
+2. docs/plan.md:
+   Mark the 5-second lock timeout and 10-row sweep limit as accepted defaults rather than pending proposals.
+   Preserve the rest of the reviewed specification.
+
+3. prompts.md:
+   Append a separate acceptance note under Prompt 47.
+   Append this prompt verbatim using the next sequential number.
+   Add a truthful pre-commit outcome note.
+   Preserve earlier entries.
+
+Before committing:
+- Show and inspect the exact incremental diff against the accepted staged tree.
+- Confirm ADR-0006 and docs/threat-model.md remain byte-identical to that tree.
+- Confirm all changes are limited to the authorized status/default wording and prompt-history additions.
+- Check relative documentation links and anchors.
+- Check staged additions for secrets/private information without printing sensitive values.
+- Confirm effective author and committer email:
+  257921624+mathewmljourney93@users.noreply.github.com
+- Run git diff --cached --check.
+- Run gitleaks git --pre-commit --staged --redact --verbose .
+
+If checks pass, create one local commit:
+docs: record M2 acceptance and reviewed M3 job specification
+
+Keep the existing attribution convention.
+Run gitleaks git --redact --verbose . after committing.
+Confirm the parent and clean working tree.
+
+No application tests or builds are needed for these documentation-only changes.
+
+Final handoff:
+- Full SHA, parent, subject, author and committer.
+- Committed paths.
+- COMPLETE incremental diff against the accepted staged tree, excluding prompts.md, directly in fenced diff blocks.
+- Prompt-history additions separately.
+- Checks actually run and final Git status.
+- State that nothing was pushed, M3a is unimplemented and Compose remains unverified.
+
+Do not implement M3a, push, merge, amend, rebase, delete branches, install tools, start Docker or contact a database.
+````
+
+**Pre-commit note (recorded before the commit):**
+- **Starting state verified:**
+  - branch `docs/m2-acceptance-m3-plan`, HEAD `9d5a93a`, the expected origin;
+  - exactly the five reviewed files staged, with nothing unstaged or untracked.
+  - The accepted staged tree, `40a49a1600bb59fa09f3f09db51a9fb1255aeb63`, was recorded under `.local/` before editing.
+- **Authorized edits:**
+  - **README:** the status heading now reads "M3 specification accepted, implementation pending", and the "Still planned" item says that the slice sequence and the M3a specification are accepted, implementation is pending and no M3 code exists.
+  - **`docs/plan.md`:** the 5 s `lock_timeout` and the 10-row sweep bound are marked as accepted initial defaults.
+  - **This prompt history.**
+- **Checks on the staged content, including this note:**
+  - the incremental diff against the accepted tree;
+  - byte identity of ADR-0006 and the threat model;
+  - the link and anchor check;
+  - the private-content check;
+  - `git diff --cached --check`;
+  - the staged Gitleaks scan.
+
+  They run before the commit, and the full-history Gitleaks scan runs after it. All results are reported in the session handoff.
+- **Not run:** application tests and builds, because only documentation changes.
+- **Not authorized:** no push or merge.
+- **Still pending:** M3a is unimplemented, and Compose remains unverified.
