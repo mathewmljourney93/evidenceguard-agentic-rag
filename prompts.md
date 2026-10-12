@@ -8388,3 +8388,155 @@ Do not begin M3d.
 - **Checks before the commit:** staged paths and diff inspected, no local artifacts or build outputs staged, staged additions checked for secrets and private information, effective author and committer email confirmed, `git diff --cached --check` and the staged Gitleaks scan. Exact results are in the session handoff.
 - **After the commit:** the full-history Gitleaks scan and the commit verification are reported in the session handoff, not recorded here.
 - **Authorization:** one local commit only. No push, merge, amend, rebase, Docker or database contact; M3d not started. Nothing here claims publication or PostgreSQL CI verification.
+
+**Outcome after the commit (recorded with Prompt 73):** local commit `057d57d` (`057d57dd91c7a6f946137df565e79e0bac75bb3c`, parent `26021c2`, noreply identity) contains the 16 expected paths. Every file except `prompts.md` matches the accepted staged tree `feed622…`. The full-history Gitleaks scan after the commit reported 28 commits scanned and no leaks; the working tree was clean, and `main` stayed at `dd26c70`. It was not pushed.
+
+## Prompt 73: Publish the M3c feature branch and verify CI
+
+- **Stage:** Publication of branch `feat/document-revisions` only (push of this branch authorized; `main` not updated or merged)
+- **Date:** 2026-10-13 (session date)
+
+````text
+Publish the reviewed M3c feature branch and verify CI. This authorizes pushing only feat/document-revisions. Do not update or merge main.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/document-revisions
+- HEAD:
+  057d57dd91c7a6f946137df565e79e0bac75bb3c
+- Parent:
+  26021c2daa6e2ad69ace5cfa4517f3b6ef7ce8a3
+- Working tree clean, nothing untracked.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- No upstream configured.
+- Local and remote main:
+  dd26c7099d1007e9ee615204dc0056abe8820c67
+- No remote feat/document-revisions branch.
+- Remote main is an ancestor of HEAD.
+- Effective author and committer email:
+  257921624+mathewmljourney93@users.noreply.github.com
+
+Check remote refs freshly. Stop without changes if anything differs.
+
+2. Publication preflight
+
+Inspect every commit and tracked change becoming public relative to remote main, including the specification commit 26021c2.
+
+Confirm:
+- Noreply author and committer identities.
+- No tracked local artifacts, backups, bundles, real environment files, credentials or generated build outputs.
+- Changes match the reviewed specification and implementation.
+- Both workflows trigger on this branch’s push.
+- Ubuntu verification, Windows verification, PostgreSQL integration and full-history secret scanning remain enabled.
+- EG_REQUIRE_INTEGRATION=1 remains enabled.
+- No workflow change was introduced by M3c.
+
+Do not modify implementation or workflows.
+Stop and report any publication blocker.
+
+3. Record authorization
+
+Change only prompts.md, append-only:
+- Append this prompt verbatim as Prompt 73 if that is the next unused number; otherwise use the next unused number and explain it.
+- Add a truthful preflight note covering verified state, publication scope, checks and branch-only authorization.
+- Record historical Windows results accurately:
+  818 passed, 134 skipped: 133 PostgreSQL tests and one POSIX-only platform test.
+- The existing 77 integration tests passed for M3b; the 56 added by M3c have not run. All 133 remain unverified against this M3c version.
+- Do not pre-record push or CI success.
+- Keep earlier entries unchanged.
+
+Stage only prompts.md.
+Inspect its diff and private content.
+Run git diff --cached --check and the staged Gitleaks scan.
+
+Create one local commit:
+docs: record M3c branch publication authorization
+
+Use the noreply identity and existing attribution convention.
+Verify it changes only prompts.md.
+Run the full-history Gitleaks scan before pushing.
+Stop on failure.
+
+No local application checks need rerunning for this history-only change.
+
+4. Publish only the feature branch
+
+Run:
+git push --set-upstream origin refs/heads/feat/document-revisions:refs/heads/feat/document-revisions
+
+Confirm the remote feature branch matches the exact published HEAD and main remains unchanged.
+
+Do not push another branch or tag. Do not force-push.
+
+5. Monitor exact-SHA CI
+
+Wait for:
+- Ubuntu verification
+- Windows verification
+- PostgreSQL integration
+- Full-history secret scan
+
+Use available read-only GitHub access. Do not install tooling or change authentication configuration.
+
+Bound monitoring to 20 minutes.
+If any check fails or remains pending, report links and available diagnostics, then stop.
+Do not automatically fix, commit or repush.
+
+If logs are accessible, report actual pytest summaries and migration-check results.
+The expected integration count is 133, but do not present that expectation as an observed result.
+
+If logs are inaccessible, report job/step conclusions and explicitly say test counts were not observed.
+Do not reuse historical counts as results for the published SHA.
+
+6. Handoff
+
+Return:
+- Publication-history commit SHA and parent.
+- Exact published SHA.
+- Prompt-history additions.
+- Preflight and scan results.
+- Workflow/job links and conclusions for that SHA.
+- Observed test summaries and migration results, or log-access limitations.
+- Final Git status and remote refs.
+- Complete incremental diff outside prompts.md; if none, explicitly say none.
+
+Main remains unchanged.
+Compose, dead-job reconciliation/projection in M3d/M3e, M3d–M3f and overall M3 acceptance remain pending.
+
+Do not merge, amend, rebase, delete branches, start Docker or contact a local database.
+Do not begin M3d.
+````
+
+**Preflight note (written before this history commit and the push):**
+- **Verified state:**
+  - branch `feat/document-revisions` at `057d57d` (parent `26021c2`);
+  - a clean working tree with nothing untracked;
+  - the expected origin, and no upstream configured;
+  - fresh `git ls-remote`: remote `main` at `dd26c70`, and no remote `feat/document-revisions`;
+  - remote `main` is an ancestor of HEAD;
+  - effective author and committer email `257921624+mathewmljourney93@users.noreply.github.com`.
+- **Publication scope:** two commits beyond remote `main`, plus this history commit:
+  - `26021c2`, the accepted M3c specification (documentation and prompt history only);
+  - `057d57d`, the reviewed M3c implementation.
+
+  The 17 changed paths relative to `main` are those reviewed in Prompts 66–72. All commits use the noreply author and committer identity.
+- **Preflight checks:**
+  - no tracked local artifacts, backups, bundles, environment files, credentials or build outputs;
+  - a search of the additions for credential patterns, private keys, credentialed URLs, personal email addresses or local paths found nothing;
+  - no workflow file changed.
+- **Workflows (unchanged):**
+  - `ci` and `secret-scan` both trigger on every `push`;
+  - `verify` still runs on `ubuntu-24.04` and `windows-2025`;
+  - the PostgreSQL 17 + pgvector `integration` job still sets `EG_REQUIRE_INTEGRATION: "1"`;
+  - Gitleaks still scans the full history (`fetch-depth: 0`).
+- **Historical local results (Windows, Prompt 71):** `818 passed, 134 skipped`. The skips are 133 PostgreSQL integration tests and one POSIX-only platform test.
+  - The 77 integration tests that existed for M3b passed in CI for M3b.
+  - The 56 integration tests added by M3c have never run.
+  - All 133 are unverified against this M3c version.
+- **Not yet done when this note was written:** the push and the CI results are reported in the session handoff, not recorded here.
+- **Authorization:** push only `feat/document-revisions`, without force. Do not update or merge `main`, push any other branch or tag, amend, rebase, delete branches, start Docker or contact a database. M3d is not started.
