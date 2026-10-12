@@ -10,7 +10,7 @@ EvidenceGuard is a planned vendor-risk review copilot. It is intended to:
 
 It is evidence-based decision support, not legal advice or compliance certification.
 
-## Status: M1 and M2 accepted (persistence, authentication, tenant-scoped vendors and readiness on `main`); M3a durable job core verified in CI on its branch, not yet merged (pre-alpha)
+## Status: M1 and M2 accepted (persistence, authentication, tenant-scoped vendors and readiness on `main`); M3a durable job core on `main`; M3b worker specification accepted, implementation pending (pre-alpha)
 
 **What works now:**
 - One installable Python 3.12 package (`evidenceguard`), managed with uv, with a committed lockfile (M1a).
@@ -50,17 +50,21 @@ It is evidence-based decision support, not legal advice or compliance certificat
   - one shared, lazily started database resource for the whole API.
 
   At commit `a888b6c`, all 21 PostgreSQL integration tests passed in CI, including the six added in M2c ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994147)), and again on `main` at `9d5a93a`. See [ADR-0006](docs/decisions/0006-vendor-api-and-readiness.md) and [Vendors and readiness](#vendors-and-readiness-m2c).
-- **Durable job core** (M3a, **reviewed and verified in CI on branch `feat/durable-job-core`; not yet merged into `main`**):
+- **Durable job core** (M3a, on `main`):
   - a `jobs` table (migration `0002`) and pure lifecycle rules;
   - idempotent enqueue, claim with `SKIP LOCKED`, reclaim of expired leases, heartbeat, completion and failure;
   - a fenced transaction that checks the `(job, worker, attempt)` token and the lease with fresh database time before any effect.
 
-  It is a library only: there is no worker process, handler or endpoint yet. At commit `11350e1`, all 63 PostgreSQL integration tests passed in CI ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517485)), including the job concurrency, lease-fencing and lock-timeout tests. These results demonstrate the tested behaviour, not a general security or performance guarantee. See [ADR-0007](docs/decisions/0007-durable-job-core.md).
+  It is a library only: there is no worker process, handler or endpoint yet. At commit `11350e1`, all 63 PostgreSQL integration tests passed in CI ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517485)), including the job concurrency, lease-fencing and lock-timeout tests, and again on `main` at `b3f9845` ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118281)). These results demonstrate the tested behaviour, not a general security or performance guarantee. See [ADR-0007](docs/decisions/0007-durable-job-core.md).
 - Tests, Ruff and strict Mypy, run in GitHub Actions on Ubuntu and Windows, plus a PostgreSQL 17 + pgvector integration job on Ubuntu.
 
 **M2 accepted.** The external reviewer accepted M2 against its agreed criteria (see [docs/plan.md](docs/plan.md)), on the basis of the implementation diffs and the CI evidence below; the reviewer did not run the suite locally. This does not claim any vector functionality: the CI database image includes pgvector, but no migration creates the extension. Compose has never been run.
 
-**Verified baseline:** `main` at commit `9d5a93a` (`9d5a93ab1389d8a2b084c8f669df3bf9941a477f`, M2a, M2b and M2c) passed:
+**Verified baseline:** `main` at commit `b3f9845` (`b3f984552bf22cf6350702330d30851f3e08b3f4`, M2 and M3a) passed:
+- [CI run 38242144844](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844): verification on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118333) (`605 passed, 63 skipped in 7.56s`) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118106) (`605 passed, 63 skipped in 14.86s`), and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118281) (`63 passed, 605 deselected in 16.17s`), all from logs retrieved by the external reviewer;
+- the [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144876) (22 commits scanned, no leaks found).
+
+Earlier, `main` at commit `9d5a93a` (`9d5a93ab1389d8a2b084c8f669df3bf9941a477f`, M2a, M2b and M2c) passed:
 - [CI run 38214711868](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868): verification on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647399) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647671), and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647728), whose log (retrieved by the external reviewer) reports `21 passed, 458 deselected in 4.92s`;
 - the [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711864).
 
@@ -76,7 +80,7 @@ The earlier M1 baseline `6d64fb3` passed [CI](https://github.com/mathewmljourney
 
 **Limits:**
 - The M1b report rules are still in-memory only. Nothing persists reports yet, and there is no protection against concurrent requests.
-- The endpoints are `/healthz`, `/readyz`, `/v1/me` and the vendor endpoints. No endpoint uses the report rules yet. There are no documents, uploads or worker yet, and the job core (M3a) is a library on its branch, verified in CI but not yet merged.
+- The endpoints are `/healthz`, `/readyz`, `/v1/me` and the vendor endpoints. No endpoint uses the report rules yet. There are no documents, uploads or worker yet, and the job core (M3a) is a library with no worker process yet.
 - Vendor pages use offset pagination, which is not a snapshot under concurrent changes (see ADR-0006).
 - API keys are possession-based bearer credentials, with no rate limiting, lockout, expiry or scopes yet (see ADR-0005).
 - A citation's shape is validated. Whether the tenant may see the chunk, whether the quote is really in it, and whether it supports the claim are **not** checked yet.
@@ -84,7 +88,7 @@ The earlier M1 baseline `6d64fb3` passed [CI](https://github.com/mathewmljourney
 
 **Still planned** (see [docs/plan.md](docs/plan.md)):
 - Revision activation and supersession tests, deferred from M1 to M3, where those state machines are built.
-- Merging M3a into `main` once authorized, then the rest of M3 (worker, documents and revisions, parsing and chunking, uploads, Docker), following the accepted slice sequence in [docs/plan.md](docs/plan.md). M3b–M3f are not implemented, and overall M3 acceptance is pending.
+- The rest of M3 (worker, documents and revisions, parsing and chunking, uploads, Docker), following the accepted slice sequence in [docs/plan.md](docs/plan.md). The M3b worker specification was accepted at review and its implementation is pending; M3b–M3f are not implemented, and overall M3 acceptance is pending.
 - After M2: ingestion, retrieval, model providers, the review workflow, API endpoints for the approval gate, and evaluation.
 
 No retrieval, agent workflow, evaluation results, security guarantees or benchmarks are claimed. Any future results will be published with their committed inputs, configuration and the command that reproduces them.

@@ -1,6 +1,6 @@
 # ADR-0007: Durable PostgreSQL job core
 
-- **Status:** Accepted (M3a), following the implementation review and passing CI at commit `11350e1` on branch `feat/durable-job-core`; not yet merged into `main`. See *Consequences and limits*.
+- **Status:** Accepted (M3a), following the implementation review and passing CI at commit `11350e1` on branch `feat/durable-job-core`, then fast-forwarded onto `main` at `b3f9845`, where CI passed again. See *Consequences and limits*.
 - **Date:** 2026-10-12
 - **Builds on:**
   - [ADR-0003](0003-plain-python-workflow.md): plain Python, PostgreSQL-backed jobs, leases and fencing;
@@ -152,7 +152,7 @@ An empty object is allowed for test-only jobs. Kind-specific schemas arrive with
     - `test_a_lock_held_beyond_the_lock_timeout_raises_the_fixed_error`, which passed as part of that suite. No individual log line or duration was observed for it.
   - The database-independent checks passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517339) (`605 passed, 63 skipped in 12.71s`) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517028) (`605 passed, 63 skipped in 14.66s`).
   - The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768288) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768288/job/114782517013): 21 commits scanned, no leaks found).
-  - M3a is not yet merged into `main`.
+  - **On `main` at `b3f9845`** (`b3f984552bf22cf6350702330d30851f3e08b3f4`): [CI run 38242144844](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118333) `605 passed, 63 skipped in 7.56s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118106) `605 passed, 63 skipped in 14.86s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118281) `63 passed, 605 deselected in 16.17s`. The [secret-scan run 38242144876](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144876) also passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144876/job/114787118292): 22 commits scanned, no leaks found).
 - **What the tests show.** Passing tests demonstrate the tested behaviour, not a general security or performance guarantee.
 - **At-least-once handling.** A handler effect can commit shortly after lease expiry (see the guarantee). External calls made by later handlers are at-least-once (ADR-0003).
 - **Claim cost.** Claiming scans eligible rows ordered by `(run_after, id)`. The partial indexes serve the common cases, but no performance or throughput figure is claimed.

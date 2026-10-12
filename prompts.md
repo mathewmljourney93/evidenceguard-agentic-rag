@@ -5693,3 +5693,563 @@ Do not begin M3b in this task.
   - Compose;
   - M3b–M3f;
   - overall M3 acceptance.
+
+**Outcome note for Prompt 56 (added with Prompt 57; publication and CI happened after the Prompt 56 commit):**
+- **Commit:** `b3f984552bf22cf6350702330d30851f3e08b3f4`, with parent `11350e1`. Its four documents were byte-identical to the accepted tree `0f0f06a…`. The staged and full-history Gitleaks scans found no leaks.
+- **Feature push:** `feat/durable-job-core` moved from `11350e1` to `b3f9845`.
+  - [CI run 38241917267](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38241917267) succeeded: Ubuntu, Windows and integration.
+  - [Secret-scan run 38241916958](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38241916958) succeeded.
+- **Fast-forward of `main`:** after all four checks passed and a fresh fetch confirmed the preconditions, `main` was fast-forwarded with `git merge --ff-only` and pushed from `9d5a93a` to `b3f9845`. No merge commit, force-push or tag push was made.
+- **`main` CI for exactly `b3f9845`:**
+  - [CI run 38242144844](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844) and [secret-scan run 38242144876](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144876) succeeded.
+  - From logs retrieved independently by the external reviewer:
+    - Ubuntu `605 passed, 63 skipped in 7.56s`;
+    - Windows `605 passed, 63 skipped in 14.86s`;
+    - PostgreSQL `63 passed, 605 deselected in 16.17s`;
+    - secret scan: 22 commits scanned, no leaks found.
+  - Claude saw only job conclusions; the unauthenticated log endpoint returned 403.
+
+## Prompt 57: Record M3a on main and propose the M3b worker specification
+
+- **Stage:** Documentation only, on branch `docs/m3b-worker-spec` (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Prepare the detailed M3b worker specification for review, and record M3a’s verified publication on main. Documentation only: do not implement M3b yet.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: main
+- HEAD and origin/main:
+  b3f984552bf22cf6350702330d30851f3e08b3f4
+- Working tree clean, nothing untracked.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+
+Read remote refs freshly. Stop without changes if anything differs.
+
+Create a new local branch:
+docs/m3b-worker-spec
+
+If that branch already exists, stop and report its state rather than resetting or reusing it.
+
+2. Read the existing design and implementation
+
+Read CLAUDE.md, the relevant plan sections, ADR-0003, ADR-0007, packaging/import-boundary guidance, the implemented domain and persistence job modules, logging configuration and relevant tests.
+
+Base the specification on the actual M3a interfaces. Preserve the accepted architecture: plain Python, PostgreSQL-backed jobs, leases and fenced transactions. No new queue or orchestration framework.
+
+3. Record M3a publication
+
+Narrowly update README.md, ADR-0007, docs/plan.md and docs/threat-model.md:
+- M3a was fast-forwarded onto main at b3f9845.
+- All four main-push checks passed for that exact SHA.
+- Keep the earlier 11350e1 evidence as historical evidence.
+- Compose remains unverified.
+- M3b–M3f remain unimplemented and overall M3 acceptance remains pending.
+
+The reviewer independently retrieved these main-push results:
+
+CI run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844
+
+- Ubuntu job 114787118333:
+  605 passed, 63 skipped in 7.56s
+- Windows job 114787118106:
+  605 passed, 63 skipped in 14.86s
+- PostgreSQL job 114787118281:
+  63 passed, 605 deselected in 16.17s
+
+Secret-scan run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144876
+
+- Job 114787118292:
+  22 commits scanned; no leaks found.
+
+Both runs have head_sha b3f984552bf22cf6350702330d30851f3e08b3f4,
+head_branch main and conclusion success.
+
+The reviewer retrieved GitHub logs but did not run the project suite locally.
+
+4. Write a detailed M3b specification in docs/plan.md
+
+Mark the new specification Proposed, awaiting review.
+
+Define concrete interfaces, execution order, failure handling and test criteria for:
+
+- The evidenceguard_worker application package and eg-worker command, consistent with the existing packaging and import boundaries.
+- Validated settings and safe CLI errors. No secrets or database URLs in output.
+- A single active job per worker process initially, unless existing accepted decisions require otherwise.
+- Process worker identity using the existing identity mechanism, without hostname or personal identifiers.
+- Polling with an interruptible wait, including idle polling and database-error backoff. Propose explicit bounded defaults and explain them.
+- A handler registry and handler context carrying the claimed job, cancellation/lease-loss state and access to fenced writes.
+- Ownership of the job outcome: who completes or fails the job, and how handler effects and terminal transitions avoid contradictory or duplicate completion.
+- Heartbeats every 20 seconds with the existing 60-second lease, using separate transactions and independent sessions.
+- Session/thread ownership: never share a SQLAlchemy Session between heartbeat and handler execution.
+- How heartbeat exceptions, database outages, lease expiry and LeaseLostError affect execution.
+- How cancellation is checked immediately before the next fenced write, while the database fence remains the final ownership check.
+- Cooperative cancellation limits: Python cannot safely terminate an arbitrary running thread. Do not promise that lease loss instantly stops all handler computation or external calls.
+- Retryable and permanent handler errors, fixed persisted error codes, unknown job kinds and unexpected exceptions.
+- Reuse of M3a’s attempt cap and scheduled retry backoff without introducing a second conflicting retry mechanism.
+- Completion/failure races with heartbeats and shutdown.
+- SIGINT/SIGTERM behavior where supported, Windows-compatible testing, stopping new claims, bounded draining and what happens to an unfinished lease.
+- Cleanup of owned engines, sessions, heartbeat tasks and handler execution resources.
+- Privacy-safe fixed logging events compatible with the current formatter. Identify any required reviewed event-table additions.
+- At-least-once execution limits and the requirement that future handlers make durable effects through the existing fence.
+
+Resolve the design of the test handler explicitly:
+- M3b has no ingestion handler yet.
+- Propose a minimal way to test the runtime without exposing an unrestricted production test-job command or adding document/chunk functionality.
+- Define what eg-worker does when no production handlers are registered.
+
+Give a proposed file list and a focused verification plan:
+- Database-independent tests using controlled clocks/events and fake stores.
+- Real PostgreSQL tests for worker claim/heartbeat/outcome integration and lease loss before a fenced write.
+- Race tests for heartbeat versus completion and shutdown.
+- Packaging, installed-wheel and CLI checks.
+- Avoid unbounded sleeps and tests that merely repeat implementation.
+
+Identify new engineering choices as proposals. Explain genuine conflicts with existing decisions instead of silently changing them.
+
+Do not add migrations, worker code, tests, dependencies, Docker services or new API endpoints in this task.
+
+5. Prompt history
+
+Append this prompt verbatim as Prompt 57 if that is the next unused number; otherwise use the next unused number and explain it.
+
+Add a truthful outcome note:
+- M3a publication and CI evidence came from reviewer-retrieved logs.
+- M3b specification is proposed, not accepted or implemented.
+- Checks actually run.
+- No commit, push or merge occurred.
+
+Keep all earlier entries unchanged.
+
+6. Verification and review handoff
+
+Stage only:
+- README.md
+- docs/decisions/0007-durable-job-core.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Check documentation links and consistency.
+Inspect staged additions for secrets/private information.
+Run git diff --cached --check and the staged Gitleaks scan.
+
+No application tests or builds are needed for documentation-only changes.
+
+Return:
+- A concise explanation of the proposed worker design.
+- New decisions and any unresolved questions.
+- Check commands and actual results.
+- Staged tree ID, staged paths and Git status.
+- COMPLETE staged diff excluding prompts.md, directly in fenced diff blocks.
+- Split large output into numbered parts at file boundaries and provide every part. Never silently truncate.
+- Summary of prompts.md additions and confirmation that earlier entries are unchanged.
+
+Leave everything staged and uncommitted for review.
+Do not push, merge, amend, rebase, start Docker or contact a local database.
+````
+
+**Outcome (documentation pending review; staged on `docs/m3b-worker-spec`, not committed or pushed):**
+- **Starting state verified:**
+  - branch `main`, HEAD and `origin/main` `b3f9845` (remote refs read freshly), a clean tree, the expected origin.
+  - Branch `docs/m3b-worker-spec` did not exist locally or on the remote, and was created from `b3f9845`.
+- **M3a publication recorded** in README, ADR-0007, the plan and the threat model:
+  - M3a on `main` at `b3f9845`, with all four `main`-push checks passing;
+  - the counts from the external reviewer's independently retrieved logs: Ubuntu `605 passed, 63 skipped in 7.56s`, Windows `605 passed, 63 skipped in 14.86s`, PostgreSQL `63 passed, 605 deselected in 16.17s`, and a secret scan of 22 commits with no leaks.
+  - The README's verified baseline moved to `b3f9845`. The earlier `9d5a93a` and `11350e1` evidence is kept as historical evidence.
+  - Compose is unverified; M3b–M3f are unimplemented; M3 acceptance is pending.
+- **M3b specification:** added to `docs/plan.md` and marked **PROPOSED, awaiting review**. It is neither accepted nor implemented. It covers:
+  - the package and command;
+  - settings and CLI errors;
+  - one job per process;
+  - identity and polling defaults;
+  - the registry, context and outcome ownership, including atomic `finish=True`;
+  - heartbeats, threads and sessions;
+  - cooperative cancellation and its limits;
+  - error codes;
+  - shutdown and draining;
+  - cleanup and logging additions;
+  - the no-handlers behaviour and the test-handler approach;
+  - files, the verification plan, exclusions and ten decisions requested at review.
+
+  No code, tests, migrations, dependencies, workflows or Docker files changed.
+- **Checks run:**
+  - the link and anchor check and a consistency check of the four documents;
+  - a private-content check of the staged additions;
+  - `git diff --cached --check`;
+  - the staged Gitleaks scan.
+
+  Exact results are in the session handoff. No application tests or builds were run.
+- **No commit, push or merge occurred.** `main` is unchanged at `b3f9845`.
+
+## Prompt 58: Correct the proposed M3b specification for lifecycle and shutdown edge cases
+
+- **Stage:** Documentation only, on branch `docs/m3b-worker-spec` (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Correct the proposed M3b specification for lifecycle and shutdown edge cases. Documentation only; do not implement or commit anything.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+Expected starting state:
+- Branch: docs/m3b-worker-spec
+- HEAD: b3f984552bf22cf6350702330d30851f3e08b3f4
+- Staged tree: 340216a359a04b7000f13fa71f1a5ecc3e9e0ba8
+- Exactly five staged files:
+  README.md
+  docs/decisions/0007-durable-job-core.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Expected origin for evidenceguard-agentic-rag.
+
+Stop without changes if the state differs. Record the pre-edit staged tree for the incremental review diff.
+
+The reviewer accepts the M3a publication documentation and the broad M3b architecture. The worker specification remains proposed until the corrections below are reviewed.
+
+1. Heartbeat join timeout
+
+The current statement that a bounded join guarantees no heartbeat/outcome race is incorrect: the heartbeat may still be running after join returns.
+
+Specify:
+- Set the heartbeat stop event, then join for the stated bound.
+- Check whether the thread actually stopped.
+- If it remains alive, do not record a runtime outcome or claim another job. Cancel further handler activity cooperatively and take the abnormal shutdown path.
+- Preserve database fencing as the final ownership check.
+- Explain that a heartbeat already in flight may still complete; setting an event does not cancel a database call.
+- Add a test where heartbeat remains blocked beyond the join deadline, proving no outcome and no subsequent claim occur.
+
+Keep the 10-second join value as a proposed default, not a guarantee about database-call duration.
+
+2. Lease loss and live handlers
+
+Define what the supervisor does if lease loss is detected while a handler continues running:
+- Request cooperative cancellation.
+- Stop renewing the lease.
+- Wait a bounded grace period.
+- If the handler exits, record no stale outcome.
+- If it remains alive, terminate the worker process through the abnormal shutdown path; never move on to another job in that process.
+
+This preserves the one-active-handler-per-process rule.
+
+Distinguish the Python runtime returning an abnormal result from the CLI process actually exiting. A daemon thread may continue running while the surrounding Python process remains alive.
+
+Add tests for both cooperative and uncooperative handlers after lease loss, including prevention of another claim.
+
+3. Atomic finish and subsequent exceptions
+
+Define a thread-safe committed-finish state:
+- It is set only after the finish=True transaction context has exited successfully, including commit.
+- A rolled-back finish must not mark the job completed.
+- Once finish has committed, the runtime must never attempt another completion, retry or permanent failure, even if the handler later raises.
+- A later handler exception is a fixed diagnostic event; it cannot change the committed job outcome.
+- Subsequent context operations are refused.
+- Coordinate heartbeat handling with committed finish so a completion-related LeaseLostError is not misreported as ownership theft.
+
+Keep uncertain commit outcomes honest: if commit raises and whether it committed is unknown, do not claim success. Any recovery/outcome attempt remains fenced, and durable effects must be idempotent.
+
+Add tests for:
+- finish commits, then handler raises;
+- finish block raises and rolls back;
+- commit raises;
+- heartbeat collides with atomic finish.
+
+The promise should be no contradictory second committed outcome, not that an outcome is always successfully recorded.
+
+4. Accurate shutdown and timing limits
+
+Remove these unsupported implications:
+- “30 s is less than the 60 s lease, so a job that finishes during drain still holds a valid lease.”
+- Disposing the engine closes connections currently checked out by live threads.
+- An in-flight database call necessarily finishes within the heartbeat join deadline.
+
+Replace them with:
+- Lease validity depends on actual successful renewals and the database fence, not the drain duration alone.
+- Drain, cancellation and join waits are bounded supervisor waits.
+- Existing connect, pool and lock timeouts do not form a total deadline for every database operation or network failure.
+- Engine disposal is pool cleanup; it does not forcibly cancel checked-out sessions or running handlers.
+- Actual process termination closes its connections; uncommitted transactions then roll back when PostgreSQL detects the disconnect.
+- Do not claim immediate server-side rollback or lease reclaim if a connection or transaction remains live.
+- Claim itself can be in flight when a stop is requested. Define the post-claim stop check and handling of an acquired job without starting a new handler.
+
+Define the initial local lease deadline conservatively from the monotonic time captured before claim begins. For heartbeat renewals, update it only after a confirmed successful renewal, using the pre-call monotonic time. Local checks remain conservative approximations; PostgreSQL decides actual lease validity.
+
+Add focused test cases for delayed claim return, shutdown during claim, heartbeat outage during drain, and checked-out resources remaining active at abnormal shutdown.
+
+5. Small interface clarifications
+
+Specify:
+- kinds=None preserves existing claim behavior.
+- An empty kinds collection yields no candidate; it must never mean “claim all”.
+- Kind values are validated, and define whether the global exhausted-job sweep still runs for an empty filter.
+- --once handles no claimable job without waiting forever.
+- Proposed log fields are populated from validated identifiers/enums; opening the formatter allowlist does not make arbitrary field values safe.
+- The worker’s handler wrapper follows M3a’s trusted-code convention and is not a security sandbox.
+
+The existing proposed defaults, empty production registry, test-only handlers, safe parser duplication and installed-wheel CLI check are reasonable. Keep them proposed pending final specification review.
+
+6. Scope, history and handoff
+
+Change only docs/plan.md and prompts.md unless another staged document contains wording directly contradicted by these corrections. Explain any such necessary edit.
+
+Append this prompt verbatim as Prompt 58 if it is the next unused number; otherwise use the next unused number and explain it.
+
+Record the review findings and correction outcome honestly. Earlier prompt entries remain unchanged.
+
+Check links, consistency and private content.
+Run git diff --cached --check and the staged Gitleaks scan.
+No application tests or builds are needed.
+
+Return:
+- Explanation of the corrections and any remaining unresolved design choices.
+- Actual check results.
+- New staged tree ID, staged paths and Git status.
+- COMPLETE incremental diff against the recorded pre-edit staged tree, excluding prompts.md, in fenced diff blocks.
+- Prompt-history additions.
+
+Leave changes staged and uncommitted.
+No code, tests, dependency, migration or workflow changes.
+No push, merge, Docker or database contact.
+
+````
+
+**Review findings recorded with this prompt (from the external reviewer of Prompt 57):**
+- The M3a publication documentation and the broad M3b architecture were accepted. The M3b specification stays proposed.
+- The Prompt 57 specification overstated several lifecycle guarantees:
+  - that a bounded heartbeat join prevents any heartbeat/outcome race;
+  - that a 30 s drain under a 60 s lease keeps the lease valid;
+  - that engine disposal closes connections checked out by live threads;
+  - that in-flight database calls finish within the join deadline.
+- It also left these undefined:
+  - lease loss with a live handler;
+  - the committed-finish state, and later handler exceptions;
+  - a claim in flight at shutdown;
+  - the local lease deadline;
+  - the semantics of the `kinds` filter;
+  - `--once` termination;
+  - the provenance of log-field values.
+
+**Outcome (documentation pending review; staged on `docs/m3b-worker-spec`, not committed or pushed):**
+- **Starting state verified:** branch `docs/m3b-worker-spec`, HEAD `b3f9845`, staged tree `340216a…` with exactly the five expected files, nothing unstaged or untracked, the expected origin. The pre-edit staged tree was recorded for the incremental diff.
+- **Only `docs/plan.md` changed,** besides this file. The M3b section was rewritten to apply the six corrections and remains marked **PROPOSED**:
+  - the heartbeat join is followed by a liveness check; a still-alive thread means no outcome, no further claim and the abnormal shutdown path;
+  - lease loss with a live handler: cooperative cancellation, renewal stops, a bounded grace, no stale outcome, and abnormal shutdown if a thread stays alive. The runtime's abnormal result is distinguished from the CLI's process exit;
+  - a thread-safe `none`/`committed`/`uncertain` finish state, with no second outcome after a committed finish, and uncertain commits never reported as success;
+  - the unsupported timing and disposal claims were removed. A post-claim stop check and a conservative monotonic lease deadline were added;
+  - the `kinds` semantics, `--once` termination, validated log-field sources and the not-a-sandbox wording;
+  - the matching tests, two new unresolved questions and the updated decisions list.
+- **No other staged document needed changes:** README, ADR-0007 and the threat model contain no wording that these corrections contradict.
+- **Checks run:**
+  - the link and anchor check;
+  - a consistency search for the removed claims;
+  - a private-content check of the changed text;
+  - `git diff --cached --check`;
+  - the staged Gitleaks scan.
+
+  Exact results are in the session handoff. No application tests or builds were run.
+- **No code, test, dependency, migration or workflow changes; no commit, push, merge, Docker or database contact.**
+
+**Acceptance note for Prompt 58 (added with Prompt 59):**
+- **What was reviewed:** the external reviewer inspected the complete Prompt 57 documentation diff and the Prompt 58 incremental corrections (staged tree `3ab25e4…`). They did not run the project suite or any application checks.
+- **Result:** the corrected M3b specification was accepted, subject to five narrow clarifications applied under Prompt 59:
+  - wording for at most one concurrently active handler;
+  - blocking supervisor operations, with no total shutdown deadline;
+  - pending-refusal coordination between the atomic finish and heartbeats;
+  - irreversible cancellation;
+  - uncertain-finish tests covering both commit possibilities.
+- **Settled choices:**
+  - at most one concurrently active handler per process, with sequential jobs allowed;
+  - the `kinds` filter semantics;
+  - atomic finish and fenced runtime outcomes;
+  - the fixed error codes and the reviewed log events and fields;
+  - `worker_shutdown` retries after a cooperative shutdown or a post-claim stop, when ownership remains valid;
+  - the timing defaults, as initial engineering defaults, not measured guarantees;
+  - conservative monotonic lease deadlines;
+  - a separate safe worker argument parser;
+  - exit 4 with an empty production registry, before settings are loaded;
+  - `os._exit(5)` from the CLI after an abnormal result, while the Python API returns that result;
+  - `--once` exits 1 on a database error, without retrying;
+  - no production worker statement timeout in M3b, with the limitation documented;
+  - authorization for the M3b implementation to add `eg-worker --help` to the CI installed-wheel check.
+- **Implementation of M3b has not started.**
+
+## Prompt 59: Accept the M3b worker specification and commit it locally
+
+- **Stage:** Documentation only, on branch `docs/m3b-worker-spec` (local commit authorized; no push)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Finalize and commit the reviewed M3b worker specification locally. Do not implement M3b or push anything.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: docs/m3b-worker-spec
+- HEAD:
+  b3f984552bf22cf6350702330d30851f3e08b3f4
+- Staged tree:
+  3ab25e4752f23e5cd116b180c30ed75bd42b4408
+- Exactly five staged files:
+  README.md
+  docs/decisions/0007-durable-job-core.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Expected origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+
+Stop without changes if anything differs. Record the accepted staged tree before editing.
+
+2. Acceptance and settled decisions
+
+The reviewer inspected the complete Prompt 57 documentation diff and Prompt 58 incremental corrections, without running the project suite.
+
+Accept the corrected M3b specification, subject to the narrow clarifications below.
+
+Settle the proposed choices:
+- Single concurrently active handler per process; sequential jobs are allowed.
+- kinds filter with the documented None/empty/validation/sweep semantics.
+- Atomic finish and fenced runtime outcomes.
+- Fixed new error codes and reviewed logging events/fields.
+- Cooperative shutdown and post-claim stop use worker_shutdown retries when ownership remains valid.
+- Proposed polling, drain, cancellation, lease-loss grace and heartbeat-join defaults are accepted as initial engineering defaults, not measured guarantees.
+- Conservative monotonic lease deadlines.
+- Separate safe worker argument parser.
+- Empty production registry exits 4 before database settings are loaded.
+- Abnormal CLI shutdown exits the process with code 5 using os._exit; the Python API returns an abnormal result.
+- --once makes one claim attempt and exits 1 on a database error, without retrying.
+- No production worker statement timeout is added in M3b. Document the resulting limitation accurately.
+- The future implementation may add eg-worker --help to the CI installed-wheel check. This authorizes that narrow workflow change when implementing M3b.
+
+3. Final specification clarifications
+
+Make only these narrow corrections:
+
+A. Concurrent-handler wording
+Replace “one active handler per worker process, ever” with “at most one concurrently active handler per worker process.” Sequential processing is intended.
+
+B. Blocking supervisor operations
+The absence of a statement timeout must not be described as every hung statement being bounded by supervisor waits.
+
+Explicitly state:
+- Claim and runtime outcome recording are synchronous supervisor operations.
+- If either blocks, the supervisor may not reach its timed shutdown checks until the call returns.
+- Signals set flags and do not automatically cancel these calls.
+- The abnormal exit path bounds lingering background threads only once the supervisor reaches it.
+- A total process shutdown deadline is not guaranteed in M3b.
+
+C. Completion/heartbeat coordination
+Define synchronization around atomic finish so a heartbeat refusal during the interval between database commit and publication of the local committed flag does not prematurely trigger lease-loss cancellation.
+
+The heartbeat can record a pending refusal. Classify it after the in-progress finish resolves:
+- confirmed committed finish: expected terminal-state refusal;
+- rollback or uncertain finish: apply conservative lease-loss/unknown-outcome handling.
+
+Do not hold a shared state lock across database I/O in a way that prevents the supervisor from observing deadlines.
+
+Add a planned deterministic race test for this exact commit/publication interval.
+
+D. Irreversible cancellation
+Once the supervisor has latched lease loss or cancellation for an attempt, a late successful heartbeat must not revive that attempt or permit further context writes.
+
+A heartbeat success received after cancellation may have extended the database lease, but the local attempt remains cancelled. Document that reclaim may therefore be delayed.
+
+E. Uncertain finish tests
+Cover both possibilities:
+- commit succeeded but acknowledgment failed: no second committed outcome;
+- commit did not succeed: recovery remains fenced and idempotent.
+
+Do not assume every commit exception means the database fence will refuse a subsequent outcome.
+
+4. Documentation status
+
+Mark the M3b specification accepted at review, implementation pending.
+Update README.md consistently.
+Keep M3b–M3f unimplemented, Compose unverified and overall M3 acceptance pending.
+
+Preserve the accepted M3a publication evidence and engineering architecture. No additional redesign.
+
+5. Prompt history
+
+Append this prompt verbatim as Prompt 59 if that is the next unused number; otherwise use the next unused number and explain it.
+
+Add an acceptance note under Prompt 58 recording:
+- the reviewed original and correction diffs;
+- the final clarifications and settled choices above;
+- that the reviewer did not run application checks;
+- that implementation has not started.
+
+Add a truthful pre-commit note. Earlier history remains unchanged.
+
+6. Checks and local commit
+
+Inspect staged paths and the complete incremental diff against the recorded accepted tree.
+Check documentation links, consistency and private content.
+Confirm author and committer use:
+257921624+mathewmljourney93@users.noreply.github.com
+
+Run git diff --cached --check and the staged Gitleaks scan.
+
+Create one LOCAL commit:
+docs: accept M3b worker specification and record M3a main results
+
+Use the existing attribution convention.
+
+After committing:
+- Run the full-history Gitleaks scan.
+- Verify parent, committed paths, identity and clean working tree.
+- Confirm main was not changed.
+
+No application tests or builds are needed for documentation-only changes.
+
+7. Handoff
+
+Return:
+- Commit SHA, parent, subject and identity.
+- Settled choices and final clarifications.
+- Actual checks and results.
+- Prompt-history additions.
+- COMPLETE incremental diff against the accepted staged tree, excluding prompts.md, in fenced diff blocks.
+- Final Git status and remaining limitations.
+
+No worker code, tests, dependencies, migrations or workflow edits in this task.
+Do not push, merge, amend, rebase, start Docker or contact a database.
+````
+
+**Pre-commit note (written before the local commit):**
+- **Starting state verified:**
+  - branch `docs/m3b-worker-spec`, HEAD `b3f9845`;
+  - staged tree `3ab25e4…` with exactly the five expected files;
+  - nothing unstaged or untracked, and the expected origin.
+
+  The accepted staged tree was recorded before editing.
+- **Changes:**
+  - `docs/plan.md`: the M3b specification is marked accepted at review, implementation pending, with the five clarifications (A–E). The proposal markers became settled wording; the decisions list became the settled choices; the unresolved list became accepted limitations.
+  - `README.md`: the status wording says the same.
+  - The threat model and ADR-0007 needed no change.
+  - M3b–M3f remain unimplemented, Compose remains unverified, and overall M3 acceptance remains pending.
+- **Checks run before the commit:**
+  - the link check;
+  - the consistency and private-content searches;
+  - the author and committer identity check;
+  - `git diff --cached --check`;
+  - the staged Gitleaks scan.
+
+  Exact results are in the session handoff. No application tests or builds were run.
+- **After the commit:** the full-history Gitleaks scan and the commit verification are reported in the session handoff, not recorded here.
+- **No worker code, tests, dependencies, migrations or workflow edits; no push, merge, amend, rebase, Docker or database contact.**

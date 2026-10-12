@@ -616,14 +616,17 @@ Each question entry contains:
 *M3 breakdown (**sequence accepted at review; M3a specification settled at review, Prompt 47**).*
 
 *Progress:*
-- **M3a is reviewed and verified in CI on branch `feat/durable-job-core`; not yet merged into `main`** ([ADR-0007](decisions/0007-durable-job-core.md)).
+- **M3a is reviewed, verified in CI and on `main`** ([ADR-0007](decisions/0007-durable-job-core.md)); see *On `main`* below.
   - **Tested commit:** `11350e1` (`11350e1818c7bd348fa6e6a26b639fe1b21a0e80`), which adds only prompt history after the reviewed M3a commit `a133513`.
   - **[CI run 38240768344](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344):**
     - `verify` passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517339) (`605 passed, 63 skipped in 12.71s`) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517028) (`605 passed, 63 skipped in 14.66s`);
     - the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517485) passed. Its log, retrieved by the external reviewer, reports `63 passed, 605 deselected in 16.58s`: M2's 21 tests and M3a's 42, including the concurrency, lease-fencing and lock-timeout tests, with no skips or failures.
   - **[Secret-scan run 38240768288](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768288):** passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768288/job/114782517013): 21 commits scanned, no leaks found).
+  - **On `main`:** `main` was fast-forwarded to `b3f9845` (`b3f984552bf22cf6350702330d30851f3e08b3f4`), which adds only documentation after `11350e1`.
+    - [CI run 38242144844](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118333) `605 passed, 63 skipped in 7.56s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118106) `605 passed, 63 skipped in 14.86s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118281) `63 passed, 605 deselected in 16.17s`.
+    - The [secret-scan run 38242144876](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144876) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144876/job/114787118292): 22 commits scanned, no leaks found).
   - **Still not verified:** Compose has never been run. The tests demonstrate the tested behaviour, not a general security or performance guarantee.
-- **M3b–M3f** are not started, and **overall M3 acceptance is pending**.
+- **M3b** has a detailed specification below, **accepted at review (Prompt 59); implementation pending**. M3b–M3f are not implemented, and **overall M3 acceptance is pending**.
 
 M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-workflow.md): plain Python, PostgreSQL-backed jobs claimed with `FOR UPDATE SKIP LOCKED`, leases, heartbeats and fenced writes. There is no new orchestration framework or queue dependency. Each slice is reviewed, verified in CI and merged before the next one starts. The M3 acceptance criteria above are split across the slices as follows:
 
@@ -636,7 +639,7 @@ M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-wo
 | **M3e** | Upload and document endpoints: upload, list and get, with size and media-type limits; a revision and its ingestion job are created in one transaction | 413, 415 and 422 behave as specified; re-uploads are idempotent |
 | **M3f** | Dockerfile and Compose services for the API, worker and database | *Slice check:* images build in CI. Compose stays unverified locally while Docker is unavailable (§10). |
 
-**M3a, the first slice, in detail (specification settled at review; implemented, reviewed and verified in CI on its branch; not yet merged):**
+**M3a, the first slice, in detail (specification settled at review; implemented, reviewed, verified in CI and on `main`):**
 
 - **Why first:**
   - Every later slice writes through the job fence, so it must exist and be proven against PostgreSQL first.
@@ -803,6 +806,314 @@ M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-wo
   - the terminal semantics, including exhausted claims.
 
   The 5-second `lock_timeout` and the sweep bound of 10 rows per claim were accepted at review (Prompt 48) as initial engineering defaults, not measured performance claims.
+
+**M3b, the worker process, in detail (ACCEPTED at review, Prompt 59; implementation pending, nothing below is implemented):**
+
+M3b turns the M3a library into a running worker. It keeps the accepted architecture: plain Python, PostgreSQL-backed jobs, leases and fenced transactions ([ADR-0003](decisions/0003-plain-python-workflow.md), [ADR-0007](decisions/0007-durable-job-core.md)). There is no new queue, framework or dependency.
+
+The external reviewer inspected the original specification (Prompt 57) and its lifecycle and shutdown corrections (Prompt 58), without running the project suite, and accepted it with the final clarifications of Prompt 59. The choices are listed as settled at the end. The timing values are **initial engineering defaults, not measured guarantees**. Implementation has not started.
+
+- **Package and command:**
+  - A new application package, `evidenceguard_worker`, at `apps/worker/evidenceguard_worker/`. This is the layout ADR-0001 already names.
+  - It joins the single `evidenceguard` distribution, Mypy's `files` and Ruff's `known-first-party`. A console script `eg-worker = "evidenceguard_worker.__main__:main"` is added.
+  - **Import boundaries:**
+    - the worker may import `evidenceguard_domain`, `evidenceguard_persistence` and `evidenceguard_observability`;
+    - nothing imports `evidenceguard_worker`;
+    - the worker does not import `evidenceguard_api`.
+
+    The existing boundary test gains these rules.
+- **Settings and CLI errors:**
+  - **Database:** the URL comes only from the existing `load_database_settings()` (`EG_DATABASE_URL`), and the engine from `create_db_engine` (5 s connect and 10 s pool timeouts).
+  - **CLI flags:**
+    - `--once`: one claim attempt and at most one job, then exit;
+    - `--log-level`.
+
+    The timing defaults below are constants, adjustable only through the Python API for tests. They are not CLI or environment settings in M3b.
+  - **Argument parsing:** a small safe parser, equivalent to the `SafeArgumentParser` in `eg-admin`, prints only static usage and a fixed message. The worker duplicates those ~10 lines rather than importing `evidenceguard_api`.
+  - **Exit codes:** fixed codes, with fixed stderr messages and no submitted values, URLs or exception text:
+
+    | Code | Meaning |
+    |---|---|
+    | 0 | normal stop, or `--once` with nothing claimable |
+    | 1 | unexpected failure, reported by class name only. This includes `--once` when its single claim attempt hits a database error |
+    | 2 | usage error |
+    | 3 | database configuration error (the existing URL-free message) |
+    | 4 | no handlers registered |
+    | 5 | **abnormal shutdown:** a handler or heartbeat thread did not stop within its bounded wait (see *Abnormal shutdown*) |
+- **Process model:**
+  - **At most one concurrently active handler per worker process.** Jobs are processed sequentially, one after another. No accepted decision requires more, and one handler at a time keeps lease, heartbeat and shutdown reasoning simple. Throughput comes from running several processes, which `SKIP LOCKED` already supports.
+  - **No new claim while a thread from an earlier job may still be alive.** The process never moves on to another job while a handler or heartbeat thread from a previous job could still be running.
+  - **Threads:**
+    - the **main thread** supervises: signals, polling and claiming, starting and stopping the per-job threads, and recording outcomes;
+    - a **handler thread** (a daemon) runs the handler for one job;
+    - a **heartbeat thread** (a daemon) extends that job's lease.
+  - **Sessions:**
+    - The engine and its pool are shared, which SQLAlchemy supports across threads.
+    - **A SQLAlchemy `Session` is never shared between threads.** Every M3a operation (`claim`, `heartbeat`, `complete`, `fail_*`, `fenced_transaction`) already opens and closes its own session from the session factory, so each thread only ever uses sessions it created.
+  - **The handler wrapper is not a sandbox.** It follows M3a's trusted-code convention. Handlers are trusted application code and must preserve the fence's transaction and lock ([ADR-0007](decisions/0007-durable-job-core.md)).
+- **Worker identity:** one `new_worker_id()` (`worker-<uuid4>`) per process start. It contains no hostname, user or other personal identifier, and it is not secret.
+- **M3a extension: a `claim(..., kinds=...)` filter:**
+  - **`kinds=None`** keeps the existing behaviour exactly: any kind.
+  - **A collection** limits candidates to those kinds. Each value is validated against M3a's kind pattern, and an invalid value raises `ValueError` before any SQL.
+  - **An empty collection selects no candidate** and returns `None`. It never means "claim all".
+  - **The exhausted-job sweep** still runs on every `claim` call, whatever the filter, including an empty one. It is global maintenance that never hands out a job.
+  - **Unhandled kinds:** jobs of kinds this worker cannot handle stay queued for a worker that can, and are never failed for being unknown.
+- **Polling loop** (main thread), repeated until a stop is requested or the runtime has become abnormal:
+  1. If a stop was requested, leave the loop.
+  2. Record the monotonic time `t0`, then call `claim(session_factory, worker_id, kinds=registry.kinds)`. A claim can still be in flight when a stop is requested: the signal handler only sets a flag.
+  3. **Post-claim stop check:** if a stop was requested while the claim ran and a job was acquired, the runtime starts **no handler**. It records `fail_retryable(..., JobErrorCode.WORKER_SHUTDOWN)` through the fence, which succeeds only while ownership remains valid, and leaves the loop. This consumes the attempt the claim counted, just as a lease expiry would, and frees the job sooner than leaving the lease to expire.
+  4. No job:
+     - in `--once` mode, exit 0 at once;
+     - otherwise wait `IDLE_POLL_SECONDS = 2` on the stop event and loop.
+  5. A database error (`SQLAlchemyError` or `JobLockTimeoutError` from the claim):
+     - log `worker.poll_failed` with `error_type` only;
+     - in `--once` mode, exit 1;
+     - otherwise wait an exponential backoff of 1, 2, 4, 8, 16, then 30 s (`POLL_BACKOFF_CAP_SECONDS = 30`), interruptible by the stop event, and reset it after the next successful claim attempt.
+  6. A job: run it under supervision (below), with its local lease deadline starting at `t0 + 60 s`. In `--once` mode, exit after it.
+
+  The defaults are bounded engineering choices, not measured figures:
+  - a 2-second idle poll keeps pickup latency low at one cheap query per 2 s per worker;
+  - capping the outage backoff at 30 s avoids reconnect storms;
+  - all waits use `threading.Event.wait(timeout)`, so a stop request ends them at once.
+- **Handler registry and context:**
+  - **The registry:** `HandlerRegistry` is an immutable mapping from job kind to handler.
+    - Kinds are validated against M3a's kind pattern, and registering the same kind twice is an error.
+    - The production registry is built in `evidenceguard_worker.handlers`. It is **empty in M3b**; M3d adds `ingest_revision`.
+  - **A handler:** `JobHandler` is any callable `(ctx: JobContext) -> None`.
+  - **`JobContext` exposes:**
+    - `job`: the claimed `JobSnapshot`. The tenant comes only from `job.tenant_id`, never from the payload;
+    - `token`;
+    - read-only `lease_lost`, `cancel_requested` and `finished` flags;
+    - `check()`: raises `FenceClosedError` once the finish has committed; `LeaseLostError` if lease loss is confirmed or presumed; or `JobCancelledError` if cancellation was requested;
+    - `fenced(*, finish=False)`: calls `check()`, then opens M3a's `fenced_transaction` for the token and yields a `HandlerFence`.
+  - **`HandlerFence`** exposes only `.session` (M3a's `FencedSession`) and `.job`. It has **no transition methods**, so handler code cannot record a lifecycle outcome directly.
+- **Committed finish (atomic completion):**
+  - **Inside the block:** `with ctx.fenced(finish=True)` records `succeeded` through the fence **inside the same transaction** as the block's effects, just before the commit.
+  - **The finish state** is thread-safe: a value of `none`, `finishing`, `committed` or `uncertain`, guarded by a small state lock.
+    - **`finishing`** is set when the `finish=True` block is entered, before any database work in it.
+    - **`committed`** is set **only after the transaction context has exited without an exception, which includes a successful commit.**
+    - **`none` again:** if the block raises, the transaction rolls back and the state returns to `none`. A rolled-back finish never marks the job completed.
+    - **`uncertain`:** if the commit itself raises, it is unknown whether the job committed, so success is **not** claimed. The handler receives the exception.
+    - **The state lock is never held across database I/O.** It is taken only to read or change the state and the pending-refusal flag, so the supervisor can always read them and keep observing its deadlines.
+  - **After `committed`:**
+    - every later context operation (`check()`, `fenced()`) raises `FenceClosedError`;
+    - the runtime **never** attempts another completion, retry or permanent failure for that job, even if the handler later raises. A later exception is logged as the fixed event `job.post_finish_error`, with `error_type` only, and cannot change the committed outcome.
+  - **After `uncertain`:** a commit exception does not say which way the commit went, and the runtime does not assume either.
+    - Any outcome the runtime then attempts still goes through the fence.
+    - **If the commit actually succeeded** (only the acknowledgment failed), the job is terminal and the fence refuses the write with `LeaseLostError`. That is logged as `job.outcome_unknown`, never as success, and no second committed outcome results.
+    - **If the commit did not succeed,** the fenced outcome write may succeed as usual, or fail if ownership has gone. Either way, recovery stays fenced, and durable handler effects must be idempotent, so a retry or reclaim after an uncommitted finish is safe.
+  - **The promise** is no contradictory second committed outcome. It is **not** that an outcome is always recorded successfully.
+- **Who records the outcome:** the supervisor, after the handler thread has stopped and the heartbeat thread has been confirmed stopped (see *End of a job*):
+
+  | Situation | Outcome |
+  |---|---|
+  | Finish state `committed` | Nothing more. Logged as `job.succeeded`, or `job.post_finish_error` if the handler raised afterwards |
+  | Lease loss was detected (confirmed or presumed) and the finish is not `committed` | **No write.** Logged as `job.lease_lost`. The stale worker records nothing |
+  | Returned normally without finishing | `complete(...)` in its own fenced transaction |
+  | `RetryableJobError(code)` | `fail_retryable(..., code)`. M3a's attempt cap and scheduled backoff apply unchanged: re-queued while attempts remain, otherwise `dead`. There is no second retry mechanism |
+  | `PermanentJobError(code)` | `fail_permanent(..., code)` → `failed` |
+  | `JobCancelledError` from a shutdown cancellation, with no lease loss detected | `fail_retryable(..., JobErrorCode.WORKER_SHUTDOWN)` |
+  | Any other exception | `fail_retryable(..., JobErrorCode.UNEXPECTED_ERROR)`; only the class name is logged |
+  | The claimed job has no handler (defensive; the kind filter should prevent it) | `fail_permanent(..., JobErrorCode.UNKNOWN_JOB_KIND)` |
+
+  - **If the outcome write itself fails:**
+    - `LeaseLostError`: log `job.lease_lost`, or `job.outcome_unknown` after an uncertain finish, and write nothing;
+    - a database error: log `job.outcome_failed`.
+
+    The lease then expires and the job is reclaimed. This is at-least-once execution.
+  - **New `JobErrorCode` values:** `unknown_job_kind`, `unexpected_error` and `worker_shutdown`.
+    - No migration is needed: `last_error` is checked against a code pattern, not a list.
+    - Handlers use `retryable_failure` or `permanent_failure`, or kind-specific codes added to the enum with review.
+- **Heartbeats** (heartbeat thread, one per running job):
+  - **The loop:** wait `HEARTBEAT_INTERVAL_SECONDS = 20` (M3a's accepted value) on the job's heartbeat-stop event. Then record the monotonic time `t_call` and call M3a's `heartbeat(session_factory, token)`. Each call is its own fenced transaction on its own session.
+  - **Results:**
+    - **Success:** move the local lease deadline to `t_call + 60 s`. It moves only after a **confirmed** renewal, and always from the pre-call time.
+    - **`LeaseLostError`:** record a **pending refusal** under the state lock and end the thread. It is not acted on at once, because a refusal can arrive between the database commit of an atomic finish and the publication of the local `committed` state. The supervisor classifies it only once no finish is in progress:
+      - finish state `committed`: an expected refusal caused by the terminal state. It is discarded and never reported as ownership loss;
+      - finish state `none`, including after a rolled-back finish: lease loss;
+      - finish state `uncertain`: lease loss, with the outcome treated as unknown (`job.outcome_unknown`), never as success;
+      - while the state is `finishing`, the refusal stays pending. The local lease deadline and the supervisor's other waits still apply, so a finish that never resolves still reaches the lease-loss or abnormal path.
+    - **`JobLockTimeoutError` or `SQLAlchemyError`:** log `job.heartbeat_failed` with `error_type`, and try again at the next interval.
+    - **Any other exception:** log it by class name, record a pending refusal as above and end the thread. When unsure, stop writing.
+  - **Presumed loss:** the local lease deadline starts at `t0 + 60 s`, where `t0` is the monotonic time captured **before** the claim began. Once it passes without a confirmed renewal, the lease is presumed lost. These local checks are conservative approximations; **PostgreSQL decides actual lease validity through the fence.**
+  - **Lock interplay:** a heartbeat waits for the job row lock up to the 5 s `lock_timeout`. Handler fenced transactions should therefore stay well under 5 s, or that interval's heartbeat fails.
+  - **What setting the stop event does:** it stops *future* heartbeats only. **A heartbeat call already in flight is not cancelled** and may still complete, extend the lease or fail later.
+  - **Cancellation is irreversible for an attempt.** Once the supervisor has latched lease loss or cancellation for an attempt, nothing clears it.
+    - A late successful heartbeat does not revive the attempt, move its local deadline, or permit further context writes: `check()` and `fenced()` keep raising.
+    - That late heartbeat may still have extended the database lease, by up to 60 s from its database time. **Reclaim of the job may therefore be delayed** until that extended lease expires.
+- **Lease loss while a handler is still running** (supervisor), on a heartbeat refusal classified as lease loss, or on presumed loss:
+  1. Latch cancellation for the attempt (irreversible, see above) and set `cancel_requested`. The handler's next `check()` or `fenced()` raises.
+  2. Stop renewing: set the heartbeat-stop event, and join the heartbeat thread for up to `HEARTBEAT_JOIN_SECONDS = 10`.
+  3. Wait up to `LEASE_LOSS_GRACE_SECONDS = 5` for the handler thread to exit.
+  4. If it exits: record **no** outcome unless the finish state is `committed`. A stale worker writes nothing.
+  5. If the handler or heartbeat thread is still alive: take the **abnormal shutdown** path. The process never claims another job.
+- **End of a job** (the handler thread has exited):
+  1. Set the heartbeat-stop event and join the heartbeat thread for up to `HEARTBEAT_JOIN_SECONDS = 10`. This is a bounded supervisor wait with an initial engineering default, **not** a guarantee about how long a database call takes.
+  2. **Check whether the thread actually stopped.** If it is still alive, a heartbeat may still be in flight:
+     - record **no** runtime outcome;
+     - set `cancel_requested`, so the context refuses further operations;
+     - take the abnormal shutdown path. **No further claim is made.**
+
+     The database fence remains the final ownership check either way.
+  3. Only if the heartbeat thread has stopped, record the outcome from the table above.
+- **Cancellation is cooperative and limited:**
+  - `ctx.fenced()` calls `check()` immediately before every fenced write. Long handlers should also call `check()` between expensive steps.
+  - **Python cannot safely stop an arbitrary running thread.** Lease loss or shutdown therefore does **not** instantly stop handler computation or an in-flight external call. It stops the handler at its next `check()` or fenced write. If the handler never checks, the fence still refuses its writes once ownership is gone.
+  - Effects outside the database (provider calls) may still happen after lease loss. That is the accepted at-least-once limit.
+- **Shutdown** (SIGINT, and SIGTERM where the platform delivers it; `SIGBREAK` is also handled on Windows):
+  - **Signal handlers** are installed only in the main thread. They only set flags: the first signal requests a graceful stop, a second requests an immediate stop.
+  - **On a graceful stop:**
+    1. No new claims are made. A claim already in flight finishes, and the post-claim stop check applies.
+    2. If a job is running, heartbeats continue while the supervisor waits up to `DRAIN_SECONDS = 30` for the handler. A normal finish ends the job as described above.
+       - **Lease validity during the drain depends only on actual successful renewals and the database fence, not on the drain length.**
+       - If heartbeats fail during the drain (for example during a database outage), presumed loss can trigger, and the lease-loss path takes over.
+    3. At the drain deadline, `cancel_requested` is set and the supervisor waits up to `CANCEL_GRACE_SECONDS = 5`. If the handler exits with `JobCancelledError`, the `worker_shutdown` retry is recorded, provided no lease loss was detected and the heartbeat thread is confirmed stopped.
+    4. If the handler is still alive: abnormal shutdown.
+  - **On an immediate stop** (second signal), the runtime goes straight to abnormal shutdown if a job is running, or exits 0 if none is.
+  - Drain, cancellation and join waits are **bounded supervisor waits**. The existing connect (5 s), pool (10 s) and lock (5 s) timeouts do **not** form a total deadline for every database operation or network failure.
+  - **Blocking supervisor operations:**
+    - `claim` and runtime outcome recording (`complete` and the `fail_*` calls) are **synchronous calls on the supervisor thread**.
+    - If either blocks, for example on a hung statement or a stalled connection, the supervisor cannot reach its timed shutdown checks until the call returns.
+    - Signals only set flags. They do **not** cancel these calls.
+    - The abnormal exit path bounds lingering background threads only **once the supervisor reaches it**.
+    - **M3b therefore does not guarantee a total process shutdown deadline.** An operator may still have to terminate the process externally.
+  - **Windows:** tests trigger shutdown through the runtime's stop API and by calling the installed handler functions directly, rather than relying on delivery of OS signals. SIGINT delivery is exercised with `signal.raise_signal` only where it is reliable.
+- **Abnormal shutdown:**
+  1. The runtime stops claiming permanently and logs `worker.abnormal_stop`, recording which wait expired.
+  2. It disposes the engine. **This is pool cleanup only.** It closes idle pooled connections; it does **not** cancel sessions checked out by live threads, or stop running handlers or in-flight database calls.
+  3. **The runtime and the process are different things.**
+     - `run_worker()`, the Python API, *returns* an abnormal result. The live daemon threads may keep running as long as the surrounding Python process lives. An in-process caller, such as a test, must not reuse that runtime.
+     - The `eg-worker` CLI, after receiving that result, flushes its log handlers and **ends the process** with `os._exit(5)`, so that interpreter shutdown cannot block on the live threads.
+  4. When the process actually terminates, the operating system closes its connections.
+     - PostgreSQL rolls back any uncommitted transaction **once it detects the disconnect**. This is not necessarily immediate.
+     - Until then, a still-open transaction can keep holding the job row lock, and claims skip that row.
+     - The job is reclaimed only after `lease_expires_at` has passed **and** no lock is held.
+     - No immediate server-side rollback or reclaim is promised.
+- **Cleanup on a normal stop:** the heartbeat thread is confirmed stopped, the handler thread has exited, the engine is disposed, and `worker.stopped` is logged. Sessions are closed by the M3a operations that opened them.
+- **Logging:**
+  - Records use logger `evidenceguard.worker` and the existing `JsonFormatter`.
+  - **Additions to `REVIEWED_EVENTS`:**
+    - `worker.started`, `worker.stopping`, `worker.stopped`, `worker.abnormal_stop`, `worker.poll_failed`, `worker.no_handlers`, `worker.config_invalid`;
+    - `job.claimed`, `job.succeeded`, `job.post_finish_error`, `job.retry_scheduled`, `job.dead`, `job.failed`, `job.cancelled`, `job.lease_lost`, `job.heartbeat_failed`, `job.outcome_failed`, `job.outcome_unknown`.
+  - **Additions to `ALLOWED_FIELDS`:** `worker_id`, `job_id`, `job_kind`, `attempt` and `error_code`. `error_type` already exists.
+  - **Values must come from validated sources.** Opening the formatter's allowlist does not make arbitrary values safe, so each field is filled only from a validated identifier or enum:
+    - `worker_id`: the worker-ID pattern;
+    - `job_id`: a UUID;
+    - `job_kind`: the kind pattern;
+    - `attempt`: an integer;
+    - `error_code`: `JobErrorCode`;
+    - `error_type`: an exception class name.
+  - **Never logged:** tenant IDs, payload values, idempotency keys, URLs, SQL or exception messages.
+- **What `eg-worker` does with no production handlers:** it exits with code 4 and the fixed message "no job handlers are registered". It does this **before** reading database settings or connecting, so in M3b the command is installable and testable but cannot claim work. This avoids a process that polls forever without being able to process anything.
+- **How the runtime is tested without a production test-job command:**
+  - Tests drive the runtime through its Python API, for example `run_worker(..., registry=..., stop=..., timings=...)`.
+  - They use **test-only handlers defined under `tests/`**, for kind `test_job`.
+  - No CLI flag, environment variable or packaged module registers test kinds, and there is no command that enqueues arbitrary jobs.
+  - M3b adds no document, chunk or ingestion code.
+- **At-least-once limits:**
+  - A handler can run more than once for the same job: after a crash between an effect and the outcome, after lease loss, after an uncertain finish, or after an abnormal shutdown.
+  - Future handlers must therefore make every durable effect through `ctx.fenced()`, idempotently (unique keys, as in M3c–M3d). They should use `finish=True` for their final effects, so completion is atomic with them.
+- **Planned files:**
+  - **New `apps/worker/evidenceguard_worker/` modules:**
+    - `__init__.py` and `py.typed`;
+    - `__main__.py` (CLI, exit codes and the process exit after an abnormal result);
+    - `runtime.py` (polling, the supervisor and outcomes);
+    - `context.py` (`JobContext`, `HandlerFence`, the finish state and the handler errors);
+    - `registry.py`;
+    - `heartbeat.py`;
+    - `shutdown.py` (signal installation);
+    - `handlers.py` (the empty production registry).
+  - **Changed:**
+    - `pyproject.toml`: the package, script, Mypy and Ruff entries; no new dependency;
+    - `packages/domain/evidenceguard_domain/jobs.py`: the new error codes;
+    - `packages/persistence/evidenceguard_persistence/jobs.py`: the `claim` `kinds` filter;
+    - `packages/observability/evidenceguard_observability/jsonlog.py`: the events and fields;
+    - the CI workflow's installed-wheel step: add `eg-worker --help`. This narrow workflow change was authorized at review (Prompt 59) for the M3b implementation;
+    - the docs, and a new ADR-0008.
+  - **Tests:** `tests/test_worker_runtime.py`, `tests/test_worker_heartbeat.py`, `tests/test_worker_cli.py` and `tests/test_worker_postgres.py`, plus additions to the packaging and boundary tests.
+- **Verification plan:**
+  - **Database-independent,** with fake stores, controlled clocks and events, and no unbounded sleeps:
+    - **Claim filter:** `None` keeps the current behaviour; an empty filter returns `None` without selecting a job but still runs the sweep; invalid kinds are rejected before any SQL.
+    - **Polling:** the idle wait asks for 2 s; the backoff runs 1, 2, 4, …, 30 and resets after success; `--once` exits 0 when nothing is claimable and 1 on a database error, never waiting indefinitely.
+    - **Delayed claim and shutdown during a claim:** a fake claim blocks on an event while a stop is requested. When it returns a job, no handler starts, the `worker_shutdown` retry is recorded, and no further claim is made. When it returns `None`, the loop ends without waiting.
+    - **Heartbeat loop:** it asks for 20 s intervals. The local deadline starts at the pre-claim time, and moves only after a confirmed renewal, from the pre-call time. Transient errors are retried. Presumed loss triggers at the deadline.
+    - **Heartbeat stuck beyond the join deadline:** a fake `heartbeat` blocks past `HEARTBEAT_JOIN_SECONDS`. Neither a runtime outcome nor a further claim happens. The runtime returns the abnormal result, and the CLI wrapper exits with code 5.
+    - **Lease loss with a live handler:**
+      - a cooperative handler exits within the grace: no outcome is recorded, and the next claim is made only after both the handler and heartbeat threads are confirmed stopped;
+      - an uncooperative handler stays alive past the grace: abnormal result, no outcome, **no further claim**.
+    - **Committed finish:**
+      - the finish commits, then the handler raises: exactly one completion, no retry or failure call, `job.post_finish_error` logged, and later context operations refused;
+      - the finish block raises: rolled back, the state returns from `finishing` to `none`, and the normal error mapping applies;
+      - the commit succeeded but its acknowledgment failed: the state is `uncertain`, success is not claimed, the fake fence refuses the later outcome write, `job.outcome_unknown` is logged, and no second committed outcome exists;
+      - the commit did not succeed and raised: the state is `uncertain`, success is not claimed, and the later outcome attempt still goes through the fence and is recorded, with the handler's effects applied idempotently on retry;
+      - a heartbeat collides with the atomic finish: `LeaseLostError` after the committed finish is classified as expected, never as `job.lease_lost`.
+    - **Commit/publication interval (deterministic race):** a fake fence pauses on an event after the database commit returns but before `committed` is published. The fake heartbeat then returns `LeaseLostError`.
+      - While paused: the refusal stays pending, `cancel_requested` is not set and `job.lease_lost` is not logged.
+      - Released as committed: the refusal is discarded as expected.
+      - In variants that release as a rollback or an uncertain commit, the refusal becomes lease loss, or lease loss with `job.outcome_unknown`.
+      - The supervisor can read the state and observe its deadlines throughout the pause.
+    - **Irreversible cancellation:** after lease loss or cancellation is latched, a fake heartbeat succeeds late. The attempt stays cancelled, `check()` and `fenced()` still raise, the local deadline does not move, and no outcome is written.
+    - **Outcomes:** for each row of the outcome table, exactly one store call (or none) with the right code.
+    - **Sessions:** a recording session factory shows that no session is ever used from two threads.
+    - **Shutdown:**
+      - a stop before a claim;
+      - a drain that finishes;
+      - a heartbeat outage during the drain, so presumed loss takes the lease-loss path;
+      - cancellation at the drain deadline, leading to a `worker_shutdown` retry;
+      - a second signal;
+      - a claim or outcome call that blocks while a stop is requested: the supervisor reaches its shutdown checks only after the call returns, and the test records that ordering rather than a total deadline.
+    - **Checked-out resources at abnormal shutdown:** a fake session that stays checked out by a live thread is not closed or cancelled by engine disposal, which only clears the pool. The runtime reports an abnormal result instead of waiting.
+    - **CLI:** the exit codes and fixed messages; usage errors never echo values; the no-handlers exit happens before any settings are read; the abnormal result ends the process with code 5, tested in a subprocess with a test-only entry point.
+    - **Logging:** only reviewed events and allowlisted fields, filled from validated values; no payload, tenant or marker values.
+    - **Boundaries:** the import-boundary rules above.
+  - **PostgreSQL integration**, using the guarded disposable database, test-only handlers, short test-only intervals, bounded waits and a server-side `statement_timeout`:
+    - `--once` processing to `succeeded`;
+    - **`finish=True`:** the effect and the completion commit together; a block that raises rolls both back; the finish commits and the handler then raises, leaving the job `succeeded` with no further write;
+    - heartbeats extending the lease across several intervals;
+    - **lease loss before a fenced write:** the handler waits on an event; the test expires the lease and another worker reclaims the job; the handler's next `ctx.fenced()` raises `LeaseLostError`; no effect row is written, the stale worker records no outcome, and it claims nothing further;
+    - **heartbeat versus completion:** with a tiny interval and a finishing handler, the job ends `succeeded` exactly once, with no spurious `job.lease_lost`;
+    - **shutdown during a job:** a cooperative handler leaves the job re-queued with `worker_shutdown`, and the attempt counted;
+    - a retryable error re-queues the job, or ends it `dead` at the cap; a permanent error ends it `failed`; an unexpected exception re-queues it with `unexpected_error`. Each records the right code;
+    - a job of an unregistered kind staying `queued`.
+  - **Packaging:**
+    - the wheel contains `evidenceguard_worker`;
+    - the installed `eg-worker --help` works without a database;
+    - the installed `eg-worker` exits 4 without database settings;
+    - the import-boundary test passes.
+- **Explicit exclusions from M3b:**
+  - the ingestion handler and any documents, revisions, chunks or uploads (M3c–M3e);
+  - Docker or Compose (M3f);
+  - more than one concurrent job per process;
+  - `LISTEN/NOTIFY`, metrics and job APIs;
+  - commands to enqueue or cancel jobs;
+  - new dependencies.
+- **Settled at review (Prompt 59):**
+  1. At most one concurrently active handler per process; sequential jobs are allowed.
+  2. The `kinds` filter on M3a's `claim`, with the semantics above: `None` means all kinds, an empty filter means no candidate, invalid values are rejected, and the sweep always runs. This is the only change to accepted M3a code.
+  3. Atomic finish through `ctx.fenced(finish=True)`, with the finish state and pending-refusal coordination above, and runtime outcomes recorded only through the fence.
+  4. The fixed new error codes (`unknown_job_kind`, `unexpected_error`, `worker_shutdown`) and the reviewed log events and fields.
+  5. Cooperative shutdown and the post-claim stop record a `worker_shutdown` retry when ownership remains valid.
+  6. The defaults, accepted as initial engineering defaults, not measured guarantees:
+     - idle poll 2 s;
+     - poll backoff 1 s doubling to 30 s;
+     - drain 30 s;
+     - cancel grace 5 s;
+     - lease-loss grace 5 s;
+     - heartbeat join 10 s.
+  7. Conservative monotonic lease deadlines: the pre-claim time plus 60 s, moved only after a confirmed renewal, from the pre-call time. Latched cancellation is irreversible.
+  8. A separate safe argument parser in the worker, not imported from the API package.
+  9. With an empty production registry, `eg-worker` exits 4 before database settings are loaded.
+  10. After an abnormal result, the CLI ends the process with `os._exit(5)`; the Python API returns an abnormal result.
+  11. `--once` makes one claim attempt and exits 1 on a database error, without retrying.
+  12. No production statement timeout is added for worker sessions in M3b.
+  13. The M3b implementation may add `eg-worker --help` to the CI installed-wheel check.
+- **Accepted limitations:**
+  - **No worker statement timeout.** A hung statement in a handler or heartbeat thread is left behind once the supervisor's bounded waits expire and it takes the abnormal path. A hung `claim` or outcome call blocks the supervisor itself, so it is bounded only by that call returning, or by external process termination (see *Blocking supervisor operations*). M3b has no total shutdown deadline.
+  - **Delayed reclaim** after a late heartbeat extended the lease of a cancelled attempt, or while a terminated worker's transaction still holds the row lock.
+  - **At-least-once execution,** as described above.
+- **Conflicts with accepted decisions:** none found.
+  - The `kinds` filter extends M3a's claim without changing its ordering, locking or sweep.
+  - Everything else builds on the accepted M3a lease, heartbeat interval, backoff and attempt cap, without redefining them.
 
 **M4 – Embeddings, retrieval and corpus**
 - Provider interface, `HashingEmbedder`, Voyage adapter (mocked in CI), RRF search over snapshot revisions, `sample_data/` including the injected variant, ground truth with acceptable and wrong claims, and the retrieval contract suite.
