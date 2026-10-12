@@ -5253,3 +5253,135 @@ Do not push, merge, amend, rebase, start Docker or contact a database.
   - all M3a PostgreSQL verification, including the lock-timeout test;
   - Compose;
   - overall M3 acceptance.
+
+## Prompt 54: Publish reviewed M3a and verify branch CI
+
+- **Stage:** Local documentation commit and publication of `feat/durable-job-core` (no merge, `main` unchanged)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Publish the reviewed M3a feature branch and verify its CI results. This authorizes pushing only feat/durable-job-core. It does not authorize merging or updating main.
+
+Follow CLAUDE.md. Work only in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify the starting state before making changes
+
+Expected:
+- Branch: feat/durable-job-core
+- HEAD: a133513ea45297fd665f147d6ab6699f6785f3c0
+- Parent: 077c2ba6305737097d3d3f5289e5e5042b8cfaf4
+- Working tree clean, with nothing staged, unstaged or untracked.
+- Origin: https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- No upstream configured for this branch.
+- Remote main: 9d5a93ab1389d8a2b084c8f669df3bf9941a477f
+- No remote feat/durable-job-core branch.
+- Remote main is an ancestor of HEAD.
+- Effective author and committer email:
+  257921624+mathewmljourney93@users.noreply.github.com
+
+Read remote refs to confirm them. If anything differs, stop and report the discrepancy without changing files or refs.
+
+2. Publication preflight
+
+Inspect every commit and tracked-file change that will become public relative to remote main, including the M2 acceptance/M3 specification commit.
+
+Confirm:
+- Author and committer identities use the noreply email.
+- No .local/ files, backups, bundles, real environment files or credentials are tracked.
+- Publication contains the reviewed documentation and M3a implementation.
+- Both workflows trigger on a push to this feature branch.
+- CI includes Ubuntu verification, Windows verification, PostgreSQL integration and full-history secret scanning.
+- The integration job retains EG_REQUIRE_INTEGRATION=1.
+
+Do not modify workflows or application code. If a problem blocks publication, stop and report it.
+
+3. Record this authorization
+
+Change only prompts.md, append-only:
+- Record this prompt verbatim as Prompt 54, provided that is the next unused number. Otherwise use the next unused number and explain the numbering.
+- Add a truthful preflight note recording the verified starting state, publication scope, checks and authorization.
+- State that PostgreSQL verification is pending until CI runs.
+- Do not pre-record a successful push or CI result.
+
+Stage only prompts.md. Inspect its staged diff, check for private content, run git diff --cached --check, and run the staged Gitleaks scan.
+
+Create one local commit:
+docs: record M3a branch publication authorization
+
+Use the repository-local noreply identity and existing attribution convention. Verify that the commit changes only prompts.md, then run the full-history Gitleaks scan. Stop if any check fails.
+
+No application tests or builds need rerunning locally because only prompt history changed.
+
+4. Publish only the feature branch
+
+After all preflight checks and scans pass, run:
+
+git push --set-upstream origin refs/heads/feat/durable-job-core:refs/heads/feat/durable-job-core
+
+Do not push main, another branch or any tag. Do not force-push.
+
+Confirm the remote feature branch matches the exact published HEAD and remote main remains unchanged.
+
+5. Monitor CI for the exact published SHA
+
+Wait for:
+- Ubuntu verification
+- Windows verification
+- PostgreSQL integration
+- Full-history secret scan
+
+Report results only for runs associated with this exact SHA and feature-branch push. Use available read-only GitHub access; do not install tooling or alter authentication configuration.
+
+The previous local results were 605 passed and 63 PostgreSQL tests skipped. These are historical local results, not CI results.
+
+If logs are accessible, report the actual pytest summaries, particularly the integration count and the new lock-timeout test result. If logs are inaccessible, distinguish observed job/step success from inferred test execution. Do not present the expected 63 integration tests as an observed result.
+
+Bound monitoring to 20 minutes. If checks remain pending, report their links and status without claiming completion. If any check fails, report the failing step and available diagnostics, then stop. Do not automatically edit, commit or repush fixes.
+
+6. Final handoff
+
+Return:
+- Publication-history commit SHA and parent.
+- Exact published SHA.
+- Changes to prompts.md.
+- Preflight and secret-scan results.
+- Workflow and job links with results.
+- Observed test counts, or an explicit statement that counts could not be retrieved.
+- Local Git status and remote branch/main refs.
+- Remaining verification limits.
+
+Include the complete incremental diff outside prompts.md in fenced diff blocks. If none, explicitly say none.
+
+Do not merge, update main, amend, rebase, delete branches, start Docker or contact a local database.
+
+Compose verification and overall M3 acceptance remain pending. Successful M3a CI does not mean the remaining M3 slices are implemented.
+````
+
+**Preflight note (recorded before this documentation commit and before any push):**
+- **Starting state verified:**
+  - branch `feat/durable-job-core`, HEAD `a133513` with parent `077c2ba`;
+  - a clean tree, the expected origin, and no upstream configured;
+  - author and committer `257921624+mathewmljourney93@users.noreply.github.com`.
+- **Remote refs, read before this commit:**
+  - `main` is `9d5a93a`;
+  - no remote `feat/durable-job-core` exists;
+  - remote `main` is an ancestor of HEAD.
+- **Publication scope, against remote `main`:** two commits, both with the noreply author and committer, plus this documentation commit:
+  - `077c2ba` (the M2 acceptance record and the reviewed M3 specification);
+  - `a133513` (the reviewed M3a implementation).
+
+  They change 17 paths: the documentation, `jobs.py` in the domain and persistence packages, migration `0002`, `models.py`, the shared fixtures, and the new and updated tests.
+- **Content checks:**
+  - no `.local/`, backup, bundle, environment or key files are tracked;
+  - a pattern scan of the added lines found no keys, credentialed URLs, tokens, private keys, local user paths or personal email addresses.
+- **Workflows**, unchanged relative to `main`:
+  - `ci.yml` and `secret-scan.yml` trigger on every push, with no branch filter;
+  - CI runs `verify` on Ubuntu 24.04 and Windows 2025, the PostgreSQL 17 + pgvector integration job with `EG_REQUIRE_INTEGRATION: "1"`, and the full-history Gitleaks scan (`fetch-depth: 0`).
+- **Authorization:** this prompt authorizes this commit and pushing only `feat/durable-job-core` with the explicit refspec. It does not authorize merging or updating `main`, force-pushing, other refs or tags.
+- **Not yet recorded here:**
+  - the push and the CI results happen after this commit and are reported in the session handoff;
+  - **M3a's PostgreSQL verification is pending until CI runs.** The last local results (605 passed, 63 PostgreSQL integration tests skipped) are historical local results, not CI results.
+- **Still pending:**
+  - Compose;
+  - overall M3 acceptance. M3b–M3f are not implemented.
