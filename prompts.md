@@ -6796,3 +6796,153 @@ Do not begin M3c.
 
   Exact results are in the session handoff. The application checks were not rerun, because only the prompt history changed since the reviewed verification.
 - **Authorization:** local commit only. No push, merge, CI run or publication is claimed. The post-commit verification is reported in the session handoff.
+
+**Outcome note for Prompt 62 (added with Prompt 63):**
+- **Commit:** `6547e9f179720b876d7ae94fe8e7b2aefa866a03`, with parent `f340b23` and subject `feat: add sequential worker runtime and safe lease cancellation`, using the noreply identity.
+- **Only `prompts.md` changed** relative to the accepted tree `e0c69cd…`.
+- **Checks:** the staged and full-history Gitleaks scans found no leaks (24 commits scanned).
+- **Not published:** the commit was not pushed.
+
+## Prompt 63: Publish the reviewed M3b feature branch and verify CI
+
+- **Stage:** Publication of `feat/worker-runtime` only (no change to `main`)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Publish the reviewed M3b feature branch and verify CI. This authorizes pushing only feat/worker-runtime. Do not update or merge main.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/worker-runtime
+- HEAD:
+  6547e9f179720b876d7ae94fe8e7b2aefa866a03
+- Parent:
+  f340b23cc03bfec53aad904398b40b931b653219
+- Working tree clean, nothing untracked.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- No upstream configured.
+- Local and remote main:
+  b3f984552bf22cf6350702330d30851f3e08b3f4
+- No remote feat/worker-runtime branch.
+- Remote main is an ancestor of HEAD.
+- Effective author and committer email:
+  257921624+mathewmljourney93@users.noreply.github.com
+
+Check remote refs freshly. Stop without changes if anything differs.
+
+2. Publication preflight
+
+Inspect all commits and tracked changes that will become public relative to remote main, including f340b23’s specification documentation.
+
+Confirm:
+- Noreply author and committer identities.
+- No tracked .local/ files, backups, bundles, real environment files, credentials or generated build outputs.
+- Changes match the reviewed specification and implementation.
+- Both workflows trigger on this branch’s push.
+- CI retains Ubuntu verification, Windows verification, PostgreSQL integration and full-history secret scanning.
+- EG_REQUIRE_INTEGRATION=1 remains enabled.
+- The only reviewed workflow change is eg-worker --help in the installed-wheel step.
+
+Do not modify implementation or workflows. Stop and report any publication blocker.
+
+3. Record authorization
+
+Change only prompts.md, append-only:
+- Append this prompt verbatim as Prompt 63 if it is the next unused number; otherwise use the next unused number and explain it.
+- Add a truthful preflight note recording verified state, publication scope, checks and branch-only authorization.
+- Clarify verification history:
+  - The existing 63 PostgreSQL tests passed for M3a.
+  - The 14 new worker integration tests have not run.
+  - All 77 integration tests remain unverified against this M3b version.
+  - Historical Windows results are 708 passed and 78 skipped: 77 PostgreSQL plus one POSIX-only SIGTERM test.
+- Do not pre-record push or CI success.
+- Keep earlier entries unchanged.
+
+Stage only prompts.md.
+Inspect its diff and private content.
+Run git diff --cached --check and the staged Gitleaks scan.
+
+Create one local commit:
+docs: record M3b branch publication authorization
+
+Use the noreply identity and existing attribution convention.
+Verify it changes only prompts.md.
+Run the full-history Gitleaks scan before pushing. Stop on failure.
+
+No local application checks need rerunning for this history-only change.
+
+4. Publish only the feature branch
+
+Run:
+git push --set-upstream origin refs/heads/feat/worker-runtime:refs/heads/feat/worker-runtime
+
+Confirm the remote feature branch matches the exact published HEAD and main remains unchanged.
+
+Do not push another branch or tag. Do not force-push.
+
+5. Monitor CI for the exact published SHA
+
+Wait for:
+- Ubuntu verification
+- Windows verification
+- PostgreSQL integration
+- Full-history secret scan
+
+Use available read-only GitHub access. Do not install tooling or change authentication configuration.
+
+Bound monitoring to 20 minutes. If a check fails or remains pending, report available diagnostics and links, then stop. Do not automatically edit, commit or repush fixes.
+
+If logs are accessible, report actual pytest summaries:
+- Integration is expected to collect 77 tests, but report the observed count.
+- Ubuntu should also exercise the POSIX-only SIGTERM test.
+- Windows retains its platform skip.
+
+Do not present expected or historical counts as observed results for this SHA. If logs are inaccessible, report job/step conclusions and explicitly identify the missing test summaries.
+
+6. Handoff
+
+Return:
+- Publication-history commit SHA and parent.
+- Exact published SHA.
+- Prompt-history additions.
+- Preflight and scan results.
+- Workflow/job links and conclusions for that SHA.
+- Observed test summaries, or the log-access limitation.
+- Final Git status and remote refs.
+- Complete incremental diff outside prompts.md; if none, explicitly say none.
+
+Main remains unchanged. Compose, overall M3 acceptance and M3c–M3f remain pending.
+
+Do not merge, amend, rebase, delete branches, start Docker or contact a local database.
+Do not begin M3c.
+````
+
+**Preflight note (written before the push; push and CI results are not recorded here):**
+- **Verified state, from freshly fetched remote refs:**
+  - branch `feat/worker-runtime` at `6547e9f`, with parent `f340b23`, a clean tree and no upstream;
+  - origin as expected;
+  - local and remote `main` at `b3f9845`, which is an ancestor of HEAD;
+  - no remote `feat/worker-runtime`;
+  - author and committer use the noreply address.
+- **Publication scope (relative to remote `main`):**
+  - commits `f340b23` (the accepted M3b specification and the M3a `main` results) and `6547e9f` (the reviewed M3b implementation);
+  - this history commit.
+
+  All of them carry noreply identities.
+- **Preflight checks:**
+  - no tracked `.local/`, backup, bundle, environment, credential or build-output files;
+  - no private-content matches in the published additions;
+  - the only workflow change is the reviewed `eg-worker --help` line in the installed-wheel step;
+  - both workflows trigger on `push`;
+  - CI keeps the Ubuntu and Windows verify jobs, the PostgreSQL integration job with `EG_REQUIRE_INTEGRATION=1`, and the full-history secret scan.
+- **Verification history:**
+  - The existing 63 PostgreSQL tests passed in CI for M3a.
+  - The 14 new worker integration tests have never run.
+  - All 77 integration tests are still unverified against this M3b version.
+  - The historical local Windows result is 708 passed and 78 skipped: 77 PostgreSQL tests, plus one POSIX-only SIGTERM test.
+- **Authorization:** push `feat/worker-runtime` only. No `main` update, merge, tag or force-push.
