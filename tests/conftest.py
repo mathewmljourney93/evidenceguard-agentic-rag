@@ -1,8 +1,14 @@
 import os
+from collections.abc import Iterator
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 import pytest
+from alembic import command
+from alembic.config import Config
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.engine import URL
+from sqlalchemy.pool import NullPool
 
 from evidenceguard_domain.context import ActorContext, Role
 from evidenceguard_domain.evidence import (
@@ -14,6 +20,12 @@ from evidenceguard_domain.evidence import (
     Severity,
     SourceType,
 )
+from evidenceguard_persistence.migration_config import alembic_config
+from evidenceguard_persistence.safety import (
+    TEST_DATABASE_URL_ENV,
+    require_disposable_test_database,
+)
+from evidenceguard_persistence.settings import DATABASE_URL_ENV, DatabaseConfigurationError
 
 
 @pytest.fixture
@@ -89,7 +101,6 @@ def content(tenant_a: UUID) -> ReportContent:
 
 # --- PostgreSQL integration-test gating (see ADR-0004) ------------------------------------
 
-TEST_DATABASE_URL_ENV = "EG_TEST_DATABASE_URL"
 REQUIRE_INTEGRATION_ENV = "EG_REQUIRE_INTEGRATION"
 _integration_passed: list[str] = []
 
@@ -129,3 +140,42 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
     """When integration tests are required, fail the run if none of them actually passed."""
     if _integration_required() and exitstatus == 0 and not _integration_passed:
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
+
+
+# --- disposable PostgreSQL fixtures, shared by the integration test modules ------------
+
+
+@pytest.fixture(scope="session")
+def test_database_url() -> URL:
+    """The validated disposable target. Every fixture that connects depends on this one."""
+    try:
+        return require_disposable_test_database(
+            os.environ.get(TEST_DATABASE_URL_ENV), os.environ.get(DATABASE_URL_ENV)
+        )
+    except DatabaseConfigurationError as exc:
+        message = f"refusing to run: {exc}"
+    pytest.fail(message, pytrace=False)
+
+
+@pytest.fixture
+def empty_database(test_database_url: URL) -> Iterator[Engine]:
+    """Reset the disposable test database to an empty public schema."""
+    engine = create_engine(test_database_url, poolclass=NullPool, hide_parameters=True)
+    with engine.begin() as connection:
+        connection.exec_driver_sql("DROP SCHEMA public CASCADE")
+        connection.exec_driver_sql("CREATE SCHEMA public")
+    try:
+        yield engine
+    finally:
+        engine.dispose()
+
+
+@pytest.fixture
+def config(test_database_url: URL) -> Config:
+    return alembic_config(database_url=test_database_url)
+
+
+@pytest.fixture
+def migrated(empty_database: Engine, config: Config) -> Engine:
+    command.upgrade(config, "head")
+    return empty_database

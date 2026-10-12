@@ -10,7 +10,7 @@ EvidenceGuard is a planned vendor-risk review copilot. It is intended to:
 
 It is evidence-based decision support, not legal advice or compliance certification.
 
-## Status: M1 and M2 accepted (persistence, authentication, tenant-scoped vendors and readiness on `main`); M3 specification accepted, implementation pending (pre-alpha)
+## Status: M1 and M2 accepted (persistence, authentication, tenant-scoped vendors and readiness on `main`); M3a durable job core implemented on its branch, under review (pre-alpha)
 
 **What works now:**
 - One installable Python 3.12 package (`evidenceguard`), managed with uv, with a committed lockfile (M1a).
@@ -50,6 +50,12 @@ It is evidence-based decision support, not legal advice or compliance certificat
   - one shared, lazily started database resource for the whole API.
 
   At commit `a888b6c`, all 21 PostgreSQL integration tests passed in CI, including the six added in M2c ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994147)), and again on `main` at `9d5a93a`. See [ADR-0006](docs/decisions/0006-vendor-api-and-readiness.md) and [Vendors and readiness](#vendors-and-readiness-m2c).
+- **Durable job core** (M3a, **implemented on branch `feat/durable-job-core`, under review, not merged; PostgreSQL verification pending**):
+  - a `jobs` table (migration `0002`) and pure lifecycle rules;
+  - idempotent enqueue, claim with `SKIP LOCKED`, reclaim of expired leases, heartbeat, completion and failure;
+  - a fenced transaction that checks the `(job, worker, attempt)` token and the lease with fresh database time before any effect.
+
+  It is a library only: there is no worker process, handler or endpoint yet. Its PostgreSQL integration tests have not run, so no concurrency or stale-worker guarantee is claimed as verified. See [ADR-0007](docs/decisions/0007-durable-job-core.md).
 - Tests, Ruff and strict Mypy, run in GitHub Actions on Ubuntu and Windows, plus a PostgreSQL 17 + pgvector integration job on Ubuntu.
 
 **M2 accepted.** The external reviewer accepted M2 against its agreed criteria (see [docs/plan.md](docs/plan.md)), on the basis of the implementation diffs and the CI evidence below; the reviewer did not run the suite locally. This does not claim any vector functionality: the CI database image includes pgvector, but no migration creates the extension. Compose has never been run.
@@ -70,7 +76,7 @@ The earlier M1 baseline `6d64fb3` passed [CI](https://github.com/mathewmljourney
 
 **Limits:**
 - The M1b report rules are still in-memory only. Nothing persists reports yet, and there is no protection against concurrent requests.
-- The endpoints are `/healthz`, `/readyz`, `/v1/me` and the vendor endpoints. No endpoint uses the report rules yet, and there are no documents, jobs or worker yet (M3).
+- The endpoints are `/healthz`, `/readyz`, `/v1/me` and the vendor endpoints. No endpoint uses the report rules yet. There are no documents, uploads or worker yet, and the job core (M3a) is a library on its branch, under review.
 - Vendor pages use offset pagination, which is not a snapshot under concurrent changes (see ADR-0006).
 - API keys are possession-based bearer credentials, with no rate limiting, lockout, expiry or scopes yet (see ADR-0005).
 - A citation's shape is validated. Whether the tenant may see the chunk, whether the quote is really in it, and whether it supports the claim are **not** checked yet.
@@ -78,7 +84,7 @@ The earlier M1 baseline `6d64fb3` passed [CI](https://github.com/mathewmljourney
 
 **Still planned** (see [docs/plan.md](docs/plan.md)):
 - Revision activation and supersession tests, deferred from M1 to M3, where those state machines are built.
-- M3 (jobs, worker and ingestion). Its slice sequence and the detailed M3a job specification in [docs/plan.md](docs/plan.md) are accepted at review; implementation is pending and no M3 code exists yet.
+- The rest of M3 (worker, documents and revisions, parsing and chunking, uploads, Docker), following the accepted slice sequence in [docs/plan.md](docs/plan.md). M3a's PostgreSQL verification is also pending.
 - After M2: ingestion, retrieval, model providers, the review workflow, API endpoints for the approval gate, and evaluation.
 
 No retrieval, agent workflow, evaluation results, security guarantees or benchmarks are claimed. Any future results will be published with their committed inputs, configuration and the command that reproduces them.
@@ -208,7 +214,7 @@ Invoke-RestMethod http://127.0.0.1:8000/readyz   # no key needed
 - **Pages** are ordered by slug, then ID, with `limit` 1–100 (default 20) and `offset` 0–10,000. They are not a snapshot when vendors are added concurrently.
 - **`GET /readyz`** returns `200 {"status": "ready", ...}` only when the database answers and its migrations exactly match this release; otherwise `503` with fixed check states. It never migrates or changes the database. `/healthz` is unaffected.
 
-Packaging layout: [ADR-0001](docs/decisions/0001-packaging-and-layout.md). Request IDs, logging and error format: [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md). Workflow orchestration: [ADR-0003](docs/decisions/0003-plain-python-workflow.md). Persistence: [ADR-0004](docs/decisions/0004-persistence-foundation.md). API-key authentication: [ADR-0005](docs/decisions/0005-api-key-authentication.md). Vendors, shared database lifecycle and readiness: [ADR-0006](docs/decisions/0006-vendor-api-and-readiness.md).
+Packaging layout: [ADR-0001](docs/decisions/0001-packaging-and-layout.md). Request IDs, logging and error format: [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md). Workflow orchestration: [ADR-0003](docs/decisions/0003-plain-python-workflow.md). Persistence: [ADR-0004](docs/decisions/0004-persistence-foundation.md). API-key authentication: [ADR-0005](docs/decisions/0005-api-key-authentication.md). Vendors, shared database lifecycle and readiness: [ADR-0006](docs/decisions/0006-vendor-api-and-readiness.md). Durable job core (under review): [ADR-0007](docs/decisions/0007-durable-job-core.md).
 
 The request ID is for correlating logs only. It is not authentication and says nothing about who made a request. Logs are local JSON lines on stderr; there is no monitoring or telemetry service.
 

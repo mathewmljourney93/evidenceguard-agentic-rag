@@ -613,7 +613,9 @@ Each question entry contains:
   - **A stale worker cannot write chunks, activate a revision or complete a job after it has been reclaimed.**
   - Retries reach `dead`.
 
-*M3 breakdown (**sequence accepted at review; M3a specification settled at review, Prompt 47; implementation pending**). Nothing below is implemented yet.*
+*M3 breakdown (**sequence accepted at review; M3a specification settled at review, Prompt 47**).*
+
+*Progress:* **M3a is implemented on branch `feat/durable-job-core` and under review** ([ADR-0007](decisions/0007-durable-job-core.md)). Its database-independent tests pass locally; its PostgreSQL integration tests have not run, so none of its concurrency or stale-worker guarantees is verified yet. M3b–M3f are not started. Compose remains unverified.
 
 M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-workflow.md): plain Python, PostgreSQL-backed jobs claimed with `FOR UPDATE SKIP LOCKED`, leases, heartbeats and fenced writes. There is no new orchestration framework or queue dependency. Each slice is reviewed, verified in CI and merged before the next one starts. The M3 acceptance criteria above are split across the slices as follows:
 
@@ -626,7 +628,7 @@ M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-wo
 | **M3e** | Upload and document endpoints: upload, list and get, with size and media-type limits; a revision and its ingestion job are created in one transaction | 413, 415 and 422 behave as specified; re-uploads are idempotent |
 | **M3f** | Dockerfile and Compose services for the API, worker and database | *Slice check:* images build in CI. Compose stays unverified locally while Docker is unavailable (§10). |
 
-**M3a, the first slice, in detail (specification settled at review; implementation pending):**
+**M3a, the first slice, in detail (specification settled at review; implemented, under review, PostgreSQL verification pending):**
 
 - **Why first:**
   - Every later slice writes through the job fence, so it must exist and be proven against PostgreSQL first.

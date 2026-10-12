@@ -4624,3 +4624,632 @@ Do not implement M3a, push, merge, amend, rebase, delete branches, install tools
 - **Not run:** application tests and builds, because only documentation changes.
 - **Not authorized:** no push or merge.
 - **Still pending:** M3a is unimplemented, and Compose remains unverified.
+
+## Prompt 49: Implement M3a, the durable PostgreSQL job core
+
+- **Stage:** Implementation, milestone M3a, on branch `feat/durable-job-core` (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Implement M3a: the durable PostgreSQL job core, following the accepted specification in docs/plan.md.
+
+Leave all implementation work staged and uncommitted for external review. No push or merge is authorized.
+
+Follow CLAUDE.md. Work only in:
+D:\Claude\evidenceguard_agentic_rag
+
+Starting state
+Verify:
+- Branch: docs/m2-acceptance-m3-plan
+- HEAD: 077c2ba6305737097d3d3f5289e5e5042b8cfaf4
+- Parent: 9d5a93ab1389d8a2b084c8f669df3bf9941a477f
+- Origin: https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Working tree clean.
+
+If anything differs, report it and stop without repairing it.
+
+Create:
+feat/durable-job-core
+from the verified HEAD.
+
+Read the accepted M3a specification and relevant ADRs before editing. Preserve the existing package boundaries and architecture. Resolve routine implementation choices yourself and report material deviations.
+
+Scope
+Implement only:
+- Pure typed job contracts and lifecycle rules.
+- Migration 0002 and the jobs model.
+- Transactional enqueue, claim, reclaim, heartbeat, completion and failure.
+- A reusable fenced-transaction boundary.
+- Database-independent tests and real PostgreSQL integration tests.
+- Relevant documentation and prompt history.
+
+Do not implement the worker process, handlers, uploads, document/revision/chunk tables, embeddings, model calls or Docker changes. Add no dependencies.
+
+1. Domain contracts and lifecycle
+Add evidenceguard_domain.jobs using the existing immutable domain conventions.
+
+Statuses:
+queued, running, succeeded, failed, dead.
+
+Rules:
+- attempt starts at 0.
+- Every successful claim/reclaim increments attempt.
+- max_attempts defaults to 3, range 1–10.
+- Never increment beyond max_attempts.
+- failed means permanent handler failure.
+- dead means retryable failure or lease abandonment exhausted the cap.
+- All terminal states clear lease fields and set finished_at.
+- Retry clears lease fields and schedules the next attempt.
+- Terminal jobs cannot be claimed or reset by retries.
+
+Defaults:
+- Lease: 60 seconds.
+- Future worker heartbeat interval: 20 seconds; no timer in M3a.
+- Backoff after failed attempt n:
+  min(5 * 2^(n - 1), 60) seconds.
+- No jitter.
+- Fenced lock_timeout: 5 seconds.
+- Exhausted-job sweep: at most 10 rows per claim.
+
+Pure functions receive explicit times supplied by callers; they must not read clocks or databases.
+
+Payload:
+- Flat JSON object with string keys and canonical lowercase hyphenated UUID-string values.
+- Empty object allowed.
+- No tenant field, nesting, arrays, document text or secrets.
+- At most 4,096 bytes of canonical UTF-8 JSON.
+- Sorted keys and compact separators; key order must not affect identity.
+- Preserve immutability without breaking serialization.
+- Kind-specific schemas arrive with later handlers.
+
+Use fixed safe messages for LeaseLostError and JobIdempotencyConflictError. Do not expose payload values, SQL or internal exception text through these errors.
+
+2. Schema and migration
+Add jobs through migration 0002, revising 0001.
+
+Follow the existing naming convention and tenant constraints:
+- UUID primary key.
+- tenant_id foreign key to tenants.
+- UNIQUE (tenant_id, id).
+- UNIQUE (tenant_id, kind, idempotency_key).
+- kind: bounded lowercase identifier, maximum 64.
+- idempotency_key: non-empty, maximum 128.
+- payload: JSONB object.
+- status, attempt, max_attempts, run_after.
+- locked_by and lease_expires_at.
+- last_error: fixed diagnostic code.
+- Timezone-aware created_at, updated_at, finished_at.
+- Lease fields populated exactly while running.
+- finished_at populated exactly for terminal states.
+- Status and attempt bounds enforced by database constraints.
+- Appropriate partial indexes for queued eligibility and expired leases.
+
+Document precisely which payload restrictions are enforced by application validation and which by PostgreSQL. Do not claim database enforcement of the canonical byte cap unless actually implemented equivalently.
+
+No extension or unrelated table change.
+
+3. Persistence and transaction ownership
+Keep database logic in evidenceguard_persistence.
+Return typed snapshots rather than session-bound ORM objects.
+
+Enqueue:
+- Runs in the caller-owned transaction.
+- Tenant comes from ActorContext.
+- INSERT ON CONFLICT for the tenant/kind/idempotency key.
+- An identical payload and max_attempts returns the existing job unchanged, including terminal jobs.
+- Changed payload or max_attempts raises JobIdempotencyConflictError and leaves the existing row unchanged.
+- Concurrent inserts must resolve safely under READ COMMITTED.
+- Do not reset or reschedule an existing job.
+
+Claim:
+- Trusted system operation across tenants.
+- Short transaction.
+- Bounded exhausted-lease sweep using FOR UPDATE SKIP LOCKED.
+- Mark swept jobs dead without incrementing attempt.
+- Select eligible jobs deterministically by (run_after, id), using FOR UPDATE SKIP LOCKED.
+- Every claim candidate must have attempt < max_attempts.
+- Queued candidates must be due; running candidates must have expired leases.
+- Exclude exhausted rows from selection so they cannot obstruct eligible work.
+- Increment attempt, assign worker ID and create the lease.
+
+Worker IDs are unique per process start; they are not secrets.
+The fencing token is (job_id, locked_by, attempt).
+
+4. Fresh time and fencing
+Every lease/scheduling decision uses fresh PostgreSQL clock_timestamp(), not worker time, now() or CURRENT_TIMESTAMP.
+
+For heartbeat, completion, failure and fenced effects:
+- Apply transaction-local lock_timeout of 5 seconds.
+- Acquire the job row lock.
+- After acquiring it, check status, token and lease in a separate statement using fresh database time.
+- Never reuse a check or time captured before waiting for the lock.
+- Refuse missing, terminal, mismatched or expired ownership with LeaseLostError and no effect.
+- Keep the lock through the effect and transaction completion.
+- An expired lease cannot be revived.
+- No provider/network calls while holding the lock.
+
+The reusable fence must allow future handler writes in the same session/transaction. It must not validate ownership in one transaction and perform the effect in another.
+
+State the guarantee correctly: reclaim cannot occur while a valid fence holds the row lock. A transaction can commit shortly after lease expiry.
+
+Ensure rollback and session cleanup on failed effects and commit failures. Make transaction ownership clear so future callers cannot accidentally commit partial handler work.
+
+5. Tests
+Add meaningful database-independent tests for:
+- Lifecycle transitions and terminal invariants.
+- Attempt bounds, defaults and backoff cap.
+- Payload shape, canonicalization, UUID values and exact byte limits.
+- Safe errors.
+- Transaction commit/rollback/cleanup.
+- Claim and fence SQL structure.
+
+Add real PostgreSQL tests under the existing disposable-database guard and required-integration mode:
+- Upgrade/downgrade/re-upgrade and migration/model drift.
+- Constraints and tenant references.
+- Identical enqueue, changed payload/configuration, reordered keys, terminal retries and cross-tenant key reuse.
+- Concurrent identical and conflicting enqueue.
+- Due-time eligibility and deterministic claiming.
+- Two concurrent claimers produce only one owner of a job.
+- Exhausted rows, including more than the sweep limit, do not block an eligible job.
+- A reclaimed stale owner cannot heartbeat, complete, fail or make a fenced write.
+- Same worker ID with a newer attempt still fences the older attempt.
+- A held fence prevents reclaim during the effect.
+- Expired but unreclaimed ownership is refused.
+- A lease expiring during a lock wait is refused after acquisition.
+- Failed fenced effects roll back.
+- Retryable failures and abandoned leases reach dead at the cap; permanent failure ends failed.
+
+Use separate connections, synchronization and bounded waits for concurrency tests. Ensure failures cannot hang CI or leave threads/connections running. Simulate expiry by SQL except for the bounded lock-wait expiry case.
+
+Preserve existing coverage:
+- Historical migration 0001 tests should remain meaningful.
+- Update installed-head expectations to 0002 where appropriate.
+- Do not weaken tests merely because the latest migration changed.
+
+Do not run PostgreSQL tests locally or contact any database. Their execution remains pending authorized publication and CI.
+
+6. Documentation
+Add ADR-0007 for the job core, clearly separating implemented local behaviour from PostgreSQL verification still pending.
+
+Update README, plan and threat model narrowly:
+- M3a implemented, under review.
+- Worker and later slices still absent.
+- No crash/concurrency guarantee claimed as verified until PostgreSQL CI passes.
+- Compose remains unverified.
+- M2 baseline evidence remains intact.
+
+Append this prompt verbatim to prompts.md using the next sequential number, with truthful outcomes. Preserve earlier entries.
+
+7. Verification
+Run:
+- uv sync --locked
+- uv run --locked ruff format --check .
+- uv run --locked ruff check .
+- uv run --locked mypy
+- uv run --locked pytest
+- uv build
+- Isolated installed-wheel imports and migration-head/resource checks, without a database.
+- git diff --cached --check
+- gitleaks git --pre-commit --staged --redact --verbose .
+
+Confirm no dependency/lockfile change unless genuinely required; this slice should need none.
+Report commands actually run, failures corrected and integration skips accurately.
+
+Final review handoff
+- Summarize implementation and material choices.
+- Include the COMPLETE staged diff excluding prompts.md directly in fenced diff blocks.
+- Split into numbered parts at file boundaries; never truncate or replace files with summaries.
+- Use a gitignored .local/ complete diff only if response limits prevent full inline output, identifying any omitted files explicitly.
+- Summarize prompt-history additions separately.
+- Report verification results, staged paths, branch, full HEAD and Git status.
+- Identify PostgreSQL verification as pending.
+
+Do not commit, push, merge, amend, rebase, install unrelated tools, start Docker or contact a database. Leave the work staged for external review.
+````
+
+**Outcome (M3a implementation pending review; staged, not committed or pushed):**
+- **Starting state verified:**
+  - branch `docs/m2-acceptance-m3-plan`, HEAD `077c2ba` with parent `9d5a93a`, the expected origin, a clean tree.
+  - Branch `feat/durable-job-core` was created from `077c2ba`.
+- **Implemented:**
+  - **`evidenceguard_domain.jobs`:**
+    - immutable `JobPayload`, `JobRequest`, `JobLeaseToken` and `JobSnapshot` values;
+    - the five statuses;
+    - pure, time-parameterised transitions: claim or reclaim, exhausted expiry, heartbeat, succeed, retryable and permanent failure;
+    - the accepted defaults: 60 s lease, 20 s heartbeat (constant only), `max_attempts` 3 within 1–10, backoff `min(5 * 2^(n - 1), 60)` with no jitter, 5 s lock timeout, 10-row sweep, 4,096-byte canonical payload;
+    - fixed-message errors.
+  - **Migration `0002` and the `Job` model:** constraints, two partial indexes, no extension, and no change to existing tables.
+  - **`evidenceguard_persistence.jobs`:**
+    - `enqueue`, in the caller's transaction, with an identity check;
+    - `claim`, with a bounded `SKIP LOCKED` sweep and selection;
+    - `fenced_transaction`, which takes the lock, then checks ownership with fresh `clock_timestamp()` in a separate statement, and exposes a restricted `FencedSession` with no commit or rollback;
+    - `heartbeat`, `complete`, `fail_retryable` and `fail_permanent`.
+  - **ADR-0007**, plus narrow README, plan and threat-model updates.
+- **Material choices, reported for review:**
+  - Payload keys are lowercase identifiers (at most 64 characters), and any key containing `tenant` is rejected.
+  - Reclaiming an abandoned lease records `last_error = lease_expired`.
+  - Transitions inside a fence re-check ownership with fresh time, so a lease that expires mid-block refuses the transition and rolls back the block.
+  - A lock timeout on the fence's lock becomes the fixed `JobLockTimeoutError`; `JobEnqueueRaceError` covers an invisible conflicting row.
+  - The guarded disposable-database fixtures moved unchanged from `tests/test_persistence_postgres.py` to `tests/conftest.py`, so the new `tests/test_jobs_postgres.py` shares one copy of the guard.
+  - A database-independent test pins the migration's literal CHECK and partial-index text to the model, because `alembic check` compares neither.
+- **Tests:**
+  - **Database-independent tests added:** lifecycle, payload, error, SQL-structure and fence-protocol tests in `tests/test_jobs.py` and `tests/test_job_store.py`.
+  - **Head expectations moved to `0002`.** The `0001` checks are kept (resource, history and offline downgrade), and offline `0002` upgrade and downgrade tests were added.
+  - **The existing PostgreSQL round-trip test** now passes through `0001`, `0002`, `0001`, base and back to `0002`.
+  - **41 PostgreSQL integration tests** were added in `tests/test_jobs_postgres.py`. **They have not run** against PostgreSQL; no database was contacted.
+- **Verified locally** (Windows, Python 3.12):
+  - `uv sync --locked`;
+  - `uv run --locked ruff format --check .` (76 files formatted);
+  - `uv run --locked ruff check .`;
+  - `uv run --locked mypy` (no issues, 63 files);
+  - `uv run --locked pytest`: **570 passed, 62 skipped**. All 62 skips are PostgreSQL integration tests: 21 existing and 41 new, skipped because `EG_TEST_DATABASE_URL` is not set.
+  - `uv build`;
+  - an isolated installed-wheel check in a throwaway environment, without database settings: imports from `site-packages`, `create_app()`, both migration resources packaged, head `0002`, packaged readiness heads `{"0002"}`, offline `jobs` DDL, and `eg-api --help` and `eg-admin --help`;
+  - required-integration mode without a URL exits 4.
+  - `uv.lock` and `pyproject.toml` are unchanged.
+  - The staged whitespace check and the staged Gitleaks scan results are in the session handoff.
+- **Corrected during the work:**
+  - Ruff import order and `SIM117` (nested `with`) findings.
+  - Strict Mypy findings: `Any` returns and row-mapping types.
+  - Pydantic wrapped the payload error in a `ValidationError`, so `from_mapping` now validates before construction.
+  - A test UUID was made of digits only, which made its uppercase variant identical; it now contains letters.
+  - Compiled-SQL expectations were updated for the `::VARCHAR` and `::INTEGER` casts.
+- **Not verified:**
+  - the 41 new PostgreSQL integration tests, and with them every concurrency, stale-worker, lock-wait and rollback guarantee;
+  - a re-run of the 21 existing integration tests against migration `0002`.
+
+  Both are pending an authorized publication and CI. The remaining unverified items:
+  - Compose;
+  - review of this implementation.
+
+## Prompt 50: Complete the M3a review handoff (read-only)
+
+- **Stage:** Read-only review handoff for staged M3a (no file changes)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Complete the M3a review handoff. Read-only task; do not change the implementation.
+
+Follow CLAUDE.md. Work only in:
+D:\Claude\evidenceguard_agentic_rag
+
+Verify:
+- Branch: feat/durable-job-core
+- HEAD: 077c2ba6305737097d3d3f5289e5e5042b8cfaf4
+- The existing 16 M3a files remain staged.
+- Nothing unstaged or untracked.
+
+If the state differs, report it and stop without repairing it.
+
+The external reviewer has inspected the production code, migration, model and existing-test changes from Prompt 49. Review is incomplete because seven files were omitted from the inline handoff.
+
+Provide the COMPLETE current staged diffs for these seven files:
+1. README.md
+2. docs/plan.md
+3. docs/threat-model.md
+4. docs/decisions/0007-durable-job-core.md
+5. tests/test_jobs.py
+6. tests/test_job_store.py
+7. tests/test_jobs_postgres.py
+
+Use fenced diff blocks, numbered parts at file boundaries.
+Do not replace source with summaries or truncate any file.
+Do not repeat the production-code diffs already supplied.
+
+If the response limit prevents providing all seven:
+- Clearly identify which complete files were included and which remain.
+- Keep the full staged diff available at .local/p49/staged.diff.
+- End with precise continuation instructions.
+- Do not suggest that the review is complete.
+
+Also include the current contents of:
+packages/domain/evidenceguard_domain/_base.py
+in a fenced python block, as supporting context for reviewing immutable job contracts and datetime validation.
+
+Finish with:
+- The current staged tree ID from git write-tree.
+- git diff --cached --check result.
+- Git status.
+- Confirmation that no files were changed and nothing was committed or pushed.
+
+Do not run tests, install anything, start Docker or contact a database.
+Do not edit prompts.md during this read-only task. Preserve this prompt for verbatim recording at the next authorized prompt-history update.
+````
+
+**Outcome (read-only; recorded with Prompt 52):**
+- **State verified:** branch `feat/durable-job-core`, HEAD `077c2ba`, 16 files staged, staged tree `44aacb2852f60fab0e6067e57209f596f01cf147`, nothing unstaged or untracked.
+- **Supplied in full:**
+  - the diffs of `README.md`, `docs/plan.md`, `docs/threat-model.md`, `docs/decisions/0007-durable-job-core.md`, `tests/test_jobs.py` and `tests/test_job_store.py`;
+  - the contents of `_base.py`, with a note that it does not itself require timezone-aware datetimes.
+- **Deferred for response length:** `tests/test_jobs_postgres.py`. Its complete diff stayed in `.local/p49/`, with continuation instructions.
+- **Checks:** `git diff --cached --check` passed. No tracked file was changed, and nothing was committed or pushed.
+
+## Prompt 51: Provide the final missing M3a review file (read-only)
+
+- **Stage:** Read-only review handoff (no file changes)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Provide the final missing M3a review file. Read-only; change nothing.
+
+Verify:
+- Branch: feat/durable-job-core
+- HEAD: 077c2ba6305737097d3d3f5289e5e5042b8cfaf4
+- Staged tree: 44aacb2852f60fab0e6067e57209f596f01cf147
+- 16 files staged; nothing unstaged or untracked.
+
+If the state differs, report it and stop.
+
+Return ONLY:
+1. The COMPLETE staged diff for tests/test_jobs_postgres.py, inside a fenced diff block. Include every line; no summary or truncation.
+2. A brief final Git-state confirmation.
+
+Do not repeat previously supplied files.
+Do not edit prompts.md, run tests, commit, push or contact a database.
+Preserve this prompt for verbatim recording at the next authorized prompt-history update.
+````
+
+**Outcome (read-only; recorded with Prompt 52):**
+- **State verified** as listed in the prompt.
+- **Supplied in full:** the diff of `tests/test_jobs_postgres.py`, after confirming it was byte-identical to the index.
+- **No changes:** no file was changed, and nothing was committed or pushed.
+
+**Review note (added with Prompt 52):**
+- **Basis of the review:** the external reviewer inspected the complete M3a diffs, from Prompts 49–51. The reviewer did not run the project suite.
+- **Corrections required:**
+  1. **Job timestamps must be timezone-aware:**
+     - `AwareDatetime` for the snapshot timestamps;
+     - a fixed `ValueError` for a naive `now`, or one whose offset is `None`, at every public time-dependent function;
+     - correct comparison of non-UTC offsets.
+  2. **The `FencedSession` boundary must be described accurately.** It omits the direct transaction methods, but it is not a sandbox: `execute` accepts arbitrary SQL, and the underlying objects are reachable. The docstrings, ADR-0007, the threat model and the test name must say so.
+  3. **The lock-timeout mapping needs a real PostgreSQL test.**
+- **Choices accepted:**
+  - lowercase, bounded payload keys and the tenant-key ban;
+  - `lease_expired` as the reclaim diagnostic;
+  - fresh ownership checks before transitions inside a fence;
+  - the fixed lock-timeout and enqueue-race errors;
+  - the fixtures moved into `conftest.py`;
+  - the offline checks of constraints and index predicates.
+- **Status:** the corrections are under review. They are not accepted yet.
+
+## Prompt 52: Correct the M3a review findings
+
+- **Stage:** Corrections to staged M3a work (no commit, no push)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Correct the M3a review findings. Leave everything staged and uncommitted for review.
+
+Follow CLAUDE.md. Work only in:
+D:\Claude\evidenceguard_agentic_rag
+
+Verify:
+- Branch: feat/durable-job-core
+- HEAD: 077c2ba6305737097d3d3f5289e5e5042b8cfaf4
+- Staged tree: 44aacb2852f60fab0e6067e57209f596f01cf147
+- Existing 16 M3a files staged.
+- Nothing unstaged or untracked.
+
+If anything differs, report it and stop without repairing it.
+Record the pre-edit staged tree for the incremental diff.
+
+1. Require timezone-aware job timestamps
+In JobSnapshot, use the existing Pydantic AwareDatetime convention for:
+- run_after
+- lease_expires_at, when present
+- created_at
+- updated_at
+- finished_at, when present
+
+Validate explicit now arguments at the pure lifecycle boundary too:
+- Reject a datetime whose tzinfo is absent or whose utcoffset() is None.
+- Raise a fixed ValueError without input values.
+- Do not assume a naive value means UTC or silently attach a timezone.
+- Keep pure functions clock-free.
+- Accept aware datetimes with non-UTC offsets and compare their actual instants correctly.
+
+Apply this consistently to public time-dependent predicates and transitions. Do not leave some operations producing incidental TypeError while others accept naive values.
+
+Add focused tests:
+- Each snapshot timestamp rejects a naive datetime, including optional fields in otherwise-valid snapshots.
+- Validated model_copy cannot introduce a naive timestamp.
+- Each public time-dependent operation rejects a naive now with the fixed error.
+- A tzinfo object returning utcoffset() = None is rejected.
+- Aware non-UTC offsets work correctly around lease/due-time boundaries.
+
+Demonstrate that representative new tests fail against the pre-edit implementation, then restore and verify the corrected files.
+
+2. State the FencedSession boundary accurately
+The wrapper omits commit/rollback/close methods, but execute/scalar/scalars accept arbitrary SQL and Python exposes underlying objects.
+
+Correct the module/class docstrings, ADR-0007 and threat-model wording:
+- The wrapper discourages accidental transaction termination through ordinary session methods.
+- Handlers are trusted application code.
+- Handlers must not issue transaction-control SQL, access underlying transaction/connection internals, or modify ownership fields directly.
+- The fence guarantee assumes callers preserve its transaction and lock.
+- It is not a security sandbox or an enforceable prohibition on every possible early commit.
+
+Keep the existing transaction-ownership design. Do not introduce a SQL parser, blacklist or sandbox.
+
+Rename or clarify the unit test that currently claims the session “cannot end the transaction”: its actual assertion proves only that direct commit/rollback/close methods are absent.
+
+Keep genuine guarantees:
+- Lock before fresh ownership check.
+- Effects share the same transaction.
+- Uncaught failures and commit failures roll back.
+- The fence closes after its block or a terminal/requeue transition.
+
+3. Verify the lock-timeout mapping against PostgreSQL
+Add a real integration test using the existing guarded disposable database:
+- One connection holds the relevant job row lock.
+- Another attempts a fenced operation.
+- The held lock outlasts the configured 5-second lock_timeout.
+- Observe JobLockTimeoutError, with its fixed safe message.
+- Confirm the fenced block did not execute and the job/effect rows are unchanged.
+- Release locks and close connections/executors in finally paths.
+- Use bounded server statements and waits, with sufficient timeout margin.
+
+This test remains skipped locally; do not contact a database.
+
+Other review choices
+The reviewer accepts:
+- Lowercase bounded payload keys and the conservative tenant-key ban.
+- lease_expired as the reclaim diagnostic.
+- Fresh ownership checks before lifecycle transitions inside a fence.
+- Fixed lock-timeout and enqueue-race errors.
+- Moving the guarded fixtures into conftest.py.
+- Explicit offline checks for migration constraints and index predicates.
+
+Do not redesign those choices.
+
+Documentation and prompt history
+Keep implementation and PostgreSQL verification marked pending review/CI.
+
+Record the read-only handoff prompts verbatim if available in this session and not already recorded, using sequential numbers. Do not invent unavailable prompt text.
+Append this prompt verbatim and a separate review/outcome note.
+Preserve earlier entries.
+State that the reviewer inspected the complete diffs but did not run the project suite.
+Do not record acceptance of these corrections yet.
+
+Verification
+Run:
+- uv run --locked ruff format --check .
+- uv run --locked ruff check .
+- uv run --locked mypy
+- uv run --locked pytest
+- uv build
+- git diff --cached --check
+- gitleaks git --pre-commit --staged --redact --verbose .
+
+Stage only the intended corrections and documentation/history updates.
+No new dependencies or schema changes are required.
+Report the actual passing/skipped counts; do not reuse old counts.
+
+Final handoff
+- Explain the corrections and regression evidence.
+- Include the COMPLETE incremental staged diff against the recorded pre-edit staged tree, excluding prompts.md, directly in fenced diff blocks.
+- Split at file boundaries if needed; do not truncate.
+- Summarize prompt-history additions separately.
+- Report actual checks, staged paths, full HEAD and Git status.
+- Keep all PostgreSQL verification and Compose unverified.
+
+Do not commit, push, merge, rewrite history, start Docker or contact a database.
+````
+
+**Outcome (corrections pending review; staged, not committed or pushed):**
+- **Starting state verified** as listed. The pre-edit staged tree, `44aacb2852f60fab0e6067e57209f596f01cf147`, was recorded under `.local/`.
+- **Correction 1 (aware time):**
+  - `JobSnapshot` timestamps are now `AwareDatetime`.
+  - A new `require_aware(now)` is called first in every public time-dependent function: `lease_expired`, `is_claimable`, `is_exhausted_abandoned`, `holds_lease`, `claim`, `expire_exhausted`, `heartbeat`, `succeed`, `fail_permanently` and `fail_retryably`. It raises the fixed `ValueError` "now must be a timezone-aware datetime" for a value with no `tzinfo` or with a `utcoffset()` of `None`.
+  - Pure functions still read no clock.
+  - A pre-check confirmed that Pydantic's `AwareDatetime` also rejects a `tzinfo` whose `utcoffset()` is `None`.
+- **Correction 2 (boundary wording):** the module and `FencedSession` docstrings, ADR-0007 and the threat model now say the following:
+  - the wrapper omits the direct transaction methods to prevent accidents by trusted handlers;
+  - it is not a sandbox, since `execute` accepts arbitrary SQL and the underlying objects are reachable;
+  - handlers must not issue transaction-control SQL, use the underlying session, transaction or connection, or edit ownership fields;
+  - the guarantee assumes they preserve the transaction and lock.
+
+  The unit test was renamed to `test_fenced_session_omits_direct_transaction_methods`. No parser, blacklist or sandbox was added.
+- **Correction 3 (lock timeout):** a new PostgreSQL test holds the job row lock beyond the real 5-second `lock_timeout`. It expects `JobLockTimeoutError` with its fixed message, a wait of at least about 5 seconds, a block that never ran, no effect row and an unchanged job row. The lock is released and the connection closed in `finally`. **It has not run.**
+- **Regression evidence:**
+  - With the pre-edit domain module restored temporarily (after confirming it matched the index), **33 of the 35 new aware-time tests failed**.
+  - The 2 non-UTC offset tests passed, because they check behaviour the old code already handled correctly.
+  - The corrected module was then restored, confirmed byte-identical with `cmp`, and all 35 passed.
+- **Verified locally** (Windows, Python 3.12):
+  - `uv run --locked ruff format --check .` (76 files formatted);
+  - `uv run --locked ruff check .`;
+  - `uv run --locked mypy` (no issues, 63 files);
+  - `uv run --locked pytest`: **605 passed, 63 skipped**. All 63 skips are PostgreSQL integration tests: 21 existing and 42 job tests, skipped because `EG_TEST_DATABASE_URL` is not set;
+  - `uv build`.
+
+  `uv.lock` and `pyproject.toml` are unchanged, and there is no schema change. The staged whitespace check and the Gitleaks scan results are in the session handoff.
+- **Not verified:**
+  - all PostgreSQL integration tests, including the new lock-timeout test, pending an authorized publication and CI;
+  - Compose;
+  - review of these corrections.
+
+**Acceptance note (added with Prompt 53):**
+- **Accepted for a local commit:** the external reviewer accepted the complete M3a implementation (Prompts 49–51) and the Prompt 52 corrections, as staged tree `ecfffb122382779990aa846e67f7d06527714757`.
+- **Basis of the acceptance:** the supplied diffs, and Claude's reported Windows results of 605 passed and 63 PostgreSQL integration tests skipped. The reviewer did not run the suite.
+- **Still pending:**
+  - all PostgreSQL verification, including the lock-timeout test;
+  - Compose;
+  - overall M3 acceptance.
+
+**Note on a repeated prompt:** after Prompt 52, the same correction prompt was submitted again. It expected staged tree `44aacb2…`, but the actual tree was already `ecfffb1…` with the corrections applied, so the run stopped at its state check without any change. It is not recorded again here, because its text is identical to Prompt 52.
+
+## Prompt 53: Commit the reviewed M3a work locally
+
+- **Stage:** Local commit of reviewed M3a work on `feat/durable-job-core` (no push, no merge)
+- **Date:** 2026-10-12 (session date)
+
+````text
+This is a new task: commit the already-reviewed M3a work locally. Do not repeat Prompt 52’s corrections.
+
+Follow CLAUDE.md. Work only in:
+D:\Claude\evidenceguard_agentic_rag
+
+Expected starting state:
+- Branch: feat/durable-job-core
+- HEAD: 077c2ba6305737097d3d3f5289e5e5042b8cfaf4
+- Staged tree: ecfffb122382779990aa846e67f7d06527714757
+- Origin: https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Exactly 16 M3a files staged.
+- Nothing unstaged or untracked.
+
+Verify first. If anything differs, report it and stop.
+
+The external reviewer has accepted the complete M3a implementation and Prompt 52’s corrections for a local commit, based on the supplied diffs and reported Windows results: 605 passed, 63 PostgreSQL tests skipped. The reviewer did not run the suite.
+
+Only change prompts.md:
+- Append an acceptance note under Prompt 52.
+- Append this prompt verbatim using the next available sequential number.
+- Add a truthful pre-commit outcome note.
+- Briefly record that the repeated correction prompt stopped without changes.
+Preserve earlier entries and avoid duplicating the already-recorded correction prompt.
+
+Confirm every other staged file remains byte-identical to the accepted tree.
+
+Before committing:
+- Inspect staged paths and diff.
+- Check for secrets/private information without printing sensitive values.
+- Confirm author and committer use:
+  257921624+mathewmljourney93@users.noreply.github.com
+- Run git diff --cached --check.
+- Run gitleaks git --pre-commit --staged --redact --verbose .
+
+If clean, create ONE LOCAL commit:
+feat: add durable PostgreSQL jobs and lease fencing
+
+Keep the existing attribution convention.
+
+Afterward:
+- Run gitleaks git --redact --verbose .
+- Confirm the parent, committed paths and clean working tree.
+- Confirm committed files other than prompts.md match the accepted tree.
+
+No application tests or builds need rerunning for prompt-history-only additions.
+
+Return:
+- Full commit SHA, parent, subject and identity.
+- Actual check results.
+- Prompt-history additions and final Git status.
+- Any incremental diff outside prompts.md, complete in fenced diff blocks; explicitly state if none.
+- PostgreSQL verification, Compose and overall M3 acceptance remain pending.
+
+Do not push, merge, amend, rebase, start Docker or contact a database.
+````
+
+**Pre-commit note (recorded before the commit):**
+- **Starting state verified:**
+  - branch `feat/durable-job-core`, HEAD `077c2ba`, the expected origin;
+  - staged tree `ecfffb1…`, with exactly 16 M3a files staged and nothing unstaged or untracked;
+  - author and committer `257921624+mathewmljourney93@users.noreply.github.com`.
+- **This commit** adds the reviewed M3a work and this prompt-history update. Only `prompts.md` changes since the accepted tree.
+- **Checks on the staged content, including this note:** the byte-identity comparison, the private-content check, `git diff --cached --check` and the staged Gitleaks scan run before the commit. The full-history Gitleaks scan runs after it. All results are reported in the session handoff.
+- **Not rerun:** application tests and builds, because only the prompt history changes. The last local results are the historical Prompt 52 results: 605 passed and 63 PostgreSQL integration tests skipped.
+- **Not authorized:** no push or merge.
+- **Still pending:**
+  - all M3a PostgreSQL verification, including the lock-timeout test;
+  - Compose;
+  - overall M3 acceptance.

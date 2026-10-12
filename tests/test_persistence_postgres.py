@@ -1,25 +1,23 @@
-"""PostgreSQL integration tests for the M2a schema and migrations.
+"""PostgreSQL integration tests for the M2 schema, migrations, authentication and vendors.
 
 They run only against the disposable database named by ``EG_TEST_DATABASE_URL``, and they drop
 and recreate its ``public`` schema. Before any engine is created, the target must pass
 ``require_disposable_test_database``: a valid URL, a database name ending in ``_test``, and a
 host, port and database different from ``EG_DATABASE_URL`` when that is set. No other URL is
 ever used. Without the variable these tests are skipped; with ``EG_REQUIRE_INTEGRATION=1`` (as
-in CI) a missing URL or a run where no integration test passes is a failure.
+in CI) a missing URL or a run where no integration test passes is a failure. The guarded
+fixtures (``test_database_url``, ``empty_database``, ``config``, ``migrated``) live in
+``conftest.py`` and are shared with ``test_jobs_postgres.py``.
 """
 
-import os
-from collections.abc import Iterator
 from uuid import UUID, uuid4
 
 import pytest
 from alembic import command
 from alembic.config import Config
 from fastapi.testclient import TestClient
-from sqlalchemy import Engine, create_engine, func, insert, inspect, select, text, update
-from sqlalchemy.engine import URL
+from sqlalchemy import Engine, func, insert, inspect, select, text, update
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.pool import NullPool
 
 from evidenceguard_api.app import create_app
 from evidenceguard_api.database import AppDatabase
@@ -35,56 +33,15 @@ from evidenceguard_persistence.accounts import (
 from evidenceguard_persistence.auth import ApiKeyAuthenticator
 from evidenceguard_persistence.credentials import generate_api_key
 from evidenceguard_persistence.db import create_session_factory
-from evidenceguard_persistence.migration_config import alembic_config
 from evidenceguard_persistence.models import ApiKey, Tenant, User, UserRole, Vendor
-from evidenceguard_persistence.safety import (
-    TEST_DATABASE_URL_ENV,
-    require_disposable_test_database,
-)
-from evidenceguard_persistence.settings import DATABASE_URL_ENV, DatabaseConfigurationError
 
 pytestmark = pytest.mark.integration
 
 M2A_TABLES = {"tenants", "users", "api_keys", "vendors"}
+HEAD_TABLES = M2A_TABLES | {"jobs"}
 FOREIGN_KEY_VIOLATION = "23503"
 UNIQUE_VIOLATION = "23505"
 CHECK_VIOLATION = "23514"
-
-
-@pytest.fixture(scope="session")
-def test_database_url() -> URL:
-    """The validated disposable target. Every fixture that connects depends on this one."""
-    try:
-        return require_disposable_test_database(
-            os.environ.get(TEST_DATABASE_URL_ENV), os.environ.get(DATABASE_URL_ENV)
-        )
-    except DatabaseConfigurationError as exc:
-        message = f"refusing to run: {exc}"
-    pytest.fail(message, pytrace=False)
-
-
-@pytest.fixture
-def empty_database(test_database_url: URL) -> Iterator[Engine]:
-    """Reset the disposable test database to an empty public schema."""
-    engine = create_engine(test_database_url, poolclass=NullPool, hide_parameters=True)
-    with engine.begin() as connection:
-        connection.exec_driver_sql("DROP SCHEMA public CASCADE")
-        connection.exec_driver_sql("CREATE SCHEMA public")
-    try:
-        yield engine
-    finally:
-        engine.dispose()
-
-
-@pytest.fixture
-def config(test_database_url: URL) -> Config:
-    return alembic_config(database_url=test_database_url)
-
-
-@pytest.fixture
-def migrated(empty_database: Engine, config: Config) -> Engine:
-    command.upgrade(config, "head")
-    return empty_database
 
 
 def _tables(engine: Engine) -> set[str]:
@@ -137,18 +94,32 @@ def test_upgrade_downgrade_upgrade_on_an_empty_database(
 ) -> None:
     assert _tables(empty_database) == set()
 
-    command.upgrade(config, "head")
+    command.upgrade(config, "0001")
     assert _tables(empty_database) == M2A_TABLES | {"alembic_version"}
-    with empty_database.connect() as connection:
-        assert (
-            connection.execute(text("SELECT version_num FROM alembic_version")).scalar() == "0001"
-        )
+    assert _version(empty_database) == "0001"
+
+    command.upgrade(config, "head")
+    assert _tables(empty_database) == HEAD_TABLES | {"alembic_version"}
+    assert _version(empty_database) == "0002"
+
+    command.downgrade(config, "0001")
+    assert _tables(empty_database) == M2A_TABLES | {"alembic_version"}
+    assert _version(empty_database) == "0001"
 
     command.downgrade(config, "base")
     assert _tables(empty_database) == {"alembic_version"}
 
     command.upgrade(config, "head")
-    assert _tables(empty_database) == M2A_TABLES | {"alembic_version"}
+    assert _tables(empty_database) == HEAD_TABLES | {"alembic_version"}
+    assert _version(empty_database) == "0002"
+
+
+def _version(engine: Engine) -> str | None:
+    with engine.connect() as connection:
+        version: str | None = connection.execute(
+            text("SELECT version_num FROM alembic_version")
+        ).scalar()
+    return version
 
 
 def test_models_and_migrations_do_not_drift(migrated: Engine, config: Config) -> None:

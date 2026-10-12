@@ -19,7 +19,23 @@ from sqlalchemy.pool import QueuePool
 
 from evidenceguard_persistence.db import create_db_engine, transaction
 from evidenceguard_persistence.migration_config import alembic_config
-from evidenceguard_persistence.models import ROLE_CHECK, SECRET_SHA256_CHECK, Base, UserRole
+from evidenceguard_persistence.models import (
+    JOB_ATTEMPT_CHECK,
+    JOB_FINISHED_CHECK,
+    JOB_IDEMPOTENCY_KEY_CHECK,
+    JOB_KIND_CHECK,
+    JOB_LAST_ERROR_CHECK,
+    JOB_LEASE_CHECK,
+    JOB_MAX_ATTEMPTS_CHECK,
+    JOB_PAYLOAD_CHECK,
+    JOB_QUEUED_INDEX_WHERE,
+    JOB_RUNNING_INDEX_WHERE,
+    JOB_STATUS_CHECK,
+    ROLE_CHECK,
+    SECRET_SHA256_CHECK,
+    Base,
+    UserRole,
+)
 from evidenceguard_persistence.settings import (
     DATABASE_URL_ENV,
     DatabaseConfigurationError,
@@ -151,6 +167,7 @@ def test_importing_persistence_needs_no_database_configuration() -> None:
         "import evidenceguard_persistence.db, evidenceguard_persistence.models, "
         "evidenceguard_persistence.migration_config, evidenceguard_persistence.auth, "
         "evidenceguard_persistence.accounts, evidenceguard_persistence.credentials, "
+        "evidenceguard_persistence.jobs, evidenceguard_domain.jobs, "
         "evidenceguard_api.admin, evidenceguard_api.app; "
         "from evidenceguard_api.app import create_app; create_app(); "
         "print('imported')"
@@ -170,31 +187,35 @@ def test_migration_resources_are_packaged() -> None:
     assert (migrations / "env.py").is_file()
     assert (migrations / "script.py.mako").is_file()
     assert (migrations / "versions" / "v0001_tenancy.py").is_file()
+    assert (migrations / "versions" / "v0002_jobs.py").is_file()
 
 
 def test_migration_history_has_one_head() -> None:
     script = ScriptDirectory.from_config(alembic_config())
 
-    assert script.get_heads() == ["0001"]
+    assert script.get_heads() == ["0002"]
+    assert script.get_revision("0002").down_revision == "0001"
     assert script.get_revision("0001").down_revision is None
 
 
-def test_schema_tables_are_limited_to_m2a() -> None:
-    assert set(Base.metadata.tables) == {"tenants", "users", "api_keys", "vendors"}
+def test_schema_tables_are_m2a_and_jobs() -> None:
+    assert set(Base.metadata.tables) == {"tenants", "users", "api_keys", "vendors", "jobs"}
     assert {role.value for role in UserRole} == {"reviewer", "approver", "admin"}
 
 
 # --- offline migration SQL (no connection) ----------------------------------------------
 
 
-def _offline_sql(monkeypatch: pytest.MonkeyPatch, *, upgrade: bool) -> str:
+def _offline_sql(
+    monkeypatch: pytest.MonkeyPatch, *, upgrade: bool, revisions: str = "0001:base"
+) -> str:
     monkeypatch.delenv(DATABASE_URL_ENV, raising=False)
     buffer = io.StringIO()
     config = alembic_config(output_buffer=buffer)
     if upgrade:
         command.upgrade(config, "head", sql=True)
     else:
-        command.downgrade(config, "0001:base", sql=True)
+        command.downgrade(config, revisions, sql=True)
     return buffer.getvalue()
 
 
@@ -208,6 +229,51 @@ def test_offline_upgrade_sql_renders_without_a_database(monkeypatch: pytest.Monk
     assert ROLE_CHECK in sql
     assert SECRET_SHA256_CHECK in sql
     assert "EXTENSION" not in sql.upper()
+
+
+def test_offline_upgrade_creates_jobs_with_the_model_constraints(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The migration's literal constraint text must equal the model's (alembic check does not
+    compare CHECK constraints or partial-index predicates)."""
+    sql = _offline_sql(monkeypatch, upgrade=True)
+
+    assert "CREATE TABLE jobs (" in sql
+    assert "payload JSONB NOT NULL" in sql
+    for check in (
+        JOB_STATUS_CHECK,
+        JOB_KIND_CHECK,
+        JOB_IDEMPOTENCY_KEY_CHECK,
+        JOB_PAYLOAD_CHECK,
+        JOB_ATTEMPT_CHECK,
+        JOB_MAX_ATTEMPTS_CHECK,
+        JOB_LEASE_CHECK,
+        JOB_FINISHED_CHECK,
+        JOB_LAST_ERROR_CHECK,
+    ):
+        assert f"CHECK ({check})" in sql
+    assert "FOREIGN KEY(tenant_id) REFERENCES tenants (id)" in sql
+    assert "UNIQUE (tenant_id, kind, idempotency_key)" in sql
+    assert "UNIQUE (tenant_id, id)" in sql
+    assert (
+        f"CREATE INDEX ix_jobs_queued_run_after ON jobs (run_after, id) "
+        f"WHERE {JOB_QUEUED_INDEX_WHERE}" in sql
+    )
+    assert (
+        f"CREATE INDEX ix_jobs_running_lease_expires_at ON jobs (lease_expires_at) "
+        f"WHERE {JOB_RUNNING_INDEX_WHERE}" in sql
+    )
+    assert "UPDATE alembic_version SET version_num='0002'" in sql
+
+
+def test_offline_downgrade_from_0002_drops_only_jobs(monkeypatch: pytest.MonkeyPatch) -> None:
+    sql = _offline_sql(monkeypatch, upgrade=False, revisions="0002:0001")
+
+    assert "DROP INDEX ix_jobs_running_lease_expires_at;" in sql
+    assert "DROP INDEX ix_jobs_queued_run_after;" in sql
+    assert "DROP TABLE jobs;" in sql
+    for table in ("vendors", "api_keys", "users", "tenants"):
+        assert f"DROP TABLE {table};" not in sql
 
 
 def test_offline_downgrade_sql_drops_every_table(monkeypatch: pytest.MonkeyPatch) -> None:
