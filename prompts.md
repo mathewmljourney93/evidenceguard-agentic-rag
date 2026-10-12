@@ -3840,3 +3840,110 @@ Do not push, merge, amend, rebase, delete branches, start Docker or contact any 
   - overall M2 acceptance.
 
   No push or merge is authorized.
+
+## Prompt 43: Publish reviewed M2c and verify branch CI
+
+- **Stage:** Local documentation commit and publication of `feat/vendor-api-readiness` (no merge, `main` unchanged)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Publish the reviewed M2c feature branch and report its CI results. This authorizes pushing only feat/vendor-api-readiness. It does not authorize merging or changing main.
+
+Follow CLAUDE.md. Work only in:
+D:\Claude\evidenceguard_agentic_rag
+
+Verify the starting state:
+- Branch: feat/vendor-api-readiness
+- HEAD: 73bebf58ed6a3703707e21fe4ddf112d7e07127c
+- Parent: 277dfeaec7c1c64fa5ee92a3ce892823acc787fb
+- Origin: https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Working tree clean.
+- Effective author and committer email:
+  257921624+mathewmljourney93@users.noreply.github.com
+
+Read remote refs. Confirm:
+- Remote main remains 277dfeaec7c1c64fa5ee92a3ce892823acc787fb.
+- The remote feature branch does not exist.
+- Remote main is an ancestor of HEAD.
+
+If the state differs, report it and stop without repairing it.
+
+Publication preflight
+- Inspect everything that will become public compared with remote main.
+- Confirm no secrets, private identifiers, tracked .local/ files, backups or bundles.
+- Confirm the commits to be published use the noreply identity.
+- Inspect the CI and secret-scan workflows. Confirm push triggers cover this branch and the PostgreSQL integration job retains EG_REQUIRE_INTEGRATION=1.
+- Do not alter application code, tests, dependencies or workflows.
+
+Prompt history
+Append this prompt verbatim using the next sequential number, with a truthful preflight note.
+Record the publication authorization, checks and remaining limits. Do not record a push or CI result before it happens.
+Preserve earlier entries.
+
+Stage only prompts.md. Run:
+- git diff --cached --check
+- gitleaks git --pre-commit --staged --redact --verbose .
+
+If clean, create one local documentation commit:
+docs: record M2c branch publication authorization
+
+Run a full-history secret scan:
+gitleaks git --redact --verbose .
+
+Only if the scan passes, push with this explicit refspec:
+git push --set-upstream origin refs/heads/feat/vendor-api-readiness:refs/heads/feat/vendor-api-readiness
+
+No force-push, other refs or tags.
+
+CI verification
+Monitor workflows for the exact published HEAD SHA until completion:
+1. Ubuntu verification.
+2. Windows verification.
+3. PostgreSQL 17 + pgvector integration.
+4. Full-history secret scan.
+
+Report run/job links and conclusions for that exact SHA.
+Where logs are accessible, retrieve the actual pytest summary, especially the integration passed/skipped count. There are currently 21 integration tests, but do not present an expected count as an observed result.
+If logs are inaccessible, distinguish confirmed job success from inferred test execution.
+
+If a job fails, report the failing step and available diagnostics, then stop. Do not implement or publish fixes automatically.
+If monitoring reaches its time limit, report pending jobs accurately.
+
+Final handoff
+- Published full SHA and documentation commit parent.
+- Prompt-history additions.
+- Preflight and scan results.
+- Workflow/job links, exact SHA and observed test counts.
+- Remote main and feature-branch refs after publication.
+- Final Git status.
+- Complete incremental diff outside prompts.md, if any, inside fenced diff blocks. If none, state that.
+- Keep Compose and overall M2 acceptance pending.
+
+Do not merge, switch or update main, rewrite history, delete branches, start Docker or contact a local database.
+````
+
+**Preflight note (recorded before this documentation commit and before any push):**
+- **Starting state verified:**
+  - branch `feat/vendor-api-readiness`, HEAD `73bebf5` with parent `277dfea`, the expected origin;
+  - a clean working tree;
+  - author and committer `257921624+mathewmljourney93@users.noreply.github.com`.
+- **Remote refs, read before this commit:**
+  - `main` is `277dfea`, and `feat/vendor-api-readiness` does not exist;
+  - remote `main` is an ancestor of HEAD.
+- **Publication preflight against remote `main`:**
+  - the only commit to publish, besides this documentation commit, is `73bebf5`, with the noreply author and committer;
+  - it changes the 22 reviewed M2c paths;
+  - no `.local/`, backup, bundle, environment or key files are tracked;
+  - a pattern scan of the added lines found no API keys, credentialed database URLs, tokens, cloud keys, private keys, local user paths or personal email addresses.
+- **Workflows**, unchanged by M2c:
+  - `ci.yml` and `secret-scan.yml` both trigger on every `push` without branch filters, so they cover this branch;
+  - the integration job keeps `EG_REQUIRE_INTEGRATION: "1"`.
+- **Authorization:** Prompt 43 authorizes this documentation commit and pushing only `feat/vendor-api-readiness` with the explicit refspec, and only after the full-history secret scan passes. It does not authorize merging or changing `main`, force-pushing, other refs or tags.
+- **Not yet recorded here:**
+  - the push and the CI results happen after this commit and are reported in the session handoff;
+  - the M2c PostgreSQL integration tests have not run yet.
+- **Not rerun in this task:** the application checks, because only `prompts.md` changes. The last local results are the historical Prompt 41 results: 458 passed and 21 PostgreSQL integration tests skipped.
+- **Still pending:**
+  - M2c CI verification;
+  - Compose verification;
+  - overall M2 acceptance.
