@@ -5385,3 +5385,311 @@ Compose verification and overall M3 acceptance remain pending. Successful M3a CI
 - **Still pending:**
   - Compose;
   - overall M3 acceptance. M3b–M3f are not implemented.
+
+## Prompt 55: Record verified M3a CI results
+
+- **Stage:** Documentation update for verified M3a CI on `feat/durable-job-core` (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Record the verified M3a CI results in the project documentation. Leave all changes staged and uncommitted for review. No push or merge is authorized.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/durable-job-core
+- HEAD and upstream:
+  11350e1818c7bd348fa6e6a26b639fe1b21a0e80
+- Working tree clean, nothing untracked.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Remote main:
+  9d5a93ab1389d8a2b084c8f669df3bf9941a477f
+
+Check remote refs read-only. Stop without changes if the state differs.
+
+2. Evidence independently retrieved by the reviewer
+
+Both runs have head_sha 11350e1818c7bd348fa6e6a26b639fe1b21a0e80,
+head_branch feat/durable-job-core, and conclusion success.
+
+CI run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344
+
+Observed job-log summaries:
+- Ubuntu job 114782517339:
+  605 passed, 63 skipped in 12.71s
+- Windows job 114782517028:
+  605 passed, 63 skipped in 14.66s
+- PostgreSQL integration job 114782517485:
+  63 passed, 605 deselected in 16.58s
+
+Secret-scan run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768288
+
+Job 114782517013:
+21 commits scanned; no leaks found.
+
+The committed lock-timeout test is:
+test_a_lock_held_beyond_the_lock_timeout_raises_the_fixed_error
+
+It belongs to the integration suite. All 63 integration tests passed, with no skips or failures. Record that the lock-timeout test passed as part of that suite, without claiming an individually named log entry or individual duration was observed.
+
+The reviewer retrieved the GitHub evidence but did not run the project suite locally.
+
+3. Documentation updates only
+
+Inspect the existing wording and make narrow, consistent updates to:
+- README.md
+- docs/decisions/0007-durable-job-core.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Record:
+- M3a implementation is reviewed and verified on its feature branch at 11350e1.
+- The actual CI summaries and links above.
+- Real PostgreSQL verification now covers M3a, including its concurrency, lease fencing and lock-timeout tests.
+- M3a is not yet merged into main.
+- Compose remains unverified.
+- M3b–M3f remain unimplemented, and overall M3 acceptance is pending.
+- Passing tests demonstrate the tested behavior, not a general security or performance guarantee.
+
+Update ADR-0007’s status consistently with the repository’s accepted-and-CI-verified ADR convention. Do not redesign the architecture or change engineering defaults.
+
+Do not change application code, tests, dependencies, migrations or workflows.
+
+4. Prompt history
+
+Append this prompt verbatim as Prompt 55 if that is the next unused number; otherwise use the next unused number and explain it.
+
+Add a truthful outcome note recording:
+- the reviewer independently retrieved the CI evidence;
+- what documentation changed;
+- checks actually run in this task;
+- that main remains unchanged and no commit, push or merge occurred.
+
+Keep all earlier prompt and outcome text unchanged.
+
+5. Verification and handoff
+
+Check documentation links and consistency.
+Inspect staged additions for secrets and private information.
+Run:
+- git diff --cached --check
+- the staged Gitleaks scan
+
+Application tests and builds need not be rerun for documentation-only changes.
+
+Stage only the five authorized files.
+
+Return:
+- A concise explanation of the changes.
+- Check commands and actual results.
+- The staged tree ID, staged paths and Git status.
+- The COMPLETE staged diff excluding prompts.md directly in fenced diff blocks.
+- Split into numbered parts at file boundaries if needed; never silently truncate.
+- A summary of prompts.md additions and confirmation that earlier entries are unchanged.
+
+Leave everything staged and uncommitted.
+Do not push, merge, amend, rebase, start Docker or contact a local database.
+````
+
+**Outcome (documentation pending review; staged, not committed or pushed):**
+- **Starting state verified:**
+  - branch `feat/durable-job-core`, HEAD and upstream `11350e1`;
+  - a clean tree with nothing untracked, and the expected origin;
+  - remote refs read without changing them: `main` at `9d5a93a`, the feature branch at `11350e1`.
+- **Evidence:** the external reviewer independently retrieved the CI evidence for `11350e1`:
+  - [CI run 38240768344](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344): Ubuntu `605 passed, 63 skipped in 12.71s`; Windows `605 passed, 63 skipped in 14.66s`; integration `63 passed, 605 deselected in 16.58s`;
+  - [secret-scan run 38240768288](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768288): 21 commits scanned, no leaks found.
+
+  The reviewer did not run the project suite. Claude had observed only the job and step conclusions, because the job logs returned 403 without authentication.
+- **Documentation updated:**
+  - **README:** M3a is described as reviewed and verified in CI on its branch and not merged, with the 63-test integration result. The plans list merging, then M3b–M3f, with M3 acceptance pending.
+  - **ADR-0007:** the status is now *Accepted*, following the review and passing CI at `11350e1`, not yet on `main`. The tests and consequences sections record the CI summaries and links, the lock-timeout test passing as part of the 63-test suite (no individual log line or duration observed), and that the tests show only the tested behaviour.
+  - **Plan:** the M3 progress note records the CI evidence, states that M3b–M3f are not started, and that M3 acceptance and Compose remain pending.
+  - **Threat model:** the M3a section heading is updated, and a verification line is added with the same limits.
+  - No code, tests, dependencies, migrations or workflows changed.
+- **Checks run in this task:**
+  - a link and anchor check of the four documents;
+  - a consistency check of the CI figures;
+  - a private-content check of the staged additions;
+  - `git diff --cached --check`;
+  - the staged Gitleaks scan.
+
+  Exact results are in the session handoff. No application tests or builds were run.
+- **No commit, push or merge occurred.** `main` is unchanged at `9d5a93a`.
+- **Still pending:**
+  - merging M3a into `main`;
+  - Compose;
+  - M3b–M3f;
+  - overall M3 acceptance.
+
+**Acceptance note (added with Prompt 56):**
+- **Accepted:** the external reviewer accepted the complete Prompt 55 documentation diff, staged as tree `0f0f06a4d316da773c5ea45bb5cbbc89ac0f15f8`.
+- **Evidence for `11350e1`, retrieved independently by the reviewer:**
+  - Ubuntu `605 passed, 63 skipped in 12.71s`;
+  - Windows `605 passed, 63 skipped in 14.66s`;
+  - PostgreSQL `63 passed, 605 deselected in 16.58s`;
+  - secret scan: 21 commits scanned, no leaks.
+- **Basis:** the reviewer did not run the project suite locally.
+
+## Prompt 56: Commit verified M3a documentation and fast-forward main
+
+- **Stage:** Local documentation commit, publication of `feat/durable-job-core`, and an authorized fast-forward of `main` after CI passes
+- **Date:** 2026-10-12 (session date)
+
+````text
+Commit the reviewed M3a verification documentation, publish the feature branch, and fast-forward main only after all four required CI checks pass.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/durable-job-core
+- HEAD and upstream:
+  11350e1818c7bd348fa6e6a26b639fe1b21a0e80
+- Staged tree:
+  0f0f06a4d316da773c5ea45bb5cbbc89ac0f15f8
+- Exactly five staged files:
+  README.md
+  docs/decisions/0007-durable-job-core.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Remote feature branch: 11350e1818c7bd348fa6e6a26b639fe1b21a0e80
+- Local and remote main:
+  9d5a93ab1389d8a2b084c8f669df3bf9941a477f
+- Main is an ancestor of HEAD.
+- Effective author and committer email:
+  257921624+mathewmljourney93@users.noreply.github.com
+
+Read remote refs freshly. Stop without changes if anything differs.
+
+2. Preserve the accepted documentation
+
+Record the accepted staged tree before editing.
+
+The reviewer accepted Prompt 55’s complete documentation diff, based on that diff and independently retrieved GitHub evidence:
+- Ubuntu: 605 passed, 63 skipped in 12.71s
+- Windows: 605 passed, 63 skipped in 14.66s
+- PostgreSQL: 63 passed, 605 deselected in 16.58s
+- Secret scan: 21 commits scanned, no leaks
+
+The reviewer did not run the project suite locally.
+
+Keep all four non-history documents byte-identical to the accepted tree. Their statements that M3a is not yet merged are true at this point; do not record future publication results.
+
+Change only prompts.md, append-only:
+- Add an acceptance note under Prompt 55.
+- Record this prompt verbatim as Prompt 56 if that is the next unused number; otherwise use the next unused number and explain it.
+- Add a truthful preflight note covering verified state, checks and the publication authorization below.
+- Do not pre-record push, CI or main-update success.
+- Keep earlier entries unchanged.
+
+3. Commit
+
+Inspect staged paths and diff, confirm the noreply identity, check additions for secrets/private information, run git diff --cached --check and the staged Gitleaks scan.
+
+Create one commit:
+docs: record verified M3a results and main publication authorization
+
+Use the existing attribution convention.
+
+Verify:
+- Parent is 11350e1818c7bd348fa6e6a26b639fe1b21a0e80.
+- Exactly the five authorized files changed.
+- Every file except prompts.md matches the accepted staged tree.
+- Working tree is clean.
+
+Run the full-history Gitleaks scan before publication. Stop on any failure.
+
+No local application tests or builds need rerunning for documentation-only changes.
+
+4. Publish the feature branch first
+
+Push only:
+git push origin refs/heads/feat/durable-job-core:refs/heads/feat/durable-job-core
+
+Monitor these four checks for the exact new commit SHA:
+- Ubuntu verification
+- Windows verification
+- PostgreSQL integration
+- Full-history secret scan
+
+Use available read-only GitHub access. Do not install tooling or change authentication configuration.
+
+Allow at most 20 minutes for this monitoring phase. If anything fails or remains pending, report it and stop before touching main. Do not automatically fix or repush.
+
+Report observed test summaries when logs are accessible. Otherwise report job conclusions and explicitly say the counts were not observed. Do not reuse 11350e1’s counts as observed results for the new SHA.
+
+5. Fast-forward main only after all four checks succeed
+
+Fetch main and the feature branch again, then confirm:
+- Remote main remains exactly 9d5a93ab1389d8a2b084c8f669df3bf9941a477f.
+- Remote feature branch matches the newly verified SHA.
+- Main is an ancestor of that SHA.
+- Local main equals origin/main and has no independent commits.
+- Working tree is clean.
+
+If any condition differs, stop and report it.
+
+Switch to main and fast-forward it to the verified SHA using git merge --ff-only. Create no merge commit.
+
+Push only:
+git push origin refs/heads/main:refs/heads/main
+
+Monitor all four checks for that exact SHA’s main-push runs, again for at most 20 minutes.
+
+If a main check fails or remains pending, report it accurately. Do not automatically revert, rewrite history or make fixes.
+
+6. Final handoff
+
+Return:
+- Commit SHA, parent, subject and identity.
+- Prompt-history additions.
+- Preflight and scan results.
+- Feature-branch and main workflow/job links and conclusions.
+- Actual observed test counts, or the log-access limitation.
+- Before/after remote refs and final Git status.
+- Remaining limits: Compose unverified, M3b–M3f unimplemented, overall M3 acceptance pending.
+- Note that the committed documentation predates the main update; recording that result belongs in a later documentation task.
+
+Include the complete incremental diff against the accepted staged tree, excluding prompts.md. If none, explicitly say none.
+
+Do not change application code, tests, dependencies, migrations or workflows.
+Do not force-push, amend, rebase, squash, delete branches or push tags.
+Do not start Docker or contact a local database.
+Do not begin M3b in this task.
+````
+
+**Preflight note (recorded before the commit, publication and any change to `main`):**
+- **Starting state verified,** with remote refs read freshly:
+  - branch `feat/durable-job-core`, HEAD and upstream `11350e1`;
+  - staged tree `0f0f06a…`, with exactly the five reviewed files staged and nothing unstaged or untracked;
+  - the expected origin, and the remote feature branch at `11350e1`;
+  - local and remote `main` at `9d5a93a`, an ancestor of HEAD;
+  - author and committer `257921624+mathewmljourney93@users.noreply.github.com`.
+- **The accepted tree** `0f0f06a…` was recorded before editing. The four non-history documents stay byte-identical to it. Their statement that M3a is not yet merged is true when this note is written.
+- **Authorization:** this prompt authorizes, in order:
+  1. this commit;
+  2. pushing only the feature branch;
+  3. **only after** Ubuntu verification, Windows verification, PostgreSQL integration and the full-history secret scan all succeed for the exact new SHA, and remote `main` is confirmed still at `9d5a93a` and an ancestor of it, fast-forwarding local `main` with `git merge --ff-only`;
+  4. pushing only `main`, then monitoring its checks.
+
+  Each monitoring phase is limited to 20 minutes. No force-push, merge commit, amend, rebase, squash, branch deletion or tag push is authorized.
+- **Not yet recorded here:** the push, the CI results and any `main` update happen after this commit and are reported in the session handoff. Recording them needs a later documentation task.
+- **Not rerun:** application tests and builds, because only the prompt history changes.
+- **Still pending:**
+  - Compose;
+  - M3b–M3f;
+  - overall M3 acceptance.

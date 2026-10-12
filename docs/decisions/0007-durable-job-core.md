@@ -1,6 +1,6 @@
 # ADR-0007: Durable PostgreSQL job core
 
-- **Status:** Proposed, under review (M3a). It is implemented and passes the database-independent tests locally. **Its PostgreSQL integration tests have not run yet.** No concurrency, crash or fencing guarantee below counts as verified until they pass in CI.
+- **Status:** Accepted (M3a), following the implementation review and passing CI at commit `11350e1` on branch `feat/durable-job-core`; not yet merged into `main`. See *Consequences and limits*.
 - **Date:** 2026-10-12
 - **Builds on:**
   - [ADR-0003](0003-plain-python-workflow.md): plain Python, PostgreSQL-backed jobs, leases and fencing;
@@ -122,7 +122,7 @@ An empty object is allowed for test-only jobs. Kind-specific schemas arrive with
   - compiled SQL for claim, sweep and fence (`SKIP LOCKED`, ordering, limits, `clock_timestamp()`, lock before check);
   - the fence protocol and transaction ownership with a scripted session: commit, rollback and close on success, on a refused check, on a lock timeout, on a failing effect and on a failing commit;
   - migration SQL rendered offline.
-- **PostgreSQL integration (`tests/test_jobs_postgres.py`):** written, **not yet run.** They need the guarded disposable database and run in the existing CI job with required-integration mode. They cover:
+- **PostgreSQL integration (`tests/test_jobs_postgres.py`):** run in the existing CI job with the guarded disposable database and required-integration mode; they passed at `11350e1` (see *Consequences and limits*). They cover:
   - constraints and the tenant reference;
   - identical, reordered, changed, terminal, cross-tenant and concurrent enqueues;
   - due-time and deterministic claiming;
@@ -141,13 +141,19 @@ An empty object is allowed for test-only jobs. Kind-specific schemas arrive with
 
 ## Consequences and limits
 
-- **Not verified against PostgreSQL yet.** Until the integration job passes, none of these is verified:
-  - one owner per job;
-  - stale-worker refusal;
-  - refusal after a lock wait;
-  - the lock-timeout mapping;
-  - rollback behaviour;
-  - the migration round trip with `0002`.
+- **Verified in CI.** The tested commit is `11350e1` (`11350e1818c7bd348fa6e6a26b639fe1b21a0e80`) on branch `feat/durable-job-core`. It adds only prompt history after the reviewed M3a commit `a133513`.
+  - In [CI run 38240768344](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344), the [PostgreSQL 17 + pgvector integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517485) passed. Its log, retrieved by the external reviewer, reports `63 passed, 605 deselected in 16.58s`.
+  - That covers M2's 21 integration tests and M3a's 42, with no skips or failures. Among them:
+    - one owner per job under concurrent claims;
+    - stale-worker refusal;
+    - refusal after a lease expires during a lock wait;
+    - the migration round trip with `0002`;
+    - rollback of failed fenced effects;
+    - `test_a_lock_held_beyond_the_lock_timeout_raises_the_fixed_error`, which passed as part of that suite. No individual log line or duration was observed for it.
+  - The database-independent checks passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517339) (`605 passed, 63 skipped in 12.71s`) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517028) (`605 passed, 63 skipped in 14.66s`).
+  - The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768288) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768288/job/114782517013): 21 commits scanned, no leaks found).
+  - M3a is not yet merged into `main`.
+- **What the tests show.** Passing tests demonstrate the tested behaviour, not a general security or performance guarantee.
 - **At-least-once handling.** A handler effect can commit shortly after lease expiry (see the guarantee). External calls made by later handlers are at-least-once (ADR-0003).
 - **Claim cost.** Claiming scans eligible rows ordered by `(run_after, id)`. The partial indexes serve the common cases, but no performance or throughput figure is claimed.
 - **Payload rules beyond "JSON object" live in the application.** Rows written outside `enqueue` are only checked against the database constraints, and reading an invalid payload back fails validation.

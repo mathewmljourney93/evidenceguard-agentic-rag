@@ -615,7 +615,15 @@ Each question entry contains:
 
 *M3 breakdown (**sequence accepted at review; M3a specification settled at review, Prompt 47**).*
 
-*Progress:* **M3a is implemented on branch `feat/durable-job-core` and under review** ([ADR-0007](decisions/0007-durable-job-core.md)). Its database-independent tests pass locally; its PostgreSQL integration tests have not run, so none of its concurrency or stale-worker guarantees is verified yet. M3b–M3f are not started. Compose remains unverified.
+*Progress:*
+- **M3a is reviewed and verified in CI on branch `feat/durable-job-core`; not yet merged into `main`** ([ADR-0007](decisions/0007-durable-job-core.md)).
+  - **Tested commit:** `11350e1` (`11350e1818c7bd348fa6e6a26b639fe1b21a0e80`), which adds only prompt history after the reviewed M3a commit `a133513`.
+  - **[CI run 38240768344](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344):**
+    - `verify` passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517339) (`605 passed, 63 skipped in 12.71s`) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517028) (`605 passed, 63 skipped in 14.66s`);
+    - the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517485) passed. Its log, retrieved by the external reviewer, reports `63 passed, 605 deselected in 16.58s`: M2's 21 tests and M3a's 42, including the concurrency, lease-fencing and lock-timeout tests, with no skips or failures.
+  - **[Secret-scan run 38240768288](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768288):** passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768288/job/114782517013): 21 commits scanned, no leaks found).
+  - **Still not verified:** Compose has never been run. The tests demonstrate the tested behaviour, not a general security or performance guarantee.
+- **M3b–M3f** are not started, and **overall M3 acceptance is pending**.
 
 M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-workflow.md): plain Python, PostgreSQL-backed jobs claimed with `FOR UPDATE SKIP LOCKED`, leases, heartbeats and fenced writes. There is no new orchestration framework or queue dependency. Each slice is reviewed, verified in CI and merged before the next one starts. The M3 acceptance criteria above are split across the slices as follows:
 
@@ -628,7 +636,7 @@ M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-wo
 | **M3e** | Upload and document endpoints: upload, list and get, with size and media-type limits; a revision and its ingestion job are created in one transaction | 413, 415 and 422 behave as specified; re-uploads are idempotent |
 | **M3f** | Dockerfile and Compose services for the API, worker and database | *Slice check:* images build in CI. Compose stays unverified locally while Docker is unavailable (§10). |
 
-**M3a, the first slice, in detail (specification settled at review; implemented, under review, PostgreSQL verification pending):**
+**M3a, the first slice, in detail (specification settled at review; implemented, reviewed and verified in CI on its branch; not yet merged):**
 
 - **Why first:**
   - Every later slice writes through the job fence, so it must exist and be proven against PostgreSQL first.

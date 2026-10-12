@@ -79,7 +79,7 @@ The full design and limits are in [ADR-0002](decisions/0002-request-ids-logging-
 
 **Verification:** at commit `a888b6c` on `feat/vendor-api-readiness`, the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994147) passed with all twenty-one PostgreSQL tests, including M2c's six (`21 passed, 458 deselected in 4.65s`, from the log retrieved by the external reviewer). M2c was then fast-forwarded onto `main` at `9d5a93a`, where the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38214711868/job/114696647728) passed again (`21 passed, 458 deselected in 4.92s`). Compose has never been run.
 
-## Durable job core (M3a, implemented on its branch; under review, PostgreSQL verification pending)
+## Durable job core (M3a, verified in CI on its branch; not yet merged into `main`)
 
 | Threat | Mitigation |
 |---|---|
@@ -91,7 +91,9 @@ The full design and limits are in [ADR-0002](decisions/0002-request-ids-logging-
 | Data leakage through jobs | Payloads hold only identifier keys and canonical UUID strings (at most 4,096 canonical bytes, enforced by the application); `last_error` holds fixed codes only; errors carry fixed messages. |
 | Exhausted jobs blocking the queue | A bounded `SKIP LOCKED` sweep marks them `dead`, and claim selection excludes them. |
 
-**Limits** (ADR-0007): handlers are trusted code, and the fence assumes they preserve its transaction and lock. `execute` accepts arbitrary SQL and Python exposes the underlying objects, so a handler that issued transaction-control SQL, used the underlying connection or edited ownership fields could defeat the fence. A fenced transaction that passed its check just before expiry may commit shortly after the lease expires; the database enforces only that the payload is a JSON object, not the finer payload rules or the byte cap; there is no worker yet. **The PostgreSQL integration tests have not run**, so none of the guarantees above is verified yet. Compose has never been run.
+**Limits** (ADR-0007): handlers are trusted code, and the fence assumes they preserve its transaction and lock. `execute` accepts arbitrary SQL and Python exposes the underlying objects, so a handler that issued transaction-control SQL, used the underlying connection or edited ownership fields could defeat the fence. A fenced transaction that passed its check just before expiry may commit shortly after the lease expires; the database enforces only that the payload is a JSON object, not the finer payload rules or the byte cap; there is no worker yet. Passing tests demonstrate the tested behaviour, not a general security or performance guarantee.
+
+**Verification:** at commit `11350e1` on `feat/durable-job-core`, the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38240768344/job/114782517485) passed with all 63 PostgreSQL tests (`63 passed, 605 deselected in 16.58s`, from the log retrieved by the external reviewer). They include M3a's concurrent-claim, stale-worker, lease-fencing, lock-wait and lock-timeout tests. M3a is not yet on `main`, and Compose has never been run.
 
 ## Not implemented yet
 
