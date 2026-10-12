@@ -7282,3 +7282,607 @@ Do not begin M3c.
   - a failure after `main` is pushed is reported, never reverted or rewritten.
 
   There is no force-push, amend, rebase, squash, branch deletion or tag push.
+
+**Outcome note for Prompt 65 (added with Prompt 66; publication and CI happened after the Prompt 65 preflight note):**
+- **Commit:** `dd26c7099d1007e9ee615204dc0056abe8820c67`, with parent `bc5f638`, using the noreply identity. Only `prompts.md` differed from the accepted tree `108db3b…`, and the full-history Gitleaks scan was clean before any push.
+- **Feature push:** `feat/worker-runtime` moved from `bc5f638` to `dd26c70`.
+  - [CI run 38255538870](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255538870) succeeded: Ubuntu, Windows and integration.
+  - [Secret-scan run 38255538708](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255538708) succeeded.
+- **Fast-forward of `main`:** after all four checks passed and a fresh fetch confirmed the preconditions, `main` was fast-forwarded with `git merge --ff-only` and pushed from `b3f9845` to `dd26c70`. No merge commit, force-push or tag push was made.
+- **`main` CI for exactly `dd26c70`:**
+  - [CI run 38255786860](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860) and [secret-scan run 38255786973](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973) succeeded.
+  - From logs retrieved independently by the external reviewer:
+    - Ubuntu `709 passed, 77 skipped in 18.16s`;
+    - Windows `708 passed, 78 skipped in 21.20s`;
+    - PostgreSQL `77 passed, 709 deselected in 17.36s`;
+    - secret scan: 26 commits scanned, no leaks found.
+  - Claude saw only job conclusions; the unauthenticated log endpoint returned 403.
+
+## Prompt 66: Record M3b on main and propose the M3c specification
+
+- **Stage:** Documentation only, on branch `docs/m3c-revision-spec` (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Record M3b’s verified main publication and prepare the detailed M3c specification for review. Documentation only; do not implement M3c yet.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: main
+- HEAD and origin/main:
+  dd26c7099d1007e9ee615204dc0056abe8820c67
+- Working tree clean, nothing untracked.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+
+Check remote refs freshly. Stop without changes if anything differs.
+
+Create docs/m3c-revision-spec from HEAD.
+If that branch already exists, stop and report its state rather than resetting or reusing it.
+
+2. Read the accepted design and actual interfaces
+
+Read:
+- CLAUDE.md
+- Relevant plan sections covering documents, revisions, ingestion, tenant constraints and the M3 sequence
+- ADR-0003, ADR-0004, ADR-0007 and ADR-0008
+- Existing persistence models, migrations, transaction helpers and job fence
+- Implemented worker context, atomic finish and cancellation behavior
+- Relevant integration fixtures and migration/readiness tests
+
+Build on the existing architecture and interfaces. Do not introduce a new storage service, queue or framework.
+
+3. Record M3b on main
+
+Narrowly update README.md, ADR-0008, docs/plan.md and docs/threat-model.md:
+- M3b was fast-forwarded onto main at dd26c70.
+- All four main-push checks passed for that exact SHA.
+- Preserve bc5f638’s earlier evidence as historical evidence.
+- No production handlers exist yet.
+- Compose remains unverified.
+- M3c–M3f remain unimplemented and overall M3 acceptance is pending.
+
+The reviewer independently retrieved these logs:
+
+CI run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860
+
+- Ubuntu job 114833375464:
+  709 passed, 77 skipped in 18.16s
+- Windows job 114833375444:
+  708 passed, 78 skipped in 21.20s
+- PostgreSQL job 114833375219:
+  77 passed, 709 deselected in 17.36s
+
+Secret-scan run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973
+
+- Job 114833375056:
+  26 commits scanned; no leaks found.
+
+Both runs:
+- head_sha: dd26c7099d1007e9ee615204dc0056abe8820c67
+- head_branch: main
+- conclusion: success
+
+The reviewer retrieved GitHub evidence but did not run the project suite locally.
+
+4. Detailed M3c specification in docs/plan.md
+
+Mark the specification Proposed, awaiting review.
+
+Scope:
+- documents and document_revisions tables in migration 0003
+- Pure revision lifecycle rules
+- Tenant-scoped persistence operations
+- Revision-number allocation
+- Fenced transactional activation and supersession
+- Tests and documentation
+
+Parsing, chunking, the ingestion handler, uploads and document endpoints belong to later slices. Do not pull them into M3c.
+
+Define concretely:
+
+A. Schema and ownership
+- Exact fields, types, nullability, defaults, uniqueness, indexes and named constraints.
+- Relationships to tenants and vendors.
+- Composite tenant constraints for tenant-scoped references.
+- How active_revision_id can refer only to a revision belonging to that same tenant and document.
+- Equivalent ownership constraints for superseded_by_revision_id.
+- Migration ordering for circular document/revision references.
+- What the database enforces versus what trusted application transitions enforce.
+- Source-content storage and content-hash requirements from the existing plan, including privacy limits; do not invent an external storage service.
+
+B. Pure lifecycle
+- pending, processing, failed, active and superseded.
+- Allowed transitions and invalid transitions.
+- Idempotency and conflicting retries.
+- Which fields are immutable.
+- Timezone-aware timestamps and safe fixed failure codes.
+- Retry of processing under a newly claimed job attempt.
+- Distinguish retryable job failure from a revision that is permanently failed.
+- A failed replacement must leave the prior active revision unchanged.
+
+C. Revision creation
+- Document identity and tenant-scoped lookup behavior.
+- Concurrent revision-number allocation without duplicates.
+- Same-document identical-content behavior consistent with the accepted upload design.
+- How metadata differences on duplicate content are handled.
+- The transaction boundary available to M3e for creating a revision and its ingestion job atomically.
+- Keep authorization and tenant scope explicit without adding endpoints.
+
+D. Activation and locking
+- Use the existing job fence and worker atomic-finish contract.
+- Verify the job tenant and revision/document binding from trusted persisted data.
+- Exact lock order across job, document and revision rows.
+- No reuse of time or ownership checks captured before a lock wait.
+- Bounded lock waits consistent with the existing design.
+- Concurrent activation by two different revision jobs for one document.
+- When a newer revision becomes active, supersede the previous active revision and update the pointer in one transaction.
+- If an older revision completes after a newer one is active, it becomes superseded without changing the active pointer.
+- Clarify whether ordering is relative to the active revision or merely the newest uploaded/pending revision; preserve the accepted plan.
+- Duplicate activation, supersession links and timestamps.
+- Rollback when activation or final job completion fails.
+- A stale worker cannot activate a revision.
+- No provider calls or parsing while activation locks are held.
+
+E. Future handler seam
+- Describe how M3d will persist chunks and activate a revision through the fence, with final job success atomic where required.
+- Define whether M3c functions accept the existing handler-facing FencedSession or another existing transaction interface.
+- Avoid allowing a persistence function to commit the caller’s transaction.
+- M3c adds no production worker handler.
+
+F. Verification
+Provide a proposed file list and focused tests:
+- Pure lifecycle and immutable model tests.
+- Database-independent persistence tests where useful.
+- Real PostgreSQL constraint and migration round-trip tests.
+- Concurrent revision allocation and duplicate-content creation.
+- Failed replacement preserves prior active revision.
+- Two revisions finishing out of order leave only the newer active.
+- Concurrent activations maintain one consistent active pointer.
+- Crash/failure during activation rolls back all changes.
+- Stale job attempt refuses activation.
+- Cross-tenant and cross-document references are rejected.
+- Installed-wheel migration checks and readiness expectations.
+
+Use event-controlled concurrency, bounded waits and guarded disposable fixtures. PostgreSQL verification remains pending future authorized publication.
+
+Identify genuine new decisions as proposals and explain conflicts with existing accepted decisions. Resolve routine choices yourself; do not leave a broad questionnaire.
+
+Do not write application code, migrations, tests or ADR-0009 yet.
+
+5. Prompt history
+
+Append this prompt verbatim as Prompt 66 if it is the next unused number; otherwise use the next unused number and explain it.
+
+Add truthful notes recording:
+- M3b publication and reviewer-retrieved main CI evidence.
+- M3c specification is proposed, not accepted or implemented.
+- Checks actually run.
+- No commit, push or merge.
+
+Keep earlier entries unchanged.
+
+6. Checks and handoff
+
+Stage only:
+- README.md
+- docs/decisions/0008-worker-runtime.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Check links, consistency and private content.
+Run git diff --cached --check and the staged Gitleaks scan.
+No application tests or builds are needed.
+
+Return:
+- Concise explanation of the M3c design.
+- New proposed decisions and genuine unresolved conflicts.
+- Actual check results.
+- Staged tree ID, paths and Git status.
+- COMPLETE staged diff excluding prompts.md in fenced diff blocks.
+- Numbered parts at file boundaries if needed; never silently truncate.
+- Summary of prompt-history additions.
+
+Leave changes staged and uncommitted for review.
+Do not push, merge, amend, rebase, start Docker or contact a local database.
+````
+
+**Outcome (documentation pending review; staged on `docs/m3c-revision-spec`, not committed or pushed):**
+- **Starting state verified:**
+  - branch `main`, with HEAD and `origin/main` at `dd26c70` (remote refs read freshly);
+  - a clean tree and the expected origin.
+  - Branch `docs/m3c-revision-spec` did not exist locally or on the remote, and was created from `dd26c70`.
+- **M3b publication recorded** in the README, ADR-0008, the plan and the threat model:
+  - M3b on `main` at `dd26c70`, with all four `main`-push checks passing;
+  - the counts from the reviewer's independently retrieved logs.
+  - The README's verified baseline moved to `dd26c70`, and the `bc5f638` and `b3f9845` evidence is kept as historical evidence.
+  - There are no production handlers; Compose is unverified; M3c–M3f are not implemented; overall M3 acceptance is pending.
+- **M3c specification:** added to `docs/plan.md` and marked **PROPOSED, awaiting review**. It is neither accepted nor implemented. It covers:
+  - the schema, ownership and migration order;
+  - the pure lifecycle;
+  - revision creation;
+  - activation and locking;
+  - the M3d handler seam;
+  - the verification plan;
+  - seven decisions requested at review and one unresolved item.
+
+  No code, migrations, tests, ADR-0009, dependencies or workflows changed.
+- **Checks run:**
+  - the link and anchor check;
+  - a status-consistency search;
+  - a private-content check of the staged additions;
+  - `git diff --cached --check`;
+  - the staged Gitleaks scan.
+
+  Exact results are in the session handoff. No application tests or builds were run.
+- **No commit, push or merge occurred.** `main` is unchanged at `dd26c70`.
+
+**Review note for Prompt 66 (added with Prompt 67):**
+- **Accepted:** the M3b publication documentation and the broad M3c schema and lifecycle approach.
+- **Corrections requested to the M3c proposal:**
+  - fresh lease checks after M3c's additional lock waits;
+  - an explicit activation order for the immediate one-active index;
+  - honest commit-failure semantics;
+  - a correct permanent-failure seam, since raising inside a fenced block rolls back `fail_revision`;
+  - a narrowly settled exhausted-job limitation;
+  - per-field state checks;
+  - `RevisionContent` consistency validated in M3c.
+- **Status:** M3c remains proposed.
+
+## Prompt 67: Correct the proposed M3c specification
+
+- **Stage:** Documentation only, on branch `docs/m3c-revision-spec` (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Correct the proposed M3c specification. Documentation only; leave changes staged and uncommitted.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+Expected starting state:
+- Branch: docs/m3c-revision-spec
+- HEAD:
+  dd26c7099d1007e9ee615204dc0056abe8820c67
+- Staged tree:
+  929800be9f0a87c8f888fb83771401ce3f3ed64f
+- Exactly five staged files:
+  README.md
+  docs/decisions/0008-worker-runtime.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Expected origin for evidenceguard-agentic-rag.
+
+Stop without changes if anything differs.
+Record the pre-edit staged tree.
+
+The reviewer accepts the M3b publication documentation and the broad M3c schema/lifecycle approach. M3c remains proposed pending review of these corrections.
+
+1. Fresh lease checks after additional lock waits
+
+The fence checks ownership before M3c acquires document and revision locks. Its JobSnapshot and earlier time cannot establish that the lease remains valid after those waits.
+
+Specify for start_processing, fail_revision and activate_revision:
+- Acquire locks in the accepted order.
+- Re-read required mutable data after locks.
+- Read the currently locked job state and fresh clock_timestamp().
+- Revalidate tenant, token ownership, running status and unexpired lease immediately before applying revision effects.
+- Raise the existing fixed LeaseLostError and change nothing if the check fails.
+- Do not use the earlier JobSnapshot's timestamp as the current database time.
+
+Explain how this is implemented through the existing FencedSession and pure job rules without changing transaction ownership or exposing lifecycle transitions to handlers.
+
+Preserve M3a's accepted limit: a valid fenced transaction may commit shortly after expiry. Do not promise continuous lease validation during every statement.
+
+Add a planned real PostgreSQL test:
+- The worker holds its job fence.
+- It waits on a document lock.
+- The lease expires during that wait, within the lock-timeout bound.
+- The lock is released.
+- Activation is refused and revision states, active pointer and job outcome remain unchanged.
+
+2. Explicit activation statement order
+
+The partial unique index enforcing one active revision is immediate.
+
+Specify:
+- Demote the old active revision first.
+- Then promote the new revision.
+- Then update the document pointer.
+- All occur in one transaction under the document lock.
+- The temporary intermediate state is not published as a committed state.
+
+For an older revision finishing late, leave the active revision and pointer unchanged and mark only the target superseded.
+
+Duplicate activation must change no timestamps, links or document updated_at.
+
+Add an integration test proving the successful replacement path works with the actual partial unique index, and rollback restores the previous active state after a failure between demotion and promotion.
+
+3. Honest commit-failure semantics
+
+Replace the statement that any commit exception necessarily rolls back everything.
+
+Distinguish:
+- A failure before commit rolls back the activation changes and job success together.
+- A successfully committed transaction persists both together.
+- If commit acknowledgment fails, the outcome may be unknown; either both committed or neither did.
+- Recovery uses existing worker uncertain-finish behavior and idempotent revision transitions.
+- Never claim a previous state is intact solely because commit raised.
+
+Add planned coverage for both uncertain-commit cases, using controlled doubles where necessary. Keep real PostgreSQL rollback tests separate from simulated acknowledgment failure.
+
+4. Permanent failure and exhausted jobs
+
+The proposed “mark failed and raise a permanent error in one fenced transaction” is incorrect: raising inside the block rolls back fail_revision.
+
+Correct the future M3d seam:
+- Do not raise inside a fenced block intended to persist failure.
+- With existing M3b interfaces, commit fail_revision in its fenced transaction, then raise PermanentJobError outside that block.
+- The supervisor records the job failure in a separate fenced transaction.
+- Explicitly document the gap between those commits.
+- Define recovery if the worker crashes in that gap: a handler must recognize an already-failed revision and request permanent job failure without trying to start processing or perform ingestion again.
+- Do not claim atomic revision failure and job failure with the current interface.
+- Any future atomic-failure interface extension requires separate review.
+
+Settle the exhausted-job limitation narrowly:
+- A job can become dead while its revision remains pending or processing, including abandonment before start_processing.
+- M3c does not introduce reconciliation.
+- Record reconciliation or a truthful stalled/dead projection as a required M3d/M3e design item before overall M3 acceptance.
+- The previous active revision remains unaffected.
+
+5. Schema and input precision
+
+Clarify the state checks so partial field pairs cannot pass:
+- failure_reason and failed_at must each be non-null exactly for failed, and null otherwise.
+- superseded_at and superseded_by_revision_id must each be non-null exactly for superseded, and null otherwise.
+- failed, pending and processing have no activated_at.
+- superseded may retain activated_at.
+- Name each proposed constraint explicitly.
+
+RevisionContent should validate consistency now, before persistence:
+- Accept strict UTF-8 source bytes or derive validated hash/size from their exact encoding.
+- sha256, byte_size and content_text must correspond to the same bytes.
+- No normalization before hashing.
+- Reject NUL content, which PostgreSQL text cannot store.
+- Keep upload size/media HTTP response mapping in M3e.
+- Validation errors and repr must not expose submitted content.
+
+Do not defer consistency of caller-supplied content/hash/size to future endpoints.
+
+6. Scope and handoff
+
+Change only docs/plan.md and prompts.md unless another staged document directly contradicts a correction; explain any necessary additional edit.
+
+Keep the other reasonable proposals:
+- Composite tenant/document pointer constraints.
+- Allocation counter under the document lock.
+- No triggers.
+- Metadata conflicts rather than silent updates.
+- Identical failed content returns the existing revision.
+- Domain module named revisions.
+- chunker_version introduced with M3d.
+
+Append this prompt verbatim as Prompt 67 if it is the next unused number; otherwise use the next unused number and explain it.
+Record the review and corrections truthfully. Earlier entries remain unchanged.
+
+Check links, consistency and private content.
+Run git diff --cached --check and the staged Gitleaks scan.
+No application tests or builds are needed.
+
+Return:
+- Explanation of the corrections and remaining design choices.
+- Actual check results.
+- New staged tree ID, paths and Git status.
+- COMPLETE incremental diff against the recorded pre-edit staged tree, excluding prompts.md.
+- Prompt-history additions.
+
+Leave changes staged and uncommitted.
+No code, migrations, tests, dependencies, workflow edits, push, merge, Docker or database contact.
+````
+
+**Outcome (corrections pending review; staged, not committed or pushed):**
+- **Starting state verified:**
+  - branch `docs/m3c-revision-spec`, HEAD `dd26c70`;
+  - staged tree `929800b…` with exactly the five expected files;
+  - nothing unstaged or untracked, and the expected origin.
+
+  The pre-edit staged tree was recorded.
+- **Only `docs/plan.md` changed,** besides this file. No other staged document contradicted the corrections. The M3c section stays **PROPOSED** and now specifies:
+  - **Ownership re-check:** after the document and revision locks, the locked job row and a fresh `clock_timestamp()` are re-read through the same `FencedSession`, M3a's `holds_lease` is applied, and the fixed `LeaseLostError` is raised before any write.
+    - That fresh time is used for the effects.
+    - It is proposed as a read-only `recheck_ownership` helper, which adds no transition and leaves transaction ownership unchanged.
+    - M3a's commit-shortly-after-expiry limit is kept.
+  - **Activation order:** demote, then promote, then the pointer. A late older revision writes only its own row; a duplicate writes nothing.
+  - **Commit semantics:** distinguished before the commit, after it, and with an unknown acknowledgment.
+  - **Permanent failure:** commit `fail_revision` without raising, then raise `PermanentJobError` outside the block. The non-atomic gap and its crash recovery are documented.
+  - **Dead jobs:** a job left dead with its revision unsettled is recorded as a required M3d/M3e design item before overall M3 acceptance.
+  - **State checks:** per-field and named.
+  - **`RevisionContent`:** built from the exact bytes, with strict UTF-8, no NUL and no normalization, and fixed errors.
+  - **Tests:** the matching planned tests, including the lease expiring during the document-lock wait, the real partial index with a failure between demotion and promotion, and uncertain commits using controlled doubles.
+
+  The other proposals are kept.
+- **Checks run:**
+  - the link and anchor check;
+  - a consistency search for the superseded statements;
+  - a private-content check of the staged additions;
+  - `git diff --cached --check`;
+  - the staged Gitleaks scan.
+
+  Exact results are in the session handoff. No application tests or builds were run.
+- **No commit, push or merge occurred.** `main` is unchanged at `dd26c70`.
+
+**Acceptance note for Prompt 67 (added with Prompt 68):**
+- **What was reviewed:** the external reviewer inspected the complete Prompt 66 documentation diff and the Prompt 67 corrections. They did not run application checks.
+- **Accepted:** the corrected M3c specification and its decisions:
+  - **Schema:** composite tenant and document ownership constraints, the one-active partial unique index, the allocation counter under the document lock, and no triggers.
+  - **Content and creation:** exact-byte `RevisionContent` validation, immutable metadata with explicit duplicate conflicts, and identical failed content returning the existing revision.
+  - **Naming and scope:** the `revisions` domain module, and `chunker_version` introduced in M3d.
+  - **Locking and activation:** the job → document → ordered-revision lock order, the fresh ownership re-check after the extra lock waits, and the demote → promote → pointer activation order.
+  - **Failure:** separate revision and job failure commits with documented recovery, and dead-job reconciliation or a truthful projection required before overall M3 acceptance.
+- **Final clarifications** (applied in Prompt 68):
+  - **Uncertain-commit recovery:** a committed atomic finish leaves the job `succeeded`, so it is not reclaimable; an uncommitted one is retried or reclaimed with the revision still `processing`. Duplicate activation is tested separately.
+  - **Failure codes:** `RevisionFailureCode.INGESTION_FAILED` maps to `PermanentJobError(JobErrorCode.PERMANENT_FAILURE)`, and the two code types are never mixed.
+  - **Tenant check:** `recheck_ownership` checks the token, status and expiry; the M3c caller checks the tenant.
+- **Implementation of M3c has not started.**
+
+## Prompt 68: Accept the M3c revision specification and commit it locally
+
+- **Stage:** Documentation only, on branch `docs/m3c-revision-spec` (local commit authorized; no push)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Finalize and commit the reviewed M3c specification locally. Documentation only; do not implement or push.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: docs/m3c-revision-spec
+- HEAD:
+  dd26c7099d1007e9ee615204dc0056abe8820c67
+- Staged tree:
+  3fe4621973afad02f3a7b3f3cf3ed36016946f1b
+- Exactly five staged files:
+  README.md
+  docs/decisions/0008-worker-runtime.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Expected origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+
+Stop without changes if anything differs.
+Record the accepted staged tree before editing.
+
+2. Accept the corrected specification
+
+The reviewer inspected the complete Prompt 66 documentation diff and Prompt 67 corrections without running application checks.
+
+Accept the corrected M3c specification and its listed decisions:
+- Composite tenant/document ownership constraints.
+- One-active partial unique index.
+- Revision allocation counter under the document lock.
+- No triggers.
+- Exact-byte RevisionContent validation.
+- Immutable metadata and explicit duplicate conflicts.
+- Identical failed content returns the existing revision.
+- revisions domain module.
+- chunker_version introduced in M3d.
+- Job → document → ordered revision locks.
+- Fresh ownership recheck after additional lock waits.
+- Demote → promote → pointer activation order.
+- Separate revision/job failure commits with documented recovery.
+- Required dead-job reconciliation or truthful projection before overall M3 acceptance.
+
+Implementation remains pending.
+
+3. Two final clarifications
+
+A. Uncertain commit and reclaim
+
+Correct the recovery wording and planned tests:
+- If atomic activation plus job success actually committed, the job is succeeded and cannot be reclaimed. A later fenced outcome attempt is refused; no second activation occurs.
+- If the atomic transaction did not commit, the job may be retried/reclaimed and the revision remains processing; the next valid attempt activates normally.
+- An idempotent duplicate activation can still be tested separately using an appropriate valid fenced invocation, but do not describe a succeeded job as reclaimable.
+
+Keep uncertain acknowledgment distinct from proven rollback.
+
+B. Revision failure code versus job failure code
+
+RevisionFailureCode and JobErrorCode are distinct types.
+The existing PermanentJobError requires JobErrorCode.
+
+Specify the initial mapping explicitly:
+- fail_revision records RevisionFailureCode.INGESTION_FAILED.
+- After that fenced transaction commits, the handler raises PermanentJobError(JobErrorCode.PERMANENT_FAILURE).
+- Recovery of an already-failed revision uses the same job error mapping.
+- Do not pass RevisionFailureCode directly to PermanentJobError.
+- Additional parser-specific revision codes and any finer job-code mapping belong to M3d review.
+
+Also clarify that recheck_ownership validates token/running/expiry, while the M3c caller explicitly verifies the persisted job tenant matches the revision/document scope. Do not imply JobLeaseToken itself carries a tenant.
+
+4. Documentation status and history
+
+Mark the M3c specification accepted at review, implementation pending.
+Update README.md consistently.
+Keep M3c–M3f unimplemented, Compose unverified and overall M3 acceptance pending.
+
+Change only README.md, docs/plan.md and prompts.md unless another staged document directly contradicts these final clarifications. Explain any additional necessary edit.
+
+Append this prompt verbatim as Prompt 68 if it is the next unused number; otherwise use the next unused number and explain it.
+Add an acceptance note under Prompt 67 recording the reviewed diffs, final clarifications and verification limits.
+Add a truthful pre-commit note.
+Earlier history remains unchanged.
+
+5. Checks and local commit
+
+Inspect the incremental diff against the recorded accepted tree.
+Check links, consistency and private content.
+Confirm effective author and committer email:
+257921624+mathewmljourney93@users.noreply.github.com
+
+Run:
+- git diff --cached --check
+- Staged Gitleaks scan
+
+Create one LOCAL commit:
+docs: accept M3c revision specification and record M3b main results
+
+Use the existing attribution convention.
+
+After committing:
+- Run the full-history Gitleaks scan.
+- Verify parent, committed paths, identity and clean working tree.
+- Confirm main remains unchanged.
+
+No application tests or builds are needed for documentation-only changes.
+
+6. Handoff
+
+Return:
+- Commit SHA, parent, subject and identity.
+- Final clarifications.
+- Actual checks and results.
+- Prompt-history additions.
+- COMPLETE incremental diff against the accepted staged tree, excluding prompts.md.
+- Final Git status and remaining limitations.
+
+No application code, migrations, tests, dependencies or workflow edits.
+Do not push, merge, amend, rebase, start Docker or contact a database.
+Do not begin M3c implementation in this task.
+````
+
+**Pre-commit note (written before the local commit):**
+- **Starting state verified:**
+  - branch `docs/m3c-revision-spec`, HEAD `dd26c70`;
+  - staged tree `3fe4621…` with exactly the five expected files;
+  - nothing unstaged or untracked, and the expected origin.
+
+  The accepted staged tree was recorded before editing.
+- **Changes:**
+  - **`docs/plan.md`:** the M3c specification is marked accepted at review, implementation pending. The proposal markers became settled wording, and the final clarifications were applied.
+  - **`README.md`:** the status was updated to match.
+  - No other staged document contradicted the clarifications.
+  - M3c–M3f remain unimplemented, Compose is unverified, and overall M3 acceptance is pending.
+- **Checks before the commit:**
+  - the link check;
+  - the consistency and private-content searches;
+  - the author and committer identity check;
+  - `git diff --cached --check`;
+  - the staged Gitleaks scan.
+
+  Exact results are in the session handoff. No application tests or builds were run.
+- **After the commit:** the full-history Gitleaks scan and the commit verification are reported in the session handoff, not recorded here.
+- **No code, tests, dependencies, migrations or workflow edits. No push, merge, amend, rebase, Docker or database contact.**

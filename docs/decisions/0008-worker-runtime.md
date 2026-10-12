@@ -1,6 +1,6 @@
 # ADR-0008: Sequential worker runtime and `eg-worker`
 
-- **Status:** Accepted (M3b), following the implementation review and passing CI at commit `bc5f638` on branch `feat/worker-runtime`. It is **not yet merged into `main`**. See *Consequences and limits*.
+- **Status:** Accepted (M3b), following the implementation review and passing CI at commit `bc5f638` on branch `feat/worker-runtime`, then fast-forwarded onto `main` at `dd26c70`, where CI passed again. See *Consequences and limits*.
   - The implementation came in Prompt 60, with corrections after review in Prompt 61: cancellation-check boundaries, exception-safe job-thread cleanup, and the abnormal exit despite cleanup failures.
   - The specification was accepted at review in Prompt 59.
 - **Date:** 2026-10-12
@@ -158,8 +158,10 @@ The 60 s lease and the 20 s heartbeat interval are M3a's.
   - Ubuntu passed one more database-independent test than Windows. That is consistent with the POSIX-only SIGTERM delivery test running on Ubuntu and being skipped on Windows; no individual log entry for that test was observed.
   - The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962775) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962775/job/114827088806): 25 commits scanned, no leaks found).
   - Earlier local Windows runs used fake stores, scripted clocks and event-controlled ordering, including the regression tests added in Prompt 61.
+  - **On `main` at `dd26c70`** (`dd26c7099d1007e9ee615204dc0056abe8820c67`), which adds only documentation after `bc5f638`, from logs retrieved by the external reviewer:
+    - in [CI run 38255786860](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860): [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375464) `709 passed, 77 skipped in 18.16s`; [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375444) `708 passed, 78 skipped in 21.20s`; [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375219) `77 passed, 709 deselected in 17.36s`;
+    - the [secret-scan run 38255786973](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973/job/114833375056): 26 commits scanned, no leaks found).
 - **Not yet verified or delivered:**
-  - M3b is not merged into `main`;
   - the production handler registry is still empty;
   - Compose is unverified;
   - M3c–M3f are not implemented;

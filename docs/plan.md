@@ -626,10 +626,15 @@ Each question entry contains:
     - [CI run 38242144844](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118333) `605 passed, 63 skipped in 7.56s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118106) `605 passed, 63 skipped in 14.86s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118281) `63 passed, 605 deselected in 16.17s`.
     - The [secret-scan run 38242144876](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144876) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144876/job/114787118292): 22 commits scanned, no leaks found).
   - **Still not verified:** Compose has never been run. The tests demonstrate the tested behaviour, not a general security or performance guarantee.
-- **M3b** has a detailed specification below, **accepted at review (Prompt 59)**. It is **implemented (Prompt 60, corrected in Prompt 61; [ADR-0008](decisions/0008-worker-runtime.md)), reviewed and verified in CI on branch `feat/worker-runtime` at `bc5f638`**, and **not yet merged into `main`**.
+- **M3b** has a detailed specification below, **accepted at review (Prompt 59)**. It is **implemented (Prompt 60, corrected in Prompt 61; [ADR-0008](decisions/0008-worker-runtime.md)), reviewed, verified in CI and on `main`**.
+  - **Tested commit:** `bc5f638` on `feat/worker-runtime`.
   - [CI run 38253962690](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827089007) `709 passed, 77 skipped in 15.96s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827088937) `708 passed, 78 skipped in 22.18s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827089078) `77 passed, 709 deselected in 19.63s` (M3a's 63 PostgreSQL tests and the worker's 14).
   - The [secret-scan run 38253962775](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962775) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962775/job/114827088806): 25 commits scanned, no leaks found).
-  - There are no production handlers yet. M3c–M3f are not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
+  - **On `main`:** `main` was fast-forwarded to `dd26c70` (`dd26c7099d1007e9ee615204dc0056abe8820c67`), which adds only documentation after `bc5f638`.
+    - [CI run 38255786860](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375464) `709 passed, 77 skipped in 18.16s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375444) `708 passed, 78 skipped in 21.20s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375219) `77 passed, 709 deselected in 17.36s`.
+    - The [secret-scan run 38255786973](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973/job/114833375056): 26 commits scanned, no leaks found).
+  - There are no production handlers yet. Compose is unverified.
+- **M3c** has a detailed specification below, **accepted at review (Prompt 68); implementation pending**. M3c–M3f are not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
 
 M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-workflow.md): plain Python, PostgreSQL-backed jobs claimed with `FOR UPDATE SKIP LOCKED`, leases, heartbeats and fenced writes. There is no new orchestration framework or queue dependency. Each slice is reviewed, verified in CI and merged before the next one starts. The M3 acceptance criteria above are split across the slices as follows:
 
@@ -810,7 +815,7 @@ M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-wo
 
   The 5-second `lock_timeout` and the sweep bound of 10 rows per claim were accepted at review (Prompt 48) as initial engineering defaults, not measured performance claims.
 
-**M3b, the worker process, in detail (ACCEPTED at review, Prompt 59; implemented in Prompts 60–61, reviewed and verified in CI on branch `feat/worker-runtime` at `bc5f638`; not yet merged into `main`):**
+**M3b, the worker process, in detail (ACCEPTED at review, Prompt 59; implemented in Prompts 60–61, reviewed, verified in CI and on `main` at `dd26c70`):**
 
 M3b turns the M3a library into a running worker. It keeps the accepted architecture: plain Python, PostgreSQL-backed jobs, leases and fenced transactions ([ADR-0003](decisions/0003-plain-python-workflow.md), [ADR-0007](decisions/0007-durable-job-core.md)). There is no new queue, framework or dependency.
 
@@ -1117,6 +1122,392 @@ The external reviewer inspected the original specification (Prompt 57) and its l
 - **Conflicts with accepted decisions:** none found.
   - The `kinds` filter extends M3a's claim without changing its ordering, locking or sweep.
   - Everything else builds on the accepted M3a lease, heartbeat interval, backoff and attempt cap, without redefining them.
+
+**M3c, documents and revisions, in detail (ACCEPTED at review, Prompt 68; implementation pending, nothing below is implemented):**
+
+The external reviewer inspected the original specification (Prompt 66) and its corrections (Prompt 67) without running application checks. They accepted it with the final clarifications of Prompt 68. The Prompt 67 corrections cover:
+- fresh lease checks after the additional lock waits;
+- the activation statement order;
+- honest commit-failure semantics;
+- the permanent-failure seam and exhausted jobs;
+- schema and input precision.
+
+The final clarifications of Prompt 68 cover uncertain-commit recovery, the mapping from revision failure codes to job error codes, and where the tenant is checked. The choices are listed as settled at the end. Implementation has not started.
+
+M3c adds the `documents` and `document_revisions` tables (migration `0003`), the pure revision lifecycle, and tenant-scoped persistence operations. Those operations are:
+- creating a revision, with revision-number allocation;
+- marking it processing or failed;
+- activating it transactionally inside the existing job fence.
+
+It builds on the accepted design (§4 *Document revision*, correction B; ADR-0004's tenant-safe references; ADR-0007's fence; ADR-0008's atomic finish). There is no new storage service, queue or framework.
+
+**Out of scope here:**
+- parsing, chunking, the `chunks` table and the `ingest_revision` handler (M3d);
+- uploads and document endpoints (M3e);
+- Docker (M3f).
+
+M3c adds no production worker handler and no endpoint.
+
+- **Modules (following M3a's layout):**
+  - `evidenceguard_domain.revisions`: pure values and rules, no database;
+  - `evidenceguard_persistence.documents`: PostgreSQL operations;
+  - new models in `evidenceguard_persistence.models`;
+  - migration `v0003_documents.py`.
+
+  The plan's earlier name `evidenceguard_domain.state` is not used; M3a established one module per lifecycle.
+
+**A. Schema and ownership**
+
+- **`documents`:**
+
+  | Column | Type | Null | Default / rule |
+  |---|---|---|---|
+  | `id` | uuid | no | primary key (application `uuid4`) |
+  | `tenant_id` | uuid | no | FK → `tenants.id` |
+  | `vendor_id` | uuid | no | composite FK `(tenant_id, vendor_id)` → `vendors (tenant_id, id)` |
+  | `document_key` | varchar(64) | no | check `ck_documents_document_key`: `^[a-z0-9]+(?:-[a-z0-9]+)*$` (the vendor slug pattern) |
+  | `title` | varchar(200) | no | check `ck_documents_title`: `char_length(btrim(title)) >= 1` |
+  | `source_type` | varchar(32) | no | check `ck_documents_source_type`: one of `SourceType` (`vendor_statement`, `contract`, `third_party_report`) |
+  | `authenticity` | varchar(32) | no | default `'not_established'`; check `ck_documents_authenticity`: `= 'not_established'` (the only v1 value, E11) |
+  | `latest_revision_no` | integer | no | default 0; check `ck_documents_latest_revision_no`: `>= 0` |
+  | `active_revision_id` | uuid | yes | composite FK `fk_documents_active_revision` `(tenant_id, id, active_revision_id)` → `document_revisions (tenant_id, document_id, id)` |
+  | `created_at`, `updated_at` | timestamptz | no | `now()` |
+
+  **Constraints:** unique `(tenant_id, id)` (for tenant-safe references) and unique `(tenant_id, vendor_id, document_key)`, the document identity, which also serves as the lookup index. There are no other indexes.
+- **`document_revisions`:**
+
+  | Column | Type | Null | Default / rule |
+  |---|---|---|---|
+  | `id` | uuid | no | primary key |
+  | `tenant_id` | uuid | no | FK → `tenants.id` |
+  | `document_id` | uuid | no | composite FK `(tenant_id, document_id)` → `documents (tenant_id, id)` |
+  | `revision_no` | integer | no | check `>= 1` |
+  | `version_label` | varchar(64) | yes | check: NULL or `char_length(btrim(version_label)) >= 1` |
+  | `effective_date` | date | yes | — |
+  | `status` | varchar(16) | no | check: one of `pending`, `processing`, `failed`, `active`, `superseded` |
+  | `failure_reason` | varchar(64) | yes | check: fixed-code pattern `^[a-z][a-z0-9_]{0,63}$` |
+  | `sha256` | char(64) | no | check: `^[0-9a-f]{64}$` (SHA-256 of the uploaded bytes) |
+  | `media_type` | varchar(32) | no | check: `IN ('text/markdown', 'text/plain')` |
+  | `byte_size` | bigint | no | check: `>= 1` |
+  | `content_text` | text | no | the decoded UTF-8 text |
+  | `activated_at`, `failed_at`, `superseded_at` | timestamptz | yes | see the state checks |
+  | `superseded_by_revision_id` | uuid | yes | composite FK `fk_document_revisions_superseded_by` `(tenant_id, document_id, superseded_by_revision_id)` → `document_revisions (tenant_id, document_id, id)` |
+  | `created_at`, `updated_at` | timestamptz | no | `now()` |
+
+  **Uniques and indexes:**
+  - `(tenant_id, id)`;
+  - `(tenant_id, document_id, id)`, the target of both pointer FKs;
+  - `(tenant_id, document_id, revision_no)` (accepted);
+  - `(tenant_id, document_id, sha256)` (accepted: idempotent uploads within a document);
+  - the partial unique index `uq_document_revisions_one_active` on `(tenant_id, document_id) WHERE status = 'active'`.
+
+  **State checks.** Each field is constrained on its own, so a partial pair cannot pass:
+
+  | Constraint | Rule |
+  |---|---|
+  | `ck_document_revisions_status` | `status IN ('active', 'failed', 'pending', 'processing', 'superseded')` |
+  | `ck_document_revisions_failure_reason_when_failed` | `(status = 'failed') = (failure_reason IS NOT NULL)` |
+  | `ck_document_revisions_failed_at_when_failed` | `(status = 'failed') = (failed_at IS NOT NULL)` |
+  | `ck_document_revisions_superseded_at_when_superseded` | `(status = 'superseded') = (superseded_at IS NOT NULL)` |
+  | `ck_document_revisions_superseded_by_when_superseded` | `(status = 'superseded') = (superseded_by_revision_id IS NOT NULL)` |
+  | `ck_document_revisions_activated_at_when_active` | `status <> 'active' OR activated_at IS NOT NULL` |
+  | `ck_document_revisions_no_activated_at_before_settled` | `status NOT IN ('pending', 'processing', 'failed') OR activated_at IS NULL` |
+  | `ck_document_revisions_not_superseded_by_self` | `superseded_by_revision_id IS NULL OR superseded_by_revision_id <> id` |
+
+  A `superseded` revision may keep its earlier `activated_at`; one superseded directly, without ever being active, has none.
+
+  **Format and range checks:**
+  - `ck_document_revisions_failure_reason_code` (the fixed-code pattern);
+  - `ck_document_revisions_sha256_hex`;
+  - `ck_document_revisions_media_type`;
+  - `ck_document_revisions_byte_size` (`>= 1`);
+  - `ck_document_revisions_revision_no` (`>= 1`);
+  - `ck_document_revisions_version_label`.
+- **Ownership:**
+  - `active_revision_id` and `superseded_by_revision_id` are composite FKs that include `tenant_id` and `document_id`. A document can therefore point only to its own revision in its own tenant, and a revision can be superseded only by a revision of the same document and tenant.
+  - Cross-tenant and cross-document references are rejected by PostgreSQL, not just by the application.
+  - A NULL `active_revision_id` (no active revision yet) passes the FK under the default `MATCH SIMPLE`.
+- **Circular references, migration order:**
+  1. create `documents` without `fk_documents_active_revision`;
+  2. create `document_revisions` with its FKs, including the self-reference;
+  3. add `fk_documents_active_revision` with `ALTER TABLE`.
+
+  Downgrade drops that FK first, then `document_revisions`, then `documents`. The FKs are not deferrable: activation sets the revision `active` before updating the pointer, and the pointer FK needs only the row to exist. No `ON DELETE` actions are added: deletion is out of scope for v1, and the default `NO ACTION` blocks it.
+- **What PostgreSQL enforces:**
+  - tenant and document ownership of every reference;
+  - uniqueness of numbers and content per document;
+  - at most one `active` revision per document;
+  - status values and their timestamp, failure and supersession fields;
+  - formats and ranges.
+- **What trusted application transitions enforce:**
+  - that `active_revision_id` points to the revision whose status is `active` (the pointer and status are changed together in one transaction under the document lock);
+  - that `revision_no` stays ≤ `latest_revision_no`;
+  - the allowed transition graph and immutability (below).
+
+  No triggers are used. Integration tests check the invariants after every concurrent scenario, as M3a does for jobs.
+- **Source content:**
+  - The plan stores content in the revision row (`sha256`, `media_type`, `byte_size`, `content_text`); there is no external object store.
+  - v1 accepts only `text/plain` and `text/markdown` (M3d parses those).
+  - The upload size cap and the HTTP mapping (413, 415, 422) belong to M3e. The database requires only `byte_size >= 1`.
+  - **`RevisionContent` is consistent by construction, now, in M3c.** It is built only from the exact uploaded bytes, `RevisionContent.from_bytes(data, media_type)`, which:
+    - decodes them as **strict UTF-8** (invalid sequences are rejected, not replaced);
+    - rejects NUL (U+0000), which PostgreSQL `text` cannot store;
+    - rejects empty input;
+    - computes `sha256` and `byte_size` from those same bytes, **with no normalization before hashing** (no newline, BOM or Unicode changes).
+
+    `content_text` is exactly the decoded text. Callers cannot supply a hash or size separately, and a value rebuilt from stored fields is re-verified by re-encoding `content_text` as UTF-8 and checking the hash and size. Mismatches, invalid UTF-8, NUL and unsupported media types raise a fixed `InvalidRevisionContentError` that contains no submitted content, and `repr` of the value shows neither the text nor any excerpt.
+  - `chunker_version` (listed in §4) moves to M3d's migration `0004`, which introduces chunking.
+  - **Privacy:**
+    - content is synthetic demonstration data only;
+    - it is never logged and never included in an exception message;
+    - it is excluded from `repr` of the domain values;
+    - it is returned only through tenant-scoped reads;
+    - hashes and sizes may be logged only as fixed fields, if at all, and M3c logs none.
+
+**B. Pure lifecycle (`evidenceguard_domain.revisions`)**
+
+- **Values:**
+  - `RevisionStatus`, an enum of the five states;
+  - `RevisionFailureCode`, an enum of fixed codes. M3c defines `ingestion_failed`; M3d adds parser-specific codes with review;
+  - immutable `DocumentSnapshot`, `RevisionSnapshot` and `RevisionContent` values, with `AwareDatetime` timestamps;
+  - every time-dependent rule takes `now` and calls `require_aware`, as M3a does.
+- **Transitions** (anything else raises `InvalidRevisionTransitionError`, with a fixed message and no change):
+
+  | From | Rule | To |
+  |---|---|---|
+  | `pending` | `start_processing` | `processing` |
+  | `processing` | `start_processing` (a retry under a newly claimed job attempt) | `processing` (no-op) |
+  | `pending`, `processing` | `fail(code)` | `failed` |
+  | `failed` | `fail(same code)` | no-op; a different code is a conflict |
+  | `processing` | `settle(now, active)` when the document has no active revision, or the active one has a **lower** `revision_no` | `active`; the previous active becomes `superseded`, with `superseded_by` set to the new one |
+  | `processing` | `settle(now, active)` when the active revision has a **higher** `revision_no` | `superseded`, with `superseded_by` = the active revision; `activated_at` stays NULL |
+  | `active`, `superseded` | `settle` repeated for the same revision | no-op: duplicate activation is idempotent and changes no link or timestamp |
+  | `active` | superseded only by a newer revision's `settle` | `superseded` |
+
+  `failed` and `superseded` are terminal. There is no transition back to `pending`.
+- **Ordering:** as accepted in §4, a revision is compared with the **currently active** revision, not with the newest uploaded or pending one.
+  - Example: revisions 1 (active), 2 and 3 exist. If 2 finishes first, it becomes active and supersedes 1; when 3 finishes, it supersedes 2. If 3 had finished first, 2 would go straight to `superseded` by 3.
+  - A failed replacement never touches the active revision: `fail` changes only its own row.
+- **Immutable once created:**
+  - revisions: `tenant_id`, `document_id`, `revision_no`, `version_label`, `effective_date`, `sha256`, `media_type`, `byte_size`, `content_text` and `created_at`;
+  - documents: `tenant_id`, `vendor_id`, `document_key`, `title`, `source_type` and `authenticity`.
+
+  Only status fields, the pointer, `latest_revision_no` and `updated_at` change. The rules return new snapshots and never mutate one.
+- **Retryable versus permanent:**
+  - A retryable job failure (`RetryableJobError`, lease loss, a crash) leaves the revision `processing`. The next claimed attempt calls `start_processing` again, which is a no-op.
+  - Only an explicit permanent ingestion decision by the handler sets `failed`, through `fail_revision` in its own committed fenced transaction (see E). It is not atomic with the job's failure.
+  - A `failed` revision is permanent; re-uploading the same bytes returns it (C).
+
+**C. Revision creation (the M3e seam)**
+
+- **The operation:** `create_revision(session, actor, *, vendor_id, document_key, title, source_type, content, version_label, effective_date) -> RevisionCreation(document, revision, created)`.
+  - It runs in the **caller's transaction** and never commits, like `enqueue`. M3e creates the revision and its `ingest_revision` job (idempotency key = the revision ID, kind and payload defined in M3d) and commits them together.
+  - The tenant comes only from `actor`.
+  - **Authorization:** reviewer or approver, as for vendors. M3c checks the role in the operation and raises the existing `PermissionDeniedError`; the endpoint mapping is M3e's.
+- **Steps:**
+  1. Validate the inputs as domain values; invalid input raises before any SQL.
+  2. Require the vendor in the actor's tenant; otherwise raise `VendorNotFoundError` (M3e maps it to 404, like another tenant's vendor).
+  3. `INSERT … ON CONFLICT (tenant_id, vendor_id, document_key) DO NOTHING` for the document, then read it with `SELECT … FOR UPDATE` by its tenant-scoped key.
+     - That lock serialises every creation for one document. Under READ COMMITTED, `ON CONFLICT` waits for a concurrent inserter, and the locked read then sees the committed row.
+     - If the row is not visible (for example under REPEATABLE READ), a fixed `RevisionCreateRaceError` is raised, as M3a's `JobEnqueueRaceError` is.
+  4. **Document metadata:** if the existing document's `title` or `source_type` differs from the request, raise `DocumentConflictError` and change nothing. Document metadata is fixed by the first upload; changing it needs a later explicit edit operation.
+  5. **Identical content:** if a revision with the same `sha256` exists for this document, compare `media_type`, `version_label` and `effective_date`.
+     - Equal: return the existing revision (`created=False`) whatever its status, including `failed`. This is the accepted "identical bytes return the existing revision".
+     - Different: raise `RevisionConflictError` and change nothing. A duplicate with different metadata is a conflict, never a silent update.
+  6. Otherwise set `latest_revision_no = latest_revision_no + 1` on the locked document and insert the revision as `pending` with that number.
+
+  Numbers are allocated under the document lock, so concurrent creations never duplicate a number. The unique constraint is the backstop: a violation surfaces as a fixed error, not a retry loop.
+- **What does not change:** the document's `active_revision_id`, which only activation changes.
+
+**D. Activation and locking**
+
+- **The operations:**
+  - `start_processing(session, job)`;
+  - `fail_revision(session, job, code)`;
+  - `activate_revision(session, job) -> ActivationResult(revision, superseded)`, where `superseded` is the revision demoted by this activation, if any.
+
+  Each runs **inside an open fence**: `session` is the fence's `FencedSession` and `job` is the fence's `JobSnapshot`. That snapshot was checked when the fence opened, **before** M3c's further lock waits, so neither it nor its time is evidence that the lease is still valid afterwards.
+- **Binding from trusted persisted data:**
+  - the revision ID comes only from the locked job's payload (`revision_id`, the payload key already planned for `ingest_revision`);
+  - the tenant comes only from `job.tenant_id`;
+  - every lookup is tenant-scoped, so a payload naming another tenant's revision finds nothing and raises `RevisionNotFoundError`;
+  - checking the job kind is M3d's handler registration.
+- **Lock order** (fixed in M3a; extended here), always:
+  1. the job row, already locked by the fence;
+  2. the document row: `SELECT … FOR UPDATE` by `(tenant_id, id)`;
+  3. the revision rows, in ascending `id` order: the target and, for activation, the current active revision.
+
+  The target's `document_id` is read first without a lock. It is immutable, so reading it unlocked is safe. Status, the pointer and every other mutable field are re-read in statements issued **after** the locks are held; nothing read before a lock wait is reused.
+
+  Creation takes only the document lock and inserts its job row, so it cannot form a cycle with this order.
+- **Bounded waits:** the fence's `SET LOCAL lock_timeout = '5s'` covers the whole transaction, including the document and revision locks. A timeout raises the existing `JobLockTimeoutError`, and the transaction rolls back.
+- **Fresh ownership re-check after the extra lock waits:** in `start_processing`, `fail_revision` and `activate_revision`, after the document and revision locks are held and the mutable revision and document data have been re-read:
+  1. re-read the **currently locked job row together with a fresh `clock_timestamp()`** in one statement. This is M3a's existing `current_state_statement`, executed through the same `FencedSession` in the same transaction; the job row is still locked by this transaction;
+  2. apply M3a's pure `holds_lease` rule: the matching `(job_id, worker_id, attempt)` token, status `running`, and `lease_expires_at` later than that fresh time. The token carries no tenant, so the **M3c caller separately verifies** that the re-read job row's `tenant_id` equals the tenant of the locked revision and document;
+  3. if the check fails, raise the existing fixed `LeaseLostError` before any revision or document write, so the transaction rolls back and nothing changes;
+  4. use **that fresh time**, never the earlier snapshot's time, as `now` for the revision rules and timestamps.
+
+  M3a's persistence module exposes this as one public helper, `recheck_ownership(session: FencedSession, token) -> tuple[JobSnapshot, datetime]`. It validates the token, the `running` status and expiry, and returns the re-read job, from which the caller checks the tenant, together with the fresh time. It wraps the existing statement and rule and adds no transition. Transaction ownership is unchanged: the fence still owns the transaction, the helper only reads, and handlers still get no lifecycle methods.
+- **The accepted M3a limit still applies:** a transaction that passes this re-check just before expiry may commit shortly after it. Ownership is checked at these explicit points, not continuously during every statement.
+- **`activate_revision`, in order, in the fence's single transaction under the document lock:**
+  1. lock the document, then the revisions (the order above);
+  2. re-read the document and the target, and the current active revision if there is one;
+  3. run the fresh ownership re-check, which yields `now`;
+  4. apply the pure `settle` rule;
+  5. write the result:
+     - **Newer than the active revision (or none active):**
+       1. **demote** the old active revision to `superseded`, with `superseded_at = now` and `superseded_by_revision_id` = the target;
+       2. **promote** the target to `active`, with `activated_at = now`;
+       3. **update the pointer**: `active_revision_id` = the target, and `updated_at`.
+
+       Demoting first is required because the one-active partial unique index is checked immediately, statement by statement. The intermediate state with no active revision exists only inside this uncommitted transaction and is never published.
+     - **Older than the active revision (finishing late):** mark only the target `superseded`, with `superseded_at = now` and `superseded_by_revision_id` = the active revision. The active revision, the pointer and the document's `updated_at` are not touched.
+     - **Duplicate** (the target is already `active` or `superseded`): no write at all. No timestamp, link or document `updated_at` changes, and the job can still finish.
+- **Concurrent activations** of two revisions of one document (two different jobs) serialise on the document lock. The second sees the first's committed result and settles against it, so the pointer and the single `active` status stay consistent, and the newer `revision_no` always wins.
+- **A stale worker cannot activate:** a reclaimed attempt fails the fence's ownership check with `LeaseLostError` before any of these statements run.
+- **Failure and commit semantics:**
+  - **A failure before the commit** (in activation, in the runtime's `succeed`, or a crash before `COMMIT`) rolls back the revision changes, the pointer and the job's success together.
+  - **A successful commit** persists them together.
+  - **If the commit acknowledgment fails**, the outcome is unknown: either both committed or neither did. The worker's uncertain-finish behaviour (ADR-0008) claims no success, and recovery depends on what actually happened:
+    - **It committed:** the job is `succeeded` and cannot be reclaimed. The runtime's later fenced outcome attempt is refused (`LeaseLostError`, logged as `job.outcome_unknown`), and no second activation occurs.
+    - **It did not commit:** the job is still `running` under this attempt. The runtime's fenced retry is recorded, or the lease expires and the job is reclaimed. The revision is still `processing`, and the next valid attempt activates it normally.
+  - An uncertain acknowledgment is never treated as a proven rollback.
+  - **A raised commit exception alone never proves that the previous state is intact.**
+- **No parsing, provider or network calls happen while these locks are held.** M3d does that work in earlier fenced transactions or outside them.
+
+**E. The M3d handler seam**
+
+- **The intended M3d handler:**
+  1. `with ctx.fenced(): start_processing(fence.session, fence.job)`;
+  2. parse and chunk outside the fence;
+  3. write chunks in short fenced transactions (idempotent, keyed by chunk ID);
+  4. finally `with ctx.fenced(finish=True): activate_revision(fence.session, fence.job)`.
+
+  The activation and the job's `succeeded` then commit together (ADR-0008's atomic finish).
+- **Permanent ingestion failure, with the existing M3b interfaces:**
+  1. `with ctx.fenced(): fail_revision(fence.session, fence.job, RevisionFailureCode.INGESTION_FAILED)`. The block **does not raise**, so it commits the revision's `failed` state;
+  2. **after** that block, the handler raises `PermanentJobError(JobErrorCode.PERMANENT_FAILURE)`;
+  3. the supervisor records the job's permanent failure in a **separate** fenced transaction.
+
+  Raising inside the block would roll back `fail_revision`, so it must not.
+  - **The gap between the two commits is real:** revision failure and job failure are **not** atomic with the current interface.
+  - **If the worker crashes in that gap**, the job is later reclaimed. The handler must first read the revision: if it is already `failed`, it raises `PermanentJobError(JobErrorCode.PERMANENT_FAILURE)` at once, without calling `start_processing` or ingesting again.
+  - **The two code types stay distinct.** `RevisionFailureCode` (stored in `failure_reason`) and `JobErrorCode` (stored in the job's `last_error`, and required by the existing `PermanentJobError`) are different types, and a revision code is never passed to `PermanentJobError`. The initial mapping is `INGESTION_FAILED` → `PERMANENT_FAILURE`. Parser-specific revision codes and any finer job-code mapping belong to M3d's review.
+  - Any future interface for atomic revision-and-job failure needs a separate review.
+- **Exhausted jobs:**
+  - A job can become `dead` while its revision is still `pending` or `processing`. That happens when a lease is abandoned (even before `start_processing` ran) and the claim sweep marks the job dead, or when the final attempt fails retryably.
+  - M3c adds **no reconciliation**. The previously active revision is unaffected either way.
+  - A reconciliation step, or a truthful stalled/dead projection of such revisions, is a **required M3d/M3e design item before overall M3 acceptance**.
+- **Interface:** M3c functions accept the existing `FencedSession` (which `HandlerFence.session` exposes) and the fence's `JobSnapshot`.
+  - They issue statements only through `FencedSession`, which has no `commit`, `rollback` or `close`, so they cannot end the caller's transaction.
+  - They never open their own transaction.
+- **`create_revision`** takes an ordinary caller-owned `Session` instead (the API transaction), like `enqueue`.
+- **No production handler is registered in M3c.**
+
+**F. Verification plan**
+
+- **Planned files:**
+  - `packages/domain/evidenceguard_domain/revisions.py`;
+  - `packages/persistence/evidenceguard_persistence/documents.py`;
+  - the read-only `recheck_ownership` helper added to `packages/persistence/evidenceguard_persistence/jobs.py`, with no change to existing operations;
+  - model additions in `models.py`;
+  - `migrations/versions/v0003_documents.py`;
+  - `tests/test_revisions.py`, `tests/test_document_store.py` and `tests/test_documents_postgres.py`;
+  - updates to the migration-head pins (`0002` → `0003`) in `tests/test_persistence.py`, `tests/test_persistence_postgres.py` and `tests/test_readiness.py`;
+  - ADR-0009;
+  - status updates to the README, plan and threat model.
+
+  No workflow change: the installed-wheel step already renders all migrations offline.
+- **Pure tests:**
+  - the exhaustive transition table, including every invalid transition;
+  - the ordering rule against the active revision;
+  - idempotent repeats and conflicting failure codes;
+  - immutability (frozen values; transitions never change immutable fields);
+  - aware-time enforcement;
+  - fixed error messages without values;
+  - content excluded from `repr`;
+  - `RevisionContent`:
+    - the hash and size are computed from the exact bytes, with no normalization (CRLF, BOM and non-ASCII samples);
+    - invalid UTF-8, NUL, empty input and unsupported media types are rejected;
+    - inconsistent stored fields fail re-verification;
+    - errors and `repr` contain no submitted text.
+- **Database-independent persistence tests** (the scripted-session double of M3a):
+  - compiled SQL shows tenant scoping and `FOR UPDATE` in the lock order;
+  - fresh reads after the locks;
+  - invalid input rejected before any SQL;
+  - functions never call `commit`;
+  - the ownership re-check (job row plus `clock_timestamp()`) is issued after the document and revision locks and before any write, and its time, not the snapshot's, is used;
+  - a job tenant different from the revision's is refused before any write;
+  - the activation statement order is demote, promote, then pointer;
+  - a late older revision writes only its own row;
+  - a duplicate activation writes nothing.
+  - **Uncertain commit, with controlled doubles** (kept separate from real rollback tests):
+    - the commit applied but its acknowledgment failed: success is not claimed, the job is `succeeded` and is never reclaimed, the runtime's later fenced outcome is refused, and exactly one activation exists;
+    - the commit did not apply: the job is retried or reclaimed, the revision is still `processing`, and the next valid attempt activates it; exactly one activation exists.
+  - **Duplicate activation, tested separately:** a valid fenced invocation for a revision that is already settled writes nothing. This test does not use a succeeded job.
+  - **The failure seam:** `fail_revision` records `INGESTION_FAILED` and commits in a block that does not raise; `PermanentJobError(JobErrorCode.PERMANENT_FAILURE)` is raised afterwards. A reclaimed attempt that finds the revision `failed` raises the same job error without `start_processing`.
+- **PostgreSQL integration tests** (guarded disposable fixtures, a server-side `statement_timeout`, event-controlled concurrency, bounded waits):
+  - **Migration:**
+    - the `0003` upgrade, downgrade and re-upgrade;
+    - `alembic check` reports no drift;
+    - readiness is ready only at `0003`;
+    - the offline SQL renders `documents` and `document_revisions`.
+  - **Constraints:**
+    - every check;
+    - the one-active partial index;
+    - cross-tenant `vendor_id`;
+    - cross-tenant and cross-document `active_revision_id` and `superseded_by_revision_id` are rejected.
+  - **Creation:**
+    - concurrent creations of new revisions for one document get distinct consecutive numbers;
+    - concurrent identical-content creations return one revision;
+    - metadata conflicts change nothing;
+    - another tenant's vendor is not found;
+    - a revision and a job created in one caller transaction commit or roll back together.
+  - **Activation:**
+    - first activation;
+    - a newer revision supersedes the active one;
+    - **a failed replacement leaves the previous revision active**;
+    - **two revisions finishing out of order leave only the newer active**;
+    - concurrent activations of two revisions keep one consistent pointer;
+    - the replacement path works with the real one-active partial unique index (demote, then promote, then pointer);
+    - an injected failure **between demotion and promotion** rolls back to the previous active revision and pointer;
+    - an injected failure before the commit (in activation or the job's `succeed`) rolls back the revision changes, the pointer and the job's success together;
+    - **a stale attempt cannot activate** after a reclaim;
+    - **the lease expires during the document-lock wait:**
+      1. the worker holds its job fence;
+      2. it waits on a document lock held by the test;
+      3. the lease expires during that wait, within the lock-timeout bound;
+      4. the lock is released.
+
+      Activation is then refused with `LeaseLostError`, and the revision states, the active pointer and the job outcome are unchanged;
+    - a duplicate activation is a no-op;
+    - a lock held beyond `lock_timeout` raises the fixed timeout error.
+  - **The atomic finish:** activation through the worker's `ctx.fenced(finish=True)` with a test-only handler under `tests/`, completing job and activation together.
+- **Pending:** PostgreSQL verification, until authorized publication and CI.
+
+**Settled at review (Prompt 68):**
+1. The schema above, including the `(tenant_id, document_id, id)` pointer FKs, the one-active partial index, `latest_revision_no` as the allocation counter, and no triggers.
+2. Content stored in the revision row as decoded text, with `sha256` and `byte_size` describing the uploaded bytes; `chunker_version` moves to M3d.
+3. Document metadata fixed by the first upload, and duplicate content with different metadata a conflict.
+4. Identical bytes return the existing revision even if it is `failed`; there is no automatic re-ingestion.
+5. M3c operations accept `FencedSession` plus the fence's `JobSnapshot`, and bind to the revision only through the job's tenant and `revision_id` payload.
+6. The lock order job → document → revisions (ascending `id`), within the fence's 5 s `lock_timeout`, followed by the fresh ownership re-check through a new read-only `recheck_ownership` helper in M3a's persistence module (token, status, expiry); the M3c caller checks the tenant.
+7. `RevisionFailureCode` starts with `ingestion_failed`; M3d adds codes with review.
+8. Activation writes in the order demote, promote, pointer; a late older revision writes only its own row, and a duplicate writes nothing.
+9. `RevisionContent` is built only from the exact bytes, with strict UTF-8, no NUL and no normalization.
+10. Permanent failure commits `fail_revision` (`INGESTION_FAILED`) first, then the job fails separately with `PERMANENT_FAILURE`; the gap and its recovery are as described in E.
+11. A job left `dead` with its revision unsettled must have reconciliation or a truthful projection before overall M3 acceptance.
+
+**Recorded limitations and required follow-ups:**
+- **Dead job with an unsettled revision:** a `dead` job can leave its revision `pending` or `processing` (E). M3c adds no reconciliation. Reconciliation or a truthful stalled/dead projection is a **required M3d/M3e design item before overall M3 acceptance**.
+- **Non-atomic failure:** revision failure and job failure are separate commits with the current worker interface (E).
+- **No retry of failed content:** retrying a `failed` revision with identical bytes is not possible in v1 (decision 4).
+
+**Conflicts with accepted decisions:** none found.
+- Ordering against the active revision, failed replacements and identical-bytes idempotency follow §4.
+- The lock order extends M3a's "job, then document".
+- The binding uses the payload key already planned for `ingest_revision`.
+- Moving `chunker_version` and the `evidenceguard_domain.state` naming change only planned details, and were accepted at review.
 
 **M4 – Embeddings, retrieval and corpus**
 - Provider interface, `HashingEmbedder`, Voyage adapter (mocked in CI), RRF search over snapshot revisions, `sample_data/` including the injected variant, ground truth with acceptable and wrong claims, and the retrieval contract suite.
