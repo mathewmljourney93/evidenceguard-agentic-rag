@@ -30,10 +30,48 @@ from typing import Any
 
 LOGGER_NAMESPACE = "evidenceguard"
 FIELDS_ATTRIBUTE = "evidenceguard_fields"
-ALLOWED_FIELDS = frozenset({"request_id", "method", "route", "status", "duration_ms", "error_type"})
+ALLOWED_FIELDS = frozenset(
+    {
+        "request_id",
+        "method",
+        "route",
+        "status",
+        "duration_ms",
+        "error_type",
+        # Worker fields (ADR-0008). Callers fill them only from validated identifiers and enums:
+        # allowlisting a field name does not make an arbitrary value safe to log.
+        "worker_id",
+        "job_id",
+        "job_kind",
+        "attempt",
+        "error_code",
+    }
+)
 
 REQUEST_COMPLETED = "request.completed"
 UNREVIEWED_EVENT = "log.unreviewed_message"
+
+# Fixed worker events (ADR-0008). Each is its own message template.
+WORKER_EVENTS = (
+    "worker.started",
+    "worker.stopping",
+    "worker.stopped",
+    "worker.abnormal_stop",
+    "worker.poll_failed",
+    "worker.no_handlers",
+    "worker.config_invalid",
+    "job.claimed",
+    "job.succeeded",
+    "job.post_finish_error",
+    "job.retry_scheduled",
+    "job.dead",
+    "job.failed",
+    "job.cancelled",
+    "job.lease_lost",
+    "job.heartbeat_failed",
+    "job.outcome_failed",
+    "job.outcome_unknown",
+)
 
 # Message template -> fixed event identifier. Templates are matched exactly; their arguments
 # (process IDs, addresses, exception objects, ...) are never written.
@@ -53,6 +91,7 @@ REVIEWED_EVENTS: Mapping[str, str] = MappingProxyType(
         "Uvicorn running on %s://%s:%d (Press CTRL+C to quit)": "server.listening",
         "Uvicorn running on %s://[%s]:%d (Press CTRL+C to quit)": "server.listening",
         "Exception in ASGI application\n": "server.unhandled_exception",
+        **{event: event for event in WORKER_EVENTS},
     }
 )
 

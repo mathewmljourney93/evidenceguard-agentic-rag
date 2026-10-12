@@ -85,6 +85,10 @@ class JobErrorCode(StrEnum):
     RETRYABLE_FAILURE = "retryable_failure"
     PERMANENT_FAILURE = "permanent_failure"
     LEASE_EXPIRED = "lease_expired"
+    # Recorded by the M3b worker runtime (ADR-0008).
+    UNKNOWN_JOB_KIND = "unknown_job_kind"
+    UNEXPECTED_ERROR = "unexpected_error"
+    WORKER_SHUTDOWN = "worker_shutdown"
 
 
 # --- errors ------------------------------------------------------------------------------
@@ -200,7 +204,8 @@ class JobPayload(DomainModel):
 # --- request and snapshot ------------------------------------------------------------------
 
 
-def _check_kind(value: Any) -> str:
+def validate_kind(value: Any) -> str:
+    """Raise ``ValueError`` unless ``value`` is an allowed job kind; return it."""
     if not isinstance(value, str) or _KIND.fullmatch(value) is None:
         raise ValueError("kind must be a lowercase identifier of at most 64 characters")
     return value
@@ -241,7 +246,7 @@ class JobRequest(DomainModel):
     @field_validator("kind", mode="before")
     @classmethod
     def _validate_kind(cls, value: Any) -> str:
-        return _check_kind(value)
+        return validate_kind(value)
 
     @field_validator("idempotency_key", mode="before")
     @classmethod
@@ -294,7 +299,7 @@ class JobSnapshot(DomainModel):
     @field_validator("kind", mode="before")
     @classmethod
     def _validate_kind(cls, value: Any) -> str:
-        return _check_kind(value)
+        return validate_kind(value)
 
     @field_validator("idempotency_key", mode="before")
     @classmethod

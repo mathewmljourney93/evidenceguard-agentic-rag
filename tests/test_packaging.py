@@ -5,9 +5,11 @@ from types import ModuleType
 
 import pytest
 
+import evidenceguard_api
 import evidenceguard_domain
 import evidenceguard_observability
 import evidenceguard_persistence
+import evidenceguard_worker
 from evidenceguard_api.__main__ import main
 
 
@@ -48,10 +50,20 @@ def _top_level_imports(package_dir: Path) -> set[str]:
     [
         (
             evidenceguard_domain,
-            {"evidenceguard_api", "evidenceguard_observability", "evidenceguard_persistence"},
+            {
+                "evidenceguard_api",
+                "evidenceguard_observability",
+                "evidenceguard_persistence",
+                "evidenceguard_worker",
+            },
         ),
-        (evidenceguard_observability, {"evidenceguard_api", "evidenceguard_persistence"}),
-        (evidenceguard_persistence, {"evidenceguard_api"}),
+        (
+            evidenceguard_observability,
+            {"evidenceguard_api", "evidenceguard_persistence", "evidenceguard_worker"},
+        ),
+        (evidenceguard_persistence, {"evidenceguard_api", "evidenceguard_worker"}),
+        (evidenceguard_api, {"evidenceguard_worker"}),
+        (evidenceguard_worker, {"evidenceguard_api"}),
     ],
 )
 def test_package_import_boundaries(package: ModuleType, forbidden: set[str]) -> None:

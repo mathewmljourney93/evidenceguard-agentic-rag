@@ -6253,3 +6253,546 @@ Do not push, merge, amend, rebase, start Docker or contact a database.
   Exact results are in the session handoff. No application tests or builds were run.
 - **After the commit:** the full-history Gitleaks scan and the commit verification are reported in the session handoff, not recorded here.
 - **No worker code, tests, dependencies, migrations or workflow edits; no push, merge, amend, rebase, Docker or database contact.**
+
+**Outcome note for Prompt 59 (added with Prompt 60; the commit happened after the Prompt 59 pre-commit note):**
+- **Commit:** `f340b23cc03bfec53aad904398b40b931b653219` on `docs/m3b-worker-spec`, with parent `b3f9845`, subject `docs: accept M3b worker specification and record M3a main results`, and author and committer `257921624+mathewmljourney93@users.noreply.github.com`.
+- **Checks:** the staged and full-history Gitleaks scans found no leaks (23 commits scanned).
+- **Not published:** the branch was not pushed, and `main` stayed at `b3f9845`.
+
+## Prompt 60: Implement M3b, the worker runtime and `eg-worker`
+
+- **Stage:** Implementation, on branch `feat/worker-runtime` (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Implement M3b: the worker runtime and eg-worker command, following the accepted specification. Leave the implementation staged and uncommitted for external review.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: docs/m3b-worker-spec
+- HEAD:
+  f340b23cc03bfec53aad904398b40b931b653219
+- Parent:
+  b3f984552bf22cf6350702330d30851f3e08b3f4
+- Working tree clean, nothing untracked.
+- Local main and origin/main:
+  b3f984552bf22cf6350702330d30851f3e08b3f4
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+
+Stop without changes if anything differs.
+
+Create feat/worker-runtime from the current HEAD. If it already exists, stop and report its state rather than resetting or reusing it.
+
+2. Read and implement the accepted specification
+
+Read:
+- CLAUDE.md
+- The full accepted M3b section in docs/plan.md
+- ADR-0001, ADR-0003 and ADR-0007
+- Actual domain/persistence job interfaces
+- Logging configuration, packaging configuration and relevant tests
+
+Implement the accepted design without reopening settled decisions or adding unrelated functionality.
+
+Scope:
+- evidenceguard_worker under apps/worker/
+- eg-worker console command
+- Validated immutable handler registry
+- JobContext and handler-facing fence
+- Sequential worker supervisor
+- Heartbeats using independent sessions
+- Cooperative cancellation and irreversible lease-loss state
+- Atomic finish and uncertain-commit handling
+- Safe shutdown and abnormal-result handling
+- Privacy-safe worker logging
+- The additive claim kinds filter
+- Accepted fixed JobErrorCode additions
+- Packaging, import boundaries and focused tests
+- ADR-0008 and truthful progress documentation
+
+No ingestion handler, documents, revisions, chunks, uploads, new migrations, queue framework, Docker changes or new dependencies.
+
+3. Preserve the reviewed lifecycle semantics
+
+Pay particular attention to:
+
+- No new claim while a previous handler or heartbeat thread remains alive.
+- No Session shared between threads.
+- State locks are never held across database I/O.
+- Initial local deadline captured before claim; renewal deadlines captured before successful heartbeat calls.
+- Cancellation cannot be cleared by a late heartbeat.
+- Check actual thread termination after bounded joins.
+- A stuck heartbeat means no runtime outcome and no subsequent claim.
+- Cooperative lease loss produces no stale outcome.
+- Uncooperative handlers produce abnormal shutdown, never another job.
+- Atomic finish commits handler effects and success together.
+- Publish committed state only after successful transaction exit.
+- Coordinate pending heartbeat refusal with the finishing state.
+- Committed finish followed by a handler exception never records another outcome.
+- Uncertain commit acknowledgment does not establish whether commit succeeded.
+- Recovery is fenced and durable effects remain idempotent.
+- Post-claim shutdown starts no handler and attempts only the accepted fenced worker_shutdown retry.
+- Synchronous claim/outcome calls have no promised total shutdown deadline.
+- Engine disposal does not cancel checked-out connections.
+- The CLI exits the process with code 5 after an abnormal runtime result; the reusable Python API returns the result.
+- Empty production registry exits 4 before reading database settings.
+- --help works without settings or a database.
+- --once performs one claim attempt, exits 0 when no job is available and 1 on a claim database error.
+- kinds=None preserves existing behavior; empty kinds selects nothing but still runs the global exhausted-job sweep; invalid kinds fail before SQL.
+
+Keep the M3a lock, lease, attempt and retry defaults unchanged.
+
+If a genuine implementation conflict requires changing the accepted contract, stop and report the concrete conflict instead of silently redesigning it.
+
+4. Logging and privacy
+
+Use the existing JSON logging configuration and reviewed fixed events.
+
+Populate new log fields only from validated identifiers/enums.
+Never log payloads, tenant IDs, idempotency keys, URLs, SQL, exception messages or tracebacks.
+
+Retain the formatter’s existing protections for arbitrary messages and message arguments. CLI usage errors must not echo submitted values.
+
+5. Tests and verification
+
+Implement the accepted verification plan, including deterministic event-controlled tests for:
+- Polling and backoff
+- Kind filtering
+- Delayed claims and shutdown during claim
+- Heartbeat success, failures and conservative deadlines
+- Blocked heartbeat beyond join deadline
+- Cooperative and uncooperative lease loss
+- Atomic finish, rollback and both uncertain-commit cases
+- The database-commit/local-publication heartbeat race
+- Late heartbeat after latched cancellation
+- Shutdown drain, cancellation, second signal and cleanup
+- No sessions crossing threads
+- CLI errors, empty registry and abnormal subprocess exit
+- Logging privacy and import boundaries
+
+Add real PostgreSQL integration tests using the existing guarded disposable fixtures. Use bounded waits and test-only statement timeouts. Keep test handlers under tests; do not package or expose a production test-job command.
+
+Do not start Docker or contact a local database. Integration tests remain pending authorized publication and CI.
+
+Run:
+- uv sync --locked
+- uv run --locked ruff format --check .
+- uv run --locked ruff check .
+- uv run --locked mypy
+- uv run --locked pytest
+- uv build
+- An isolated installed-wheel check outside the source tree:
+  package imports, eg-worker --help, and empty-registry exit 4 without database settings
+- git diff --cached --check
+- Staged Gitleaks scan
+
+The narrow CI change adding eg-worker --help to the installed-wheel step is already authorized. Preserve other workflow behavior and required-integration mode.
+
+Report actual results and skipped integration counts. Do not claim PostgreSQL verification from unit tests.
+
+6. Documentation and prompt history
+
+Create ADR-0008 describing the implemented worker decisions and limits. Mark implementation under review and PostgreSQL verification pending.
+
+Update relevant README, plan and threat-model wording truthfully:
+- M3b implemented on its local branch, awaiting review and CI.
+- No production handlers yet.
+- Compose and overall M3 acceptance pending.
+- M3c–M3f unimplemented.
+
+Append this prompt verbatim as Prompt 60 if that is the next unused number; otherwise use the next unused number and explain it.
+Add a truthful outcome note with actual checks, limitations and no commit/push/merge.
+
+Preserve earlier prompt history.
+
+7. Review handoff
+
+Stage the complete implementation, excluding .local/ artifacts and generated build outputs.
+
+Return:
+- What changed and why.
+- Any implementation choices within the accepted design.
+- Actual commands and results, including failures corrected along the way.
+- Staged tree ID, full staged-path list and Git status.
+- COMPLETE staged diff excluding prompts.md, including all new source, tests, configuration and docs.
+- Split the diff into numbered parts at file boundaries and provide every part. Never silently truncate or replace test/code diffs with summaries.
+- If response limits prevent completion, identify precisely which files remain and preserve the full diff under .local/ for continuation.
+- Summary of prompts.md additions.
+- Remaining verification limits.
+
+Leave all work staged and uncommitted.
+Do not push, merge, amend, rebase, start Docker or contact a local database.
+````
+
+**Outcome (implementation pending review; staged on `feat/worker-runtime`, not committed or pushed):**
+- **Starting state verified:**
+  - branch `docs/m3b-worker-spec` at `f340b23` (parent `b3f9845`), a clean tree;
+  - local `main` and `origin/main` at `b3f9845`, and the expected origin;
+  - `feat/worker-runtime` did not exist locally or on the remote, and was created from `f340b23`.
+- **Implemented**, following the accepted M3b specification (see ADR-0008):
+  - the `evidenceguard_worker` package and the `eg-worker` command;
+  - an immutable, validated handler registry, empty in production;
+  - `JobContext` and `HandlerFence`;
+  - the sequential supervisor and the heartbeat thread;
+  - the shared attempt state: a `finishing` state, pending refusals, and irreversible lease loss and cancellation;
+  - atomic finish and uncertain-commit handling;
+  - the post-claim stop check, drain, cancellation and abnormal shutdown, with the CLI ending the process with `os._exit(5)`;
+  - the reviewed log events and fields;
+  - the additive `claim(..., kinds=...)` filter;
+  - the three new `JobErrorCode` values;
+  - packaging and import boundaries;
+  - the authorized `eg-worker --help` line in the CI installed-wheel step;
+  - ADR-0008 and status updates in the README, plan and threat model.
+- **No** migrations, dependencies, lockfile changes, Docker changes, ingestion code or production handlers. The M3a lock, lease, attempt and retry defaults are unchanged.
+- **Checks run locally (Windows):**
+  - `uv sync --locked`;
+  - `ruff format --check`, `ruff check` and `mypy` (75 source files): all clean;
+  - `pytest`: 693 passed and 78 skipped. The skips are the 77 PostgreSQL integration tests (63 existing and 14 new) without `EG_TEST_DATABASE_URL`, plus the POSIX-only SIGTERM test;
+  - `uv build`;
+  - an isolated installed-wheel check outside the source tree: the imports resolve to `site-packages`, `eg-worker --help` exits 0, and `eg-worker` exits 4 without database settings.
+
+  Exact results, and the staged diff and secret-scan checks, are in the session handoff.
+- **Corrected along the way:**
+  - a SQLite pool test switched from in-memory SQLite (a singleton pool) to a file database (`QueuePool`);
+  - the CLI test fakes lacked `fenced`, which made the abnormal subprocess exit 1 and then hang on its deliberately non-daemon thread;
+  - an empty-filter test also matched `FOR UPDATE` when looking for the `UPDATE` statement;
+  - a weak packaging test was removed.
+- **Not verified:**
+  - the PostgreSQL integration tests have not run anywhere; they are pending authorized publication and CI;
+  - Compose is unverified;
+  - M3c–M3f are not implemented;
+  - overall M3 acceptance is pending.
+- **No commit, push or merge occurred.** No Docker or database was used.
+
+**Review note for Prompt 60 (added with Prompt 61):**
+- **Scope:** the external reviewer inspected the complete Prompt 60 staged diff.
+- **Reproduced in isolation:** `JobContext.fenced` checked permission only before opening the fence. Cancellation latched while the fence was opening still let the handler body run. The reviewer did not run the project suite.
+- **Further findings:**
+  - job threads could be left running after an unexpected startup or supervisor exception;
+  - a cleanup or flushing failure after an abnormal result could prevent `exit_process(5)`;
+  - the uncertain-commit retry test used two different job IDs;
+  - "bounded graceful shutdown" could be read as a total shutdown deadline.
+
+## Prompt 61: Correct M3b cancellation and exception cleanup
+
+- **Stage:** Correction, on branch `feat/worker-runtime` (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Correct M3b cancellation and exception cleanup. Leave everything staged and uncommitted for review.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/worker-runtime
+- HEAD:
+  f340b23cc03bfec53aad904398b40b931b653219
+- Staged tree:
+  92f5e613b2c138b852369f334a5f30d922a9ac45
+- The same 25 staged paths reported for Prompt 60.
+- Nothing unstaged or untracked.
+- Expected origin for evidenceguard-agentic-rag.
+
+Stop without changes if anything differs.
+Record the pre-edit staged tree for the incremental review diff.
+
+2. Cancellation during fence acquisition
+
+Current JobContext.fenced calls check() before opening the database fence, then yields without checking again.
+
+The reviewer reproduced this sequence in isolation:
+- Initial check passes.
+- Cancellation is latched while the fence opens.
+- The handler body still executes despite cancel_requested=True.
+
+Correct both ordinary and finish=True contexts:
+- Retain the check before opening the fence.
+- Recheck attempt permission after the fence has opened/acquired its lock, before yielding the HandlerFence.
+- If cancellation or lease loss was latched during acquisition, raise and roll back without entering the handler body.
+- Before recording atomic success after the handler block, recheck cancellation/lease-loss permission. Do not call the public check in a way that incorrectly rejects the legitimate FINISHING state.
+- Preserve committed/uncertain finish semantics and pending-heartbeat-refusal coordination.
+- Do not hold the attempt-state lock across database I/O.
+
+This does not require interrupting statements already in flight. Document that cancellation checks occur at explicit boundaries and are not atomic with every SQL statement.
+
+Add deterministic regression tests:
+- Cancellation while an ordinary fence opens: no handler body/effect.
+- Lease loss while a fence opens: no handler body/effect.
+- Cancellation while a finish=True fence opens: no effect or completion.
+- Cancellation during the finish block before success recording: rollback of effects and no atomic success.
+- Existing committed-finish and heartbeat race tests remain intact.
+
+Show that the relevant new tests fail against the previous implementation, then restore the corrected files and verify their identity.
+
+3. Exception-safe job-thread lifecycle
+
+Once any per-job thread has started, an unexpected supervisor or startup exception must not simply escape while leaving threads active.
+
+Add an exception-safe lifecycle around per-job startup and supervision:
+- Track which threads actually started.
+- On an unexpected failure, latch cancellation, stop future heartbeats and perform bounded cleanup of started threads.
+- Never join a thread that was not started.
+- Never record an outcome or make another claim while a previous thread remains alive.
+- If cleanup leaves any live job thread, return an abnormal result so the CLI takes the process-exit path.
+- If all threads stopped, report the unexpected failure truthfully without claiming a successful job outcome.
+
+Preserve the accepted limitation that synchronous database calls can block the supervisor; this correction does not promise a total shutdown deadline.
+
+Add deterministic tests for:
+- Heartbeat starts but handler-thread startup fails.
+- An unexpected supervisor failure while a handler is running.
+- Cooperative cleanup versus a thread that remains alive.
+- No subsequent claim and no contradictory outcome.
+
+4. Abnormal CLI exit must survive cleanup failures
+
+Current main obtains an abnormal result inside the store context, but disposal or output flushing can raise before exit_process(5) is reached.
+
+Once an abnormal result has been obtained:
+- Cleanup and diagnostic-output failures must not downgrade it to an ordinary exit or prevent the required process termination.
+- Ensure exit_process(5) is reached through exception-safe control flow even if store-context cleanup, signal restoration or output flushing fails.
+- Keep diagnostics fixed and privacy-safe.
+- Preserve injectable exit_process for in-process tests.
+- Test actual termination in a bounded subprocess, including cleanup or flushing failure with a deliberately live thread.
+
+Do not introduce a new logging service or shutdown framework.
+
+5. Strengthen the uncertain-commit retry test
+
+The existing “commit did not succeed ... stays idempotent” test creates two jobs with different IDs. That does not demonstrate retrying the same durable job.
+
+Change the scenario to represent two attempts of the same job ID with matching tenant, kind and payload:
+- First finish does not commit and leads to a fenced retry.
+- Second attempt is a valid reclaim of that same job.
+- Exactly one durable effect exists after successful completion.
+- Token/attempt ownership is represented accurately.
+
+Keep both uncertain-commit cases covered.
+
+6. Documentation and verification
+
+Update ADR-0008 and relevant documentation narrowly:
+- Explicit cancellation-check boundaries.
+- Exception-safe cleanup and abnormal-exit behavior.
+- Still under review; PostgreSQL verification pending.
+- Remove or qualify “bounded graceful shutdown” wording wherever it could imply a total process shutdown deadline.
+
+No unrelated redesign, migrations, dependencies or Docker changes.
+
+Run:
+- uv run --locked ruff format --check .
+- uv run --locked ruff check .
+- uv run --locked mypy
+- uv run --locked pytest
+- uv build
+- Isolated installed-wheel checks for imports, --help and empty-registry exit 4
+- git diff --cached --check
+- Staged Gitleaks scan
+
+Do not start Docker or contact a local database.
+Report PostgreSQL skips separately from platform skips.
+
+7. History and handoff
+
+Append this prompt verbatim as Prompt 61 if that is the next unused number; otherwise use the next unused number and explain it.
+
+Record:
+- The reviewer inspected the complete Prompt 60 diff.
+- The reviewer reproduced the fence-acquisition cancellation issue in isolation, but did not run the project suite.
+- The corrections, regression evidence and actual verification results.
+- Earlier prompt entries remain unchanged.
+
+Return:
+- Explanation of the fixes.
+- New-test results against the previous implementation.
+- Actual final check results.
+- New staged tree ID, staged paths and Git status.
+- COMPLETE incremental diff against the recorded pre-edit staged tree, excluding prompts.md, including all changed tests and docs.
+- Numbered fenced diff parts if necessary; never silently truncate.
+
+Leave everything staged and uncommitted.
+No push, merge, amend, rebase, Docker or local database contact.
+````
+
+**Outcome (corrections pending review; staged on `feat/worker-runtime`, not committed or pushed):**
+- **Starting state verified:**
+  - branch `feat/worker-runtime`, HEAD `f340b23`;
+  - staged tree `92f5e61…` with the same 25 paths;
+  - nothing unstaged or untracked, and the expected origin.
+
+  The pre-edit staged tree was recorded.
+- **Fence boundaries:** `JobContext.fenced` now checks permission:
+  - before opening the fence;
+  - again after the fence has acquired its lock, before the handler block;
+  - with `finish=True`, again before recording `succeeded`.
+
+  A failed check raises inside the transaction, which rolls back. `finishing` remains permitted. The checks are explicit boundaries, not atomic with every SQL statement.
+- **Exception-safe job lifecycle:** the runtime tracks which job threads actually started. On an unexpected startup or supervisor failure it:
+  - latches cancellation and stops future heartbeats;
+  - joins only the started threads, each for a bounded time;
+  - records no outcome;
+  - returns an abnormal result if a thread is still alive, or otherwise re-raises the failure, so no further claim is made.
+- **CLI:** once an abnormal result exists, failures in engine disposal, signal restoration or diagnostic output can no longer prevent or downgrade `exit_process(5)`. A cleanup failure after a normal stop is reported as an unexpected error (exit 1) instead of being hidden.
+- **Tests:**
+  - the uncertain-commit retry test now reclaims the same job ID (attempts 1 and 2), with exactly one durable effect;
+  - the fake store's ownership is per attempt;
+  - new regression tests cover:
+    - fence-acquisition cancellation and lease loss;
+    - finish cancellation;
+    - handler-thread startup failure;
+    - supervisor failure, cooperative and uncooperative;
+    - the abnormal exit despite disposal, restoration or flush failures, in process and in a bounded subprocess with a live non-daemon thread;
+    - a cleanup failure after a normal stop;
+    - `finishing` permitted by `check()`.
+- **Regression evidence:** the new and changed tests were run against the previous implementation files.
+  - 13 failed and 4 passed. The 4 were the baseline subprocess case, the `finishing` check, the strengthened retry test, which is a test-only change, and the normal-stop cleanup report.
+  - The previous CLI's subprocess cases hung until their 60 s timeout.
+  - The corrected files were restored, and their SHA-256 hashes were verified identical.
+- **Docs:** ADR-0008, the README, the plan status line and the threat model now describe the check boundaries, exception-safe cleanup and the abnormal exit. They qualify the shutdown wording as bounded supervisor waits, not a total shutdown deadline. The implementation is still under review, and PostgreSQL verification is pending.
+- **Checks run locally (Windows):**
+  - `ruff format --check`, `ruff check` and `mypy` (75 source files): clean;
+  - `pytest`: 708 passed and 78 skipped. The skips are 77 PostgreSQL integration tests without `EG_TEST_DATABASE_URL`, plus 1 platform skip, the POSIX-only SIGTERM test;
+  - `uv build`;
+  - the isolated installed-wheel check: the imports, `--help` exiting 0, and an empty registry exiting 4.
+
+  The staged diff check and the staged Gitleaks scan are reported in the session handoff.
+- **Not verified:** the PostgreSQL integration tests have not run anywhere; Compose is unverified; M3c–M3f are not implemented; overall M3 acceptance is pending.
+- **No commit, push or merge occurred.** No Docker or database was used.
+
+**Acceptance note for Prompt 61 (added with Prompt 62):**
+- **What was accepted:** the external reviewer accepted the complete Prompt 60 implementation plus the Prompt 61 corrections for a local commit.
+- **What the acceptance rests on:**
+  - the complete original and incremental diffs;
+  - the reported Windows results: 708 passed and 78 skipped. The skips are 77 PostgreSQL integration tests and one POSIX-only SIGTERM test;
+  - the reported format, lint, strict type-check, build, installed-wheel and secret-scan results;
+  - the regression evidence: 13 failures against the previous implementation, then passing checks after the corrected files were restored.
+- **What the reviewer ran:** they reproduced the original cancellation issue in isolation, but did not run the project suite or the corrected regression tests.
+- **Still pending:** PostgreSQL verification, Linux, Compose and overall M3 acceptance.
+
+## Prompt 62: Commit the reviewed M3b implementation locally
+
+- **Stage:** Local commit only, on branch `feat/worker-runtime` (no push or merge)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Commit the reviewed M3b implementation locally. Do not push or merge.
+
+Follow CLAUDE.md. Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/worker-runtime
+- HEAD:
+  f340b23cc03bfec53aad904398b40b931b653219
+- Staged tree:
+  e0c69cd0461e3ee035b4441e71a5a612e44ca94a
+- Exactly the same 25 staged paths reported in Prompt 61.
+- Nothing unstaged or untracked.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Local main and origin/main:
+  b3f984552bf22cf6350702330d30851f3e08b3f4
+
+Stop without changes if anything differs.
+Record the accepted staged tree before editing.
+
+2. Preserve the reviewed implementation
+
+The reviewer accepts the complete Prompt 60 implementation plus the Prompt 61 corrections for a local commit.
+
+Acceptance rests on:
+- The complete original and incremental diffs.
+- Reported Windows results: 708 passed, 78 skipped.
+- Reported format, lint, strict type-check, build, installed-wheel and secret-scan results.
+- Regression evidence: 13 failures against the previous implementation, followed by passing checks after restoration.
+
+The reviewer reproduced the original cancellation issue in isolation but did not run the project suite or corrected regression tests.
+
+The 78 skips comprise:
+- 77 PostgreSQL integration tests.
+- One POSIX-only SIGTERM test.
+
+PostgreSQL, Linux, Compose and overall M3 acceptance remain pending.
+
+Every tracked file except prompts.md must remain byte-identical to the accepted staged tree. Do not alter code, tests, configuration or other documentation.
+
+3. Prompt history
+
+Change only prompts.md, append-only:
+- Add an acceptance note under Prompt 61 with the evidence and limits above.
+- Append this prompt verbatim as Prompt 62 if that is the next unused number; otherwise use the next unused number and explain it.
+- Add a truthful pre-commit note recording the verified state, checks and local-only authorization.
+- Keep earlier entries unchanged.
+- Do not claim publication or CI verification.
+
+4. Checks and local commit
+
+Inspect Git status, staged paths and staged diff.
+Confirm no .local/ files or generated build outputs are staged.
+Check staged additions for secrets and private information.
+Confirm effective author and committer email:
+257921624+mathewmljourney93@users.noreply.github.com
+
+Run:
+- git diff --cached --check
+- Staged Gitleaks scan
+
+Create one LOCAL commit:
+feat: add sequential worker runtime and safe lease cancellation
+
+Use the existing attribution convention.
+
+After committing:
+- Run the full-history Gitleaks scan.
+- Verify parent is f340b23cc03bfec53aad904398b40b931b653219.
+- Verify the expected 25 committed paths.
+- Verify all files except prompts.md match the accepted staged tree.
+- Verify noreply identity and clean working tree.
+- Confirm main remains unchanged.
+
+Application checks need not be rerun because only prompt history changed since the reviewed verification.
+
+5. Handoff
+
+Return:
+- Commit SHA, parent, subject and identity.
+- Committed paths.
+- Actual check results.
+- Prompt-history additions and confirmation that earlier entries are unchanged.
+- Final Git status.
+- Complete incremental diff against the accepted staged tree, excluding prompts.md. If none, explicitly say none.
+- Remaining verification limits.
+
+Do not push, merge, amend, rebase, start Docker or contact a local database.
+Do not begin M3c.
+````
+
+**Pre-commit note (written before the local commit):**
+- **Starting state verified:**
+  - branch `feat/worker-runtime`, HEAD `f340b23`;
+  - staged tree `e0c69cd…` with the same 25 paths;
+  - nothing unstaged or untracked;
+  - the expected origin;
+  - local `main` and `origin/main` at `b3f9845`.
+
+  The accepted staged tree was recorded before editing.
+- **Change:** only `prompts.md`, append-only: this acceptance note, this prompt and this pre-commit note. Every other tracked file stays byte-identical to the accepted tree.
+- **Checks before the commit:**
+  - the staged paths and diff inspected, with no `.local/` or build outputs staged;
+  - the private-content check;
+  - the author and committer identity check;
+  - `git diff --cached --check`;
+  - the staged Gitleaks scan.
+
+  Exact results are in the session handoff. The application checks were not rerun, because only the prompt history changed since the reviewed verification.
+- **Authorization:** local commit only. No push, merge, CI run or publication is claimed. The post-commit verification is reported in the session handoff.

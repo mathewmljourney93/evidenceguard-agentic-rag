@@ -42,7 +42,7 @@ reach into the underlying session, transaction or connection, and must not modif
 ownership fields directly.
 """
 
-from collections.abc import Callable, Iterator, Mapping
+from collections.abc import Callable, Collection, Iterator, Mapping
 from contextlib import contextmanager
 from datetime import datetime
 from typing import Any, cast
@@ -128,8 +128,11 @@ def sweep_statement() -> Select[Any]:
     )
 
 
-def claim_statement() -> Select[Any]:
-    """The oldest claimable job by ``(run_after, id)``. Exhausted rows are never candidates."""
+def claim_statement(kinds: Collection[str] | None = None) -> Select[Any]:
+    """The oldest claimable job by ``(run_after, id)``. Exhausted rows are never candidates.
+
+    With ``kinds``, only jobs of those (already validated, non-empty) kinds are candidates.
+    """
     due = and_(
         JOBS.c.status == JobStatus.QUEUED.value,
         JOBS.c.run_after <= func.clock_timestamp(),
@@ -138,12 +141,11 @@ def claim_statement() -> Select[Any]:
         JOBS.c.status == JobStatus.RUNNING.value,
         JOBS.c.lease_expires_at <= func.clock_timestamp(),
     )
+    statement = select(JOBS).where(JOBS.c.attempt < JOBS.c.max_attempts, or_(due, abandoned))
+    if kinds is not None:
+        statement = statement.where(JOBS.c.kind.in_(sorted(kinds)))
     return (
-        select(JOBS)
-        .where(JOBS.c.attempt < JOBS.c.max_attempts, or_(due, abandoned))
-        .order_by(JOBS.c.run_after, JOBS.c.id)
-        .limit(1)
-        .with_for_update(skip_locked=True)
+        statement.order_by(JOBS.c.run_after, JOBS.c.id).limit(1).with_for_update(skip_locked=True)
     )
 
 
@@ -262,15 +264,37 @@ def enqueue(
 # --- claim ---------------------------------------------------------------------------------
 
 
-def claim(session_factory: sessionmaker[Session], worker_id: str) -> JobSnapshot | None:
+def _validated_kinds(kinds: Collection[str] | None) -> frozenset[str] | None:
+    if kinds is None:
+        return None
+    if isinstance(kinds, str):  # a string is a collection of characters, never a kind filter
+        raise ValueError("kinds must be a collection of job kinds, not a string")
+    return frozenset(lifecycle.validate_kind(kind) for kind in kinds)
+
+
+def claim(
+    session_factory: sessionmaker[Session],
+    worker_id: str,
+    *,
+    kinds: Collection[str] | None = None,
+) -> JobSnapshot | None:
     """Claim the next due or abandoned job for ``worker_id``, in one short transaction.
 
     First, at most ``SWEEP_LIMIT`` expired leases with no attempts left are marked ``dead``
     (``attempt`` unchanged). Then the oldest claimable row is taken with ``SKIP LOCKED``.
     Exhausted rows are excluded from that selection, so they never block eligible work.
     Returns ``None`` when nothing is claimable.
+
+    ``kinds`` (M3b, ADR-0008) limits the candidates:
+
+    - ``None`` keeps the behaviour above exactly: any kind;
+    - a collection allows only those kinds. Every value is validated before any SQL, and an
+      invalid one raises ``ValueError``;
+    - an **empty** collection selects no candidate and returns ``None``; it never means "claim
+      all". The sweep still runs, because it is global maintenance that never hands out a job.
     """
     lifecycle.validate_worker_id(worker_id)
+    allowed = _validated_kinds(kinds)
     with transaction(session_factory) as session:
         exhausted = [_snapshot(row._mapping) for row in session.execute(sweep_statement())]
         if exhausted:
@@ -278,7 +302,9 @@ def claim(session_factory: sessionmaker[Session], worker_id: str) -> JobSnapshot
             for job in exhausted:
                 _write(session, lifecycle.expire_exhausted(job, now=swept_at))
 
-        row = session.execute(claim_statement()).first()
+        if allowed is not None and not allowed:
+            return None
+        row = session.execute(claim_statement(allowed)).first()
         if row is None:
             return None
         claimed = lifecycle.claim(

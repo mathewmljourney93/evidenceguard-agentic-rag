@@ -21,6 +21,7 @@ dependencies = [
 [project.scripts]
 eg-api = "evidenceguard_api.__main__:main"
 eg-admin = "evidenceguard_api.admin:main"
+eg-worker = "evidenceguard_worker.__main__:main"
 
 [dependency-groups]
 dev = [
@@ -40,6 +41,7 @@ exclude-newer-package = { sqlalchemy = "2026-09-28T00:00:00Z", alembic = "2026-0
 [tool.hatch.build.targets.wheel]
 packages = [
     "apps/api/evidenceguard_api",
+    "apps/worker/evidenceguard_worker",
     "packages/domain/evidenceguard_domain",
     "packages/observability/evidenceguard_observability",
     "packages/persistence/evidenceguard_persistence",
@@ -48,6 +50,7 @@ packages = [
 [tool.hatch.build.targets.sdist]
 include = [
     "/apps/api/evidenceguard_api",
+    "/apps/worker/evidenceguard_worker",
     "/packages/domain/evidenceguard_domain",
     "/packages/observability/evidenceguard_observability",
     "/packages/persistence/evidenceguard_persistence",
@@ -69,6 +72,7 @@ known-first-party = [
     "evidenceguard_domain",
     "evidenceguard_observability",
     "evidenceguard_persistence",
+    "evidenceguard_worker",
 ]
 
 [tool.mypy]
@@ -79,6 +83,7 @@ files = [
     "packages/domain/evidenceguard_domain",
     "packages/observability/evidenceguard_observability",
     "packages/persistence/evidenceguard_persistence",
+    "apps/worker/evidenceguard_worker",
     "tests",
 ]
 plugins = ["pydantic.mypy"]

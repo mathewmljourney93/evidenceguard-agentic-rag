@@ -465,6 +465,67 @@ def test_claim_rejects_an_invalid_worker_id_before_touching_the_database() -> No
     assert session.sql == [] and session.events == []
 
 
+# --- claim kind filter (M3b, ADR-0008) -------------------------------------------------------
+
+
+def test_the_kind_filter_adds_only_a_kind_condition_to_the_claim_statement() -> None:
+    unfiltered = _sql(store.claim_statement())
+    statement = store.claim_statement(frozenset({"test_job", "a_job"}))
+    filtered = _sql(statement)
+
+    assert "jobs.kind" not in unfiltered.split("FROM jobs", 1)[1]
+    assert filtered == unfiltered.replace(
+        " ORDER BY", " AND jobs.kind IN (__[POSTCOMPILE_kind_1]) ORDER BY"
+    )
+    assert statement.compile(dialect=_DIALECT).params["kind_1"] == ["a_job", "test_job"]
+
+
+def test_claim_without_a_kind_filter_keeps_the_existing_statement() -> None:
+    session = _Session(_claim_responder([], _job_row(kind="any_kind"), T0))
+
+    claimed = store.claim(_factory(session), WORKER, kinds=None)
+
+    assert claimed is not None and claimed.kind == "any_kind"
+    assert _sql(store.claim_statement()) in session.sql
+
+
+def test_claim_with_a_kind_filter_selects_only_those_kinds() -> None:
+    session = _Session(_claim_responder([], _job_row(), T0))
+
+    store.claim(_factory(session), WORKER, kinds=["test_job"])
+
+    (select_sql,) = [sql for sql in session.sql if "jobs.attempt < jobs.max_attempts" in sql]
+    assert "jobs.kind IN" in select_sql
+    (params,) = [p for sql, p in zip(session.sql, session.params, strict=True) if sql == select_sql]
+    assert params["kind_1"] == ["test_job"]
+
+
+def test_an_empty_kind_filter_selects_nothing_but_still_runs_the_sweep() -> None:
+    exhausted = _running_row(attempt=3, lease_expires_at=T0 - timedelta(seconds=1))
+    session = _Session(_claim_responder([exhausted], _job_row(), T0))
+
+    assert store.claim(_factory(session), WORKER, kinds=frozenset()) is None
+
+    assert not any("jobs.attempt < jobs.max_attempts" in sql for sql in session.sql)
+    assert "jobs.attempt >= jobs.max_attempts" in session.sql[0]
+    (update,) = [
+        p
+        for sql, p in zip(session.sql, session.params, strict=True)
+        if sql.startswith("UPDATE jobs")
+    ]
+    assert update["status"] == "dead"
+    assert session.events == ["commit", "close"]
+
+
+@pytest.mark.parametrize("kinds", [["Not A Kind"], [""], ["test_job", 7], "test_job"])
+def test_invalid_kinds_are_rejected_before_any_sql(kinds: Any) -> None:
+    session = _Session(_claim_responder([], _job_row(), T0))
+
+    with pytest.raises(ValueError):
+        store.claim(_factory(session), WORKER, kinds=kinds)
+    assert session.sql == [] and session.events == []
+
+
 # --- enqueue --------------------------------------------------------------------------------
 
 

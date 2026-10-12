@@ -626,7 +626,7 @@ Each question entry contains:
     - [CI run 38242144844](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118333) `605 passed, 63 skipped in 7.56s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118106) `605 passed, 63 skipped in 14.86s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144844/job/114787118281) `63 passed, 605 deselected in 16.17s`.
     - The [secret-scan run 38242144876](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144876) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38242144876/job/114787118292): 22 commits scanned, no leaks found).
   - **Still not verified:** Compose has never been run. The tests demonstrate the tested behaviour, not a general security or performance guarantee.
-- **M3b** has a detailed specification below, **accepted at review (Prompt 59); implementation pending**. M3b–M3f are not implemented, and **overall M3 acceptance is pending**.
+- **M3b** has a detailed specification below, **accepted at review (Prompt 59)**. It is **implemented on local branch `feat/worker-runtime` (Prompt 60, corrected in Prompt 61; [ADR-0008](decisions/0008-worker-runtime.md)), awaiting review and CI**; its PostgreSQL verification is pending. There are no production handlers yet. M3c–M3f are not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
 
 M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-workflow.md): plain Python, PostgreSQL-backed jobs claimed with `FOR UPDATE SKIP LOCKED`, leases, heartbeats and fenced writes. There is no new orchestration framework or queue dependency. Each slice is reviewed, verified in CI and merged before the next one starts. The M3 acceptance criteria above are split across the slices as follows:
 
@@ -807,11 +807,11 @@ M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-wo
 
   The 5-second `lock_timeout` and the sweep bound of 10 rows per claim were accepted at review (Prompt 48) as initial engineering defaults, not measured performance claims.
 
-**M3b, the worker process, in detail (ACCEPTED at review, Prompt 59; implementation pending, nothing below is implemented):**
+**M3b, the worker process, in detail (ACCEPTED at review, Prompt 59; implemented on branch `feat/worker-runtime` in Prompt 60, under review; PostgreSQL verification pending):**
 
 M3b turns the M3a library into a running worker. It keeps the accepted architecture: plain Python, PostgreSQL-backed jobs, leases and fenced transactions ([ADR-0003](decisions/0003-plain-python-workflow.md), [ADR-0007](decisions/0007-durable-job-core.md)). There is no new queue, framework or dependency.
 
-The external reviewer inspected the original specification (Prompt 57) and its lifecycle and shutdown corrections (Prompt 58), without running the project suite, and accepted it with the final clarifications of Prompt 59. The choices are listed as settled at the end. The timing values are **initial engineering defaults, not measured guarantees**. Implementation has not started.
+The external reviewer inspected the original specification (Prompt 57) and its lifecycle and shutdown corrections (Prompt 58), without running the project suite, and accepted it with the final clarifications of Prompt 59. The choices are listed as settled at the end. The timing values are **initial engineering defaults, not measured guarantees**. The implementation ([ADR-0008](decisions/0008-worker-runtime.md)) records its choices within this specification; it is under review, and its PostgreSQL integration tests have not run yet.
 
 - **Package and command:**
   - A new application package, `evidenceguard_worker`, at `apps/worker/evidenceguard_worker/`. This is the layout ADR-0001 already names.
