@@ -1,6 +1,8 @@
 # ADR-0009: Documents, revisions and fenced activation
 
-- **Status:** Implemented on local branch `feat/document-revisions` (Prompt 69), staged and uncommitted, **under review**. PostgreSQL verification is **pending** authorized publication and CI; no database was contacted locally.
+- **Status:** Accepted (M3c), following the implementation review (Prompt 69, corrected in Prompt 71) and passing CI at commit `8646b75` on branch `feat/document-revisions`; **not yet merged into `main`**. See *Consequences and limits*.
+  - The implementation was committed locally as `057d57d` (Prompt 72) and published with a prompt-history commit, `8646b75` (Prompt 73).
+  - The specification was accepted at review in Prompt 68.
 - **Date:** 2026-10-12
 - **Builds on:**
   - [ADR-0004](0004-persistence-foundation.md): tenant-safe composite references, naming conventions and migration policy;
@@ -68,4 +70,8 @@ A lock wait beyond the fence's `lock_timeout` (SQLSTATE `55P03`) raises the exis
 - **Dead jobs:** a job can become `dead` while its revision stays `pending` or `processing`. M3c adds no reconciliation; reconciliation or a truthful projection is a **required M3d/M3e item before overall M3 acceptance**.
 - Failed content cannot be retried with identical bytes in v1.
 - There is no production ingestion handler, endpoint, upload or job-kind check yet; tests use test-only handlers.
-- **Verification:** unit tests and a scripted database double cover the content rules, lifecycle table, statement scoping, lock order, the fresh re-check, write order and both uncertain-commit cases. The PostgreSQL integration tests (constraints, migration step, concurrency, lock waits and timeouts, rollback and worker integration) have **not run**: they are pending publication and CI. Compiled SQL and the double are not database verification.
+- **Verification:** unit tests and a scripted database double cover the content rules, lifecycle table, statement scoping, lock order, the fresh re-check, write order and both uncertain-commit cases.
+  - At commit `8646b75`, [CI run 38284929219](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219) passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930898138) (`819 passed, 133 skipped in 18.75s`) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930898065) (`818 passed, 134 skipped in 23.07s`).
+  - The [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930897691) passed all 133 integration tests (`133 passed, 819 deselected in 36.46s`): the 77 existing ones and the 56 added by M3c. Those cover constraints, the migration step (round trip, linked-row downgrade and the metadata-drift check), concurrency, activation, lock waits and timeouts, lease loss, rollback and worker integration. They passed as part of the suite; no separate migration transcript or per-test listing was observed.
+  - The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929225) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929225/job/114930897815): 29 commits scanned, no leaks found).
+  - All counts are from logs retrieved by the external reviewer, who did not run the suite locally. These results demonstrate the tested behaviour, not a general security or performance guarantee.

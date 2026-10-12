@@ -634,7 +634,11 @@ Each question entry contains:
     - [CI run 38255786860](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375464) `709 passed, 77 skipped in 18.16s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375444) `708 passed, 78 skipped in 21.20s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375219) `77 passed, 709 deselected in 17.36s`.
     - The [secret-scan run 38255786973](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973/job/114833375056): 26 commits scanned, no leaks found).
   - There are no production handlers yet. Compose is unverified.
-- **M3c** has a detailed specification below, accepted at review (Prompt 68), and is **implemented on local branch `feat/document-revisions` (Prompt 69), staged and uncommitted, awaiting review and PostgreSQL CI** ([ADR-0009](decisions/0009-document-revisions.md)). Its PostgreSQL integration tests have not run. There is no production ingestion handler. M3d–M3f are not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
+- **M3c** has a detailed specification below, accepted at review (Prompt 68). The implementation (Prompt 69, corrected in Prompt 71; [ADR-0009](decisions/0009-document-revisions.md)) was **accepted at review and verified in CI on branch `feat/document-revisions`; it is not yet merged into `main`**.
+  - **Tested commit:** `8646b75` on `feat/document-revisions` (the implementation commit `057d57d` plus a prompt-history commit).
+  - [CI run 38284929219](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930898138) `819 passed, 133 skipped in 18.75s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930898065) `818 passed, 134 skipped in 23.07s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930897691) `133 passed, 819 deselected in 36.46s` (the 77 existing PostgreSQL tests and the 56 added by M3c, including its constraint, migration, concurrency, activation and lease tests).
+  - The [secret-scan run 38284929225](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929225) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929225/job/114930897815): 29 commits scanned, no leaks found).
+  - There is no production ingestion handler, upload or document endpoint. Dead-job reconciliation or a truthful projection remains a required M3d/M3e item. M3d–M3f are not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
 
 M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-workflow.md): plain Python, PostgreSQL-backed jobs claimed with `FOR UPDATE SKIP LOCKED`, leases, heartbeats and fenced writes. There is no new orchestration framework or queue dependency. Each slice is reviewed, verified in CI and merged before the next one starts. The M3 acceptance criteria above are split across the slices as follows:
 
@@ -1123,7 +1127,7 @@ The external reviewer inspected the original specification (Prompt 57) and its l
   - The `kinds` filter extends M3a's claim without changing its ordering, locking or sweep.
   - Everything else builds on the accepted M3a lease, heartbeat interval, backoff and attempt cap, without redefining them.
 
-**M3c, documents and revisions, in detail (ACCEPTED at review, Prompt 68; implemented on local branch `feat/document-revisions` in Prompt 69, under review; PostgreSQL verification pending):**
+**M3c, documents and revisions, in detail (ACCEPTED at review, Prompt 68; implemented in Prompt 69, corrected in Prompt 71, accepted at review and verified in CI on branch `feat/document-revisions` at `8646b75`; not yet on `main`):**
 
 The external reviewer inspected the original specification (Prompt 66) and its corrections (Prompt 67) without running application checks. They accepted it with the final clarifications of Prompt 68. The Prompt 67 corrections cover:
 - fresh lease checks after the additional lock waits;
@@ -1483,7 +1487,7 @@ M3c adds no production worker handler and no endpoint.
     - a duplicate activation is a no-op;
     - a lock held beyond `lock_timeout` raises the fixed timeout error.
   - **The atomic finish:** activation through the worker's `ctx.fenced(finish=True)` with a test-only handler under `tests/`, completing job and activation together.
-- **Pending:** PostgreSQL verification, until authorized publication and CI.
+- **Result:** the PostgreSQL integration tests listed above passed against PostgreSQL in the CI integration job at `8646b75` (`133 passed, 819 deselected`, from the log retrieved by the external reviewer). The database-independent tests above, including the controlled uncertain-commit simulations, ran in the Ubuntu and Windows verify jobs, not against PostgreSQL.
 
 **Settled at review (Prompt 68):**
 1. The schema above, including the `(tenant_id, document_id, id)` pointer FKs, the one-active partial index, `latest_revision_no` as the allocation counter, and no triggers.

@@ -114,9 +114,9 @@ The full design and limits are in [ADR-0002](decisions/0002-request-ids-logging-
 
 **Verification:** at commit `bc5f638` on `feat/worker-runtime`, [CI run 38253962690](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690) passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827089007) (`709 passed, 77 skipped in 15.96s`) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827088937) (`708 passed, 78 skipped in 22.18s`). The [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38253962690/job/114827089078) passed with all 77 PostgreSQL tests (`77 passed, 709 deselected in 19.63s`): M3a's 63 and the worker's 14, including lease loss before a fenced write, heartbeats racing atomic completion, and shutdown re-queueing. All counts are from logs retrieved by the external reviewer. M3b was then fast-forwarded onto `main` at `dd26c70`, where the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375219) passed again (`77 passed, 709 deselected in 17.36s`). These results demonstrate the tested behaviour, not a general security or performance guarantee. There are no production handlers yet, and Compose has never been run.
 
-## Documents and revisions (M3c, implemented on a local branch, under review)
+## Documents and revisions (M3c, verified in CI on its branch; not yet on `main`)
 
-Implemented on local branch `feat/document-revisions`, staged for review; not on `main`. The PostgreSQL integration tests have **not run** yet (pending publication and CI), so the database rows below are design intent backed by schema and unit tests, not verified enforcement.
+Reviewed and verified in CI on branch `feat/document-revisions` at commit `8646b75`; not yet merged into `main`. The mitigations below were exercised by M3c's PostgreSQL integration tests: constraints, migration, concurrency, activation and lease loss.
 
 | Threat | Mitigation |
 |---|---|
@@ -130,6 +130,8 @@ Implemented on local branch `feat/document-revisions`, staged for review; not on
 | Concurrent uploads allocating the same number | Numbers are allocated under the document row lock; unique constraints back this up and map to a fixed error. |
 
 **Limits** (ADR-0009): the re-check is not atomic with the commit (the M3a limit). Revision failure and job failure are separate commits. A `dead` job can leave its revision unsettled until M3d/M3e add reconciliation or a projection, which is required before overall M3 acceptance. There is no production handler, upload or endpoint yet, and document text is untrusted input for later milestones.
+
+**Verification:** at commit `8646b75` on `feat/document-revisions`, [CI run 38284929219](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219) passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930898138) (`819 passed, 133 skipped in 18.75s`) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930898065) (`818 passed, 134 skipped in 23.07s`). The [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930897691) passed all 133 PostgreSQL tests (`133 passed, 819 deselected in 36.46s`): the 77 existing ones and the 56 added by M3c, including cross-tenant references, the one-active index, concurrent creation and activation, rollback after demotion, stale attempts, lease expiry during a lock wait and the lock timeout. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929225) passed (29 commits scanned, no leaks found). All counts are from logs retrieved by the external reviewer. These results demonstrate the tested behaviour, not a general security or performance guarantee. M3c is not yet on `main`, and Compose has never been run.
 
 ## Not implemented yet
 
