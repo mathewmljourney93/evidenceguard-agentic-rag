@@ -3947,3 +3947,261 @@ Do not merge, switch or update main, rewrite history, delete branches, start Doc
   - M2c CI verification;
   - Compose verification;
   - overall M2 acceptance.
+
+**Outcome note for Prompt 43 (added with Prompt 44; publication and CI happened after the Prompt 43 commit):**
+- **Documentation commit:** `a888b6cbd277fb6a4556899fa630a7c50df14e61`, `docs: record M2c branch publication authorization`, with parent `73bebf5` and the noreply author and committer.
+  - Before it: `git diff --cached --check` printed nothing and the staged Gitleaks scan found no leaks.
+  - After it, before the push: the full-history Gitleaks scan found no leaks.
+- **Push:** `git push --set-upstream origin refs/heads/feat/vendor-api-readiness:refs/heads/feat/vendor-api-readiness` created the remote branch at `a888b6c`. Remote `main` stayed at `277dfea`. There was no force-push, and no other ref or tag was pushed.
+- **CI for exactly `a888b6c`:** Claude confirmed the run and job conclusions through the public GitHub REST API.
+  - [CI run 38212619855](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855) succeeded:
+    - [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994050) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689993962) verification;
+    - the [PostgreSQL 17 + pgvector integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994147).
+  - [Secret-scan run 38212619867](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619867) succeeded ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619867/job/114689993899)).
+- **Integration count:**
+  - Claude could not read the job logs: the unauthenticated log endpoint returned 403.
+  - The external reviewer independently retrieved the integration log, which reports `21 passed, 458 deselected in 4.65s`, with no integration test skipped. That covers M2a's ten tests, M2b's five and M2c's six.
+
+## Prompt 44: Record verified M2c CI results
+
+- **Stage:** Documentation update for verified M2c CI (staged for review, no commit)
+- **Date:** 2026-10-12 (session date)
+
+````text
+Prepare the M2c verification documentation. Leave it staged and uncommitted for external review.
+
+Follow CLAUDE.md. Work only in:
+D:\Claude\evidenceguard_agentic_rag
+
+Verify:
+- Branch: feat/vendor-api-readiness
+- HEAD: a888b6cbd277fb6a4556899fa630a7c50df14e61
+- Upstream: origin/feat/vendor-api-readiness, at the same SHA.
+- Origin: https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Working tree clean.
+- Remote main remains 277dfeaec7c1c64fa5ee92a3ce892823acc787fb.
+
+If anything differs, report it and stop without repairing the state.
+
+Verified evidence
+The external reviewer independently retrieved GitHub evidence for the exact published SHA a888b6cbd277fb6a4556899fa630a7c50df14e61:
+- CI run 38212619855: completed successfully.
+- Secret-scan run 38212619867: completed successfully.
+- PostgreSQL integration job 114689994147:
+  21 passed, 458 deselected in 4.65s.
+- No integration tests were skipped in that run.
+
+Links:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994147
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619867
+
+Documentation changes only
+Update:
+- README.md
+- docs/decisions/0006-vendor-api-and-readiness.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Record:
+1. M2c was reviewed, committed locally and published on its feature branch.
+2. Ubuntu, Windows, PostgreSQL integration and full-history secret scanning passed for the tested SHA.
+3. All 21 integration tests passed, including the six added in M2c.
+4. Attribute the observed integration summary to evidence independently retrieved by the external reviewer. Do not claim you accessed logs yourself unless you actually do.
+5. ADR-0006 is accepted following the implementation review and passing CI.
+6. M2c is not yet merged into main.
+7. Overall M2 acceptance remains pending the main publication and acceptance review.
+8. Compose remains unverified. Do not imply vector functionality was tested merely because CI uses a pgvector image.
+9. Existing authentication, pagination and readiness limitations remain applicable.
+
+Keep historical prompt entries unchanged. Append a separate outcome note for Prompt 43 recording the actual publication and verified CI results, then append this prompt verbatim using the next sequential number and add its truthful outcome note.
+
+Keep the edits narrow. Do not alter application code, tests, workflows, dependencies or architecture.
+
+Checks
+- Check relative links and anchors in changed documentation.
+- Check the staged additions for secrets and private information.
+- Run git diff --cached --check.
+- Run gitleaks git --pre-commit --staged --redact --verbose .
+- Confirm only the five authorized documentation files are staged.
+
+Application tests and builds need not be rerun for documentation-only changes.
+
+Final handoff
+- Include the COMPLETE staged diff excluding prompts.md directly in fenced diff blocks.
+- Split into numbered parts at file boundaries if needed; do not truncate.
+- Summarize prompt-history additions separately.
+- Report checks actually run and final Git status.
+- Distinguish the tested published commit from these new, uncommitted documentation edits.
+
+Do not commit, push, merge, update main, rewrite history, start Docker or contact a database.
+````
+
+**Outcome (documentation pending review; staged, not committed or pushed):**
+- **Starting state verified:**
+  - branch `feat/vendor-api-readiness`, HEAD and upstream `a888b6c`, the expected origin, a clean tree;
+  - remote `main` at `277dfea`.
+- **Documentation updated:** README, ADR-0006, the plan and the threat model now record that M2c was reviewed, committed and published on its branch, and that it passed CI at `a888b6c`:
+  - Ubuntu and Windows verification;
+  - the integration job, with `21 passed, 458 deselected in 4.65s` from the log retrieved by the external reviewer, including M2c's six tests;
+  - the full-history secret scan.
+- **Status changes:**
+  - ADR-0006 is now *Accepted*, following the implementation review and passing CI.
+  - M2c is recorded as not yet merged into `main`. Overall M2 acceptance is pending the `main` publication and acceptance review.
+  - Compose is unverified, and no vector functionality is claimed as tested.
+  - The existing authentication, pagination and readiness limits are kept.
+  - The README's name rule now also mentions the null-character restriction from Prompt 41.
+- **Not changed:** ADR-0005 is outside this prompt's file list. Its status line still describes ADR-0006's shared `AppDatabase` as "under review".
+- **Checks run:**
+  - a relative link and anchor check of the four changed documents: no problems;
+  - a private-content check of the staged additions;
+  - `git diff --cached --check`;
+  - the staged Gitleaks scan.
+
+  Exact results are in the session handoff. Application tests and builds were not rerun, because only documentation changed.
+- **Tested commit versus these edits:** CI verified the published commit `a888b6c`. These documentation edits are newer, uncommitted and untested by CI.
+
+**Review note (added with Prompt 45):**
+- The external reviewer accepted the Prompt 44 documentation diff, staged as tree `0c3a30275b91dc5c47a1562c81d171c6ca8036c7`.
+- The acceptance rests on that diff and on CI evidence for `a888b6c` that the reviewer retrieved independently:
+  - [CI run 38212619855](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855) succeeded;
+  - [secret-scan run 38212619867](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619867) succeeded;
+  - [integration job 114689994147](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994147) reported `21 passed, 458 deselected in 4.65s`.
+- The reviewer did not run the project suite locally.
+- Compose and overall M2 acceptance remain pending.
+
+## Prompt 45: Commit verified M2c documentation and fast-forward main
+
+- **Stage:** Local documentation commit, publication of `feat/vendor-api-readiness`, and an authorized fast-forward of `main` after CI passes
+- **Date:** 2026-10-12 (session date)
+
+````text
+Commit the reviewed M2c verification documentation, publish the feature branch, then fast-forward main only after all four CI checks pass.
+
+Follow CLAUDE.md. Work only in:
+D:\Claude\evidenceguard_agentic_rag
+
+Verify the starting state:
+- Branch: feat/vendor-api-readiness
+- HEAD and upstream: a888b6cbd277fb6a4556899fa630a7c50df14e61
+- Origin: https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Exactly five documentation files staged:
+  README.md
+  docs/decisions/0006-vendor-api-and-readiness.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Remote main: 277dfeaec7c1c64fa5ee92a3ce892823acc787fb
+- Remote main is an ancestor of HEAD.
+
+If the state differs, report it and stop without repairing it.
+
+Review acceptance
+The external reviewer accepts the Prompt 44 documentation diff, based on that diff and independently retrieved CI evidence for a888b6c:
+- CI run 38212619855 succeeded.
+- Secret-scan run 38212619867 succeeded.
+- Integration job 114689994147 reported:
+  21 passed, 458 deselected in 4.65s.
+
+The reviewer did not run the project suite locally. Compose and overall M2 acceptance remain pending.
+
+One additional authorized edit
+In docs/decisions/0005-api-key-authentication.md, change only the status-line phrase:
+“superseded, under review, by”
+to:
+“superseded by”
+
+This makes it consistent with the accepted ADR-0006. Preserve the rest of ADR-0005.
+
+Prompt history
+Record the accepted staged tree before editing.
+Append:
+- A review note under Prompt 44 recording acceptance and its evidence.
+- This prompt verbatim, using the next sequential number.
+- A truthful preflight note explaining the publication sequence and limits.
+
+Preserve earlier entries. Do not record future push, merge or CI results as already completed.
+
+Pre-commit checks
+- Confirm only the six authorized documentation files are staged.
+- Confirm the four previously reviewed non-prompts.md files remain byte-identical to the accepted staged tree.
+- Confirm ADR-0005 contains only the exact authorized phrase change.
+- Check documentation links and staged additions for secrets/private information.
+- Confirm effective author and committer email:
+  257921624+mathewmljourney93@users.noreply.github.com
+- Run git diff --cached --check.
+- Run gitleaks git --pre-commit --staged --redact --verbose .
+
+If clean, commit:
+docs: record verified M2c results and main publication authorization
+
+Keep the existing attribution convention.
+Run gitleaks git --redact --verbose . after the commit.
+Do not publish if the scan fails.
+
+Publication sequence
+1. Push only the feature branch with an explicit refspec:
+   git push origin refs/heads/feat/vendor-api-readiness:refs/heads/feat/vendor-api-readiness
+
+2. Wait for all four checks on the exact new HEAD SHA:
+   - Ubuntu verification
+   - Windows verification
+   - PostgreSQL integration
+   - Full-history secret scan
+
+3. If any check fails or remains pending at the monitoring limit, stop and report. Do not update main or implement fixes.
+
+4. Once all four pass, fetch main and the feature branch again. Confirm:
+   - Remote main is still 277dfeaec7c1c64fa5ee92a3ce892823acc787fb.
+   - That commit is an ancestor of the verified feature HEAD.
+   - Local main has no independent commits or divergence.
+   - The working tree is clean.
+   If any condition differs, stop.
+
+5. Switch to main and fast-forward with git merge --ff-only to the exact verified feature SHA.
+
+6. Push only main:
+   git push origin refs/heads/main:refs/heads/main
+
+7. Monitor the workflows triggered by the main push for that exact SHA and report their results.
+
+Do not force-push, create a merge commit, squash, amend, rebase, delete branches or push tags.
+
+Final handoff
+- Full commit SHA, parent, subject and identity.
+- Complete incremental diff against the accepted staged tree, excluding prompts.md, directly in fenced diff blocks. This should contain only the ADR-0005 phrase correction.
+- Prompt-history additions and actual checks run.
+- Feature and main workflow/job links, conclusions and exact tested SHA.
+- Actual integration test counts if logs are accessible; otherwise state that the count is unobserved.
+- Remote refs before and after publication.
+- Final Git status.
+- Keep Compose and overall M2 acceptance pending.
+
+No application checks need to run locally for these documentation-only changes. Do not start Docker or contact a local database.
+````
+
+**Preflight note (recorded before the commit, publication and any change to `main`):**
+- **Starting state verified:**
+  - branch `feat/vendor-api-readiness`, HEAD and upstream `a888b6c`, the expected origin;
+  - exactly the five reviewed documentation files staged, with nothing unstaged or untracked.
+  - The accepted staged tree, `0c3a30275b91dc5c47a1562c81d171c6ca8036c7`, was recorded before any edit.
+- **Remote refs, read before this commit:**
+  - `main` is `277dfea`, and local `main` matches it;
+  - `feat/vendor-api-readiness` is `a888b6c`;
+  - remote `main` is an ancestor of HEAD.
+- **This commit** adds:
+  - the accepted Prompt 44 documentation;
+  - the authorized ADR-0005 status-line correction ("superseded, under review, by" becomes "superseded by");
+  - this prompt-history update.
+- **Authorization:** Prompt 45 authorizes these steps, in order:
+  1. push only the feature branch;
+  2. **only after** Ubuntu verification, Windows verification, PostgreSQL integration and the full-history secret scan all pass for the exact pushed SHA, and remote `main` is confirmed still at `277dfea` and an ancestor of it, fast-forward local `main` to that SHA with `git merge --ff-only`;
+  3. push only `main`, then monitor its workflows.
+
+  No force-push, merge commit, squash, amend, rebase, branch deletion or tag push is authorized.
+- **Stop conditions:** if a check fails or is still pending at the monitoring limit, `main` is not changed.
+- **Not yet recorded here:** the push, the CI results and any `main` update happen after this commit, so they are reported in the session handoff.
+- **Not rerun:** application checks, because only documentation changes.
+- **Still open:** Compose remains unverified, and overall M2 acceptance is pending.

@@ -1,6 +1,6 @@
 # ADR-0006: Tenant-scoped vendors, shared database lifecycle and readiness
 
-- **Status:** Proposed, under review (M2c)
+- **Status:** Accepted (M2c), following the implementation review and passing CI at commit `a888b6c` on branch `feat/vendor-api-readiness`; not yet merged into `main`. See *Consequences and limits*.
 - **Date:** 2026-10-12
 - **Builds on:** [ADR-0004](0004-persistence-foundation.md) (the `vendors` table and its constraints), [ADR-0005](0005-api-key-authentication.md) (API-key authentication and roles), plan sections on the API and M2, and the M2 decisions recorded under Prompt 24 in [prompts.md](../../prompts.md)
 
@@ -65,14 +65,16 @@ M2b authenticated requests but only `/v1/me` used the database, through a privat
 
 ## Consequences and limits
 
-- **Not run against PostgreSQL yet.** The M2c PostgreSQL integration tests have not run:
-  - vendor create, list and get through the API;
-  - two-tenant isolation with identical slugs;
-  - duplicate rollback;
-  - pagination;
-  - readiness when ready, unmigrated and on a revision mismatch.
-
-  No local database is used. They are **pending** until a reviewed branch is published and its CI integration job passes.
+- **Verified in CI.** The tested commit is `a888b6c` (`a888b6cbd277fb6a4556899fa630a7c50df14e61`) on branch `feat/vendor-api-readiness`. It adds only documentation after the reviewed M2c commit `73bebf5`.
+  - In [CI run 38212619855](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855), the [integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994147) ran against a PostgreSQL 17 + pgvector service container. Its log, retrieved by the external reviewer, reports `21 passed, 458 deselected in 4.65s`, so none was skipped. That covers M2a's ten tests, M2b's five and M2c's six:
+    - vendor create, list and get through the API;
+    - two-tenant isolation with identical slugs;
+    - duplicate rollback;
+    - pagination;
+    - readiness when ready, unmigrated and on a revision mismatch.
+  - The database-independent checks passed on [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689994050) and [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619855/job/114689993962), and the [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38212619867) passed.
+  - M2c is not yet merged into `main`.
+- **Not verified locally.** No local database is used. No vector functionality is tested: the CI image includes pgvector, but no migration creates the extension.
 - **The PostgreSQL error code is not checked.** Duplicate detection relies on psycopg reporting the constraint name. If a future driver stopped reporting it, duplicates would surface as 503s rather than 409s, never as false 409s.
 - **Readiness is coarse.** It checks connectivity and revision equality only. It does not prove that every table matches the models; `alembic check` in CI does that.
 - **Readiness is not access-controlled.** It is unauthenticated and reveals only that the service is or is not ready, plus which of the two fixed checks failed.

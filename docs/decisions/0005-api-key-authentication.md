@@ -1,6 +1,6 @@
 # ADR-0005: API-key authentication and tenant context
 
-- **Status:** Accepted (M2b). Verified in CI at commit `b2f7f23` on branch `feat/api-key-authentication`, then fast-forwarded onto `main` at `277dfea`, where CI passed again. See *Consequences and limits*. The default database wiring below is superseded, under review, by the shared `AppDatabase` in [ADR-0006](0006-vendor-api-and-readiness.md).
+- **Status:** Accepted (M2b). Verified in CI at commit `b2f7f23` on branch `feat/api-key-authentication`, then fast-forwarded onto `main` at `277dfea`, where CI passed again. See *Consequences and limits*. The default database wiring below is superseded by the shared `AppDatabase` in [ADR-0006](0006-vendor-api-and-readiness.md).
 - **Date:** 2026-10-12
 - **Builds on:** [ADR-0002](0002-request-ids-logging-and-errors.md) (problem responses and logging), [ADR-0004](0004-persistence-foundation.md) (the `api_keys` and `users` tables), plan decision G12, and the M2 decisions recorded under Prompt 24 in [prompts.md](../../prompts.md)
 
