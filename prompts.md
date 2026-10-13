@@ -8862,3 +8862,746 @@ Do not begin M3d.
   4. Fast-forward `main` with `git merge --ff-only`, push only `main`, and monitor its four checks for at most 20 minutes.
 - **Stop conditions:** any mismatch, failed scan, failed or pending check, or non-fast-forward situation stops the work before `main` is touched; there is no automatic fix, repush, revert or history rewrite. No force-push, amend, rebase, squash, branch deletion, tags, Docker or database contact. M3d is not started.
 - **Not yet done when this note was written:** the push, CI and `main` results are reported in the session handoff; recording them here needs a later documentation update.
+
+**Publication outcome for Prompt 75 (recorded later, with Prompt 76):**
+- **Commit:** `6f8ffde` (`6f8ffded2e5c7b2ed69e37700dc03f20f5e24482`, parent `8646b75`, noreply identity) changed exactly the five authorized files. Compared with the accepted tree `49ed2b9…`, only the plan sentence and `prompts.md` differed. The staged and full-history Gitleaks scans found no leaks (30 commits).
+- **Feature push:** `git push origin refs/heads/feat/document-revisions:refs/heads/feat/document-revisions`, run directly, reported `8646b75..6f8ffde` with git's own exit status 0.
+- **Feature CI:** [ci run 38286402740](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286402740) and [secret-scan run 38286402386](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286402386) succeeded for `6f8ffde`, with every job and step successful.
+- **Fast-forward:** a fresh fetch confirmed remote `main` at `dd26c70`, the remote branch at `6f8ffde`, ancestry, local `main` equal to `origin/main`, and a clean tree. `main` was fast-forwarded with `git merge --ff-only`, creating no merge commit.
+- **Main push:** `git push origin refs/heads/main:refs/heads/main` reported `dd26c70..6f8ffde`, exit status 0.
+- **Main CI:** [ci run 38286702295](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295) and [secret-scan run 38286702205](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702205) succeeded on `main` for `6f8ffde`. Job logs returned HTTP 403 in that session, so no counts were observed there.
+- **Reviewer-observed results (later):** the external reviewer retrieved the main-run logs:
+  - Ubuntu `819 passed, 133 skipped in 18.04s`;
+  - Windows `818 passed, 134 skipped in 18.87s`;
+  - PostgreSQL `133 passed, 819 deselected in 38.29s`;
+  - secret scan: 30 commits scanned, no leaks found.
+
+The historical "not yet merged" statements in Prompts 74 and 75 were true when written and are left unchanged.
+
+## Prompt 76: Record M3c main verification and specify M3d ingestion
+
+- **Stage:** Documentation and specification only, on branch `docs/m3d-ingestion-spec` (staged and uncommitted for review; no commit, push or merge)
+- **Date:** 2026-10-13 (session date)
+- **Numbering:** 76 is the next unused number after Prompt 75. No earlier read-only handoff from this session is left unrecorded: the read-only diff handoff was recorded as Prompt 70.
+
+````text
+Prompt 76 — Record M3c main verification and specify M3d ingestion
+
+Work only inside D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md and the existing architecture decisions.
+
+This is a documentation and specification task. Do not implement M3d, commit, push, merge, rewrite history, start Docker, contact a database, install tools, or modify global configuration.
+
+1. Verify the starting state before editing
+
+Expected:
+- Branch: main
+- HEAD and origin/main:
+  6f8ffded2e5c7b2ed69e37700dc03f20f5e24482
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Clean working tree, nothing staged or untracked.
+- Effective author and committer email:
+  257921624+mathewmljourney93@users.noreply.github.com
+
+Check remote main read-only. If the state differs, stop and report the difference without changing anything.
+
+Read CLAUDE.md, the relevant plan sections, ADR-0007 through ADR-0009, and the existing revision, document-store, fenced-job and worker interfaces. Inspect the existing code before proposing interfaces.
+
+Create docs/m3d-ingestion-spec from the verified HEAD.
+
+2. Record verified M3c publication
+
+Update README.md, ADR-0009, docs/plan.md and docs/threat-model.md where necessary to record that M3c was fast-forwarded onto main at 6f8ffde.
+
+The external reviewer independently retrieved these results for that exact SHA:
+
+Main CI:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295
+
+- Ubuntu job 114936682783:
+  819 passed, 133 skipped in 18.04s
+- Windows job 114936682699:
+  818 passed, 134 skipped in 18.87s
+- PostgreSQL integration job 114936682399:
+  133 passed, 819 deselected in 38.29s
+
+Main secret scan:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702205
+- Job 114936700730:
+  30 commits scanned, no leaks found
+
+Both runs completed successfully on main with head_sha
+6f8ffded2e5c7b2ed69e37700dc03f20f5e24482.
+
+Attribute these observations to the external reviewer; do not claim you retrieved the logs or ran the suite yourself. Preserve earlier SHA-specific evidence as historical evidence.
+
+M3c is verified and on main. Compose, M3d–M3f and overall M3 acceptance remain pending.
+
+3. Write a reviewable M3d specification in docs/plan.md
+
+Keep the accepted architecture and scope:
+- Only UTF-8 text/plain and text/markdown.
+- Deterministic chunker v1.
+- A chunks table introduced by migration 0004, following 0003.
+- The first production worker handler: ingest_revision.
+- No embeddings, retrieval, model calls, upload endpoints or document endpoints in this slice.
+
+Specify the following precisely. Distinguish existing decisions from proposed defaults needing review. Resolve routine choices with a concrete recommendation; do not leave a list of competing implementations.
+
+A. Parsing and provenance
+
+Define exact behavior for:
+- Markdown headings and section paths.
+- Paragraph boundaries and plain-text blank lines.
+- Approximately 2,500-character chunks, with no overlap.
+- Oversized paragraphs and oversized table rows.
+- Markdown tables, including splitting by rows and repeating headers.
+- LF and CRLF, BOMs, Unicode and whitespace.
+- Empty or whitespace-only documents.
+- Unsupported or malformed input.
+
+Define whether the character target is a hard limit or a packing target.
+
+Define source line numbering and how chunk text maps back to the original stored source. Repeated table headers must not create a false claim that generated chunk text is one contiguous verbatim source passage.
+
+Preserve the original uploaded-byte hash and size. Explain any derived-text normalization separately. The parser is not a Markdown renderer, does not execute content and performs no network or filesystem access.
+
+Provide small input/output examples covering headings, long text, tables and line provenance.
+
+B. Chunk contract and database schema
+
+Specify exact columns, types, constraints and indexes, including:
+- Tenant and revision identity.
+- Chunker version and ordinal.
+- Deterministic UUID5 identity using tenant, revision, chunker version and ordinal.
+- The fixed UUID namespace and ordinal convention.
+- Chunk text and section/line provenance.
+- Composite tenant-scoped foreign keys and uniqueness.
+- An explicit, consistent home for chunker_version.
+- Immutability after activation.
+- Whether any content digest or manifest is required to verify a complete chunk set.
+
+Re-chunking active revisions is out of scope.
+
+Migration 0004 must not introduce embeddings or create the vector extension. Explain upgrade/downgrade order and migration-head test updates.
+
+C. Persistence operations and fencing
+
+Specify tenant-scoped source loading without exposing content through repr, logs or exception messages.
+
+Specify chunk writes through the existing FencedSession and job fence:
+- Parse outside database locks.
+- Keep write transactions bounded.
+- Check cancellation and current ownership at the required boundaries.
+- Make retries idempotent.
+- Verify that an existing deterministic chunk matches the expected immutable content and provenance; do not silently overwrite or ignore a mismatch.
+- Define how partial writes resume after a crash.
+- Prevent activation until the entire expected chunk set is verified.
+- Preserve document/revision lock ordering and fresh ownership checks from M3c.
+
+Explain the exact final transaction that verifies completeness, activates or supersedes the revision, and completes the job through ctx.fenced(finish=True).
+
+Do not redesign the worker’s cancellation or uncertain-commit semantics.
+
+D. Production handler
+
+Define:
+- Exact job kind: ingest_revision.
+- Payload shape and validation.
+- Idempotency key derived from revision identity.
+- Registry registration and installed-wheel behavior.
+- Processing of pending, processing, failed, active and superseded revisions.
+- Retryable versus permanent failure classification.
+- Fixed RevisionFailureCode and JobErrorCode mappings.
+- Cancellation, lease loss, partial writes, reclaim and uncertain commit behavior.
+
+Preserve the existing two-transaction permanent-failure protocol unless proposing a separately reviewed interface change. Never raise PermanentJobError inside the fenced block that must commit the revision’s failure.
+
+Already-failed revisions must not be parsed again.
+
+Describe behavior when a different valid job refers to an already-settled revision, and explain how malformed or cross-tenant payloads fail safely.
+
+E. Dead-job truthfulness
+
+A dead job can leave a revision pending or processing. Select and specify a concrete approach:
+- reconciliation, or
+- a truthful derived status projection for M3e.
+
+Explain the authoritative stored revision status, the related job status, lease expiry and what users will eventually see. Do not imply a currently live lease guarantees progress.
+
+If implementation belongs in M3e, explicitly assign it there with acceptance tests and retain it as a blocker for overall M3 acceptance. Do not leave this responsibility unspecified.
+
+F. Verification and implementation boundaries
+
+List intended files and meaningful tests:
+- Pure parser/chunker determinism and provenance.
+- Tenant-disjoint chunk IDs for identical source bytes.
+- Validation and privacy.
+- Idempotent chunk persistence and conflicting existing chunks.
+- Real PostgreSQL constraints and migration checks.
+- Partial-write crash and resume.
+- Stale worker and lease expiry during lock waits.
+- Completeness enforcement before activation.
+- Atomic activation and job completion.
+- Permanent-failure crash gap.
+- Cancellation and uncertain commit.
+- Real worker execution with the registered production handler.
+- Installed-wheel packaging.
+
+Separate database-independent tests from real PostgreSQL tests. PostgreSQL verification remains pending an authorized publication and successful CI.
+
+Do not claim any M3d implementation, test result or performance measurement exists yet.
+
+4. Prompt history
+
+Use the next unused prompt number; expect 76, but verify it.
+
+Append this prompt verbatim to prompts.md, followed by an outcome note describing the actual work and verification.
+
+Record the Prompt 75 publication outcome and the reviewer-observed main results above as a later outcome update. Preserve all earlier text byte-for-byte; do not rewrite historical “not yet merged” statements inside old prompt entries.
+
+If any earlier read-only handoff continuation remains unrecorded, append an accurately labelled note without inventing its verbatim text.
+
+5. Verify and stage for review
+
+Allowed tracked changes:
+- README.md
+- docs/decisions/0009-document-revisions.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+No application, test, migration, dependency or workflow changes.
+
+Check documentation consistency, relative links and anchors, private content, git diff --cached --check and the staged Gitleaks scan.
+
+Application tests and builds are unnecessary for this documentation-only task.
+
+Leave all changes staged and uncommitted.
+
+6. Review handoff
+
+Provide:
+- A concise explanation of the recommended M3d design and proposed defaults.
+- Verification commands and actual results.
+- Branch, HEAD, staged tree, staged paths and working-tree status.
+- The COMPLETE staged diff excluding prompts.md, directly in fenced diff blocks.
+- Split at file boundaries into numbered parts if necessary. Do not truncate or substitute summaries.
+- If response limits prevent completion, save the complete diff under .local/ and clearly identify which inline parts remain to be supplied.
+
+Nothing is authorized to be committed, pushed or merged.
+````
+
+**Outcome note (written before review; the changes are staged and uncommitted):**
+- **Starting state verified:** branch `main` with HEAD, `origin/main` and a fresh read-only `git ls-remote` all at `6f8ffde`; the expected origin; a clean tree with nothing staged or untracked; and the noreply identity. Branch `docs/m3d-ingestion-spec` was created from that HEAD.
+- **Read before editing:** `CLAUDE.md`, the plan's data-model, lifecycle, retrieval, M3 and M3c sections, and ADR-0007 to ADR-0009. Also the existing interfaces in:
+  - `evidenceguard_domain.revisions` and `evidenceguard_domain.jobs`;
+  - `evidenceguard_persistence.documents` and `evidenceguard_persistence.jobs` (`enqueue`, `FencedSession`, `recheck_ownership`);
+  - `evidenceguard_worker` (`context`, `registry`, `handlers` and the runtime's outcome mapping);
+  - the import-boundary and packaging tests.
+- **M3c publication recorded:** `README.md`, ADR-0009, `docs/plan.md` and `docs/threat-model.md` record the fast-forward onto `main` at `6f8ffde` and the reviewer-retrieved main CI results, attributed to the external reviewer. The branch evidence at `8646b75` is kept as history.
+- **M3d specification added (proposed, not implemented):** in `docs/plan.md`, it separates decided items from proposed defaults and covers:
+  - parsing and provenance, with exact line, offset, BOM, heading, fence, table and size rules and four normative examples;
+  - the `chunk_sets` and `chunks` schema in migration `0004`, with the fixed UUID namespace literal and a completeness manifest;
+  - fenced, bounded and idempotent chunk writes with conflict verification and crash resume;
+  - completeness checked in M3c's activation transaction through a new optional `before_settle` argument;
+  - the `ingest_revision` handler, with its payload, registry and failure classification, new revision failure codes all mapped to `PERMANENT_FAILURE`, and the unchanged two-transaction failure protocol;
+  - a derived `ingestion_state` projection for dead jobs, assigned to M3e as a blocker for overall M3 acceptance;
+  - the verification plan, split into database-independent and PostgreSQL tests.
+
+  The examples' offsets and the example chunk IDs were computed with Python's standard library in this session.
+- **Checks:** relative links and anchors in the four edited documents, consistency and private-content searches, `git diff --cached --check` and the staged Gitleaks scan. Exact results are in the session handoff. No application tests or builds were run (documentation only).
+- **Not done:** no M3d code, migration, test or measurement exists. Nothing was committed, pushed or merged. No Docker, database contact or global configuration change.
+- **Review status:** pending.
+
+## Prompt 77: Correct the M3d specification (interrupted; exact text unavailable)
+
+- **Stage:** Specification correction, on branch `docs/m3d-ingestion-spec`. Interrupted by the session usage limit before verification, prompt-history update or staging.
+- **Date:** 2026-10-13 (session date)
+- **Exact text unavailable:** the interrupted session did not record Prompt 77, and its text could not be recovered in the resuming session (Prompt 78). The only project-local material is the session's own scripts under `.local/p77/`. This entry is therefore an honestly labelled interruption note, **not** the verbatim prompt. Prompt 78 restates the correction requirements (INSERT return values, serializing chunk writes with lifecycle changes, parser boundary rules, binding completeness to the current attempt), and those requirements were used to complete the work.
+
+**Outcome note (written in Prompt 78, from the recovered state):**
+- **Work present on recovery:** `.local/p77/apply.py` had run and left `docs/plan.md` with **unstaged** changes (174 insertions, 65 deletions) to the M3d section: rewritten line, block and chunk rules, normative examples 5–9, `chunk_sets` return values and the canonical manifest encoding, the lock-protocol and serialization rules, the bound `ExpectedChunkSet` callback, and the handler's refusal handling and test lists.
+- **Not done by the interrupted session:** no verification, no prompt-history entry and no staging. The staged tree was still the Prompt 76 tree `fc9e360`.
+- **Completion:** in Prompt 78 (below).
+
+## Prompt 78: Resume interrupted Prompt 77 — recover, complete and hand off
+
+- **Stage:** Recovery and specification correction, documentation only, on branch `docs/m3d-ingestion-spec` (staged and uncommitted for review; no commit, push or merge)
+- **Date:** 2026-10-13 (session date)
+- **Numbering:** 77 was unused on recovery and is taken by the interruption note above; 78 is the next unused number.
+
+````text
+Resume interrupted Prompt 77 — recover, complete and hand off
+
+This is a fresh Claude Code session.
+
+Work only inside D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md first.
+
+Load only the relevant M3d section of docs/plan.md and the recent prompt-history entries needed for this task. Do not load the entire prompts.md or previous session transcript.
+
+Our workflow:
+- Claude performs the work locally.
+- Mathew brings the complete diff and results to an external reviewer.
+- Implementation and corrections remain staged and uncommitted until reviewed.
+- Commit, push and merge require explicit authorization.
+
+No implementation, commit, push, merge, history rewrite, Docker, database contact, installation or global configuration change is authorized by this prompt.
+
+1. Recover the actual repository state
+
+The previous session hit its usage limit during Prompt 77.
+
+Its last visible action successfully ran:
+python .local/p77/apply.py
+
+It reported changes to docs/plan.md:
+174 insertions and 65 deletions.
+
+Verification, prompt-history updates and staging may be incomplete.
+
+Do not rerun that script or repeat corrections blindly.
+
+Inspect:
+- branch, HEAD and origin;
+- git status;
+- staged paths and unstaged changes;
+- current staged tree;
+- staged and unstaged diffs;
+- recent entries at the end of prompts.md;
+- existing .local/p77/ files, if present.
+
+Expected branch:
+docs/m3d-ingestion-spec
+
+Expected HEAD:
+6f8ffded2e5c7b2ed69e37700dc03f20f5e24482
+
+Expected origin:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+
+Expected repository-local identity:
+257921624+mathewmljourney93@users.noreply.github.com
+
+The staged tree before Prompt 77 was:
+fc9e360b2f643b4689f591db5a76b05b035a6d9e
+
+That baseline contained:
+README.md
+docs/decisions/0009-document-revisions.md
+docs/plan.md
+docs/threat-model.md
+prompts.md
+
+Partial staged or unstaged edits to docs/plan.md and prompts.md are expected after the interruption. Those alone are not a starting-state failure.
+
+If the branch or HEAD differs, or unrelated tracked files changed, stop and report the discrepancy. Preserve existing work.
+
+Record the recovered state before editing. Do not reset, restore or discard work to recreate the baseline.
+
+2. Recover and complete Prompt 77
+
+Read Prompt 77 from prompts.md if recorded. Otherwise inspect available project-local recovery material.
+
+If its exact original text is unavailable, the correction requirements below are sufficient to complete the task. Do not invent a verbatim historical prompt.
+
+Inspect the edits already applied. Complete only missing or incorrect corrections.
+
+A. Correct INSERT return values
+
+chunk_sets has a composite primary key and no id column.
+
+Specify valid RETURNING columns separately for write_chunk_set and write_chunks. Do not add an artificial id column merely to match earlier wording.
+
+Define immutable fields compared on conflict. Creation timestamps are metadata, not regenerated expectations for retries.
+
+Errors must use fixed messages without source content.
+
+B. Serialize chunk writes with lifecycle changes
+
+The original proposal checked processing status without locking the revision. A job lock alone does not serialize different jobs referring to the same revision.
+
+Specify a protocol compatible with M3c:
+- job lock from the fence;
+- document lock;
+- required revision locks in ascending ID order;
+- fresh ownership check after lock waits;
+- fresh processing-status check under those locks;
+- insert and verify the batch;
+- fresh ownership check after unique-index waits and before returning.
+
+Use existing M3c locking machinery where appropriate.
+
+Required behavior:
+- If the writer wins the locks, its permitted batch commits before settlement proceeds.
+- If activation or failure wins, the writer sees the new status and writes nothing.
+- No chunk or chunk-set insertion occurs after settlement.
+- A stale attempt changes nothing.
+
+Specify how ChunkWriteRefusedError leads to a fresh status read and the correct settled/failed branch, without trying to fail an already-settled revision.
+
+Keep parsing outside transactions and locks.
+
+Add planned PostgreSQL cases for:
+- writer versus activation using different jobs for the same revision;
+- writer versus failure;
+- insertion attempts after settlement;
+- lease expiry during these lock waits;
+- rollback of a refused batch.
+
+C. Complete parser boundary rules
+
+Clarify:
+- Paragraphs stop before recognized headings, fence openings and table starts, even without a blank line.
+- Fence-closing recognition is precise.
+- Consecutive headings are an explicit exception to the general heading boundary rule, with defined chunk membership and section paths.
+- Oversized heading lines have a defined splitting rule.
+- Oversized table headers and header-only tables are handled within every size limit.
+- Every emitted piece reconstructs exactly from its documented source spans.
+- Empty-document and split-whitespace predicates are explicit and consistent with blank-line handling.
+- Omitted separators never lose non-whitespace source characters.
+
+Add normative examples and planned tests for:
+- prose immediately followed by a heading;
+- consecutive headings;
+- oversized headings;
+- oversized headers and header-only tables;
+- whitespace-only source under the chosen predicate.
+
+Preserve existing correct examples and the fixed UUID namespace.
+
+D. Bind completeness to the current attempt
+
+Specify how the final callback receives or captures this attempt’s expected manifest, count and chunker version. Include an unambiguous illustrative call.
+
+Define canonical manifest JSON encoding:
+- key ordering;
+- separators;
+- Unicode escaping;
+- UUID representation;
+- null representation;
+- ordinal ordering.
+
+The final check verifies:
+- expected chunker version;
+- expected chunk count and exact ordinal set;
+- stored set manifest;
+- manifest reconstructed from stored chunk fields;
+- equality with this attempt’s independently computed manifest.
+
+Explain that digest-only verification relies on application immutability and does not protect against privileged database modification.
+
+Preserve the proposed optional callback interface and atomic activation/job-success transaction. Do not redesign worker cancellation or uncertain-commit semantics.
+
+3. Preserve accepted scope and content
+
+The M3c publication documentation is accepted.
+
+Relative to baseline fc9e360:
+- README.md, ADR-0009 and docs/threat-model.md remain byte-identical.
+- Only docs/plan.md and prompts.md may change for the correction.
+- CLAUDE.md may additionally change for the session guidance below.
+
+Keep these M3d proposals:
+- text/plain and text/markdown only;
+- text-md-v1;
+- 2,500-character prose limit;
+- 4,000-character absolute chunk limit;
+- 1,000-character repeated-header limit;
+- 4,096 chunks per revision;
+- batches bounded by 200 chunks and 512,000 code points;
+- chunk_sets and chunks in migration 0004;
+- no embeddings, extensions, retrieval or model calls;
+- existing worker and two-transaction permanent-failure semantics;
+- M3e derived dead-job projection, required before overall M3 acceptance.
+
+M3d remains proposed and unimplemented until the corrected specification is accepted.
+
+4. Add persistent session guidance to CLAUDE.md
+
+Add a concise “Session management” section, without duplicating existing rules:
+
+- Recommend a fresh session at the boundary between milestone slices, after the current slice has a reviewable handoff.
+- Recommend a fresh session when Claude Code reports that a large expired context will be re-cached, or when context is dominated by unrelated completed work.
+- Use any available context/usage indicators as evidence. Never invent a token count or claim a measured saving.
+- State the recommendation explicitly: “Start a new Claude session before the next task,” with a brief reason.
+- Before recommending a switch during unfinished work, provide a recovery handoff: branch, HEAD, staging and working-tree state, completed work, outstanding work and the next prompt.
+- Keep immediate corrections in the current session when its relevant context remains useful.
+- Starting a new session never authorizes discarding changes or rewriting Git history.
+- In a fresh session, read project instructions and targeted relevant files. Avoid loading the entire prompt archive by default.
+
+This is guidance, not a mandatory interruption in the middle of useful work. Finish the authorized task and its handoff unless a real limit prevents it.
+
+5. Prompt history
+
+Verify the next unused number.
+
+Do not append Prompt 77 twice.
+
+If Prompt 77 is absent:
+- record it verbatim only if its exact original text is available;
+- otherwise append an honestly labelled interruption note explaining that the exact text was unavailable in this session.
+
+Append this prompt verbatim once under the next unused number.
+
+Preserve all earlier history byte-for-byte.
+
+Record:
+- the interruption;
+- work already present on recovery;
+- corrections completed after recovery;
+- session guidance added;
+- actual verification results;
+- that M3d remains unimplemented and unaccepted.
+
+Do not claim tests, publication or review acceptance that did not happen.
+
+6. Verify and stage for review
+
+Allowed staged paths:
+CLAUDE.md
+README.md
+docs/decisions/0009-document-revisions.md
+docs/plan.md
+docs/threat-model.md
+prompts.md
+
+Check:
+- corrected specification consistency and normative examples;
+- relative links and anchors;
+- private content;
+- byte identity of the three unchanged documents;
+- git diff --cached --check;
+- staged Gitleaks scan.
+
+No application tests or builds are necessary for documentation-only changes.
+
+Leave the authorized files staged and uncommitted. Do not stage .local/ artifacts or unrelated files. Report any remaining unstaged or untracked files.
+
+7. Complete review handoff
+
+Provide:
+- recovered starting state;
+- what was already completed before interruption;
+- what changed in this session;
+- actual verification commands and results;
+- branch, HEAD, final staged tree and staged paths;
+- remaining unstaged or untracked files;
+- prompt-history additions;
+- whether a fresh session is recommended before the next task, and why.
+
+Include the COMPLETE incremental diff against:
+fc9e360b2f643b4689f591db5a76b05b035a6d9e
+
+Exclude prompts.md, but include the full CLAUDE.md change.
+
+Print the diff directly in fenced diff blocks, split into numbered parts at file boundaries if necessary. Do not truncate or replace it with a summary.
+
+Use .local/ only as a fallback and identify any inline parts still missing.
+
+Nothing may be committed, pushed, merged or implemented.
+````
+
+**Outcome note (written before review; the changes are staged and uncommitted):**
+- **Recovered starting state (verified before editing):** branch `docs/m3d-ingestion-spec`, HEAD `6f8ffde`, the expected origin and noreply identity. The staged tree was exactly the Prompt 76 tree `fc9e360`. The only unstaged change was `docs/plan.md` (174 insertions, 65 deletions) from `.local/p77/apply.py`; `prompts.md` had no Prompt 77 entry, and there were no untracked files. That script was not rerun.
+- **Recovered edits kept:** they already covered most of A–D (see the Prompt 77 note), and were checked against the M3c code: `_lock(session, job, *, include_active)` performs exactly the documented job → document → revisions → `recheck_ownership` sequence, and `recheck_ownership`, `RevisionSnapshot` and `InvalidRevisionTransitionError` exist as named.
+- **Corrections completed in this session (`docs/plan.md`):**
+  - a leading BOM is excluded from line 1's content for every rule, so a BOM-only line is blank and the empty-document predicate agrees with blank-line handling;
+  - the oversized-line rule now trims leading and trailing spaces and tabs before cutting, ends when the remainder fits, and never emits an empty or whitespace-only piece;
+  - runs and pieces of a split block are never packed with neighbouring blocks, and a split heading run keeps the run's section path;
+  - `fail_revision` racing a settlement raises `InvalidRevisionTransitionError`, which the handler catches outside the block and answers with the same fresh status read; the re-read happens at most once per attempt;
+  - example 9 spells NBSP as an escape instead of an invisible literal, and gains a BOM-only empty case;
+  - matching planned tests.
+- **Session guidance added:** a "Session management" section in `CLAUDE.md`.
+- **Checks run in this session:** see the session handoff for exact commands and results. They covered:
+  - every normative example's offsets, slices and lengths, the oversized-line splits, the namespace literal and both example chunk IDs, recomputed with Python's standard library (all matched);
+  - relative links and anchors, the private-content search, and byte identity of `README.md`, ADR-0009 and `docs/threat-model.md` with `fc9e360`;
+  - `git diff --cached --check` and the staged Gitleaks scan.
+
+  No application tests or builds were run (documentation only).
+- **Not done:** M3d remains **proposed, unimplemented and unaccepted**. No code, migration or test exists. Nothing was committed, pushed or merged. No Docker, database contact, installation or global configuration change.
+- **Review status:** pending.
+
+**Review note (recorded in Prompt 79):**
+- **Accepted:** the external reviewer accepted the M3d specification from Prompt 76 together with the corrections recovered and completed in Prompts 77–78, subject to two final clarifications made in Prompt 79 (source coverage, and chunk insert conflicts). The session-management guidance in `CLAUDE.md` was also accepted.
+- **How it was reviewed:** the reviewer inspected the diffs supplied in the handoffs. The reviewer had previously checked the UUID examples and the table offsets independently. The reviewer did not run the project tests or the documentation checker; the documentation checks and secret-scan results were reported by Claude.
+- **Still pending:** the M3d implementation and all of its verification.
+
+## Prompt 79: Accept and commit the M3d specification locally
+
+- **Stage:** Documentation acceptance and a local commit on branch `docs/m3d-ingestion-spec` (no push or merge)
+- **Date:** 2026-10-13 (session date)
+- **Numbering:** 79 is the next unused number after Prompt 78; verified before appending.
+
+````text
+Prompt 79 — Accept and commit the M3d specification locally
+
+Work only inside D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+The external reviewer accepts the M3d specification from Prompt 76 plus the recovered corrections in Prompt 78, subject to the two narrow clarifications below. The session-management guidance is also accepted.
+
+This authorizes a local documentation commit only. No implementation, push, merge, history rewrite, Docker, database contact, installation or global configuration change.
+
+1. Verify the starting state
+
+Expected:
+- Branch: docs/m3d-ingestion-spec
+- HEAD:
+  6f8ffded2e5c7b2ed69e37700dc03f20f5e24482
+- Staged tree:
+  43baa6b17e88872548fbd9761fea963cd50e0048
+- Exactly six staged paths:
+  CLAUDE.md
+  README.md
+  docs/decisions/0009-document-revisions.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Expected origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Effective author and committer email:
+  257921624+mathewmljourney93@users.noreply.github.com
+
+If anything differs, stop and report it without changing anything.
+
+Record the accepted staged tree before editing.
+
+2. Apply two final specification clarifications
+
+A. Source coverage
+
+The whitespace predicate intentionally contains only space and tab. LF and CRLF terminators are excluded from line content and may be omitted between chunks.
+
+Correct “Only whitespace is ever omitted” and the coverage invariant to distinguish:
+- a leading BOM;
+- LF and CRLF line terminators;
+- permitted omitted spaces and tabs;
+- all remaining source characters.
+
+The invariant must require every source character other than these permitted omissions to appear exactly once in the ordered body spans. Repeated headers are additional context copies, not additional body coverage.
+
+Preserve lone CR, NBSP and other characters treated as non-whitespace.
+
+Change “Coverage invariant (tested)” to wording that clearly identifies a planned test. No M3d tests exist yet.
+
+Add a planned coverage case with multiple chunks separated by LF and CRLF, proving the permitted omissions and preservation of every remaining character.
+
+Do not change the parser examples or whitespace predicate.
+
+B. Chunk insert conflicts
+
+Remove the absolute claim that the chunk ID and ordinal uniqueness constraints always conflict together.
+
+Specify:
+- ON CONFLICT DO NOTHING can suppress a conflict on either unique key.
+- If an expected insert returns no ID, perform the existing tenant/revision/version/ordinal lookup.
+- If the expected row is absent, or any immutable field differs, raise fixed ChunkConflictError.
+- Never treat a missing lookup result as a successful idempotent retry.
+- Never overwrite the conflicting row.
+
+Add a planned test for a suppressed insert conflict where the expected tuple lookup finds no row. This may use a controlled unit double or deliberately conflicting test row; do not claim such a test has run.
+
+Preserve the accepted schema and deterministic ID formula.
+
+3. Mark specification acceptance accurately
+
+Make only narrow wording changes in README.md and docs/plan.md:
+- M3d specification accepted at review.
+- Implementation pending.
+- Engineering defaults accepted as initial choices, not measured performance results.
+
+Record acceptance of:
+- parser grammar and provenance rules;
+- the chunk limits and batch bounds;
+- chunk_sets and chunks;
+- deterministic IDs and canonical manifests;
+- shared lifecycle locking;
+- the optional completeness callback;
+- the handler and failure protocol;
+- the M3e derived status projection and its acceptance obligation.
+
+M3d is not implemented. Compose and overall M3 acceptance remain pending.
+
+Keep CLAUDE.md, ADR-0009 and docs/threat-model.md byte-identical to the accepted tree.
+
+Do not redesign anything else.
+
+4. Prompt history
+
+Append a review note under Prompt 78 recording:
+- acceptance of the original specification and recovered corrections, with these final clarifications;
+- acceptance of session-management guidance;
+- that the reviewer inspected the supplied diffs;
+- that the reviewer previously checked UUID examples and table offsets independently;
+- that the reviewer did not run project tests or the documentation checker;
+- that documentation checks and secret-scan results were reported by Claude;
+- that implementation and its verification remain pending.
+
+Append this prompt verbatim using the next unused number; expect 79 and verify it.
+
+Preserve earlier history byte-for-byte.
+
+Add a truthful pre-commit note. Do not pre-record a successful commit or include the future commit’s own SHA in its content.
+
+5. Verify and commit locally
+
+Confirm:
+- only the six authorized paths are staged;
+- no .local/ or build artifacts are staged;
+- the three unchanged files are byte-identical to the accepted tree;
+- the complete incremental diff contains only the authorized clarifications, acceptance wording and prompt history;
+- documentation links and anchors resolve;
+- no private content is introduced;
+- git diff --cached --check passes;
+- staged Gitleaks scan passes;
+- effective author and committer use the noreply identity.
+
+No application tests or builds are required for documentation-only changes.
+
+Commit with subject:
+docs: record accepted M3d ingestion specification and session guidance
+
+Preserve the existing co-author attribution convention.
+
+After the commit:
+- verify parent, identity and committed paths;
+- run the full-history Gitleaks scan;
+- confirm a clean working tree;
+- confirm main was not changed.
+
+Do not push.
+
+6. Handoff
+
+Provide:
+- commit SHA, parent, subject and identity;
+- committed paths;
+- actual verification results;
+- prompt-history additions;
+- final branch and working-tree status;
+- confirmation that nothing was pushed or implemented.
+
+Include the COMPLETE incremental diff against
+43baa6b17e88872548fbd9761fea963cd50e0048,
+excluding prompts.md, directly in fenced diff blocks.
+
+Split into numbered parts if needed. Do not truncate or replace the diff with a summary.
+
+End with:
+“Start a new Claude session before M3d implementation.”
+
+Explain that the accepted specification is now on disk and the implementation prompt will provide the new session’s scope. Do not start implementation or invent its authorization.
+````
+
+**Pre-commit note (written before the commit; the commit's own SHA is not recorded here):**
+- **Starting state verified:** branch `docs/m3d-ingestion-spec`, HEAD `6f8ffde`, staged tree `43baa6b` with exactly the six expected paths, nothing unstaged or untracked, the expected origin, and the noreply author and committer identity. The accepted tree was recorded under `.local/` before editing.
+- **Clarifications applied (`docs/plan.md`):**
+  - source coverage separates a leading BOM, LF and CRLF terminators, permitted spaces and tabs, and every remaining character (lone CR and NBSP included), and is now marked as a planned test;
+  - the chunk insert rule no longer claims the two unique keys always conflict together. A returned-ID gap leads to the tuple lookup, and a missing row or any differing field raises `ChunkConflictError`, without overwrite;
+  - matching planned tests: a coverage case with LF- and CRLF-separated chunks, and a suppressed conflict whose lookup finds no row.
+
+  The parser examples, the whitespace predicate, the schema and the ID formula are unchanged.
+- **Acceptance wording:** `README.md` and `docs/plan.md` record the specification as accepted at review, with its implementation pending and its limits accepted as initial engineering defaults, not measured results. `CLAUDE.md`, ADR-0009 and `docs/threat-model.md` are byte-identical to `43baa6b`.
+- **Checks run before this entry was written:** relative links and anchors (54 links, 0 problems), the private-content search of the added lines (no matches) and byte identity of the three unchanged files. `git diff --cached --check`, the staged Gitleaks scan and the post-commit checks run after this entry is staged; their results are in the session handoff.
+- **Not done:** no M3d implementation, test or measurement. Nothing pushed or merged. No Docker, database contact, installation or global configuration change.

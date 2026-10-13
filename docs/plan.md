@@ -634,11 +634,15 @@ Each question entry contains:
     - [CI run 38255786860](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375464) `709 passed, 77 skipped in 18.16s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375444) `708 passed, 78 skipped in 21.20s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375219) `77 passed, 709 deselected in 17.36s`.
     - The [secret-scan run 38255786973](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973/job/114833375056): 26 commits scanned, no leaks found).
   - There are no production handlers yet. Compose is unverified.
-- **M3c** has a detailed specification below, accepted at review (Prompt 68). The implementation (Prompt 69, corrected in Prompt 71; [ADR-0009](decisions/0009-document-revisions.md)) was **accepted at review and verified in CI on branch `feat/document-revisions`; it is not yet merged into `main`**.
+- **M3c** has a detailed specification below, accepted at review (Prompt 68). The implementation (Prompt 69, corrected in Prompt 71; [ADR-0009](decisions/0009-document-revisions.md)) is **reviewed, verified in CI and on `main`**.
   - **Tested commit:** `8646b75` on `feat/document-revisions` (the implementation commit `057d57d` plus a prompt-history commit).
   - [CI run 38284929219](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930898138) `819 passed, 133 skipped in 18.75s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930898065) `818 passed, 134 skipped in 23.07s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930897691) `133 passed, 819 deselected in 36.46s` (the 77 existing PostgreSQL tests and the 56 added by M3c, including its constraint, migration, concurrency, activation and lease tests).
   - The [secret-scan run 38284929225](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929225) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929225/job/114930897815): 29 commits scanned, no leaks found).
-  - There is no production ingestion handler, upload or document endpoint. Dead-job reconciliation or a truthful projection remains a required M3d/M3e item. M3d–M3f are not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
+  - **On `main`:** `main` was fast-forwarded to `6f8ffde` (`6f8ffded2e5c7b2ed69e37700dc03f20f5e24482`), which adds only documentation after `8646b75`.
+    - [CI run 38286702295](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295/job/114936682783) `819 passed, 133 skipped in 18.04s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295/job/114936682699) `818 passed, 134 skipped in 18.87s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295/job/114936682399) `133 passed, 819 deselected in 38.29s`.
+    - The [secret-scan run 38286702205](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702205) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702205/job/114936700730): 30 commits scanned, no leaks found).
+  - There is no production ingestion handler, upload or document endpoint. Compose is unverified.
+- **M3d** has a detailed specification below, **accepted at review (Prompt 76, corrected in Prompts 77–79); its implementation is pending**. It assigns the dead-job projection to M3e (section E), which remains a blocker for overall M3 acceptance. M3d–M3f are not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
 
 M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-workflow.md): plain Python, PostgreSQL-backed jobs claimed with `FOR UPDATE SKIP LOCKED`, leases, heartbeats and fenced writes. There is no new orchestration framework or queue dependency. Each slice is reviewed, verified in CI and merged before the next one starts. The M3 acceptance criteria above are split across the slices as follows:
 
@@ -1127,7 +1131,7 @@ The external reviewer inspected the original specification (Prompt 57) and its l
   - The `kinds` filter extends M3a's claim without changing its ordering, locking or sweep.
   - Everything else builds on the accepted M3a lease, heartbeat interval, backoff and attempt cap, without redefining them.
 
-**M3c, documents and revisions, in detail (ACCEPTED at review, Prompt 68; implemented in Prompt 69, corrected in Prompt 71, accepted at review and verified in CI on branch `feat/document-revisions` at `8646b75`; not yet on `main`):**
+**M3c, documents and revisions, in detail (ACCEPTED at review, Prompt 68; implemented in Prompt 69, corrected in Prompt 71, accepted at review, verified in CI at `8646b75` and on `main` at `6f8ffde`):**
 
 The external reviewer inspected the original specification (Prompt 66) and its corrections (Prompt 67) without running application checks. They accepted it with the final clarifications of Prompt 68. The Prompt 67 corrections cover:
 - fresh lease checks after the additional lock waits;
@@ -1512,6 +1516,428 @@ M3c adds no production worker handler and no endpoint.
 - The lock order extends M3a's "job, then document".
 - The binding uses the payload key already planned for `ingest_revision`.
 - Moving `chunker_version` and the `evidenceguard_domain.state` naming change only planned details, and were accepted at review.
+
+**M3d, parsing, chunking and the first production handler, in detail (ACCEPTED at review, Prompt 76, corrected in Prompts 77–79; implementation pending, nothing below is implemented):**
+
+M3d turns a `pending` revision into a verified set of chunks and activates it. It uses the M3a fence, the M3b worker and the M3c lifecycle, with two small additive interface changes to M3c (C): a public name for M3c's existing lock helper and an optional `before_settle` argument. It is the slice that carries the M3 criteria "chunk IDs include tenant and revision" and "a stale worker cannot write chunks".
+
+**Already decided (not reopened here):**
+- The scope:
+  - only `text/plain` and `text/markdown`, already validated as strict UTF-8 without NUL by M3c's `RevisionContent`;
+  - a deterministic chunker v1;
+  - a `chunks` table in migration `0004`;
+  - the `ingest_revision` handler.
+- The chunk-ID formula (correction A): `uuid5(NS, f"{tenant_id}:{revision_id}:{chunker_version}:{ordinal}")`, with uniqueness `(tenant_id, revision_id, chunker_version, ordinal)` and a tenant-scoped foreign key to the revision.
+- The §5 chunking rules: split at Markdown headings; pack paragraphs to about 2,500 characters with no overlap; a table is one chunk; long tables are split by rows with the header repeated; plain text splits at blank lines.
+- `chunker_version` moved to `0004` (M3c, settled decision 2).
+- The job kind `ingest_revision`, payload `{"revision_id": …}` and idempotency key equal to the revision ID (M3a, M3c).
+- The handler seam, the permanent-failure protocol and its crash gap (M3c, E).
+- Chunks are immutable once their revision is active, and re-chunking is out of scope.
+
+**Out of scope:**
+- embeddings, the `vector` extension, `ChunkEmbedding`;
+- the lexical `tsvector` column and the `injection_flag` heuristic (M4–M5);
+- retrieval, model calls;
+- upload and document endpoints, including the chunk-inspection endpoint (M3e);
+- Docker (M3f).
+
+Everything else below was proposed in Prompt 76 and is marked *(proposed)* where a choice was new. **The external review accepted it** (Prompt 79): the parser grammar and provenance rules; the chunk limits and batch bounds; `chunk_sets` and `chunks`; deterministic IDs and canonical manifests; shared lifecycle locking; the optional completeness callback; the handler and failure protocol; and the M3e derived status projection with its acceptance obligation. The numeric limits and bounds are accepted as **initial engineering defaults, not measured performance results**.
+
+**A. Parsing and provenance** *(proposed)*
+
+- **Module:** `evidenceguard_retrieval.chunking`, in the planned `packages/retrieval/evidenceguard_retrieval/` package (§3). It is pure code with no I/O. It imports only `evidenceguard_domain` and is added to the wheel's package list and the import-boundary test.
+- **Input:** the revision's stored `content_text`, rebuilt with `RevisionContent.from_stored`, which re-verifies the uploaded-byte `sha256` and `byte_size`, together with its `media_type`.
+- **What the parser is not:**
+  - not a Markdown renderer: it does not interpret inline syntax, HTML, links or images;
+  - it executes nothing;
+  - it performs no network or filesystem access.
+- **Determinism:** the output is a pure function of `(content_text, media_type, CHUNKER_VERSION)`. Locale, environment and platform do not affect it.
+- **Constants:**
+  - `CHUNKER_VERSION = "text-md-v1"`;
+  - `TARGET_CHARS = 2500`;
+  - `MAX_CHUNK_CHARS = 4000`;
+  - `MAX_HEADER_REPEAT_CHARS = 1000`;
+  - `MAX_CHUNKS_PER_REVISION = 4096`.
+
+  Lengths are counted in Unicode code points of the chunk text.
+
+**Lines and offsets**
+- **Lines:** a line ends at LF. A CR immediately before that LF belongs to the terminator, so CRLF and LF files give the same line numbers. A lone CR, U+2028, VT and FF are ordinary characters.
+- **Numbering:** lines are numbered from 1. A final line without a terminator counts; a file ending in a terminator has no extra empty line.
+- **Line content:** a line's content is the line without its terminator.
+- **Character offsets:** zero-based, half-open code-point offsets into the stored `content_text`, as Python string indices.
+- **BOM:** a leading U+FEFF stays in `content_text`, and therefore in the byte hash, and keeps its offset 0. It is excluded from every chunk span, so the first chunk starts at offset 1 on line 1. For every rule below (classification, the blank-line predicate, empty documents and splitting), line 1's content starts after the BOM, so a line holding only a BOM is blank.
+- **No normalization:** there is no newline, Unicode or whitespace normalization of the source or the chunk text. Characters inside a span are copied verbatim, including CR, tabs and leading or trailing spaces on lines.
+- **Whitespace predicate (one definition for every rule):** the only whitespace characters are U+0020 (space) and U+0009 (tab).
+  - A line is **blank** when its content is empty or consists only of whitespace.
+  - Every other character is non-whitespace for blank lines, empty documents and split points alike. That includes a lone CR, NBSP (U+00A0), U+3000 and U+2028.
+
+**Blocks**
+- **Plain text:** maximal runs of non-blank lines. Section path is always `[]`.
+- **Markdown classification:** the text is scanned line by line, top to bottom. Outside a fence, each non-blank line is classified in this order, and the first match wins:
+  1. **Fence opening:** 0–3 spaces, then a run of at least three backticks or at least three tildes (the fence character *c* and run length *n*), then an optional info string. For a backtick fence the info string must not contain a backtick; if it does, the line is not a fence opening.
+  2. **ATX heading:** 0–3 spaces, 1–6 `#`, then a space, a tab or the end of the content.
+  3. **Table start:** a line containing `|` whose next line is a delimiter row. A delimiter row has content matching `^ {0,3}\|?[ \t]*:?-+:?[ \t]*(\|[ \t]*:?-+:?[ \t]*)*\|?[ \t]*$` and contains at least one `|`.
+  4. **Paragraph line:** anything else.
+- **Fenced code blocks:**
+  - A fence opened with character *c* and run length *n* closes only at a line whose content is 0–3 spaces, then a run of *c* of length ≥ *n*, then only whitespace.
+  - These lines are fence content, **not** closers: a line with an info string or other text after the run, fewer than *n* fence characters, the other fence character, or four or more leading spaces.
+  - The block runs from the opening line through the closing line, and blank lines inside a fence do not split it.
+  - An unclosed fence runs to the end of the document. This is deterministic, not an error.
+- **Headings:**
+  - Heading text is the content after the `#` run, with surrounding whitespace removed and an optional closing sequence of `#` removed (one preceded by whitespace, or one that makes up the whole text).
+  - The section path stores the text truncated to 200 code points, with trailing whitespace then removed. The chunk text keeps the whole line.
+  - Setext headings, and heading-like lines inside fences, are ordinary lines.
+- **Tables:**
+  - A table block starts at its table-start line and includes the delimiter row. It continues over the following lines that are non-blank, contain `|`, and are neither a fence opening nor an ATX heading.
+  - Its **header segment** is the header row and the delimiter row, including the delimiter row's line terminator. A **header-only table** has no body rows.
+- **Paragraphs:**
+  - A paragraph is a maximal run of paragraph lines.
+  - **A paragraph stops before** a blank line, a fence opening, an ATX heading or a table start, **even when no blank line separates them**.
+  - The parser is not a general Markdown implementation; these four classifications are its whole grammar.
+- **Section path:** a heading at level *n* drops every path entry of level ≥ *n* and appends its text. `# A` then `### C` gives `["A", "C"]`, and content before the first heading has path `[]`.
+
+**Chunks**
+- **Sections:** the general rule is that every heading starts a new chunk, so a chunk never contains content from two sections.
+  - **Consecutive headings (the exception):** a *heading run* is a maximal sequence of ATX headings separated only by blank lines. The whole run is one block and starts one chunk.
+    - The chunk's first line is the run's first heading line.
+    - Its section path is the path after applying every heading in the run, in order. `# A`, `## B` gives `["A", "B"]`; `## B`, `## C` gives the parent path plus `"C"`.
+    - Every heading line of the run is in the chunk text, but only the path after the last one is recorded.
+  - The heading run is packed with the content blocks that follow it in its section, by the normal packing rule.
+  - A heading run with nothing after it before the end of the document is a chunk of its own.
+- **Packing (prose):**
+  - Within a section, consecutive non-table blocks are packed greedily, in document order.
+  - A chunk is the verbatim slice from the start of its first block to the last character of its last block's content, so the final line terminator is excluded.
+  - Blank lines between packed blocks are included verbatim.
+  - The next block is added only while the slice stays ≤ `TARGET_CHARS`.
+- **Size limits:** `TARGET_CHARS` is a **hard limit for prose chunks** and a packing target for table chunks. `MAX_CHUNK_CHARS` is the **absolute limit for every chunk**, and a database CHECK enforces it.
+- **Oversized prose blocks:** a block longer than `TARGET_CHARS` on its own, including a heading run or a fence, is split at line boundaries into greedy runs of whole lines, each ≤ `TARGET_CHARS`. A run never starts or ends with a blank line, so blank lines at a split point belong to no chunk.
+  - Each run or piece of a split block is a chunk of its own; it is never packed with a neighbouring block.
+  - **Oversized lines:** a line whose content is longer than `TARGET_CHARS`, including a heading line, is cut into pieces that are emitted alone, never packed with neighbouring lines.
+    - The cut text is the line content with leading and trailing spaces and tabs removed; those removed runs belong to no chunk. The remaining text therefore always starts and ends with a non-whitespace character.
+    - While the remaining text is longer than `TARGET_CHARS`: find the last whitespace character at code-point index *i* with `TARGET_CHARS/2 ≤ i ≤ TARGET_CHARS`. The piece is the remaining text before the run of spaces and tabs that contains *i*. That whole run is skipped, and the remaining text then starts at the first non-whitespace character after it.
+    - If there is no such whitespace, the piece is cut hard at exactly `TARGET_CHARS` code points and nothing is skipped. The character at index `TARGET_CHARS` is then non-whitespace, because it was in the searched range.
+    - Once the remaining text is ≤ `TARGET_CHARS`, it is the last piece.
+    - So every piece is non-empty and starts and ends with a non-whitespace character.
+  - **Only permitted omissions.** A split point may omit only LF and CRLF line terminators and spaces and tabs (including the content of blank lines). It never omits any other character, so a lone CR, NBSP and every other character outside the whitespace predicate are always kept.
+  - Every piece is a verbatim contiguous slice of at most `TARGET_CHARS` code points. A piece within one line has `line_start = line_end`.
+  - **Oversized headings:** every run or piece of a split heading run, including the pieces of an oversized heading line, carries the run's section path (the path after its last heading), and the content that follows keeps the same path.
+- **Tables:** a table is never packed with prose, and every table chunk has `is_table = true`.
+  - **Small tables:** a table whose slice is ≤ `TARGET_CHARS` is one contiguous chunk. That includes a header-only table that fits.
+  - **Header segment longer than `TARGET_CHARS`** (including a header-only table that does not fit): the whole table is split as an oversized prose block, first into line runs and then into oversized-line pieces. The header is never repeated, and every piece is ≤ `TARGET_CHARS`.
+  - **Longer tables** are split by rows:
+    - The first chunk is the contiguous slice from the header row through as many body rows as fit within `TARGET_CHARS`, which may be the header segment alone.
+    - Each continuation chunk is the **repeated header segment** followed by as many further rows as fit, but only if the header segment is ≤ `MAX_HEADER_REPEAT_CHARS`. Otherwise continuation chunks contain rows only.
+  - **Oversized rows:** a row that does not fit within `TARGET_CHARS` together with a repeatable header is emitted with that header if header plus row is ≤ `MAX_CHUNK_CHARS`. Otherwise the row is emitted without the header, as one chunk if it is ≤ `TARGET_CHARS` or as oversized-line pieces if it is longer.
+  - **Bound:** a repeated header is at most 1,000 code points and is emitted with a row only when the total is ≤ `MAX_CHUNK_CHARS`. Every other chunk is ≤ `TARGET_CHARS`. So every emitted chunk is within the absolute cap.
+- **Ordinals:** zero-based and contiguous in document order.
+- **Coverage invariant (to be enforced by a planned test; no M3d test exists yet):** the source characters fall into four groups:
+  1. a leading BOM, which is never in a span;
+  2. LF and CRLF line terminators, which may be omitted between chunks;
+  3. spaces and tabs, which may be omitted only where the rules above permit (blank lines, split points and trimmed oversized lines);
+  4. every remaining source character, including a lone CR and NBSP.
+
+  Every character in group 4, and every group 2 or 3 character that is not omitted, appears in exactly one chunk's body span (`char_start`/`char_end`). The body spans are disjoint and in ascending source order. A repeated header is an additional context copy, carried only in the header span; it does not count as body coverage.
+
+**Provenance and the source mapping**
+- Each chunk records `char_start`/`char_end` and `line_start`/`line_end`. `line_start` is the line of `char_start`, and `line_end` is the line of `char_end − 1`.
+- **Contiguous chunks** (`header_char_start` is null): `text == content_text[char_start:char_end]` exactly.
+- **Table continuation chunks with a repeated header:** `text == content_text[header_char_start:header_char_end] + content_text[char_start:char_end]`.
+  - `header_line_start` and `header_line_end` give the header's own lines.
+  - There is no synthetic separator, because the header segment ends with its own terminator.
+  - The body span alone is the verbatim source passage. **Such a chunk is not one contiguous source passage**, and later citation display (M5) must cite the body lines, with the header labelled as repeated context.
+- **Byte fingerprints:** the uploaded-byte `sha256` and `byte_size` on the revision are unchanged and remain the only byte fingerprints. Each chunk adds `content_sha256` = SHA-256 of its UTF-8 `text`.
+
+**Errors**
+- **Empty document:** a document is **empty** when, with a leading BOM excluded, every line is blank under the whitespace predicate. It produces no chunks and is a permanent revision failure `empty_document` (D).
+- **More than `MAX_CHUNKS_PER_REVISION` chunks:** permanent `chunk_limit_exceeded`.
+- **Malformed input:** there is none at this layer. Any strict-UTF-8 text without NUL parses deterministically, and malformed Markdown is just text.
+- **Integrity mismatch:** if `from_stored` refuses the stored row (hash, size or encoding mismatch), that is permanent `content_integrity_failed`.
+- **Privacy:** parser errors carry fixed messages and never include content.
+
+**Examples (normative):**
+1. **Headings.** The source is `"# Retention\n\nCustomer data is kept for 90 days.\n\n## Backups\n\nBackups are encrypted.\n"`. It has 84 code points and 7 lines.
+   - **Chunk 0:** path `["Retention"]`, lines 1–3, chars [0, 47), text `"# Retention\n\nCustomer data is kept for 90 days."`.
+   - **Chunk 1:** path `["Retention", "Backups"]`, lines 5–7, chars [49, 83), text `"## Backups\n\nBackups are encrypted."`.
+2. **CRLF and BOM.** Plain text `"Line one\r\nLine two\r\n"` gives one chunk: lines 1–2, chars [0, 18), text `"Line one\r\nLine two"`. Plain text `"\ufeffTitle line\n"` gives one chunk: line 1, chars [1, 11), text `"Title line"`.
+3. **Long text.** Plain text `" ".join(["alpha"] * 1000)` is one line of 5,999 code points. It gives three chunks on line 1: chars [0, 2495), [2496, 4991) and [4992, 5999). Each split falls at the last whitespace within [1,250, 2,500] code points of the remaining text, and the single spaces at offsets 2495 and 4991 belong to no chunk.
+4. **Table rows and a repeated header** (illustration only, with `TARGET_CHARS` lowered to 48; v1 uses 2,500). The source is `"| Region | Provider |\n|---|---|\n| EU | Alpha |\n| US | Beta |\n| APAC | Gamma |\n"`, and its header segment is chars [0, 32), lines 1–2.
+   - **Chunk 0:** contiguous, lines 1–3, chars [0, 46).
+   - **Chunk 1:** header [0, 32) lines 1–2, plus body chars [47, 60) line 4; text `"| Region | Provider |\n|---|---|\n| US | Beta |"`.
+   - **Chunk 2:** header [0, 32), plus body [61, 77) line 5.
+5. **Heading directly after prose.** Markdown `"Intro text.\n# Scope\nOnly EU data.\n"` has no blank line before the heading. It gives two chunks:
+   - **Chunk 0:** path `[]`, line 1, chars [0, 11), text `"Intro text."`.
+   - **Chunk 1:** path `["Scope"]`, lines 2–3, chars [12, 33), text `"# Scope\nOnly EU data."`.
+6. **Consecutive headings.**
+   - `"# A\n\n## B\n\nBody.\n"` gives one chunk: path `["A", "B"]`, lines 1–5, chars [0, 16).
+   - `"# A\n## B\n"`, with no content, gives one chunk: path `["A", "B"]`, lines 1–2, chars [0, 8).
+7. **Oversized heading.** Markdown `"# " + " ".join(["word"] * 600)` is one heading line of 3,001 code points. It gives two chunks on line 1: chars [0, 2496) and [2497, 3001); the space at offset 2496 belongs to no chunk.
+   - Both chunks have the path `["word word … word"]`: the heading text truncated to 200 code points, then trailing whitespace removed, leaving 40 words in 199 code points.
+8. **Oversized and header-only tables.**
+   - Header-only: `"| a | b |\n|---|---|\n"` gives one chunk with `is_table = true`, lines 1–2, chars [0, 19).
+   - Oversized header (illustration only, with `TARGET_CHARS` lowered to 20): `"| Region | Provider |\n|---|---|\n| EU | Alpha |\n"` has a 32-code-point header segment. The table is split as an oversized prose block into four table chunks with no repeated header:
+     - [0, 19) `"| Region | Provider"`;
+     - [20, 21) `"|"` (the space at offset 19 is skipped);
+     - [22, 31) `"|---|---|"`;
+     - [32, 46) `"| EU | Alpha |"`.
+9. **Whitespace-only source.**
+   - `" \t\r\n\n  \n"` is empty: its line contents are `" \t"`, `""` and `"  "`, and the CR belongs to the first terminator. It is refused with `empty_document`.
+   - `"\ufeff\n  \n"` is empty: after the BOM, line 1's content is `""`.
+   - `"\u00a0\n"` (NBSP, then LF) is not empty, because NBSP is not whitespace. It gives one chunk at chars [0, 1).
+
+**B. Chunk contract and schema (migration `0004`)** *(proposed)*
+
+- **Home of `chunker_version` and the completeness manifest:** a new `chunk_sets` table, with one row per revision in v1. Its `chunker_version` is authoritative. Each chunk repeats `chunker_version` and references its set through a composite foreign key, so the two can never disagree. The revision table is unchanged.
+- **`chunk_sets`:**
+
+  | Column | Type | Notes |
+  |---|---|---|
+  | `tenant_id` | uuid not null | FK → `tenants(id)` |
+  | `revision_id` | uuid not null | composite FK `(tenant_id, revision_id)` → `document_revisions (tenant_id, id)` |
+  | `chunker_version` | varchar(32) not null | CHECK `chunker_version ~ '^[a-z0-9][a-z0-9.-]{0,31}$'` |
+  | `chunk_count` | integer not null | CHECK `chunk_count BETWEEN 1 AND 4096` |
+  | `manifest_sha256` | varchar(64) not null | CHECK 64 lowercase hex |
+  | `created_at` | timestamptz not null default `now()` | |
+
+  - **Keys:** PK `(tenant_id, revision_id)` (`pk_chunk_sets`); unique `(tenant_id, revision_id, chunker_version)`. The table has no `id` column.
+- **Manifest:** `manifest_sha256` is the lowercase hexadecimal SHA-256 of the manifest bytes.
+  - **Contents:** a JSON array with one object per chunk, in ascending `ordinal` order (0, 1, …). Each object has exactly these keys: `char_end`, `char_start`, `content_sha256`, `header_char_end`, `header_char_start`, `header_line_end`, `header_line_start`, `id`, `is_table`, `line_end`, `line_start`, `ordinal`, `section_path`.
+  - **Encoding:** Python's `json.dumps(manifest, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False)`, encoded as ASCII bytes. So keys are sorted by code point, there is no whitespace, and every non-ASCII character is a `\uXXXX` escape (surrogate pairs above the BMP).
+  - **Values:** UUIDs are lowercase hyphenated strings. Integers are JSON integers, booleans are `true`/`false`, absent header fields are `null`, `section_path` is an array of strings and `content_sha256` is a lowercase hex string.
+
+  The manifest lets the final transaction verify a complete, exact chunk set from stored fields, without re-reading text or parsing.
+- **`chunks`:**
+
+  | Column | Type | Notes |
+  |---|---|---|
+  | `id` | uuid PK | `uuid5(CHUNK_ID_NAMESPACE, f"{tenant_id}:{revision_id}:{chunker_version}:{ordinal}")` |
+  | `tenant_id` | uuid not null | FK → `tenants(id)` |
+  | `revision_id` | uuid not null | |
+  | `chunker_version` | varchar(32) not null | composite FK `(tenant_id, revision_id, chunker_version)` → `chunk_sets` |
+  | `ordinal` | integer not null | CHECK `ordinal BETWEEN 0 AND 4095` |
+  | `text` | text not null | CHECK `char_length(text) BETWEEN 1 AND 4000` |
+  | `content_sha256` | varchar(64) not null | CHECK 64 lowercase hex |
+  | `section_path` | text[] not null default `'{}'` | CHECK `cardinality(section_path) <= 6` |
+  | `is_table` | boolean not null | |
+  | `line_start`, `line_end` | integer not null | CHECK `line_start >= 1 AND line_end >= line_start` |
+  | `char_start`, `char_end` | integer not null | CHECK `char_start >= 0 AND char_end > char_start` |
+  | `header_line_start`, `header_line_end`, `header_char_start`, `header_char_end` | integer null | CHECK all four null or all four set; set only when `is_table`; `header_char_end <= char_start`; `header_line_end < line_start` |
+  | `created_at` | timestamptz not null default `now()` | |
+
+  - **Keys:** unique `(tenant_id, revision_id, chunker_version, ordinal)` and unique `(tenant_id, id)`, for later tenant-scoped references from embeddings and citations.
+  - **Indexes:** the unique indexes serve the lookups by revision; no other index is added in v1.
+- **Namespace and names:**
+  - `CHUNK_ID_NAMESPACE = UUID("973dffe5-e145-5fd2-833e-6793460ee3be")`, derived once as `uuid5(NAMESPACE_URL, "https://evidenceguard.invalid/namespaces/chunk-id/v1")` and then **fixed as a literal**.
+  - The name string uses canonical lowercase hyphenated UUIDs and a decimal ordinal.
+  - Example: tenant `11111111-1111-4111-8111-111111111111`, revision `22222222-2222-4222-8222-222222222222`, version `text-md-v1`, ordinal 0 gives `a11668be-c537-5f4d-b5d8-7a056099b8a0`. The same revision ID under tenant `33333333-3333-4333-8333-333333333333` gives `53214eae-4b9a-5805-a6e7-41a8e3b6341c`.
+- **Immutability:**
+  - No code path updates or deletes `chunk_sets` or `chunks`: writes are `INSERT … ON CONFLICT DO NOTHING` followed by verification.
+  - This is an **application invariant**. There are no triggers, consistent with ADR-0009, and the database does not stop a privileged session from updating rows.
+  - Re-chunking active revisions is out of scope.
+- **Migration `0004`** (`v0004_chunks.py`, down-revision `0003`, constraint text spelled literally):
+  - **Upgrade:** creates `chunk_sets`, then `chunks`. There are no circular references, and no extension or embedding table.
+  - **Downgrade:** drops `chunks`, then `chunk_sets`.
+  - **Test updates:** the head pins in `test_persistence.py`, `test_readiness.py` and `test_persistence_postgres.py` move to `0004`. The round-trip test steps down through `0003` (asserting the M3c tables remain), then `0002`, `0001` and base, then re-upgrades. An offline-render test checks every constraint and the absence of `vector`, `EXTENSION` and `TRIGGER`. Historical migration tests are kept.
+
+**C. Persistence operations and fencing** *(proposed)*
+
+New module `evidenceguard_persistence.chunks`. All its functions take M3a's `FencedSession` and the fence's `JobSnapshot`, scope every statement by the job's tenant, and never commit, roll back or issue transaction-control SQL.
+
+- **`load_revision_source(session, job) -> RevisionSource`:**
+  - reads `status`, `media_type`, `content_text`, `sha256` and `byte_size` of the payload's revision in the job's tenant (missing → `RevisionNotFoundError`);
+  - rebuilds `RevisionContent.from_stored`;
+  - returns a frozen value whose `repr` shows only the revision ID, status, media type and size.
+
+  It takes no lock. Content never appears in a repr, log event or exception message.
+- **Shared lock helper:** M3c's existing private helper `_lock`, which `start_processing`, `fail_revision` and `activate_revision` already use, becomes the public `lock_revision_for_job(session, job, *, include_active)`. The code, lock order and checks are unchanged:
+  1. the job row, already locked by the fence;
+  2. the document row (`FOR UPDATE`);
+  3. the required revision rows (`FOR UPDATE`, ascending ID);
+  4. then `recheck_ownership` with fresh `clock_timestamp()` and the tenant check.
+
+  It returns the locked document, the target revision re-read under the lock, and the fresh time. There is no parallel lifecycle.
+- **`write_chunk_set(session, job, expected_set)`** and **`write_chunks(session, job, batch)`:** each runs inside an ordinary `ctx.fenced()` block and follows one protocol:
+  1. **Lock and check:** call `lock_revision_for_job(session, job, include_active=False)`, which waits for the document lock and then re-checks ownership. Then require the re-read target status to be `processing`. Any other status raises the fixed `ChunkWriteRefusedError`, and nothing is written.
+  2. **Insert, `write_chunk_set`:** `INSERT INTO chunk_sets … ON CONFLICT ON CONSTRAINT pk_chunk_sets DO NOTHING RETURNING tenant_id, revision_id`.
+     - If no row is returned, the stored `chunker_version`, `chunk_count` and `manifest_sha256` are read and compared with the expected values.
+  3. **Insert, `write_chunks`:** `INSERT INTO chunks … ON CONFLICT DO NOTHING RETURNING id`. With no conflict target, this suppresses a conflict on **either** unique key: the primary key `id`, or `(tenant_id, revision_id, chunker_version, ordinal)`.
+     - For every expected chunk whose `id` was not returned, the stored row is read by `(tenant_id, revision_id, chunker_version, ordinal)` and compared field by field: `id`, `chunker_version`, `ordinal`, `text`, `content_sha256`, `section_path`, `is_table`, the line and character spans and the four header fields.
+     - If that lookup finds **no row** (the suppressed conflict was on some other row), or any field differs, the write raises the fixed `ChunkConflictError`. A missing lookup result is never treated as a successful idempotent retry, and the conflicting row is never overwritten.
+  4. **Conflicts:** any difference raises the fixed `ChunkConflictError`, with no overwrite and no silent acceptance. Its message contains no content, digest or ID. `created_at` is metadata: it is never compared or regenerated on an idempotent retry.
+  5. **Re-check:** call `recheck_ownership` again, after any unique-index waits and before the block exits and commits.
+- **Serialization against settlement:** activation (`activate_revision`) and failure (`fail_revision`) take the same document lock first. So do chunk writes, whichever job they come from, including a different valid job that names the same revision through its own job row. The document lock is the serialization point:
+  - **If the writer wins the lock,** its permitted batch commits before settlement can lock the document. The completeness check at activation then sees the committed rows.
+  - **If settlement wins,** the writer waits. After the lock it re-reads the status (`active`, `superseded` or `failed`) and raises `ChunkWriteRefusedError`, so it writes nothing.
+  - **No chunk or chunk-set row is inserted after the revision settles,** because every insert happens under the document lock after a `processing` check, and settlement changes the status under the same lock.
+  - **A stale attempt changes nothing.** Its fence is refused when it opens, or its ownership re-check raises `LeaseLostError` after the lock wait or before commit, and the transaction rolls back.
+  - Each batch holds the document lock only for one bounded batch, and every wait is bounded by the fence's 5-second `lock_timeout`.
+- **Bounded transactions:** each chunk transaction writes at most 200 chunks or 512,000 code points of text, whichever comes first. Parsing happens before the first write, outside every transaction and every lock.
+- **Crash and resume:** a crash or lease loss leaves earlier committed batches in place. The next attempt parses again (deterministic), re-writes the chunk-set row, and re-sends every batch. Existing identical rows are verified and skipped, and missing ones are inserted. There is no partial overwrite and no deletion.
+- **Completeness and activation:** M3c's `activate_revision` gains one optional, keyword-only argument, `before_settle: Callable[[FencedSession, RevisionSnapshot], None] | None = None`.
+  - It is invoked after M3c's locks and fresh ownership re-check, only when the target is `processing`, and before `settle`.
+  - Existing callers are unchanged, and a duplicate activation of a settled revision skips it.
+- **Binding the check to the current attempt:** the callback signature stays two-argument. The handler binds its own expectation into it with a closure.
+  - `ExpectedChunkSet` is a frozen value with `chunker_version`, `chunk_count` and `manifest_sha256`, computed independently by the current attempt from its own parse.
+  - `require_complete_chunk_set(session, revision, *, expected: ExpectedChunkSet) -> None` performs the check.
+  - Illustrative call:
+
+    ```python
+    expected = ExpectedChunkSet(
+        chunker_version=CHUNKER_VERSION,
+        chunk_count=len(chunks),
+        manifest_sha256=manifest_sha256(chunks),
+    )
+    with ctx.fenced(finish=True) as fence:
+        activate_revision(
+            fence.session,
+            fence.job,
+            before_settle=functools.partial(require_complete_chunk_set, expected=expected),
+        )
+    ```
+- **What `require_complete_chunk_set` verifies,** in the same transaction and under the same locks:
+  1. the `chunk_sets` row exists, and its `chunker_version` equals `expected.chunker_version`;
+  2. its `chunk_count` equals `expected.chunk_count`;
+  3. the stored chunks for `(tenant_id, revision_id, chunker_version)`, read without `text`, are exactly `chunk_count` rows with ordinals exactly `{0, …, chunk_count − 1}`;
+  4. the manifest rebuilt from those stored fields, by the canonical encoding in B, hashes to the stored `manifest_sha256`;
+  5. that hash also equals `expected.manifest_sha256`.
+
+  Otherwise it raises the fixed `ChunkSetIncompleteError`, and nothing settles. This check prevents activation until the entire expected set is verified.
+- **Trust limit:** the final check reads stored `content_sha256` digests, not the text. A digest is trusted because each row was compared field by field, text included, when it was written, and no code path updates chunks afterwards. That is the application's immutable-write invariant. The digest-only final check adds **no** protection against privileged direct database modification.
+- **The final transaction:** in order:
+  1. lock the job (the fence);
+  2. check cancellation and lease;
+  3. lock the document, then the revisions;
+  4. re-check ownership;
+  5. run `require_complete_chunk_set`;
+  6. demote, promote, then update the pointer, or supersede a late older revision;
+  7. check cancellation and lease again;
+  8. record the job `succeeded`;
+  9. commit.
+
+  The worker's cancellation and uncertain-commit semantics are unchanged (ADR-0008, M3c). A lost acknowledgment means either the activation and the job success both committed, so the job is never reclaimed, or neither did, so the next attempt resumes.
+
+**D. The production handler `ingest_revision`** *(proposed unless noted)*
+
+- **Kind and registration:**
+  - `INGEST_REVISION_KIND = "ingest_revision"` (decided).
+  - `evidenceguard_worker.handlers.production_registry()` returns `HandlerRegistry([(INGEST_REVISION_KIND, ingest_revision)])`.
+  - `eg-worker` then no longer exits 4 for an empty registry, and the CLI test is updated. The installed-wheel check imports the handler module and asserts the registered kinds.
+- **Payload:**
+  - exactly `{"revision_id": "<canonical lowercase UUID>"}`, validated by M3a's `JobPayload` plus a handler check for exactly that key;
+  - the idempotency key is the same canonical revision ID (decided);
+  - `max_attempts` is the M3a default of 3.
+  - M3e enqueues it in the revision-creation transaction.
+- **Flow:**
+  1. **Status read:** `with ctx.fenced()`:
+     - read the revision status in the job's tenant;
+     - if it is `pending` or `processing`, call `start_processing` (a no-op when already processing) and `load_revision_source`.
+
+     The block commits.
+  2. **Already failed:** if the status was `failed`, raise `PermanentJobError(JobErrorCode.PERMANENT_FAILURE)` now, outside any block. **Nothing is parsed again.**
+  3. **Already settled:** if the status was `active` or `superseded`, run `with ctx.fenced(finish=True): activate_revision(...)`. That is M3c's duplicate no-op, so the job completes without parsing or writing. The same applies to a different valid job for a settled revision.
+  4. **Parse:** `ctx.check()`, parse (pure, no locks, no transaction), `ctx.check()`.
+  5. **Write:** `ctx.check()`, then `with ctx.fenced(): write_chunk_set(...)`. Then, for each batch, `ctx.check()` and `with ctx.fenced(): write_chunks(...)`, each under the locking protocol in C.
+  6. **Finish:** run the final transaction in C, with the closure bound to this attempt's `ExpectedChunkSet`.
+- **`ChunkWriteRefusedError`:**
+  - The refusing block raised, so it rolled back and wrote nothing.
+  - The handler catches the error **outside** the block and goes back to step 1, a fresh status read in a new fenced transaction.
+  - It then takes the branch for the status it finds: step 2 for `failed`, or step 3 for `active` or `superseded`.
+  - It never calls `fail_revision` for a revision that is already settled or failed.
+  - A settled or failed status never returns to `processing`, so the fresh read always takes step 2 or 3, and the handler re-enters step 1 at most once per attempt.
+- **Failure classification:**
+
+  | Condition | Revision | Job |
+  |---|---|---|
+  | `empty_document`, `chunk_limit_exceeded`, `content_integrity_failed`, `chunk_conflict` | `fail_revision(code)` in a non-raising block, which commits | then `PermanentJobError(PERMANENT_FAILURE)` raised **outside** the block |
+  | Unexpected parser exception (a bug) | `fail_revision(INGESTION_FAILED)`, then as above | `PERMANENT_FAILURE` |
+  | Payload invalid or extra keys, or revision not found in the job's tenant (including cross-tenant IDs) | untouched (no revision to fail) | `PermanentJobError(PERMANENT_FAILURE)` |
+  | `ChunkSetIncompleteError` at activation | untouched (`processing`) | `RetryableJobError(RETRYABLE_FAILURE)`; the next attempt resumes the writes |
+  | `ChunkWriteRefusedError` (the revision settled or failed meanwhile) | untouched | fresh status read, then the settled or failed branch (above) |
+  | Database or lock timeout (`JobLockTimeoutError`, `OperationalError`) | untouched | retryable: `JobLockTimeoutError` → `RetryableJobError(RETRYABLE_FAILURE)`; other database errors take the runtime's existing `UNEXPECTED_ERROR` retry |
+  | Lease loss, cancellation, uncertain commit | untouched | existing M3b behaviour (no outcome, `WORKER_SHUTDOWN` retry, `outcome_unknown`) |
+
+  `fail_revision` itself takes the same document lock. If the revision settled first, M3c's rule raises the fixed `InvalidRevisionTransitionError`, so that block rolls back and writes nothing; the handler catches it outside the block and re-reads the status as above.
+- **Revision codes:** `RevisionFailureCode` adds `empty_document`, `chunk_limit_exceeded`, `content_integrity_failed` and `chunk_conflict` to `ingestion_failed`. All of them map to `JobErrorCode.PERMANENT_FAILURE`, and no revision code is ever passed to `PermanentJobError`. The database CHECK already accepts these well-formed codes (ADR-0009).
+- **Two-transaction permanent failure (decided, unchanged):**
+  - `PermanentJobError` is never raised inside the block that must commit the revision's failure.
+  - The crash gap between the two commits is recovered by step 2 on reclaim.
+  - Retries exhaust to `dead` only for retryable causes.
+- **Reclaim and partial writes:** a reclaimed attempt re-enters at step 1 and resumes through C. A stale attempt is refused at every fence and at every `recheck_ownership`.
+
+**E. Dead-job truthfulness** *(proposed: a derived projection in M3e, no reconciliation writes)*
+
+- **Authoritative state:** the stored revision `status` remains authoritative and is never rewritten by a sweep. The job row (`status`, `attempt`, `last_error`, `lease_expires_at`) is the authority on processing progress.
+- **Projection:** M3e's document and revision read models expose a derived `ingestion_state`. It comes from the revision status and the revision's `ingest_revision` job, found by `(tenant_id, kind, idempotency_key = revision_id)`:
+
+  | Revision | Job | `ingestion_state` | Meaning shown to users |
+  |---|---|---|---|
+  | `active`, `superseded`, `failed` | any | the revision status | settled |
+  | `pending` or `processing` | `queued` | `queued` | waiting for a worker |
+  | `pending` or `processing` | `running` | `in_progress` | a worker holds or recently held a lease; **this is not a guarantee of progress**, and an expired lease awaits reclaim |
+  | `pending` or `processing` | `dead`, `failed` or `succeeded`, or no job | `stalled` | no further attempt will run; the content was not activated |
+
+- **Limit:** in v1 a `stalled` revision cannot be retried, because re-uploading identical bytes returns the same revision and enqueue returns the same terminal job. Recovery is uploading changed bytes; an operator re-run is a later enhancement.
+- **Assignment:** M3e implements the projection, with acceptance tests that a revision whose job is `dead` reads `stalled`, a running job with an expired lease reads `in_progress` without a progress claim, and settled revisions ignore the job. This **remains a blocker for overall M3 acceptance**.
+
+**F. Verification plan and implementation boundaries** *(proposed)*
+
+- **Intended files:**
+  - `packages/retrieval/evidenceguard_retrieval/{__init__,chunking}.py` (new package; `pyproject.toml` package list and the boundary test updated, with no new dependency);
+  - `evidenceguard_domain.revisions` (new failure codes);
+  - `evidenceguard_persistence.models` and `migrations/versions/v0004_chunks.py`;
+  - `evidenceguard_persistence.chunks`;
+  - in `evidenceguard_persistence.documents`, the `before_settle` argument and the public `lock_revision_for_job`;
+  - `evidenceguard_worker.ingest` and `handlers.py`;
+  - tests and ADR-0010.
+- **Database-independent tests:**
+  - every normative example above (1–9);
+  - determinism across repeated runs;
+  - CRLF/LF line parity;
+  - BOM exclusion;
+  - fences, including closing-delimiter rules (info strings, short runs, the other fence character and deep indentation do not close);
+  - a heading, fence or table directly after prose with no blank line;
+  - consecutive heading runs and their section paths;
+  - setext lines;
+  - prose packing at exactly `TARGET_CHARS`;
+  - oversized paragraphs, lines and heading lines, including oversized lines with leading or trailing whitespace and lines with no whitespace in the search range (no empty or whitespace-only piece);
+  - split blocks never packed with neighbouring blocks, and split heading runs keeping the run's path;
+  - a BOM-only first line treated as blank;
+  - oversized rows, header segments above `MAX_HEADER_REPEAT_CHARS` and above `TARGET_CHARS`, and header-only tables;
+  - the whitespace predicate (NBSP and a lone CR are not whitespace) for empty documents and split points;
+  - the chunk-count cap;
+  - every chunk within `MAX_CHUNK_CHARS` and reconstructing from the source by the mapping rules, and the coverage invariant;
+  - a coverage case with several chunks separated by both LF and CRLF terminators (and blank lines of spaces and tabs), with a lone CR and NBSP inside chunk text: only the BOM, LF and CRLF terminators and permitted spaces and tabs are absent from the ordered body spans, and every other character appears exactly once;
+  - tenant-disjoint chunk IDs for identical bytes;
+  - manifest stability and byte-exact canonical encoding, including non-ASCII section paths;
+  - content never appearing in reprs or errors;
+  - payload validation;
+  - the handler's branch table with scripted doubles, including:
+    - the permanent-failure crash gap;
+    - uncertain commits in both directions;
+    - cancellation between batches;
+    - a settled-revision duplicate job that never parses;
+    - `ChunkWriteRefusedError` leading to a fresh status read and the settled or failed branch without `fail_revision`;
+    - `InvalidRevisionTransitionError` from `fail_revision` after a concurrent settlement, leading to the same fresh read;
+    - an `ExpectedChunkSet` mismatch refusing activation;
+  - registry and installed-wheel registration.
+- **PostgreSQL integration tests** (event-controlled concurrency, bounded waits, test-only statement timeouts):
+  - migration `0004` upgrade, downgrade and re-upgrade, and `alembic check`;
+  - every CHECK, the composite foreign keys (cross-tenant and cross-revision rejected) and uniqueness;
+  - idempotent re-writes of the set and the chunks;
+  - a conflicting existing chunk or chunk set refused with nothing overwritten;
+  - a suppressed insert conflict where the `(tenant_id, revision_id, chunker_version, ordinal)` lookup finds no row, raising `ChunkConflictError` (a deliberately conflicting test row, or a controlled unit double in the database-independent tests);
+  - a crash after some batches (injected) resumed by a second attempt to one complete set;
+  - **writer versus activation** with two different valid jobs for the same revision: if the writer holds the document lock, its batch commits first; if activation wins, the writer is refused and writes nothing;
+  - **writer versus failure:** the same two orders with `fail_revision`;
+  - **no inserts after settlement:** a chunk or chunk-set write for an `active`, `superseded` or `failed` revision is refused and leaves no rows;
+  - **lease expiry during the new lock waits:** a writer whose lease expires while it waits for the document lock is refused after acquiring it, and writes nothing;
+  - **rollback of a refused batch:** the batch transaction leaves no partial rows;
+  - a stale worker refused at chunk writes and at activation;
+  - activation refused while the set is incomplete or differs from the attempt's `ExpectedChunkSet`;
+  - atomic activation with job completion, and rollback when either fails;
+  - the permanent-failure crash gap against real rows;
+  - a real `run_worker` execution with the **registered production handler**.
+- **Pending:** the M3d implementation and all of its tests, and PostgreSQL verification until authorized publication and CI. No M3d implementation, test result or performance measurement exists yet.
 
 **M4 – Embeddings, retrieval and corpus**
 - Provider interface, `HashingEmbedder`, Voyage adapter (mocked in CI), RRF search over snapshot revisions, `sample_data/` including the injected variant, ground truth with acceptable and wrong claims, and the retrieval contract suite.

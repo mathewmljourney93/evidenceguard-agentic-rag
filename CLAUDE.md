@@ -36,3 +36,15 @@ These rules apply to every Claude session in this repository.
 - Never truncate a diff or replace it with a summary. Split a large diff into numbered parts at file boundaries and provide every part.
 - Report verification results and Git status separately from the diff.
 - Attach the diff as a file under `.local/` only as a fallback, when response limits prevent including it in full.
+
+## Session management
+
+- Recommend a fresh session at the boundary between milestone slices, once the current slice has a reviewable handoff.
+- Also recommend one when Claude Code reports that a large expired context will be re-cached, or when the context is dominated by unrelated completed work.
+- Base the recommendation on available context or usage indicators. Never invent a token count or claim a measured saving.
+- State it explicitly: "Start a new Claude session before the next task," with a brief reason.
+- Before recommending a switch during unfinished work, give a recovery handoff: branch, HEAD, staged and working-tree state, completed work, outstanding work and the next prompt.
+- Keep immediate corrections in the current session while its context remains useful.
+- This is guidance, not an interruption: finish the authorized task and its handoff unless a real limit prevents it.
+- A new session never authorizes discarding changes or rewriting Git history.
+- In a fresh session, read the project instructions and only the relevant files; do not load the whole prompt archive by default.
