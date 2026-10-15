@@ -172,16 +172,16 @@ Implemented in Prompt 89, corrected in Prompt 90, accepted at external review (P
 
 **Limits** (ADR-0011): the reader depends on the verified behaviour of `python-multipart` 0.0.32, which an upgrade must re-verify. Per-byte header feeding costs CPU bounded by the header caps. The upload response is an observation that a worker may change at once. `stalled` revisions have no operator retry in v1.
 
-## Containers (M3f, verified in CI on `feat/container-stack`, not merged)
+## Containers (M3f, verified in CI and on `main`)
 
-Implemented in Prompt 98, corrected in Prompt 99, accepted at external review (Prompt 100), and verified in CI on `feat/container-stack` at `682101b` ([CI run 38769986459](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459)). Ubuntu, Windows, the 204-test PostgreSQL suite and the container job (image build, effective build context, image checks, Compose smoke and cleanup) passed, per job logs retrieved by the external reviewer; it is not merged ([ADR-0012](decisions/0012-containers.md)). In that run, the container job checked these mitigations in a real container:
+Implemented in Prompt 98, corrected in Prompt 99, accepted at external review (Prompt 100), and verified in CI on `feat/container-stack` at `682101b` ([CI run 38769986459](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459)). Ubuntu, Windows, the 204-test PostgreSQL suite and the container job (image build, effective build context, image checks, Compose smoke and cleanup) passed, per job logs retrieved by the external reviewer; it was then published on `main` at `e2463cb`, where the same checks passed again ([ADR-0012](decisions/0012-containers.md)). In that run, the container job checked these mitigations in a real container:
 - the effective build context excluded all 19 planted fixtures;
 - the runtime ran as UID/GID 10001;
 - the application containers ran the CI-built image;
 - the smoke passed, including its key-in-service-logs check and the idle-worker exit check;
 - cleanup verified ownership.
 
-Local Compose is unverified. It is a development stack only, with no production-readiness or general security guarantee.
+Local Compose is unverified. It is a development stack only, with no production-readiness or general security guarantee; the acceptance of overall M3 at external review (Prompt 105) does not change that.
 
 | Threat | Mitigation |
 |---|---|

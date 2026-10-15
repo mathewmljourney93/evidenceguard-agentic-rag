@@ -14094,3 +14094,355 @@ Return this output plus .local/p103/m3f-publication-incremental.diff to the exte
 
   On any stop: no fixes, reruns, rollbacks or further pushes.
 - **Not authorized:** force-push, amend, rebase, squash, tag, branch deletion, local Docker or database contact. Overall M3 acceptance remains pending.
+
+**Publication outcome (recorded in Prompt 104):**
+- **Documentation commit:** `e2463cb5a94d7c40eb1d894b8fded29a866165a8`, parent `682101b`, noreply identity. Only ADR-0012 (the SIGTERM/SIGKILL clarification) and `prompts.md` differed from accepted tree `d3917b0`. Full-history Gitleaks before publication scanned 42 commits and found no leaks.
+- **Feature push:** `git push origin refs/heads/feat/container-stack:refs/heads/feat/container-stack` exited 0 (`682101b..e2463cb`). Claude observed through the public API that [ci run 38772852347](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38772852347) and [secret-scan run 38772852507](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38772852507) (push events on `feat/container-stack` at `e2463cb`) concluded `success` in all five jobs, and that all six container steps concluded `success`, none skipped.
+- **Main fast-forward:**
+  - Preconditions held on fresh refs: remote `main` still at `2e605e7` and an ancestor; remote feature branch at `e2463cb`; local `main` equal to `origin/main`; clean tree.
+  - `git merge --ff-only` and `git push origin refs/heads/main:refs/heads/main` both exited 0 (`2e605e7..e2463cb`).
+  - Claude observed [ci run 38773393988](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38773393988) and [secret-scan run 38773393999](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38773393999) (push events on `main` at `e2463cb`) concluding `success` in all five jobs, with all six container steps `success`.
+- **Not observed by Claude:** the job-log endpoint returned HTTP 403, so Claude reported every count and all container output for `e2463cb` as unobserved.
+- **Not done:** no force-push, merge commit, tag or branch deletion.
+
+**Reviewer evidence note (recorded in Prompt 104):**
+- **Incremental diff:** the external reviewer inspected the Prompt 103 incremental diff (`.local/p103/m3f-publication-incremental.diff`) and independently matched its checksum. It contains only the approved SIGTERM/SIGKILL wording clarification.
+- **Main results:** the reviewer retrieved both `main` workflow-run records and all five job logs. Both runs were push events on `main` at exact head commit `e2463cb5a94d7c40eb1d894b8fded29a866165a8`, with conclusion success. The reviewer did not run the suite or Docker locally. Observed results:
+  - Ubuntu job 116554736110: `1364 passed, 204 skipped in 28.13s`.
+  - Windows job 116554736342: `1363 passed, 205 skipped in 39.10s`.
+  - PostgreSQL job 116554736165: `204 passed, 1364 deselected in 61.97s (0:01:01)`.
+  - Container job 116554735789:
+    - `compose config: ok`; `context: ok (72 files; 19 planted fixtures excluded)`;
+    - image checks passed (UID/GID 10001, all three CLI helps, installed imports, offline migration SQL, runtime contents);
+    - the stack started with the database healthy, migration complete and API healthy, and `migrate`, `api` and `worker` used the CI-built image;
+    - an API key was created and held in memory; the upload was accepted with 202; the ingestion job succeeded; the revision was active with 2 verified chunks;
+    - a duplicate upload returned the existing revision with 200; the idle worker exited with code 0 and no OOM kill;
+    - `smoke: ok`; `cleanup: ok`.
+  - Secret-scan job 116554735382: 42 commits scanned, no leaks found.
+
+## Prompt 104: Record M3f main verification and prepare the overall M3 acceptance assessment
+
+- **Stage:** Documentation only, on branch `docs/m3-acceptance` created from `e2463cb`; staged and uncommitted for review
+- **Date:** 2026-10-16 (session date)
+- **Numbering:** 104 is the next unused number after Prompt 103; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 104 — Record M3f main verification and prepare the overall M3 acceptance assessment. Documentation only; stage for review.
+
+Read CLAUDE.md and relevant plan, ADR and test sections. Avoid reloading full prompt history. Do not print diffs.
+
+1. Verify starting state
+
+Expected:
+- Current branch: main.
+- HEAD, origin/main and remote main:
+  e2463cb5a94d7c40eb1d894b8fded29a866165a8.
+- Parent:
+  682101b4f06d099b147b8d21734fa83f7f53637f.
+- Local and remote feat/container-stack at the same commit.
+- Working tree clean.
+- Expected origin and noreply identity unchanged.
+
+Read fresh remote refs. Stop on material mismatch.
+
+Create docs/m3-acceptance from HEAD, provided that branch does not already exist. Do not overwrite an existing branch.
+
+2. Record verified main results
+
+The external reviewer retrieved both main workflow-run records and all five job logs. Both runs were push events on main at exact head commit `e2463cb5a94d7c40eb1d894b8fded29a866165a8`, conclusion success.
+
+CI:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38773393988
+
+Observed summaries:
+- Ubuntu, job 116554736110:
+  1364 passed, 204 skipped in 28.13s.
+- Windows, job 116554736342:
+  1363 passed, 205 skipped in 39.10s.
+- PostgreSQL, job 116554736165:
+  204 passed, 1364 deselected in 61.97s (0:01:01).
+
+Container job 116554735789:
+- compose config: ok
+- context: ok (72 files; 19 planted fixtures excluded)
+- image checks passed: UID/GID 10001, all three CLI helps, installed imports, offline migration SQL, runtime contents
+- stack started with database healthy, migration complete and API healthy
+- migrate, api and worker used the CI-built image
+- API key created and held in memory
+- upload accepted with 202
+- ingestion job succeeded
+- revision active; 2 verified chunks
+- duplicate upload returned the existing revision with 200
+- idle worker exited with code 0 and no OOM kill
+- smoke: ok
+- cleanup: ok
+
+Secret scan:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38773393999
+Job 116554735382:
+42 commits scanned, no leaks found.
+
+Attribute the logs to the external reviewer, who did not run the suite or Docker locally. Preserve Claude's earlier report that its anonymous session could not retrieve logs.
+
+The reviewer also inspected the Prompt 103 incremental diff and independently matched its checksum. It contains only the approved SIGTERM/SIGKILL wording clarification.
+
+3. Documentation scope
+
+Modify only:
+- README.md
+- docs/decisions/0012-containers.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Record M3f as verified and on main at e2463cb. Replace current “not merged” wording, preserving the earlier 682101b feature-branch evidence as historical.
+
+Include full main evidence and links in the README M3f entry and ADR-0012, with concise references elsewhere.
+
+Preserve:
+- local Compose remains unverified;
+- CI Compose satisfies the agreed Compose verification requirement;
+- shutdown smoke covers an idle worker, not an in-flight handler bound or forced SIGKILL;
+- the uv exception remains unchanged;
+- development-only scope and existing limitations.
+
+4. Prepare an overall M3 acceptance assessment
+
+In docs/plan.md, add a concise criterion-to-evidence table covering:
+- specified upload errors and idempotent re-uploads;
+- tenant- and revision-specific chunk IDs;
+- failed replacement retaining the previous active revision;
+- out-of-order completion leaving only the newer revision active;
+- activation rollback;
+- concurrent claims producing one owner;
+- stale-worker fencing for chunks, activation and job completion;
+- retries reaching dead;
+- worker lease-loss cancellation;
+- truthful stalled/dead ingestion projection;
+- image build, effective context, runtime checks and Compose smoke.
+
+Inspect the existing test names and relevant implementation as needed to identify concrete supporting tests and their verification jobs. Link to actual files and use real test names. Do not infer coverage merely from total test counts.
+
+Distinguish database-independent simulations from real PostgreSQL tests and from the real Compose smoke. Identify any unmet criterion honestly.
+
+Mark this assessment “prepared for external review”. Do not mark overall M3 accepted yet. Do not weaken criteria to make them pass.
+
+Do not design or start M4 in this task.
+
+5. Prompt history
+
+Append:
+- Prompt 103 publication outcome, keeping Claude's observations separate from unavailable logs;
+- reviewer evidence for main, including the results above;
+- the incremental-diff acceptance and checksum verification;
+- Prompt 104 verbatim and an outcome note marking overall M3 acceptance as awaiting review.
+
+Preserve all earlier bytes. Use inline backticked commit references in your own notes.
+
+6. Checks and staging
+
+Stage exactly the five permitted files.
+
+Check:
+- earlier prompts.md content remains an identical prefix;
+- relative links and anchors;
+- current status wording versus historical statements;
+- private content and unintended artifacts;
+- git diff --cached --check;
+- staged Gitleaks without suppression.
+
+No application tests, builds, Docker or database contact are needed. Do not commit, push, merge, amend, rebase, tag or delete branches.
+
+7. Review export
+
+Export the complete staged diff against HEAD, excluding prompts.md, to:
+.local/p104/m3-acceptance-assessment.diff
+
+UTF-8 without BOM. Report baseline commit, final staged tree, changed paths, statistics, byte size and SHA-256. Do not print the diff.
+
+Report any acceptance gaps, checks and final Git state.
+
+Return this output plus .local/p104/m3-acceptance-assessment.diff to the external reviewer.
+````
+
+**Outcome note (documentation staged; overall M3 acceptance awaiting review):**
+- **Starting state verified:**
+  - branch `main`; HEAD, `origin/main` and remote `main` at `e2463cb` (parent `682101b`);
+  - local and remote `feat/container-stack` at the same commit; working tree clean;
+  - origin and noreply identity unchanged.
+
+  Branch `docs/m3-acceptance` was created from `e2463cb` (it did not exist before).
+- **M3f main results recorded:** in `README.md`, ADR-0012, `docs/plan.md` and `docs/threat-model.md`, attributed to the reviewer's retrieval of the logs.
+  - The full `main` evidence is in the README container section and ADR-0012, with concise references elsewhere.
+  - Current "not merged" wording was replaced; the `682101b` feature-branch evidence is kept and labelled historical.
+  - Unchanged: local Compose unverified; CI Compose satisfying the agreed Compose verification requirement; the idle-worker-only shutdown coverage (no in-flight drain or forced SIGKILL); the uv exception; the development-only scope.
+- **Overall M3 acceptance assessment** added to `docs/plan.md` and marked **prepared for external review**.
+  - **Table:** maps each criterion to real test names in 14 linked test files. Every name was checked to exist, and the PostgreSQL evidence was checked to be integration-marked.
+  - **Evidence kinds:** DB-independent, PostgreSQL and the real container smoke are kept apart.
+  - **Finding:** no criterion is unmet on this evidence. Four evidence limitations are left to the reviewer: activation "crash" shown by injected in-transaction failures; 413/415/422 verified only database-independently; cross-tenant chunk-ID disjointness shown on the pure function; container shutdown limited to an idle worker.
+  - Overall M3 is **not** marked accepted.
+- **Checks:** the staged-path, history, link, status-wording, private-content, `git diff --cached --check` and staged Gitleaks checks run after this entry is staged; results are in the session handoff. No application tests, builds, Docker or database contact.
+- **Not done:** nothing committed, pushed or merged; M4 not started.
+
+**Acceptance note (recorded in Prompt 105):**
+- **Decision:** the external reviewer accepted overall M3 within its agreed scope.
+- **Basis:**
+  - the reviewed M3a–M3f implementations and corrections;
+  - the criterion-to-evidence assessment;
+  - the independently retrieved `main` CI evidence for `e2463cb`;
+  - the passing real PostgreSQL suite and container smoke.
+- **What the reviewer did:**
+  - inspected the Prompt 104 diff (`.local/p104/m3-acceptance-assessment.diff`) and independently matched its checksum;
+  - inspected selected supporting tests: chunk-ID disjointness, exact PostgreSQL storage, failed replacement, activation rollback and rejected uploads.
+
+  The reviewer did not rerun the suite or Docker locally.
+- **Accepted limitations.** The four documented evidence limitations are accepted as limitations, not removed or represented as additional tests:
+  - rollback tested by injected in-transaction failures, without killing a process;
+  - invalid-upload statuses tested database-independently;
+  - tenant-specific chunk-ID disjointness tested directly, with separate PostgreSQL storage and constraint tests rather than a two-tenant ingestion scenario;
+  - container shutdown tested with an idle worker only.
+- **Compose:** CI Compose satisfies the agreed Compose verification requirement. Local Compose remains unverified.
+- **No guarantees follow:** acceptance implies no production-readiness, performance or general security guarantee.
+
+## Prompt 105: Record overall M3 acceptance and commit the reviewed documentation locally
+
+- **Stage:** Acceptance wording and a local commit on branch `docs/m3-acceptance` (no push or merge)
+- **Date:** 2026-10-16 (session date)
+- **Numbering:** 105 is the next unused number after Prompt 104; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 105 — Record overall M3 acceptance and commit the reviewed documentation locally. Do not push or merge.
+
+Read CLAUDE.md and relevant status sections only. Do not reload full prompt history or print diffs.
+
+1. Verify starting state
+
+Expected:
+- Branch: docs/m3-acceptance.
+- HEAD:
+  e2463cb5a94d7c40eb1d894b8fded29a866165a8.
+- Staged tree:
+  a3ab3645a0f9e9cd9a594cd926a2fe309a1b9e57.
+- Exactly five staged paths:
+  README.md
+  docs/decisions/0012-containers.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Local main and origin/main at HEAD.
+- Expected origin and noreply author/committer identity unchanged.
+
+Stop on a material mismatch. Record the accepted staged tree under .local/p105/.
+
+2. Record the acceptance decision
+
+The external reviewer accepts overall M3 within its agreed scope, based on:
+- the reviewed M3a–M3f implementations and corrections;
+- the criterion-to-evidence assessment;
+- the independently retrieved main CI evidence for e2463cb;
+- the passing real PostgreSQL suite and container smoke.
+
+The reviewer inspected the Prompt 104 diff and independently matched its checksum. The reviewer also inspected selected supporting tests for chunk-ID disjointness, exact PostgreSQL storage, failed replacement, activation rollback and rejected uploads. The reviewer did not rerun the suite or Docker locally.
+
+The four documented evidence limitations are accepted as limitations, not silently removed or represented as additional tests:
+- rollback tested by injected in-transaction failures, without killing a process;
+- invalid-upload statuses tested database-independently;
+- tenant-specific chunk-ID disjointness tested directly, with separate PostgreSQL storage/constraint tests rather than a two-tenant ingestion scenario;
+- container shutdown tested with an idle worker only.
+
+CI Compose satisfies the agreed Compose verification requirement. Local Compose remains unverified. No production-readiness, performance or general security guarantee follows from acceptance.
+
+3. Narrow documentation edits
+
+Only the existing five staged files may change.
+
+Update current overall-M3 status wording consistently:
+- M1, M2 and M3 accepted;
+- M3 implementation is on main at e2463cb;
+- the acceptance record is being committed locally on this documentation branch;
+- M4 implementation has not started.
+
+In docs/plan.md:
+- change the assessment heading from prepared for review to accepted at external review, Prompt 105;
+- retain the criterion table, test names, evidence kinds, CI references and four limitations;
+- replace the unresolved-review wording with the acceptance decision and rationale above;
+- update current overall-M3-pending statements without rewriting historical baseline records.
+
+Make corresponding narrow status changes in README, ADR-0012 and the threat model where needed.
+
+Do not redesign or specify M4. Do not change source, tests, configurations, workflows, migrations, dependencies, lockfile or CLAUDE.md.
+
+4. Prompt history
+
+Append:
+- acceptance note under Prompt 104 with the reviewer’s actual work, evidence and decision;
+- Prompt 105 verbatim;
+- a truthful pre-commit note.
+
+Preserve earlier bytes. Do not include the new commit’s own SHA in its committed note. Do not pre-record publication.
+
+5. Checks and local commit
+
+Verify:
+- exactly the five permitted paths staged;
+- differences against the accepted tree are only the authorized acceptance wording and prompt history;
+- earlier prompts.md content is an identical prefix;
+- relative links and anchors;
+- current versus historical status wording;
+- private content and unintended artifacts;
+- git diff --cached --check;
+- staged Gitleaks without suppression;
+- effective author and committer identity.
+
+Commit with subject:
+docs: record M3 acceptance and verified main baseline
+
+Use the existing co-author trailer.
+
+After committing:
+- verify parent e2463cb5a94d7c40eb1d894b8fded29a866165a8;
+- verify exactly five committed paths;
+- run full-history Gitleaks;
+- confirm working tree clean;
+- confirm main and origin/main remain unchanged.
+
+No application tests or builds are needed for these documentation-only edits. Do not run Docker or contact a database.
+
+Stop on failed checks without suppressing findings or amending.
+
+6. Review export and handoff
+
+Export the complete incremental diff from accepted tree
+a3ab3645a0f9e9cd9a594cd926a2fe309a1b9e57
+to the new commit, excluding prompts.md, to:
+.local/p105/m3-acceptance-commit-incremental.diff
+
+Use UTF-8 without BOM. Report baseline/final, paths, statistics, byte size and SHA-256. Do not print the diff.
+
+Report commit SHA, parent, identity, checks and final Git state.
+
+No push, merge, force-push, amend, rebase, tag, branch deletion or M4 work is authorized.
+
+Return this output plus .local/p105/m3-acceptance-commit-incremental.diff to the external reviewer.
+````
+
+**Pre-commit note (written before the commit; the commit's own SHA is not recorded here):**
+- **Starting state verified:**
+  - branch `docs/m3-acceptance`, HEAD `e2463cb`;
+  - staged tree `a3ab3645a0f9e9cd9a594cd926a2fe309a1b9e57` with exactly the five expected paths; nothing unstaged or untracked;
+  - local `main` and `origin/main` at HEAD; origin and the noreply identity as expected.
+
+  The accepted tree is recorded under `.local/p105/`.
+- **Changes since the accepted tree:** narrow acceptance wording only, plus this prompt history.
+  - **`README.md`:** the status heading now reads M1, M2 and M3 accepted, with M3 on `main` at `e2463cb` and M4 not started; the M3 summary and the container-section qualifier are updated.
+  - **`docs/plan.md`:** the assessment heading now reads accepted at external review (Prompt 105). The pending line became the acceptance decision and rationale. The criterion table, test names, evidence kinds, CI references and the four limitations are kept. The current "pending" statements are updated; historical baseline records are left as written.
+  - **ADR-0012:** status and qualifier.
+  - **`docs/threat-model.md`:** one sentence noting that acceptance changes no guarantee.
+- **Unchanged:** source, tests, configuration, workflows, migrations, dependencies, `uv.lock` and `CLAUDE.md`. M4 is neither specified nor started.
+- **Checks for this commit:** run after this entry is staged; results are in the session handoff. They are the staged-path, accepted-tree comparison, prompt-history prefix, link, status-wording, private-content, `git diff --cached --check`, staged Gitleaks and identity checks, and after the commit the full-history Gitleaks scan. No application tests, builds, Docker or database contact.
+- **Not done:** nothing pushed or merged; publication of this branch is not authorized.
