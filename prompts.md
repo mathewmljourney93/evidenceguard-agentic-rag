@@ -12356,3 +12356,600 @@ End with:
   - no force-push, merge commit, squash, amend, rebase, tag or branch deletion.
 - **Earlier CI counts** (Ubuntu `1261 passed, 204 skipped`; Windows `1260 passed, 205 skipped`; PostgreSQL `204 passed, 1261 deselected`; secret scan 37 commits, no leaks) belong to `ccdf08d` only, not to the new commit.
 - **Still pending:** Compose, M3f and overall M3 acceptance.
+
+**Publication outcome (recorded in Prompt 95):**
+- **Formatting exception:** applied as authorized, only within the then-uncommitted Prompt 93 entry. Moving the identifier inline with the `SHA:` label kept was still flagged. Replacing that label with `commit` made the staged Gitleaks scan pass, with no suppression, allowlist or rule change. The existing account in the formatting exception note above is unchanged.
+- **Documentation commit:** `2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f`, parent `ccdf08d`, noreply identity. Only `prompts.md` differed from accepted tree `e393d03`. Full-history Gitleaks before publication scanned 38 commits and found no leaks.
+- **Feature push:** `git push origin refs/heads/feat/document-api:refs/heads/feat/document-api` exited 0. Claude observed through the public API that [ci run 38758322301](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38758322301) and [secret-scan run 38758322339](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38758322339) (push events on `feat/document-api` at `2e605e7`) concluded `success` in all four jobs.
+- **Main fast-forward:**
+  - Preconditions held on fresh refs: remote `main` at `cdf7260` and an ancestor; remote feature branch at `2e605e7`; local `main` equal to `origin/main`; clean tree.
+  - `git merge --ff-only` and `git push origin refs/heads/main:refs/heads/main` both exited 0 (`cdf7260..2e605e7`).
+  - Claude observed [ci run 38758727669](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38758727669) and [secret-scan run 38758727831](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38758727831) (push events on `main` at `2e605e7`) concluding `success` in all four jobs.
+- **Not observed by Claude:** the job logs need admin rights, so Claude reported every count for `2e605e7` as unobserved.
+- **Not done:** no force-push, merge commit, tag or branch deletion.
+
+**Reviewer evidence note (recorded in Prompt 95):** the external reviewer independently retrieved both `main` workflow records and all four job logs. Both runs were successful push events on `main` at commit `2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f`. The reviewer did not run the suite locally. Observed results:
+- Ubuntu job 116503999468: `1261 passed, 204 skipped in 28.04s`.
+- Windows job 116503999418: `1260 passed, 205 skipped in 29.97s`.
+- PostgreSQL job 116503999580: `204 passed, 1261 deselected in 56.65s`.
+- Secret-scan job 116503999509: 38 commits scanned, no leaks found.
+
+## Prompt 95: Record M3e main verification and specify M3f containers
+
+- **Stage:** Documentation only, on branch `docs/m3f-container-spec` created from `2e605e7`; staged and uncommitted for review
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 95 is the next unused number after Prompt 94; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 95: Record M3e main verification and specify M3f containers
+
+Record the verified M3e main publication and propose the detailed M3f implementation plan. This is documentation work only.
+
+Leave changes staged and uncommitted. Do not implement containers, change workflows, install tools, start Docker, contact databases, commit, push or merge.
+
+1. Verify the starting state
+
+Expected:
+- Current branch: main.
+- HEAD and origin/main: 2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f.
+- Local and remote feat/document-api point to the same commit.
+- Working tree clean.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Existing noreply identity unchanged.
+
+Check fresh remote refs. Stop on a material mismatch without overwriting work.
+
+Create docs/m3f-container-spec from the verified HEAD. If that branch exists already, inspect its state before proceeding.
+
+Read CLAUDE.md, the relevant M3 plan and the existing Docker/Compose, packaging, database and CLI configuration. Avoid rereading the complete prompt history.
+
+2. Record verified M3e main results
+
+The reviewer independently retrieved both main workflow records and all four job logs.
+
+Both runs were successful push events on main at commit `2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f`.
+
+CI run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38758727669
+
+Observed results:
+- Ubuntu job 116503999468:
+  1261 passed, 204 skipped in 28.04s.
+- Windows job 116503999418:
+  1260 passed, 205 skipped in 29.97s.
+- PostgreSQL job 116503999580:
+  204 passed, 1261 deselected in 56.65s.
+
+Secret-scan run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38758727831
+
+- Job 116503999509:
+  38 commits scanned, no leaks found.
+
+Attribute these observations to the reviewer’s retrieval of GitHub logs. The reviewer did not run the suite locally.
+
+Update current “not merged” wording for M3e. Preserve the earlier ccdf08d feature-branch results as historical evidence.
+
+Compose, M3f and overall M3 acceptance remain pending.
+
+3. Propose the M3f specification in docs/plan.md
+
+Keep the accepted architecture: one Python distribution, the existing API and sequential worker, PostgreSQL-backed jobs, and the existing PostgreSQL image.
+
+Inspect what already exists before proposing changes.
+
+Specify a concrete, modest implementation covering:
+
+- Dockerfile layout and build stages.
+- Reproducible installation from the committed lockfile.
+- Runtime packages and entry points for API, worker and administrative commands.
+- A non-root runtime, suitable working directory and file permissions.
+- Build context and .dockerignore rules excluding .git, .local, .env, credentials, caches and build artifacts.
+- Compose API, worker and database services.
+- A deliberate migration/startup sequence that avoids API and worker racing to migrate.
+- Database readiness, API readiness and startup dependencies.
+- API binding inside the container and safe host port exposure.
+- Worker signal delivery and graceful shutdown using its existing semantics.
+- Disposable development credentials, environment settings and database-volume lifecycle.
+- Commands for building, starting, migrating, seeding, creating a key, uploading a document, inspecting ingestion and stopping the stack.
+- Clear separation between development convenience and production deployment claims.
+
+Do not redesign application behaviour, authentication or the worker.
+
+Inspect the current dependency/base-image policy. If selecting base image and uv versions requires research, use official sources and record the proposed versions and rationale. Do not silently change dependency policy.
+
+4. Define what CI will verify
+
+The existing M3f slice requires images to build in CI.
+
+Propose the smallest meaningful CI validation:
+- Image build.
+- Installed entry-point/import checks.
+- Where practical, an isolated Compose smoke run using only disposable CI resources:
+  database readiness, migrations, API readiness, synthetic account/key setup, upload, production-worker ingestion, and verified active/chunk views.
+
+Explain whether the Compose smoke is feasible within the current workflows and resource limits. If recommending build-only verification, state precisely what would remain unverified.
+
+Do not equate a successful Docker image build with a working Compose stack.
+
+Plan cleanup on success and failure, bounded waits, useful privacy-safe diagnostics and no committed plaintext generated keys. Do not send credentials or uploaded content to logs.
+
+No local Docker installation or local execution is required or authorized. Local Compose remains unverified until it actually runs; CI Compose execution, if implemented later, should be labelled separately.
+
+5. Specify files and acceptance criteria
+
+List the intended files, expected workflow changes and documentation/ADR additions for the later implementation.
+
+Separate:
+- Already accepted architectural requirements.
+- Proposed engineering defaults needing review.
+- Exact build and smoke-test acceptance criteria.
+- Remaining M3 acceptance requirements.
+
+Check the overall M3 acceptance list for any other outstanding obligation. Do not mark M3 complete or silently defer an unmet criterion.
+
+Mark the M3f specification proposed for review, with no implementation yet.
+
+6. Documentation and prompt history
+
+Change only:
+- README.md
+- docs/decisions/0011-document-api.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Keep the M3f detailed proposal in the plan; do not create its implementation ADR yet.
+
+Preserve earlier prompts.md bytes. Append:
+- Prompt 94’s actual publication outcome.
+- The narrowly authorized Prompt 93 formatting exception and successful unsuppressed scans, without rewriting the existing account.
+- A reviewer-evidence note for the main results above.
+- This prompt verbatim.
+- A truthful outcome note marking the M3f specification awaiting review.
+
+Write public commit references inline in backticks in your own notes. Do not introduce broad exceptions to verbatim prompt recording or secret scanning.
+
+7. Checks and handoff
+
+Check:
+- Exactly the five permitted files staged.
+- Earlier prompt history unchanged.
+- Relative links and anchors.
+- Current status wording.
+- Private content and unintended artifacts.
+- git diff --cached --check.
+- Staged Gitleaks.
+
+Do not run application tests or builds for this documentation-only task.
+
+Export the COMPLETE staged diff against HEAD, excluding prompts.md, directly from Git to:
+
+.local/p95/m3f-container-spec.diff
+
+Use UTF-8 without a BOM. Do not print the diff in chat.
+
+Report:
+- The recorded M3e results.
+- Proposed M3f design, decisions and verification scope.
+- Outstanding decisions or blockers.
+- Checks actually run.
+- Branch, HEAD, staged tree and staged paths.
+- Diff path, baseline, final tree, byte size and SHA-256.
+
+Keep the current Claude session.
+
+End with:
+“Return this output plus .local/p95/m3f-container-spec.diff to the external reviewer.”
+````
+
+**Outcome note (documentation staged; M3f specification awaiting review):**
+- **Starting state verified:**
+  - branch `main`; HEAD, `origin/main` and local and remote `feat/document-api` all at `2e605e7`;
+  - working tree clean; origin and noreply identity unchanged.
+
+  Branch `docs/m3f-container-spec` was created from `2e605e7` (it did not exist locally or remotely).
+- **M3e main results recorded** in `README.md`, ADR-0011, `docs/plan.md` and `docs/threat-model.md`, attributed to the reviewer's retrieval of GitHub logs. Current "not merged" wording was replaced. The `ccdf08d` feature-branch results are kept as historical evidence.
+- **M3f specification** added to `docs/plan.md`, marked **proposed for review, not implemented**. It covers:
+  - a two-stage image from the locked dependencies, non-root and read-only;
+  - an allowlisted build context;
+  - Compose `migrate`, `api` and `worker` services beside the existing `postgres`, with the API on loopback only and the worker's 60 s stop grace period;
+  - developer commands and a development-only scope;
+  - a CI `container` job with a build, image checks and a bounded Compose smoke run;
+  - intended files and acceptance criteria;
+  - four open decisions: the base patch version under the age policy, Compose smoke versus build-only, whether CI Compose satisfies the M3 Compose requirement, and the engineering defaults.
+- **Base-image facts** were read from official registries: the Docker Hub tag listing for `python` and the GHCR manifest for `astral-sh/uv`. Nothing was installed, pulled, built or run.
+- **Checks:** the staged-path, history, link, status-wording, private-content, `git diff --cached --check` and staged Gitleaks checks run after this entry is staged; results are in the session handoff. No application tests or builds were run (documentation only).
+- **Not done:** nothing committed, pushed or merged; no Docker, database contact or container implementation.
+
+**Review note (recorded in Prompt 96):**
+- **Accepted:** the external reviewer accepted the M3e publication documentation from Prompt 95. They independently computed the SHA-256 of `.local/p95/m3f-container-spec.diff`, which matched (`98bd148e9df0151c6ae5c26ab776321cdfec8b5385638b3e32a0a4ca1731208c`).
+- **Reviewed, not executed:** the reviewer inspected the diff and ADR-0008, and ran neither Docker nor any project checks.
+- **Decisions:**
+  - **Python base:** `python:3.12.14-slim-trixie` with the proposed digest, subject to official-registry verification at implementation. No dependency-age exception is approved.
+  - **Smoke test:** the CI Compose smoke is required for M3f.
+  - **M3 Compose requirement:** a passing CI Compose smoke can satisfy it, alongside the other agreed criteria. Local Compose stays unverified until it actually runs locally.
+  - **Engineering defaults:** UID/GID 10001; loopback host ports 8000 and 5433; a 60 s worker stop grace period; no restart policy; a 180 s startup wait; a 90 s ingestion wait; a 20-minute CI job timeout. These are engineering defaults, not measured performance claims.
+- **Specification corrections requested:**
+  - **Worker shutdown:** remove the claim that the drain, cancel and heartbeat waits add up to a guaranteed 45 s shutdown bound (ADR-0008, *No total shutdown deadline*). Describe the 60 s grace period as an external termination budget. Require the smoke to inspect the stopped worker's actual exit status (exit code 0, no OOM kill), and state that it stops an idle worker.
+  - **Image selection:** make the selection of the CI-built image explicit, verify that each service runs that exact image ID, and rule out any silent rebuild or pull.
+  - **Diagnostics:** stop treating migrate, API and worker logs as privacy-safe JSON. Capture and redact the generated key before printing, report a key found in logs safely, give every subprocess and network call its own timeout, and keep the original failure.
+  - **Cleanup:** use a unique project name per run and attempt, and confirm resource ownership before destructive cleanup.
+  - **Build context:** add explicit recursive exclusions inside `apps/` and `packages/`, and verify the effective build context with nested excluded fixtures.
+
+## Prompt 96: Correct and finalize the M3f container specification
+
+- **Stage:** Specification correction on branch `docs/m3f-container-spec`; staged and uncommitted for review
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 96 is the next unused number after Prompt 95; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 96: Correct and finalize the M3f container specification
+
+Correct the M3f specification only. Leave the documentation staged and uncommitted for review.
+
+No implementation, dependency installation, Docker execution, database contact, commit, push or merge is authorized.
+
+1. Verify the starting state
+
+Expected:
+- Branch: docs/m3f-container-spec.
+- HEAD: 2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f.
+- Staged tree: 759ec7b33494ccb5803f05afc10b6a22c27a22d5.
+- Exactly five staged files:
+  README.md
+  docs/decisions/0011-document-api.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Local main and origin/main unchanged at HEAD.
+- Origin and noreply identity unchanged.
+
+Record the pre-edit staged tree under .local/p96/ as the incremental review baseline.
+
+Stop on a material mismatch without overwriting work.
+
+2. Record the reviewer’s decisions
+
+The reviewer approves:
+- Python 3.12.14-slim-trixie, using the proposed digest subject to official-registry verification during implementation. No dependency-age exception is approved.
+- The CI Compose smoke test is required for M3f.
+- A passing CI Compose smoke can satisfy the M3 Compose requirement, alongside the other agreed criteria. Local Compose remains unverified until actually executed locally.
+- UID/GID 10001, loopback host ports 8000 and 5433, a 60-second worker stop grace period, no restart policy, a 180-second startup wait, a 90-second ingestion wait and a 20-minute CI job timeout.
+
+These are engineering defaults, not measured performance claims.
+
+The M3e publication documentation is accepted. Keep README.md and ADR-0011 byte-identical to the baseline tree. Keep the threat-model wording unchanged unless a narrow correction below requires it.
+
+3. Correct worker shutdown claims
+
+Read ADR-0008’s “No total shutdown deadline” limitation.
+
+Remove claims that adding drain, cancel and heartbeat waits produces a guaranteed 45-second process shutdown bound.
+
+State accurately:
+- Those are bounded supervisor waits.
+- Synchronous database calls can delay shutdown beyond them.
+- The 60-second Compose grace period is an external termination budget.
+- Docker may force termination if that budget expires.
+- M3f does not change the worker’s existing semantics or introduce a database statement timeout.
+
+Strengthen the smoke acceptance:
+- A successful docker compose stop command alone is not proof of a graceful worker exit.
+- Inspect the stopped worker container’s actual exit status.
+- Require application exit code 0 and no OOM termination.
+- Unexpected exit or forced termination fails the shutdown smoke.
+- State whether this smoke stops an idle worker after successful ingestion. Do not claim it proves draining an in-flight handler if it does not test that scenario.
+
+Use Docker’s official documentation where command behaviour needs verification.
+
+4. Make the CI-built image selection explicit
+
+The plan builds evidenceguard:ci but Compose currently proposes evidenceguard:dev.
+
+Specify one explicit mechanism for selecting the image, such as a shared image variable with a development default and a CI override.
+
+Require:
+- migrate, api and worker use the exact image built by the CI job.
+- The smoke does not silently rebuild or pull a different application image.
+- Inspect their image IDs against the built image ID.
+- Build, smoke, diagnostics and cleanup use the same Compose files, project name and image selection.
+
+Keep the development commands straightforward.
+
+5. Correct diagnostics and cleanup
+
+Remove the assumption that migrate, API and worker logs are all privacy-safe JSON. Alembic and dependency failures can produce ordinary text and tracebacks.
+
+Specify:
+- Capture subprocess output and container logs before displaying them.
+- Check for and redact the generated API key before printing diagnostics, on both success and failure paths.
+- Do not rely solely on GitHub masking.
+- Do not print unsanitized HTTP bodies, command outputs or exception representations that could carry the key.
+- Report a key-in-logs finding safely without printing the key or offending raw line.
+- Preserve the original smoke failure if diagnostics or cleanup also fail.
+
+Every subprocess and network operation needs an appropriate timeout. Poll deadlines do not bound an individual hung command.
+
+Use a unique CI project name including run ID and attempt. Confirm that CI resources and volumes belong to that project before destructive cleanup. Do not remove unrelated resources.
+
+Keep always-run cleanup in the workflow, while acknowledging that runner loss or hard cancellation can prevent cleanup from completing.
+
+6. Tighten build-context exclusions
+
+The build-context allowlist must not accidentally include nested secrets or artifacts inside apps/ or packages/.
+
+Specify explicit recursive exclusions applied after directory inclusion for:
+- .env files, preserving no credential-bearing exception;
+- .git and .local directories;
+- virtual environments, caches and Python bytecode;
+- dist/build outputs and credential/key files.
+
+Preserve the legitimate source files and package data required by the wheel.
+
+Require verification of effective build-context contents, including representative nested excluded paths. Do not rely solely on a text assertion that .dockerignore contains certain strings.
+
+7. Status and prompt history
+
+Make only the narrow plan and related documentation corrections above.
+
+Keep M3f marked as awaiting final specification review. No implementation exists yet. Overall M3 acceptance remains pending.
+
+Preserve earlier prompts.md bytes. Append:
+- A review note accepting the M3e publication documentation and recording that the checksum independently matched.
+- The four decisions above.
+- The specification corrections requested here.
+- That the reviewer inspected the diff and ADR-0008 but did not run Docker or project checks.
+- This prompt verbatim and a truthful outcome note.
+
+Do not require a session restart for this correction. We can finish specification review and its acceptance commit in this session, then use a fresh session for M3f implementation.
+
+8. Checks and handoff
+
+Run only appropriate documentation checks:
+- Permitted staged paths.
+- Earlier prompt-history prefix unchanged.
+- Relative links and anchors.
+- Consistent shutdown, verification and acceptance wording.
+- Private-content/artifact checks.
+- git diff --cached --check.
+- Staged Gitleaks.
+
+No application tests, builds or Docker execution.
+
+Export the COMPLETE incremental diff against tree
+759ec7b33494ccb5803f05afc10b6a22c27a22d5,
+excluding prompts.md, directly from Git to:
+
+.local/p96/m3f-spec-corrections.diff
+
+Use UTF-8 without a BOM. Do not print the diff in chat.
+
+Report:
+- Corrections and settled decisions.
+- Checks actually run.
+- Branch, HEAD, final staged tree and staged paths.
+- Byte identity of the accepted M3e documents.
+- Diff path, baseline, final tree, byte size and SHA-256.
+- Any unresolved specification decision.
+
+End with:
+“Return this output plus .local/p96/m3f-spec-corrections.diff to the external reviewer.”
+````
+
+**Outcome note (specification corrected and staged; awaiting final specification review):**
+- **Starting state verified:**
+  - branch `docs/m3f-container-spec` at `2e605e7`;
+  - staged tree `759ec7b33494ccb5803f05afc10b6a22c27a22d5` with the five expected files; nothing unstaged or untracked;
+  - `main` and `origin/main` at HEAD; origin and noreply identity unchanged.
+
+  The baseline tree is recorded under `.local/p96/`.
+- **Only `docs/plan.md` changed** among the four documents. `README.md`, ADR-0011 and `docs/threat-model.md` are byte-identical to `759ec7b`, because their existing M3f wording ("proposed for review") remains accurate.
+- **Decisions recorded** in the M3f specification, which no longer lists open decisions; the four Prompt 95 decisions are settled.
+- **Worker shutdown:**
+  - The drain, cancel and heartbeat waits are described as bounded supervisor waits that synchronous database calls can outlast. The 60 s grace period is an external termination budget, after which Docker may SIGKILL.
+  - No change to worker semantics, and no statement timeout.
+  - The smoke stops an **idle** worker and inspects its state: exited, code 0, not OOM-killed. It does not claim to prove an in-flight drain.
+- **Image selection:**
+  - `image: ${EG_IMAGE:-evidenceguard:dev}` with `pull_policy: never` for all three application services.
+  - CI builds through Compose with a per-run, per-attempt tag and project name, runs `up --no-build --pull never`, and checks each container's image ID against the built image.
+- **Diagnostics and cleanup:**
+  - Output is captured and the key redacted before printing, on success and failure, without relying solely on masking. A key found in logs is reported as a count only. Only fixed fields and exception class names are printed.
+  - Every subprocess and HTTP call has its own timeout, and the first failure is preserved.
+  - Cleanup confirms ownership through the project label and removes only this run's resources and tag. The runner-loss limit is stated.
+- **Build context:**
+  - Explicit recursive re-exclusions follow the allowlist, with no `.env` exception.
+  - The legitimate package data (`py.typed`, `script.py.mako`) is preserved.
+  - A required effective-context check plants synthetic nested excluded fixtures in a `git archive` copy, lists the context through a throwaway build, and requires an exact match.
+- **Docker command behaviour** checked against Docker's official documentation:
+  - `stop_grace_period` (10 s default, then SIGKILL), `stop_signal` and `init`;
+  - `pull_policy: never`;
+  - `up --no-build`, `--pull never`, `--wait` and `--wait-timeout`;
+  - `${VAR:-default}` interpolation;
+  - `.dockerignore` matching (last match wins; `**` for any depth).
+
+  The documentation lists no command to print the effective build context, hence the listing build.
+- **Checks:** the documentation checks run after this entry is staged; results are in the session handoff. No application tests, builds or Docker execution.
+- **Status:** M3f is awaiting final specification review, with no implementation; overall M3 acceptance is pending.
+- **Not done:** nothing committed, pushed or merged.
+
+**Acceptance note (recorded in Prompt 97):**
+- **Accepted:** the external reviewer accepted the M3f container specification, subject to the two final clarifications below.
+- **What the reviewer inspected:**
+  - the original specification diff (`.local/p95/m3f-container-spec.diff`) and the correction diff (`.local/p96/m3f-spec-corrections.diff`), independently matching both checksums;
+  - ADR-0008 and Docker's official documentation.
+
+  The reviewer did not execute Docker or project checks.
+- **Final clarifications (applied in Prompt 97):**
+  - **Database image availability:** the CI `container` job explicitly pulls only the approved digest-pinned PostgreSQL image, with a bounded timeout, before Compose startup. The database image selection does not change; `--no-build --pull never` is kept for startup; the application containers must still run the exact CI-built image ID; no registry login or image publication is introduced.
+  - **Private key capture versus published output:**
+    - the `create-key` stdout is captured privately in process memory and is never printed, written to disk or uploaded;
+    - the key must not appear in the captured service logs, and all other diagnostic output is checked and redacted before display;
+    - GitHub masking is an additional protection, not the primary control;
+    - a key-in-service-logs failure is reported without exposing the key or the offending line.
+
+## Prompt 97: Commit the accepted M3f container specification locally
+
+- **Stage:** Specification acceptance and a local commit on branch `docs/m3f-container-spec` (no push or merge)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 97 is the next unused number after Prompt 96; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 97: Commit the accepted M3f container specification locally
+
+Commit the reviewed documentation and M3f specification locally, including the two narrow clarifications below.
+
+No implementation, Docker execution, database contact, push, merge or main update is authorized.
+
+1. Verify the starting state
+
+Expected:
+- Branch: docs/m3f-container-spec.
+- HEAD: 2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f.
+- Staged tree: b494d3b991c45a2bd958db8aece7522a52edc0a9.
+- Exactly five staged files:
+  README.md
+  docs/decisions/0011-document-api.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Local main and origin/main unchanged at HEAD.
+- Origin and noreply identity unchanged.
+
+Record the accepted staged tree under .local/p97/ before editing.
+
+Stop on a material mismatch without overwriting work.
+
+2. Add two narrow specification clarifications
+
+A. Database image availability
+
+The container CI job must explicitly pull the existing digest-pinned PostgreSQL image before Compose startup.
+
+Building the application image does not guarantee that the database image is present in that job.
+
+Specify:
+- Pull only the approved digest-pinned PostgreSQL image, with a bounded timeout.
+- Do not change its image selection.
+- Retain --no-build --pull never during smoke startup.
+- Application containers must still run the exact CI-built image ID.
+- No registry login or image publication is introduced.
+
+This is planned behaviour only; do not run Docker.
+
+B. Private key capture versus published output
+
+Correct the acceptance wording that currently says the key must never appear in captured output.
+
+Specify:
+- The create-key command’s stdout is captured privately in process memory so the smoke can obtain the generated credential.
+- That private capture is never printed, written to disk or uploaded.
+- The key must not appear in captured service logs.
+- All other diagnostic output is checked and redacted before display.
+- GitHub masking is an additional protection, not the primary control.
+- A key-in-service-logs failure is reported without exposing the key or offending line.
+
+Preserve the existing privacy and failure-handling design.
+
+3. Record specification acceptance
+
+Make narrow status updates in README.md, docs/plan.md and docs/threat-model.md:
+- M3f specification accepted at external review.
+- Implementation pending; no container implementation exists yet.
+- Required CI build, effective-context checks and Compose smoke remain unexecuted.
+- Local Compose remains unverified.
+- Overall M3 acceptance remains pending.
+
+Keep docs/decisions/0011-document-api.md byte-identical to the accepted staged tree.
+
+Do not change historical M3e evidence or redesign the specification.
+
+4. Prompt history
+
+Preserve earlier prompts.md bytes.
+
+Append:
+- An acceptance note under Prompt 96 recording that the reviewer inspected the original specification and correction diffs and independently matched both checksums.
+- The two final clarifications in this prompt.
+- That the reviewer inspected ADR-0008 and official Docker documentation but did not execute Docker or project checks.
+- This prompt verbatim.
+- A truthful pre-commit note.
+
+Do not record implementation, future CI results or the new commit’s own SHA inside that commit.
+
+5. Check and commit locally
+
+Confirm:
+- Exactly the five permitted files staged.
+- Changes since the accepted tree are limited to the authorized wording and prompt history.
+- ADR-0011 is byte-identical.
+- Earlier prompt-history bytes remain unchanged.
+- Relative links and anchors are valid.
+- No private information, credentials or unintended artifacts.
+- git diff --cached --check passes.
+- Staged Gitleaks passes without suppression.
+- Author and committer use the noreply identity.
+
+No application tests, builds or Docker execution are needed.
+
+Commit with subject:
+docs: record M3e main results and accepted M3f container specification
+
+Retain the existing co-author convention.
+
+After committing:
+- Run the full-history Gitleaks scan.
+- Verify the parent, committed paths and identity.
+- Confirm a clean working tree.
+- Confirm main and origin/main remain unchanged.
+- Do not push or merge.
+
+6. Review handoff
+
+Export the COMPLETE incremental diff from accepted tree
+b494d3b991c45a2bd958db8aece7522a52edc0a9
+to the new commit, excluding prompts.md, directly from Git to:
+
+.local/p97/m3f-spec-acceptance.diff
+
+Use UTF-8 without a BOM. Do not print the diff in chat.
+
+Report:
+- Commit SHA, parent, subject and identity.
+- Committed paths.
+- Final clarifications and acceptance wording.
+- Checks actually run.
+- ADR-0011 byte identity.
+- Final Git state.
+- Diff path, baseline, final commit, byte size and SHA-256.
+
+Finish this task in the current session. The next implementation task will use a fresh Claude session, recovering from the committed specification and repository instructions.
+
+End with:
+“Return this output plus .local/p97/m3f-spec-acceptance.diff to the external reviewer.”
+````
+
+**Pre-commit note (written before the commit; the commit's own SHA is not recorded here):**
+- **Starting state verified:**
+  - branch `docs/m3f-container-spec` at `2e605e7`;
+  - staged tree `b494d3b991c45a2bd958db8aece7522a52edc0a9` with the five expected files; nothing unstaged or untracked;
+  - `main` and `origin/main` at HEAD; origin and noreply identity unchanged.
+
+  The accepted tree is recorded under `.local/p97/`.
+- **Changes since the accepted tree:**
+  - the two clarifications in the M3f specification (`docs/plan.md`, E4 and G);
+  - narrow acceptance wording in `README.md`, `docs/plan.md` and `docs/threat-model.md`: the M3f specification accepted at review; implementation pending; the required CI build, effective-context checks and Compose smoke not run; local Compose unverified; overall M3 acceptance pending;
+  - this prompt history.
+
+  ADR-0011 is byte-identical to the accepted tree, and the historical M3e evidence is unchanged.
+- **Checks for this commit:** run after this entry is staged; results are in the session handoff. They are the staged-path, accepted-tree comparison, ADR-0011 identity, prompt-history prefix, link, private-content, `git diff --cached --check`, staged Gitleaks and identity checks, and after the commit the full-history Gitleaks scan. No application tests, builds or Docker execution.
+- **Not done:** no container implementation, no Docker or database contact, nothing pushed or merged.

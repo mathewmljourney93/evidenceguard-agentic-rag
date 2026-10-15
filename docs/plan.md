@@ -644,8 +644,9 @@ Each question entry contains:
     - [CI run 38286702295](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295/job/114936682783) `819 passed, 133 skipped in 18.04s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295/job/114936682699) `818 passed, 134 skipped in 18.87s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295/job/114936682399) `133 passed, 819 deselected in 38.29s`.
     - The [secret-scan run 38286702205](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702205) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702205/job/114936700730): 30 commits scanned, no leaks found).
   - On the M3c `main` baseline `6f8ffde` there was no production ingestion handler, upload or document endpoint. Compose is unverified.
-- **M3d** has a detailed specification below, **accepted at review (Prompt 76, corrected in Prompts 77–79)**. It is **implemented on `feat/document-ingestion` (Prompts 80–81; [ADR-0010](decisions/0010-document-ingestion.md)) and reviewed (Prompts 82–83)**. It was verified in CI on `feat/document-ingestion` at `74904e6` ([CI run 38699149482](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482)). From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837532) `1020 passed, 178 skipped in 20.13s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837727) `1019 passed, 179 skipped in 23.75s`, and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837038) `178 passed, 1020 deselected in 51.89s`: the full suite, including M3d's 45 new tests. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149417) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149417/job/116302836923): 33 commits scanned, no leaks found). PostgreSQL, Linux and Windows verification of that version are complete. M3d was then fast-forwarded onto `main` at `cdf7260` (`cdf7260d02b8af9affb369cc805d666be61f9ac0`, adding only documentation after `74904e6`), where [CI run 38701376504](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504) passed again. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119787) `1020 passed, 178 skipped in 19.71s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119664) `1019 passed, 179 skipped in 16.16s`, and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119317) `178 passed, 1020 deselected in 53.28s`. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376501) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376501/job/116310119403): 34 commits scanned, no leaks found). Both runs were push-triggered on `main`; the reviewer did not run the suite locally. These results demonstrate the tested behaviour, not a performance benchmark or a general security guarantee. The production registry registers `ingest_revision`; at that baseline, upload and document endpoints were not implemented. It assigned the dead-job projection to M3e (section E) as a condition of overall M3 acceptance; M3e implements it and is verified in CI on `feat/document-api`, not merged (below). M3f is not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
-- **M3e** has a detailed specification below (upload, document, revision, chunk and job endpoints, and the required `ingestion_state` projection), **accepted at external review (Prompt 86, corrected in Prompts 87–88)**. Its implementation (Prompt 89, corrected in Prompt 90; [ADR-0011](decisions/0011-document-api.md)) was accepted at external review (Prompt 91) and is **reviewed and verified in CI on `feat/document-api` at `ccdf08d` ([CI run 38755179760](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38755179760)): Ubuntu, Windows and the full 204-test PostgreSQL integration suite (including the 26 M3e tests) passed, per job logs retrieved by the external reviewer**. PostgreSQL, Ubuntu and Windows verification of that version is complete. It is not merged; `main` remains at `cdf7260`. M3f, Compose verification and **overall M3 acceptance remain pending**.
+- **M3d** has a detailed specification below, **accepted at review (Prompt 76, corrected in Prompts 77–79)**. It is **implemented on `feat/document-ingestion` (Prompts 80–81; [ADR-0010](decisions/0010-document-ingestion.md)) and reviewed (Prompts 82–83)**. It was verified in CI on `feat/document-ingestion` at `74904e6` ([CI run 38699149482](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482)). From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837532) `1020 passed, 178 skipped in 20.13s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837727) `1019 passed, 179 skipped in 23.75s`, and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837038) `178 passed, 1020 deselected in 51.89s`: the full suite, including M3d's 45 new tests. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149417) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149417/job/116302836923): 33 commits scanned, no leaks found). PostgreSQL, Linux and Windows verification of that version are complete. M3d was then fast-forwarded onto `main` at `cdf7260` (`cdf7260d02b8af9affb369cc805d666be61f9ac0`, adding only documentation after `74904e6`), where [CI run 38701376504](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504) passed again. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119787) `1020 passed, 178 skipped in 19.71s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119664) `1019 passed, 179 skipped in 16.16s`, and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119317) `178 passed, 1020 deselected in 53.28s`. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376501) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376501/job/116310119403): 34 commits scanned, no leaks found). Both runs were push-triggered on `main`; the reviewer did not run the suite locally. These results demonstrate the tested behaviour, not a performance benchmark or a general security guarantee. The production registry registers `ingest_revision`; at that baseline, upload and document endpoints were not implemented. It assigned the dead-job projection to M3e (section E) as a condition of overall M3 acceptance; M3e implements it and is verified in CI and on `main` at `2e605e7` (below). M3f is not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
+- **M3e** has a detailed specification below (upload, document, revision, chunk and job endpoints, and the required `ingestion_state` projection), **accepted at external review (Prompt 86, corrected in Prompts 87–88)**. Its implementation (Prompt 89, corrected in Prompt 90; [ADR-0011](decisions/0011-document-api.md)) was accepted at external review (Prompt 91) and is **reviewed and verified in CI on `feat/document-api` at `ccdf08d` ([CI run 38755179760](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38755179760)): Ubuntu, Windows and the full 204-test PostgreSQL integration suite (including the 26 M3e tests) passed, per job logs retrieved by the external reviewer**. PostgreSQL, Ubuntu and Windows verification of that version is complete. It was then fast-forwarded onto `main` at `2e605e7` (`2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f`, adding only documentation after `ccdf08d`), where [CI run 38758727669](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38758727669) passed again. From job logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38758727669/job/116503999468) `1261 passed, 204 skipped in 28.04s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38758727669/job/116503999418) `1260 passed, 205 skipped in 29.97s`, and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38758727669/job/116503999580) `204 passed, 1261 deselected in 56.65s`. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38758727831) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38758727831/job/116503999509): 38 commits scanned, no leaks found). Both runs were push events on `main`; the reviewer did not run the suite locally.
+- **M3f** has a detailed specification below (container image, Compose API, worker and migration services, and a required CI Compose smoke), **proposed in Prompt 95, corrected in Prompt 96 and accepted at external review (Prompt 97)**. Its implementation is pending: no container implementation exists yet, and the required CI build, effective-context checks and Compose smoke have not run. Local Compose remains unverified, and **overall M3 acceptance remains pending**.
 
 M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-workflow.md): plain Python, PostgreSQL-backed jobs claimed with `FOR UPDATE SKIP LOCKED`, leases, heartbeats and fenced writes. There is no new orchestration framework or queue dependency. Each slice is reviewed, verified in CI and merged before the next one starts. The M3 acceptance criteria above are split across the slices as follows:
 
@@ -1942,7 +1943,7 @@ New module `evidenceguard_persistence.chunks`. All its functions take M3a's `Fen
   - a real `run_worker` execution with the **registered production handler**.
 - **Status (Prompts 80–84):** implemented as planned, with the files above and ADR-0010, and reviewed. The database-independent tests ran locally on Windows in Prompt 81 (1019 passed, 179 skipped). It was verified in CI on `feat/document-ingestion` at `74904e6` ([CI run 38699149482](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482)). From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837532) `1020 passed, 178 skipped in 20.13s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837727) `1019 passed, 179 skipped in 23.75s`, and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837038) `178 passed, 1020 deselected in 51.89s`: the full suite, including M3d's 45 new tests. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149417) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149417/job/116302836923): 33 commits scanned, no leaks found). M3d was then fast-forwarded onto `main` at `cdf7260` (`cdf7260d02b8af9affb369cc805d666be61f9ac0`, adding only documentation after `74904e6`), where [CI run 38701376504](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504) passed again. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119787) `1020 passed, 178 skipped in 19.71s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119664) `1019 passed, 179 skipped in 16.16s`, and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119317) `178 passed, 1020 deselected in 53.28s`. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376501) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376501/job/116310119403): 34 commits scanned, no leaks found). Both runs were push-triggered on `main`; the reviewer did not run the suite locally. These results demonstrate the tested behaviour, not a performance benchmark or a general security guarantee.
 
-**M3e, upload and document endpoints, in detail (ACCEPTED at review, Prompt 86, corrected in Prompts 87–88; implementation accepted at review in Prompt 91 and verified in CI on `feat/document-api` at `ccdf08d`, not merged, see ADR-0011):**
+**M3e, upload and document endpoints, in detail (ACCEPTED at review, Prompt 86, corrected in Prompts 87–88; implementation accepted at review in Prompt 91, verified in CI and on `main` at `2e605e7`, see ADR-0011):**
 
 M3e adds the HTTP surface for documents: a bounded multipart upload that creates a revision and its ingestion job in one transaction, read-only views of documents, revisions, chunks and jobs, and the required derived `ingestion_state` (M3d, section E). It changes no M3a–M3d behaviour.
 
@@ -2252,7 +2253,255 @@ Six endpoints. The milestone's "list" requirement is met by a **vendor-scoped do
     - after a REPEATABLE READ, READ ONLY read on a pooled connection, a later upload on the same connection runs read-write at READ COMMITTED (settings restored).
   - **Upload observation:** the 202 and 200 bodies match the state read inside the creation transaction, even when a worker changes the job immediately after the commit.
   - **End to end:** upload, then a real `run_worker` with the production handler, then views show `active` and the verified chunks.
-- **Status (Prompts 89–93):** the implementation and the tests above were accepted at external review (Prompt 91), after Prompt 90's corrections for raw header-byte counting, lossless parameter validation and the missing PostgreSQL tests. The database-independent tests ran and passed locally on Windows (`1260 passed, 205 skipped`: 204 PostgreSQL tests and one POSIX-only signal test). The PostgreSQL integration tests in the plan above then ran in CI on `feat/document-api` at `ccdf08d`: the full 204-test integration suite passed, including all 26 M3e tests, as did Ubuntu and Windows verification (job logs retrieved by the external reviewer; see ADR-0011). M3e is not merged.
+- **Status (Prompts 89–93):** the implementation and the tests above were accepted at external review (Prompt 91), after Prompt 90's corrections for raw header-byte counting, lossless parameter validation and the missing PostgreSQL tests. The database-independent tests ran and passed locally on Windows (`1260 passed, 205 skipped`: 204 PostgreSQL tests and one POSIX-only signal test). The PostgreSQL integration tests in the plan above then ran in CI on `feat/document-api` at `ccdf08d`: the full 204-test integration suite passed, including all 26 M3e tests, as did Ubuntu and Windows verification (job logs retrieved by the external reviewer; see ADR-0011). It was then published on `main` at `2e605e7`, where [CI run 38758727669](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38758727669) passed again (Ubuntu, Windows and the 204-test PostgreSQL suite, per job logs retrieved by the external reviewer).
+
+**M3f, container image and Compose services, in detail (ACCEPTED at review, Prompt 97; proposed in Prompt 95, corrected in Prompts 96–97; implementation pending, nothing below is implemented):**
+
+M3f packages the existing distribution as one container image and adds the API, worker and migration services to the existing Compose file. It changes no application behaviour, authentication or worker semantics. It is development tooling: it makes no production-deployment claim.
+
+**Already decided (not reopened here):**
+- **Architecture:** one Python distribution (ADR-0001), the existing `eg-api`, sequential `eg-worker` and `eg-admin` entry points, PostgreSQL-backed jobs (ADR-0003, ADR-0007), and the existing database image `pgvector/pgvector:0.8.7-pg17`, pinned by digest (ADR-0004).
+- **Slice check** (M3 table above): images build in CI. Compose stays unverified **locally** while Docker is unavailable (§10).
+- **Dependency policy:** the committed `uv.lock` and the dependency-age policy (ADR-0004). Images are pinned by digest.
+
+**Reviewer decisions (Prompt 96):**
+- **Python base:** `python:3.12.14-slim-trixie` with the digest in A, subject to verification against the official registry at implementation. **No dependency-age exception is approved.**
+- **Smoke test:** the CI Compose smoke in E is **required** for M3f.
+- **M3 Compose requirement:** a passing CI Compose smoke can satisfy it, alongside the other agreed criteria. Local Compose stays unverified until it actually runs locally.
+- **Engineering defaults:** UID/GID 10001; loopback host ports 8000 (API) and 5433 (database); a 60 s worker stop grace period; no restart policy; a 180 s startup wait; a 90 s ingestion wait; a 20-minute CI job timeout.
+
+These are engineering defaults, not measured performance claims.
+
+**What exists today** (inspected at `2e605e7`):
+- `docker-compose.yml` defines **only** `postgres`:
+  - the pinned pgvector image, with disposable credentials `evidenceguard` / `evidenceguard-local-dev`;
+  - host port `127.0.0.1:5433`, a `pg_isready` health check and the named volume `evidenceguard-pgdata`;
+  - `infra/docker/postgres-init/01-create-test-database.sql`, which creates `evidenceguard_test` on first initialisation.
+
+  It has never been run.
+- There is no `Dockerfile` or `.dockerignore`.
+- **Entry points:**
+  - `eg-api` binds `127.0.0.1:8000` by default and takes `--host` and `--port`;
+  - `eg-worker` handles SIGINT and SIGTERM: the first requests a graceful stop, a second an immediate one;
+  - `eg-admin` has `seed-demo`, `create-key` and `revoke-key`.
+- **Database settings:** every entry point reads only `EG_DATABASE_URL`, and the URL policy accepts a single DNS host such as `postgres`.
+- **Migrations** ship inside `evidenceguard_persistence`. `alembic.ini` only names that script location, and online migrations read `EG_DATABASE_URL`.
+- **`GET /readyz`** returns 200 only when the database answers and its migrations match this release; it never migrates.
+- **Package data** the wheel needs besides Python modules: the `py.typed` markers and `evidenceguard_persistence/migrations/script.py.mako`.
+- **Worker shutdown** (ADR-0008, *No total shutdown deadline*): the drain (30 s), cancellation grace (5 s) and heartbeat join (10 s) are **bounded supervisor waits, not a deadline for the whole process**.
+  - `claim` and outcome recording are synchronous database calls on the supervisor thread, and signals do not cancel them.
+  - There is no worker statement timeout, so a blocked call can delay shutdown beyond those waits.
+- **CI** pins uv `0.13.0` and Python 3.12. Docker is not installed on the development machine.
+
+**A. Image (`Dockerfile`)**
+
+- **One image** for every role; the command selects the process (`eg-api`, `eg-worker`, `eg-admin`, `alembic`).
+- **Base images:**
+  - **Python:** the Docker Official Image `python:3.12.14-slim-trixie@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f`, for both stages. The Docker Hub tag listing showed this digest last updated 2026-09-25, which meets the two-week policy.
+  - **uv:** binaries copied from `ghcr.io/astral-sh/uv:0.13.0@sha256:cdc6093146eb3ff6a40107b38f008b789e050e77ad87865e381d9917da55a168`, the same uv version CI already uses. That digest is the multi-platform index the registry returned for the tag.
+
+  The implementation re-verifies both digests from the official registries and records them, with their dates, in its ADR. If the approved Python digest cannot be verified there, implementation stops for review instead of substituting a newer image.
+- **Builder stage:**
+  - **Environment:** `UV_PROJECT_ENVIRONMENT=/opt/venv`, `UV_PYTHON_DOWNLOADS=never`, `UV_COMPILE_BYTECODE=1` and `UV_LINK_MODE=copy`.
+  - **Dependency layer:** copy `pyproject.toml`, `uv.lock` and `README.md` (the build backend reads the readme), then run `uv sync --locked --no-dev --no-install-project`.
+  - **Project layer:** copy `apps/`, `packages/` and `alembic.ini`, then run `uv sync --locked --no-dev --no-editable`, so the project is installed as a regular wheel.
+  - `--locked` fails the build if `uv.lock` does not match `pyproject.toml`. No dev dependencies are installed.
+- **Runtime stage:**
+  - **Contents:** the same base, plus `/opt/venv` and `/app/alembic.ini` only. No uv, compiler, source tree, tests, documentation or Git metadata.
+  - **User:** a fixed system user and group `evidenceguard`, UID/GID 10001, with no login shell. `USER 10001:10001`.
+  - **Permissions:** all files are owned by root and readable, not writable, by the runtime user. The application needs no writable path: uploads are stored in PostgreSQL. Compose adds a read-only root filesystem and a small `/tmp` tmpfs.
+  - **Environment and command:** `WORKDIR /app`, `PATH=/opt/venv/bin:$PATH`, `PYTHONUNBUFFERED=1` and `PYTHONDONTWRITEBYTECODE=1`. Exec-form `CMD ["eg-api", "--host", "0.0.0.0", "--port", "8000"]` and `EXPOSE 8000`; no shell entrypoint.
+  - **No configuration or secrets** are baked in: no `EG_DATABASE_URL`, no build arguments carrying secrets, no `.env`.
+- **`.dockerignore`:** an allowlist, followed by recursive re-exclusions. In `.dockerignore` the last matching line decides, and only `**` patterns match at any depth (Docker build-context documentation).
+  1. **Exclude everything:** `*`.
+  2. **Include only:** `!pyproject.toml`, `!uv.lock`, `!README.md`, `!alembic.ini`, `!apps/` and `!packages/`.
+  3. **Then exclude again, at any depth inside the included directories:**
+     - `**/.env` and `**/.env.*`, with **no** credential-bearing exception;
+     - `**/.git` and `**/.local`;
+     - virtual environments, caches and bytecode: `**/.venv`, `**/venv`, `**/__pycache__`, `**/*.py[cod]`, `**/.mypy_cache`, `**/.ruff_cache`, `**/.pytest_cache`;
+     - build outputs: `**/dist`, `**/build`, `**/*.egg-info`;
+     - credential and key files: `**/*.pem`, `**/*.key`, `**/*.p12`, `**/*.pfx`, `**/id_rsa*`;
+     - logs: `**/*.log`.
+
+  Everything outside the allowlist stays out of the build context, including `.git`, `.local`, `.venv`, `dist`, `tests`, `docs` and `prompts.md`. The legitimate sources and package data under `apps/` and `packages/` (the `.py` modules, `py.typed` and `script.py.mako`) match none of the re-exclusions and stay included. The effective context is **verified**, not assumed (E2).
+
+**B. Compose services (extending `docker-compose.yml`)**
+
+- **`postgres`:** unchanged (image digest, credentials, health check, `127.0.0.1:5433`, volume, init script).
+- **One image selection** for `migrate`, `api` and `worker`, shared through a YAML anchor: `build: .`, `image: ${EG_IMAGE:-evidenceguard:dev}` and `pull_policy: never`.
+  - **Development:** the default `evidenceguard:dev` is built locally by `docker compose build`.
+  - **CI:** sets `EG_IMAGE` to a unique tag (E1).
+  - **No registry pulls:** `pull_policy: never` means the application image is never pulled. A missing image is an error, so a same-named public image can never be substituted.
+- **Shared application settings** (the same anchor):
+  - `EG_DATABASE_URL=postgresql+psycopg://evidenceguard:evidenceguard-local-dev@postgres:5432/evidenceguard_dev`, the existing disposable development credentials (no `.env` file is needed);
+  - `read_only: true`, a `/tmp` tmpfs, `cap_drop: [ALL]`, `security_opt: [no-new-privileges:true]` and `init: true`. A minimal init process (PID 1) then forwards signals to the command and reaps processes.
+- **`migrate`** (one-shot): `alembic -c /app/alembic.ini upgrade head`.
+  - It depends on `postgres` being `service_healthy` and has `restart: "no"`.
+  - It is the **only** service that migrates. The API and the worker never migrate at startup, so they cannot race.
+- **`api`:** `eg-api --host 0.0.0.0 --port 8000`. Inside the container it must bind all interfaces to be reachable.
+  - **Host port:** published only as `127.0.0.1:8000:8000`, never on all host interfaces.
+  - **Dependencies:** `postgres` (`service_healthy`) and `migrate` (`service_completed_successfully`).
+  - **Health check:** `GET /readyz` through the image's Python (`urllib`; no curl in the slim image). Interval 5 s, timeout 3 s, 20 retries, start period 5 s.
+- **`worker`:** `eg-worker`, with the same dependencies as `api`. No ports. The worker has no HTTP readiness endpoint; it is "started" once running, and polls with its existing backoff if the database is briefly unavailable.
+- **Worker shutdown** (`stop_signal: SIGTERM`, `stop_grace_period: 60s`):
+  - The first SIGTERM triggers the worker's existing graceful stop (M3b, ADR-0008).
+  - **The 60 s is an external termination budget, not a guaranteed shutdown bound.** The worker's waits are bounded supervisor waits, but a synchronous database call can delay its exit beyond them. If the budget expires, Docker sends SIGKILL (Compose's documented `stop_grace_period` behaviour).
+  - M3f does not change the worker's shutdown semantics and introduces no database statement timeout.
+- **Restart policy:** none (`restart: "no"`), so failures stay visible during development.
+- **Database volume:** `docker compose down` keeps `evidenceguard-pgdata`; `docker compose down -v` deletes it. The init script runs only when a new volume is initialised.
+
+**C. Developer commands** (to be documented in the README at implementation)
+
+```
+docker compose build               # builds the default image evidenceguard:dev
+docker compose up -d --wait        # postgres healthy, migrate done, api healthy, worker running
+docker compose run --rm migrate    # re-run migrations explicitly (idempotent)
+docker compose exec api eg-admin seed-demo
+docker compose exec api eg-admin create-key --tenant-id <tenant_id> --user-id <user_id>
+#   prints the key once; keep it in a shell variable only, never in a file under version control
+curl -sS -X POST http://127.0.0.1:8000/v1/vendors -H "Authorization: Bearer $EG_KEY" \
+  -H "Content-Type: application/json" -d '{"slug": "lumenvale", "name": "Lumenvale"}'
+curl -sS http://127.0.0.1:8000/v1/vendors/<vendor_id>/documents -H "Authorization: Bearer $EG_KEY" \
+  -F document_key=security-policy -F "title=Security policy" -F source_type=vendor_statement \
+  -F "file=@policy.md;type=text/markdown"
+curl -sS http://127.0.0.1:8000/v1/jobs/<job_id> -H "Authorization: Bearer $EG_KEY"
+curl -sS http://127.0.0.1:8000/v1/documents/<document_id> -H "Authorization: Bearer $EG_KEY"
+curl -sS http://127.0.0.1:8000/v1/documents/<document_id>/revisions/1/chunks -H "Authorization: Bearer $EG_KEY"
+docker compose logs api worker
+docker compose stop                # requests a graceful stop; data kept
+docker compose down -v             # remove containers and the database volume
+```
+
+The uploaded file is synthetic demonstration text. Commands use only the documented disposable credentials and a key created at runtime.
+
+**D. Development convenience versus production**
+
+M3f provides a **development stack** only. It does not provide:
+- TLS;
+- secrets management (the database credentials are disposable and public);
+- resource limits;
+- more than one worker;
+- backups;
+- image signing, an SBOM or registry publication;
+- a production deployment.
+
+The non-root user, read-only filesystem and dropped capabilities are sensible defaults, not a security certification. A production deployment is a later, separately reviewed decision.
+
+**E. CI verification (required)**
+
+Add one job, `container`, to `ci.yml`. It runs on `ubuntu-24.04` only, because GitHub's Windows runners cannot run Linux containers. It has `timeout-minutes: 20`, read-only `contents` permission, no registry login or push, and no new third-party actions: it uses the preinstalled Docker Engine and Compose v2 through plain commands.
+
+**Shared selection:** every step uses the same values:
+- the Compose file `docker-compose.yml`;
+- the project name `P=eg-ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}`;
+- the image `EG_IMAGE=evidenceguard:ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}`.
+
+They are set once as job environment variables.
+
+1. **Build:** `docker compose -f docker-compose.yml -p "$P" build api` builds the shared image and tags it `$EG_IMAGE`.
+   - The job records `IMAGE_ID=$(docker image inspect --format '{{.Id}}' "$EG_IMAGE")`.
+   - Base images resolve by digest, and the lockfile is enforced by `--locked`.
+2. **Effective build context** (not just a text check of `.dockerignore`):
+   - **Copy:** export the committed tree with `git archive HEAD` into a temporary directory.
+   - **Plant fixtures:** add synthetic placeholder files there, never real secrets, at representative nested excluded paths:
+     - `.env` and `.env.local` files under `apps/` and `packages/`;
+     - `.git/`, `.local/`, `.venv/`, `__pycache__/` (`.pyc`), `.mypy_cache/`, `dist/` and `build/` directories inside packages;
+     - a `.pem` file and an `id_rsa` file.
+   - **List:** build a throwaway listing image from that directory. Its Dockerfile copies the context and lists every file, on the approved Python base. It lives outside the context, with no Dockerfile-specific ignore file, so the context root `.dockerignore` applies.
+   - **Require:**
+     - every tracked file under `apps/` and `packages/`, plus the four root files, is present, including `py.typed` and `script.py.mako`;
+     - no planted file is present;
+     - nothing else is present (for example `tests/`, `docs/`, `.github/`, `prompts.md`).
+
+   The listing image is then removed.
+3. **Image checks** (`docker run --rm "$EG_IMAGE" …`, each with a timeout):
+   - `id -u` and `id -g` are `10001`;
+   - `eg-api --help`, `eg-worker --help` and `eg-admin --help` succeed;
+   - the installed-package import check (as in `verify`), and `alembic -c /app/alembic.ini upgrade head --sql` renders `CREATE TABLE api_keys` with no database;
+   - `/app` contains no `.git`, `tests`, `.env` or `prompts.md`, and no `uv` executable is on `PATH`.
+4. **Compose smoke:** a stdlib-only script, `infra/ci/compose_smoke.py`, run by the runner's Python.
+   - **Database image:** before startup, the job explicitly pulls the existing approved PostgreSQL image, and only that image, by its digest:
+     - `docker pull pgvector/pgvector:0.8.7-pg17@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d`, run with a 300 s subprocess timeout;
+     - building the application image does not guarantee that the database image is present in this job, and `--pull never` (below) applies to every service;
+     - the database image selection in `docker-compose.yml` does not change, and no registry login or image publication is introduced.
+   - **Startup:** `docker compose -p "$P" up -d --no-build --pull never --wait --wait-timeout 180`: database ready, `migrate` exited 0, `api` healthy (`/readyz` 200), `worker` running. `--no-build` and `--pull never` mean the smoke can neither rebuild nor pull a different application image; the application containers must still run the exact CI-built image ID (next item).
+   - **Image identity:** for each `migrate`, `api` and `worker` container, `docker inspect --format '{{.Image}}'` must equal `IMAGE_ID`.
+   - **Key:** `eg-admin seed-demo`, then `eg-admin create-key` for the demo tenant-A reviewer (deterministic demo IDs). The `create-key` command's stdout is captured **privately in the script's memory**, so the smoke can obtain the generated credential. That private capture is never printed, written to disk or uploaded as an artifact. The key is also registered with `::add-mask::`, but GitHub masking is an **additional** protection, not the primary control (see step 5).
+   - **Ingestion:**
+     - create a vendor (201) and upload a synthetic Markdown document (202);
+     - poll `GET /v1/jobs/{id}` every 2 s, up to a **90 s deadline**, until `succeeded`, with the production `ingest_revision` handler in the `worker` container;
+     - the document view shows the revision active with `ingestion_state` `active`; the chunk view shows `verified_complete: true` and `stored_count == chunk_count ≥ 1`;
+     - a duplicate upload returns 200.
+   - **Worker shutdown:**
+     - **What it tests:** this stops an **idle** worker, after the ingestion job has succeeded and nothing is claimable. It does **not** prove that an in-flight handler drains in a container. That behaviour is covered at process level by the M3b tests, not here.
+     - **Stop:** `docker compose -p "$P" stop -t 60 worker`, run with a 90 s subprocess timeout.
+     - **Inspect the outcome:** a successful `stop` command alone is **not** proof of a graceful exit. The script reads the stopped container's state with `docker inspect --format '{{.State.Status}} {{.State.ExitCode}} {{.State.OOMKilled}}'`.
+     - **Require:** status `exited`, application exit code **0**, and `OOMKilled` `false`. Any other exit code fails the shutdown smoke, including 137 from a SIGKILL after the grace period, worker exit code 5 (abnormal) or any unexpected exit.
+   - **Timeouts:** every subprocess call has its own timeout, sized above the wait it contains: about 240 s for `up`; 60 s for each `exec` or `inspect`; 90 s for `stop`; 60 s for `logs`; 120 s for `down`. Every HTTP request has a 10 s socket timeout. A poll deadline bounds the polling loop, not an individual hung call, so both kinds of bound apply.
+5. **Diagnostics** (inside the smoke script; on success and failure):
+   - **Capture first:** command output and container logs (`docker compose ps -a`, and the last 200 lines from `migrate`, `api`, `worker` and `postgres`) are captured into memory before anything is displayed.
+     - They are **not** assumed to be privacy-safe JSON: Alembic, dependency or interpreter failures can print ordinary text and tracebacks.
+     - All application data is synthetic, and the disposable database password is not logged by PostgreSQL.
+   - **Redact:** before anything is printed, every captured text is checked for the generated key, and each occurrence is replaced with a fixed marker. This does not rely solely on GitHub masking.
+   - **Never printed:**
+     - HTTP response bodies; only status codes and selected fixed fields, such as `ingestion_state`, are printed;
+     - raw command output, except after redaction;
+     - exception representations; only exception class names are printed.
+   - **Key-in-service-logs check:** on both paths, any occurrence of the key in the captured service logs is a smoke failure. It is reported only as the service name and a count, never the key or the offending line.
+   - **Failure precedence:** the first failure is recorded and decides the script's exit status. Errors during diagnostics are reported as secondary and never replace it.
+6. **Cleanup** (a separate workflow step with `if: always()`):
+   - **Confirm ownership:** the containers, networks and volumes to remove are listed with the Compose project label `com.docker.compose.project=$P`, a name unique to this run and attempt.
+   - **Remove:** then `docker compose -f docker-compose.yml -p "$P" down -v --remove-orphans` (120 s timeout), and `docker image rm "$EG_IMAGE"`. Only this run's resources and tag are removed; nothing outside the project is touched.
+   - **Failure precedence:** cleanup failures are reported without hiding an earlier smoke failure.
+   - **Limit:** losing the runner or a hard cancellation can prevent cleanup from completing. GitHub-hosted runners are discarded after the job.
+
+**Feasibility:** GitHub's `ubuntu-24.04` runners ship Docker Engine and Compose v2. The stack is one slim Python image plus the already-used pgvector image, and every wait is bounded. A few minutes per run is expected, but **this is an estimate, not a measurement**. The job runs separately from the existing jobs.
+
+**What the smoke does not show:** that the Compose stack works locally, an in-flight handler draining in a container, multi-worker behaviour, and production readiness. A passing run is recorded as **CI Compose verification**, separate from local Compose.
+
+**F. Intended files (later implementation)**
+
+- **New:** `Dockerfile`, `.dockerignore`, and `infra/ci/compose_smoke.py` (stdlib only; not part of the distribution).
+- **Changed:** `docker-compose.yml` (adds `migrate`, `api` and `worker`) and `.github/workflows/ci.yml` (adds the `container` job; the existing jobs are unchanged).
+- **Tests:** `tests/test_container_files.py`, a database-independent text check of invariants:
+  - base images pinned by digest;
+  - a non-root `USER`;
+  - `pull_policy: never` and a single `EG_IMAGE` selection for all three application services;
+  - loopback-only host ports;
+  - `migrate` being the only service that runs migrations;
+  - no `EG_DATABASE_URL` or secrets in the `Dockerfile`.
+
+  It **complements**, and does not replace, the effective build-context check in E2.
+- **Documentation:**
+  - an ADR (`docs/decisions/0012-containers.md`) at implementation time, with the verified base-image digests and dates;
+  - the README container section; the plan; the threat model;
+  - `prompts.md`.
+- **No changes to:** application code, migrations, dependencies or `uv.lock`.
+
+**G. Acceptance criteria**
+
+- **Build criteria:**
+  - the image builds in CI from the committed lockfile with `--locked`;
+  - both base images are pinned by digest and recorded with their dates, with the approved Python digest verified;
+  - the runtime user and group are 10001;
+  - the entry points and the offline migration SQL work from the image;
+  - the image contains no `.git`, `.local`, `.env`, tests or uv;
+  - the effective build context matches E2 exactly;
+  - the container-file test passes on Ubuntu and Windows.
+- **Smoke criteria:**
+  - every step in E4 passes in CI within its bounds;
+  - `migrate`, `api` and `worker` run the exact CI-built image ID;
+  - the idle worker exits with application code 0, with no OOM kill;
+  - the private `create-key` capture is never printed, written to disk or uploaded;
+  - the key does not appear in the captured service logs, and is otherwise reported only as a service name and count;
+  - all other diagnostic output is checked and redacted before display;
+  - the PostgreSQL image is pulled only by its approved digest before startup;
+  - cleanup runs whatever the outcome.
+- **Remaining M3 requirements:**
+  - The M3 acceptance criteria carried by M3a–M3e, and the dead-job projection obligation, are verified in CI and on `main` (M3e at `2e605e7`).
+  - What remains: the M3f build and smoke criteria above, then review of overall M3 acceptance. Per the reviewer's decision, a passing CI Compose smoke can satisfy the M3 Compose requirement alongside the other agreed criteria.
+  - No other outstanding M3 criterion was found. Local Compose stays unverified until it actually runs (§10).
+- **Open decisions:** none; the four Prompt 95 decisions are settled above. Two items are implementation-time verifications, not open choices: the official-registry check of both digests, and Docker's actual behaviour for the commands in E. If either contradicts this specification, implementation stops for review.
 
 **M4 – Embeddings, retrieval and corpus**
 - Provider interface, `HashingEmbedder`, Voyage adapter (mocked in CI), RRF search over snapshot revisions, `sample_data/` including the injected variant, ground truth with acceptable and wrong claims, and the retrieval contract suite.
