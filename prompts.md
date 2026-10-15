@@ -15357,3 +15357,177 @@ Return this output plus .local/p110/m4a-commit-incremental.diff to the external 
   is claimed. M4b–M4f and overall M4 acceptance remain pending.
 - Export complete incremental diff from accepted tree to the new commit, excluding
   prompts.md, as UTF-8 without BOM: .local/p110/m4a-commit-incremental.diff.
+
+
+**Prompt 110 outcome (recorded in Prompt 111):** local commit
+82e8e3111ee6bac87eab381c7a99bf8f6e2c7484, parent
+ac395039fa43ef19c8e316d253af639f0e35fe0f, tree
+cb8207911a2fe545d256dd81ebcb7de480efd563. Exactly seven intended paths changed;
+both embedding modules and tests/test_embeddings.py remained byte-identical
+to reviewed tree 6edf253f38d929fb3ace8b16bfa9249275d813c6. Expected noreply
+author/committer; commit body identifies OpenAI Codex assistance, no Claude trailer.
+Reported documentation/status/prefix/link/privacy/scope checks and staged
+Gitleaks passed; full-history Gitleaks scanned 46 commits with no leaks. No
+application tests or builds were repeated. Working tree clean; main/origin/main
+unchanged at 85cb0d6. Incremental export .local/p110/m4a-commit-incremental.diff:
+23,458 bytes, SHA-256 12b716f00530c4b6851834d7f3dd9747d311e30ac07675c3dee1f61aacd4f8cf.
+
+**Reviewer acceptance of Prompt 110:** incremental diff inspected and checksum
+independently matched; accepted, with no new application tests or build run by
+the reviewer. This records the supplied review decision.
+
+## Prompt 111: Publish reviewed M4a feature branch and monitor exact-commit CI
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Scope:** prompt-history commit, feature-branch-only push and CI monitoring.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 111 — Publish only the reviewed M4a feature branch and monitor CI. Do not update main.
+
+Read applicable AGENTS.md instructions, CLAUDE.md and the workflows. Avoid reloading full prompt history or printing diffs.
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/embedding-contracts.
+- HEAD:
+  82e8e3111ee6bac87eab381c7a99bf8f6e2c7484.
+- Parent:
+  ac395039fa43ef19c8e316d253af639f0e35fe0f.
+- Working tree clean.
+- No upstream or remote feat/embedding-contracts branch.
+- Local main and origin/main:
+  85cb0d622a5b49c11439b0b9f67abceaa82edb29.
+- Expected origin and noreply author/committer identity unchanged.
+
+Read fresh remote refs. Confirm remote main is unchanged and an ancestor of HEAD. Stop on material mismatch.
+
+2. Publication preflight
+
+Inspect everything that would become public relative to remote main:
+- ac39503: accepted specification;
+- 82e8e31: reviewed implementation;
+- the history commit authorized below.
+
+Confirm accurate identities/attribution, no unintended private content or secrets, and no tracked local artifacts, backups, bundles, real environment files or build outputs.
+
+Confirm both workflows trigger on this branch and all five jobs remain enabled:
+- Ubuntu verification;
+- Windows verification;
+- PostgreSQL integration with EG_REQUIRE_INTEGRATION=1;
+- container;
+- full-history Gitleaks.
+
+Do not modify source, tests, documentation, dependencies, workflows or configuration.
+
+3. Append prompt history and commit
+
+Modify prompts.md only, append-only:
+- Record the Prompt 110 commit outcome and reported checks.
+- Record the reviewer's acceptance of its incremental diff: inspected and checksum independently matched; no new application tests or build run by the reviewer.
+- Append Prompt 111 verbatim.
+- Add a preflight note with the verified state, publication scope and branch-only authorization.
+
+Keep historical Windows results separate from new CI:
+1479 passed, 205 skipped, including 204 PostgreSQL skips and one POSIX-only signal skip.
+
+Record that local build and installed-wheel verification remained blocked by missing hatchling under the earlier offline/no-install constraints. CI's existing build environment may perform its normal dependency setup; no workflow or lockfile change is authorized.
+
+Do not pre-record publication or CI outcomes.
+
+Check history prefix, private content, git diff --cached --check, staged Gitleaks without suppression and identity.
+
+Commit prompts.md only with subject:
+docs: record M4a branch publication authorization
+
+Use accurate Codex attribution under repository conventions.
+
+Verify parent 82e8e31, only prompts.md changed, and working tree clean. Run full-history Gitleaks before pushing. Stop on a finding without suppression, amend or reset.
+
+4. Publish only this branch
+
+Run directly, preserving Git's exit status:
+
+git push --set-upstream origin refs/heads/feat/embedding-contracts:refs/heads/feat/embedding-contracts
+
+Confirm the remote matches the exact published HEAD. No other branch or tag may be pushed.
+
+5. Monitor exact-commit CI
+
+Monitor push-triggered runs for the published SHA on feat/embedding-contracts for up to 25 minutes.
+
+Report all five jobs separately. Required container configuration, context, build, image, smoke and cleanup steps must execute successfully, not be skipped.
+
+Pay particular attention to:
+- Ubuntu and Windows embedding tests;
+- distribution build;
+- clean installed-wheel checks;
+- container context and runtime checks after adding the embedding modules.
+
+Do not claim an embedding-specific installed-wheel smoke occurred unless the actual checks exercise it. Report exactly what the existing wheel checks establish.
+
+Use existing GitHub access or the public read-only API. Do not install tools or add credentials. Retrieve logs if accessible; otherwise give links and label counts/output unobserved.
+
+If any job fails, is cancelled or remains pending at the limit:
+- report the failing step and accessible evidence;
+- stop without changing files, rerunning workflows or making another push.
+
+Do not claim background polling continues after the task ends.
+
+6. Handoff
+
+Report:
+- history commit SHA, parent and attribution;
+- exact published SHA;
+- push command and exit status;
+- five job conclusions and run/job links;
+- build, wheel and container step conclusions;
+- observed summaries separately from unobserved expectations;
+- final branch/upstream and clean-tree status;
+- confirmation that main remains unchanged.
+
+Do not update documentation after CI in this task. Recording results is a later reviewed task.
+
+No merge, main update, force-push, amend, rebase, tag, branch deletion, local Docker, database contact, provider calls or M4b work.
+
+Return this output only to the external reviewer; no diff attachment is required.
+````
+
+**Prompt 111 preflight note (written before commit/publication; no CI result recorded):**
+- Verified feat/embedding-contracts at 82e8e3111ee6bac87eab381c7a99bf8f6e2c7484,
+  parent ac395039fa43ef19c8e316d253af639f0e35fe0f; clean starting tree; no upstream.
+  Fresh git ls-remote showed remote main unchanged at
+  85cb0d622a5b49c11439b0b9f67abceaa82edb29 and no remote feature branch. Local
+  main/origin/main match that commit, verified as an ancestor of HEAD. Expected
+  origin and effective noreply author/committer identities are unchanged.
+- Publication scope is ac39503 (accepted specification), 82e8e31 (reviewed
+  implementation), plus this prompts.md-only authorization commit. The range
+  contains exactly seven reviewed text paths, no tracked artifacts, backups,
+  bundles, real environment files or build outputs. Both existing commits have
+  noreply identities and accurate Codex attribution. No private-path/key/token
+  pattern matches in added content; staged and full-history secret scans follow.
+- Both workflows trigger on every push without branch/path filters. Ubuntu and
+  Windows verification, PostgreSQL integration with EG_REQUIRE_INTEGRATION=1,
+  container and full-history Gitleaks remain enabled. Container configuration,
+  effective context, build, image, smoke and cleanup steps are present; cleanup
+  has if: always(). No workflow or lockfile changes are authorized.
+- Historical Prompt 109 Windows results remain 1479 passed, 205 skipped:
+  204 PostgreSQL skips and one POSIX-only signal skip; focused checks 126 passed.
+  They are not results for the new publication. Local build and installed-wheel
+  verification remained blocked by missing hatchling under offline/no-install
+  constraints. CI may use its existing normal dependency/build setup.
+- Existing clean-wheel checks import the application/domain package, create the
+  app, run entry-point help, check ingest_revision registration and render offline
+  migration SQL. They do not directly import or exercise the embedding modules;
+  no embedding-specific installed-wheel smoke is claimed in advance.
+- Only prompts.md is modified, append-only. Before committing: verify prefix,
+  private content, cached whitespace, staged Gitleaks without suppression and
+  identity. Use subject docs: record M4a branch publication authorization and
+  identify OpenAI Codex assistance. Verify parent/path/clean tree; full-history
+  Gitleaks must pass before pushing. Stop on any finding without amend/reset.
+- Authorization is only the explicit feature-branch push command above; no other
+  branch or tag. Confirm exact remote SHA, then monitor push runs for that SHA
+  and branch for at most 25 minutes. Stop on failure/cancellation/timeout without
+  fixes, reruns, documentation updates or another push. Main must remain unchanged.
