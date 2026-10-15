@@ -10171,3 +10171,156 @@ Nothing may be pushed or merged.
 - **Application results:** these are from Prompt 81 and were not rerun for these documentation changes.
 - **Checks for this commit:** the documentation, staged-scan and identity checks run after this entry is staged, then the post-commit checks; results are in the session handoff.
 - **Still pending:** PostgreSQL and Linux verification, Compose, M3e–M3f and overall M3 acceptance. Nothing pushed or merged.
+
+**Outcome note for Prompt 82 (recorded in Prompt 83):**
+- **Commit:** `4207cc8a7a481791de6a292a5c5fdb73a09703cd` (`feat: add deterministic document ingestion and fenced chunk storage`) on `feat/document-ingestion`. Its parent is `a3e1546` and its tree `783be90`, with the noreply author and committer identity, and it contains the 31 paths of Prompt 81.
+- **Changes from the accepted tree:** only the six permitted documentation and history paths differ from `4b7519f`.
+- **Post-commit checks:** the full-history Gitleaks scan reported 32 commits scanned and no leaks found; the working tree was clean; `main` and `origin/main` stayed at `6f8ffde`. Nothing was pushed.
+- **Review file:** `.local/p82/m3d-commit-incremental.diff`, from tree `4b7519f` to commit `4207cc8`, excluding `prompts.md`: 45,546 bytes, SHA-256 `99594e143e915e3985ae25be49eb09e4d38ba8f39318be48c85d0989d0ce66c5`.
+- **Review note:** the external reviewer accepted that incremental documentation diff. The reviewer inspected the diff and independently checked its SHA-256, which matched, but did not run the project checks.
+
+## Prompt 83: Publish the reviewed M3d feature branch and observe CI
+
+- **Stage:** Prompt-history commit and publication of `feat/document-ingestion` only (no merge, no `main` update)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 83 is the next unused number after Prompt 82; verified before appending.
+
+````text
+Prompt 83 — Publish the reviewed M3d feature branch and observe CI
+
+Work only inside D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+The reviewer accepts Prompt 82’s incremental documentation diff. Its SHA-256 was independently checked and matches:
+99594e143e915e3985ae25be49eb09e4d38ba8f39318be48c85d0989d0ce66c5
+
+This authorizes a prompt-history commit and publication of feat/document-ingestion only.
+
+Do not merge, update main, force-push, amend, rebase, delete branches, push tags, start Docker, contact a local database or begin M3e.
+
+1. Verify the starting state
+
+Expected:
+- Branch: feat/document-ingestion
+- HEAD:
+  4207cc8a7a481791de6a292a5c5fdb73a09703cd
+- Parent:
+  a3e15465be71893627121dca75be121e48613d49
+- Clean working tree.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Effective author and committer:
+  257921624+mathewmljourney93@users.noreply.github.com
+
+Read fresh remote refs:
+- main must still be:
+  6f8ffded2e5c7b2ed69e37700dc03f20f5e24482
+- feat/document-ingestion should not exist remotely.
+- Remote main must be an ancestor of HEAD.
+- No upstream should already be configured for this branch.
+
+If the state differs, stop and report it without changing anything.
+
+2. Publication preflight
+
+Inspect everything that will become public relative to remote main, including:
+- a3e1546, the accepted specification;
+- 4207cc8, the implementation;
+- the history commit authorized below.
+
+Confirm:
+- expected commit identities use the noreply address;
+- no tracked .local/, environment secrets, backups, bundles or build artifacts;
+- no real credentials or private information in published content;
+- both workflows trigger on this branch;
+- Ubuntu and Windows verification remain enabled;
+- PostgreSQL integration uses EG_REQUIRE_INTEGRATION=1;
+- full-history secret scanning remains enabled.
+
+Do not redesign workflows or install tooling.
+
+3. Prompt-history commit
+
+Only prompts.md may change.
+
+Append:
+- the actual Prompt 82 commit outcome;
+- acceptance of its incremental diff, stating that the reviewer inspected the diff and checked its checksum but did not run project checks;
+- this prompt verbatim under the next unused number, expected 83;
+- a truthful publication-preflight note.
+
+Preserve earlier history byte-for-byte.
+
+Do not pre-record successful pushes or CI results. Keep prior local test results clearly labelled as historical.
+
+Run:
+- private-content check of additions;
+- git diff --cached --check;
+- staged Gitleaks scan.
+
+Commit with subject:
+docs: record M3d branch publication authorization
+
+Preserve the existing co-author convention.
+
+Verify only prompts.md changed, then run the full-history Gitleaks scan before pushing.
+
+Do not rerun application checks: no application content is changing.
+
+4. Publish only the feature branch
+
+Use:
+git push --set-upstream origin refs/heads/feat/document-ingestion:refs/heads/feat/document-ingestion
+
+Run Git directly and report its actual exit status. Do not pipe it through commands that mask failures.
+
+Confirm the remote feature ref equals the exact new local HEAD and remote main is unchanged.
+
+If the push fails, inspect the result and remote state. Do not change authentication, configuration or publication scope automatically.
+
+5. Observe CI for the exact published SHA
+
+Monitor the push-triggered runs for at most 20 minutes:
+- Ubuntu verification;
+- Windows verification;
+- PostgreSQL integration;
+- full-history Gitleaks.
+
+Use existing available read-only access. Do not install gh or request broader credentials solely to obtain logs.
+
+Use bounded polling, avoiding repeated verbose output.
+
+If any check fails, stop and report the failed job, step and available diagnostics. Do not edit or retry implementation automatically.
+
+If checks remain pending at the limit, report their links and status.
+
+Where logs are accessible, report actual pytest summaries. Otherwise distinguish observed successful job/step conclusions from expected test counts.
+
+The 178 integration tests are an expectation until observed. Do not infer or fabricate their exact count.
+
+Do not merge or update main even if every check passes.
+
+6. Concise handoff
+
+Report:
+- history commit SHA and parent;
+- exact published SHA;
+- push result and remote refs;
+- workflow/job links and conclusions;
+- observed test summaries, or the precise log-access limitation;
+- checks actually run;
+- final Git state and remaining limitations.
+
+Only prompts.md should have changed, so no diff file is needed. Do not print a diff.
+
+End with:
+“Return this output only to the external reviewer; no diff attachment is required.”
+````
+
+**Publication-preflight note (written before the history commit and the push; neither result is recorded here):**
+- **Starting state verified:** branch `feat/document-ingestion` at `4207cc8` with parent `a3e1546`, a clean tree, the expected origin and the noreply identity. A fresh `git ls-remote` showed remote `main` at `6f8ffde`, an ancestor of HEAD, and no remote `feat/document-ingestion`. No upstream was configured.
+- **What will become public:** `a3e1546` (the accepted M3d specification), `4207cc8` (the implementation) and this history commit. Every commit in `6f8ffde..HEAD` has the noreply author and committer.
+- **Tracked files:** no `.local/`, environment secret, backup, bundle, wheel, sdist or other build artifact. The only environment-like path is the long-standing placeholder `.env.example`, unchanged from `main`.
+- **Content:** the search of lines added since `main` found no credential patterns, user paths or private email addresses.
+- **Workflows:** both run on every push. CI verifies on `ubuntu-24.04` and `windows-2025`, and its PostgreSQL integration job sets `EG_REQUIRE_INTEGRATION: "1"`. The secret scan checks out the full history (`fetch-depth: 0`) and runs Gitleaks over it. No workflow was changed in this prompt.
+- **Historical local results (Prompt 81, Windows, no database):** 1019 passed and 179 skipped, the skips being 178 PostgreSQL tests and 1 POSIX-only signal test. No application check was rerun in this prompt, and no CI result for M3d exists yet. The 178 integration tests are an expectation until CI reports them.
+- **Not done:** no merge, `main` update, force-push, tag, Docker or database contact.
