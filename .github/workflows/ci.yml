@@ -116,3 +116,45 @@ jobs:
 
       - name: Run integration tests
         run: uv run --locked pytest -m integration
+
+  container:
+    # M3f (ADR-0012): image build, effective build-context check, image checks and a Compose smoke
+    # test. Linux containers need an Ubuntu runner. Development stack only; nothing is published.
+    name: container (ubuntu-24.04, image build and Compose smoke)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    env:
+      # One selection for every step: the same Compose file, project name and image tag.
+      EG_COMPOSE_PROJECT: eg-ci-${{ github.run_id }}-${{ github.run_attempt }}
+      EG_IMAGE: evidenceguard:ci-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate the rendered Compose configuration
+        run: python3 infra/ci/container_ci.py config
+
+      - name: Verify the effective build context
+        run: python3 infra/ci/container_ci.py context
+
+      - name: Build the application image
+        run: |
+          set -euo pipefail
+          timeout 900 docker compose -f docker-compose.yml -p "$EG_COMPOSE_PROJECT" build api
+          echo "EG_IMAGE_ID=$(docker image inspect --format '{{.Id}}' "$EG_IMAGE")" >> "$GITHUB_ENV"
+
+      - name: Check the image
+        run: python3 infra/ci/container_ci.py image
+
+      - name: Compose smoke test
+        run: python3 infra/ci/container_ci.py smoke
+
+      - name: Clean up this run's Compose project and image
+        # Runs whatever the outcome. Losing the runner or a hard cancellation can still prevent it.
+        if: always()
+        run: python3 infra/ci/container_ci.py cleanup

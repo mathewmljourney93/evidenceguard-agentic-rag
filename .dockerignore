@@ -1,0 +1,36 @@
+# Build-context allowlist for the M3f image (ADR-0012). The last matching line decides, and only
+# "**" patterns match at any depth. CI verifies the effective context with planted fixtures
+# (infra/ci/container_ci.py context).
+
+# 1. Exclude everything.
+*
+
+# 2. Include only what the image build needs.
+!pyproject.toml
+!uv.lock
+!README.md
+!alembic.ini
+!apps/
+!packages/
+
+# 3. Exclude again, at any depth inside the included directories. No exceptions.
+**/.env
+**/.env.*
+**/.git
+**/.local
+**/.venv
+**/venv
+**/__pycache__
+**/*.py[cod]
+**/.mypy_cache
+**/.ruff_cache
+**/.pytest_cache
+**/dist
+**/build
+**/*.egg-info
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/id_rsa*
+**/*.log

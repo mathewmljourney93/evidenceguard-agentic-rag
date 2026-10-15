@@ -172,6 +172,22 @@ Implemented in Prompt 89, corrected in Prompt 90, accepted at external review (P
 
 **Limits** (ADR-0011): the reader depends on the verified behaviour of `python-multipart` 0.0.32, which an upgrade must re-verify. Per-byte header feeding costs CPU bounded by the header caps. The upload response is an observation that a worker may change at once. `stalled` revisions have no operator retry in v1.
 
+## Containers (M3f, accepted at review, committed locally, container CI pending)
+
+Implemented in Prompt 98, corrected in Prompt 99 and accepted at external review for a local commit on `feat/container-stack` (Prompt 100; [ADR-0012](decisions/0012-containers.md)); nothing is pushed or merged. The CI container job (image build, effective build-context check, image checks, Compose smoke and cleanup) **has not run**, so none of these mitigations is yet verified in a container, and local Compose is unverified. It is a development stack only.
+
+| Threat | Mitigation |
+|---|---|
+| Secrets or artifacts entering the image | The build context is an allowlist with recursive re-exclusions (`.env*`, `.git`, `.local`, virtual environments, caches, build outputs, keys). CI is to verify the effective context with planted nested fixtures. The runtime image holds only the virtual environment and `alembic.ini`, with no build arguments or baked-in configuration. |
+| A substituted or unexpected image | Base images and the database image are pinned by digest. Application services never pull (`pull_policy: never`), and CI is to check that every application container runs the CI-built image ID. |
+| Excess privilege in containers | UID/GID 10001; root-owned files the runtime user cannot modify; a read-only root filesystem with a `/tmp` tmpfs; all capabilities dropped; `no-new-privileges`; an init process. |
+| Exposure on the network | Host ports bind `127.0.0.1` only (API 8000, database 5433). |
+| Migration races | Only the one-shot `migrate` service migrates; the API and worker start after it succeeds. |
+| The CI API key leaking into logs | The key stays in memory. Every key-shaped string from `create-key` is protected before its status or format is checked, and its raw output is never shown. Captured output is redacted before display, including anything key-shaped. Unavailable service logs fail the smoke rather than passing the key check, and a key found in service logs fails it (reported as a count). GitHub masking is only an extra layer. |
+| Cleanup removing unrelated resources | Cleanup removes only resources labelled with this run's Compose project and this run's image tag, after checking that both name the same run and attempt. It refuses `down` when ownership cannot be verified, and reports success only after a successful post-cleanup verification. |
+
+**Limits** (ADR-0012): the database credentials are disposable and public. Stopping the worker has an external 60 s budget, not a guaranteed shutdown bound (ADR-0008). The smoke stops an idle worker only. Cleanup can be prevented by runner loss. The uv builder-tool image is used under a narrowly approved exception to the two-week age policy, for its exact digest only (no runtime uv; no change to the Python base or the general policy). The exception does not claim age compliance or general safety. There is no production deployment.
+
 ## Not implemented yet
 
 - **Rate limiting, lockout, key expiry and usage auditing** for API keys. Direct domain callers (tests, later the worker) still construct `ActorContext` themselves and are trusted.
@@ -185,7 +201,6 @@ Implemented in Prompt 89, corrected in Prompt 90, accepted at external review (P
 - **Destructive integration tests.** The PostgreSQL tests drop the `public` schema of `EG_TEST_DATABASE_URL`. Before any engine exists, they refuse a missing or invalid URL, a database name without the `_test` suffix, an invalid `EG_DATABASE_URL`, or a target with the same host, port and database as `EG_DATABASE_URL` (ignoring credentials, spelling and loopback aliases). URL comparison cannot detect two different DNS names for one server, so the test database must be explicitly disposable. In CI for commit `9ad7dae`, the guard accepted the disposable service database before the [integration tests](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070229) ran against it. Its refusal paths are covered by database-independent tests on Ubuntu and Windows. Compose has never been run.
 - **Atomic, concurrent-safe transitions.** The report transitions are pure functions. Two simultaneous requests could both pass validation; persistence must serialize them (for example with a row lock or compare-and-set on revision and hash). The M3a job fence (above) provides this pattern for jobs; reports do not use it yet.
 - **Upload limits and untrusted-file handling** (M3e): implemented, reviewed, **verified in CI and on `main`** (see *Document API* above).
-- **Containers** (M3f): a development image and Compose API, worker and migration services are specified in the [plan](plan.md) (**specification accepted at review; implementation pending**): a non-root, read-only runtime with an allowlisted build context, loopback-only host ports, no baked-in secrets, and a single migration step. Nothing is implemented, the required CI checks and Compose smoke have not run, local Compose is unverified, and production deployment is out of scope.
 - **Provenance checks:** that a cited chunk was actually retrieved for the review and that the quote occurs in it (M5).
 - **Secret handling beyond the database URL and API keys.** The database URL (M2a) and API keys (M2b) are covered above. Other secrets, such as model-provider keys, arrive with later milestones. Request logging (M1c) writes only allowlisted fields; see ADR-0002.
 

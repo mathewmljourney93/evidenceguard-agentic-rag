@@ -12953,3 +12953,623 @@ End with:
   ADR-0011 is byte-identical to the accepted tree, and the historical M3e evidence is unchanged.
 - **Checks for this commit:** run after this entry is staged; results are in the session handoff. They are the staged-path, accepted-tree comparison, ADR-0011 identity, prompt-history prefix, link, private-content, `git diff --cached --check`, staged Gitleaks and identity checks, and after the commit the full-history Gitleaks scan. No application tests, builds or Docker execution.
 - **Not done:** no container implementation, no Docker or database contact, nothing pushed or merged.
+
+**Commit outcome (recorded in Prompt 98):**
+- **Commit:** `b7c9ea28808cfa54a66d55b2ab63f80016594c03` ("docs: record M3e main results and accepted M3f container specification"), parent `2e605e7`, tree `71ca97ddbf14b7c8df80bdd2eab5b0a70cf4ee64`, on the local branch `docs/m3f-container-spec`, with the noreply author and committer identity.
+- **Checks reported in the Prompt 97 handoff:**
+  - ADR-0011 byte-identical to the accepted tree;
+  - staged Gitleaks: no leaks;
+  - full-history Gitleaks after the commit: 39 commits scanned, no leaks found;
+  - working tree clean; `main` and `origin/main` unchanged at `2e605e7`.
+- **Diff:** `.local/p97/m3f-spec-acceptance.diff`, 19,848 bytes, SHA-256 `af4c64baffd32d5308ddd694e7d3e989b7b37832a879f78a54e67eefb0c6f77e`.
+- Nothing was pushed or merged.
+
+**Review note (recorded in Prompt 98):**
+- **Accepted:** the external reviewer accepted the Prompt 97 final diff and independently matched its checksum.
+- **How it was reviewed:** the reviewer ran no project or Docker checks.
+- **Next:** Prompt 98 authorizes implementing M3f on top of the local specification commit, staged and uncommitted for review.
+
+## Prompt 98: Implement the accepted M3f container specification
+
+- **Stage:** M3f implementation on branch `feat/container-stack`, created from `b7c9ea2`; staged and uncommitted for external review (no commit, push or merge)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 98 is the next unused number after Prompt 97; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 98: Implement the accepted M3f container specification
+
+This is a fresh Claude session continuing EvidenceGuard. Implement M3f from the accepted specification in docs/plan.md. Leave the implementation staged and uncommitted for external review.
+
+The specification commit is local only. You are authorized to implement directly on top of it; publishing or merging it separately is unnecessary.
+
+No commit, push, merge, main update, Docker installation, local Docker execution or database contact is authorized. Container execution will be verified in CI after a later authorized publication.
+
+1. Recover context and verify state
+
+Work in D:\Claude\evidenceguard_agentic_rag.
+
+Read:
+- CLAUDE.md.
+- The accepted M3f specification in docs/plan.md.
+- The relevant packaging, Compose, CI, CLI and database configuration.
+- ADR-0008’s shutdown limitations.
+
+Read only relevant prompt-history entries and its tail, not the entire prompts.md file.
+
+Expected starting state:
+- Branch: docs/m3f-container-spec.
+- HEAD: b7c9ea28808cfa54a66d55b2ab63f80016594c03.
+- Parent: 2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f.
+- Working tree clean.
+- Local main and origin/main:
+  2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Effective author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>.
+
+Stop on a material mismatch without overwriting work.
+
+Create feat/container-stack from the verified HEAD. Inspect before proceeding if that branch already exists.
+
+2. Implement the accepted specification
+
+The detailed M3f specification in docs/plan.md is authoritative, including the Prompt 96–97 corrections.
+
+Implement:
+- Dockerfile.
+- .dockerignore.
+- Compose migration, API and worker services.
+- CI container build, effective-context verification, image checks and Compose smoke.
+- The supporting stdlib-only scripts and meaningful tests.
+- ADR-0012 and accurate usage/status documentation.
+
+Preserve existing application behaviour, migrations, dependencies and uv.lock. Keep the existing CI jobs unchanged while adding the container job.
+
+Do not redesign authentication, ingestion or worker semantics.
+
+3. Image and build context
+
+Use the approved two-stage image design and locked, non-editable installation.
+
+Verify the proposed Python and uv digests against their official registries through read-only metadata requests. Do not pull images locally.
+
+Use the approved Python 3.12.14-slim-trixie digest. No dependency-age exception or substitute image is authorized. Report a concrete blocker if the approved digest cannot be verified.
+
+Preserve:
+- One runtime image for all roles.
+- Non-root UID/GID 10001.
+- Root-owned runtime files.
+- No uv, source tree, tests, Git metadata or secrets in the runtime.
+- Required package data and migration configuration.
+- Exec-form process commands.
+
+Implement the allowlisted build context and recursive exclusions exactly enough to preserve required sources while excluding nested secrets and artifacts.
+
+The required CI effective-context check must exercise Docker’s actual ignore behaviour using synthetic nested fixtures in an isolated archive copy. Text assertions alone are insufficient.
+
+4. Compose and image identity
+
+Implement the shared EG_IMAGE selection with a development default and pull_policy: never for application services.
+
+Preserve the existing pinned PostgreSQL image and development credentials.
+
+Implement:
+- Database health gating.
+- One-shot migrate service.
+- API and worker depending on successful migration.
+- Loopback-only host port publication.
+- Read-only application filesystems, tmpfs, dropped capabilities, no-new-privileges and init.
+- API readiness health check.
+- Worker SIGTERM and 60-second external stop budget.
+- No restart policy.
+
+Do not claim the worker has a total shutdown deadline or add a statement timeout.
+
+CI must explicitly pull the approved database image by digest before startup. Start the stack without rebuilding or pulling application images.
+
+Verify migrate, api and worker use the recorded CI-built image ID.
+
+5. CI smoke and diagnostics
+
+Implement the accepted end-to-end smoke:
+- Startup with bounded waits.
+- Seed synthetic accounts.
+- Capture a generated API key privately in memory.
+- Create a vendor and upload synthetic Markdown.
+- Observe production-worker ingestion.
+- Verify active revision and verified chunks.
+- Verify duplicate upload returns 200.
+- Stop the idle worker and inspect actual container state: exited, code 0, no OOM kill.
+
+Do not present a successful stop command alone as proof of graceful exit.
+
+Use per-operation subprocess/network timeouts as well as polling deadlines.
+
+Preserve the agreed privacy handling:
+- Never publish the private create-key capture.
+- Check service logs for the generated key.
+- Capture and redact diagnostics before printing.
+- Do not rely solely on GitHub masking.
+- Avoid raw HTTP bodies and exception representations.
+- Preserve the first failure if diagnostics or cleanup also fail.
+
+Use a unique project/image selection per CI run and attempt. Cleanup must be scoped to owned resources and run in an always step. Acknowledge hard-cancellation limitations.
+
+Do not execute the smoke locally.
+
+6. Tests and local verification
+
+Add focused tests for meaningful container/configuration invariants and the smoke helper’s error handling, timeout handling and redaction where these can run without Docker.
+
+Avoid tests that merely restate implementation strings when a stronger behavioural check is practical.
+
+Run appropriate local checks:
+- Locked environment synchronization.
+- Ruff formatting and lint.
+- Strict Mypy using the repository’s established scope.
+- Relevant new tests.
+- One final full database-independent suite, reporting actual skips.
+- Build and isolated installed-wheel checks if required by repository policy or changes.
+- git diff --cached --check.
+- Staged Gitleaks and private-content/artifact checks.
+
+Do not repeatedly rerun unchanged checks without a reason.
+
+Do not claim image builds, Compose operation or Linux/container verification passed locally. Those remain pending CI.
+
+7. Documentation and prompt history
+
+Add docs/decisions/0012-containers.md with:
+- Verified image identities and sources.
+- Build and startup design.
+- CI verification scope.
+- Privacy and shutdown limitations.
+- Development-only scope.
+
+Update README.md, docs/plan.md and docs/threat-model.md accurately:
+- Implementation staged, awaiting review.
+- Container build and CI Compose verification pending.
+- Local Compose unverified.
+- Overall M3 acceptance pending.
+
+Include usable developer commands, respecting the project’s Windows environment. Do not imply those commands were executed.
+
+Preserve earlier prompts.md bytes. Append:
+- Prompt 97’s reported local commit outcome.
+- The reviewer’s acceptance of its final diff and independently matched checksum; no project or Docker checks run by the reviewer.
+- This prompt verbatim.
+- A truthful outcome note.
+
+Public commit references in your own notes should be inline and backticked. Do not add scanner suppressions.
+
+8. Handoff
+
+Stage only the intended implementation, tests and documentation. Leave everything uncommitted.
+
+Export the COMPLETE staged diff against HEAD, excluding prompts.md, directly from Git to:
+
+.local/p98/m3f-implementation.diff
+
+Use UTF-8 without a BOM. Do not print the diff in chat.
+
+Report:
+- What was implemented and important decisions.
+- Official image-verification sources and results.
+- Local commands and actual results.
+- Anything differing from the accepted specification.
+- Container checks written but not executed.
+- Branch, HEAD, staged tree, staged paths and working-tree status.
+- Diff path, baseline, final staged tree, byte size and SHA-256.
+
+Keep this new session for implementation and its review corrections. Do not recommend restarting after one or two prompts.
+
+End with:
+“Return this output plus .local/p98/m3f-implementation.diff to the external reviewer.”
+````
+
+**Outcome note (written before staging; implementation awaiting external review):**
+- **Starting state verified:**
+  - branch `docs/m3f-container-spec` at `b7c9ea2` (parent `2e605e7`), working tree clean;
+  - `main` and `origin/main` at `2e605e7`; origin and the noreply identity as expected.
+
+  Branch `feat/container-stack` was created from `b7c9ea2`.
+- **Implemented (staged, unreviewed):**
+  - `Dockerfile` (two stages, locked non-editable install, UID/GID 10001, root-owned runtime files, exec-form command);
+  - `.dockerignore` (allowlist plus recursive re-exclusions);
+  - `docker-compose.yml` (`migrate`, `api` and `worker` beside the unchanged `postgres`; shared `EG_IMAGE` selection with `pull_policy: never`);
+  - the CI `container` job;
+  - `infra/ci/container_ci.py` (stdlib-only `config`, `context`, `image`, `smoke` and `cleanup` subcommands);
+  - `tests/test_container_ci.py` and `tests/test_container_files.py`;
+  - ADR-0012, and status and usage documentation.
+
+  No application code, migration, dependency or `uv.lock` changed. `pyproject.toml` changed only to add the CI helper to the strict mypy scope.
+- **Image verification** (read-only registry metadata, nothing pulled):
+  - The approved Python digest `f77ac9e…` is what `3.12.14-slim-trixie` resolves to; its `linux/amd64` image configuration was created on 2026-09-19, which meets the age policy.
+  - The approved uv digest `cdc6093…` is what `0.13.0` resolves to. But uv 0.13.0 and its image date from 2026-10-09, which is **below the two-week threshold**. It is recorded as an open review item in ADR-0012; no exception or substitute was chosen.
+- **Differences from the specification:**
+  - one helper script with subcommands, instead of `compose_smoke.py` alone;
+  - an added rendered-configuration (`config`) check;
+  - the effective-context listing uses a `FROM scratch` export instead of a listing on the Python base;
+  - diagnostics are displayed only on failure, while the key check runs on both paths;
+  - the CI helper was added to the mypy scope.
+- **Checks actually run in this session (Windows, local):**
+  - `uv sync --locked`, `ruff format --check .`, `ruff check .` and `mypy` (104 source files): passed;
+  - full suite: `1337 passed, 205 skipped` (204 PostgreSQL skips plus one POSIX-only signal skip);
+  - `uv build`: the wheel's 72 entries contain no `infra/`, `tests/` or `Dockerfile` content.
+
+  The staged-diff, whitespace, Gitleaks and artifact checks run after this entry is staged; their results are in the session handoff.
+- **Written but not executed:** the image build, the effective build-context check, the image checks and the Compose smoke. Docker was not installed or run, and no database was contacted.
+- **Pending:** external review, the uv age decision, the CI container verification, local Compose and overall M3 acceptance.
+- **Not done:** nothing committed, pushed or merged.
+
+**Review note (recorded in Prompt 99):**
+- **How it was reviewed:** the external reviewer inspected the complete Prompt 98 diff (`.local/p98/m3f-implementation.diff`) and independently matched its SHA-256. The reviewer ran isolated probes of the CI helper, not Docker or the project suite.
+- **Not accepted yet.** Reproduced helper failures:
+  - **Service-log verification failed open:** with otherwise successful smoke steps, `Smoke.run` returned 0 when every `logs` command exited nonzero, and also when they timed out. `diagnostics()` ignored log return codes, and diagnostic errors never became a primary failure.
+  - **Credential exposure before validation:** when `create-key` printed a valid key on stdout, echoed it on stderr and exited nonzero, `create_key` stored stderr for diagnostics but raised before registering the key for redaction. Failure diagnostics then printed the plaintext key.
+  - **Cleanup ignored failed ownership checks:** when every label-filtered resource listing exited nonzero, `cleanup` still ran `compose down` and returned 0.
+- **Approved exception:** the exact uv 0.13.0 builder-tool image digest already selected in the specification and used by CI, despite its six-day age at implementation. The scope is that pinned digest only:
+  - no floating tag or replacement digest;
+  - no uv binary in the runtime image;
+  - no application dependency or lockfile change;
+  - no exception for the Python base image, and no broad dependency-age policy change.
+
+## Prompt 99: Correct M3f CI failure handling and record the uv exception
+
+- **Stage:** Correction of the staged M3f implementation on `feat/container-stack`; staged and uncommitted for review (no commit, push or merge)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 99 is the next unused number after Prompt 98; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 99: Correct M3f CI failure handling and record the uv exception
+
+Correct the reviewed M3f implementation. Leave everything staged and uncommitted.
+
+No commit, push, merge, main update, Docker installation/execution or database contact is authorized.
+
+1. Verify and record the baseline
+
+Expected:
+- Branch: feat/container-stack.
+- HEAD: b7c9ea28808cfa54a66d55b2ab63f80016594c03.
+- Staged tree: dad3438846863ad6d01db447e13a88de4b6980be.
+- The same 13 staged paths reported in Prompt 98.
+- Nothing unstaged or untracked.
+- Local main and origin/main unchanged at 2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f.
+- Origin and noreply identity unchanged.
+
+Record the pre-edit staged tree under .local/p99/. Stop on a material mismatch without overwriting work.
+
+2. Service-log verification must fail closed
+
+The reviewer reproduced:
+- With successful smoke steps but every logs command returning a nonzero status, Smoke.run returns 0.
+- With successful smoke steps but logs commands timing out, it also returns 0.
+
+diagnostics() ignores log-command return codes, and diagnostic errors never become a primary failure when the main steps succeeded.
+
+Correct this:
+- Successful retrieval of each required service’s logs is part of smoke acceptance.
+- Nonzero status, timeout or retrieval exception must fail an otherwise successful smoke.
+- A legitimate empty log from a successful command is permitted.
+- If an earlier step already failed, retain that primary failure and report log failures as secondary.
+- Never claim the key-in-service-logs check passed when the logs were unavailable.
+- Preserve safe diagnostics and redaction.
+
+Add regression tests for nonzero status, timeout and unexpected retrieval exceptions, both with and without an earlier failure.
+
+3. Protect credentials before create-key success is validated
+
+The reviewer reproduced:
+- create-key returns a valid key on stdout, echoes it on stderr, and exits nonzero.
+- create_key stores stderr for diagnostics, but raises before registering the key for redaction.
+- Failure diagnostics then print the plaintext key.
+
+Correct credential handling on every create-key outcome:
+- Treat its stdout and stderr as private until safely processed.
+- Recognizable credential material must be protected before any return-code or format error can trigger diagnostics.
+- Never publish raw failed-command stdout/stderr.
+- If output cannot be parsed safely, report a fixed failure and withhold potentially sensitive diagnostics.
+- Do not depend on GitHub masking to cover this failure path.
+- Continue protecting service logs if the command produced a recognizable key before failing.
+
+Add tests for:
+- Nonzero exit with a valid key on stdout and stderr.
+- Zero exit with malformed output containing a recognizable key.
+- Failure before a key can be safely recovered.
+- No plaintext credential in emitted diagnostic output.
+- Existing successful key creation and masking still work.
+
+Do not print the probe keys or failing raw output in the handoff.
+
+4. Cleanup must respect failed ownership verification
+
+The reviewer reproduced:
+- All label-filtered resource listings return nonzero.
+- cleanup still runs compose down and returns 0.
+
+Correct this:
+- Check every ownership-listing command’s return status.
+- Distinguish a successful empty inventory from an unavailable inventory.
+- If ownership verification fails, refuse the destructive operation that depends on it and return failure.
+- Do not convert inspection errors into “nothing exists”.
+- Check post-cleanup listing failures too; do not report successful cleanup without verification.
+- Validate that project and image selections identify the same run and attempt.
+- Keep removal scoped to this project and image tag.
+- Preserve an earlier workflow failure while separately reporting cleanup failure.
+
+Add tests showing that failed ownership checks prevent compose down, and that verification failures cannot produce cleanup: ok.
+
+5. Record the narrowly approved uv exception
+
+The external reviewer approves the exact uv 0.13.0 image digest already selected in the specification and used by CI, despite its reported six-day age at implementation.
+
+Scope:
+- Only the pinned uv builder-tool image.
+- No floating tag or replacement digest.
+- No uv binary in the runtime image.
+- No application dependency or lockfile changes.
+- No exception for the Python base image.
+- No broad dependency-age policy change.
+
+Record the exception and rationale in ADR-0012, the plan and relevant threat-model wording. Replace the unresolved-decision wording.
+
+The reason is consistency with the existing CI toolchain and the explicitly reviewed digest. Do not claim age-policy compliance or general safety from this exception.
+
+6. Preserve scope and verify
+
+Keep application code, migrations, uv.lock and runtime behaviour unchanged.
+
+Demonstrate the new regression tests failing against the previously staged helper, then restore the corrections and verify file identity.
+
+Run:
+- Focused helper tests.
+- Ruff formatting and lint.
+- Strict Mypy.
+- One final full database-independent suite, with actual skip reasons.
+- git diff --cached --check.
+- Staged Gitleaks and private-content/artifact checks.
+
+No rebuild or wheel check is needed if only CI tooling, tests and documentation changed. Explain any additional verification that is necessary.
+
+Do not run Docker or claim the container checks have executed.
+
+7. Documentation and prompt history
+
+Update only relevant statements to describe the corrected behaviour and approved exception.
+
+Keep M3f implementation review and container verification pending. Overall M3 acceptance and local Compose verification remain pending.
+
+Preserve earlier prompts.md bytes. Append:
+- A reviewer note: the complete Prompt 98 diff was inspected and its checksum independently matched.
+- The three reproduced helper failures.
+- The reviewer ran isolated helper probes, not Docker or the project suite.
+- The narrowly approved uv exception.
+- This prompt verbatim.
+- A truthful outcome note.
+
+8. Review handoff
+
+Export the COMPLETE incremental diff against staged tree
+dad3438846863ad6d01db447e13a88de4b6980be,
+excluding prompts.md, directly from Git to:
+
+.local/p99/m3f-corrections.diff
+
+Use UTF-8 without a BOM. Do not print the diff in chat.
+
+Report:
+- Corrections and regression evidence.
+- Actual verification commands/results.
+- Files changed and unchanged scope.
+- Branch, HEAD, final staged tree and Git status.
+- Diff path, baseline, final tree, byte size and SHA-256.
+- Remaining limitations.
+
+Keep the current Claude session.
+
+End with:
+“Return this output plus .local/p99/m3f-corrections.diff to the external reviewer.”
+````
+
+**Outcome note (corrections staged; implementation awaiting external review):**
+- **Starting state verified:**
+  - branch `feat/container-stack`, HEAD `b7c9ea2`;
+  - staged tree `dad3438846863ad6d01db447e13a88de4b6980be` with the 13 Prompt 98 paths; nothing unstaged or untracked;
+  - `main` and `origin/main` at `2e605e7`; origin and identity unchanged.
+
+  The baseline tree and the staged helper are recorded under `.local/p99/`.
+- **Service logs fail closed:** retrieving every service's logs is now part of smoke acceptance. A nonzero status, a timeout or any retrieval error fails an otherwise successful smoke. After an earlier failure, it is reported as secondary. The key check is reported as not performed for unavailable logs, never as passed. Empty logs from a successful command are accepted.
+- **Credentials protected before validation:**
+  - Both `create-key` streams are private. Every key-shaped string in either is registered for redaction, service-log checks and masking before the exit status or format is checked. The command's raw output is never kept for display.
+  - Redaction also replaces any unregistered key-shaped string.
+  - A failure before any key is recoverable reports a fixed message.
+- **Cleanup respects ownership:**
+  - Every inventory listing's exit status is checked, and an unavailable inventory is never treated as empty. A failed ownership check refuses `compose down` and fails cleanup. A failed post-cleanup verification also fails it, so cleanup reports `ok` only after successful verification.
+  - The project and image must name the same run and attempt.
+  - The image tag is found with `docker image ls`, which distinguishes an absent tag from an unavailable inventory.
+- **uv exception recorded** in ADR-0012, the plan and the threat model, for the exact builder-tool digest only, replacing the open-decision wording.
+- **Regression demonstration:** with the Prompt 98 helper temporarily restored from the staged blob, 22 of the 26 new tests failed: every log, credential and cleanup failure the reviewer reproduced. The other 4 confirm unchanged correct behaviour. The corrected helper was restored, and its SHA-256 matched the saved copy.
+- **Checks actually run in this session (Windows, local):**
+  - `ruff format --check .`, `ruff check .` and `mypy` (104 source files): passed;
+  - helper and file tests: `103 passed`;
+  - full suite: `1363 passed, 205 skipped` (204 PostgreSQL skips plus one POSIX-only signal skip).
+
+  No rebuild or wheel check: only CI tooling, tests and documentation changed. The staged-diff, whitespace, Gitleaks and artifact checks run after this entry is staged; their results are in the session handoff.
+- **Not executed:** the image build and all container checks remain pending CI. Docker was not run, and no database was contacted.
+- **Pending:** external review, CI container verification, local Compose and overall M3 acceptance.
+- **Not done:** nothing committed, pushed or merged.
+
+**Acceptance note (recorded in Prompt 100):**
+- **Accepted:** the external reviewer accepted the Prompt 98 implementation and the Prompt 99 corrections for a local commit.
+- **What the reviewer inspected:** both diffs (`.local/p98/m3f-implementation.diff` and `.local/p99/m3f-corrections.diff`), independently matching their reported SHA-256 checksums.
+- **What the reviewer probed:** the earlier helper failures were reproduced in isolation, and the corrected helper was checked with isolated probes:
+  - unavailable service logs, by nonzero exit or timeout, fail the smoke;
+  - failed `create-key` output does not expose the credential in diagnostics, apart from the intentional GitHub `::add-mask::` workflow command;
+  - a failed cleanup inventory prevents `compose down` and fails cleanup.
+- **Not run by the reviewer:** the project suite, the new pytest regression suite or Docker.
+- **Basis:** acceptance also relies on the reported Windows checks and on the regression comparison, in which 22 new tests failed and 4 passed against the Prompt 98 helper.
+- **Still pending:** actual container execution, CI for the current version on PostgreSQL and Linux, local Compose and overall M3 acceptance.
+
+## Prompt 100: Commit the reviewed M3f implementation locally
+
+- **Stage:** Acceptance wording and a local commit on branch `feat/container-stack` (no push or merge)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 100 is the next unused number after Prompt 99; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 100 — Commit the reviewed M3f implementation locally. Do not push or merge.
+
+Read CLAUDE.md and the relevant current status sections. Avoid reloading the full prompt history or printing diffs in chat.
+
+Authorization
+Commit the reviewed Prompt 98 implementation plus the Prompt 99 corrections locally, with narrowly scoped acceptance wording and prompt-history additions. No publication is authorized.
+
+1. Verify the starting state before editing
+
+Expected:
+- Branch: feat/container-stack.
+- HEAD: b7c9ea28808cfa54a66d55b2ab63f80016594c03.
+- Staged tree: 50da664aec976822b134024d8de401dcd5869b98.
+- Exactly these 13 paths staged:
+  .dockerignore
+  Dockerfile
+  .github/workflows/ci.yml
+  README.md
+  docker-compose.yml
+  docs/decisions/0012-containers.md
+  docs/plan.md
+  docs/threat-model.md
+  infra/ci/container_ci.py
+  prompts.md
+  pyproject.toml
+  tests/test_container_ci.py
+  tests/test_container_files.py
+- Nothing unstaged or untracked.
+- Local main and origin/main:
+  2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Effective author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>.
+
+If the state differs materially, stop and report the mismatch without altering it. Record the accepted staged tree under .local/p100/.
+
+2. Preserve the reviewed implementation
+
+Do not change application code, CI tooling, tests, Dockerfile, .dockerignore, Compose configuration, workflows, dependencies, lockfile or tool settings.
+
+Only these files may change relative to the accepted staged tree:
+- README.md
+- docs/decisions/0012-containers.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Make only narrow status edits in the four documents:
+- M3f is accepted at external review for a local commit.
+- Container execution and CI verification remain pending.
+- No image build, effective-context check, image check, Compose smoke or real Docker cleanup has run.
+- Historical local Windows results are 1363 passed and 205 skipped: 204 PostgreSQL skips and one POSIX-only signal skip.
+- The focused helper/file checks reported 103 passed.
+- Local Compose and overall M3 acceptance remain pending.
+- Nothing is pushed or merged.
+
+Preserve the precise, approved uv exception and its limitations. Do not broaden it or claim age compliance, general safety or production readiness.
+
+Do not redesign the specification or rewrite historical evidence.
+
+3. Record the review accurately
+
+Append an acceptance note under Prompt 99, followed by Prompt 100 verbatim and a truthful pre-commit note.
+
+The acceptance note should record:
+- The reviewer accepted the Prompt 98 implementation and Prompt 99 corrections for a local commit.
+- The reviewer inspected both diffs and independently matched their reported SHA-256 checksums.
+- The reviewer reproduced the earlier helper failures in isolation and checked the corrected helper with isolated probes:
+  - unavailable service logs, by nonzero exit or timeout, fail the smoke;
+  - failed create-key output does not expose the credential in diagnostics, apart from the intentional GitHub masking workflow command;
+  - failed cleanup inventory prevents compose down and fails cleanup.
+- The reviewer did not run the project suite, the new pytest regression suite or Docker.
+- Acceptance also relies on the reported Windows checks and the regression comparison: 22 new tests failed and four passed against the Prompt 98 helper.
+- Actual container execution, current-version PostgreSQL/Linux CI, local Compose and overall M3 acceptance remain pending.
+
+Keep all earlier committed prompt history byte-identical. Do not insert the new commit’s own SHA into its committed note.
+
+4. Check and commit locally
+
+Before committing:
+- Verify the staged paths remain exactly the expected 13.
+- Confirm every file outside the four permitted documents and prompts.md is byte-identical to accepted tree 50da664aec976822b134024d8de401dcd5869b98.
+- Verify the earlier prompts.md content is an identical prefix.
+- Check relative links and anchors in the changed documents.
+- Check new additions for private content and unintended artifacts without printing sensitive matches.
+- Run git diff --cached --check.
+- Run the staged Gitleaks scan without suppression or allowlisting.
+- Confirm the effective author and committer identity again.
+
+Do not rerun application tests or builds: the implementation must remain unchanged. Do not start Docker or contact a database.
+
+Commit with subject:
+feat: add development container stack and CI Compose smoke
+
+Use the same Co-Authored-By trailer as the earlier commits.
+
+After committing:
+- Run the full-history Gitleaks scan.
+- Confirm the parent is b7c9ea28808cfa54a66d55b2ab63f80016594c03.
+- Confirm the expected 13 committed paths.
+- Confirm all files outside the four permitted documents and prompts.md remain byte-identical to the accepted tree.
+- Confirm the working tree is clean.
+- Confirm main and origin/main remain unchanged.
+
+If a check fails, report it accurately. Do not suppress findings, amend, reset or publish.
+
+5. Export the incremental review diff
+
+Export the complete diff from accepted tree
+50da664aec976822b134024d8de401dcd5869b98
+to the new commit, excluding prompts.md, to:
+
+.local/p100/m3f-commit-incremental.diff
+
+Use UTF-8 without BOM. Report:
+- baseline tree and final commit;
+- changed paths and diff statistics;
+- byte size and SHA-256.
+
+Do not print the diff in chat.
+
+6. Handoff
+
+Report the commit SHA, parent, subject, identity, committed paths, checks, byte-identity verification and final Git state.
+
+Clearly separate historical Windows results from checks performed in this task. State that all real container verification remains pending an authorized publication and CI.
+
+No push, merge, force-push, amend, rebase, tag, branch deletion, Docker execution or database contact is authorized.
+
+Return this output plus .local/p100/m3f-commit-incremental.diff to the external reviewer.
+````
+
+**Pre-commit note (written before the commit; the commit's own SHA is not recorded here):**
+- **Starting state verified:**
+  - branch `feat/container-stack`, HEAD `b7c9ea2`;
+  - staged tree `50da664aec976822b134024d8de401dcd5869b98` with exactly the 13 expected paths; nothing unstaged or untracked;
+  - `main` and `origin/main` at `2e605e7`; origin and the noreply identity as expected.
+
+  The accepted tree is recorded under `.local/p100/`.
+- **Changes since the accepted tree:**
+  - narrow status wording in `README.md`, ADR-0012, `docs/plan.md` and `docs/threat-model.md`: M3f accepted at external review for a local commit; container execution and CI verification pending; no image build, effective-context check, image check, Compose smoke or real Docker cleanup run; local Compose and overall M3 acceptance pending; nothing pushed or merged;
+  - this prompt history.
+
+  The approved uv exception is unchanged. Every other file is to remain byte-identical to the accepted tree.
+- **Historical local results** (Prompt 99, Windows), not rerun here: `1363 passed, 205 skipped` (204 PostgreSQL skips and one POSIX-only signal skip), and `103 passed` for the focused helper and file tests.
+- **Checks for this commit:** run after this entry is staged; results are in the session handoff. They are the staged-path, accepted-tree byte-identity, prompt-history prefix, link, private-content, `git diff --cached --check`, staged Gitleaks and identity checks, and after the commit the full-history Gitleaks scan. No application tests, builds or Docker execution.
+- **Not done:** nothing pushed or merged; no Docker or database contact.

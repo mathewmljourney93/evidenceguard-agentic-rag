@@ -10,7 +10,7 @@ EvidenceGuard is a planned vendor-risk review copilot. It is intended to:
 
 It is evidence-based decision support, not legal advice or compliance certification.
 
-## Status: M1 and M2 accepted (persistence, authentication, tenant-scoped vendors and readiness on `main`); M3a durable job core, M3b worker runtime and M3c documents and revisions on `main`; M3d document ingestion on `main`; M3e document API on `main`; M3f specification accepted, implementation pending (pre-alpha)
+## Status: M1 and M2 accepted (persistence, authentication, tenant-scoped vendors and readiness on `main`); M3a durable job core, M3b worker runtime and M3c documents and revisions on `main`; M3d document ingestion on `main`; M3e document API on `main`; M3f container stack accepted at review and committed locally, container CI pending (pre-alpha)
 
 **What works now:**
 - One installable Python 3.12 package (`evidenceguard`), managed with uv, with a committed lockfile (M1a).
@@ -122,7 +122,7 @@ The earlier M1 baseline `6d64fb3` passed [CI](https://github.com/mathewmljourney
 
 **Still planned** (see [docs/plan.md](docs/plan.md)):
 - Revision activation and supersession tests, deferred from M1 to M3: now on `main` with M3c and passing in CI, including against PostgreSQL.
-- The rest of M3 (worker, documents and revisions, parsing and chunking, uploads, Docker), following the accepted slice sequence in [docs/plan.md](docs/plan.md). M3a, M3b and M3c are on `main`; the M3d ingestion specification (parsing, chunking, migration `0004` and the `ingest_revision` handler) was accepted at review in [docs/plan.md](docs/plan.md), with its limits as initial engineering defaults rather than measured results, and is implemented, reviewed, verified in CI and on `main` at `cdf7260`; the M3e upload and document API specification was accepted at review in [docs/plan.md](docs/plan.md), with its caps and pagination bounds as initial engineering choices rather than measured results, and its implementation is reviewed, verified in CI and on `main` at `2e605e7`; the M3f container specification was accepted at review in [docs/plan.md](docs/plan.md), but its implementation is pending: no container implementation exists, and its required CI build, effective-context checks and Compose smoke have not run; Compose is unverified, and overall M3 acceptance is pending.
+- The rest of M3 (worker, documents and revisions, parsing and chunking, uploads, Docker), following the accepted slice sequence in [docs/plan.md](docs/plan.md). M3a, M3b and M3c are on `main`; the M3d ingestion specification (parsing, chunking, migration `0004` and the `ingest_revision` handler) was accepted at review in [docs/plan.md](docs/plan.md), with its limits as initial engineering defaults rather than measured results, and is implemented, reviewed, verified in CI and on `main` at `cdf7260`; the M3e upload and document API specification was accepted at review in [docs/plan.md](docs/plan.md), with its caps and pagination bounds as initial engineering choices rather than measured results, and its implementation is reviewed, verified in CI and on `main` at `2e605e7`; the M3f container specification was accepted at review in [docs/plan.md](docs/plan.md), and its implementation was accepted at external review for a local commit on `feat/container-stack` (not pushed or merged; [ADR-0012](docs/decisions/0012-containers.md)); its image build, effective build-context check, image checks, CI Compose smoke and Docker cleanup are written but have not run; Compose is unverified, and overall M3 acceptance is pending.
 - After M2: ingestion, retrieval, model providers, the review workflow, API endpoints for the approval gate, and evaluation.
 
 No retrieval, agent workflow, evaluation results, security guarantees or benchmarks are claimed. Any future results will be published with their committed inputs, configuration and the command that reproduces them.
@@ -171,7 +171,7 @@ The persistence package (`evidenceguard_persistence`) adds PostgreSQL settings, 
 1. Start a disposable PostgreSQL 17 + pgvector server. `docker-compose.yml` binds it to `127.0.0.1:5433` with **disposable local-only credentials**: user `evidenceguard`, password `evidenceguard-local-dev`, databases `evidenceguard_dev` and `evidenceguard_test`. Never reuse these anywhere else.
 
    ```powershell
-   docker compose up -d
+   docker compose up -d postgres
    ```
 
 2. Set the database URLs in your shell. Variable names are listed in `.env.example`; EvidenceGuard does not read a `.env` file automatically. URLs must name exactly one host, an optional port (5432 if omitted) and a database. The only query parameters accepted are `sslmode` and `connect_timeout` (1–600 seconds), each at most once. Anything else, such as `dbname`, `host`, `service`, `password` or `options`, is rejected with an error that never repeats the URL.
@@ -255,6 +255,43 @@ Invoke-RestMethod http://127.0.0.1:8000/readyz   # no key needed
 Packaging layout: [ADR-0001](docs/decisions/0001-packaging-and-layout.md). Request IDs, logging and error format: [ADR-0002](docs/decisions/0002-request-ids-logging-and-errors.md). Workflow orchestration: [ADR-0003](docs/decisions/0003-plain-python-workflow.md). Persistence: [ADR-0004](docs/decisions/0004-persistence-foundation.md). API-key authentication: [ADR-0005](docs/decisions/0005-api-key-authentication.md). Vendors, shared database lifecycle and readiness: [ADR-0006](docs/decisions/0006-vendor-api-and-readiness.md). Durable job core: [ADR-0007](docs/decisions/0007-durable-job-core.md). Worker runtime: [ADR-0008](docs/decisions/0008-worker-runtime.md). Documents and revisions: [ADR-0009](docs/decisions/0009-document-revisions.md).
 
 The request ID is for correlating logs only. It is not authentication and says nothing about who made a request. Logs are local JSON lines on stderr; there is no monitoring or telemetry service.
+
+### Containers (M3f; accepted at review, committed locally, not yet run)
+
+> **Not executed.** Docker is not available on the development machine, so none of these commands has been run locally. The CI `container` job (image build, effective build-context check, image checks, a Compose smoke test and cleanup) was accepted at review and committed locally, but has not run yet; nothing is pushed or merged. See [ADR-0012](docs/decisions/0012-containers.md). This is a development stack only: no TLS, secrets management or production deployment.
+
+`docker-compose.yml` defines four services:
+- `postgres`: the existing pinned pgvector image, on `127.0.0.1:5433`;
+- `migrate`: a one-shot Alembic upgrade, the only service that migrates;
+- `api`: on `127.0.0.1:8000`, healthy when `/readyz` returns 200;
+- `worker`: the sequential worker.
+
+The application services all run one locally built image, `evidenceguard:dev` by default (set `EG_IMAGE` to change it), which is never pulled from a registry. They run as UID 10001 with a read-only filesystem. The database credentials are the disposable ones above.
+
+```powershell
+docker compose build                     # builds evidenceguard:dev
+docker compose up -d --wait              # database healthy, migrate done, api healthy, worker running
+docker compose run --rm migrate          # re-run migrations explicitly (idempotent)
+docker compose exec api eg-admin seed-demo
+docker compose exec api eg-admin create-key --tenant-id <tenant_id> --user-id <user_id>
+$env:EG_KEY = Read-Host "Paste the key printed above"   # stays in this shell only; never commit it
+$headers = @{ Authorization = "Bearer $env:EG_KEY" }
+$vendor = Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/v1/vendors -Headers $headers `
+  -ContentType application/json -Body '{"slug": "lumenvale", "name": "Lumenvale"}'
+curl.exe -sS "http://127.0.0.1:8000/v1/vendors/$($vendor.id)/documents" -H "Authorization: Bearer $env:EG_KEY" `
+  -F document_key=security-policy -F "title=Security policy" -F source_type=vendor_statement `
+  -F "file=@policy.md;type=text/markdown"
+Invoke-RestMethod -Uri http://127.0.0.1:8000/v1/jobs/<job_id> -Headers $headers
+Invoke-RestMethod -Uri http://127.0.0.1:8000/v1/documents/<document_id> -Headers $headers
+Invoke-RestMethod -Uri http://127.0.0.1:8000/v1/documents/<document_id>/revisions/1/chunks -Headers $headers
+docker compose logs api worker
+docker compose stop                      # requests a graceful stop; the database volume is kept
+docker compose down -v                   # removes the containers and the database volume
+```
+
+- **Upload file:** `policy.md` is any synthetic Markdown file.
+- **Starting only the database:** use `docker compose up -d postgres`.
+- **Stopping the worker:** `docker compose stop` sends SIGTERM and allows the worker 60 s. That is an external termination budget, not a guaranteed shutdown time: a blocked database call can outlast it, after which Docker kills the container (ADR-0008, ADR-0012).
 
 ## Engineering record
 

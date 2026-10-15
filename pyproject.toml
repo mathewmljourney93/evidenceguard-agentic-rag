@@ -89,6 +89,7 @@ files = [
     "packages/persistence/evidenceguard_persistence",
     "packages/retrieval/evidenceguard_retrieval",
     "apps/worker/evidenceguard_worker",
+    "infra/ci/container_ci.py",
     "tests",
 ]
 plugins = ["pydantic.mypy"]

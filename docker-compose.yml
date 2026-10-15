@@ -1,15 +1,42 @@
-# Local PostgreSQL with pgvector, for development and integration tests only.
+# EvidenceGuard development stack (M3f, ADR-0012): PostgreSQL with pgvector, a one-shot migration,
+# the API and the sequential worker. Development only; not a production deployment.
 #
 # NOT VERIFIED LOCALLY: Docker is not available on the development machine, so this file has
-# not been run. CI uses the same image as a service container instead (see ci.yml).
+# never been run locally. CI builds the image and runs a Compose smoke test (ADR-0012).
 #
 # The credentials below are disposable and for local use only. They are documented in the
-# README and must never be reused anywhere else. The port is bound to 127.0.0.1 only, and uses
-# 5433 so it cannot collide with a PostgreSQL server already listening on 5432.
+# README and must never be reused anywhere else. Host ports are bound to 127.0.0.1 only:
+# 5433 for PostgreSQL (so it cannot collide with a server already on 5432) and 8000 for the API.
 #
-#   docker compose up -d
+#   docker compose build
+#   docker compose up -d --wait
 #   EG_DATABASE_URL=postgresql+psycopg://evidenceguard:evidenceguard-local-dev@127.0.0.1:5433/evidenceguard_dev
 #   EG_TEST_DATABASE_URL=postgresql+psycopg://evidenceguard:evidenceguard-local-dev@127.0.0.1:5433/evidenceguard_test
+#
+# The application image is selected by EG_IMAGE (default evidenceguard:dev) and is never pulled
+# from a registry (pull_policy: never): build it first. CI sets EG_IMAGE to a per-run tag.
+
+x-app: &app
+  build: .
+  image: ${EG_IMAGE:-evidenceguard:dev}
+  pull_policy: never
+  environment:
+    EG_DATABASE_URL: postgresql+psycopg://evidenceguard:evidenceguard-local-dev@postgres:5432/evidenceguard_dev
+  read_only: true
+  tmpfs:
+    - /tmp
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  init: true
+  restart: "no"
+
+x-after-migration: &after-migration
+  postgres:
+    condition: service_healthy
+  migrate:
+    condition: service_completed_successfully
 
 services:
   postgres:
@@ -28,6 +55,41 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+
+  # The only service that migrates. The API and the worker never migrate at startup.
+  migrate:
+    <<: *app
+    command: ["alembic", "-c", "/app/alembic.ini", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    <<: *app
+    command: ["eg-api", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on: *after-migration
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import sys, urllib.request; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=3).status == 200 else 1)"
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+
+  # SIGTERM starts the worker's existing graceful stop (ADR-0008). The 60 s grace period is an
+  # external termination budget, not a guaranteed shutdown bound: a synchronous database call
+  # can outlast the worker's supervisor waits, and Docker sends SIGKILL when the budget expires.
+  worker:
+    <<: *app
+    command: ["eg-worker"]
+    depends_on: *after-migration
+    stop_signal: SIGTERM
+    stop_grace_period: 60s
 
 volumes:
   evidenceguard-pgdata:
