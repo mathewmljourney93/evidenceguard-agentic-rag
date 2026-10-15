@@ -14446,3 +14446,165 @@ Return this output plus .local/p105/m3-acceptance-commit-incremental.diff to the
 - **Unchanged:** source, tests, configuration, workflows, migrations, dependencies, `uv.lock` and `CLAUDE.md`. M4 is neither specified nor started.
 - **Checks for this commit:** run after this entry is staged; results are in the session handoff. They are the staged-path, accepted-tree comparison, prompt-history prefix, link, status-wording, private-content, `git diff --cached --check`, staged Gitleaks and identity checks, and after the commit the full-history Gitleaks scan. No application tests, builds, Docker or database contact.
 - **Not done:** nothing pushed or merged; publication of this branch is not authorized.
+
+**Commit outcome (recorded in Prompt 106):**
+- **Commit:** `162241d0547330620aba12bf7ed8f4ebbd6de646` ("docs: record M3 acceptance and verified main baseline"), parent `e2463cb`, tree `b9351d0b71fcaa2713c0c87901aa664e8ef4fed4`, on the local branch `docs/m3-acceptance`, with the noreply author and committer identity and the existing co-author trailer.
+- **Content:** exactly five paths (`README.md`, ADR-0012, `docs/plan.md`, `docs/threat-model.md`, `prompts.md`), with only acceptance wording and prompt history changed against accepted tree `a3ab364`.
+- **Checks reported in the Prompt 105 handoff:**
+  - an identical earlier prompt-history prefix;
+  - no broken links; no private-content matches;
+  - a clean `git diff --cached --check`; staged Gitleaks with no leaks;
+  - full-history Gitleaks after the commit: 43 commits scanned, no leaks found;
+  - working tree clean; `main` and `origin/main` unchanged at `e2463cb`.
+- **Diff:** `.local/p105/m3-acceptance-commit-incremental.diff`, 29,123 bytes, SHA-256 `a54646707357e0ea094ffa05af528c66d6e68a7ac16d29463a41035553ff8dfb`.
+- Nothing was pushed or merged.
+
+**Review note (recorded in Prompt 106):**
+- **Accepted:** the external reviewer accepted the Prompt 105 incremental diff.
+- **How it was reviewed:** the reviewer inspected it and independently matched its checksum, with no new local suite or Docker execution.
+
+**Session-count correction (recorded in Prompt 106):** the Prompt 105 handoff said that this Claude session had run Prompts 77–105. That was inaccurate: this Claude session began at Prompt 98. The earlier history is left unchanged; this note corrects it. The session continues, and no restart is required on that count alone.
+
+## Prompt 106: Publish the reviewed M3 acceptance record, then fast-forward main
+
+- **Stage:** A prompt-history commit, publication of `docs/m3-acceptance`, and a fast-forward of `main` only after all five checks pass
+- **Date:** 2026-10-16 (session date)
+- **Numbering:** 106 is the next unused number after Prompt 105; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 106 — Publish the reviewed M3 acceptance record, then fast-forward main after all five checks pass. Do not start M4.
+
+Read CLAUDE.md and relevant workflows. Avoid reloading full prompt history. Do not print diffs.
+
+1. Verify starting state
+
+Expected:
+- Branch: docs/m3-acceptance.
+- HEAD:
+  162241d0547330620aba12bf7ed8f4ebbd6de646.
+- Parent:
+  e2463cb5a94d7c40eb1d894b8fded29a866165a8.
+- Working tree clean.
+- No upstream or remote docs/m3-acceptance branch.
+- Local main, origin/main and remote main:
+  e2463cb5a94d7c40eb1d894b8fded29a866165a8.
+- Expected origin and noreply author/committer identity unchanged.
+
+Fetch fresh refs and confirm main is an ancestor of HEAD, with no independent local main commits. Stop on material mismatch.
+
+2. Preflight and history commit
+
+Review what will become public relative to remote main. Confirm:
+- only the reviewed acceptance documentation and prompt history;
+- noreply identities;
+- no unintended private content, credentials, artifacts, backups or real environment files;
+- all five CI jobs remain enabled for this branch.
+
+Modify prompts.md only, append-only:
+- Record the Prompt 105 commit outcome and reported checks.
+- Record the reviewer's acceptance of its incremental diff: inspected and checksum independently matched; no new local suite or Docker execution.
+- Correct the session-count statement in a new note, without editing earlier history: this Claude session began at Prompt 98, so the statement that it handled Prompts 77–105 was inaccurate. Continue this session; no restart is required solely on that count.
+- Append Prompt 106 verbatim.
+- Add a preflight note recording verified state, scope, authorization order and stop conditions.
+
+Do not pre-record publication or CI outcomes. Preserve the four reviewed documents byte-identical to HEAD.
+
+Check history prefix, private content, git diff --cached --check, staged Gitleaks without suppression, and identity.
+
+Commit prompts.md only with subject:
+docs: record M3 acceptance publication authorization
+
+Use the existing co-author trailer.
+
+Verify parent 162241d, only prompts.md changed, and working tree clean. Run full-history Gitleaks before publication. Stop on a finding without suppression or amend.
+
+No application tests, builds, local Docker or database contact are needed.
+
+3. Publish only the documentation branch
+
+Run directly, preserving Git's exit status:
+
+git push --set-upstream origin refs/heads/docs/m3-acceptance:refs/heads/docs/m3-acceptance
+
+Confirm the remote equals the exact new HEAD.
+
+Monitor push-triggered workflows for that exact SHA and branch, up to 25 minutes:
+- Ubuntu verify;
+- Windows verify;
+- PostgreSQL integration;
+- container;
+- full-history Gitleaks.
+
+All five must succeed. Required container configuration, context, build, image, smoke and cleanup steps must execute successfully, not be skipped.
+
+Use existing GitHub access or public read-only API; do not install tools or add credentials. Retrieve logs if accessible. Otherwise report summaries as unobserved, without reusing historical counts.
+
+If any required job fails, is cancelled or remains pending at the limit, stop without changing main. Report evidence; do not fix files, rerun workflows or push again.
+
+4. Fast-forward main only after five green jobs
+
+Fetch fresh refs again and confirm:
+- remote main remains e2463cb5a94d7c40eb1d894b8fded29a866165a8;
+- remote documentation branch equals the verified commit;
+- main is an ancestor of that commit;
+- local main equals origin/main, with no independent commits;
+- working tree clean.
+
+Stop if any precondition fails.
+
+Switch to main and run:
+git merge --ff-only <exact verified commit>
+
+Then push only:
+git push origin refs/heads/main:refs/heads/main
+
+Preserve Git's exit statuses. No force-push or merge commit.
+
+Monitor all five jobs for the exact SHA's push to main, up to 25 minutes. Report failures and stop; do not roll back, fix, rerun or make further pushes.
+
+5. Handoff
+
+Report:
+- history commit SHA, parent, identity and changed path;
+- both push commands and exit statuses;
+- exact published SHA;
+- all five job conclusions and run/job links for each push;
+- required container step conclusions;
+- observed summaries separately from inaccessible counts;
+- refs before/after and final working-tree status.
+
+Leave documentation unchanged after publication. Existing e2463cb results remain evidence for that implementation baseline; do not relabel them as results for the new commit.
+
+M1, M2 and M3 are accepted. M4 has not started. Local Compose remains unverified.
+
+No force-push, amend, rebase, squash, tag, branch deletion, local Docker or database contact is authorized.
+
+Return this output only to the external reviewer; no diff attachment is required.
+````
+
+**Preflight note (written before the commit; no push, CI or `main` result is recorded here):**
+- **Starting state verified:**
+  - branch `docs/m3-acceptance` at `162241d` (parent `e2463cb`), working tree clean, no upstream;
+  - fresh refs: no remote `docs/m3-acceptance`; local `main`, `origin/main` and remote `main` at `e2463cb`, an ancestor of HEAD, with no independent local commits;
+  - origin and the noreply identity as expected.
+- **Publication scope:** relative to remote `main`, the reviewed acceptance commit `162241d` (only `README.md`, ADR-0012, `docs/plan.md`, `docs/threat-model.md` and `prompts.md`) and this history commit (only `prompts.md`).
+  - All commits use the noreply identity.
+  - No binaries, artifacts, backups or environment files are in the range, and no private-content matches.
+  - Gitleaks over `origin/main..HEAD` before this entry: 1 commit scanned, no leaks found.
+- **Workflows:** both trigger on every push, without branch filters. Ubuntu and Windows `verify`, PostgreSQL integration (`EG_REQUIRE_INTEGRATION=1`), `container` and full-history Gitleaks (`fetch-depth: 0`) remain enabled.
+- **Authorized order:**
+  1. commit `prompts.md` only;
+  2. run full-history Gitleaks;
+  3. push `docs/m3-acceptance` only;
+  4. require all five jobs to succeed for that exact commit, with the container configuration, context, build, image, smoke and cleanup steps executed successfully;
+  5. re-verify fresh refs, fast-forward `main` with `--ff-only` to that exact commit, and push only `main`;
+  6. monitor the five jobs again.
+- **Stop conditions:**
+  - any scan finding;
+  - any required job failing, cancelled, skipped in a required container step, or pending after 25 minutes;
+  - any failed fast-forward precondition.
+
+  On any stop: no fixes, reruns, rollbacks or further pushes.
+- **Status:** the `e2463cb` CI results remain evidence for that implementation baseline only. M1, M2 and M3 are accepted; M4 has not started; local Compose remains unverified.
