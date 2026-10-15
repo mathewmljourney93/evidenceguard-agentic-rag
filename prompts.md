@@ -14608,3 +14608,395 @@ Return this output only to the external reviewer; no diff attachment is required
 
   On any stop: no fixes, reruns, rollbacks or further pushes.
 - **Status:** the `e2463cb` CI results remain evidence for that implementation baseline only. M1, M2 and M3 are accepted; M4 has not started; local Compose remains unverified.
+
+
+**Prompt 106 outcome (recorded in Prompt 107):** publication completed at
+`85cb0d622a5b49c11439b0b9f67abceaa82edb29`, parent
+`162241d0547330620aba12bf7ed8f4ebbd6de646`. The commit changes only
+`prompts.md` and uses the expected noreply author/committer, with the existing
+co-author trailer. The documentation branch and main now point to that commit.
+Codex independently verified local main, origin/main, local docs/m3-acceptance,
+fresh remote main and remote docs/m3-acceptance at that SHA in Prompt 107.
+The prior publication command exit statuses and branch-push run IDs were not
+supplied to Codex; they are not reconstructed here.
+
+**Reviewer evidence supplied for Prompt 107:** the external reviewer independently
+retrieved both main workflow records and all five job logs for this exact SHA.
+Both runs were successful push events on main. The detailed counts, container
+observations and links are recorded under the final M3 publication baseline in
+`docs/plan.md`. The reviewer did not execute the suite or Docker locally.
+Claude previously observed run/job conclusions but could not retrieve logs
+anonymously. Codex records this supplied evidence; it did not retrieve those logs
+or rerun those checks. Earlier `e2463cb` evidence remains attributed to that SHA.
+
+## Prompt 107: Codex handover and proposed M4 breakdown
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Status:** documentation only; proposed specification, pending external review.
+- **Session:** first substantial prompt in this Codex session.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 107 — Codex handover and proposed M4 breakdown. Documentation only; no implementation or publication.
+
+You are taking over implementation assistance from Claude Code in the existing EvidenceGuard repository. ChatGPT acts as the external reviewer. Mathew transfers your output and exported diff to that reviewer.
+
+Read any applicable AGENTS.md instructions. Also read CLAUDE.md explicitly as the existing project working agreement, preserving its relevant repository conventions even though you are Codex. Read the relevant README, plan, architecture decisions and source sections.
+
+Do not read the entire prompts.md history. Read only its tail as needed to establish the next prompt number and recent state. Do not print full diffs in chat.
+
+1. Verify the handover state before changing anything
+
+Expected:
+- Repository: evidenceguard-agentic-rag.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Current branch: main.
+- HEAD, origin/main and remote main:
+  85cb0d622a5b49c11439b0b9f67abceaa82edb29.
+- Parent:
+  162241d0547330620aba12bf7ed8f4ebbd6de646.
+- Working tree clean.
+- docs/m3-acceptance exists locally and remotely at the same HEAD.
+- Repository identity:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>.
+
+Read fresh remote refs without modifying them. Stop on a material mismatch.
+
+Create docs/m4-retrieval-spec from HEAD if that branch does not already exist. Do not overwrite an existing branch.
+
+2. Established project state
+
+M1, M2 and M3 are accepted.
+
+Implemented and verified:
+- Python 3.12, uv, locked dependencies, installable package, strict typing, lint and cross-platform CI.
+- Tenant-scoped PostgreSQL persistence, API-key authentication, vendor endpoints and readiness.
+- Durable jobs, leases, heartbeats, retries and fenced writes.
+- Sequential worker runtime and safe lease cancellation.
+- Document revisions, transactional activation and supersession.
+- Deterministic plain-text/Markdown parsing and chunk storage.
+- Bounded document uploads and tenant-scoped document, revision, chunk and job views.
+- Development container stack and real CI Compose smoke.
+
+No retrieval, model-driven review workflow, completed risk reports or evaluation results exist yet. Existing evidence and approval domain contracts are foundations, not completed product workflows.
+
+Accepted M3 limitations remain:
+- activation rollback tested through injected transaction failures, not process termination;
+- invalid uploads tested database-independently;
+- tenant-specific chunk IDs tested directly, with separate database storage/constraint checks;
+- container shutdown smoke tests an idle worker only.
+Local Compose remains unverified. No production-readiness or general security claim is made.
+
+3. Record the final M3 publication evidence
+
+The external reviewer independently retrieved both main workflow records and all five job logs for exact commit `85cb0d622a5b49c11439b0b9f67abceaa82edb29`.
+
+Both runs were push events on main with conclusion success.
+
+CI run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38776947803
+
+Observed:
+- Ubuntu job 116566948053:
+  1364 passed, 204 skipped in 27.18s.
+- Windows job 116566948118:
+  1363 passed, 205 skipped in 38.85s.
+- PostgreSQL job 116566948087:
+  204 passed, 1364 deselected in 58.35s.
+- Container job 116566947772:
+  configuration passed;
+  effective context contained 72 files and excluded all 19 planted fixtures;
+  image checks passed;
+  stack started successfully;
+  application services used the CI-built image;
+  upload returned 202;
+  ingestion succeeded;
+  revision became active with two verified chunks;
+  duplicate upload returned 200;
+  idle worker exited with code 0 and no OOM kill;
+  smoke and cleanup passed.
+
+Secret-scan run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38776947848
+Job 116566948188:
+44 commits scanned, no leaks found.
+
+The reviewer did not execute the project suite or Docker locally. Claude previously observed run/job conclusions but could not retrieve logs anonymously. Preserve that distinction and the earlier e2463cb evidence.
+
+4. Propose the M4 sequence and first-slice specification
+
+Inspect the existing plan's embeddings, retrieval, snapshot, provider, corpus and evaluation requirements before proposing changes.
+
+M4 currently includes:
+- provider interface;
+- HashingEmbedder;
+- Voyage adapter, mocked in CI;
+- RRF retrieval over snapshot revisions;
+- synthetic sample_data, including an injected variant;
+- ground truth and retrieval contract tests.
+
+Acceptance includes tenant/snapshot isolation, exclusion of ineligible chunks and correct Recall@k calculation.
+
+Propose a small, dependency-ordered slice sequence, comparable to M3's reviewed slices. Fully specify only the first implementation slice; keep later slices concise.
+
+Resolve or explicitly flag:
+- embedding identity, version, dimension and validation;
+- deterministic offline provider versus live provider behaviour;
+- persistence and migration requirements, including when pgvector is actually needed;
+- tenant and revision constraints;
+- indexing jobs and how they use existing leases/fences;
+- how indexing relates to immutable completed chunk sets;
+- retrieval eligibility and snapshot inputs before M5 introduces review orchestration;
+- the meaning of “no superseded chunks” versus preserving a review's snapshot after later revision activation;
+- deterministic ranking, tie-breaking, bounded inputs and result sizes;
+- what the synthetic corpus proves, without pretending hashing measures semantic quality;
+- Recall@k's relevance unit, denominator and treatment of empty relevance sets;
+- database-independent versus real PostgreSQL verification.
+
+Preserve accepted architecture and existing invariants. Do not add a framework or expand the product scope.
+
+Clearly distinguish existing decisions from proposed defaults and questions needing reviewer judgement. Include intended files and meaningful acceptance tests for the first slice.
+
+Do not install dependencies, create migrations, implement code, make provider calls, require keys, run Docker or contact a database. If dependency research is necessary, use official sources and record proposals only.
+
+5. Authorized changes
+
+Modify only:
+- README.md
+- docs/plan.md
+- prompts.md
+
+README: concise final M3 publication reference and M4 planning status.
+Plan: final M3 baseline reference, proposed M4 sequence and detailed first-slice specification.
+Prompt history: append the Prompt 106 outcome, reviewer evidence, this prompt verbatim and a truthful outcome note.
+
+Keep M4 proposed and unimplemented. Do not mark its specification accepted.
+
+Do not rewrite earlier prompt history. Do not alter CLAUDE.md, create AGENTS.md, change co-author conventions or make a commit in this task.
+
+6. Verification and review export
+
+Stage exactly those three files.
+
+Check:
+- earlier prompts.md content is an identical prefix;
+- relative links and anchors;
+- status consistency;
+- private content and unintended artifacts;
+- git diff --cached --check;
+- staged Gitleaks without suppression.
+
+No application suite or build is necessary for documentation-only work.
+
+Export the complete staged diff against HEAD, excluding prompts.md, to:
+.local/p107/m4-retrieval-spec.diff
+
+Use UTF-8 without BOM. Report baseline commit, final staged tree, paths, statistics, byte size and SHA-256. Do not print the diff.
+
+Keep the handoff concise: proposed sequence, first-slice scope, decisions needed, checks, Git state and diff metadata.
+
+No commit, push, merge, amend, rebase, tag, branch deletion, implementation, Docker or database contact is authorized.
+
+Session preference:
+Do not recommend a new session after one or two tasks. Continue through implementation and correction work. Around 20 substantial prompts, or if context problems actually arise, recommend a handover at a suitable checkpoint. Count this Codex session from this prompt.
+
+Return this output plus .local/p107/m4-retrieval-spec.diff to the external reviewer.
+````
+
+**Prompt 107 outcome:** documentation prepared on `docs/m4-retrieval-spec` from
+verified baseline `85cb0d622a5b49c11439b0b9f67abceaa82edb29`. Fresh remote refs
+were read with `git ls-remote` without fetching or changing remote-tracking refs;
+main and docs/m3-acceptance matched locally and remotely. Expected origin,
+parent, identity and clean starting tree were verified. The branch did not
+previously exist and was created without overwriting any branch.
+
+Only README.md, docs/plan.md and this append-only history changed. The plan
+records final M3 publication evidence supplied by the reviewer, preserves earlier
+e2463cb evidence and accepted limitations, and proposes M4a through M4f. Only
+M4a has a detailed implementation specification: immutable embedding contracts,
+validation, versioned deterministic hashing, intended files and acceptance tests.
+Indexing/readiness, snapshot-relative supersession, bounds and Recall semantics
+are explicit proposals/questions. M4 is unimplemented and not accepted.
+
+Checks already run before this note: exact earlier-history byte prefix and
+verbatim request, README/plan relative file links and anchors, current status
+consistency, added-text private-path/key/token checks, and git diff --check.
+Final staging, git diff --cached --check, staged Gitleaks without suppression,
+post-note prefix/link/status/scope checks and export validation follow this note;
+their actual outcomes and final staged tree are reported in the session handoff.
+No application suite/build, dependency installation, migration, live provider,
+Docker or database operation ran. No commit or publication was made. Scratch
+and export files are confined to ignored .local/p107/. This is Codex session
+prompt 1; no new-session recommendation is needed.
+
+Review export: complete staged diff against HEAD, excluding prompts.md, written
+directly from Git as UTF-8 without BOM to .local/p107/m4-retrieval-spec.diff.
+Mathew returns output plus that diff file to the external reviewer.
+
+
+**Prompt 107 acceptance (external review, Prompt 108):** the reviewer inspected
+the full Prompt 107 diff and independently matched its SHA-256 checksum. The
+reviewer also checked the existing chunk domain and chunker source, confirming
+that the 4,000-code-point input bound covers the existing maximum chunk length.
+The reviewer ran no project tests or documentation checks.
+
+Accepted: the dependency-ordered M4a–M4f sequence; complete M4a contracts/hashing
+specification, including identity/fingerprint, strict validation, input/batch
+bounds, deterministic ASCII hashing and offline zero-vector policy; separate
+indexing readiness preserving M3 activation; refusal of snapshot capture when
+any active revision is unready; snapshot-relative supersession; ranking/input/
+result bounds as initial engineering defaults; chunk-based Recall denominator,
+empty-gold N/A treatment and separate variant/profile reporting. No benchmark
+or semantic-quality claim follows. M4 implementation is pending. M4b–M4f still
+require detailed specification reviews; exact schemas, migration, lock ordering,
+provider transport and operational limits are not approved by this sequence.
+
+## Prompt 108: Record accepted M4 sequence and embedding contracts specification
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Scope:** acceptance documentation and local commit only.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 108 — Record acceptance of the M4 sequence and M4a specification, then commit the documentation locally. No implementation or publication.
+
+Read applicable AGENTS.md instructions and the relevant CLAUDE.md working agreement. Avoid reloading full prompt history or printing diffs.
+
+1. Verify starting state
+
+Expected:
+- Branch: docs/m4-retrieval-spec.
+- HEAD:
+  85cb0d622a5b49c11439b0b9f67abceaa82edb29.
+- Staged tree:
+  24eec1b6543cd22ce8e490fced91aeb791d6f9df.
+- Exactly README.md, docs/plan.md and prompts.md staged.
+- Nothing unstaged or untracked.
+- Local main and origin/main at HEAD.
+- Expected origin and noreply identity unchanged.
+
+Stop on a material mismatch. Record the accepted staged tree under .local/p108/.
+
+2. Acceptance decision
+
+The external reviewer inspected the full Prompt 107 diff and independently matched its SHA-256 checksum.
+
+The reviewer also checked the existing chunk domain and chunker source, confirming that the proposed 4,000-code-point per-input bound covers the existing maximum chunk length. No project tests or documentation checks were run by the reviewer.
+
+Accepted:
+- the dependency-ordered M4a–M4f sequence;
+- the complete M4a contracts/hashing specification;
+- M4a identity, fingerprint, strict validation, input/batch bounds, deterministic ASCII hashing and explicit offline zero-vector policy;
+- separate indexing readiness without changing M3 activation semantics;
+- refusing snapshot capture when any active revision lacks a ready index;
+- snapshot-relative supersession, preserving revisions active at capture after later supersession;
+- proposed ranking/input/result bounds as initial engineering defaults;
+- chunk-based Recall denominator, empty-gold N/A handling and separate variant/profile reporting.
+
+These decisions make no benchmark or semantic-quality claim. M4b–M4f still require their own detailed specification reviews before implementation. Exact schemas, migration, lock ordering, provider transport and operational limits are not approved merely by approving the sequence.
+
+3. Narrow documentation edits
+
+Only these three files may change:
+- README.md
+- docs/plan.md
+- prompts.md
+
+In README and plan:
+- record the M4 sequence and M4a specification as accepted at external review, Prompt 108;
+- keep all M4 implementation pending;
+- convert the explicitly approved recommendations/open-decision entries consistently to accepted decisions;
+- retain the detailed contracts, algorithm, bounds, tests and limitations without redesign;
+- preserve the final M3 evidence and historical attribution;
+- retain the requirement for detailed later-slice reviews.
+
+Do not claim embeddings, retrieval, live adapters, corpus evaluation or M5 functionality exists.
+
+Do not change source, tests, dependencies, lockfile, configuration, migrations, workflows, CLAUDE.md or AGENTS.md.
+
+4. Prompt history
+
+Append:
+- acceptance note under Prompt 107, recording the actual reviewer work and decisions above;
+- Prompt 108 verbatim;
+- a truthful pre-commit note.
+
+Preserve all earlier bytes. Do not include the new commit's own SHA in its committed note or pre-record publication.
+
+5. Checks and local commit
+
+Verify:
+- exactly the three permitted paths staged;
+- changes against the accepted staged tree are only acceptance wording and prompt history;
+- earlier prompts.md content remains an identical prefix;
+- relative links and anchors;
+- consistent accepted-specification versus unimplemented status;
+- private content and unintended artifacts;
+- git diff --cached --check;
+- staged Gitleaks without suppression;
+- effective author and committer identity.
+
+Commit with subject:
+docs: record accepted M4 sequence and embedding contracts specification
+
+Follow the repository's applicable commit-attribution conventions accurately. Do not attribute new Codex work to Claude.
+
+After committing:
+- verify parent 85cb0d622a5b49c11439b0b9f67abceaa82edb29;
+- verify exactly the three committed paths;
+- run full-history Gitleaks;
+- confirm working tree clean;
+- confirm main and origin/main unchanged.
+
+No application tests or builds are needed for documentation-only changes. Do not install dependencies, call providers, run Docker or contact a database.
+
+Stop on failed checks without suppression, amend or reset.
+
+6. Review export and handoff
+
+Export the complete incremental diff from accepted tree
+24eec1b6543cd22ce8e490fced91aeb791d6f9df
+to the new commit, excluding prompts.md, to:
+.local/p108/m4-spec-acceptance.diff
+
+Use UTF-8 without BOM. Report baseline/final, paths, statistics, byte size and SHA-256. Do not print the diff.
+
+Report commit SHA, parent, attribution, checks and final Git state.
+
+No push, merge, force-push, amend, rebase, tag, branch deletion or implementation is authorized.
+
+Return this output plus .local/p108/m4-spec-acceptance.diff to the external reviewer.
+````
+
+**Prompt 108 pre-commit note (no commit or publication result recorded here):**
+- Recovery found Prompt 108 unfinished: original HEAD and accepted staged tree
+  unchanged, no Prompt 108 entry or acceptance note, no unstaged/untracked files.
+  The automatic approval review had failed because of a usage limit before the
+  requested tree-recording action executed. No rollback was assumed.
+- Verified branch docs/m4-retrieval-spec; HEAD, main and origin/main at
+  85cb0d622a5b49c11439b0b9f67abceaa82edb29; expected origin and effective noreply
+  author/committer identity. Accepted pre-edit tree
+  24eec1b6543cd22ce8e490fced91aeb791d6f9df is recorded under .local/p108/.
+- Only README.md, docs/plan.md and prompts.md are authorized. Relative to the
+  accepted tree, README/plan edits record acceptance without changing contract,
+  hashing, validation, bounds, tests, M3 evidence or historical attribution.
+  Later-slice detailed designs remain subject to review; all implementation pending.
+- This history appends one acceptance note and Prompt 108 verbatim, preserving
+  the complete earlier byte prefix. Recovery is part of Prompt 108, not a new prompt.
+- Pre-commit checks follow this note: staged scope, acceptance-only comparison,
+  prefix/links/anchors/status/private-content/artifact checks, cached whitespace
+  check, staged Gitleaks without suppression and effective identity checks.
+  Actual results will be reported in the handoff; no results are pre-recorded.
+- Authorized local commit subject: docs: record accepted M4 sequence and embedding contracts specification.
+  Use the configured noreply author and committer; identify Codex assistance in
+  the commit body. Do not copy Claude's co-author trailer from older commits.
+  No applicable instruction specifies a Codex co-author email.
+- After the commit, verify parent and paths, clean working tree, unchanged main
+  and origin/main, and full-history Gitleaks. Stop on failure without amend/reset.
+  Export the complete incremental diff from the accepted tree, excluding prompts.md,
+  to .local/p108/m4-spec-acceptance.diff as UTF-8 without BOM.
+- No implementation, application tests/builds, dependency installation, provider
+  calls, Docker, database contact, push or merge is authorized or claimed.

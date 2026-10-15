@@ -1,6 +1,6 @@
 # EvidenceGuard implementation plan
 
-**Status:** proposed plan, revised after the first architecture review (Prompt 5 in [prompts.md](../prompts.md)). No application code exists yet. Everything below is a plan, not a description of working software.
+**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. All M4 implementation remains pending; M4b–M4f require detailed specification reviews. Later milestones remain plans. Historical evidence below retains its original baseline.
 
 EvidenceGuard is a vendor-risk review copilot. It ingests synthetic vendor documents, retrieves evidence the tenant is authorized to see, classifies each review question against that evidence, and drafts a cited report. A human must approve the exact report revision before it can be finalized or exported. It is decision support, not legal advice or compliance certification.
 
@@ -43,7 +43,7 @@ Labels: **[FACT]** observed or verified; **[DECISION]** accepted in review; **[R
 
 | Item | Status |
 |---|---|
-| Repository | [FACT] Published to GitHub. `main` is at `9d5a93a` (M2 accepted; see §9). |
+| Repository | [FACT] Published to GitHub. `main` is at `85cb0d6` (M1–M3 accepted; verified in Prompt 107; see §9). |
 | Python | [FACT] 3.12 (uv-managed) for the project; 3.13 and 3.11 are also installed. |
 | uv | [FACT] 0.13.0. |
 | Docker | [FACT] **Not installed** (no Docker, Docker Compose or Podman). No WSL distribution is listed. |
@@ -225,7 +225,7 @@ Each lifecycle is a pure function in `evidenceguard_domain.state`, tested exhaus
 
 **Document revision (correction B)**
 1. An upload creates a revision with status `pending`. The document's `active_revision_id` does not change.
-2. The worker sets `processing`, writes chunks and embeddings, then **activates the revision in one transaction**:
+2. The implemented M3 worker sets `processing`, writes and verifies chunks, then **activates the revision in one transaction** (embedding readiness is a separate accepted M4 direction, unimplemented):
    - lock the document row (`SELECT … FOR UPDATE`);
    - set the new revision `active`;
    - set the previous active revision `superseded`;
@@ -286,7 +286,7 @@ Each lifecycle is a pure function in `evidenceguard_domain.state`, tested exhaus
 
 **Real provider (D11):** Voyage `voyage-4-lite` at 1024 dimensions.
 - It downloads no local model and has negligible cost at corpus scale.
-- It needs a MongoDB Atlas key and network access.
+- It needs provider credentials and network access; live setup is deferred to the reviewed adapter slice.
 - A local `fastembed` provider is optional enhancement E8.
 
 **Test substitute:** `HashingEmbedder`.
@@ -310,9 +310,9 @@ Each lifecycle is a pure function in `evidenceguard_domain.state`, tested exhaus
 - Format: `{document_key}@r{n} ({version_label}, effective {date}) § {section_path}, lines a–b`, stored as a snapshot.
 
 **Superseded and conflicting documents**
-- Superseded revisions are not in a review's snapshot, so they are never retrieved as evidence.
+- Revisions already superseded at capture are excluded from a new review snapshot. A revision active at capture remains in that snapshot after later supersession (see the accepted M4 clarification in §9).
 - The report can note that an older revision existed and what it said, labelled "superseded".
-- Two active revisions that disagree make the status `conflicting`. A superseded revision that disagrees with the active one does not.
+- Disagreement between eligible revisions in the same snapshot can produce `conflicting`; revisions excluded at capture cannot supply that conflict. Later activation does not change an existing snapshot.
 
 ---
 
@@ -710,6 +710,34 @@ All three kinds passed on `main` at `e2463cb` ([CI run 38773393988](https://gith
 - **Compose:** CI Compose satisfies the agreed Compose verification requirement. Local Compose remains unverified.
 - **No guarantees follow:** acceptance implies no production-readiness, performance or general security guarantee.
 - **Status:** the M3 implementation is on `main` at `e2463cb`. M4 implementation has not started.
+
+### Final M3 publication baseline (Prompt 107)
+
+[FACT] The accepted M3 record was published on `main` at
+`85cb0d622a5b49c11439b0b9f67abceaa82edb29` (parent `162241d`), after
+the implementation baseline `e2463cb`. This documentation publication does not
+replace or relabel the earlier implementation evidence above.
+
+The following is **evidence supplied by the external reviewer**, who independently
+retrieved both workflow records and all five job logs for this exact commit.
+Both runs were push events on `main`, conclusion `success`:
+
+- [CI run 38776947803](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38776947803):
+  - [Ubuntu job 116566948053](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38776947803/job/116566948053): `1364 passed, 204 skipped in 27.18s`.
+  - [Windows job 116566948118](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38776947803/job/116566948118): `1363 passed, 205 skipped in 38.85s`.
+  - [PostgreSQL job 116566948087](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38776947803/job/116566948087): `204 passed, 1364 deselected in 58.35s`.
+  - [Container job 116566947772](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38776947803/job/116566947772): configuration passed; effective context contained 72 files and excluded all 19 planted fixtures; image checks passed; stack startup succeeded; application services used the CI-built image; upload returned 202; ingestion succeeded; the revision became active with two verified chunks; duplicate upload returned 200; the idle worker exited with code 0 and no OOM kill; smoke and cleanup passed.
+- [Secret-scan run 38776947848](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38776947848), [job 116566948188](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38776947848/job/116566948188): 44 commits scanned, no leaks found.
+
+The reviewer did not execute the project suite or Docker locally. Claude earlier
+observed run/job conclusions but could not retrieve logs anonymously. Codex has
+verified the Git handover refs, and records the supplied reviewer evidence without
+claiming independent log retrieval or fresh application verification.
+The four accepted limitations in the M3 assessment remain: injected transaction
+failures rather than process termination for rollback; database-independent
+invalid-upload tests; direct tenant-specific chunk-ID tests plus separate database
+storage/constraint checks; idle-worker-only container shutdown. Local Compose is
+unverified. No production-readiness or general security claim follows.
 
 **M3a, the first slice, in detail (specification settled at review; implemented, reviewed, verified in CI and on `main`):**
 
@@ -2556,10 +2584,248 @@ They are set once as job environment variables.
 - **Open decisions:** none; the four Prompt 95 decisions are settled above. Two items are implementation-time verifications, not open choices: the official-registry check of both digests, and Docker's actual behaviour for the commands in E. If either contradicts this specification, implementation stops for review.
 
 **M4 – Embeddings, retrieval and corpus**
-- Provider interface, `HashingEmbedder`, Voyage adapter (mocked in CI), RRF search over snapshot revisions, `sample_data/` including the injected variant, ground truth with acceptable and wrong claims, and the retrieval contract suite.
-- *Acceptance:*
-  - No foreign, superseded or non-snapshot chunks are ever returned.
-  - Recall@k is computed correctly.
+
+**Status (Prompt 108): [DECISION] M4a–M4f sequence and complete M4a specification
+accepted at external review; all M4 implementation pending.** M1, M2 and M3 remain accepted.
+
+The reviewer inspected the full Prompt 107 diff, independently matched its
+SHA-256 checksum and checked the existing chunk domain and chunker source
+against the 4,000-code-point input bound. The reviewer ran no project tests or
+documentation checks. Acceptance makes no benchmark or semantic-quality claim.
+M4b–M4f require their own detailed specification reviews: their exact schemas,
+migration, lock ordering, provider transport and operational limits remain
+unapproved by acceptance of this sequence. Later-slice design sketches below
+remain proposals except for the explicitly accepted directions and defaults.
+
+#### M4 direction and review decisions
+
+[DECISION] Preserve D7/D11 and §§4–7: a provider interface, offline
+`HashingEmbedder` (`fake-hash-v1`, 1024 dimensions, unigrams and bigrams),
+Voyage adapter mocked in CI, exact cosine search plus PostgreSQL full-text
+search, per-channel top 20, RRF constant 60, final top 8, tenant/snapshot
+filtering, synthetic clean/injected corpus and ground truth. No framework,
+approximate index, downloaded model or M5 orchestration is added.
+
+[FACT] Current source has parsing/chunking, `chunk_sets`, immutable chunks and
+`ingest_revision`, but no embeddings, generated tsvector, retrieval implementation
+or review snapshot persistence. [ADR-0010](decisions/0010-document-ingestion.md)
+and `require_complete_chunk_set` gate activation on exact chunk completeness;
+the broader §4 description of embeddings before activation is a future design,
+not current behaviour. Existing leases, lock order, fresh-time checks, atomic
+finish and cancellation remain governed by [ADR-0007](decisions/0007-durable-job-core.md),
+[ADR-0008](decisions/0008-worker-runtime.md) and [ADR-0009](decisions/0009-document-revisions.md).
+
+Accepted dependency-ordered sequence (Prompt 108; each later slice needs its own reviewed detail):
+
+| Slice | Scope and completion evidence |
+|---|---|
+| M4a | Immutable embedding identity/batch contracts, provider protocol, deterministic offline hashing and validation. Detailed below; no persistence or provider access. |
+| M4b | Embedding profiles/index records, tenant-scoped storage and migration, full-text representation, exact vector operations and completeness/readiness. Real PostgreSQL constraints, migration round trips and filtering tests. Introduce pgvector here when vector storage/operators first require it; M4a needs no extension. |
+| M4c | Separate durable `index_revision` jobs over completed immutable chunk sets, enqueue/backfill seam and registered handler. Test leases/fences, replay, partial batches, conflicting retries, cancellation and atomic readiness/job finish. No review workflow. |
+| M4d | Explicit snapshot input/capture seam, eligibility validation, deterministic lexical/vector/RRF retrieval and bounded results. PostgreSQL isolation, snapshot-after-supersession, ranking and tie tests. No review endpoints or report generation. |
+| M4e | Synthetic clean/injected corpus, stable anchor-to-chunk ground truth, Recall@5/@8 and retrieval contracts. Include cross-tenant, cross-vendor and superseded traps and missing answers; no semantic-quality claim. |
+| M4f | Voyage adapter behind the same contract, injected transport mocked in CI, fixed profile/configuration, bounded calls and safe error mapping. No live calls required for M4 acceptance; live quality evidence belongs to M7. |
+
+**[DECISION] Separate indexing readiness (Prompt 108); later persistence details remain proposals.** Retain M3's activation and immutable
+chunk rules. Treat indexing readiness as separate from revision status: an active
+but unindexed revision exists and is not silently treated as searchable. M4b
+should store an immutable profile with a tenant-scoped ID; an index record binds
+tenant, revision, chunker version, chunk manifest/count and profile fingerprint.
+Embedding rows reference both their index and `(tenant_id, chunk_id)` through
+composite constraints, with revision membership checked by matching composite
+keys, not UUID assumptions. Uniqueness is per index/chunk; no mixing profiles,
+dimensions, text hashes or tenants. M4b specifies the exact schema and migration,
+including finite/nonzero dimension checks in the application and enforceable
+database checks. Use exact pgvector cosine operations without HNSW/IVFFlat;
+the 1024-dimensional baseline fits a fixed-dimensional column. Supporting other
+dimensions later requires explicit reviewed schema design, not silent padding.
+
+**[REC] Job compatibility (M4c detail still requires review).** Existing `JobPayload` values are canonical UUIDs
+only. Use an `index_id` UUID to resolve immutable profile/revision metadata;
+do not put model strings, arrays, text or keys in the payload. Enqueue and index
+creation are atomic and idempotent. A bounded explicit backfill handles already
+settled revisions; future activation can enqueue indexing in its transaction,
+without calling a provider or changing chunk immutability. Jobs may index a
+previously activated, now superseded revision for an existing snapshot; revisions
+that never activated are ineligible. Provider work and hashing happen outside
+fences; writes use short fenced batches with tenant checks and fresh ownership
+rechecks after locks. Retain job → document → revisions lock order before new
+index locks, and specify all additional lock ordering in M4c. Partial rows stay
+ineligible until count/manifest/profile completeness and readiness commit with
+job success. Identical replay compares immutable fields; changed vectors or
+profile metadata conflict, never overwrite. A live provider may be nondeterministic:
+reuse committed batches; repeated uncommitted calls are possible, not exactly-once.
+No embedding failure demotes an active revision or mutates settled chunks.
+
+**[DECISION] Refuse unready snapshot capture (Prompt 108); the detailed M4d seam remains proposed.** M4d accepts a trusted immutable value
+containing actor-derived tenant, vendor, explicit distinct revision IDs, chunk
+manifests, profile identity and retrieval configuration. A database capture seam
+selects only that vendor's active pointers with verified complete chunks and
+ready indexes in one consistent read transaction. Accepted policy: refuse the
+capture if any active revision is not ready, rather than silently omit it; record
+pending/processing exclusions. Empty eligible sets are an explicit error.
+No public request may declare arbitrary revision IDs authorized; the internal
+constructor validates tenant/vendor membership and snapshot eligibility. M5
+persists the same authorization/configuration facts atomically with review creation.
+A manually constructed ID list alone proves neither past eligibility nor authority.
+
+**[DECISION] Supersession clarification (Prompt 108).** “No superseded chunks” means no revision
+already superseded at *snapshot capture* enters a new snapshot. A revision active
+at capture remains eligible for that snapshot after later activation supersedes
+it; retrieval must not re-filter it by today's `active` status. A new revision
+is never added to an older snapshot. Current-state search first captures a fresh
+snapshot. Never-activated, failed, incomplete, foreign-vendor/tenant, non-snapshot
+or wrong-profile chunks remain excluded. This clarifies the contradictory old
+M4 wording while preserving §4's snapshot/resume invariant; this clarification was accepted at external review
+in Prompt 108.
+
+**[DECISION] Ranking/input/result bounds (Prompt 108); detailed M4d ranking design remains proposed.** Accepted M4d defaults: 1–8 distinct nonblank queries,
+each at most 4,000 code points and 16,000 UTF-8 bytes; 1–100 revision IDs;
+at most 100,000 eligible chunks (reject excess, never silently truncate);
+per-channel limit 20 and final requested k 1–20 (default 8).
+Use explicit PostgreSQL `simple` text configuration for both full-text document
+and query processing. Filter tenant/vendor/snapshot/profile/readiness *before*
+each channel's limit; ignore zero lexical scores and zero query vectors.
+For each distinct query/channel list, use one-based ranks, ties by canonical
+chunk UUID ascending; fuse each chunk with sum `1 / (60 + rank)` across lists.
+Final ties use canonical chunk UUID ascending; return each chunk once with
+channel ranks, scores, pinned profile and provenance. All-zero hash queries yield
+no vector candidates, not a division error; no candidates yields an empty result.
+Determinism is for a fixed stored corpus/configuration and database/provider
+outputs, not a promise of bit-identical live embeddings across calls or platforms.
+Bounds are accepted initial engineering defaults, not benchmark-derived limits.
+
+**[DECISION] Recall semantics (Prompt 108); detailed M4e corpus/mapping design remains proposed.** Preserve §7's fictional tenants, vendors, conflict,
+missing evidence, table, wrong-claim valid-quotation and injection cases. Load
+clean/injected variants separately; only the injection paragraph differs, while
+revision hashes and resulting IDs may differ. Human anchors plus exact quoted
+spans resolve deterministically against the pinned chunker/manifest. Accepted
+relevance unit is a distinct authorized chunk ID: resolve each gold passage to
+every chunk containing its full required span; fail ambiguous/missing mappings
+unless an explicit multi-chunk span annotation resolves them. Deduplicate chunks
+when several anchors share one chunk. For a question with nonempty gold set G,
+`Recall@k = |set(top_k_chunk_ids) ∩ G| / |G|`; the denominator is all relevant
+snapshot chunks, not k or answerable-question count. Duplicate retrieval IDs
+are contract errors. Empty gold sets yield N/A, excluded from the macro mean,
+with excluded count reported; all-empty suites yield N/A, not 1. Report per-question
+values and macro mean over nonempty sets at k=5 and k=8, separately by variant
+and profile. Foreign or forbidden results fail isolation even if recall is high.
+Unit examples include 2/3, duplicate anchors, fewer than k results, and empty G.
+Hashing proves reproducibility and retrieval contracts on synthetic inputs;
+collisions and lexical dependence prevent semantic-quality or injection-resistance
+claims. End-to-end canary/output behaviour and claim judgments remain M5/M7.
+
+#### M4a first implementation slice (ACCEPTED at external review, Prompt 108; implementation pending)
+
+**Scope.** Pure contracts and offline provider only, using the standard library
+and existing domain validation. No migrations, SQL, worker registration, settings,
+HTTP, SDK, dependency changes, keys, corpus loader or retrieval service.
+
+**Identity and values.** Accepted frozen domain values:
+`EmbeddingIdentity(provider_id, model_id, algorithm_version, dims, normalization)`;
+`EmbeddingUsage(input_tokens)` with a nonnegative strict integer or `None` when
+unknown; `EmbeddingBatch(identity, input_type, vectors, usage)`.
+The provider protocol is `embed(texts: tuple[str, ...], input_type: Literal['query',
+'document']) -> EmbeddingBatch`, plus an immutable `identity` property. Input
+order equals vector order. Put shared values in domain and the protocol/adapters
+in retrieval, preserving import direction and current stricter retrieval import
+test (domain and standard library only).
+
+Identifiers are bounded lowercase ASCII `[a-z][a-z0-9._-]{0,63}`;
+`dims` is a strict integer 1–4096; `normalization` is `l2` in this slice.
+Reject booleans, coercions and unknown fields. Identity fingerprint is SHA-256
+of ASCII JSON with exactly those five field names, sorted keys, compact
+separators, no NaN; never rely on Python `hash()` or mutable aliases.
+Hash identity is provider `offline`, model `fake-hash-v1`, algorithm
+`ascii-word-sha256-v1`, dims 1024, normalization `l2`. Any feature, hashing,
+dimension or normalization change requires a new identity/version. Query and
+document paths share this algorithm but retain the requested `input_type`.
+Future Voyage identity must pin requested model, dimensions and adapter contract
+version; model aliases cannot establish an upstream immutable model revision.
+Record any provider-returned model identity and fail on unexpected mismatch;
+do not claim that an API alias guarantees reproducibility.
+
+**Input validation.** Require an immutable tuple of 1–32 strings; each is 1–4,000
+code points, at most 16,000 UTF-8 bytes, contains no NUL, encodes strictly as
+UTF-8, and is not whitespace-only (`str.isspace`). Total batch cap 128,000
+UTF-8 bytes. Reject invalid inputs before computing vectors. Preserve input
+strings exactly at the boundary (disable inherited whitespace stripping);
+duplicates are allowed and retain their positions. These bounds cover existing
+4,000-code-point chunks, including Unicode. No implicit truncation or splitting.
+
+**Deterministic hashing algorithm.** Extract maximal `[A-Za-z0-9]+` runs and
+ASCII-lowercase each. Other characters delimit tokens; no Unicode normalization,
+stemming, stopword list, random seed or built-in `hash()`. Features are `u:` plus
+each token, and `b:` plus each adjacent token pair joined by one ASCII space.
+Count every occurrence. For each feature, SHA-256 its UTF-8 bytes; bucket is the
+first eight digest bytes as an unsigned big-endian integer modulo 1024; sign is
++1 when digest byte 8 is even, -1 otherwise. Add signed integer counts, then
+normalize once using square root of the sum of squared counts, with coordinates
+in bucket order. No features or complete collision cancellation yields a 1024-zero
+vector. Usage is `input_tokens=None`: feature counts are not billable tokens.
+Always label output “lexical-hash baseline — not semantic”.
+
+**Output validation.** Vectors are immutable tuples of finite real coordinates
+(strict int/float, excluding bool), count matches inputs and length matches
+identity dims. Every nonzero vector has L2 norm within absolute tolerance 1e-6
+of 1; zero vectors are explicitly permitted only for the offline provider and
+must be skipped by future cosine retrieval. A live adapter rejects zero vectors.
+Reject NaN, infinity, wrong count/dims/type, identity mismatch and malformed
+usage. Validate provider output at the caller boundary as well as construction;
+the batch alone cannot know the requested input count/identity. Fixed error
+codes/messages carry no input text, vectors, provider response or exception body;
+representations omit texts and vector contents. No content logging is added.
+
+**Intended files, only in a later authorized implementation:**
+
+- New `packages/domain/evidenceguard_domain/embeddings.py`: frozen values,
+  canonical identity and request/output validation, with fixed errors.
+- New `packages/retrieval/evidenceguard_retrieval/embeddings.py`: protocol and
+  `HashingEmbedder`; no persistence/worker/API imports.
+- New `tests/test_embeddings.py`: contracts, independently pinned vectors/buckets
+  and negative cases; existing `tests/test_packaging.py` import checks apply.
+- New ADR `docs/decisions/0013-embeddings.md` if the number remains available;
+  update README, plan and prompt history truthfully after implementation.
+- No change to `pyproject.toml`, `uv.lock`, existing chunker or ingestion semantics.
+
+**Meaningful acceptance checks for M4a:**
+
+1. Pin literal fingerprint and independently calculated feature bucket/sign
+   fixtures for unigrams, bigrams, repetition and a collision; no expected vector
+   generated by the implementation under test. Check ordering, normalization,
+   punctuation/case behaviour, non-ASCII-only zero output and cancellation.
+2. Same vectors across independent processes with different `PYTHONHASHSEED`,
+   query/document modes, and duplicate/batch versus single inputs; run on both
+   Windows and Ubuntu. Floating comparisons use the stated tolerance, not exact
+   cross-platform byte equality.
+3. Exercise every input bound at and beyond its boundary, UTF-8 supplementary
+   characters, lone surrogates, NUL, blank text, invalid mode, mutable collections,
+   booleans/coercions, unknown fields and immutable-value copy revalidation.
+4. A fake provider returns count/dimension/identity mismatches, NaN/infinity,
+   non-unit vectors, malformed usage and live zero output: boundary rejects each
+   with fixed messages and no input/vector leakage in repr/error output.
+5. Confirm import boundaries and offline operation with no environment reads,
+   network, keys or model downloads. Run focused tests, lint, format and strict
+   typing plus the existing database-independent suite when implementing.
+   No database test proves M4a more strongly; SQL compilation mocks must never
+   be represented as tenant/constraint or lease verification.
+
+Later PostgreSQL slices must run real constraints, extension/migration up/down,
+foreign-tenant/revision joins, readiness completeness, expired-lease lock waits,
+partial-batch replay, concurrent activation/snapshot capture and frozen-snapshot
+retrieval tests in guarded integration CI. Those checks are proposed, not run.
+
+**[DECISION] Accepted at external review (Prompt 108):** complete M4a contracts,
+identity/fingerprint, strict validation, input/batch bounds, deterministic ASCII
+hashing/version and offline zero-vector policy; separate indexing readiness
+without changing M3 activation; refusal-on-unready snapshot policy; snapshot-relative
+supersession; ranking/input/result bounds as initial engineering defaults; and
+chunk-based Recall denominator, empty-gold N/A handling and separate variant/profile
+reporting. These decisions make no benchmark or semantic-quality claim.
+M4b–M4f need detailed reviews before their implementation, including pgvector
+schema and live-adapter request/timeout/retry/token limits. No dependency or
+provider documentation research was needed for M4a; historical model/pricing
+notes in §2 are not freshly verified availability or price claims.
 
 **M5 – Review workflow (fake model in CI)**
 - Provider interface; Anthropic and scripted fake providers; `prompts/verifier/v1.md` and `prompts/risk_analyst/v1.md`; planner; orchestration; review snapshot; provenance checks; status derivation; report renderer; provider-call records and spans.
