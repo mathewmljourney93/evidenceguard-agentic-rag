@@ -13573,3 +13573,179 @@ Return this output plus .local/p100/m3f-commit-incremental.diff to the external 
 - **Historical local results** (Prompt 99, Windows), not rerun here: `1363 passed, 205 skipped` (204 PostgreSQL skips and one POSIX-only signal skip), and `103 passed` for the focused helper and file tests.
 - **Checks for this commit:** run after this entry is staged; results are in the session handoff. They are the staged-path, accepted-tree byte-identity, prompt-history prefix, link, private-content, `git diff --cached --check`, staged Gitleaks and identity checks, and after the commit the full-history Gitleaks scan. No application tests, builds or Docker execution.
 - **Not done:** nothing pushed or merged; no Docker or database contact.
+
+**Commit outcome (recorded in Prompt 101):**
+- **Commit:** `56fc3b5327ff860a9ed9a092dfd591b8edb7dcdf` ("feat: add development container stack and CI Compose smoke"), parent `b7c9ea2`, tree `7caae5d853eefecf743eaac64b353276213a6ef5`, on the local branch `feat/container-stack`, with the noreply author and committer identity and the existing co-author trailer.
+- **Content:** the 13 reviewed paths. Only `README.md`, ADR-0012, `docs/plan.md`, `docs/threat-model.md` and `prompts.md` differed from accepted tree `50da664`.
+- **Checks reported in the Prompt 100 handoff:**
+  - byte identity of every other file;
+  - an identical earlier prompt-history prefix;
+  - no broken links; no private-content matches;
+  - a clean `git diff --cached --check`; staged Gitleaks with no leaks;
+  - full-history Gitleaks after the commit: 40 commits scanned, no leaks found;
+  - working tree clean; `main` and `origin/main` unchanged at `2e605e7`.
+- **Diff:** `.local/p100/m3f-commit-incremental.diff`, 18,560 bytes, SHA-256 `5906bf220c5a787419287d2a15d18c73a61815f3756de9de06cefc03702f276b`.
+- Nothing was pushed or merged.
+
+**Review note (recorded in Prompt 101):**
+- **Accepted:** the external reviewer accepted the Prompt 100 incremental documentation diff.
+- **How it was reviewed:** the reviewer inspected it and independently matched its checksum. The reviewer ran no project tests and no Docker in this review.
+
+## Prompt 101: Publish only the reviewed M3f feature branch and monitor CI
+
+- **Stage:** Publication of `feat/container-stack` only, and CI monitoring (no merge, no `main` update)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 101 is the next unused number after Prompt 100; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 101 — Publish only the reviewed M3f feature branch and monitor CI. Do not merge or update main.
+
+Read CLAUDE.md and the relevant workflow sections. Do not reload the full prompt history or print diffs.
+
+1. Verify the starting state
+
+Expected:
+- Branch: feat/container-stack.
+- HEAD: 56fc3b5327ff860a9ed9a092dfd591b8edb7dcdf.
+- Parent: b7c9ea28808cfa54a66d55b2ab63f80016594c03.
+- Working tree clean.
+- No upstream or remote feat/container-stack branch.
+- Local main and origin/main:
+  2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Effective author and committer use:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>.
+
+Read fresh remote refs. Confirm remote main is unchanged and an ancestor of HEAD. If the state differs materially, stop without modifying it.
+
+2. Publication preflight
+
+Inspect everything that would become public relative to remote main:
+- the specification commit b7c9ea2;
+- the implementation commit 56fc3b5;
+- the history commit authorized below.
+
+Confirm:
+- noreply author and committer identities;
+- no tracked local artifacts, backups, bundles, real environment files, credentials or build outputs;
+- no secrets, personal paths or unintended private content in the additions;
+- the existing .env.example remains a documented placeholder file;
+- both workflows trigger on this branch.
+
+Confirm CI retains:
+- Ubuntu verification;
+- Windows verification;
+- PostgreSQL integration with EG_REQUIRE_INTEGRATION=1;
+- the new container job;
+- full-history Gitleaks.
+
+There are now FIVE expected jobs, not four. The container job is required for this publication review.
+
+Do not modify source, tests, Docker configuration, workflows, dependencies, lockfile or the reviewed documentation.
+
+3. Append prompt history and commit
+
+Change prompts.md only, append-only:
+- Record the Prompt 100 commit outcome and its reported checks.
+- Record the reviewer's acceptance of the incremental documentation diff: inspected and checksum independently matched; no project tests or Docker run by the reviewer in this review.
+- Append Prompt 101 verbatim.
+- Add a preflight note with the verified state, publication scope, checks and branch-only authorization.
+
+Keep historical Windows results separate from new CI:
+1363 passed, 205 skipped, including 204 PostgreSQL skips and one POSIX-only signal skip.
+
+State that all real container execution was pending before publication. Do not pre-record push or CI outcomes.
+
+Verify the earlier history is an identical prefix, scan the additions for private content, run git diff --cached --check and the staged Gitleaks scan without suppression.
+
+Commit prompts.md only with subject:
+docs: record M3f branch publication authorization
+
+Use the existing co-author trailer and noreply identity.
+
+Verify only prompts.md changed, the parent is 56fc3b5 and the tree is clean. Run the full-history Gitleaks scan before pushing. Stop on a finding; do not allowlist or suppress it.
+
+4. Push only the feature branch
+
+Run directly, preserving Git's own exit status:
+
+git push --set-upstream origin refs/heads/feat/container-stack:refs/heads/feat/container-stack
+
+No other ref, tag or main update is authorized. Confirm the remote branch matches the exact published HEAD.
+
+5. Monitor CI for that exact commit
+
+Monitor both push-triggered workflow runs for the published SHA on feat/container-stack, for up to 25 minutes total.
+
+Use existing GitHub access or the public read-only API. Do not install tools or add credentials. Use bounded requests and sensible polling intervals.
+
+Report these five jobs separately:
+- verify: Ubuntu;
+- verify: Windows;
+- PostgreSQL integration;
+- container;
+- Gitleaks full history.
+
+For the container job, report the actual step conclusions for:
+- rendered Compose configuration;
+- effective build-context check;
+- application image build;
+- runtime image checks;
+- Compose smoke;
+- cleanup.
+
+A green job with a skipped smoke step does not establish smoke verification. Distinguish success, failure and skipped steps.
+
+Retrieve pytest summaries and container output if accessible. If logs are inaccessible, report that explicitly and give the run and job links. Do not invent counts or treat old counts as new results.
+
+If a job fails:
+- report the failing job, step and accessible diagnostic evidence;
+- redact credentials and private output;
+- do not change files, retry failed workflows, make a fix commit or push again;
+- stop for review.
+
+If monitoring times out, report what remains pending. Do not claim a background poll continues after this task ends.
+
+6. Final handoff
+
+Report:
+- history commit SHA and parent;
+- exact published SHA;
+- push command and exit status;
+- run/job links and conclusions;
+- observed test summaries, separately from unobserved expectations;
+- which real container checks actually executed;
+- final branch/upstream and working-tree state;
+- confirmation that main remains unchanged.
+
+Do not update documentation after CI in this task. Recording the results will be a later reviewed task.
+
+Do not run local Docker, contact a local database, merge, update main, force-push, amend, rebase, tag or delete branches. Overall M3 acceptance remains pending even if CI passes. Local Compose remains unverified.
+
+Return this output only to the external reviewer; no diff attachment is required.
+````
+
+**Preflight note (written before the push; no push or CI result is recorded here):**
+- **Authorization:** Prompt 101 authorizes publishing **only** `feat/container-stack` and monitoring its CI. No merge, no `main` update, no force-push, no other ref and no tag.
+- **Starting state verified:**
+  - branch `feat/container-stack` at `56fc3b5` (parent `b7c9ea2`), working tree clean, no upstream;
+  - fresh remote refs: no remote `feat/container-stack`, and remote `main` at `2e605e7`, an ancestor of HEAD;
+  - origin and the noreply identity as expected.
+- **Publication scope:** the specification commit `b7c9ea2`, the implementation commit `56fc3b5`, and this history commit, which changes only `prompts.md`.
+- **Preflight checks:**
+  - All commits use the noreply identity.
+  - No tracked `.local/`, backups, bundles, build outputs, wheels, keys or real environment files. The only environment file is the existing placeholder `.env.example`, which is unchanged in this range.
+  - No binary files.
+  - One added line matched the private-path pattern: the repository path in Prompt 98's verbatim text, which already appears 83 times in published history.
+  - Gitleaks over `origin/main..HEAD`: 2 commits scanned, no leaks found.
+- **Workflows:** both trigger on every push and pull request, with no branch filters. CI keeps five jobs:
+  - Ubuntu and Windows `verify`;
+  - PostgreSQL integration with `EG_REQUIRE_INTEGRATION=1`;
+  - the new `container` job;
+  - full-history Gitleaks (`fetch-depth: 0`).
+- **Verification status before publication:**
+  - **Historical local Windows results** (Prompt 99): `1363 passed, 205 skipped` (204 PostgreSQL skips and one POSIX-only signal skip).
+  - **Not yet run:** all real container execution (image build, effective build-context check, image checks, Compose smoke and Docker cleanup), and CI for this version.
