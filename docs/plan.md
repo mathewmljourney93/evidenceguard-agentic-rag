@@ -1,6 +1,6 @@
 # EvidenceGuard implementation plan
 
-**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. All M4 implementation remains pending; M4b–M4f require detailed specification reviews. Later milestones remain plans. Historical evidence below retains its original baseline.
+**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a implementation is accepted at external review for a local commit (Prompt 110); Linux/current-version CI, build and clean installed-wheel verification remain pending. M4b–M4f remain unimplemented and require detailed specification reviews. Later milestones remain plans. Historical evidence below retains its original baseline.
 
 EvidenceGuard is a vendor-risk review copilot. It ingests synthetic vendor documents, retrieves evidence the tenant is authorized to see, classifies each review question against that evidence, and drafts a cited report. A human must approve the exact report revision before it can be finalized or exported. It is decision support, not legal advice or compliance certification.
 
@@ -709,7 +709,7 @@ All three kinds passed on `main` at `e2463cb` ([CI run 38773393988](https://gith
   - container shutdown tested with an idle worker only.
 - **Compose:** CI Compose satisfies the agreed Compose verification requirement. Local Compose remains unverified.
 - **No guarantees follow:** acceptance implies no production-readiness, performance or general security guarantee.
-- **Status:** the M3 implementation is on `main` at `e2463cb`. M4 implementation has not started.
+- **Status:** the M3 implementation is on `main` at `e2463cb`. M4a implementation is accepted at external review for a local commit (Prompt 110); M4b–M4f remain unimplemented and overall M4 acceptance is pending.
 
 ### Final M3 publication baseline (Prompt 107)
 
@@ -2586,7 +2586,9 @@ They are set once as job environment variables.
 **M4 – Embeddings, retrieval and corpus**
 
 **Status (Prompt 108): [DECISION] M4a–M4f sequence and complete M4a specification
-accepted at external review; all M4 implementation pending.** M1, M2 and M3 remain accepted.
+accepted at external review; M4a implementation accepted for a local commit in
+Prompt 110. Linux/current-version CI, build and clean installed-wheel verification
+remain pending. M4b–M4f and overall M4 acceptance remain pending.** M1, M2 and M3 remain accepted.
 
 The reviewer inspected the full Prompt 107 diff, independently matched its
 SHA-256 checksum and checked the existing chunk domain and chunker source
@@ -2606,9 +2608,11 @@ search, per-channel top 20, RRF constant 60, final top 8, tenant/snapshot
 filtering, synthetic clean/injected corpus and ground truth. No framework,
 approximate index, downloaded model or M5 orchestration is added.
 
-[FACT] Current source has parsing/chunking, `chunk_sets`, immutable chunks and
-`ingest_revision`, but no embeddings, generated tsvector, retrieval implementation
-or review snapshot persistence. [ADR-0010](decisions/0010-document-ingestion.md)
+[FACT] At the accepted specification baseline `ac39503`, source had parsing/chunking,
+`chunk_sets`, immutable chunks and `ingest_revision`, but no embeddings, generated
+tsvector, retrieval implementation or review snapshot persistence. Prompt 109 adds
+only M4a embedding contracts and offline hashing, accepted for a local commit in Prompt 110; no other
+retrieval or snapshot functionality is implemented. [ADR-0010](decisions/0010-document-ingestion.md)
 and `require_complete_chunk_set` gate activation on exact chunk completeness;
 the broader §4 description of embeddings before activation is a future design,
 not current behaviour. Existing leases, lock order, fresh-time checks, atomic
@@ -2715,7 +2719,43 @@ Hashing proves reproducibility and retrieval contracts on synthetic inputs;
 collisions and lexical dependence prevent semantic-quality or injection-resistance
 claims. End-to-end canary/output behaviour and claim judgments remain M5/M7.
 
-#### M4a first implementation slice (ACCEPTED at external review, Prompt 108; implementation pending)
+#### M4a local verification (Prompt 109)
+
+The specification remains accepted (Prompt 108). The implementation is accepted
+at external review for a local commit (Prompt 110); Linux/current-version CI,
+build and clean installed-wheel verification remain pending. It adds frozen
+identity/usage/batch values, canonical fingerprints, strict request/result
+validation, the provider protocol and deterministic `HashingEmbedder`, with
+fixed private errors and the lexical-hash label. See [ADR-0013](decisions/0013-embeddings.md).
+No M4b–M4f implementation, retrieval or semantic-quality evidence is added.
+
+Historical Prompt 109 local Windows checks used the existing Python 3.12 locked environment,
+with `--offline --no-sync` to avoid network and dependency installation:
+
+- `uv run --locked --offline --no-sync ruff format --check .`: 125 files already formatted.
+- `uv run --locked --offline --no-sync ruff check .`: all checks passed.
+- `uv run --locked --offline --no-sync mypy`: no issues in 107 source files.
+- `uv run --locked --offline --no-sync pytest tests/test_embeddings.py tests/test_packaging.py -q`:
+  126 passed in 1.30s (116 embedding tests and 10 existing packaging/import checks).
+- `uv run --locked --offline --no-sync pytest -q -ra`: 1479 passed, 205 skipped in 38.74s.
+  Exactly 204 skips: `EG_TEST_DATABASE_URL is not set; integration tests need a
+  disposable PostgreSQL test database (see README)`.
+  One POSIX-only signal skip on Windows: `raise_signal(SIGTERM) ends a Windows process`.
+  PostgreSQL tests did not run; no database was contacted.
+- `uv build --offline --no-build-isolation --out-dir .local/p109/dist`: failed
+  before producing a distribution because `hatchling` is absent from the
+  existing environment (`ModuleNotFoundError`). No dependency was installed;
+  build and a clean installed-wheel smoke for this version remain unverified.
+
+Initial lint/type issues in new code/tests were corrected before the final
+passing checks. An environment-denial test initially interfered with pytest's
+own environment reads; limiting the patch to the embedding call fixed the test
+harness. The final suite includes that corrected test. These results prove
+tested contracts, not semantic quality or provider behaviour. Final staged
+scope, whitespace, private-content and Gitleaks checks are recorded in the
+Prompt 109 handoff, not implied by these application-check results.
+
+#### M4a first implementation slice (specification ACCEPTED at review, Prompt 108; implementation ACCEPTED for a local commit, Prompt 110)
 
 **Scope.** Pure contracts and offline provider only, using the standard library
 and existing domain validation. No migrations, SQL, worker registration, settings,
@@ -2776,7 +2816,7 @@ the batch alone cannot know the requested input count/identity. Fixed error
 codes/messages carry no input text, vectors, provider response or exception body;
 representations omit texts and vector contents. No content logging is added.
 
-**Intended files, only in a later authorized implementation:**
+**M4a files (implemented in Prompt 109; accepted for a local commit in Prompt 110):**
 
 - New `packages/domain/evidenceguard_domain/embeddings.py`: frozen values,
   canonical identity and request/output validation, with fixed errors.
@@ -2784,8 +2824,8 @@ representations omit texts and vector contents. No content logging is added.
   `HashingEmbedder`; no persistence/worker/API imports.
 - New `tests/test_embeddings.py`: contracts, independently pinned vectors/buckets
   and negative cases; existing `tests/test_packaging.py` import checks apply.
-- New ADR `docs/decisions/0013-embeddings.md` if the number remains available;
-  update README, plan and prompt history truthfully after implementation.
+- New ADR [0013-embeddings.md](decisions/0013-embeddings.md);
+  README, plan and prompt history record the implementation and verification limits.
 - No change to `pyproject.toml`, `uv.lock`, existing chunker or ingestion semantics.
 
 **Meaningful acceptance checks for M4a:**

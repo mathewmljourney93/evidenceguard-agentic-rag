@@ -15000,3 +15000,360 @@ Return this output plus .local/p108/m4-spec-acceptance.diff to the external revi
   to .local/p108/m4-spec-acceptance.diff as UTF-8 without BOM.
 - No implementation, application tests/builds, dependency installation, provider
   calls, Docker, database contact, push or merge is authorized or claimed.
+
+
+**Prompt 108 outcome (recorded in Prompt 109):** committed locally as
+ac395039fa43ef19c8e316d253af639f0e35fe0f, parent
+85cb0d622a5b49c11439b0b9f67abceaa82edb29, tree
+66ffb2f5ac466f857b70faf6dd4972f73deb5e91. Exactly README.md, docs/plan.md and
+prompts.md changed. Expected noreply author/committer; commit body identifies
+OpenAI Codex assistance without a Claude trailer. Prior handoff reported all
+requested documentation checks and staged Gitleaks passed; full-history Gitleaks
+scanned 45 commits with no leaks. Working tree was clean; main/origin/main unchanged.
+Incremental export .local/p108/m4-spec-acceptance.diff: 15,867 bytes, SHA-256
+a0bf652e0ded2d66ec192dc66b7920c3255a61ec6281c66bf34f9f401e1c9070.
+
+**Reviewer acceptance of Prompt 108:** incremental diff accepted, checksum
+independently matched; no new project checks. This records the supplied review
+decision, not a new execution of project checks by Codex.
+
+## Prompt 109: Implement accepted M4a embedding contracts and offline provider
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Scope:** M4a only; stage for external review, no commit or publication.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 109 — Implement the accepted M4a embedding contracts and deterministic offline provider. Stage for external review; do not commit or publish.
+
+Read applicable AGENTS.md instructions, CLAUDE.md and the accepted M4a specification in docs/plan.md. Read existing domain validation and retrieval import-boundary conventions. Avoid reloading the full prompt history.
+
+1. Verify starting state
+
+Expected:
+- Branch: docs/m4-retrieval-spec.
+- HEAD:
+  ac395039fa43ef19c8e316d253af639f0e35fe0f.
+- Parent:
+  85cb0d622a5b49c11439b0b9f67abceaa82edb29.
+- Working tree clean.
+- Local main and origin/main:
+  85cb0d622a5b49c11439b0b9f67abceaa82edb29.
+- Expected origin and noreply identity unchanged.
+
+Stop on a material mismatch. Record the baseline under .local/p109/.
+
+Create feat/embedding-contracts from HEAD if it does not exist. Do not overwrite an existing branch. The accepted specification commit may remain local beneath this implementation branch; no separate publication is needed now.
+
+2. Implement only M4a
+
+Follow the accepted specification exactly:
+- frozen embedding identity, usage and batch values;
+- canonical identity fingerprint;
+- strict request validation;
+- provider protocol with immutable identity;
+- deterministic HashingEmbedder;
+- caller-boundary validation of provider results;
+- fixed, privacy-safe errors and representations.
+
+Use these intended files:
+- packages/domain/evidenceguard_domain/embeddings.py
+- packages/retrieval/evidenceguard_retrieval/embeddings.py
+- tests/test_embeddings.py
+- docs/decisions/0013-embeddings.md, if that number is available
+- README.md
+- docs/plan.md
+- prompts.md
+
+If an additional file change is necessary, explain why and keep it minimal. Do not add dependencies or change uv.lock.
+
+Preserve import direction: shared values in domain; provider protocol and offline implementation in retrieval. Keep existing import-boundary tests.
+
+Implement the specified tuple-only inputs, limits, exact text preservation, UTF-8 validation, identity fields, hashing features, bucket/sign calculation, normalization and zero-vector policy. Do not silently truncate, normalize Unicode, change tokenization or substitute Python hash().
+
+Hashing outputs must remain clearly labelled as a lexical-hash baseline, not semantic embeddings.
+
+Treat malformed provider output as untrusted at the caller boundary:
+- requested identity, mode and count must match;
+- dimensions, coordinate types, finite values, norm, zero policy and usage must be checked;
+- reject booleans and coercions;
+- avoid leaking input, vectors or raw exception text.
+Handle extreme numeric inputs safely without exposing raw conversion errors.
+
+Do not introduce persistence, SQL, pgvector, indexing jobs, worker registration, settings, environment reads, network calls, SDKs, model downloads, corpus loading or retrieval ranking.
+
+If an accepted requirement cannot be implemented as written, stop and explain the concrete issue rather than silently redesigning it.
+
+3. Meaningful tests
+
+Cover the accepted M4a checks, including:
+- literal pinned fingerprint and independently calculated bucket/sign fixtures;
+- unigram/bigram features, repetition, collisions and cancellation;
+- normalization, ordering, case/punctuation and non-ASCII-only zero vectors;
+- duplicate positions and batch versus individual equivalence;
+- query/document equivalence while preserving the requested mode;
+- independent processes with different PYTHONHASHSEED values;
+- every request bound at and beyond its boundary;
+- supplementary Unicode, lone surrogates, NUL and blank inputs;
+- mutable collections, booleans, coercions and unknown fields;
+- frozen values and supported copy/revalidation paths;
+- malformed fake-provider outputs and privacy-safe errors/repr;
+- offline operation and import boundaries.
+
+Do not derive expected golden outputs using the implementation under test. Use the specified tolerance for floating comparisons.
+
+Tests may control PYTHONHASHSEED in child processes; production embedding code must not read environment variables.
+
+4. Documentation and prompt history
+
+ADR-0013 should explain the implemented contracts, fingerprint, exact hashing algorithm, validation boundaries and limitations.
+
+README and plan must distinguish:
+- accepted specification;
+- implementation staged and awaiting review;
+- checks actually run locally;
+- Linux/current-version CI pending.
+
+M4a adds no retrieval or semantic-quality evidence. M4b–M4f remain unimplemented and require detailed reviews.
+
+Append:
+- Prompt 108 outcome;
+- reviewer acceptance of its incremental diff, with independently matched checksum and no new project checks;
+- Prompt 109 verbatim;
+- truthful outcome note.
+
+Preserve all earlier prompt-history bytes. Do not attribute Codex work to Claude.
+
+5. Verification
+
+Run appropriate checks:
+- focused embedding tests;
+- Ruff format and lint;
+- strict mypy;
+- full existing suite using the repository's locked commands;
+- build and a clean installed-wheel smoke check for the new modules and offline provider;
+- git diff --cached --check;
+- staged Gitleaks without suppression;
+- private-content/artifact check.
+
+Do not weaken existing tests or integration guards. PostgreSQL tests may skip when no test database is configured; report exact skip reasons/counts rather than claiming they ran.
+
+No local Docker, database contact, provider calls or dependency installation is authorized. Use the existing locked environment; report a missing prerequisite rather than changing dependencies.
+
+6. Stage and export for review
+
+Stage only the intended implementation, tests, documentation and prompt history. Do not stage .local/, dist/ or build artifacts.
+
+Export the complete staged diff against HEAD, excluding prompts.md, to:
+.local/p109/m4a-implementation.diff
+
+UTF-8 without BOM. Report baseline commit, final staged tree, paths, statistics, byte size and SHA-256. Do not print the diff in chat.
+
+Handoff:
+- what was built;
+- deviations or unresolved questions;
+- actual commands/results and remaining verification;
+- Git state;
+- diff metadata.
+
+Do not commit, push, merge, amend, rebase, tag, delete branches or begin M4b.
+
+Return this output plus .local/p109/m4a-implementation.diff to the external reviewer.
+````
+
+**Prompt 109 outcome:** M4a implemented on feat/embedding-contracts, based on
+ac395039fa43ef19c8e316d253af639f0e35fe0f (parent 85cb0d6), with main and
+origin/main unchanged at 85cb0d622a5b49c11439b0b9f67abceaa82edb29. Starting
+branch, clean tree, parent, origin and effective noreply identities matched.
+Baseline and original prompt-history bytes are saved under .local/p109/.
+
+Only the seven intended paths changed: two embeddings modules, tests/test_embeddings.py,
+ADR-0013, README.md, docs/plan.md and prompts.md. Frozen dataclasses follow the
+existing chunk contract pattern, with dataclasses.replace as supported revalidating
+copy. The protocol/HashingEmbedder remain domain/stdlib-only. Caller-boundary
+validation reconstructs provider values and checks the captured identity, mode,
+count, shapes, finite/unit/zero rules and usage. Fixed errors and repr omit content;
+huge integer conversions and raw provider failures cannot expose raw errors.
+Algorithm, bounds, exact input text and zero policy follow the accepted specification.
+No specification deviation or unresolved implementation-design question was found.
+
+Final local checks: Ruff format (125 files), lint, strict mypy (107 source files),
+focused embedding+packaging tests (126 passed in 1.30s), and full locked suite
+(1479 passed, 205 skipped in 38.74s). Exact skips: 204 because EG_TEST_DATABASE_URL
+is not set and a disposable PostgreSQL test database is required (see README);
+one because raise_signal(SIGTERM) ends a Windows process. No PostgreSQL tests ran.
+The final checks use uv run --locked --offline --no-sync. Earlier lint/type and
+test-harness failures were corrected, without weakening existing checks.
+
+Build attempted with uv build --offline --no-build-isolation --out-dir .local/p109/dist;
+failed because the existing environment lacks hatchling. No dependency installation
+was authorized or performed. No new wheel exists, so the clean installed-wheel
+smoke remains unperformed. Linux/current-version CI, implementation acceptance,
+build and wheel verification remain pending. M4b–M4f are unimplemented and need
+detailed review. No retrieval, semantic-quality or production-readiness evidence.
+
+Final stage/export checks follow this outcome note: exact seven-path scope,
+identical earlier prompt-history prefix and verbatim Prompt 109, relative links/
+anchors, status/private-content/artifact review, cached whitespace and staged
+Gitleaks without suppression. Results, staged tree and export metadata are reported
+in the handoff. Complete staged diff against HEAD, excluding prompts.md, goes to
+.local/p109/m4a-implementation.diff as UTF-8 without BOM. No commit, push, merge,
+dependency installation, Docker, database contact, provider call or M4b work.
+Codex performed this work; no Claude attribution is added.
+
+
+**Prompt 109 acceptance (external review, Prompt 110):** the reviewer inspected
+the complete implementation diff and independently matched its SHA-256 checksum.
+Independent standard-library probes passed for canonical fingerprint, SHA-256
+feature buckets/signs and golden vector, collision handling, non-ASCII zero
+output, input rejection, private provider errors and extreme numerics. The
+reviewer did not rerun the pytest suite because pytest was unavailable in its
+review environment. Acceptance also relies on the reported Windows checks:
+1479 passed, 205 skipped (204 PostgreSQL skips and one POSIX-only signal skip),
+with 126 focused embedding/packaging checks passed. M4a is accepted for a local
+commit; build, clean installed-wheel and Linux/current-version CI verification
+remain pending. Local build is blocked by missing hatchling under offline/no-install
+constraints. M4b–M4f and overall M4 acceptance remain pending. This note records
+the supplied reviewer evidence, not fresh execution of those probes by Codex.
+
+## Prompt 110: Commit reviewed M4a implementation locally
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Scope:** local commit only; no push or merge.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 110 — Commit the reviewed M4a implementation locally. No push or merge.
+
+Read applicable AGENTS.md instructions and CLAUDE.md. Avoid reloading full prompt history or printing diffs.
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/embedding-contracts.
+- HEAD:
+  ac395039fa43ef19c8e316d253af639f0e35fe0f.
+- Staged tree:
+  6edf253f38d929fb3ace8b16bfa9249275d813c6.
+- Exactly seven staged paths:
+  README.md
+  docs/plan.md
+  docs/decisions/0013-embeddings.md
+  packages/domain/evidenceguard_domain/embeddings.py
+  packages/retrieval/evidenceguard_retrieval/embeddings.py
+  tests/test_embeddings.py
+  prompts.md
+- Nothing unstaged or untracked.
+- Local main and origin/main:
+  85cb0d622a5b49c11439b0b9f67abceaa82edb29.
+- Expected origin and noreply identity unchanged.
+
+Stop on material mismatch. Record the accepted staged tree under .local/p110/.
+
+2. Preserve implementation
+
+The external reviewer accepts Prompt 109 for a local commit.
+
+Keep both embedding modules and tests/test_embeddings.py byte-identical to accepted tree 6edf253f38d929fb3ace8b16bfa9249275d813c6.
+
+Only README.md, docs/plan.md, ADR-0013 and prompts.md may change relative to that tree.
+
+Make narrow status changes:
+- M4a implementation accepted at external review for a local commit;
+- historical Windows results: 1479 passed, 205 skipped, comprising 204 PostgreSQL skips and one POSIX-only signal skip;
+- focused embedding/packaging checks: 126 passed;
+- Linux/current-version CI pending;
+- local build blocked by missing hatchling under the offline/no-install constraints;
+- build and clean installed-wheel verification remain pending;
+- no persistence, indexing, retrieval or live provider functionality added;
+- M4b–M4f and overall M4 acceptance remain pending.
+
+ADR-0013 may become Accepted, explicitly scoped to this reviewed implementation with the verification limits above.
+
+Do not change dependencies or install hatchling in this task. Do not redesign the contracts or hashing algorithm.
+
+3. Prompt history
+
+Append an acceptance note under Prompt 109:
+- reviewer inspected the complete diff and independently matched its checksum;
+- independent standard-library probes passed for canonical fingerprint, SHA-256 feature buckets/signs and golden vector, collision handling, non-ASCII zero output, input rejection, private provider errors and extreme numerics;
+- reviewer did not rerun the pytest suite because pytest was unavailable in its review environment;
+- acceptance also relies on the reported Windows checks;
+- build, installed-wheel and current-version CI verification remain pending.
+
+Append Prompt 110 verbatim and a truthful pre-commit note. Preserve earlier bytes. Do not include the new commit's own SHA or pre-record publication.
+
+4. Checks and local commit
+
+Verify:
+- exactly seven staged paths;
+- implementation and tests byte-identical to the accepted tree;
+- earlier prompts.md content remains an identical prefix;
+- links and anchors;
+- truthful status/verification wording;
+- private content and unintended artifacts;
+- git diff --cached --check;
+- staged Gitleaks without suppression;
+- noreply author and committer identity.
+
+Commit with subject:
+feat: add validated embedding contracts and deterministic hashing
+
+Use accurate Codex attribution under the applicable repository conventions. Do not attribute new work to Claude.
+
+After committing:
+- verify parent ac395039fa43ef19c8e316d253af639f0e35fe0f;
+- verify the seven committed paths;
+- verify both modules and the embedding tests still match the accepted tree;
+- run full-history Gitleaks;
+- confirm clean working tree;
+- confirm main and origin/main unchanged.
+
+No application tests or builds need repeating because implementation is unchanged. Stop on failed checks without suppression, amend or reset.
+
+5. Review export
+
+Export the complete incremental diff from accepted tree
+6edf253f38d929fb3ace8b16bfa9249275d813c6
+to the new commit, excluding prompts.md, to:
+.local/p110/m4a-commit-incremental.diff
+
+UTF-8 without BOM. Report baseline/final, paths, statistics, byte size and SHA-256. Do not print the diff.
+
+Report commit SHA, parent, attribution, checks and final Git state.
+
+No push, merge, force-push, amend, rebase, tag, branch deletion, dependency installation, Docker, database contact, provider calls or M4b work is authorized.
+
+Return this output plus .local/p110/m4a-commit-incremental.diff to the external reviewer.
+````
+
+**Prompt 110 pre-commit note (no new commit SHA or publication result recorded):**
+- Starting branch feat/embedding-contracts, HEAD
+  ac395039fa43ef19c8e316d253af639f0e35fe0f, staged tree
+  6edf253f38d929fb3ace8b16bfa9249275d813c6 verified; exactly the seven intended
+  paths staged, nothing unstaged/untracked. main and origin/main remained at
+  85cb0d622a5b49c11439b0b9f67abceaa82edb29, expected origin and noreply effective
+  author/committer identity. Accepted staged tree saved under .local/p110/.
+- Only README.md, docs/plan.md, ADR-0013 and appended prompt history change
+  relative to that tree. Both embedding modules and tests/test_embeddings.py
+  remain byte-identical. Status records reviewed implementation acceptance for
+  a local commit, historical Windows evidence, blocked local build and pending
+  build/wheel/Linux CI verification. No later-slice or overall M4 acceptance.
+- Pre-commit checks follow this note: exact scope, implementation/test bytes,
+  earlier-history identical prefix and verbatim prompt, links/anchors, truthful
+  status, private content/artifacts, cached whitespace, staged Gitleaks without
+  suppression and effective noreply identities. Actual outcomes go in the handoff.
+- Authorized subject: feat: add validated embedding contracts and deterministic hashing.
+  Use configured noreply author/committer and identify OpenAI Codex assistance
+  in the commit body; do not copy older Claude attribution.
+- After the local commit, verify parent, seven paths, byte-identical implementation/
+  tests, clean working tree and unchanged main/origin/main, then full-history
+  Gitleaks. Stop on failed checks without suppression, amend or reset.
+- No application test/build repetition, dependency installation, Docker, database
+  contact, provider calls, M4b work or publication. Build remains blocked by absent
+  hatchling under the offline/no-install constraints; no build or clean-wheel result
+  is claimed. M4b–M4f and overall M4 acceptance remain pending.
+- Export complete incremental diff from accepted tree to the new commit, excluding
+  prompts.md, as UTF-8 without BOM: .local/p110/m4a-commit-incremental.diff.
