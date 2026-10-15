@@ -11865,3 +11865,160 @@ End with:
   No application code, tests, dependencies, migrations, workflows or configuration changed.
 - **Checks for this commit:** run after this entry is staged; results are in the session handoff. They are the staged-path, byte-identity, link, private-content, `git diff --cached --check`, staged Gitleaks and identity checks, and after the commit the full-history Gitleaks scan. No application tests or builds were rerun, because the implementation files are byte-identical to the accepted tree.
 - **Not done:** nothing pushed or merged; `main` unchanged; no Docker or database contact.
+
+**Commit outcome (recorded in Prompt 92):**
+- **Commit:** `0dd1ebde0430322a6283420973fcb7b6f63d6019` ("feat: add bounded document uploads and tenant-scoped read API"), parent `98ca70b8e43ff4fd74349647b520213962374151`, tree `353bdefaca51702cdf826987a5440f76d7916c2b`, on `feat/document-api`, with the noreply author and committer identity.
+- **Content:** the 19 reviewed paths. Only `README.md`, ADR-0011, `docs/plan.md`, `docs/threat-model.md` and `prompts.md` differed from accepted tree `a2e6ed0`.
+- **Checks reported in the Prompt 91 handoff:**
+  - staged Gitleaks: no leaks;
+  - full-history Gitleaks after the commit: 36 commits scanned, no leaks found;
+  - working tree clean; `main` and `origin/main` unchanged at `cdf7260`.
+- **Diff:** `.local/p91/m3e-commit-incremental.diff`, 27,860 bytes, SHA-256 `af15e9bbfe4b4412b484b12934883b4a19bc30903930aad0e2684d4cf8ff9741`.
+- Nothing was pushed or merged.
+
+**Review note (recorded in Prompt 92):**
+- **Accepted:** the external reviewer accepted the Prompt 91 incremental documentation diff.
+- **How it was reviewed:** the reviewer independently computed its SHA-256, which matched the reported value. The reviewer ran no project checks.
+
+## Prompt 92: Publish the reviewed M3e feature branch and verify CI
+
+- **Stage:** Publication of `feat/document-api` only, and CI monitoring (no merge, no `main` update)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 92 is the next unused number after Prompt 91; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 92: Publish the reviewed M3e feature branch and verify CI
+
+You are authorized to publish only feat/document-api and monitor its CI. No merge or main update is authorized.
+
+1. Verify the starting state
+
+Expected:
+- Branch: feat/document-api.
+- HEAD: 0dd1ebde0430322a6283420973fcb7b6f63d6019.
+- Parent: 98ca70b8e43ff4fd74349647b520213962374151.
+- Working tree clean.
+- Local main and origin/main:
+  cdf7260d02b8af9affb369cc805d666be61f9ac0.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Effective author and committer use:
+  257921624+mathewmljourney93@users.noreply.github.com.
+
+Read fresh remote refs. Confirm remote main is still cdf7260 and an ancestor of HEAD. Confirm the feature branch does not already exist remotely.
+
+Stop on a material mismatch without changing or overwriting work.
+
+2. Publication preflight
+
+Inspect everything that will become public compared with remote main, including the specification commit 98ca70b and implementation commit 0dd1ebd.
+
+Confirm:
+- Commit identities use the noreply address.
+- No tracked .local/, environment files, backups, bundles, credentials or build outputs.
+- No secrets or private information in the publication content.
+- The workflows still trigger on this branch.
+- Ubuntu and Windows verification, PostgreSQL integration with EG_REQUIRE_INTEGRATION=1, and full-history secret scanning remain enabled.
+
+Do not change application code, tests, dependencies, configuration, workflows or the four reviewed documents.
+
+3. Prompt history and local history commit
+
+Preserve earlier prompts.md bytes.
+
+Append:
+- Prompt 91’s reported commit outcome.
+- The reviewer’s acceptance of its incremental documentation diff, with independently matched checksum; the reviewer did not run project checks.
+- This prompt verbatim.
+- A preflight note recording verified facts and the branch-only publication authorization.
+
+Keep historical Windows results distinct from future CI:
+- 1260 passed, 205 skipped.
+- 204 PostgreSQL skips plus one POSIX-only Windows signal skip.
+- The 26 new M3e PostgreSQL tests have not run.
+- The full 204-test PostgreSQL suite is unverified against this implementation.
+
+Do not pre-record a successful push or CI result.
+
+Stage only prompts.md. Check its append-only history, private content, git diff --cached --check and staged Gitleaks scan.
+
+Commit with subject:
+docs: record M3e branch publication authorization
+
+Retain the existing co-author convention.
+
+Verify that the commit changes only prompts.md, has parent 0dd1ebd, uses the noreply identity, and leaves a clean working tree.
+
+Run the full-history Gitleaks scan before pushing. Stop if it fails.
+
+4. Publish only the feature branch
+
+Run git directly, without piping away its exit status:
+
+git push --set-upstream origin refs/heads/feat/document-api:refs/heads/feat/document-api
+
+No force-push, other branches or tags.
+
+Confirm the remote feature ref matches the exact new HEAD and remote main remains unchanged.
+
+5. Monitor CI for the exact published SHA
+
+Wait for these four checks:
+- Ubuntu verification.
+- Windows verification.
+- PostgreSQL 17 + pgvector integration.
+- Full-history Gitleaks.
+
+Use available authenticated tooling where already configured; otherwise use read-only public GitHub APIs. Do not install tools or add credentials merely to retrieve logs.
+
+Poll at reasonable intervals, for at most 20 minutes. Verify each run’s head SHA, branch and event.
+
+If a job fails, report its failing step and available diagnostic output, then stop. Do not fix implementation or push further changes without review.
+
+If logs are accessible, report actual pytest summaries and any integration failures. If logs are inaccessible, report job conclusions and links, and clearly label test counts as unobserved. Do not present the expected 204 integration tests as an observed result.
+
+Do not merge or update main even if all checks pass.
+
+6. Handoff
+
+Report:
+- History commit SHA and parent.
+- Exact published SHA.
+- Preflight and scan results.
+- Push command and Git’s exit status.
+- Workflow and job links, conclusions and observed summaries.
+- Remote refs and final working-tree status.
+- Remaining verification limits.
+
+No application checks need rerunning locally because only prompts.md changes.
+
+No diff attachment is required because nothing outside prompts.md changes.
+
+Keep the current Claude session.
+
+End with:
+“Return this output only to the external reviewer; no diff attachment is required.”
+````
+
+**Preflight note (written before the push; no push or CI result is recorded here):**
+- **Authorization:** Prompt 92 authorizes publishing **only** `feat/document-api` and monitoring its CI. No merge, no `main` update, no force-push, no other branch and no tag.
+- **Starting state verified:**
+  - branch `feat/document-api` at `0dd1ebd` (parent `98ca70b`), working tree clean;
+  - local `main` and `origin/main` at `cdf7260`; origin and the noreply author and committer identity as expected.
+- **Fresh remote refs (`git ls-remote`, then `git fetch --prune`):** remote `main` is `cdf7260` and an ancestor of HEAD; `feat/document-api` does not exist remotely.
+- **Publication content:** commits `98ca70b` (specification) and `0dd1ebd` (implementation), plus this history commit, which changes only `prompts.md`.
+  - All use the noreply identity.
+  - No tracked `.local/`, build outputs, bundles, backups, keys or credentials. The only environment file is the existing `.env.example`, which holds obvious placeholders and is unchanged by this publication.
+  - No binary files; the added lines hold no private paths, addresses or tokens.
+  - Gitleaks over `origin/main..HEAD` found no leaks.
+- **Workflows (unchanged):**
+  - `ci.yml` and `secret-scan.yml` trigger on every push and pull request, without branch filters;
+  - `verify` runs on `ubuntu-24.04` and `windows-2025`;
+  - `integration` runs PostgreSQL 17 + pgvector with `EG_REQUIRE_INTEGRATION=1`;
+  - `gitleaks` scans the full history (`fetch-depth: 0`).
+- **Verification status before CI:**
+  - The local Windows result was `1260 passed, 205 skipped`: 204 PostgreSQL skips plus one POSIX-only Windows signal skip.
+  - The 26 new M3e PostgreSQL tests have **never run**, and the full 204-test PostgreSQL suite is **unverified** against this implementation.
+  - Any CI result belongs to the session handoff and later history, not to this note.
