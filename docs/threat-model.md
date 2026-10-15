@@ -172,9 +172,16 @@ Implemented in Prompt 89, corrected in Prompt 90, accepted at external review (P
 
 **Limits** (ADR-0011): the reader depends on the verified behaviour of `python-multipart` 0.0.32, which an upgrade must re-verify. Per-byte header feeding costs CPU bounded by the header caps. The upload response is an observation that a worker may change at once. `stalled` revisions have no operator retry in v1.
 
-## Containers (M3f, accepted at review, committed locally, container CI pending)
+## Containers (M3f, verified in CI on `feat/container-stack`, not merged)
 
-Implemented in Prompt 98, corrected in Prompt 99 and accepted at external review for a local commit on `feat/container-stack` (Prompt 100; [ADR-0012](decisions/0012-containers.md)); nothing is pushed or merged. The CI container job (image build, effective build-context check, image checks, Compose smoke and cleanup) **has not run**, so none of these mitigations is yet verified in a container, and local Compose is unverified. It is a development stack only.
+Implemented in Prompt 98, corrected in Prompt 99, accepted at external review (Prompt 100), and verified in CI on `feat/container-stack` at `682101b` ([CI run 38769986459](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459)). Ubuntu, Windows, the 204-test PostgreSQL suite and the container job (image build, effective build context, image checks, Compose smoke and cleanup) passed, per job logs retrieved by the external reviewer; it is not merged ([ADR-0012](decisions/0012-containers.md)). In that run, the container job checked these mitigations in a real container:
+- the effective build context excluded all 19 planted fixtures;
+- the runtime ran as UID/GID 10001;
+- the application containers ran the CI-built image;
+- the smoke passed, including its key-in-service-logs check and the idle-worker exit check;
+- cleanup verified ownership.
+
+Local Compose is unverified. It is a development stack only, with no production-readiness or general security guarantee.
 
 | Threat | Mitigation |
 |---|---|

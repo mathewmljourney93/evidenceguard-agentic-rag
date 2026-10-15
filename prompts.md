@@ -13749,3 +13749,348 @@ Return this output only to the external reviewer; no diff attachment is required
 - **Verification status before publication:**
   - **Historical local Windows results** (Prompt 99): `1363 passed, 205 skipped` (204 PostgreSQL skips and one POSIX-only signal skip).
   - **Not yet run:** all real container execution (image build, effective build-context check, image checks, Compose smoke and Docker cleanup), and CI for this version.
+
+**Publication outcome (recorded in Prompt 102):**
+- **History commit:** `682101b4f06d099b147b8d21734fa83f7f53637f` ("docs: record M3f branch publication authorization"), parent `56fc3b5`, changing only `prompts.md`. Full-history Gitleaks before the push scanned 41 commits and found no leaks.
+- **Push:** `git push --set-upstream origin refs/heads/feat/container-stack:refs/heads/feat/container-stack` exited 0 and created the remote branch. Remote `feat/container-stack` matched `682101b` exactly; remote `main` stayed at `2e605e7`. No other ref, tag or force-push.
+- **What Claude observed** through the public GitHub API: [ci run 38769986459](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459) and [secret-scan run 38769986224](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986224) were push events on `feat/container-stack` at `682101b`, and all five jobs concluded `success`: Ubuntu verify, Windows verify, PostgreSQL integration, container and full-history Gitleaks. Every container step concluded `success` and none was skipped: rendered Compose configuration, effective build context, image build, image checks, Compose smoke and cleanup.
+- **What Claude could not observe:** the job-log endpoint returned HTTP 403 (admin rights required), so Claude reported every test count and all container output as unobserved.
+
+**Reviewer evidence note (recorded in Prompt 102):** the external reviewer retrieved both workflow-run records and all five job logs. Both runs were push events on `feat/container-stack` at exact head commit `682101b4f06d099b147b8d21734fa83f7f53637f`, with conclusion success. The reviewer did not run the project suite or Docker locally. Observed results:
+- Ubuntu job 116542962186: `1364 passed, 204 skipped in 27.63s`.
+- Windows job 116542962338: `1363 passed, 205 skipped in 39.61s`.
+- PostgreSQL job 116542961580: `204 passed, 1364 deselected in 59.62s`.
+- Container job 116542962209:
+  - `compose config: ok`; `context: ok (72 files; 19 planted fixtures excluded)`; the application image built;
+  - UID and GID 10001 checks passed; `eg-api`, `eg-worker` and `eg-admin` `--help` checks passed; installed imports, offline migration SQL and runtime contents checks passed;
+  - the stack started (database healthy, migration complete, API healthy), and `migrate`, `api` and `worker` used the CI-built image;
+  - an API key was created and held in memory; the upload was accepted with 202; the ingestion job succeeded; the revision was active with 2 verified chunks;
+  - a duplicate upload returned the existing revision with 200; the idle worker exited with code 0 and no OOM kill;
+  - `smoke: ok`; `cleanup: ok`.
+- Secret-scan job 116542954404: 41 commits scanned, no leaks found.
+
+## Prompt 102: Record verified M3f feature-branch CI results
+
+- **Stage:** Documentation of verified CI results on `feat/container-stack`; staged and uncommitted for review (no commit, push or merge)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 102 is the next unused number after Prompt 101; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 102 — Record verified M3f feature-branch CI results. Stage documentation for review; do not commit, push or merge.
+
+Read CLAUDE.md and relevant status sections only. Do not reload the complete prompt history or print diffs.
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/container-stack.
+- HEAD and upstream:
+  682101b4f06d099b147b8d21734fa83f7f53637f.
+- Parent:
+  56fc3b5327ff860a9ed9a092dfd591b8edb7dcdf.
+- Working tree clean.
+- Local main and origin/main:
+  2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f.
+- Expected origin and noreply identity unchanged.
+
+Check fresh remote refs read-only. Stop on a material mismatch. Record the baseline under .local/p102/.
+
+2. Record independently retrieved evidence
+
+The external reviewer retrieved all five job logs and both workflow-run records. Both runs were push events on feat/container-stack with exact head commit `682101b4f06d099b147b8d21734fa83f7f53637f` and conclusion success.
+
+CI run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459
+
+Observed summaries:
+- Ubuntu job 116542962186:
+  1364 passed, 204 skipped in 27.63s.
+- Windows job 116542962338:
+  1363 passed, 205 skipped in 39.61s.
+- PostgreSQL job 116542961580:
+  204 passed, 1364 deselected in 59.62s.
+
+Container job 116542962209:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459/job/116542962209
+
+Observed output:
+- compose config: ok
+- context: ok (72 files; 19 planted fixtures excluded)
+- application image built successfully
+- UID and GID 10001 checks passed
+- eg-api, eg-worker and eg-admin --help checks passed
+- installed imports, offline migration SQL and runtime contents checks passed
+- stack started: database healthy, migration complete, API healthy
+- migrate, api and worker used the CI-built image
+- API key created and held in memory
+- upload accepted with 202
+- ingestion job succeeded
+- revision active; 2 verified chunks
+- duplicate upload returned the existing revision with 200
+- idle worker exited with code 0 and no OOM kill
+- smoke: ok
+- cleanup: ok
+
+Secret-scan run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986224
+Job 116542954404:
+41 commits scanned, no leaks found.
+
+Attribute these log results to the external reviewer. The reviewer did not run the project suite or Docker locally. Preserve Claude's earlier account that its anonymous API session could not retrieve logs.
+
+3. Documentation scope
+
+Modify only:
+- README.md
+- docs/decisions/0012-containers.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Record M3f as reviewed and verified in CI on feat/container-stack at `682101b`, not merged. Main remains at `2e605e7`.
+
+Replace current claims that no container build, context check, image check, Compose smoke or cleanup has run. Preserve historical pre-CI statements when clearly labelled historical.
+
+Include full evidence and links in the README M3f entry and ADR-0012; concise references elsewhere. Keep the historical Windows results separate.
+
+State precisely:
+- CI Compose verification is complete for this version.
+- Under the accepted specification, this can satisfy M3's Compose requirement alongside its other criteria.
+- Local Compose remains unverified.
+- The smoke proves the tested idle-worker shutdown, not an in-flight handler shutdown bound.
+- Overall M3 acceptance remains pending a separate review.
+- The stack is for development; no production readiness, benchmark or general security guarantee is claimed.
+- The approved uv exception remains unchanged.
+
+Sweep current M3 status sections for contradictory M3f wording. Narrowly correct stale present-tense claims such as “M3f is not implemented”, while preserving historical baseline descriptions.
+
+Do not implement anything or begin M4.
+
+4. Prompt history
+
+Append:
+- The Prompt 101 publication outcome, separating Claude's API observations from the logs it could not retrieve.
+- A reviewer-evidence note containing the verified results above.
+- Prompt 102 verbatim and an outcome note marking this documentation as awaiting review.
+
+Preserve all earlier bytes. Write commit references inline in backticks to avoid the earlier public-SHA Gitleaks false positive. Do not alter the existing formatting-exception history.
+
+5. Checks and staging
+
+Stage exactly the five permitted files.
+
+Verify:
+- earlier prompts.md content is an identical prefix;
+- relative links and anchors;
+- stale current-status wording;
+- no private content or unintended artifacts;
+- git diff --cached --check;
+- staged Gitleaks without suppression or allowlisting.
+
+No application tests, builds, Docker or database contact are needed for this documentation-only task.
+
+Do not commit, push, merge, amend, rebase, tag or delete branches.
+
+6. Review export and handoff
+
+Export the complete staged diff against HEAD, excluding prompts.md, to:
+.local/p102/m3f-verification-docs.diff
+
+Use UTF-8 without BOM. Report baseline commit, final staged tree, changed paths, statistics, byte size and SHA-256. Do not print the diff.
+
+Report checks and final Git state. Keep overall M3 acceptance and merging into main pending.
+
+Return this output plus .local/p102/m3f-verification-docs.diff to the external reviewer.
+````
+
+**Outcome note (documentation staged, awaiting review):**
+- **Starting state verified:**
+  - branch `feat/container-stack`; HEAD and upstream `682101b` (parent `56fc3b5`); working tree clean;
+  - fresh remote refs: remote `feat/container-stack` at `682101b`, local and remote `main` at `2e605e7`;
+  - origin and noreply identity unchanged.
+
+  The baseline is recorded under `.local/p102/`.
+- **Documentation:** status updates in `README.md`, ADR-0012, `docs/plan.md` and `docs/threat-model.md`.
+  - **New status:** M3f is reviewed and verified in CI on `feat/container-stack` at `682101b`, not merged, with `main` at `2e605e7`. The full evidence is in the README container section and ADR-0012, with concise references elsewhere, attributed to the reviewer's retrieval of the logs.
+  - **Replaced:** current claims that no container check had run, labelling the pre-CI statement in ADR-0012 as historical.
+  - **Stale wording corrected:** the M3d status line's present-tense "M3f is not implemented" is now scoped to its baseline.
+  - **Kept:** the historical Windows results separate; the uv exception unchanged.
+  - **Stated:**
+    - CI Compose verification is complete for this version, and can satisfy M3's Compose requirement under the accepted specification;
+    - local Compose is unverified;
+    - the smoke shows idle-worker shutdown only, not an in-flight handler bound;
+    - overall M3 acceptance needs a separate review;
+    - there is no production-readiness, benchmark or general security claim.
+- **Checks:** the staged-path, history, link, stale-wording, private-content, `git diff --cached --check` and staged Gitleaks checks run after this entry is staged; results are in the session handoff. No application tests, builds, Docker or database contact.
+- **Not done:** nothing committed, pushed or merged.
+
+**Acceptance note (recorded in Prompt 103):**
+- **Accepted:** the external reviewer accepted the Prompt 102 documentation diff, with one clarification applied in Prompt 103: ADR-0012's "Docker behaviour relied on" bullet now separates the behaviours the passing run exercised from Docker's documented forced SIGKILL after `stop_grace_period`, which the run did not exercise.
+- **How it was reviewed:** the reviewer inspected `.local/p102/m3f-verification-docs.diff`, independently matched its SHA-256, and checked it against the previously retrieved CI logs.
+- **Not run by the reviewer:** a local suite or Docker.
+
+## Prompt 103: Commit the reviewed M3f results, publish the feature branch, then fast-forward main
+
+- **Stage:** A documentation commit on `feat/container-stack`, publication of the feature branch, and a fast-forward of `main` only after all five checks pass
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 103 is the next unused number after Prompt 102; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 103 — Commit the reviewed M3f results, publish the feature branch, then fast-forward main only after all five checks pass.
+
+Read CLAUDE.md and relevant workflow/status sections. Do not reload full prompt history or print diffs.
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/container-stack.
+- HEAD, upstream and remote feature branch:
+  682101b4f06d099b147b8d21734fa83f7f53637f.
+- Staged tree:
+  d3917b0d994915e88508f34d187dcee8c4feef69.
+- Exactly five staged paths:
+  README.md
+  docs/decisions/0012-containers.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Local main, origin/main and remote main:
+  2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f.
+- Expected origin and noreply author/committer identity unchanged.
+
+Fetch fresh refs. Confirm main is an ancestor of HEAD and has no independent local commits. Stop on material mismatch. Record the accepted staged tree under .local/p103/.
+
+2. One authorized documentation clarification
+
+In ADR-0012's final “Docker behaviour relied on” bullet, distinguish:
+- behaviours exercised by the passing run;
+- Docker's documented forced-SIGKILL behaviour after stop_grace_period, which was NOT exercised because the idle worker exited normally.
+
+Keep the 60-second external termination budget and existing shutdown limitations unchanged. This is a wording clarification only.
+
+Otherwise preserve README, plan and threat model byte-identical to the accepted tree. No source, tests, Docker configuration, workflows, dependencies or tool settings may change.
+
+Do not mark overall M3 accepted.
+
+3. Prompt history and local commit
+
+Append:
+- Acceptance note under Prompt 102: reviewer inspected the diff, independently matched its checksum, checked it against the previously retrieved CI logs, and accepted it with the SIGKILL wording clarification. Reviewer ran no local suite or Docker.
+- Prompt 103 verbatim.
+- A preflight note recording the verified state, checks, authorized publication order and stop conditions.
+
+Preserve all earlier bytes. Do not pre-record pushes, new CI outcomes or the main update.
+
+Check:
+- exactly five staged paths;
+- only ADR-0012 and prompts.md differ from the accepted tree;
+- earlier prompts.md content is an identical prefix;
+- links and anchors;
+- private content and unintended artifacts;
+- git diff --cached --check;
+- staged Gitleaks without suppression;
+- effective author and committer identity.
+
+Commit with subject:
+docs: record verified M3f results and main publication authorization
+
+Use the existing co-author trailer.
+
+Verify parent, paths and clean tree. Run full-history Gitleaks before publication. Stop on a finding. Do not suppress, allowlist or amend.
+
+No application tests, builds, local Docker or database contact are needed.
+
+4. Push the feature branch and verify five jobs
+
+Run directly, preserving Git's exit status:
+
+git push origin refs/heads/feat/container-stack:refs/heads/feat/container-stack
+
+Confirm the exact remote SHA. Monitor push-triggered workflows for that SHA and branch, up to 25 minutes.
+
+All FIVE jobs must succeed:
+- Ubuntu verify;
+- Windows verify;
+- PostgreSQL integration;
+- container;
+- full-history Gitleaks.
+
+The container configuration, context, build, image, smoke and cleanup steps must execute successfully, not be skipped.
+
+If any required job fails, is cancelled or remains pending at the limit, stop without changing main. Report accessible evidence; do not fix files, rerun workflows or push again.
+
+Use existing GitHub access or public read-only API. Do not add credentials or install tools. Retrieve logs if accessible; otherwise report counts as unobserved. Never reuse the 682101b counts as results for the new SHA.
+
+5. Fast-forward main only after five green jobs
+
+Fetch fresh refs again and verify:
+- remote main is still 2e605e7bcf3b7b1ee90e9f12cb2acddb6950048f;
+- remote feature equals the newly verified commit;
+- main is an ancestor of that commit;
+- local main equals origin/main with no independent commits;
+- working tree clean.
+
+If any precondition fails, stop.
+
+Switch to main and fast-forward using:
+git merge --ff-only <the exact verified commit>
+
+Then push only:
+git push origin refs/heads/main:refs/heads/main
+
+No force-push or merge commit.
+
+Monitor all five jobs again for the exact commit's push to main, up to 25 minutes. Report failures accurately and stop; do not roll back, fix, rerun or make further pushes.
+
+6. Handoff
+
+Report:
+- commit SHA, parent, subject, identity and paths;
+- exact changes against the accepted tree;
+- scans and checks;
+- both push commands and Git exit statuses;
+- all five job conclusions and run/job links for each push;
+- container step conclusions;
+- observed summaries separately from inaccessible counts;
+- refs before/after and final working-tree status.
+
+Leave documents unchanged after publication. Recording main results and overall M3 acceptance belongs to a later review.
+
+No force-push, amend, rebase, squash, tag, branch deletion, local Docker or database contact. Do not start M4.
+
+Export the incremental diff from accepted tree d3917b0d994915e88508f34d187dcee8c4feef69 to the new commit, excluding prompts.md, to:
+.local/p103/m3f-publication-incremental.diff
+
+Report baseline/final, size and SHA-256; UTF-8 without BOM. Do not print it.
+
+Return this output plus .local/p103/m3f-publication-incremental.diff to the external reviewer.
+````
+
+**Preflight note (written before the commit; no push, CI or `main` result is recorded here):**
+- **Starting state verified:**
+  - branch `feat/container-stack`; HEAD, upstream and remote feature branch at `682101b`;
+  - staged tree `d3917b0d994915e88508f34d187dcee8c4feef69` with exactly the five expected paths; nothing unstaged or untracked;
+  - fresh refs: local `main`, `origin/main` and remote `main` at `2e605e7`, an ancestor of HEAD, with no independent local commits;
+  - origin and the noreply identity as expected.
+
+  The accepted tree is recorded under `.local/p103/`.
+- **Changes since the accepted tree:** only the authorized ADR-0012 wording clarification, and this prompt history. `README.md`, `docs/plan.md` and `docs/threat-model.md` are to stay byte-identical.
+- **Checks before the commit:** run after this entry is staged; results are in the session handoff. They are the staged-path, accepted-tree comparison, prompt-history prefix, link, private-content, `git diff --cached --check`, staged Gitleaks and identity checks, then full-history Gitleaks before publication.
+- **Authorized publication order:**
+  1. commit locally;
+  2. push `feat/container-stack` only;
+  3. require all five jobs to succeed for that exact commit (Ubuntu verify, Windows verify, PostgreSQL integration, container with its configuration, context, build, image, smoke and cleanup steps executed successfully, and full-history Gitleaks);
+  4. re-verify fresh refs, fast-forward `main` with `--ff-only` to that exact commit, and push only `main`;
+  5. monitor the five jobs again.
+- **Stop conditions:**
+  - any finding from a scan;
+  - any required job failing, cancelled, skipped in a required container step, or pending after 25 minutes;
+  - any precondition for the fast-forward not holding.
+
+  On any stop: no fixes, reruns, rollbacks or further pushes.
+- **Not authorized:** force-push, amend, rebase, squash, tag, branch deletion, local Docker or database contact. Overall M3 acceptance remains pending.

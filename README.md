@@ -10,7 +10,7 @@ EvidenceGuard is a planned vendor-risk review copilot. It is intended to:
 
 It is evidence-based decision support, not legal advice or compliance certification.
 
-## Status: M1 and M2 accepted (persistence, authentication, tenant-scoped vendors and readiness on `main`); M3a durable job core, M3b worker runtime and M3c documents and revisions on `main`; M3d document ingestion on `main`; M3e document API on `main`; M3f container stack accepted at review and committed locally, container CI pending (pre-alpha)
+## Status: M1 and M2 accepted (persistence, authentication, tenant-scoped vendors and readiness on `main`); M3a durable job core, M3b worker runtime and M3c documents and revisions on `main`; M3d document ingestion on `main`; M3e document API on `main`; M3f container stack verified in CI on `feat/container-stack`, not merged (pre-alpha)
 
 **What works now:**
 - One installable Python 3.12 package (`evidenceguard`), managed with uv, with a committed lockfile (M1a).
@@ -122,7 +122,7 @@ The earlier M1 baseline `6d64fb3` passed [CI](https://github.com/mathewmljourney
 
 **Still planned** (see [docs/plan.md](docs/plan.md)):
 - Revision activation and supersession tests, deferred from M1 to M3: now on `main` with M3c and passing in CI, including against PostgreSQL.
-- The rest of M3 (worker, documents and revisions, parsing and chunking, uploads, Docker), following the accepted slice sequence in [docs/plan.md](docs/plan.md). M3a, M3b and M3c are on `main`; the M3d ingestion specification (parsing, chunking, migration `0004` and the `ingest_revision` handler) was accepted at review in [docs/plan.md](docs/plan.md), with its limits as initial engineering defaults rather than measured results, and is implemented, reviewed, verified in CI and on `main` at `cdf7260`; the M3e upload and document API specification was accepted at review in [docs/plan.md](docs/plan.md), with its caps and pagination bounds as initial engineering choices rather than measured results, and its implementation is reviewed, verified in CI and on `main` at `2e605e7`; the M3f container specification was accepted at review in [docs/plan.md](docs/plan.md), and its implementation was accepted at external review for a local commit on `feat/container-stack` (not pushed or merged; [ADR-0012](docs/decisions/0012-containers.md)); its image build, effective build-context check, image checks, CI Compose smoke and Docker cleanup are written but have not run; Compose is unverified, and overall M3 acceptance is pending.
+- The rest of M3 (worker, documents and revisions, parsing and chunking, uploads, Docker), following the accepted slice sequence in [docs/plan.md](docs/plan.md). M3a, M3b and M3c are on `main`; the M3d ingestion specification (parsing, chunking, migration `0004` and the `ingest_revision` handler) was accepted at review in [docs/plan.md](docs/plan.md), with its limits as initial engineering defaults rather than measured results, and is implemented, reviewed, verified in CI and on `main` at `cdf7260`; the M3e upload and document API specification was accepted at review in [docs/plan.md](docs/plan.md), with its caps and pagination bounds as initial engineering choices rather than measured results, and its implementation is reviewed, verified in CI and on `main` at `2e605e7`; the M3f container specification was accepted at review in [docs/plan.md](docs/plan.md), and its implementation is reviewed and verified in CI on `feat/container-stack` at `682101b`, including the image build, effective build-context check, image checks, CI Compose smoke and cleanup. It is not merged ([ADR-0012](docs/decisions/0012-containers.md)). Local Compose is unverified, and overall M3 acceptance is pending a separate review.
 - After M2: ingestion, retrieval, model providers, the review workflow, API endpoints for the approval gate, and evaluation.
 
 No retrieval, agent workflow, evaluation results, security guarantees or benchmarks are claimed. Any future results will be published with their committed inputs, configuration and the command that reproduces them.
@@ -256,9 +256,27 @@ Packaging layout: [ADR-0001](docs/decisions/0001-packaging-and-layout.md). Reque
 
 The request ID is for correlating logs only. It is not authentication and says nothing about who made a request. Logs are local JSON lines on stderr; there is no monitoring or telemetry service.
 
-### Containers (M3f; accepted at review, committed locally, not yet run)
+### Containers (M3f; verified in CI on `feat/container-stack`, not merged; not run locally)
 
-> **Not executed.** Docker is not available on the development machine, so none of these commands has been run locally. The CI `container` job (image build, effective build-context check, image checks, a Compose smoke test and cleanup) was accepted at review and committed locally, but has not run yet; nothing is pushed or merged. See [ADR-0012](docs/decisions/0012-containers.md). This is a development stack only: no TLS, secrets management or production deployment.
+> **Verified in CI; not run locally.** Docker is not available on the development machine, so none of these commands has been run locally.
+
+It was verified in CI on `feat/container-stack` at `682101b` (`682101b4f06d099b147b8d21734fa83f7f53637f`; [CI run 38769986459](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459), a push event, conclusion success). From job logs retrieved by the external reviewer:
+- [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459/job/116542962186): `1364 passed, 204 skipped in 27.63s`;
+- [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459/job/116542962338): `1363 passed, 205 skipped in 39.61s`;
+- [PostgreSQL integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459/job/116542961580): `204 passed, 1364 deselected in 59.62s`;
+- [container job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459/job/116542962209):
+  - `compose config: ok` and `context: ok (72 files; 19 planted fixtures excluded)`;
+  - the application image built;
+  - the image checks passed: UID and GID 10001, `--help` for `eg-api`, `eg-worker` and `eg-admin`, installed imports, offline migration SQL and runtime contents;
+  - the stack started with the database healthy, the migration complete and the API healthy, and `migrate`, `api` and `worker` ran the CI-built image;
+  - an API key was created and held in memory; the upload was accepted (202), the ingestion job succeeded, and the revision was active with 2 verified chunks;
+  - a duplicate upload returned the existing revision (200), and the idle worker exited with code 0 and no OOM kill;
+  - `smoke: ok` and `cleanup: ok`;
+- the [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986224) ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986224/job/116542954404)): 41 commits scanned, no leaks found.
+
+The reviewer did not run the suite or Docker locally. Claude's anonymous API session saw only the job and step conclusions (all `success`, none skipped) and could not retrieve the logs.
+
+CI Compose verification is complete for this version; under the accepted specification, it can satisfy M3's Compose requirement alongside M3's other criteria. Local Compose remains unverified. The smoke shows the tested idle-worker shutdown, not a shutdown bound for an in-flight handler. Overall M3 acceptance remains pending a separate review. This is a development stack: no production readiness, benchmark or general security guarantee is claimed. The approved uv exception is unchanged. See [ADR-0012](docs/decisions/0012-containers.md). The stack has no TLS, secrets management or production deployment.
 
 `docker-compose.yml` defines four services:
 - `postgres`: the existing pinned pgvector image, on `127.0.0.1:5433`;

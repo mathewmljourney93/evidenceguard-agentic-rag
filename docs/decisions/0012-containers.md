@@ -1,6 +1,6 @@
 # ADR-0012: Development container image and Compose stack
 
-- **Status:** Accepted (M3f) at external review for a local commit on `feat/container-stack` (Prompt 100). It was implemented in Prompt 98 and corrected in Prompt 99 after review findings; nothing is pushed or merged. No image build, effective build-context check, image check, Compose smoke or real Docker cleanup has run, and container execution and CI verification remain pending. Local Compose is unverified, and overall M3 acceptance is pending.
+- **Status:** Accepted (M3f) at external review (Prompt 100); implemented in Prompt 98 and corrected in Prompt 99 after review findings. It is **verified in CI on `feat/container-stack` at `682101b` ([CI run 38769986459](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459)). Ubuntu, Windows, the 204-test PostgreSQL suite and the container job (image build, effective build context, image checks, Compose smoke and cleanup) passed, per job logs retrieved by the external reviewer** (see *Consequences and limits*). It is not merged; `main` remains at `2e605e7`. Local Compose is unverified, and overall M3 acceptance is pending a separate review.
   - The specification was accepted at review in Prompt 97 (proposed in Prompt 95, corrected in Prompts 96–97).
 - **Date:** 2026-10-15
 - **Builds on:**
@@ -52,7 +52,7 @@ Both digests come from the accepted specification. They were re-verified on 2026
   - `api` publishes `127.0.0.1:8000` only, and its health check calls `/readyz` with the image's Python.
 - **Worker shutdown:** `stop_signal: SIGTERM` and `stop_grace_period: 60s`. The 60 s is an **external termination budget**, not a guaranteed shutdown bound. The worker's drain, cancellation and join waits are bounded supervisor waits, but a synchronous database call can outlast them (ADR-0008), and Docker sends SIGKILL when the budget expires. M3f does not change worker semantics and adds no statement timeout.
 
-### CI verification (`container` job; written, not executed)
+### CI verification (`container` job; verified in CI at `682101b`)
 
 One Ubuntu job (Linux containers), with `timeout-minutes: 20`, read-only contents permission, no registry login or push, and no new third-party actions.
 - **Selection:** the project name and image tag are both unique per run and attempt: `eg-ci-<run id>-<attempt>` and `evidenceguard:ci-<run id>-<attempt>`. Every step uses the same Compose file, project and image.
@@ -107,7 +107,25 @@ The steps, implemented by the stdlib-only `infra/ci/container_ci.py`:
   - ruff and strict mypy, now including `infra/ci/container_ci.py`;
   - the database-independent suite, including `tests/test_container_ci.py` (the smoke, cleanup and configuration logic against fake subprocess and HTTP functions, plus real subprocess timeouts and a local HTTP server). It includes the Prompt 99 regressions for unavailable logs, credential protection and cleanup ownership, which fail against the Prompt 98 helper;
   - `tests/test_container_files.py`: Dockerfile invariants, Compose and CI wiring, and an *approximation* of Docker's ignore rules applied to the real tracked files and nested fixtures.
-- **Not run anywhere yet:** the image build, the effective build-context check, the image checks and the Compose smoke. They need an authorized publication and CI. Until the smoke passes in CI, nothing in this ADR is demonstrated to work in a container. Local Compose remains unverified until it actually runs locally.
+- **Verified in CI (`682101b`):** It was verified in CI on `feat/container-stack` at `682101b` (`682101b4f06d099b147b8d21734fa83f7f53637f`; [CI run 38769986459](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459), a push event, conclusion success). From job logs retrieved by the external reviewer:
+- [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459/job/116542962186): `1364 passed, 204 skipped in 27.63s`;
+- [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459/job/116542962338): `1363 passed, 205 skipped in 39.61s`;
+- [PostgreSQL integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459/job/116542961580): `204 passed, 1364 deselected in 59.62s`;
+- [container job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986459/job/116542962209):
+  - `compose config: ok` and `context: ok (72 files; 19 planted fixtures excluded)`;
+  - the application image built;
+  - the image checks passed: UID and GID 10001, `--help` for `eg-api`, `eg-worker` and `eg-admin`, installed imports, offline migration SQL and runtime contents;
+  - the stack started with the database healthy, the migration complete and the API healthy, and `migrate`, `api` and `worker` ran the CI-built image;
+  - an API key was created and held in memory; the upload was accepted (202), the ingestion job succeeded, and the revision was active with 2 verified chunks;
+  - a duplicate upload returned the existing revision (200), and the idle worker exited with code 0 and no OOM kill;
+  - `smoke: ok` and `cleanup: ok`;
+- the [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986224) ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38769986224/job/116542954404)): 41 commits scanned, no leaks found.
+
+The reviewer did not run the suite or Docker locally. Claude's anonymous API session saw only the job and step conclusions (all `success`, none skipped) and could not retrieve the logs.
+- **What this establishes:** CI Compose verification is complete for this version; under the accepted specification, it can satisfy M3's Compose requirement alongside M3's other criteria. Local Compose remains unverified. The smoke shows the tested idle-worker shutdown, not a shutdown bound for an in-flight handler. Overall M3 acceptance remains pending a separate review. This is a development stack: no production readiness, benchmark or general security guarantee is claimed. The approved uv exception is unchanged.
+- **Before CI (historical, Prompts 98–101):** the image build, the effective build-context check, the image checks, the Compose smoke and cleanup had not run anywhere until that CI run.
 - **Scope of the smoke:** it stops an idle worker. It does not prove that an in-flight handler drains in a container (M3b's process-level tests cover draining), nor multi-worker behaviour.
 - **Development only:** there is no TLS, no secrets management (the database credentials are disposable and public), no resource limits, no backups, no image signing or SBOM, no registry publication and no production deployment. The non-root, read-only and capability settings are sensible defaults, not a security certification.
-- **Docker behaviour relied on** (from Docker's documentation, to be confirmed by the first CI run): `pull_policy: never` together with a `build` section; `up --no-build --pull never --wait`; `stop_grace_period` followed by SIGKILL; `init`; `${VAR:-default}` interpolation; `.dockerignore` matching; and `--output type=local` exporting a `FROM scratch` stage.
+- **Docker behaviour relied on** (from Docker's documentation):
+  - **Exercised by the passing CI run at `682101b`:** `pull_policy: never` together with a `build` section; `up --no-build --pull never --wait`; `init`; `${VAR:-default}` interpolation; `.dockerignore` matching; `--output type=local` exporting a `FROM scratch` stage; and `stop_signal: SIGTERM` with a normal worker exit inside the grace period.
+  - **Not exercised:** Docker's documented forced SIGKILL after `stop_grace_period` expires. The idle worker exited normally (code 0) within the grace period, so the SIGKILL path never ran. The 60 s grace period remains an external termination budget, with the shutdown limitations above unchanged.
