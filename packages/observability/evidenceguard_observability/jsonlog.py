@@ -49,6 +49,8 @@ ALLOWED_FIELDS = frozenset(
 )
 
 REQUEST_COMPLETED = "request.completed"
+# Fixed API events. Each carries no submitted value (ADR-0011).
+DOCUMENT_UPLOAD_INCONSISTENT = "document.upload_inconsistent"
 UNREVIEWED_EVENT = "log.unreviewed_message"
 
 # Fixed worker events (ADR-0008). Each is its own message template.
@@ -78,6 +80,7 @@ WORKER_EVENTS = (
 REVIEWED_EVENTS: Mapping[str, str] = MappingProxyType(
     {
         REQUEST_COMPLETED: REQUEST_COMPLETED,
+        DOCUMENT_UPLOAD_INCONSISTENT: DOCUMENT_UPLOAD_INCONSISTENT,
         # Uvicorn 0.54 (uvicorn/server.py, config.py, lifespan/on.py, protocols/http/*).
         "Started server process [%d]": "server.process_started",
         "Finished server process [%d]": "server.process_finished",

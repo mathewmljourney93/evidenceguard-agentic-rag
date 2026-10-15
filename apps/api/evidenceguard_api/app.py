@@ -8,6 +8,8 @@ from fastapi import FastAPI
 
 from evidenceguard_api.auth import Authenticator, DatabaseAuthenticator
 from evidenceguard_api.database import AppDatabase
+from evidenceguard_api.documents import DatabaseDocumentStore, DocumentStore
+from evidenceguard_api.documents import router as documents_router
 from evidenceguard_api.me import router as me_router
 from evidenceguard_api.middleware import RequestContextMiddleware
 from evidenceguard_api.problems import install_problem_handlers
@@ -22,6 +24,7 @@ def create_app(
     *,
     authenticator: Authenticator | None = None,
     vendor_store: VendorStore | None = None,
+    document_store: DocumentStore | None = None,
     readiness: Readiness | None = None,
     database: AppDatabase | None = None,
 ) -> FastAPI:
@@ -30,10 +33,10 @@ def create_app(
     The factory adds request-ID middleware and problem+json error handlers. It does not
     configure logging handlers; ``eg-api`` does that once per process.
 
-    Injection seams: ``authenticator``, ``vendor_store`` and ``readiness`` replace the
-    database-backed defaults (tests pass doubles). Any default that is used shares one
-    ``AppDatabase``: the ``database`` passed in, which the caller owns and closes, or else one
-    the app creates and disposes on shutdown. The database starts lazily, so building the app,
+    Injection seams: ``authenticator``, ``vendor_store``, ``document_store`` and ``readiness``
+    replace the database-backed defaults (tests pass doubles). Any default that is used shares
+    one ``AppDatabase``: the ``database`` passed in, which the caller owns and closes, or else
+    one the app creates and disposes on shutdown. The database starts lazily, so building the app,
     starting it and serving ``/healthz`` never read settings or connect.
     """
     shared = database if database is not None else AppDatabase()
@@ -61,6 +64,9 @@ def create_app(
     app.state.vendor_store = (
         vendor_store if vendor_store is not None else DatabaseVendorStore(shared)
     )
+    app.state.document_store = (
+        document_store if document_store is not None else DatabaseDocumentStore(shared)
+    )
     app.state.readiness = readiness if readiness is not None else DatabaseReadiness(shared)
     app.add_middleware(RequestContextMiddleware)
     install_problem_handlers(app)
@@ -81,4 +87,5 @@ def create_app(
     app.include_router(readiness_router)
     app.include_router(me_router)
     app.include_router(vendors_router)
+    app.include_router(documents_router)
     return app

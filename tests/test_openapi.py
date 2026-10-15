@@ -19,6 +19,11 @@ def test_openapi_lists_every_route() -> None:
         "/v1/me",
         "/v1/vendors",
         "/v1/vendors/{vendor_id}",
+        "/v1/vendors/{vendor_id}/documents",
+        "/v1/documents/{document_id}",
+        "/v1/documents/{document_id}/revisions",
+        "/v1/documents/{document_id}/revisions/{revision_no}/chunks",
+        "/v1/jobs/{job_id}",
     ]
 
 
@@ -93,3 +98,43 @@ def test_openapi_documents_readyz_without_security() -> None:
     assert set(readyz["responses"]) == {"200", "503"}
     checks = schema["components"]["schemas"]["ReadinessChecks"]["properties"]
     assert set(checks) == {"database", "migrations"}
+
+
+def test_openapi_documents_document_routes() -> None:
+    schema = _openapi()
+    paths = schema["paths"]
+
+    upload = paths["/v1/vendors/{vendor_id}/documents"]["post"]
+    assert upload["security"] == [{"ApiKey": []}]
+    assert {"200", "202", "400", "401", "403", "404", "409", "413", "415", "422", "503"} <= set(
+        upload["responses"]
+    )
+    body = upload["requestBody"]["content"]["multipart/form-data"]["schema"]
+    assert set(body["properties"]) == {
+        "file",
+        "document_key",
+        "title",
+        "source_type",
+        "version_label",
+        "effective_date",
+    }
+    assert set(body["required"]) == {"file", "document_key", "title", "source_type"}
+    assert body["additionalProperties"] is False
+
+    chunks = paths["/v1/documents/{document_id}/revisions/{revision_no}/chunks"]["get"]
+    params = {p["name"]: p["schema"] for p in chunks["parameters"]}
+    assert (params["revision_no"]["minimum"], params["revision_no"]["maximum"]) == (
+        1,
+        2_147_483_647,
+    )
+    assert (params["limit"]["minimum"], params["limit"]["maximum"]) == (1, 200)
+    assert params["limit"]["default"] == 50
+    assert (params["offset"]["minimum"], params["offset"]["maximum"]) == (0, 4_095)
+
+    components = schema["components"]["schemas"]
+    assert "content_text" not in components["RevisionOut"]["properties"]
+    assert not {"payload", "idempotency_key", "locked_by", "tenant_id"} & set(
+        components["JobViewOut"]["properties"]
+    )
+    for name in ("RevisionOut", "JobViewOut", "ChunkOut", "UploadResultOut", "DocumentDetailOut"):
+        assert components[name]["additionalProperties"] is False

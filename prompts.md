@@ -11265,3 +11265,603 @@ End with:
   ADR-0010 and `docs/threat-model.md` are byte-identical to `07d7153`.
 - **Checks for this commit:** the documentation, staged-scan and identity checks, and the post-commit checks, run after this entry is staged; results are in the session handoff. No application tests or builds were run.
 - **Not done:** no M3e implementation, no dependency installed, nothing pushed or merged.
+
+**Commit outcome (recorded in Prompt 89):**
+- **Commit:** `98ca70b8e43ff4fd74349647b520213962374151` ("docs: record accepted M3e upload and document API specification"), parent `cdf7260d02b8af9affb369cc805d666be61f9ac0`, on `docs/m3e-api-spec`, with the noreply author and committer identity.
+- **Checks reported in the Prompt 88 handoff:** full-history Gitleaks scanned 35 commits with no leaks found; the working tree was clean afterwards and `main` was unchanged.
+- **Diff:** `.local/p88/m3e-spec-acceptance.diff`, 16,305 bytes, SHA-256 `38640973a57eea3f270840df0fcb4556569bef72236d9ef8878cbad2ef36dbbc`.
+- Nothing was pushed or merged.
+
+**Review note (recorded in Prompt 89):**
+- **Accepted:** the external reviewer accepted the Prompt 88 incremental diff.
+- **How it was reviewed:** the reviewer inspected `.local/p88/m3e-spec-acceptance.diff` and independently computed its SHA-256, which matched the reported value. The reviewer ran no project checks.
+- **Next:** Prompt 89 authorizes the M3e implementation, staged and uncommitted for review.
+
+## Prompt 89: Implement the accepted M3e upload and document API specification
+
+- **Stage:** Implementation on branch `feat/document-api`, created from `98ca70b`; staged and uncommitted for external review (no commit, push or merge)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 89 is the next unused number after Prompt 88; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 89: Implement the accepted M3e upload and document API specification
+
+Implement M3e according to the accepted specification in docs/plan.md, including the corrections in Prompts 87–88. Leave the work staged and uncommitted for external review.
+
+Do not commit, push, merge, amend, rebase, change main, start Docker, or contact a local database. Do not begin M3f.
+
+1. Verify the starting state
+
+Work only within D:\Claude\evidenceguard_agentic_rag, apart from necessary installed-tool/reference access allowed by CLAUDE.md.
+
+Read CLAUDE.md and the relevant accepted M3e specification and architecture records. Avoid rereading the complete prompts.md history; inspect its tail and relevant entries only.
+
+Expected state:
+- Branch: docs/m3e-api-spec.
+- HEAD: 98ca70b8e43ff4fd74349647b520213962374151.
+- Parent: cdf7260d02b8af9affb369cc805d666be61f9ac0.
+- Working tree clean, with nothing staged, unstaged or untracked.
+- Local main and origin/main: cdf7260d02b8af9affb369cc805d666be61f9ac0.
+- Origin: https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git.
+- Effective author and committer email:
+  257921624+mathewmljourney93@users.noreply.github.com.
+
+Stop and report any material mismatch without overwriting work.
+
+Create feat/document-api from the verified HEAD. If that branch already exists, inspect and report its state before proceeding.
+
+2. Implement the accepted scope
+
+Use docs/plan.md as the detailed contract. Implement all six M3e endpoints:
+- POST /v1/vendors/{vendor_id}/documents.
+- GET /v1/vendors/{vendor_id}/documents.
+- GET /v1/documents/{document_id}.
+- GET /v1/documents/{document_id}/revisions.
+- GET /v1/documents/{document_id}/revisions/{revision_no}/chunks.
+- GET /v1/jobs/{job_id}.
+
+Preserve the accepted role restrictions, tenant scoping, foreign-object 404 behaviour, pagination bounds, response fields, safe errors and privacy rules.
+
+Reuse the existing persistence, authentication, database wiring, worker and revision contracts. Avoid unrelated refactoring.
+
+3. Multipart dependency and upload parsing
+
+An established streaming multipart library is authorized in principle. Before adding it:
+- Inspect the repository’s dependency-age policy.
+- Check official release information, compatibility with the locked stack, and published security advisories.
+- Select an eligible release and retain the age policy.
+- Record the selected version, sources and reasoning.
+- Update pyproject.toml and uv.lock as needed.
+
+Do not bypass the policy. If no suitable release is available, report the concrete blocker.
+
+Use the streaming parser API with bounded in-memory buffers and no temporary files. Do not use automatic Form/File/UploadFile body parsing.
+
+Implement the complete accepted multipart contract, including:
+- Authentication, authorization and vendor validation before reading body bytes.
+- Header, boundary, part, field, file and whole-request limits.
+- Exact byte preservation, strict UTF-8 validation and the accepted content rules.
+- Explicit part-end and closing-boundary tracking.
+- Disconnect handling and normally completed Content-Length mismatch handling.
+- The three-phase error precedence.
+- Byte-order error detection independent of ASGI receive-message partitioning.
+
+Verify the selected parser’s actual completion and callback behaviour. Do not assume finalize() detects truncation.
+
+Tests must exercise the same mixed-fault bytes in one receive message and multiple partitions, including splits inside headers, boundaries and file data. A later oversized tail must not override an earlier parser or structural error.
+
+“No store/database call” in rejected-body tests means no upload-creation operation or write after the permitted authentication and vendor prechecks. Keep those prechecks before body consumption.
+
+4. Atomic upload creation and response observation
+
+Create the revision and canonical ingestion job in one caller-owned transaction.
+
+Implement the accepted new-versus-duplicate response behaviour, metadata conflicts, missing-job repair restrictions and terminal-job preservation.
+
+Build UploadResult from one SQL statement inside that transaction after the writes. Send it only after commit succeeds. Do not independently reread after commit.
+
+Keep synchronous database work off the async event loop. Preserve truthful observations of revision and job state, including duplicate uploads whose ingestion has already advanced.
+
+5. Consistent, read-only views
+
+Implement the proposed document_views persistence module and typed API response models.
+
+For each GET:
+- Start a short read transaction.
+- Make SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY its first statement before data access.
+- Capture clock_timestamp() once for the response.
+- Read parent checks, pointers, revisions, job projection, counts, chunk metadata and items from that snapshot.
+- Construct immutable result values within the transaction.
+- End the transaction before sending the response.
+- Ensure pooled connections retain no read-only or isolation-setting changes.
+
+Uploads continue using READ COMMITTED.
+
+Implement the accepted ingestion_state table, canonical-job lookup and lease_expired projection. GET requests must never repair or modify state.
+
+Keep partial chunk inspection honest: verified_complete depends on settled revision status and the activation invariant, not count equality. Preserve separate repeated-header provenance.
+
+6. Tests
+
+Implement the accepted database-independent and PostgreSQL test plans.
+
+Include meaningful coverage of:
+- Roles, tenant isolation and parent-child lookups.
+- Authentication and vendor checks before body reads.
+- Multipart limits, completion, mixed faults, partition invariance and disconnects.
+- Atomic creation, duplicate observations and conflict mappings.
+- Safe errors/logs and intentionally exposed success fields.
+- Every ingestion_state case.
+- Read-only GET behaviour and bounded pagination.
+- Concurrent activation, chunk insertion and revision/job changes during reads.
+- Connection settings restored before a subsequent upload.
+- Upload-to-production-worker-to-read-model integration.
+
+Use real PostgreSQL for the integration tests in CI. Do not substitute SQLite or claim that mocks verify PostgreSQL behaviour.
+
+Do not run PostgreSQL tests locally without an authorized disposable database. Keep them pending CI.
+
+7. Documentation and prompt history
+
+Add ADR-0011 for the implemented M3e design and its tradeoffs.
+
+Update README.md, docs/plan.md and docs/threat-model.md accurately:
+- Implementation staged and awaiting review.
+- Actual local verification results.
+- PostgreSQL and Linux verification pending CI.
+- Compose, M3f and overall M3 acceptance still pending.
+- No performance or general security claims.
+
+Do not mark M3e accepted as an implementation merely because its specification was accepted.
+
+Append to prompts.md without changing earlier entries:
+- Prompt 88’s reported local commit outcome.
+- The reviewer’s acceptance of its supplied incremental diff and independently matched checksum; the reviewer ran no project checks.
+- This prompt verbatim, using the next unused number if numbering has changed.
+- A truthful outcome note.
+
+8. Verification and review handoff
+
+Run the relevant targeted tests during implementation, then one final verification after corrections:
+- uv sync --locked
+- Ruff format check and lint
+- Strict Mypy
+- Full database-independent suite, reporting all skips
+- Build
+- Isolated installed-wheel checks for the changed API/package behaviour
+- git diff --cached --check
+- Staged Gitleaks scan
+- Private-content and tracked-artifact checks
+
+Use the repository’s established commands and tooling. Report failures and fixes honestly. Do not repeatedly rerun unchanged checks without a reason.
+
+Stage only the intended implementation, tests, dependency and documentation files.
+
+Export the COMPLETE staged diff against HEAD, excluding prompts.md, directly from Git to:
+.local/p89/m3e-implementation.diff
+
+Use UTF-8 without a BOM. Do not print the diff in chat or truncate it.
+
+Report:
+- Summary of behaviour and important implementation decisions.
+- Dependency selection and source references.
+- Verification commands and actual results.
+- Known limitations and anything deviating from the accepted specification.
+- Branch, HEAD, staged tree, staged paths and working-tree status.
+- Diff path, baseline, final tree, byte size and SHA-256.
+
+Keep the current session. Do not recommend restarting merely because this implementation is substantial; flag a new session only for a concrete context problem or after roughly 20 substantial prompts as a guideline.
+
+End with:
+“Return this output plus .local/p89/m3e-implementation.diff to the external reviewer.”
+
+Nothing is authorized to be committed, pushed or merged.
+````
+
+**Outcome note (written before staging; implementation awaiting external review):**
+- **Starting state verified:** branch `docs/m3e-api-spec` at `98ca70b` (parent `cdf7260`) with a clean tree; `main` and `origin/main` at `cdf7260`; origin and the noreply identity as expected. Branch `feat/document-api` was created from `98ca70b`.
+- **Dependency:** `python-multipart` 0.0.32, published 2026-06-04, with an `exclude-newer-package` cutoff of `2026-10-01T00:00:00Z` (the age policy was not bypassed). The PyPI metadata lists no vulnerabilities and OSV no advisory affecting 0.0.32; the historical advisories were fixed in 0.0.7 to 0.0.31. It is compatible with the locked FastAPI 0.143.0 and Starlette 1.7.0.
+- **Implemented (staged, unreviewed):**
+  - the six endpoints;
+  - the bounded multipart reader with explicit completion tracking;
+  - atomic creation with a single-statement observation returned after commit;
+  - REPEATABLE READ, READ ONLY read snapshots;
+  - the `ingestion_state` projection;
+  - ADR-0011 and status updates in README, plan and threat model.
+- **Parser finding:** `python-multipart` 0.0.32 checks a header name's size before its characters, across the whole span to the next colon or the end of the write. With large writes, an earlier invalid character could therefore be reported as a later 413. The reader feeds header and boundary regions one byte at a time, and part data in slices that stop before each delimiter. Tests reproduce the case in both directions.
+- **Checks actually run in this session (Windows, local):**
+  - `uv sync --locked`, `ruff format --check .`, `ruff check .` and `mypy` (101 source files): passed;
+  - full suite: `1214 passed, 192 skipped`. Every skip is a PostgreSQL integration test without `EG_TEST_DATABASE_URL`: the 179 existing ones plus the 13 new M3e tests;
+  - `uv build`, and installed-wheel checks in a clean venv under `.local/p89/`: imports, both CLIs, the production registry, offline migration SQL, and a 202 upload through a test double with the routes registered.
+
+  The staged-diff, whitespace, Gitleaks and artifact checks run after this entry is staged; their results are in the session handoff.
+- **Pending:**
+  - **the PostgreSQL integration tests are written but not run** (no authorized disposable database), and Linux CI has not run;
+  - concurrent identical uploads through the API, and event-controlled interleavings inside one view, are not covered yet;
+  - external review, Compose, M3f and overall M3 acceptance.
+- **Not done:** nothing committed, pushed or merged; `main` unchanged; no Docker or database contact.
+
+**Review note (recorded in Prompt 90):**
+- **How it was reviewed:** the external reviewer inspected the complete supplied diff `.local/p89/m3e-implementation.diff` and matched its SHA-256 against the reported value. The reviewer ran isolated parser probes with `python-multipart` 0.0.32 against the supplied upload reader; the reviewer did not run the project suite or the PostgreSQL tests.
+- **Not accepted yet.** Findings:
+  - **Header-byte cap undercount:** the parser consumes leading spaces in `HEADER_VALUE_START` without reporting them through `on_header_value`. Two headers of the form `X-One:<5000 spaces>a` and `X-Two:<5000 spaces>b`, each below the line cap, passed parsing with over 10,000 header bytes, because the aggregate cap counted reported names and values plus a synthetic 4 bytes per line.
+  - **Lossy parameter parsing:** `parse_options_header` ignores extended parameters containing `*` and collapses repeated names. So `filename*` on a text field evaded the no-filename rule, `text/plain; charset*=utf-8''latin-1` was accepted, and `text/plain; charset=latin-1; charset=utf-8` was accepted after the first value was overwritten.
+  - **Missing verification:** PostgreSQL tests that the accepted specification required were omitted. They cover concurrent uploads through the API, interleavings inside one response, the pooled connection after a snapshot followed by a real write, duplicates against real rows, the missing-job behaviour of GET, and the upload observation boundary.
+  - **Skip accounting:** the reported "192 PostgreSQL skips, including 179 existing tests" appears to include the Windows POSIX-only signal skip; the earlier baseline had 178 PostgreSQL tests and one POSIX-only skip.
+
+## Prompt 90: Correct M3e multipart validation and complete the agreed tests
+
+- **Stage:** Correction of the staged M3e implementation on `feat/document-api`; staged and uncommitted for external review (no commit, push or merge)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 90 is the next unused number after Prompt 89; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 90: Correct M3e multipart validation and complete the agreed tests
+
+Correct the reviewed M3e implementation. Leave everything staged and uncommitted.
+
+Do not commit, push, merge, amend, rebase, change main, start Docker, contact a local database, or begin M3f.
+
+1. Verify and record the starting state
+
+Expected:
+- Branch: feat/document-api.
+- HEAD: 98ca70b8e43ff4fd74349647b520213962374151.
+- Staged tree: ce122c308c4179d092b0845f671ee6ce062d2fba.
+- Exactly the 19 paths reported in Prompt 89 staged.
+- Nothing unstaged or untracked.
+- Local main and origin/main unchanged at cdf7260d02b8af9affb369cc805d666be61f9ac0.
+- Existing origin and repository-local noreply identity unchanged.
+
+Record the pre-edit staged tree under .local/p90/. Use that tree as the incremental review baseline.
+
+Stop on a material mismatch without overwriting work.
+
+Read CLAUDE.md and relevant code/specification sections. Do not reload the entire prompt history.
+
+2. Fix the actual multipart header-byte cap
+
+The reviewer reproduced this against the supplied upload reader and python-multipart 0.0.32:
+
+A valid part with these additional headers passes parsing despite containing over 10,000 header bytes:
+
+X-One:<5000 spaces>a\r\n
+X-Two:<5000 spaces>b\r\n
+
+Each individual line stays below the parser’s line cap. The parser consumes leading spaces in HEADER_VALUE_START without reporting them through on_header_value. Consequently, _Collector’s name/value callbacks plus synthetic four-byte overhead undercount the actual aggregate header bytes.
+
+Correct the aggregate cap to count the actual received header bytes, including whitespace and syntax, according to an explicit, consistent definition of the header region. Do not approximate it using normalized header names and values.
+
+Preserve:
+- The accepted 8 KiB cap.
+- First-error detection in byte order.
+- ASGI receive-partition invariance.
+- Existing safe errors and parser-log suppression.
+- Bounded memory and no temporary files.
+
+Add regressions for:
+- The two whitespace-heavy headers above.
+- Exact-limit and one-byte-over-limit cases.
+- Header lines without the optional space after the colon.
+- An aggregate cap crossing before a later malformed byte, and the reverse ordering.
+- Single-message and fragmented presentations.
+
+Demonstrate that the whitespace-heavy regression fails against the previous implementation, then restore the corrected files and verify their identity.
+
+3. Validate parameters before information is discarded
+
+python-multipart 0.0.32’s parse_options_header ignores extended parameters containing "*", and collapses repeated parameter names.
+
+Consequences in the current implementation:
+- Checking b"filename*" in its returned dictionary cannot detect that parameter.
+- A text field with filename* can evade the no-filename rule.
+- A file Content-Type such as text/plain; charset*=utf-8''latin-1 is accepted because the unsupported parameter disappears.
+- text/plain; charset=latin-1; charset=utf-8 is accepted after the first value is overwritten.
+
+Validate the relevant raw parameter structure without relying on a lossy dictionary to prove that disallowed parameters were absent.
+
+Keep the accepted contract:
+- Text fields cannot carry filenames.
+- File media types are text/plain or text/markdown, optionally with the permitted UTF-8 charset.
+- Unsupported or ambiguous charset parameters must not become accepted because parsing dropped or overwrote them.
+- Disposition structural errors are safe 422 responses.
+- File media-type errors remain deferred 415 responses at the accepted phase.
+- No submitted parameter text appears in errors or logs.
+
+Use established parsing facilities where suitable. Do not introduce a replacement multipart parser or another dependency without a concrete need.
+
+Add focused tests for extended filename parameters on text fields, extended media parameters, conflicting duplicate charset parameters, and ordinary valid quoted/token forms. Preserve receive-partition invariance.
+
+4. Complete the accepted PostgreSQL verification plan
+
+The accepted specification explicitly required tests that are currently omitted. Implement them using the existing guarded disposable-database fixtures, but do not execute them locally.
+
+Add deterministic, bounded tests for:
+- Concurrent identical uploads through the real API: one revision, one canonical job, one 202 and a duplicate 200.
+- Concurrent different-content uploads with correct revision allocation.
+- Activation committing between the document pointer and revision reads of one response.
+- A chunk batch committing between a chunk count and page-item read.
+- Consistent revision/job projection while a worker transaction changes their state.
+- A later upload on the same pooled connection after a read-only snapshot: settings restored and the upload actually writes successfully.
+- Duplicate uploads of processing, superseded, failed and dead-job revisions against real rows, preserving terminal jobs and returning the actual observed state.
+- The remaining accepted SQL projection and partial-chunk cases not already meaningfully covered.
+
+Use explicit events/barriers or controlled query hooks, bounded waits and reliable cleanup. Do not use timing-only sleeps as the proof of an interleaving.
+
+Exercise the production store/read operations. A generic test showing that PostgreSQL supports REPEATABLE READ does not replace tests of the actual multi-query operations.
+
+Improve the existing missing-job test:
+- After deleting the canonical job, GET must report stalled with no job and leave the database unchanged.
+- Only a subsequent permitted duplicate POST repairs the missing job.
+- Verify that GET itself never repairs anything.
+
+Add a focused test of the upload observation boundary: a state change immediately after commit must not cause a post-commit reread or replace the observation returned by the creation transaction.
+
+Review the accepted test matrix for other omissions. Reuse existing meaningful coverage rather than adding redundant tests.
+
+5. Correct documentation and verification accounting
+
+Check the actual skip reasons and integration collection count.
+
+The reported “192 PostgreSQL skips, including 179 existing tests” appears to include the Windows POSIX-only signal skip. The earlier baseline had 178 PostgreSQL tests and one POSIX-only Windows skip; 13 added PostgreSQL tests would produce 191 PostgreSQL skips plus that signal skip.
+
+Report the actual breakdown after these corrections, based on collection and skip reasons. Do not change markers just to match an expected count.
+
+Update ADR-0011, the plan, README and threat model only where needed:
+- Explain the corrected raw-header counting and parameter validation.
+- Remove claims that the agreed concurrency tests are intentionally outside this slice once they are written.
+- Distinguish tests written from tests executed.
+- Keep implementation review, PostgreSQL execution, Linux CI, Compose, M3f and overall M3 acceptance pending as appropriate.
+- Scope historical “no document endpoints” statements to their named baseline where necessary.
+
+Do not weaken the accepted specification to match incomplete implementation.
+
+6. Prompt history
+
+Preserve earlier prompts.md bytes.
+
+Append:
+- A review note recording that the reviewer inspected the complete supplied diff and matched its checksum.
+- The concrete header-counting and parameter findings, the missing verification, and the skip-accounting correction.
+- State that the reviewer ran isolated parser probes with python-multipart 0.0.32, not the project suite or PostgreSQL tests.
+- This prompt verbatim.
+- A truthful outcome note.
+
+Do not record acceptance of the implementation yet.
+
+7. Verification and handoff
+
+Run focused regression tests during correction, followed by one final appropriate verification:
+- uv sync --locked
+- Ruff formatting and lint
+- Strict Mypy
+- Full database-independent suite, with actual skip breakdown
+- Integration-test collection without contacting a database
+- Build and isolated installed-wheel checks appropriate to the changed parser
+- git diff --cached --check
+- Staged Gitleaks and private-content/artifact checks
+
+Do not repeatedly rerun unchanged checks without a reason.
+
+Keep the corrected work staged and uncommitted.
+
+Export the COMPLETE incremental diff against staged tree
+ce122c308c4179d092b0845f671ee6ce062d2fba,
+excluding prompts.md, directly from Git to:
+
+.local/p90/m3e-corrections.diff
+
+Use UTF-8 without a BOM. Do not print the diff in chat.
+
+Report:
+- Findings corrected and relevant design choices.
+- Regression results against the previous implementation.
+- Verification commands and actual results.
+- PostgreSQL tests added and their still-unexecuted status.
+- Branch, HEAD, final staged tree and staged paths.
+- Diff baseline, final tree, byte size and SHA-256.
+- Any remaining deviation from the accepted specification.
+
+Keep the current Claude session.
+
+End with:
+“Return this output plus .local/p90/m3e-corrections.diff to the external reviewer.”
+````
+
+**Outcome note (written before staging; corrections awaiting external review, implementation not accepted):**
+- **Starting state verified:**
+  - branch `feat/document-api`, HEAD `98ca70b`, staged tree `ce122c308c4179d092b0845f671ee6ce062d2fba` with the 19 Prompt 89 paths;
+  - nothing unstaged or untracked;
+  - `main` and `origin/main` at `cdf7260`; origin and the noreply identity unchanged.
+
+  The baseline tree is recorded under `.local/p90/`.
+- **Header-byte cap:** the per-part 8 KiB cap now counts the raw header region. That is every byte the parser consumes in a header state, from after the boundary line's line ending through the empty line's line ending, inclusive. It no longer counts callback-reported names and values plus a synthetic overhead. The feeder already sends header regions one byte at a time, so it refuses the byte that crosses the cap before the parser sees it. Earlier malformed bytes still win, and the result does not depend on receive partitioning.
+- **Parameters:** a strict RFC 9110 parameter parser keeps extended and repeated parameters, and replaces `parse_options_header` for the request `Content-Type`, the part `Content-Disposition` and the file `Content-Type`. As a result:
+  - `filename*` on a text field is a 422;
+  - `charset*` and repeated or conflicting `charset` parameters are deferred 415s;
+  - repeated, extended or missing disposition `name` parameters are 422;
+  - repeated or extended `boundary` parameters are 415.
+- **Regression demonstration:** with the Prompt 89 reader temporarily restored from the baseline index blob, 23 of the new regression tests failed, including the whitespace-heavy headers, every exact-limit case and the lossy-parameter cases. The corrected file was restored, and its SHA-256 matched the saved copy.
+- **PostgreSQL tests:** 13 tests were added or strengthened, for 26 in `tests/test_document_api_postgres.py`. They cover:
+  - concurrent identical and different uploads through the API (barrier);
+  - activation between the pointer and revision reads, a job and revision change mid-read, and a chunk batch between the count and page reads (deterministic statement hooks on a separate engine);
+  - a later upload writing on the same pooled connection after a snapshot;
+  - duplicates of processing, superseded, failed and dead-job revisions;
+  - GET never repairing a missing job, while a duplicate POST does;
+  - the upload observation boundary;
+  - terminal jobs with unsettled revisions;
+  - partial chunk sets.
+
+  They are **written, not executed**.
+- **Skip accounting corrected:** Prompt 89's suite had 191 PostgreSQL skips plus 1 Windows POSIX-only signal skip, not "179 existing + 13". This run has 204 PostgreSQL skips (178 earlier + 26 M3e) plus that 1 signal skip, which matches the integration collection of 204.
+- **Checks actually run in this session (Windows, local):**
+  - `uv sync --locked`, `ruff format --check .`, `ruff check .` and `mypy` (101 source files): passed;
+  - full suite: `1260 passed, 205 skipped`;
+  - integration collection without a database: `204/1465 tests collected`;
+  - `uv build`, and installed-wheel checks in a clean venv under `.local/p90/`: imports, both CLIs, the registry, offline migration SQL, a 202 upload through a test double, and the corrected parser behaviour (raw header cap 413, `filename*` 422, `charset*` 415).
+
+  The staged-diff, whitespace, Gitleaks and artifact checks run after this entry is staged; their results are in the session handoff.
+- **Pending:**
+  - external review of the corrections;
+  - execution of the PostgreSQL tests in CI;
+  - Linux CI, Compose, M3f and overall M3 acceptance.
+- **Not done:** nothing committed, pushed or merged; `main` unchanged; no Docker or database contact.
+
+**Acceptance note (recorded in Prompt 91):**
+- **Accepted:** the external reviewer accepted the Prompt 89 implementation plus the Prompt 90 corrections for a local commit.
+- **What the reviewer inspected:** the complete Prompt 89 implementation diff (`.local/p89/m3e-implementation.diff`) and the Prompt 90 incremental correction diff (`.local/p90/m3e-corrections.diff`). Both supplied SHA-256 checksums independently matched.
+- **Findings and their correction:** the reviewer had earlier reproduced the raw-header counting and lossy-parameter findings with isolated probes against `python-multipart` 0.0.32. After the correction, isolated probes rejected the oversized headers with 413 and the tested invalid charset parameters with 415.
+- **PostgreSQL tests:** the reviewer inspected the added concurrency and state tests but did not execute them.
+- **Basis:** acceptance also relies on the reported Windows checks (`1260 passed, 205 skipped`: 204 PostgreSQL tests and one POSIX-only signal test). The reviewer did not run the project suite or the PostgreSQL tests.
+- **Pending:** CI verification (PostgreSQL and Linux), Compose, M3f and overall M3 acceptance.
+
+## Prompt 91: Commit the reviewed M3e implementation locally
+
+- **Stage:** Acceptance wording and a local commit on branch `feat/document-api` (no push or merge)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 91 is the next unused number after Prompt 90; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 91: Commit the reviewed M3e implementation locally
+
+Commit the reviewed M3e implementation locally. No push, merge or main update is authorized.
+
+1. Verify the starting state
+
+Expected:
+- Branch: feat/document-api.
+- HEAD: 98ca70b8e43ff4fd74349647b520213962374151.
+- Staged tree: a2e6ed04c897a0c79ebcf2fcba50efd86b99942c.
+- The same 19 staged paths reported in Prompt 90.
+- Nothing unstaged or untracked.
+- Local main and origin/main unchanged at cdf7260d02b8af9affb369cc805d666be61f9ac0.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Effective author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Record the accepted staged tree under .local/p91/ before editing.
+
+Stop on a material mismatch without overwriting work.
+
+2. Preserve the accepted implementation
+
+The external reviewer accepts the Prompt 89 implementation plus the Prompt 90 corrections for a local commit.
+
+Do not change application code, tests, dependencies, migrations, workflows or configuration in this step.
+
+Outside prompts.md, permit only narrow acceptance/status wording in:
+- README.md
+- docs/decisions/0011-document-api.md
+- docs/plan.md
+- docs/threat-model.md
+
+Record:
+- M3e accepted at external review for a local commit.
+- The reported Windows verification: 1260 passed, 205 skipped.
+- The skips comprise 204 PostgreSQL tests and one POSIX-only signal test.
+- The 26 M3e PostgreSQL tests are written but have not executed.
+- PostgreSQL and Linux verification of this implementation remain pending CI.
+- Compose, M3f and overall M3 acceptance remain pending.
+- Nothing is published or merged.
+
+Keep historical results and their attribution intact. Do not mark overall M3 accepted.
+
+3. Prompt history
+
+Preserve all earlier prompts.md bytes.
+
+Append an acceptance note under Prompt 90 stating:
+- The reviewer inspected the complete Prompt 89 implementation diff and Prompt 90 incremental correction diff.
+- Both supplied checksums independently matched.
+- The reviewer previously reproduced the raw-header counting and lossy-parameter findings with isolated probes against python-multipart 0.0.32.
+- After correction, isolated probes rejected the oversized headers with 413 and the tested invalid charset parameters with 415.
+- The reviewer inspected the added PostgreSQL concurrency and state tests but did not execute them.
+- Acceptance also relies on the reported Windows checks.
+- The reviewer did not run the project suite or PostgreSQL tests.
+- CI verification remains pending.
+
+Append this prompt verbatim, using the next unused prompt number if necessary, and a truthful pre-commit note.
+
+Do not write the new commit’s own SHA into a file included in that commit. Report it in the handoff instead.
+
+4. Check and commit locally
+
+Confirm:
+- Exactly the intended 19 paths are staged.
+- No .local/, build output, environment files, backups or credentials are staged.
+- Earlier prompt-history content is byte-identical.
+- Every file outside the four permitted documents and prompts.md is byte-identical to accepted tree a2e6ed04c897a0c79ebcf2fcba50efd86b99942c.
+- Documentation links remain valid.
+- Staged additions contain no private information or secrets.
+- git diff --cached --check passes.
+- The staged Gitleaks scan passes.
+- Author and committer use the repository’s noreply identity.
+
+No application tests or builds need rerunning because implementation files must remain unchanged.
+
+Create the local commit with subject:
+
+feat: add bounded document uploads and tenant-scoped read API
+
+Retain the existing co-author convention.
+
+After committing:
+- Run the full-history Gitleaks scan.
+- Verify the parent, committed paths and identity.
+- Verify byte identity against the accepted tree outside the explicitly permitted documentation and prompt-history changes.
+- Verify the working tree is clean.
+- Confirm main and origin/main remain unchanged.
+
+Do not push, merge, amend, rebase, delete branches, create tags, start Docker or contact a database.
+
+5. Review handoff
+
+Export the COMPLETE incremental diff from accepted tree
+a2e6ed04c897a0c79ebcf2fcba50efd86b99942c
+to the new commit, excluding prompts.md, directly from Git to:
+
+.local/p91/m3e-commit-incremental.diff
+
+Use UTF-8 without a BOM. Do not print the diff in chat.
+
+Report:
+- Commit SHA, parent, subject, author and committer.
+- Committed paths.
+- Narrow documentation changes.
+- Verification commands and actual results.
+- Final Git status and unchanged main refs.
+- Diff path, baseline, final commit, byte size and SHA-256.
+- Pending PostgreSQL, Linux, Compose, M3f and overall M3 verification.
+
+Keep the current Claude session.
+
+End with:
+“Return this output plus .local/p91/m3e-commit-incremental.diff to the external reviewer.”
+````
+
+**Pre-commit note (written before the commit; the commit's own SHA is not recorded here):**
+- **Starting state verified:**
+  - branch `feat/document-api`, HEAD `98ca70b`, staged tree `a2e6ed04c897a0c79ebcf2fcba50efd86b99942c` with the same 19 paths;
+  - nothing unstaged or untracked;
+  - `main` and `origin/main` at `cdf7260`;
+  - origin and the noreply author and committer identity as expected.
+
+  The accepted tree is recorded under `.local/p91/`.
+- **Changes in this step:** narrow acceptance and status wording only, in `README.md`, `docs/decisions/0011-document-api.md`, `docs/plan.md` and `docs/threat-model.md`. The wording records:
+  - M3e accepted at external review for a local commit;
+  - the reported Windows verification (`1260 passed, 205 skipped`: 204 PostgreSQL tests and one POSIX-only signal test);
+  - the 26 M3e PostgreSQL tests written but not executed;
+  - PostgreSQL and Linux verification pending CI;
+  - Compose, M3f and overall M3 acceptance pending;
+  - nothing published or merged.
+
+  No application code, tests, dependencies, migrations, workflows or configuration changed.
+- **Checks for this commit:** run after this entry is staged; results are in the session handoff. They are the staged-path, byte-identity, link, private-content, `git diff --cached --check`, staged Gitleaks and identity checks, and after the commit the full-history Gitleaks scan. No application tests or builds were rerun, because the implementation files are byte-identical to the accepted tree.
+- **Not done:** nothing pushed or merged; `main` unchanged; no Docker or database contact.

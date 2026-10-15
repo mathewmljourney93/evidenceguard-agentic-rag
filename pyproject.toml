@@ -14,6 +14,7 @@ dependencies = [
     "psycopg[binary]>=3.3.6",
     "pydantic>=2.14.0",
     "pydantic-settings>=2.15.0",
+    "python-multipart>=0.0.32",
     "sqlalchemy>=2.1.1",
     "uvicorn>=0.54.0",
 ]
@@ -34,7 +35,7 @@ dev = [
 # Dependency-age policy: new dependencies resolve to releases published at least two weeks
 # before they were added (ADR-0004). The cutoff applies only to the packages listed here.
 [tool.uv]
-exclude-newer-package = { sqlalchemy = "2026-09-28T00:00:00Z", alembic = "2026-09-28T00:00:00Z", psycopg = "2026-09-28T00:00:00Z", psycopg-binary = "2026-09-28T00:00:00Z", pydantic-settings = "2026-09-28T00:00:00Z", mako = "2026-09-28T00:00:00Z", markupsafe = "2026-09-28T00:00:00Z", greenlet = "2026-09-28T00:00:00Z", python-dotenv = "2026-09-28T00:00:00Z", tzdata = "2026-09-28T00:00:00Z" }
+exclude-newer-package = { sqlalchemy = "2026-09-28T00:00:00Z", alembic = "2026-09-28T00:00:00Z", psycopg = "2026-09-28T00:00:00Z", psycopg-binary = "2026-09-28T00:00:00Z", pydantic-settings = "2026-09-28T00:00:00Z", mako = "2026-09-28T00:00:00Z", markupsafe = "2026-09-28T00:00:00Z", greenlet = "2026-09-28T00:00:00Z", python-dotenv = "2026-09-28T00:00:00Z", tzdata = "2026-09-28T00:00:00Z", python-multipart = "2026-10-01T00:00:00Z" }
 
 # One distribution, nested layout: each package lives under its approved
 # directory and is installed at the top level of the wheel (see ADR-0001).
