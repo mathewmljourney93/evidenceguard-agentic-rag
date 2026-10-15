@@ -31,20 +31,22 @@ These rules apply to every Claude session in this repository.
 
 ## Review handoffs
 
-- An implementation handoff includes the complete staged diff, excluding `prompts.md`, directly in the response inside fenced `diff` blocks.
-- A correction handoff includes the complete incremental diff against the previously reviewed staged version, excluding `prompts.md`.
-- Never truncate a diff or replace it with a summary. Split a large diff into numbered parts at file boundaries and provide every part.
-- Report verification results and Git status separately from the diff.
-- Attach the diff as a file under `.local/` only as a fallback, when response limits prevent including it in full.
+- An implementation handoff exports the complete staged diff, excluding `prompts.md`, to a UTF-8 `.diff` file under the gitignored `.local/`, written directly from Git output.
+- A correction handoff exports the complete incremental diff against the explicitly recorded, previously reviewed tree or commit, excluding `prompts.md`.
+- Never truncate an exported diff or omit source, tests, migrations or configuration from it.
+- Do not print complete diffs in chat unless Mathew explicitly asks for it.
+- For each exported diff, report the exact file path, the baseline tree or commit, the final tree or commit, the byte size and the SHA-256.
+- Keep the response concise: changes, actual verification, Git state and remaining limitations.
+- End every handoff with an explicit instruction: Mathew returns either "output only" or "output plus the diff file", naming that file. Implementation and correction reviews require output plus the appropriate diff file.
+- If nothing outside `prompts.md` changed, say so; no empty diff file is needed.
 
 ## Session management
 
-- Recommend a fresh session at the boundary between milestone slices, once the current slice has a reviewable handoff.
-- Also recommend one when Claude Code reports that a large expired context will be re-cached, or when the context is dominated by unrelated completed work.
-- Base the recommendation on available context or usage indicators. Never invent a token count or claim a measured saving.
-- State it explicitly: "Start a new Claude session before the next task," with a brief reason.
-- Before recommending a switch during unfinished work, give a recovery handoff: branch, HEAD, staged and working-tree state, completed work, outstanding work and the next prompt.
-- Keep immediate corrections in the current session while its context remains useful.
+- Keep the current session through implementation and its immediate reviews and corrections. A milestone boundary alone is not a reason to restart.
+- Consider recommending a fresh session after roughly 20 substantial prompts. This is a guideline, not a hard cutoff.
+- Recommend an earlier switch only when concrete context or usage evidence, or a large expired-cache warning from Claude Code, makes it worthwhile. Never invent a token count or claim a measured saving.
+- When recommending a switch, state it explicitly ("Start a new Claude session before the next task") with the reason.
+- Before a necessary switch during unfinished work, give a complete recovery handoff: branch, HEAD, staged and working-tree state, completed work, outstanding work and the next prompt.
 - This is guidance, not an interruption: finish the authorized task and its handoff unless a real limit prevents it.
 - A new session never authorizes discarding changes or rewriting Git history.
 - In a fresh session, read the project instructions and only the relevant files; do not load the whole prompt archive by default.

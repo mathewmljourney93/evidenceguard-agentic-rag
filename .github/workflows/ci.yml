@@ -65,6 +65,7 @@ jobs:
           "${bin}/python" -I -c "import evidenceguard_api, evidenceguard_domain; from evidenceguard_api.app import create_app; create_app(); print(evidenceguard_api.__file__); assert 'site-packages' in evidenceguard_api.__file__"
           "${bin}/eg-api" --help
           "${bin}/eg-worker" --help
+          "${bin}/python" -I -c "from evidenceguard_worker.handlers import production_registry; assert production_registry().kinds == frozenset({'ingest_revision'}); print('production registry: ingest_revision')"
           "${bin}/python" -I -c "import io; from alembic import command; from evidenceguard_persistence.migration_config import alembic_config; buf = io.StringIO(); command.upgrade(alembic_config(output_buffer=buf), 'head', sql=True); assert 'CREATE TABLE api_keys' in buf.getvalue(); print('offline migration SQL rendered from the installed wheel')"
 
   integration:

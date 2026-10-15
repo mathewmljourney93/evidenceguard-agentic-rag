@@ -31,11 +31,16 @@ and the intermediate state is never committed. A late older revision writes only
 duplicate activation writes nothing. A lock wait beyond the fence's ``lock_timeout`` raises the
 existing ``JobLockTimeoutError``.
 
+Steps 1-4 are the public ``lock_revision_for_job`` (M3d, ADR-0010), which M3d's chunk writes
+also use, so chunk writes, activation and failure all serialise on the same document lock.
+``activate_revision`` accepts an optional ``before_settle`` callback (M3d's completeness check),
+called under those locks only for a ``processing`` target, before the settle rule.
+
 These checks happen at explicit points; they are not atomic with every statement. A transaction
 that passes the re-check just before expiry may commit shortly after it (the M3a limit).
 """
 
-from collections.abc import Collection
+from collections.abc import Callable, Collection
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any, cast
@@ -362,16 +367,23 @@ def create_revision(
 
 
 @dataclass(frozen=True)
-class _Locked:
+class LockedRevision:
+    """The rows ``lock_revision_for_job`` locked and re-read, and the fresh database time of its
+    ownership re-check."""
+
     document: DocumentSnapshot
     target: RevisionSnapshot
     active: RevisionSnapshot | None
     now: datetime
 
 
+BeforeSettle = Callable[[FencedSession, RevisionSnapshot], None]
+"""Called by ``activate_revision`` under its locks, for a ``processing`` target only."""
+
+
 def start_processing(session: FencedSession, job: JobSnapshot) -> RevisionSnapshot:
     """``pending`` → ``processing``; a no-op while already ``processing``."""
-    locked = _lock(session, job, include_active=False)
+    locked = lock_revision_for_job(session, job, include_active=False)
     updated = rules.start_processing(locked.target, now=locked.now)
     if updated != locked.target:
         session.execute(update_revision_statement(updated))
@@ -389,19 +401,31 @@ def fail_revision(
     """
     if not isinstance(code, RevisionFailureCode):
         raise TypeError("code must be a RevisionFailureCode")
-    locked = _lock(session, job, include_active=False)
+    locked = lock_revision_for_job(session, job, include_active=False)
     updated = rules.fail(locked.target, code, now=locked.now)
     if updated != locked.target:
         session.execute(update_revision_statement(updated))
     return updated
 
 
-def activate_revision(session: FencedSession, job: JobSnapshot) -> ActivationResult:
+def activate_revision(
+    session: FencedSession,
+    job: JobSnapshot,
+    *,
+    before_settle: BeforeSettle | None = None,
+) -> ActivationResult:
     """Settle the job's ``processing`` revision against the document's active revision.
 
     Writes, in order: demote the old active revision, promote the target, update the pointer.
+
+    ``before_settle`` (optional, M3d) runs after the locks and the fresh ownership re-check, only
+    when the target is ``processing``, and before the settle rule. If it raises, nothing settles
+    and the caller's transaction rolls back. A duplicate activation of a settled revision skips
+    it. Existing callers are unchanged.
     """
-    locked = _lock(session, job, include_active=True)
+    locked = lock_revision_for_job(session, job, include_active=True)
+    if before_settle is not None and locked.target.status is RevisionStatus.PROCESSING:
+        before_settle(session, locked.target)
     settlement = rules.settle(locked.document, locked.target, locked.active, now=locked.now)
     if settlement.changed:
         if settlement.demoted is not None:
@@ -412,7 +436,19 @@ def activate_revision(session: FencedSession, job: JobSnapshot) -> ActivationRes
     return ActivationResult(revision=settlement.target, superseded=settlement.demoted)
 
 
-def _lock(session: FencedSession, job: JobSnapshot, *, include_active: bool) -> _Locked:
+def lock_revision_for_job(
+    session: FencedSession, job: JobSnapshot, *, include_active: bool
+) -> LockedRevision:
+    """Lock the job's revision for a fenced change, in the fixed order, then re-check ownership.
+
+    The job row is already locked by the fence. This locks the document row, then the revision
+    rows in ascending ID order (the target and, with ``include_active``, the document's active
+    revision), re-reading every mutable field under those locks. It then runs
+    ``recheck_ownership`` with a fresh ``clock_timestamp()`` and requires the job's tenant, raising
+    ``LeaseLostError`` otherwise. A lock wait beyond the fence's ``lock_timeout`` raises
+    ``JobLockTimeoutError``; a revision missing from the job's tenant raises
+    ``RevisionNotFoundError``. It writes nothing.
+    """
     tenant_id = job.tenant_id
     revision_id = _payload_revision_id(job)
 
@@ -441,7 +477,7 @@ def _lock(session: FencedSession, job: JobSnapshot, *, include_active: bool) -> 
     fresh_job, now = recheck_ownership(session, job.lease_token())
     if fresh_job.tenant_id != tenant_id or document.tenant_id != tenant_id:
         raise LeaseLostError()
-    return _Locked(document=document, target=target, active=active, now=now)
+    return LockedRevision(document=document, target=target, active=active, now=now)
 
 
 def _payload_revision_id(job: JobSnapshot) -> UUID:

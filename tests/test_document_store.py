@@ -933,8 +933,15 @@ def test_a_reclaimed_job_finding_its_revision_failed_fails_without_reprocessing(
 
 
 def test_the_two_failure_code_types_are_distinct() -> None:
-    assert {c.value for c in RevisionFailureCode} == {"ingestion_failed"}
-    assert "ingestion_failed" not in {c.value for c in JobErrorCode}
+    # M3c's code plus the four M3d parser and chunk-write codes (ADR-0010).
+    assert {c.value for c in RevisionFailureCode} == {
+        "ingestion_failed",
+        "empty_document",
+        "chunk_limit_exceeded",
+        "content_integrity_failed",
+        "chunk_conflict",
+    }
+    assert not {c.value for c in RevisionFailureCode} & {c.value for c in JobErrorCode}
     with pytest.raises(TypeError):
         PermanentJobError(cast(Any, RevisionFailureCode.INGESTION_FAILED))
 

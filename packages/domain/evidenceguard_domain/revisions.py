@@ -62,9 +62,17 @@ SETTLED_STATUSES = frozenset({RevisionStatus.ACTIVE, RevisionStatus.SUPERSEDED})
 
 
 class RevisionFailureCode(StrEnum):
-    """Fixed codes stored in ``failure_reason``. Distinct from ``JobErrorCode``."""
+    """Fixed codes stored in ``failure_reason``. Distinct from ``JobErrorCode``.
+
+    M3c defined ``ingestion_failed``; M3d adds the parser and chunk-write codes (ADR-0010).
+    Every one of them maps to ``JobErrorCode.PERMANENT_FAILURE`` for the job.
+    """
 
     INGESTION_FAILED = "ingestion_failed"
+    EMPTY_DOCUMENT = "empty_document"
+    CHUNK_LIMIT_EXCEEDED = "chunk_limit_exceeded"
+    CONTENT_INTEGRITY_FAILED = "content_integrity_failed"
+    CHUNK_CONFLICT = "chunk_conflict"
 
 
 class MediaType(StrEnum):

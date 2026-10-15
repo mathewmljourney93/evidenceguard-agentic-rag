@@ -9605,3 +9605,569 @@ Explain that the accepted specification is now on disk and the implementation pr
 - **Acceptance wording:** `README.md` and `docs/plan.md` record the specification as accepted at review, with its implementation pending and its limits accepted as initial engineering defaults, not measured results. `CLAUDE.md`, ADR-0009 and `docs/threat-model.md` are byte-identical to `43baa6b`.
 - **Checks run before this entry was written:** relative links and anchors (54 links, 0 problems), the private-content search of the added lines (no matches) and byte identity of the three unchanged files. `git diff --cached --check`, the staged Gitleaks scan and the post-commit checks run after this entry is staged; their results are in the session handoff.
 - **Not done:** no M3d implementation, test or measurement. Nothing pushed or merged. No Docker, database contact, installation or global configuration change.
+
+**Outcome note for Prompt 79 (recorded in Prompt 80):** the documentation was committed locally as `a3e15465be71893627121dca75be121e48613d49` on `docs/m3d-ingestion-spec`, with parent `6f8ffde` and the noreply author and committer identity. It contains the six authorized paths. After the commit, the full-history Gitleaks scan reported 31 commits scanned and no leaks found, the working tree was clean, and `main` stayed at `6f8ffde`. Nothing was pushed.
+
+## Prompt 80: Implement M3d ingestion and revise session guidance
+
+- **Stage:** Implementation on branch `feat/document-ingestion`, created from `a3e1546` (staged and uncommitted for review; no commit, push or merge)
+- **Date:** 2026-10-13 (session date)
+- **Numbering:** 80 is the next unused number after Prompt 79.
+- **Interrupted:** the session hit its weekly usage limit after the installed-wheel checks and before documentation, prompt history, staging and the handoff. It was resumed in the same session as Prompt 81 below, so the text below is the exact prompt as received.
+
+````text
+Prompt 80 — Implement M3d ingestion and revise session guidance
+
+Work only inside D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md, subject to the explicit session preference below.
+
+This prompt authorizes M3d implementation, verification and staging for external review. It does not authorize any commit, push, merge, history rewrite, Docker startup or database contact.
+
+1. Verify the starting state
+
+Expected:
+- Branch: docs/m3d-ingestion-spec
+- HEAD:
+  a3e15465be71893627121dca75be121e48613d49
+- Parent:
+  6f8ffded2e5c7b2ed69e37700dc03f20f5e24482
+- Clean working tree, nothing staged or untracked.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Local main and origin/main:
+  6f8ffded2e5c7b2ed69e37700dc03f20f5e24482
+
+If anything differs, stop and report it without changing anything.
+
+Create feat/document-ingestion from the verified HEAD.
+
+Read the accepted M3d specification in docs/plan.md and the relevant existing domain, persistence, worker and packaging interfaces. Read only relevant prompt-history entries; do not load the entire archive.
+
+2. Correct the session-management preference
+
+Mathew explicitly rejects restarting after every milestone or after one or two prompts.
+
+Update CLAUDE.md narrowly:
+- Keep the current session through implementation and immediate reviews.
+- Consider recommending a fresh session after roughly 20 substantial prompts, as a guideline rather than a hard cutoff.
+- Recommend an earlier switch only when concrete context/usage evidence or a large expired-cache warning makes it worthwhile.
+- A milestone boundary alone is not a reason to restart.
+- Never invent token counts or measured savings.
+- Before a necessary switch during unfinished work, provide a complete recovery handoff.
+- Preserve targeted reading and preservation of saved work.
+
+Remove or replace conflicting recommendations to restart automatically at milestone boundaries.
+
+This explicit user preference supersedes the closing recommendation in Prompt 79. No new session is needed now.
+
+3. Implement the accepted M3d specification
+
+docs/plan.md is authoritative, including the corrections and acceptance from Prompts 77–79. Implement it without redesigning the architecture.
+
+Scope:
+- Deterministic text/plain and text/markdown parsing and chunking.
+- evidenceguard_retrieval.chunking and its package registration.
+- chunk_sets and chunks, migration 0004.
+- Tenant-scoped source loading and fenced chunk persistence.
+- Shared revision locking helper.
+- Optional before_settle completeness callback.
+- Production ingest_revision handler and registry.
+- Fixed failure codes and existing worker failure protocol.
+- Tests, ADR-0010 and accurate documentation.
+
+No embeddings, vector extension, retrieval engine, model calls, upload/document endpoints, Docker work or M3e projection implementation.
+
+The M3e projection remains explicitly assigned and required before overall M3 acceptance.
+
+4. Preserve the critical contracts
+
+Parser:
+- Implement the accepted grammar, priority and boundary rules.
+- Preserve exact source slices and separate repeated-header provenance.
+- Enforce all accepted size, count and batch bounds.
+- Use the accepted whitespace and permitted-omission rules.
+- Preserve every other source character exactly once in ordered body spans.
+- Implement all normative examples as meaningful tests.
+- Keep original revision byte hash and size unchanged.
+
+Persistence:
+- Use the specified composite tenant references and constraints.
+- Keep model and migration definitions aligned.
+- Use fixed deterministic chunk IDs and canonical manifest encoding.
+- Preserve idempotent insert-and-compare behavior.
+- Missing conflict lookups and mismatched immutable fields raise ChunkConflictError.
+- Never overwrite existing chunks.
+- Serialize writers with activation/failure through the accepted job → document → revisions lock order.
+- Re-check ownership with fresh database time after waits.
+- Refuse all writes after settlement.
+- Verify the complete set against the current attempt’s expected version, count and manifest before settlement.
+
+Worker:
+- Parse outside transactions and locks.
+- Keep cancellation and lease checks at the accepted boundaries.
+- Resume partial writes deterministically.
+- Complete activation and job success together through ctx.fenced(finish=True).
+- Preserve uncertainty after a lost commit acknowledgment.
+- Preserve the two-transaction permanent-failure protocol.
+- Never raise PermanentJobError inside the block that must commit revision failure.
+- Already-failed or settled revisions are not parsed again.
+- Handle settlement races with the specified fresh-status branches.
+- Register the production handler and update empty-registry expectations accurately.
+
+Protect content:
+- No document text, credential values, submitted content or internal exception messages in logs, reprs or public errors.
+- Use fixed error codes and messages.
+- Keep existing privacy-safe logging behavior.
+
+If the specification conflicts with an existing interface, identify the concrete conflict. Resolve routine implementation details within the accepted design; do not silently change architecture or broaden scope.
+
+5. Verification
+
+Run the repository’s relevant checks, including:
+- uv sync --locked
+- Ruff formatting and lint
+- strict Mypy
+- focused new tests
+- full database-independent suite
+- package build
+- isolated installed-wheel checks outside the source tree
+- offline rendering of migrations through 0004
+- git diff --cached --check
+- staged Gitleaks scan
+
+Include a clean-wheel parser/manifest smoke check and production registry verification. Do not start the production worker against a database.
+
+Write the real PostgreSQL tests specified in the plan, including:
+- constraints and migration round trips;
+- conflicting and idempotent writes;
+- partial-write resume;
+- writer/activation and writer/failure races;
+- refusal after settlement;
+- lease expiry during lock waits;
+- completeness and expected-manifest mismatch;
+- atomic finish and rollback;
+- permanent-failure crash gap;
+- execution through the registered production handler.
+
+Do not run PostgreSQL tests locally or contact a database. Ensure database URLs cannot accidentally enable local integration work. Report PostgreSQL tests as collected/skipped or unrun, with exact observed results. Their execution remains pending authorized publication and CI.
+
+Do not weaken existing assertions or remove historical migration coverage merely to make checks pass.
+
+6. Documentation and prompt history
+
+Add ADR-0010 explaining the final implementation, accepted decisions and limits.
+
+Update README.md, docs/plan.md and docs/threat-model.md accurately:
+- implemented locally and under review;
+- no commit or publication;
+- actual local verification;
+- PostgreSQL and Linux verification pending for this version;
+- Compose, M3e–M3f and overall M3 acceptance pending.
+
+Record Prompt 79’s actual local commit outcome as a later history note.
+
+Append this prompt verbatim using the next unused number; expect 80 and verify it. Preserve earlier history byte-for-byte.
+
+Record the revised user session preference and actual implementation outcome. Never pre-record successful checks or review acceptance.
+
+7. Stage and hand off for review
+
+Stage only relevant implementation, test, configuration and documentation files. Do not stage .local/, environments, credentials, backups or build outputs.
+
+Leave the work staged and uncommitted.
+
+Provide:
+- implementation decisions and any deviations;
+- changed paths;
+- actual verification commands and results;
+- skipped/unrun verification and limitations;
+- branch, HEAD, staged tree and working-tree status;
+- prompt-history additions.
+
+Include the COMPLETE staged diff excluding prompts.md directly in fenced diff blocks.
+
+Split large output into numbered parts at file boundaries. Do not truncate, omit tests or replace source with summaries.
+
+If response limits prevent delivering every part, save the complete diff under .local/, list all parts and clearly identify which remain to be supplied. Do not declare the handoff complete while parts are missing.
+
+Keep this Claude session for the immediate review and corrections. Recommend a new session only under the revised user preference.
+
+Nothing may be committed, pushed or merged.
+````
+
+**Outcome note (written in Prompt 81, before review; the work is staged and uncommitted):**
+- **Starting state verified:** branch `docs/m3d-ingestion-spec` at `a3e1546` with parent `6f8ffde`, a clean tree, the expected origin, and local `main` and `origin/main` at `6f8ffde`. Branch `feat/document-ingestion` was created from that HEAD.
+- **Session preference recorded:** `CLAUDE.md`'s "Session management" section now keeps the session through implementation and immediate reviews. It considers a fresh session after roughly 20 substantial prompts (a guideline), switches earlier only on concrete context or usage evidence or a large expired-cache warning, and treats a milestone boundary alone as no reason to restart. This replaces the milestone-boundary recommendation from Prompt 78 and supersedes the closing recommendation of Prompt 79.
+- **Implemented before the interruption (this session):**
+  - **Domain:** `evidenceguard_domain.chunks`, the shared chunk contract; and four new `RevisionFailureCode` values.
+  - **Parser:** the pure chunker `evidenceguard_retrieval.chunking` in a new packaged `evidenceguard_retrieval`.
+  - **Persistence:** the `ChunkSet` and `Chunk` models with migration `0004`; `evidenceguard_persistence.chunks`; and, in `documents`, the public `lock_revision_for_job` and the optional `before_settle`.
+  - **Worker:** the `ingest_revision` handler, registered in `production_registry()`.
+  - **Packaging:** `pyproject.toml` package registration and a CI installed-wheel registry assertion.
+  - **Tests:** updated head pins, registry, boundary and failure-code tests. New `test_chunking.py`, `test_chunks.py`, `test_chunk_store.py` and `test_ingest_handler.py`, plus 45 PostgreSQL integration tests in `test_ingestion_postgres.py`.
+- **Verification before the interruption (Prompt 80, reported in that session):**
+  - the format, lint, strict type-check and full database-independent suite passed;
+  - all nine normative examples matched the specification;
+  - the isolated installed-wheel checks passed: parser/manifest smoke, production registry, offline `0004` upgrade/downgrade SQL, and both `--help` commands.
+- **Completed in Prompt 81:** see that entry below.
+- **Review status:** pending. Nothing is accepted, committed or published.
+
+## Prompt 81: Resume interrupted Prompt 80 — finish M3d and provide the review handoff
+
+- **Stage:** Recovery, documentation and the review handoff on branch `feat/document-ingestion` (staged and uncommitted; no commit, push or merge)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 80 was unused on recovery and now holds the interrupted prompt above; 81 is the next unused number.
+
+````text
+Resume interrupted Prompt 80 — finish M3d and provide the review handoff
+
+Work only inside D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and the accepted M3d specification in docs/plan.md. Read only relevant recent prompt-history entries.
+
+Prompt 80 was interrupted by the weekly usage limit. The last visible message reported installed-wheel checks passing:
+- parser/manifest smoke check;
+- production registry;
+- offline migration 0004 upgrade/downgrade SQL;
+- both CLI --help commands.
+
+Claude was about to write ADR-0010 and update documentation. Final checks, staging and the complete diff handoff were not confirmed.
+
+Do not rerun Prompt 80 blindly or recreate files that already exist.
+
+1. Recover the actual state before editing
+
+Expected:
+- Branch: feat/document-ingestion
+- HEAD:
+  a3e15465be71893627121dca75be121e48613d49
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Local main:
+  6f8ffded2e5c7b2ed69e37700dc03f20f5e24482
+
+Inspect:
+- branch, HEAD and origin;
+- staged, unstaged and untracked files;
+- current diffs and staged tree;
+- relevant .local/ verification records;
+- whether Prompt 80 and its outcome are already recorded;
+- implemented code, tests and remaining documentation.
+
+Partial implementation changes are expected. Preserve them.
+
+If branch or HEAD differs, or unrelated work is present, stop and report the discrepancy. Do not reset, restore, discard or rewrite anything.
+
+2. Recover the implementation requirements
+
+Read Prompt 80 if recorded and the accepted specification.
+
+Scope:
+- deterministic text/plain and text/markdown chunking;
+- retrieval package registration;
+- chunk_sets and chunks, migration 0004;
+- tenant-scoped source loading;
+- fenced, idempotent chunk writes;
+- shared revision locking;
+- completeness callback bound to the current attempt’s manifest;
+- production ingest_revision handler;
+- fixed failure codes;
+- tests, ADR-0010 and accurate documentation.
+
+Preserve:
+- exact source provenance and permitted omissions;
+- repeated headers as separate context spans;
+- deterministic IDs and canonical manifests;
+- insert-conflict comparison, including missing lookup results;
+- job → document → revision lock order and fresh lease checks;
+- no writes after settlement;
+- deterministic partial-write recovery;
+- atomic activation and job success;
+- permanent-failure crash-gap recovery;
+- cancellation and uncertain-commit semantics;
+- content privacy.
+
+No embeddings, retrieval engine, model calls, endpoints, M3e projection implementation or Docker work.
+
+Inspect what already exists. Complete missing work and correct concrete defects within the accepted scope.
+
+3. Finish documentation and session guidance
+
+Create or complete ADR-0010.
+
+Update README.md, docs/plan.md and docs/threat-model.md to describe actual implementation and limitations:
+- local implementation awaiting review;
+- PostgreSQL and Linux verification pending for this version;
+- Compose, M3e–M3f and overall M3 acceptance pending.
+
+Check CLAUDE.md reflects Mathew’s preference:
+- keep sessions through implementation and immediate corrections;
+- consider a new session after roughly 20 substantial prompts;
+- switch earlier only for concrete context/usage reasons;
+- milestone boundaries alone do not require a restart.
+
+Do not change that preference back to frequent restarts.
+
+4. Verification
+
+Distinguish previous-session results from checks executed now. Never claim a historical check ran in this session.
+
+Run the relevant final checks on the completed state:
+- uv sync --locked;
+- Ruff formatting and lint;
+- strict Mypy;
+- focused tests and the full database-independent suite;
+- package build;
+- isolated installed-wheel checks outside the source tree;
+- offline migration rendering through 0004;
+- git diff --cached --check;
+- staged Gitleaks scan.
+
+Check parser/manifest behavior and production registry from the installed wheel without starting a worker against a database.
+
+No Docker startup or database contact is authorized. Prevent environment variables from accidentally enabling PostgreSQL tests. Report integration tests as collected/skipped or unrun, with exact observed results.
+
+Preserve historical tests and meaningful assertions.
+
+5. Prompt history
+
+Do not duplicate Prompt 80.
+
+If its exact original text is unavailable, record an honestly labelled interruption note rather than inventing a verbatim entry.
+
+Append this resumption prompt verbatim under the next unused number. Record:
+- recovered state;
+- work already present;
+- work completed now;
+- historical versus current verification;
+- remaining limitations.
+
+Preserve earlier history byte-for-byte. Do not claim acceptance or publication.
+
+6. Stage and provide the complete review handoff
+
+Stage only relevant source, tests, configuration and documentation. Exclude .local/, credentials, environments, backups and build outputs.
+
+Leave everything staged and uncommitted.
+
+Report:
+- recovered state and completed work;
+- design decisions and any deviations;
+- changed paths;
+- actual checks and results;
+- skipped/unrun verification;
+- branch, HEAD, staged tree and working-tree status;
+- prompt-history additions.
+
+Provide the COMPLETE staged diff excluding prompts.md directly in fenced diff blocks.
+
+Split into numbered parts at file boundaries. Do not truncate or omit source or tests. If output limits prevent completion, save the full diff under .local/ and clearly identify all parts still missing.
+
+No commit, push, merge, history rewrite, installation of unrelated tools, global configuration change, Docker startup or database contact is authorized.
+````
+
+**Outcome note (written before review; the work is staged and uncommitted):**
+- **Recovered state (verified before editing):**
+  - branch `feat/document-ingestion` at HEAD `a3e1546`, with the expected origin and local `main` at `6f8ffde`;
+  - nothing staged;
+  - the Prompt 80 work present as 14 modified and 12 untracked paths, all within M3d scope;
+  - no Prompt 80 entry in the history.
+
+  Nothing was reset, restored or discarded. The exact Prompt 80 text was still available in this session, so it is recorded verbatim above rather than as a reconstruction.
+- **Completed now:**
+  - ADR-0010 (`docs/decisions/0010-document-ingestion.md`);
+  - `README.md`, `docs/plan.md` and `docs/threat-model.md`, marking M3d as implemented locally, awaiting review, with its PostgreSQL integration tests unrun and PostgreSQL and Linux verification pending, and Compose, M3e–M3f and overall M3 acceptance pending;
+  - this prompt history.
+
+  `CLAUDE.md` was checked: it already holds the revised session preference from Prompt 80, and it was not changed again. No source or test defects were found during recovery, so no code changed in this prompt.
+- **Checks run in Prompt 81 (Windows, no database; the `EG_` database variables unset):**
+  - `uv sync --locked`, `ruff format --check .` (108 files already formatted), `ruff check .` (all checks passed) and `mypy` (no issues in 92 source files);
+  - the focused M3d tests: 196 passed, 45 skipped;
+  - the full suite: 1019 passed, 179 skipped. The skips are 178 PostgreSQL integration tests and 1 Windows-only signal test; `pytest -m integration --collect-only` collected 178 integration tests;
+  - `uv build` into `.local/`;
+  - in a fresh isolated environment outside the source tree: the parser/manifest smoke (normative example 1 and the documented chunk ID), the production registry (`ingest_revision`), offline migration SQL through `0004` (upgrade and `0004:0003` downgrade), and `eg-worker --help` and `eg-api --help` exiting 0.
+
+  `git diff --cached --check` and the staged Gitleaks scan run after this entry is staged; their results are in the session handoff.
+- **Not run:** no PostgreSQL integration test ran (45 new, 178 in all); there was no database contact or Docker, and no Linux run. No performance was measured.
+- **Limits:** see ADR-0010.
+  - The digest-only completeness check does not protect against privileged database modification.
+  - The M3e `stalled` projection is still required before overall M3 acceptance.
+  - Compose is unverified.
+- **Review status:** pending. Nothing is accepted, committed, pushed or merged.
+
+**Review note (recorded in Prompt 82):**
+- **Accepted for a local commit**, subject to narrow documentation cleanup. The basis was the complete implementation diff supplied as `p80-staged.diff` and the Windows checks reported in Prompt 81: 1019 passed and 179 skipped, the skips being 178 PostgreSQL tests and the POSIX-only signal test, which is skipped on Windows.
+- **How it was reviewed:** the reviewer inspected the source, tests, schema, migration and worker integration but did not run the project suite.
+- **Claim order:** a suspected claim-order issue was checked and is not a defect.
+- **Still pending:** PostgreSQL and Linux verification of this version.
+- **Handoff format:** from Prompt 82, review handoffs export the complete diff to a file under `.local/` instead of printing it in chat.
+
+## Prompt 82: Local M3d commit and file-based review handoffs
+
+- **Stage:** Documentation cleanup and a local commit on branch `feat/document-ingestion` (no push or merge)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 82 is the next unused number after Prompt 81; verified before appending.
+
+````text
+Prompt 82 — Local M3d commit and file-based review handoffs
+
+Work only inside D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md, with the explicit handoff-rule change below.
+
+The external reviewer inspected the complete p80-staged.diff and accepts the M3d implementation for a local commit, subject to narrow documentation cleanup.
+
+No push, merge, history rewrite, Docker, database contact or M3e implementation is authorized.
+
+1. Verify the starting state
+
+Expected:
+- Branch: feat/document-ingestion
+- HEAD:
+  a3e15465be71893627121dca75be121e48613d49
+- Staged tree:
+  4b7519fbcf9d591b752b62b1b68c820b7edd90ce
+- Exactly the 31 staged paths reported in Prompt 81.
+- Nothing unstaged or untracked.
+- Expected origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Local main and origin/main:
+  6f8ffded2e5c7b2ed69e37700dc03f20f5e24482
+- Effective author and committer:
+  257921624+mathewmljourney93@users.noreply.github.com
+
+If anything differs, stop and report the discrepancy without changing anything.
+
+Record the accepted staged tree before editing.
+
+2. Change the persistent review-handoff rule
+
+In CLAUDE.md, replace conflicting requirements to print complete diffs in chat.
+
+The new rule:
+- Export the complete implementation staged diff, excluding prompts.md, directly to a UTF-8 .diff file under gitignored .local/.
+- Correction handoffs export the complete incremental diff against the explicitly recorded previously reviewed tree, excluding prompts.md.
+- Do not print complete diffs in chat unless Mathew explicitly requests it.
+- Never truncate exported diffs or omit source, tests, migrations or configuration.
+- Report the exact file path, baseline tree or commit, final tree or commit, byte size and SHA-256.
+- Keep the response concise: changes, actual verification, Git state and remaining limitations.
+- End every handoff with an explicit instruction saying whether Mathew should return “output only” or “output plus the diff file”, naming that file.
+- Implementation and correction reviews require output plus the appropriate diff file.
+- If there are no changes outside prompts.md, say so; no empty diff attachment is needed.
+
+Preserve the revised session preference. Do not recommend restarting this session merely because implementation is complete.
+
+3. Narrow documentation cleanup
+
+Update README.md, docs/plan.md, docs/threat-model.md and ADR-0010 only where needed.
+
+A. Remove ambiguity about the production registry:
+- Historical M3b/M3c statements describing an empty registry or no production ingestion handler must be explicitly scoped to those milestone baselines or current main at 6f8ffde.
+- The local M3d implementation registers ingest_revision.
+- Upload and document endpoints remain unimplemented.
+- Preserve historical CI evidence and earlier prompt history.
+
+B. Record the review status accurately:
+- M3d implementation accepted at external review for a local commit.
+- PostgreSQL and Linux verification of this version remain pending publication and CI.
+- No new CI results exist.
+- The 133 earlier PostgreSQL tests passed against M3c, but the complete 178-test suite has not run against M3d; its 45 new tests have never run.
+- Compose, M3e–M3f and overall M3 acceptance remain pending.
+
+Avoid embedding this new commit’s own SHA in its content or pre-recording a successful commit.
+
+Do not change application code, tests, migrations, dependencies or workflows.
+
+4. Prompt history
+
+Append a review note under Prompt 81 recording:
+- acceptance based on the complete supplied implementation diff and reported Windows checks;
+- 1019 passed and 179 skipped locally: 178 PostgreSQL tests plus the POSIX-only signal test skipped on Windows;
+- the reviewer inspected source, tests, schema, migration and worker integration but did not run the project suite;
+- PostgreSQL and Linux verification remain pending;
+- the earlier suspected claim-order issue was checked and was not a defect;
+- the switch to file-based review handoffs.
+
+Append this prompt verbatim using the next unused number; expect 82 and verify it.
+
+Preserve earlier prompt-history bytes unchanged. Add a truthful pre-commit note without claiming future results.
+
+5. Verify and commit locally
+
+Allowed changes relative to the accepted staged tree:
+CLAUDE.md
+README.md
+docs/decisions/0010-document-ingestion.md
+docs/plan.md
+docs/threat-model.md
+prompts.md
+
+Confirm all other staged files remain byte-identical to the accepted tree. Keep exactly the expected 31 paths staged; do not stage .local/ or build artifacts.
+
+Run:
+- documentation consistency and relative-link/anchor checks;
+- private-content check of new additions;
+- git diff --cached --check;
+- staged Gitleaks scan;
+- effective identity checks.
+
+Do not rerun application checks or rebuild merely for these documentation changes. Attribute the application results to Prompt 81, rather than claiming they ran now.
+
+Commit with subject:
+feat: add deterministic document ingestion and fenced chunk storage
+
+Keep the existing co-author attribution convention.
+
+After committing:
+- verify the parent, identity and committed paths;
+- confirm every file outside the six permitted documentation/history paths is byte-identical to the accepted tree;
+- run the full-history Gitleaks scan;
+- confirm the working tree is clean;
+- confirm main was not changed.
+
+Do not push.
+
+6. Export the incremental review file
+
+Export the COMPLETE diff from:
+4b7519fbcf9d591b752b62b1b68c820b7edd90ce
+
+to the new local commit, excluding prompts.md, as:
+.local/p82/m3d-commit-incremental.diff
+
+Write it directly from Git output without printing the diff into chat. Preserve UTF-8 correctly; do not use a shell redirection method that converts it to UTF-16.
+
+Report:
+- baseline tree;
+- resulting commit;
+- exact file path;
+- byte size;
+- SHA-256.
+
+Keep it gitignored and untracked by Git.
+
+7. Concise handoff
+
+Report:
+- commit SHA, parent, subject and identity;
+- committed paths;
+- documentation and handoff-rule changes;
+- actual checks and results;
+- historical application results clearly labelled;
+- final Git state;
+- pending PostgreSQL/Linux verification, Compose and M3 acceptance.
+
+Do not print the diff.
+
+End with:
+“Return this output plus .local/p82/m3d-commit-incremental.diff to the external reviewer.”
+
+Nothing may be pushed or merged.
+````
+
+**Pre-commit note (written before the commit; the commit's own SHA is not recorded here):**
+- **Starting state verified:** branch `feat/document-ingestion`, HEAD `a3e1546`, staged tree `4b7519f` with the 31 paths of Prompt 81 and nothing unstaged or untracked. Also the expected origin, local `main` and `origin/main` at `6f8ffde`, and the noreply author and committer identity. The accepted tree was recorded under `.local/p82/` before editing.
+- **Handoff rule:** `CLAUDE.md`'s "Review handoffs" now exports complete diffs to UTF-8 files under `.local/` instead of printing them in chat. Each handoff reports the path, baseline, final tree or commit, byte size and SHA-256, and ends with an explicit return instruction. The session preference is unchanged.
+- **Documentation:**
+  - `README.md`, `docs/plan.md` and `docs/threat-model.md` scope the historical "no production handler" and empty-registry statements to the M3a–M3c baselines or to `main` at `6f8ffde`. They state that the local M3d implementation registers `ingest_revision`, and that upload and document endpoints are not implemented.
+  - These files and ADR-0010 record M3d as accepted at external review for a local commit.
+  - They also record that no new CI results exist: the 133 earlier PostgreSQL tests passed against M3c, but the complete 178-test suite has not run against M3d, and its 45 new tests have never run. PostgreSQL and Linux verification are pending.
+  - No application code, test, migration, dependency or workflow changed.
+- **Application results:** these are from Prompt 81 and were not rerun for these documentation changes.
+- **Checks for this commit:** the documentation, staged-scan and identity checks run after this entry is staged, then the post-commit checks; results are in the session handoff.
+- **Still pending:** PostgreSQL and Linux verification, Compose, M3e–M3f and overall M3 acceptance. Nothing pushed or merged.

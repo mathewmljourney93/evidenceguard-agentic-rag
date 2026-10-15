@@ -1,5 +1,5 @@
-"""The schema: tenants, users, API keys and vendors (M2a), durable jobs (M3a, ADR-0007), and
-documents with their revisions (M3c, ADR-0009).
+"""The schema: tenants, users, API keys and vendors (M2a), durable jobs (M3a, ADR-0007),
+documents with their revisions (M3c, ADR-0009), and chunk sets with their chunks (M3d, ADR-0010).
 
 These models are the single source of the schema. Migrations are written to match them, and
 ``alembic check`` (run by the PostgreSQL integration tests) fails if they drift apart.
@@ -21,6 +21,12 @@ identifier formats, a JSON *object* payload). The finer payload rules (identifie
 UUID values, no tenant field, the 4,096-byte canonical cap) are enforced by application
 validation in ``evidenceguard_domain.jobs``, not by the database.
 
+``chunk_sets`` and ``chunks`` (M3d, ADR-0010) hold a revision's verified chunks. A chunk set is
+keyed by ``(tenant_id, revision_id)`` (it has no ``id`` column) and references the revision through
+``(tenant_id, revision_id)``; each chunk references its set through ``(tenant_id, revision_id,
+chunker_version)``, so the two can never disagree on the version. PostgreSQL enforces the length,
+ordinal, span and header checks; immutability (no update or delete) is an application invariant.
+
 ``documents`` and ``document_revisions`` reference vendors and documents through composite
 tenant keys. The active pointer and the supersession link reference ``(tenant_id, document_id,
 id)``, so they can only name a revision of the same document in the same tenant. PostgreSQL
@@ -39,6 +45,7 @@ from uuid import UUID, uuid4
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     CheckConstraint,
     Date,
     DateTime,
@@ -47,6 +54,7 @@ from sqlalchemy import (
     Index,
     Integer,
     MetaData,
+    PrimaryKeyConstraint,
     String,
     Text,
     UniqueConstraint,
@@ -54,9 +62,16 @@ from sqlalchemy import (
     func,
     text,
 )
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+from evidenceguard_domain.chunks import (
+    CHUNKER_VERSION_MAX_LENGTH,
+    CHUNKER_VERSION_PATTERN,
+    MAX_CHUNK_CHARS,
+    MAX_CHUNKS_PER_REVISION,
+    MAX_SECTION_DEPTH,
+)
 from evidenceguard_domain.evidence import Authenticity, SourceType
 from evidenceguard_domain.jobs import (
     ERROR_CODE_MAX_LENGTH,
@@ -157,6 +172,30 @@ REVISION_ONE_ACTIVE_INDEX = "uq_document_revisions_one_active"
 REVISION_ONE_ACTIVE_WHERE = "status = 'active'"
 DOCUMENT_ACTIVE_REVISION_FK = "fk_documents_active_revision"
 REVISION_SUPERSEDED_BY_FK = "fk_document_revisions_superseded_by"
+
+CHUNK_SET_CHUNKER_VERSION_CHECK = f"chunker_version ~ '{CHUNKER_VERSION_PATTERN}'"
+CHUNK_SET_CHUNK_COUNT_CHECK = f"chunk_count BETWEEN 1 AND {MAX_CHUNKS_PER_REVISION}"
+CHUNK_SET_MANIFEST_SHA256_CHECK = f"manifest_sha256 ~ '{SHA256_PATTERN}'"
+CHUNK_ORDINAL_CHECK = f"ordinal BETWEEN 0 AND {MAX_CHUNKS_PER_REVISION - 1}"
+CHUNK_TEXT_CHECK = f"char_length(text) BETWEEN 1 AND {MAX_CHUNK_CHARS}"
+CHUNK_CONTENT_SHA256_CHECK = f"content_sha256 ~ '{SHA256_PATTERN}'"
+CHUNK_SECTION_PATH_CHECK = f"cardinality(section_path) <= {MAX_SECTION_DEPTH}"
+CHUNK_LINES_CHECK = "line_start >= 1 AND line_end >= line_start"
+CHUNK_CHARS_CHECK = "char_start >= 0 AND char_end > char_start"
+CHUNK_HEADER_ALL_OR_NONE_CHECK = (
+    "(header_line_start IS NULL AND header_line_end IS NULL AND header_char_start IS NULL "
+    "AND header_char_end IS NULL) OR (header_line_start IS NOT NULL AND header_line_end IS NOT "
+    "NULL AND header_char_start IS NOT NULL AND header_char_end IS NOT NULL)"
+)
+CHUNK_HEADER_ONLY_TABLES_CHECK = "header_char_start IS NULL OR is_table"
+CHUNK_HEADER_BEFORE_BODY_CHECK = (
+    "header_char_start IS NULL OR (header_char_start >= 0 AND header_char_end > "
+    "header_char_start AND header_char_end <= char_start AND header_line_start >= 1 AND "
+    "header_line_end >= header_line_start AND header_line_end < line_start)"
+)
+CHUNK_SET_PRIMARY_KEY = "pk_chunk_sets"
+# Defined here: inside ``Chunk`` the column attribute ``text`` shadows ``sqlalchemy.text``.
+EMPTY_TEXT_ARRAY = text("'{}'")
 
 
 class Base(DeclarativeBase):
@@ -375,3 +414,74 @@ class DocumentRevision(Base):
     superseded_by_revision_id: Mapped[UUID | None] = mapped_column(Uuid)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ChunkSet(Base):
+    """The completeness record of one revision's chunks: the authoritative ``chunker_version``,
+    the chunk count and the canonical manifest digest (one row per revision in v1)."""
+
+    __tablename__ = "chunk_sets"
+    __table_args__ = (
+        PrimaryKeyConstraint("tenant_id", "revision_id", name=CHUNK_SET_PRIMARY_KEY),
+        UniqueConstraint("tenant_id", "revision_id", "chunker_version"),
+        ForeignKeyConstraint(
+            ["tenant_id", "revision_id"], ["document_revisions.tenant_id", "document_revisions.id"]
+        ),
+        CheckConstraint(CHUNK_SET_CHUNKER_VERSION_CHECK, name="chunker_version"),
+        CheckConstraint(CHUNK_SET_CHUNK_COUNT_CHECK, name="chunk_count"),
+        CheckConstraint(CHUNK_SET_MANIFEST_SHA256_CHECK, name="manifest_sha256"),
+    )
+
+    tenant_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("tenants.id"))
+    revision_id: Mapped[UUID] = mapped_column(Uuid)
+    chunker_version: Mapped[str] = mapped_column(String(CHUNKER_VERSION_MAX_LENGTH))
+    chunk_count: Mapped[int] = mapped_column(Integer)
+    manifest_sha256: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Chunk(Base):
+    """One verbatim chunk of a revision with its source span (see ``evidenceguard_domain.chunks``).
+
+    ``id`` is the deterministic chunk ID. ``(tenant_id, id)`` is unique for later tenant-scoped
+    references from embeddings and citations. Rows are never updated or deleted by application
+    code.
+    """
+
+    __tablename__ = "chunks"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "revision_id", "chunker_version", "ordinal"),
+        UniqueConstraint("tenant_id", "id"),
+        ForeignKeyConstraint(
+            ["tenant_id", "revision_id", "chunker_version"],
+            ["chunk_sets.tenant_id", "chunk_sets.revision_id", "chunk_sets.chunker_version"],
+        ),
+        CheckConstraint(CHUNK_ORDINAL_CHECK, name="ordinal"),
+        CheckConstraint(CHUNK_TEXT_CHECK, name="text_length"),
+        CheckConstraint(CHUNK_CONTENT_SHA256_CHECK, name="content_sha256"),
+        CheckConstraint(CHUNK_SECTION_PATH_CHECK, name="section_path_depth"),
+        CheckConstraint(CHUNK_LINES_CHECK, name="lines"),
+        CheckConstraint(CHUNK_CHARS_CHECK, name="chars"),
+        CheckConstraint(CHUNK_HEADER_ALL_OR_NONE_CHECK, name="header_all_or_none"),
+        CheckConstraint(CHUNK_HEADER_ONLY_TABLES_CHECK, name="header_only_tables"),
+        CheckConstraint(CHUNK_HEADER_BEFORE_BODY_CHECK, name="header_before_body"),
+    )
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
+    tenant_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("tenants.id"))
+    revision_id: Mapped[UUID] = mapped_column(Uuid)
+    chunker_version: Mapped[str] = mapped_column(String(CHUNKER_VERSION_MAX_LENGTH))
+    ordinal: Mapped[int] = mapped_column(Integer)
+    text: Mapped[str] = mapped_column(Text)
+    content_sha256: Mapped[str] = mapped_column(String(64))
+    section_path: Mapped[list[str]] = mapped_column(ARRAY(Text), server_default=EMPTY_TEXT_ARRAY)
+    is_table: Mapped[bool] = mapped_column(Boolean)
+    line_start: Mapped[int] = mapped_column(Integer)
+    line_end: Mapped[int] = mapped_column(Integer)
+    char_start: Mapped[int] = mapped_column(Integer)
+    char_end: Mapped[int] = mapped_column(Integer)
+    header_line_start: Mapped[int | None] = mapped_column(Integer)
+    header_line_end: Mapped[int | None] = mapped_column(Integer)
+    header_char_start: Mapped[int | None] = mapped_column(Integer)
+    header_char_end: Mapped[int | None] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

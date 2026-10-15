@@ -38,7 +38,8 @@ from evidenceguard_persistence.models import ApiKey, Tenant, User, UserRole, Ven
 pytestmark = pytest.mark.integration
 
 M2A_TABLES = {"tenants", "users", "api_keys", "vendors"}
-HEAD_TABLES = M2A_TABLES | {"jobs", "documents", "document_revisions"}
+M3C_TABLES = M2A_TABLES | {"jobs", "documents", "document_revisions"}
+HEAD_TABLES = M3C_TABLES | {"chunk_sets", "chunks"}
 FOREIGN_KEY_VIOLATION = "23503"
 UNIQUE_VIOLATION = "23505"
 CHECK_VIOLATION = "23514"
@@ -100,6 +101,10 @@ def test_upgrade_downgrade_upgrade_on_an_empty_database(
 
     command.upgrade(config, "head")
     assert _tables(empty_database) == HEAD_TABLES | {"alembic_version"}
+    assert _version(empty_database) == "0004"
+
+    command.downgrade(config, "0003")
+    assert _tables(empty_database) == M3C_TABLES | {"alembic_version"}
     assert _version(empty_database) == "0003"
 
     command.downgrade(config, "0002")
@@ -115,7 +120,7 @@ def test_upgrade_downgrade_upgrade_on_an_empty_database(
 
     command.upgrade(config, "head")
     assert _tables(empty_database) == HEAD_TABLES | {"alembic_version"}
-    assert _version(empty_database) == "0003"
+    assert _version(empty_database) == "0004"
 
 
 def _version(engine: Engine) -> str | None:

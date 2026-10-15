@@ -20,6 +20,18 @@ from sqlalchemy.pool import QueuePool
 from evidenceguard_persistence.db import create_db_engine, transaction
 from evidenceguard_persistence.migration_config import alembic_config
 from evidenceguard_persistence.models import (
+    CHUNK_CHARS_CHECK,
+    CHUNK_CONTENT_SHA256_CHECK,
+    CHUNK_HEADER_ALL_OR_NONE_CHECK,
+    CHUNK_HEADER_BEFORE_BODY_CHECK,
+    CHUNK_HEADER_ONLY_TABLES_CHECK,
+    CHUNK_LINES_CHECK,
+    CHUNK_ORDINAL_CHECK,
+    CHUNK_SECTION_PATH_CHECK,
+    CHUNK_SET_CHUNK_COUNT_CHECK,
+    CHUNK_SET_CHUNKER_VERSION_CHECK,
+    CHUNK_SET_MANIFEST_SHA256_CHECK,
+    CHUNK_TEXT_CHECK,
     DOCUMENT_AUTHENTICITY_CHECK,
     DOCUMENT_KEY_CHECK,
     DOCUMENT_LATEST_REVISION_NO_CHECK,
@@ -209,18 +221,20 @@ def test_migration_resources_are_packaged() -> None:
     assert (migrations / "versions" / "v0001_tenancy.py").is_file()
     assert (migrations / "versions" / "v0002_jobs.py").is_file()
     assert (migrations / "versions" / "v0003_documents.py").is_file()
+    assert (migrations / "versions" / "v0004_chunks.py").is_file()
 
 
 def test_migration_history_has_one_head() -> None:
     script = ScriptDirectory.from_config(alembic_config())
 
-    assert script.get_heads() == ["0003"]
+    assert script.get_heads() == ["0004"]
+    assert script.get_revision("0004").down_revision == "0003"
     assert script.get_revision("0003").down_revision == "0002"
     assert script.get_revision("0002").down_revision == "0001"
     assert script.get_revision("0001").down_revision is None
 
 
-def test_schema_tables_are_m2a_jobs_and_documents() -> None:
+def test_schema_tables_are_m2a_jobs_documents_and_chunks() -> None:
     assert set(Base.metadata.tables) == {
         "tenants",
         "users",
@@ -229,6 +243,8 @@ def test_schema_tables_are_m2a_jobs_and_documents() -> None:
         "jobs",
         "documents",
         "document_revisions",
+        "chunk_sets",
+        "chunks",
     }
     assert {role.value for role in UserRole} == {"reviewer", "approver", "admin"}
 
@@ -380,3 +396,60 @@ def test_offline_downgrade_from_0003_drops_the_pointer_first(
     assert sql.index("DROP TABLE document_revisions;") < sql.index("DROP TABLE documents;")
     for table in ("jobs", "vendors", "api_keys", "users", "tenants"):
         assert f"DROP TABLE {table};" not in sql
+
+
+def test_offline_upgrade_creates_chunks_with_the_model_constraints(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Migration 0004's literal constraint text must equal the model's (alembic check does not
+    compare CHECK constraints)."""
+    sql = _offline_sql(monkeypatch, upgrade=True)
+
+    assert "CREATE TABLE chunk_sets (" in sql
+    assert "CREATE TABLE chunks (" in sql
+    assert "text TEXT NOT NULL" in sql
+    assert "section_path TEXT[] DEFAULT '{}' NOT NULL" in sql
+    for check in (
+        CHUNK_SET_CHUNKER_VERSION_CHECK,
+        CHUNK_SET_CHUNK_COUNT_CHECK,
+        CHUNK_SET_MANIFEST_SHA256_CHECK,
+        CHUNK_ORDINAL_CHECK,
+        CHUNK_TEXT_CHECK,
+        CHUNK_CONTENT_SHA256_CHECK,
+        CHUNK_SECTION_PATH_CHECK,
+        CHUNK_LINES_CHECK,
+        CHUNK_CHARS_CHECK,
+        CHUNK_HEADER_ALL_OR_NONE_CHECK,
+        CHUNK_HEADER_ONLY_TABLES_CHECK,
+        CHUNK_HEADER_BEFORE_BODY_CHECK,
+    ):
+        assert f"CHECK ({check})" in sql
+    assert "CONSTRAINT pk_chunk_sets PRIMARY KEY (tenant_id, revision_id)" in sql
+    assert "UNIQUE (tenant_id, revision_id, chunker_version)" in sql
+    assert (
+        "FOREIGN KEY(tenant_id, revision_id) REFERENCES document_revisions (tenant_id, id)" in sql
+    )
+    assert (
+        "FOREIGN KEY(tenant_id, revision_id, chunker_version) REFERENCES chunk_sets "
+        "(tenant_id, revision_id, chunker_version)" in sql
+    )
+    assert "UNIQUE (tenant_id, revision_id, chunker_version, ordinal)" in sql
+    assert sql.index("CREATE TABLE chunk_sets (") < sql.index("CREATE TABLE chunks (")
+    assert "UPDATE alembic_version SET version_num='0004'" in sql
+    upper = sql.upper()
+    assert "TRIGGER" not in upper
+    assert "EXTENSION" not in upper
+    assert "VECTOR" not in upper
+
+
+def test_offline_downgrade_from_0004_drops_chunks_then_chunk_sets_only(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sql = _offline_sql(monkeypatch, upgrade=False, revisions="0004:0003")
+
+    assert "DROP TABLE chunks;" in sql
+    assert "DROP TABLE chunk_sets;" in sql
+    assert sql.index("DROP TABLE chunks;") < sql.index("DROP TABLE chunk_sets;")
+    for table in ("document_revisions", "documents", "jobs", "vendors", "tenants"):
+        assert f"DROP TABLE {table};" not in sql
+    assert "UPDATE alembic_version SET version_num='0003'" in sql

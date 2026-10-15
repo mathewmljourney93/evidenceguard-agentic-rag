@@ -633,7 +633,7 @@ Each question entry contains:
   - **On `main`:** `main` was fast-forwarded to `dd26c70` (`dd26c7099d1007e9ee615204dc0056abe8820c67`), which adds only documentation after `bc5f638`.
     - [CI run 38255786860](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375464) `709 passed, 77 skipped in 18.16s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375444) `708 passed, 78 skipped in 21.20s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375219) `77 passed, 709 deselected in 17.36s`.
     - The [secret-scan run 38255786973](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973/job/114833375056): 26 commits scanned, no leaks found).
-  - There are no production handlers yet. Compose is unverified.
+  - At this baseline there were no production handlers (the local M3d implementation adds `ingest_revision`). Compose is unverified.
 - **M3c** has a detailed specification below, accepted at review (Prompt 68). The implementation (Prompt 69, corrected in Prompt 71; [ADR-0009](decisions/0009-document-revisions.md)) is **reviewed, verified in CI and on `main`**.
   - **Tested commit:** `8646b75` on `feat/document-revisions` (the implementation commit `057d57d` plus a prompt-history commit).
   - [CI run 38284929219](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930898138) `819 passed, 133 skipped in 18.75s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930898065) `818 passed, 134 skipped in 23.07s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930897691) `133 passed, 819 deselected in 36.46s` (the 77 existing PostgreSQL tests and the 56 added by M3c, including its constraint, migration, concurrency, activation and lease tests).
@@ -641,8 +641,8 @@ Each question entry contains:
   - **On `main`:** `main` was fast-forwarded to `6f8ffde` (`6f8ffded2e5c7b2ed69e37700dc03f20f5e24482`), which adds only documentation after `8646b75`.
     - [CI run 38286702295](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295/job/114936682783) `819 passed, 133 skipped in 18.04s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295/job/114936682699) `818 passed, 134 skipped in 18.87s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295/job/114936682399) `133 passed, 819 deselected in 38.29s`.
     - The [secret-scan run 38286702205](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702205) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702205/job/114936700730): 30 commits scanned, no leaks found).
-  - There is no production ingestion handler, upload or document endpoint. Compose is unverified.
-- **M3d** has a detailed specification below, **accepted at review (Prompt 76, corrected in Prompts 77–79); its implementation is pending**. It assigns the dead-job projection to M3e (section E), which remains a blocker for overall M3 acceptance. M3d–M3f are not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
+  - On `main` at `6f8ffde` there is no production ingestion handler, upload or document endpoint. Compose is unverified.
+- **M3d** has a detailed specification below, **accepted at review (Prompt 76, corrected in Prompts 77–79)**. It is **implemented on `feat/document-ingestion` (Prompts 80–81; [ADR-0010](decisions/0010-document-ingestion.md)) and accepted at external review for a local commit (Prompt 82)**, not published. Local Windows checks without a database passed in Prompt 81. No new CI results exist: the 133 earlier PostgreSQL tests passed against M3c, but the complete 178-test PostgreSQL suite has not run against M3d, and its 45 new tests have never run. PostgreSQL and Linux verification of this version are pending publication and CI. The production registry registers `ingest_revision`; upload and document endpoints are not implemented. It assigns the dead-job projection to M3e (section E), which remains a blocker for overall M3 acceptance. M3e–M3f are not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
 
 M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-workflow.md): plain Python, PostgreSQL-backed jobs claimed with `FOR UPDATE SKIP LOCKED`, leases, heartbeats and fenced writes. There is no new orchestration framework or queue dependency. Each slice is reviewed, verified in CI and merged before the next one starts. The M3 acceptance criteria above are split across the slices as follows:
 
@@ -1517,7 +1517,7 @@ M3c adds no production worker handler and no endpoint.
 - The binding uses the payload key already planned for `ingest_revision`.
 - Moving `chunker_version` and the `evidenceguard_domain.state` naming change only planned details, and were accepted at review.
 
-**M3d, parsing, chunking and the first production handler, in detail (ACCEPTED at review, Prompt 76, corrected in Prompts 77–79; implementation pending, nothing below is implemented):**
+**M3d, parsing, chunking and the first production handler, in detail (ACCEPTED at review, Prompt 76, corrected in Prompts 77–79; implemented in Prompts 80–81 and accepted at review for a local commit in Prompt 82, see [ADR-0010](decisions/0010-document-ingestion.md); PostgreSQL and Linux verification pending):**
 
 M3d turns a `pending` revision into a verified set of chunks and activates it. It uses the M3a fence, the M3b worker and the M3c lifecycle, with two small additive interface changes to M3c (C): a public name for M3c's existing lock helper and an optional `before_settle` argument. It is the slice that carries the M3 criteria "chunk IDs include tenant and revision" and "a stale worker cannot write chunks".
 
@@ -1631,7 +1631,7 @@ Everything else below was proposed in Prompt 76 and is marked *(proposed)* where
   - **Oversized rows:** a row that does not fit within `TARGET_CHARS` together with a repeatable header is emitted with that header if header plus row is ≤ `MAX_CHUNK_CHARS`. Otherwise the row is emitted without the header, as one chunk if it is ≤ `TARGET_CHARS` or as oversized-line pieces if it is longer.
   - **Bound:** a repeated header is at most 1,000 code points and is emitted with a row only when the total is ≤ `MAX_CHUNK_CHARS`. Every other chunk is ≤ `TARGET_CHARS`. So every emitted chunk is within the absolute cap.
 - **Ordinals:** zero-based and contiguous in document order.
-- **Coverage invariant (to be enforced by a planned test; no M3d test exists yet):** the source characters fall into four groups:
+- **Coverage invariant (enforced by the database-independent tests in `tests/test_chunking.py`):** the source characters fall into four groups:
   1. a leading BOM, which is never in a span;
   2. LF and CRLF line terminators, which may be omitted between chunks;
   3. spaces and tabs, which may be omitted only where the rules above permit (blank lines, split points and trimmed oversized lines);
@@ -1937,7 +1937,7 @@ New module `evidenceguard_persistence.chunks`. All its functions take M3a's `Fen
   - atomic activation with job completion, and rollback when either fails;
   - the permanent-failure crash gap against real rows;
   - a real `run_worker` execution with the **registered production handler**.
-- **Pending:** the M3d implementation and all of its tests, and PostgreSQL verification until authorized publication and CI. No M3d implementation, test result or performance measurement exists yet.
+- **Status (Prompts 80–82):** implemented as planned, with the files above and ADR-0010, and accepted at external review for a local commit. The database-independent tests ran locally on Windows in Prompt 81 (1019 passed, 179 skipped). The PostgreSQL integration tests listed above are written in `tests/test_ingestion_postgres.py` but **unrun**. No new CI results exist: the 133 earlier PostgreSQL tests passed against M3c, but the complete 178-test PostgreSQL suite has not run against M3d, and its 45 new tests have never run. PostgreSQL and Linux verification of this version are pending publication and CI. No performance has been measured.
 
 **M4 – Embeddings, retrieval and corpus**
 - Provider interface, `HashingEmbedder`, Voyage adapter (mocked in CI), RRF search over snapshot revisions, `sample_data/` including the injected variant, ground truth with acceptable and wrong claims, and the retrieval contract suite.

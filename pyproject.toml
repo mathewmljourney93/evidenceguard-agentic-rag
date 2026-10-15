@@ -45,6 +45,7 @@ packages = [
     "packages/domain/evidenceguard_domain",
     "packages/observability/evidenceguard_observability",
     "packages/persistence/evidenceguard_persistence",
+    "packages/retrieval/evidenceguard_retrieval",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -54,6 +55,7 @@ include = [
     "/packages/domain/evidenceguard_domain",
     "/packages/observability/evidenceguard_observability",
     "/packages/persistence/evidenceguard_persistence",
+    "/packages/retrieval/evidenceguard_retrieval",
     "/alembic.ini",
     "/tests",
     "/docs/decisions",
@@ -72,6 +74,7 @@ known-first-party = [
     "evidenceguard_domain",
     "evidenceguard_observability",
     "evidenceguard_persistence",
+    "evidenceguard_retrieval",
     "evidenceguard_worker",
 ]
 
@@ -83,6 +86,7 @@ files = [
     "packages/domain/evidenceguard_domain",
     "packages/observability/evidenceguard_observability",
     "packages/persistence/evidenceguard_persistence",
+    "packages/retrieval/evidenceguard_retrieval",
     "apps/worker/evidenceguard_worker",
     "tests",
 ]

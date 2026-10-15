@@ -9,6 +9,7 @@ import evidenceguard_api
 import evidenceguard_domain
 import evidenceguard_observability
 import evidenceguard_persistence
+import evidenceguard_retrieval
 import evidenceguard_worker
 from evidenceguard_api.__main__ import main
 
@@ -54,14 +55,32 @@ def _top_level_imports(package_dir: Path) -> set[str]:
                 "evidenceguard_api",
                 "evidenceguard_observability",
                 "evidenceguard_persistence",
+                "evidenceguard_retrieval",
                 "evidenceguard_worker",
             },
         ),
         (
             evidenceguard_observability,
-            {"evidenceguard_api", "evidenceguard_persistence", "evidenceguard_worker"},
+            {
+                "evidenceguard_api",
+                "evidenceguard_persistence",
+                "evidenceguard_retrieval",
+                "evidenceguard_worker",
+            },
         ),
-        (evidenceguard_persistence, {"evidenceguard_api", "evidenceguard_worker"}),
+        (
+            evidenceguard_persistence,
+            {"evidenceguard_api", "evidenceguard_retrieval", "evidenceguard_worker"},
+        ),
+        (
+            evidenceguard_retrieval,
+            {
+                "evidenceguard_api",
+                "evidenceguard_observability",
+                "evidenceguard_persistence",
+                "evidenceguard_worker",
+            },
+        ),
         (evidenceguard_api, {"evidenceguard_worker"}),
         (evidenceguard_worker, {"evidenceguard_api"}),
     ],
@@ -69,3 +88,14 @@ def _top_level_imports(package_dir: Path) -> set[str]:
 def test_package_import_boundaries(package: ModuleType, forbidden: set[str]) -> None:
     assert package.__file__ is not None
     assert not _top_level_imports(Path(package.__file__).parent) & forbidden
+
+
+def test_retrieval_imports_only_the_domain_and_the_standard_library() -> None:
+    """M3d: the chunker is pure code with no I/O dependencies (ADR-0010)."""
+    assert evidenceguard_retrieval.__file__ is not None
+    imported = _top_level_imports(Path(evidenceguard_retrieval.__file__).parent)
+    assert {name for name in imported if name.startswith("evidenceguard")} <= {
+        "evidenceguard_domain",
+        "evidenceguard_retrieval",
+    }
+    assert not imported & {"sqlalchemy", "psycopg", "httpx", "socket", "urllib", "requests", "os"}

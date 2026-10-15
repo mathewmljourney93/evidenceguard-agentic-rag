@@ -25,6 +25,7 @@ from evidenceguard_persistence.settings import DATABASE_URL_ENV
 from evidenceguard_worker import __main__ as cli
 from evidenceguard_worker.context import JobContext
 from evidenceguard_worker.handlers import production_registry
+from evidenceguard_worker.ingest import INGEST_REVISION_KIND, ingest_revision
 from evidenceguard_worker.registry import HandlerRegistry
 from evidenceguard_worker.runtime import JobStore, Timings
 from evidenceguard_worker.shutdown import StopController, install_signal_handlers
@@ -158,8 +159,11 @@ def test_usage_errors_exit_two_without_echoing_values(
 # --- exit codes -----------------------------------------------------------------------------
 
 
-def test_the_production_registry_is_empty() -> None:
-    assert len(production_registry()) == 0
+def test_the_production_registry_registers_exactly_ingest_revision() -> None:
+    registry = production_registry()
+
+    assert registry.kinds == frozenset({INGEST_REVISION_KIND}) == frozenset({"ingest_revision"})
+    assert registry[INGEST_REVISION_KIND] is ingest_revision
 
 
 def test_no_handlers_exit_four_before_reading_database_settings(
@@ -171,7 +175,8 @@ def test_no_handlers_exit_four_before_reading_database_settings(
     monkeypatch.setattr(cli, "load_database_settings", forbidden)
     monkeypatch.setenv(DATABASE_URL_ENV, f"postgresql://{SUBMITTED_MARKER}")
 
-    assert cli.main([]) == 4
+    # The production registry is no longer empty (M3d); an empty one is injected.
+    assert cli.main([], registry_factory=HandlerRegistry) == 4
     err = capsys.readouterr().err
     assert "eg-worker: error: no job handlers are registered" in err
     assert '"event":"worker.no_handlers"' in err
