@@ -1,6 +1,6 @@
 # EvidenceGuard implementation plan
 
-**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a implementation is accepted at external review for a local commit (Prompt 110); Linux/current-version CI, build and clean installed-wheel verification remain pending. M4b–M4f remain unimplemented and require detailed specification reviews. Later milestones remain plans. Historical evidence below retains its original baseline.
+**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is reviewed and verified in feature-branch CI at `d501bd6`, not merged; Linux/Windows verification, CI builds and existing clean installed-wheel checks passed. Direct embedding-provider execution from an isolated installed wheel remains unverified. M4b–M4f remain unimplemented and require detailed specification reviews. Later milestones remain plans. Historical evidence below retains its original baseline.
 
 EvidenceGuard is a vendor-risk review copilot. It ingests synthetic vendor documents, retrieves evidence the tenant is authorized to see, classifies each review question against that evidence, and drafts a cited report. A human must approve the exact report revision before it can be finalized or exported. It is decision support, not legal advice or compliance certification.
 
@@ -709,7 +709,7 @@ All three kinds passed on `main` at `e2463cb` ([CI run 38773393988](https://gith
   - container shutdown tested with an idle worker only.
 - **Compose:** CI Compose satisfies the agreed Compose verification requirement. Local Compose remains unverified.
 - **No guarantees follow:** acceptance implies no production-readiness, performance or general security guarantee.
-- **Status:** the M3 implementation is on `main` at `e2463cb`. M4a implementation is accepted at external review for a local commit (Prompt 110); M4b–M4f remain unimplemented and overall M4 acceptance is pending.
+- **Status:** the M3 implementation is on `main` at `e2463cb`. M4a is reviewed and verified in feature-branch CI at `d501bd6`, not merged; main remains at `85cb0d6`. M4b–M4f remain unimplemented and overall M4 acceptance is pending.
 
 ### Final M3 publication baseline (Prompt 107)
 
@@ -2585,10 +2585,12 @@ They are set once as job environment variables.
 
 **M4 – Embeddings, retrieval and corpus**
 
-**Status (Prompt 108): [DECISION] M4a–M4f sequence and complete M4a specification
-accepted at external review; M4a implementation accepted for a local commit in
-Prompt 110. Linux/current-version CI, build and clean installed-wheel verification
-remain pending. M4b–M4f and overall M4 acceptance remain pending.** M1, M2 and M3 remain accepted.
+**Status (Prompt 112): [DECISION] M4a–M4f sequence and complete M4a specification
+accepted at external review; M4a reviewed and verified in CI at `d501bd6` on
+`feat/embedding-contracts`, not merged. Main remains at `85cb0d6`. Linux/Windows
+verification, CI builds and existing installed-wheel checks passed; direct
+embedding-provider execution from an isolated installed wheel remains unverified.
+M4b–M4f and overall M4 acceptance remain pending.** M1, M2 and M3 remain accepted.
 
 The reviewer inspected the full Prompt 107 diff, independently matched its
 SHA-256 checksum and checked the existing chunk domain and chunker source
@@ -2721,9 +2723,12 @@ claims. End-to-end canary/output behaviour and claim judgments remain M5/M7.
 
 #### M4a local verification (Prompt 109)
 
-The specification remains accepted (Prompt 108). The implementation is accepted
-at external review for a local commit (Prompt 110); Linux/current-version CI,
-build and clean installed-wheel verification remain pending. It adds frozen
+The specification remains accepted (Prompt 108), and the implementation was
+accepted for a local commit in Prompt 110. It is now reviewed and verified in
+feature-branch CI at `d501bd6`, not merged; see the full [CI evidence and wheel
+check scope](decisions/0013-embeddings.md#feature-branch-ci-evidence-at-d501bd6).
+Linux/Windows verification and CI builds are complete for that version; direct
+embedding-provider execution from an isolated installed wheel remains unverified. It adds frozen
 identity/usage/batch values, canonical fingerprints, strict request/result
 validation, the provider protocol and deterministic `HashingEmbedder`, with
 fixed private errors and the lexical-hash label. See [ADR-0013](decisions/0013-embeddings.md).
@@ -2743,9 +2748,11 @@ with `--offline --no-sync` to avoid network and dependency installation:
   One POSIX-only signal skip on Windows: `raise_signal(SIGTERM) ends a Windows process`.
   PostgreSQL tests did not run; no database was contacted.
 - `uv build --offline --no-build-isolation --out-dir .local/p109/dist`: failed
-  before producing a distribution because `hatchling` is absent from the
-  existing environment (`ModuleNotFoundError`). No dependency was installed;
-  build and a clean installed-wheel smoke for this version remain unverified.
+  before producing a distribution because `hatchling` was absent from the
+  local environment (`ModuleNotFoundError`). No dependency was installed. This
+  historical local failure is separate from the later successful CI builds and
+  existing clean installed-wheel checks at `d501bd6`; direct installed-wheel
+  embedding-provider execution remains unverified.
 
 Initial lint/type issues in new code/tests were corrected before the final
 passing checks. An environment-denial test initially interfered with pytest's

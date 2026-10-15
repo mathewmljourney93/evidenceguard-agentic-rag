@@ -15531,3 +15531,349 @@ Return this output only to the external reviewer; no diff attachment is required
   branch or tag. Confirm exact remote SHA, then monitor push runs for that SHA
   and branch for at most 25 minutes. Stop on failure/cancellation/timeout without
   fixes, reruns, documentation updates or another push. Main must remain unchanged.
+
+
+**Prompt 111 publication outcome (recorded in Prompt 112):** prompts.md-only
+authorization commit d501bd6de68a965c283a2187665170502af083e2, parent
+82e8e3111ee6bac87eab381c7a99bf8f6e2c7484; expected noreply author/committer,
+with OpenAI Codex assistance identified in the body. Prefix, scope, private-content,
+cached whitespace, staged Gitleaks and identity checks passed. Full-history
+Gitleaks before push: 47 commits scanned, no leaks. The explicit command
+git push --set-upstream origin refs/heads/feat/embedding-contracts:refs/heads/feat/embedding-contracts
+exited 0. Remote feature branch matched exact HEAD; main stayed at 85cb0d6.
+All five exact-commit push jobs succeeded. Codex retrieved both workflow records
+and all five logs: Ubuntu 1480 passed/204 skipped in 25.65s; Windows 1479 passed/
+205 skipped in 32.31s; PostgreSQL 204 passed/1480 deselected in 59.32s. Embedding
+tests ran in both verification jobs; both builds and existing installed-wheel
+checks passed. Container config/context/build/image/smoke/cleanup succeeded:
+74 context files, all 19 planted fixtures excluded; CI-built service image;
+upload 202, ingestion success, active revision with two verified chunks,
+duplicate 200, idle-worker exit 0/no OOM. CI Gitleaks: 47 commits, no leaks.
+Full links and the exact wheel-check scope are in ADR-0013. Final branch tracked
+origin/feat/embedding-contracts, tree clean, local/origin/remote main unchanged.
+No documentation was updated after CI in Prompt 111; no merge or main update.
+
+**Reviewer verification supplied in Prompt 112:** the reviewer independently
+retrieved both successful push workflow records and all five logs for exact SHA
+d501bd6de68a965c283a2187665170502af083e2 on feat/embedding-contracts, confirming
+the observations above. Both implementing Codex and reviewer retrieved logs
+independently. The reviewer did not execute the project suite or Docker locally.
+Earlier Prompt 109 local Windows results and the local hatchling failure remain
+historical local evidence, separate from this CI result. Existing wheel checks
+do not execute embeddings directly; isolated installed-wheel embedding execution
+remains unverified. Local Compose is unverified. No semantic-quality claim.
+
+## Prompt 112: Record verified M4a feature-branch results
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Scope/status:** documentation only, staged for external review; no commit or publication.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 112 — Record verified M4a feature-branch results. Documentation only, staged for review. No commit, push or merge.
+
+Read applicable AGENTS.md instructions, CLAUDE.md and relevant status sections. Avoid reloading full prompt history or printing diffs.
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/embedding-contracts.
+- HEAD, upstream and remote feature branch:
+  d501bd6de68a965c283a2187665170502af083e2.
+- Parent:
+  82e8e3111ee6bac87eab381c7a99bf8f6e2c7484.
+- Working tree clean.
+- Local main, origin/main and remote main:
+  85cb0d622a5b49c11439b0b9f67abceaa82edb29.
+- Expected origin and noreply identity unchanged.
+
+Read fresh remote refs. Stop on material mismatch. Record the baseline under .local/p112/.
+
+2. Verified evidence
+
+The external reviewer independently retrieved both workflow records and all five job logs. Both runs were successful push events on feat/embedding-contracts at exact commit `d501bd6de68a965c283a2187665170502af083e2`.
+
+CI:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38789281404
+
+Observed:
+- Ubuntu, job 116609328373:
+  1480 passed, 204 skipped in 25.65s.
+- Windows, job 116609328257:
+  1479 passed, 205 skipped in 32.31s.
+- PostgreSQL, job 116609327970:
+  204 passed, 1480 deselected in 59.32s.
+- Embedding tests ran successfully in both verify jobs.
+- Both distribution builds and existing clean installed-wheel checks passed.
+
+Container job 116609328164:
+- configuration passed;
+- effective context: 74 files, all 19 planted fixtures excluded;
+- image checks passed;
+- stack startup and CI-built image identity passed;
+- upload 202, ingestion succeeded, active revision with two verified chunks;
+- duplicate upload 200;
+- idle-worker exit 0, no OOM kill;
+- smoke and cleanup passed.
+
+Secret scan:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38789281505
+Job 116609328947:
+47 commits scanned, no leaks found.
+
+Both the implementing Codex session and the external reviewer retrieved logs independently. The reviewer did not execute the project suite or Docker locally.
+
+3. Authorized documentation changes
+
+Modify only:
+- README.md
+- docs/decisions/0013-embeddings.md
+- docs/plan.md
+- prompts.md
+
+Record:
+- M4a reviewed and verified in CI at d501bd6 on the feature branch;
+- not merged; main remains at 85cb0d6;
+- Linux and Windows verification and CI builds are complete for this version;
+- existing clean installed-wheel checks passed;
+- those wheel checks cover application imports/factory, entry points, ingestion registration and offline migrations, not a direct embedding-provider smoke;
+- direct embedding-provider execution from an isolated installed wheel remains unverified;
+- the earlier local hatchling failure remains historical and local, not a current CI build failure;
+- no semantic-quality, retrieval or live-provider evidence is claimed;
+- M4b–M4f and overall M4 acceptance remain pending;
+- local Compose remains unverified.
+
+Use full evidence and links in ADR-0013 or the plan, with concise references elsewhere. Keep older results tied to their original commits.
+
+Replace stale present-tense “Linux/current-version CI pending” and general build-pending claims. Preserve the narrower installed-embedding limitation.
+
+Do not change the accepted algorithm, specification, source, tests, configuration, dependencies, lockfile or workflows.
+
+4. Prompt history
+
+Append:
+- Prompt 111 publication outcome and its actual observations;
+- reviewer verification of the exact-commit runs/logs above;
+- Prompt 112 verbatim and a truthful outcome marking this documentation awaiting review.
+
+Preserve all earlier bytes. Do not claim the reviewer ran the suite locally.
+
+5. Checks and export
+
+Stage exactly the four permitted files.
+
+Check:
+- unchanged earlier prompts.md prefix;
+- links and anchors;
+- truthful status and verification scope;
+- private content and unintended artifacts;
+- git diff --cached --check;
+- staged Gitleaks without suppression.
+
+No application tests, builds, installs, Docker, database contact or provider calls are needed.
+
+Export the complete staged diff against HEAD, excluding prompts.md:
+.local/p112/m4a-verification-docs.diff
+
+UTF-8 without BOM. Report baseline/final staged tree, paths, statistics, byte size and SHA-256. Do not print the diff.
+
+No commit, push, merge, amend, rebase, tag, branch deletion or M4b work.
+
+Return this output plus .local/p112/m4a-verification-docs.diff to the external reviewer.
+````
+
+**Prompt 112 outcome (documentation awaiting external review):** verified clean
+feat/embedding-contracts at d501bd6de68a965c283a2187665170502af083e2, expected
+parent 82e8e31, matching upstream and fresh remote feature ref. main/origin/main
+and fresh remote main matched 85cb0d622a5b49c11439b0b9f67abceaa82edb29. Expected
+origin and noreply effective identity verified. Baseline saved under .local/p112/.
+Only README.md, ADR-0013, docs/plan.md and this append-only history changed.
+ADR-0013 records full exact-commit CI evidence/links and independent log retrieval
+by Codex and reviewer; concise references replace stale general CI/build-pending
+claims. Direct isolated installed-wheel embedding execution remains unverified;
+the historical local hatchling failure, unverified local Compose and pending
+M4b–M4f/overall M4 acceptance are retained. Accepted contracts/algorithm and all
+source/tests/config/dependencies/workflows are unchanged. No semantic-quality,
+retrieval or live-provider evidence is claimed. The reviewer did not run the
+suite or Docker locally. This documentation is staged for review, not accepted.
+
+Checks after this note: exact four-path staged scope, identical earlier history
+prefix and verbatim Prompt 112, links/anchors, status/verification scope,
+private-content/artifact checks, cached whitespace and staged Gitleaks without
+suppression. Actual results and export metadata are reported in the handoff.
+Complete staged diff against HEAD excluding prompts.md is exported as UTF-8
+without BOM to .local/p112/m4a-verification-docs.diff. No application tests,
+builds, installs, Docker, database/provider contact, commit, push, merge or M4b work.
+
+
+**Prompt 112 acceptance (recorded in Prompt 113):** reviewer inspected the full
+documentation diff, independently matched SHA-256
+f72016094f9dc2475e824d5b73ebc7e9b1c0536d03097556e125cefeb2b5fcd4 and compared
+it with previously retrieved exact-commit CI evidence. Accepted; no new local
+application checks. Accepted staged tree 776b48a2d01649e6e4366e04b7597d63e557bc37.
+The three reviewed documents are preserved byte-identical for this task.
+
+## Prompt 113: Commit M4a CI documentation, publish feature, conditionally fast-forward main
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Scope:** reviewed documentation commit; gated feature and main publication.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 113 — Commit the reviewed M4a CI documentation, publish the feature branch, then fast-forward main only after all five checks pass.
+
+Read applicable AGENTS.md instructions, CLAUDE.md and the workflows. Avoid reloading full prompt history or printing diffs.
+
+1. Verify starting state
+
+Expected:
+- Branch: feat/embedding-contracts.
+- HEAD, upstream and remote feature branch:
+  d501bd6de68a965c283a2187665170502af083e2.
+- Staged tree:
+  776b48a2d01649e6e4366e04b7597d63e557bc37.
+- Exactly four staged paths:
+  README.md
+  docs/decisions/0013-embeddings.md
+  docs/plan.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Local main, origin/main and remote main:
+  85cb0d622a5b49c11439b0b9f67abceaa82edb29.
+- Expected origin and noreply identity unchanged.
+
+Fetch fresh refs. Confirm main is an ancestor of HEAD with no independent local main commits. Stop on material mismatch. Record the accepted staged tree under .local/p113/.
+
+2. Preserve reviewed documents and append history
+
+Keep README.md, ADR-0013 and docs/plan.md byte-identical to the accepted staged tree.
+
+Modify prompts.md only, append-only:
+- Record acceptance of the Prompt 112 diff: reviewer inspected it, independently matched its checksum and compared it with the previously retrieved CI evidence; no new local application checks.
+- Append Prompt 113 verbatim.
+- Add a preflight note with verified state, checks, publication order and stop conditions.
+
+Do not pre-record publication or new CI results.
+
+Verify:
+- exactly four staged paths;
+- only prompts.md differs from the accepted tree;
+- earlier prompt history unchanged;
+- links/anchors;
+- private content and unintended artifacts;
+- git diff --cached --check;
+- staged Gitleaks without suppression;
+- effective identity.
+
+Commit with subject:
+docs: record verified M4a results and main publication authorization
+
+Use accurate Codex attribution.
+
+Verify parent d501bd6, expected paths, document byte identity and clean tree. Run full-history Gitleaks before publication. Stop on a finding without suppression or amend.
+
+No application tests or builds need repeating locally.
+
+3. Feature-branch push and CI
+
+Run directly, preserving Git's exit status:
+
+git push origin refs/heads/feat/embedding-contracts:refs/heads/feat/embedding-contracts
+
+Confirm the remote equals the exact new HEAD.
+
+Monitor push-triggered workflows for that SHA and branch for up to 25 minutes. All five jobs must succeed:
+- Ubuntu verify;
+- Windows verify;
+- PostgreSQL integration;
+- container;
+- full-history Gitleaks.
+
+Required container configuration, context, build, image, smoke and cleanup steps must execute successfully, not be skipped.
+
+Use existing GitHub access or read-only API. Retrieve logs if accessible; otherwise label counts/output unobserved. Do not reuse d501bd6 counts as results for the new SHA.
+
+If any required job fails, is cancelled or remains pending at the limit, stop without changing main. Report accessible evidence. Do not fix files, rerun workflows or push again.
+
+4. Fast-forward main only after five green jobs
+
+Fetch fresh refs again and confirm:
+- remote main remains 85cb0d622a5b49c11439b0b9f67abceaa82edb29;
+- remote feature equals the verified commit;
+- main is its ancestor;
+- local main equals origin/main with no independent commits;
+- working tree clean.
+
+Stop if any precondition fails.
+
+Switch to main, then:
+git merge --ff-only <exact verified commit>
+
+Push only:
+git push origin refs/heads/main:refs/heads/main
+
+Preserve Git exit statuses. No merge commit or force-push.
+
+Monitor all five jobs again for the exact SHA's push to main, up to 25 minutes. Report failures and stop without rollback, fixes, reruns or further pushes.
+
+5. Final handoff
+
+Report:
+- commit SHA, parent, identity and paths;
+- reviewed documents' byte identity;
+- checks/scans;
+- both push commands and exit statuses;
+- exact SHA and all five run/job conclusions for each push;
+- build, wheel and required container step results;
+- observed summaries separately from inaccessible output;
+- refs before/after and final working-tree state.
+
+Existing wheel checks still do not directly exercise the embedding provider. Preserve this limitation unless independently verified; no additional smoke or workflow change is authorized here.
+
+Leave documents unchanged after publication. Recording main results is a later reviewed task.
+
+No force-push, amend, rebase, squash, tag, branch deletion, local Docker, database contact, provider calls or M4b work.
+
+Return this output only to the external reviewer; no diff attachment is required.
+````
+
+**Prompt 113 preflight note (before commit/publication; no new CI outcome recorded):**
+- Verified feat/embedding-contracts, HEAD/upstream/fresh remote feature at
+  d501bd6de68a965c283a2187665170502af083e2; accepted staged tree
+  776b48a2d01649e6e4366e04b7597d63e557bc37 with exactly README.md, ADR-0013,
+  docs/plan.md and prompts.md staged; nothing unstaged/untracked. Accepted tree
+  recorded under .local/p113/. git fetch origin completed; local main,
+  origin/main and fresh remote main at 85cb0d622a5b49c11439b0b9f67abceaa82edb29,
+  an ancestor of HEAD, without independent local main commits. Expected origin
+  and effective noreply author/committer identity unchanged.
+- Only prompts.md changes relative to the accepted tree, preserving every earlier
+  byte. README, ADR-0013 and plan remain byte-identical. Source, tests, algorithm,
+  workflows, dependencies and configuration are untouched. Both workflows still
+  trigger on branch pushes with all five jobs enabled; integration requires
+  EG_REQUIRE_INTEGRATION=1; required container steps and full-history scan remain.
+- Before commit: verify four-path scope, accepted document bytes, earlier history
+  prefix and verbatim prompt, links/anchors, privacy/artifacts, cached whitespace,
+  staged Gitleaks without suppression and effective identity. Checks run after
+  this note; actual outcomes are reported in the handoff, not pre-recorded here.
+- Commit subject: docs: record verified M4a results and main publication authorization.
+  Use expected noreply identities and OpenAI Codex assistance in the body; no
+  Claude attribution. Verify parent d501bd6, four paths, preserved documents and
+  clean tree; full-history Gitleaks must pass before publication.
+- Order: push feature only; verify exact remote SHA; require all five push jobs
+  on that SHA/branch to succeed within 25 minutes, with container config/context/
+  build/image/smoke/cleanup executed successfully. Stop on any failure, cancelled
+  job or timeout without fixes, reruns, another push or changing main.
+- Only after five green jobs: fetch again; require clean tree, remote main still
+  85cb0d6, remote feature equal to verified commit, local main equal origin/main,
+  no independent main commits and main ancestor of verified commit. Then switch
+  to main, merge --ff-only exact verified SHA, and push main only. Monitor that
+  SHA's main push separately for all five jobs up to 25 minutes. On failure stop
+  without rollback/fixes/reruns/further pushes. No force or merge commit.
+- Existing d501bd6 evidence stays tied to d501bd6. New-SHA counts/output require
+  retrieved logs; inaccessible output is unobserved. Existing installed-wheel
+  checks do not directly exercise embeddings, and this limitation is preserved.
+- No local application tests/builds, Docker, database/provider contact, M4b work,
+  history rewriting or tags. Documents stay unchanged after publication;
+  recording main evidence belongs to a later reviewed task.

@@ -1,10 +1,11 @@
 # ADR-0013: Embedding contracts and deterministic offline hashing
 
-- **Status:** Accepted for the reviewed M4a implementation and a local commit
-  (external review, Prompt 110; specification accepted in Prompt 108).
-  Linux/current-version CI, build and clean installed-wheel verification remain
-  pending. Acceptance is scoped to this implementation with the limits below;
-  M4b–M4f and overall M4 acceptance remain pending.
+- **Status:** Accepted (M4a implementation reviewed in Prompt 110; specification
+  accepted in Prompt 108). Reviewed and verified in feature-branch CI at `d501bd6`
+  on `feat/embedding-contracts`, not merged. Main remains at `85cb0d6`.
+  Linux/Windows verification, CI builds and existing clean installed-wheel checks
+  passed; direct isolated installed-wheel embedding-provider execution remains
+  unverified. M4b–M4f and overall M4 acceptance remain pending.
 - **Date:** 2026-10-16
 - **Builds on:** the accepted M4a specification in [the plan](../plan.md#m4a-first-implementation-slice-specification-accepted-at-review-prompt-108-implementation-accepted-for-a-local-commit-prompt-110)
   and [ADR-0010](0010-document-ingestion.md). M3 ingestion and activation are unchanged.
@@ -78,16 +79,46 @@ the implementation. Tests cover repetition, opposite-sign collisions and
 cancellation, Unicode/no-feature zeros, cross-process hash-seed independence,
 bounds, strict types, copying, malicious provider outputs and privacy.
 
+## Feature-branch CI evidence at d501bd6
+
+M4a is reviewed and verified in CI on `feat/embedding-contracts` at exact commit
+`d501bd6de68a965c283a2187665170502af083e2`. It is **not merged**;
+`main` remains at `85cb0d622a5b49c11439b0b9f67abceaa82edb29`.
+Both workflow records are successful **push** events on that feature branch and SHA.
+The implementing Codex session and the external reviewer independently retrieved
+both records and all five job logs. The reviewer did not execute the project
+suite or Docker locally. This records observed logs, not fresh local execution.
+
+[CI run 38789281404](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38789281404):
+
+- [Ubuntu job 116609328373](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38789281404/job/116609328373): `1480 passed, 204 skipped in 25.65s`.
+- [Windows job 116609328257](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38789281404/job/116609328257): `1479 passed, 205 skipped in 32.31s`.
+- [PostgreSQL job 116609327970](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38789281404/job/116609327970): `204 passed, 1480 deselected in 59.32s`.
+- Embedding tests ran successfully in both verify jobs. Linux and Windows
+  verification and both distribution builds are complete for this version.
+  Both existing clean installed-wheel checks passed: application imports and
+  factory creation, API/worker entry-point help, `ingest_revision` registration
+  and offline migration SQL rendering. These checks do **not** directly import
+  and execute the embedding provider. Direct embedding-provider execution from
+  an isolated installed wheel remains unverified.
+- [Container job 116609328164](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38789281404/job/116609328164): configuration passed; effective context contained 74 files and excluded all 19 planted fixtures; application image build and image checks passed; stack startup and CI-built service-image identity passed; upload returned 202; ingestion succeeded; the revision became active with two verified chunks; duplicate upload returned 200; idle worker exited 0 with no OOM kill; smoke and cleanup passed. All required configuration, context, build, image, smoke and cleanup steps executed successfully, without being skipped.
+
+[Secret-scan run 38789281505](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38789281505),
+[job 116609328947](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38789281505/job/116609328947):
+47 commits scanned, no leaks found.
+
 ## Verification and limits
 
 Historical Prompt 109 local Windows checks (1479 passed, 205 skipped: 204
 PostgreSQL skips and one POSIX-only signal skip; 126 focused embedding/packaging
 checks passed) are recorded in the
-[plan](../plan.md#m4a-local-verification-prompt-109). The current implementation
-has not run in Linux/current-version CI. The build attempt used offline mode
-with build isolation disabled and failed because the existing environment lacks
-`hatchling`; no dependency was installed. A clean installed-wheel smoke check
-therefore remains unperformed for this version.
+[plan](../plan.md#m4a-local-verification-prompt-109). The earlier local build
+attempt used offline mode with build isolation disabled and failed because the
+local environment lacked `hatchling`; no dependency was installed. This remains
+historical local evidence, not a current CI build failure. Later CI builds and
+existing installed-wheel checks passed for `d501bd6` as recorded above; direct
+embedding-provider execution from an isolated installed wheel remains unverified.
+Local Compose remains unverified; the container smoke is CI-only evidence.
 
 This slice adds no persistence, migration, pgvector, indexing job, worker
 registration, live adapter, corpus evaluation, ranking or review workflow.
