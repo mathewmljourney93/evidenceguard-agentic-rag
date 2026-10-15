@@ -332,9 +332,11 @@ All endpoints except `/healthz` and `/readyz` are under `/v1` and need `Authoriz
 | GET `/v1/me` | Resolved principal | → `Principal` | any key | 401 missing or revoked |
 | POST `/v1/vendors` | Create a vendor | `VendorCreate` → 201 `Vendor` | reviewer+ | 409 duplicate slug |
 | GET `/v1/vendors`, `/v1/vendors/{id}` | List or get vendors | → `Page[Vendor]` / `Vendor` | reviewer+ | 404 |
-| POST `/v1/vendors/{id}/documents` | Upload a revision (multipart) | → 202 `UploadAccepted{document_id, revision_id, revision_no, job_id, status: pending}` | reviewer+ | 413, 415, 422; same bytes for the same document return 200 with the existing revision |
+| POST `/v1/vendors/{id}/documents` | Upload a revision (multipart) | → 202 `UploadResult` for a new revision and job; 200 with the existing revision's true state for identical bytes (M3e, accepted specification) | reviewer+ | 413, 415, 422, 409; see the M3e specification |
+| GET `/v1/vendors/{id}/documents` | List a vendor's documents (M3e, accepted specification) | → `Page[DocumentSummary]` | reviewer+ | 404 |
 | GET `/v1/documents/{id}` | Revisions, statuses and active revision | → `DocumentDetail` | reviewer+ | 404 |
-| GET `/v1/documents/{id}/revisions/{rev}/chunks` | Inspect chunks | → `Page[ChunkView]` | reviewer+ | 404 |
+| GET `/v1/documents/{id}/revisions` | Revision history, newest first (M3e, accepted specification) | → `Page[RevisionView]` | reviewer+ | 404 |
+| GET `/v1/documents/{id}/revisions/{rev}/chunks` | Inspect chunks; `{rev}` is the revision number (M3e, accepted specification) | → `Page[ChunkView]` | reviewer+ | 404 |
 | GET `/v1/jobs/{id}` | Job status | → `JobView` | reviewer+ | 404 |
 | GET `/v1/review-templates` | List templates | → `list[TemplateSummary]` | reviewer+ | — |
 | POST `/v1/reviews` | Start a review; snapshots eligible revisions (`Idempotency-Key`) | `ReviewCreate` → 202 `ReviewAccepted{review_id, job_id, revision_ids, excluded_pending}` | reviewer+ | 409 if the vendor has no active revisions; a repeated key returns the original review |
@@ -633,7 +635,7 @@ Each question entry contains:
   - **On `main`:** `main` was fast-forwarded to `dd26c70` (`dd26c7099d1007e9ee615204dc0056abe8820c67`), which adds only documentation after `bc5f638`.
     - [CI run 38255786860](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375464) `709 passed, 77 skipped in 18.16s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375444) `708 passed, 78 skipped in 21.20s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786860/job/114833375219) `77 passed, 709 deselected in 17.36s`.
     - The [secret-scan run 38255786973](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38255786973/job/114833375056): 26 commits scanned, no leaks found).
-  - At this baseline there were no production handlers (the unmerged M3d branch (`feat/document-ingestion`) adds `ingest_revision`). Compose is unverified.
+  - At this baseline there were no production handlers (M3d, on `main` since `cdf7260`, adds `ingest_revision`). Compose is unverified.
 - **M3c** has a detailed specification below, accepted at review (Prompt 68). The implementation (Prompt 69, corrected in Prompt 71; [ADR-0009](decisions/0009-document-revisions.md)) is **reviewed, verified in CI and on `main`**.
   - **Tested commit:** `8646b75` on `feat/document-revisions` (the implementation commit `057d57d` plus a prompt-history commit).
   - [CI run 38284929219](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930898138) `819 passed, 133 skipped in 18.75s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930898065) `818 passed, 134 skipped in 23.07s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38284929219/job/114930897691) `133 passed, 819 deselected in 36.46s` (the 77 existing PostgreSQL tests and the 56 added by M3c, including its constraint, migration, concurrency, activation and lease tests).
@@ -641,8 +643,9 @@ Each question entry contains:
   - **On `main`:** `main` was fast-forwarded to `6f8ffde` (`6f8ffded2e5c7b2ed69e37700dc03f20f5e24482`), which adds only documentation after `8646b75`.
     - [CI run 38286702295](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295) passed. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295/job/114936682783) `819 passed, 133 skipped in 18.04s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295/job/114936682699) `818 passed, 134 skipped in 18.87s`, [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702295/job/114936682399) `133 passed, 819 deselected in 38.29s`.
     - The [secret-scan run 38286702205](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702205) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38286702205/job/114936700730): 30 commits scanned, no leaks found).
-  - On `main` at `6f8ffde` there is no production ingestion handler, upload or document endpoint. Compose is unverified.
-- **M3d** has a detailed specification below, **accepted at review (Prompt 76, corrected in Prompts 77–79)**. It is **implemented on `feat/document-ingestion` (Prompts 80–81; [ADR-0010](decisions/0010-document-ingestion.md)) and reviewed (Prompts 82–83)**. It was verified in CI on `feat/document-ingestion` at `74904e6` ([CI run 38699149482](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482)). From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837532) `1020 passed, 178 skipped in 20.13s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837727) `1019 passed, 179 skipped in 23.75s`, and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837038) `178 passed, 1020 deselected in 51.89s`: the full suite, including M3d's 45 new tests. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149417) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149417/job/116302836923): 33 commits scanned, no leaks found). PostgreSQL, Linux and Windows verification of that version are complete. M3d is not merged into `main`, which remains the M3c baseline at `6f8ffde`. These results demonstrate the tested behaviour, not a performance benchmark or a general security guarantee. The production registry registers `ingest_revision`; upload and document endpoints are not implemented. It assigns the dead-job projection to M3e (section E), which remains a blocker for overall M3 acceptance. M3e–M3f are not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
+  - On the M3c `main` baseline `6f8ffde` there was no production ingestion handler, upload or document endpoint. Compose is unverified.
+- **M3d** has a detailed specification below, **accepted at review (Prompt 76, corrected in Prompts 77–79)**. It is **implemented on `feat/document-ingestion` (Prompts 80–81; [ADR-0010](decisions/0010-document-ingestion.md)) and reviewed (Prompts 82–83)**. It was verified in CI on `feat/document-ingestion` at `74904e6` ([CI run 38699149482](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482)). From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837532) `1020 passed, 178 skipped in 20.13s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837727) `1019 passed, 179 skipped in 23.75s`, and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837038) `178 passed, 1020 deselected in 51.89s`: the full suite, including M3d's 45 new tests. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149417) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149417/job/116302836923): 33 commits scanned, no leaks found). PostgreSQL, Linux and Windows verification of that version are complete. M3d was then fast-forwarded onto `main` at `cdf7260` (`cdf7260d02b8af9affb369cc805d666be61f9ac0`, adding only documentation after `74904e6`), where [CI run 38701376504](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504) passed again. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119787) `1020 passed, 178 skipped in 19.71s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119664) `1019 passed, 179 skipped in 16.16s`, and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119317) `178 passed, 1020 deselected in 53.28s`. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376501) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376501/job/116310119403): 34 commits scanned, no leaks found). Both runs were push-triggered on `main`; the reviewer did not run the suite locally. These results demonstrate the tested behaviour, not a performance benchmark or a general security guarantee. The production registry registers `ingest_revision`; upload and document endpoints are not implemented. It assigns the dead-job projection to M3e (section E), which remains a blocker for overall M3 acceptance. M3e–M3f are not implemented, Compose is unverified, and **overall M3 acceptance is pending**.
+- **M3e** has a detailed specification below (upload, document, revision, chunk and job endpoints, and the required `ingestion_state` projection), **accepted at external review (Prompt 86, corrected in Prompts 87–88); its implementation is pending**. M3f, Compose verification and **overall M3 acceptance remain pending**.
 
 M3 keeps the architecture above and in [ADR-0003](decisions/0003-plain-python-workflow.md): plain Python, PostgreSQL-backed jobs claimed with `FOR UPDATE SKIP LOCKED`, leases, heartbeats and fenced writes. There is no new orchestration framework or queue dependency. Each slice is reviewed, verified in CI and merged before the next one starts. The M3 acceptance criteria above are split across the slices as follows:
 
@@ -1517,7 +1520,7 @@ M3c adds no production worker handler and no endpoint.
 - The binding uses the payload key already planned for `ingest_revision`.
 - Moving `chunker_version` and the `evidenceguard_domain.state` naming change only planned details, and were accepted at review.
 
-**M3d, parsing, chunking and the first production handler, in detail (ACCEPTED at review, Prompt 76, corrected in Prompts 77–79; implemented in Prompts 80–81, reviewed, and verified in CI on `feat/document-ingestion` at `74904e6`, see [ADR-0010](decisions/0010-document-ingestion.md); not merged into `main`):**
+**M3d, parsing, chunking and the first production handler, in detail (ACCEPTED at review, Prompt 76, corrected in Prompts 77–79; implemented in Prompts 80–81, reviewed, and verified in CI on `feat/document-ingestion` at `74904e6`, see [ADR-0010](decisions/0010-document-ingestion.md); on `main` at `cdf7260`):**
 
 M3d turns a `pending` revision into a verified set of chunks and activates it. It uses the M3a fence, the M3b worker and the M3c lifecycle, with two small additive interface changes to M3c (C): a public name for M3c's existing lock helper and an optional `before_settle` argument. It is the slice that carries the M3 criteria "chunk IDs include tenant and revision" and "a stale worker cannot write chunks".
 
@@ -1937,7 +1940,319 @@ New module `evidenceguard_persistence.chunks`. All its functions take M3a's `Fen
   - atomic activation with job completion, and rollback when either fails;
   - the permanent-failure crash gap against real rows;
   - a real `run_worker` execution with the **registered production handler**.
-- **Status (Prompts 80–84):** implemented as planned, with the files above and ADR-0010, and reviewed. The database-independent tests ran locally on Windows in Prompt 81 (1019 passed, 179 skipped). It was verified in CI on `feat/document-ingestion` at `74904e6` ([CI run 38699149482](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482)). From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837532) `1020 passed, 178 skipped in 20.13s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837727) `1019 passed, 179 skipped in 23.75s`, and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837038) `178 passed, 1020 deselected in 51.89s`: the full suite, including M3d's 45 new tests. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149417) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149417/job/116302836923): 33 commits scanned, no leaks found). M3d is not merged into `main`, which remains the M3c baseline at `6f8ffde`. These results demonstrate the tested behaviour, not a performance benchmark or a general security guarantee.
+- **Status (Prompts 80–84):** implemented as planned, with the files above and ADR-0010, and reviewed. The database-independent tests ran locally on Windows in Prompt 81 (1019 passed, 179 skipped). It was verified in CI on `feat/document-ingestion` at `74904e6` ([CI run 38699149482](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482)). From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837532) `1020 passed, 178 skipped in 20.13s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837727) `1019 passed, 179 skipped in 23.75s`, and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149482/job/116302837038) `178 passed, 1020 deselected in 51.89s`: the full suite, including M3d's 45 new tests. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149417) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38699149417/job/116302836923): 33 commits scanned, no leaks found). M3d was then fast-forwarded onto `main` at `cdf7260` (`cdf7260d02b8af9affb369cc805d666be61f9ac0`, adding only documentation after `74904e6`), where [CI run 38701376504](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504) passed again. From logs retrieved by the external reviewer: [Ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119787) `1020 passed, 178 skipped in 19.71s`, [Windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119664) `1019 passed, 179 skipped in 16.16s`, and the [PostgreSQL integration job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504/job/116310119317) `178 passed, 1020 deselected in 53.28s`. The [full-history secret scan](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376501) passed ([job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376501/job/116310119403): 34 commits scanned, no leaks found). Both runs were push-triggered on `main`; the reviewer did not run the suite locally. These results demonstrate the tested behaviour, not a performance benchmark or a general security guarantee.
+
+**M3e, upload and document endpoints, in detail (ACCEPTED at review, Prompt 86, corrected in Prompts 87–88; implementation pending, nothing below is implemented):**
+
+M3e adds the HTTP surface for documents: a bounded multipart upload that creates a revision and its ingestion job in one transaction, read-only views of documents, revisions, chunks and jobs, and the required derived `ingestion_state` (M3d, section E). It changes no M3a–M3d behaviour.
+
+**Already decided (not reopened here):**
+- **Scope and media:** multipart upload; only `text/plain` and `text/markdown`, as strict UTF-8 without NUL (M3c's `RevisionContent`). PDFs are a later addition.
+- **Authorization:** reviewer or approver, as for vendors; administrators get a generic 403. The tenant comes only from the API key (ADR-0005, ADR-0006).
+- **Creation:** `create_revision` (M3c, section C) and `enqueue` (M3a), both in the caller's transaction; kind `ingest_revision`, payload `{"revision_id": …}`, idempotency key = the canonical revision ID, and the M3a default of 3 attempts.
+- **Revision rules:** identical bytes for the same document return the existing revision, whatever its status. A metadata difference is a conflict. Document metadata is fixed by the first upload.
+- **Behaviour:** 413, 415 and 422 behave as specified, and re-uploads are idempotent (the M3e acceptance row).
+- **Projection:** the `ingestion_state` table of M3d section E, with no reconciliation writes. It is required before overall M3 acceptance.
+- **Shared conventions:** generic RFC 9457 problem responses, request IDs and fixed log events (ADR-0002); bounded offset pagination that is not a snapshot (ADR-0006).
+
+Everything else below was proposed in Prompt 86, corrected in Prompts 87–88, and **accepted at external review** (Prompt 88). The numeric caps and pagination bounds are **initial engineering choices, not measured results**. An established streaming multipart library is accepted in principle; the exact release remains subject to the age, compatibility and advisory prerequisites in B.
+
+**A. Endpoints**
+
+Six endpoints. The milestone's "list" requirement is met by a **vendor-scoped document list**. A separate **revision list** keeps the document view bounded.
+
+| Method and path | Purpose | Success |
+|---|---|---|
+| `POST /v1/vendors/{vendor_id}/documents` | Upload a revision (multipart, B) | 202 new revision and job; 200 identical existing revision |
+| `GET /v1/vendors/{vendor_id}/documents` | List the vendor's documents | 200 `DocumentPage` |
+| `GET /v1/documents/{document_id}` | One document with its active and latest revisions | 200 `DocumentDetail` |
+| `GET /v1/documents/{document_id}/revisions` | The document's revision history, bounded | 200 `RevisionPage` |
+| `GET /v1/documents/{document_id}/revisions/{revision_no}/chunks` | Inspect a revision's chunks | 200 `ChunkPage` |
+| `GET /v1/jobs/{job_id}` | Status of an ingestion job | 200 `JobView` |
+
+- **Common to every endpoint:**
+  - **401:** missing, malformed, unknown or revoked credentials, with `WWW-Authenticate: Bearer` (the existing dependency).
+  - **403:** an administrator; generic, with no admin bypass.
+  - **404:** a missing object, or one in another tenant; the two are indistinguishable.
+  - **422:** a malformed ID or out-of-range query parameter. Problem entries carry only `loc` and `type`.
+  - **503:** a database or configuration failure; generic.
+
+  Tenant headers, query parameters and form fields are never read as scope.
+- **`{revision_no}` is the revision number**, not a UUID: an integer 1–2,147,483,647, validated by the path (otherwise 422).
+  - The revision is found by `(tenant_id, document_id, revision_no)` after the document is found in the caller's tenant.
+  - A number the document does not have is a 404, as is a document of another tenant. The document-revision relationship therefore cannot mismatch.
+  - Revision UUIDs appear in responses and job payloads, but no path takes one in v1.
+- **Pagination:**
+  - `limit` defaults to 20 (1–100), and `offset` to 0 (0–10,000), for documents and revisions.
+  - Chunks: `limit` defaults to 50 (1–200), and `offset` to 0 (0–4,095).
+  - Every page has `items`, `total`, `limit` and `offset`.
+  - Document and revision pages are **not snapshots** across requests (ADR-0006).
+  - Chunk pages are always ordered by `ordinal`. For a **settled** revision (`active` or `superseded`) the set is complete and immutable under the application's write-once invariant (M3d), so its pages do not change between requests.
+  - For an **unsettled** revision, an ingestion attempt may still be writing batches, so `stored_count`, `total` and the page contents can change between requests. Each page is an observation at one read snapshot (D), with no snapshot guarantee across requests while writes continue.
+- **Ordering:**
+  - documents by `document_key`, then `id`;
+  - revisions by `revision_no` **descending** (newest first), then `id`;
+  - chunks by `ordinal`.
+- **`GET /v1/vendors/{vendor_id}/documents`:** 404 if the vendor is not in the caller's tenant. `items` are `DocumentSummary`.
+- **`GET /v1/documents/{document_id}` → `DocumentDetail`:**
+  - the `DocumentSummary` fields;
+  - `active_revision`: a `RevisionView` or `null`;
+  - `latest_revision`: a `RevisionView` or `null`. It is the highest `revision_no`, which may equal the active revision.
+
+  It never nests the full history; that is the revision list.
+- **`DocumentSummary`:** `id`, `vendor_id`, `document_key`, `title`, `source_type`, `authenticity` (always `not_established` in v1), `latest_revision_no`, `active_revision_id`, `created_at` and `updated_at`. It contains no content.
+- **`RevisionView`:**
+  - **Identity and metadata:** `id`, `revision_no`, `version_label`, `effective_date`, `media_type`, `byte_size`, `sha256`.
+  - **Stored state:** `status`, `failure_reason` (a fixed `RevisionFailureCode` or `null`), `activated_at`, `failed_at`, `superseded_at`, `superseded_by_revision_id`, `created_at` and `updated_at`.
+  - **Derived state:** `ingestion_state` (E) and `ingestion_job`, a `JobSummary` or `null` (E).
+
+  It never contains `content_text`.
+- **`ChunkPage`:**
+  - `chunk_set`: `null` when no chunk-set row exists; otherwise `{chunker_version, chunk_count, stored_count, verified_complete}`;
+  - `items`: `ChunkView`, plus `total`, `limit` and `offset`.
+- **Partial-set policy:**
+  - Chunks are visible for a revision in any status, as stored.
+  - `verified_complete` is `true` only for an `active` or `superseded` revision. Activation verified the exact set (M3d C), and chunks are never updated.
+  - For `pending`, `processing` and `failed` revisions it is `false`, whatever `stored_count` is. The rows are whatever an attempt wrote and may be partial; for a failed revision they are never completed.
+  - `chunk_count` is the expected count recorded by the writing attempt; `stored_count` is the number of stored rows.
+  - `verified_complete` is never inferred from `stored_count` equalling `chunk_count`: only activation's under-lock verification establishes completeness.
+- **`ChunkView`:**
+  - `id`, `ordinal`, `text` and `content_sha256`;
+  - `section_path` (a list);
+  - `is_table`;
+  - `source`: the body span `{line_start, line_end, char_start, char_end}`;
+  - `repeated_header`: `null`, or the header span `{line_start, line_end, char_start, char_end}`;
+  - `contiguous`: `repeated_header` is `null`.
+
+  When `repeated_header` is set, `text` is the header slice followed by the body slice. **It is not one contiguous source passage**, and only `source` identifies the cited passage.
+- **`JobView`** (only for jobs of the reviewed kinds; in v1 that is just `ingest_revision`, and any other kind is a 404):
+  - `id`, `kind` and `status`;
+  - `attempt`, `max_attempts`, `run_after`, `last_error` (a fixed `JobErrorCode` or `null`), `created_at`, `updated_at` and `finished_at`;
+  - `lease_expires_at` (only while `running`, otherwise `null`);
+  - `lease_expired`: `true` or `false` while `running`, compared with the single database time captured for the response (D); `null` otherwise.
+
+  It never contains the payload, `idempotency_key`, `locked_by` (a worker identifier), `tenant_id`, exception text or free-form errors.
+- **`JobSummary`** (inside `RevisionView` and the upload response): `id`, `status`, `attempt`, `max_attempts`, `lease_expires_at` and `lease_expired`, with the same rules.
+
+**B. Upload parsing and limits**
+
+- **Route shape:** the endpoint declares **no body parameters** (no `Form`, `File` or `UploadFile`), so FastAPI never parses the body. The handler reads `request.stream()` itself, through a bounded reader.
+  - Authentication and the role check are ordinary dependencies, resolved **before the handler runs**. The handler is the only code that reads the body, so no body byte is read for a 401 or 403. This relies on the route having no body parameters, and a test asserts that the stream is untouched on 401 and 403; FastAPI's dependency order alone is not taken as a guarantee.
+  - The vendor is then looked up (read-only, tenant-scoped) **before the body is read**, so a missing or foreign vendor is a 404 without consuming the upload. `create_revision` re-checks it in its own transaction.
+- **Request headers:**
+  - `Content-Type` must be `multipart/form-data` with a `boundary` of 1–70 characters; otherwise 415.
+  - If `Content-Length` is present, it must be a single non-negative decimal; otherwise 400. If it exceeds the total cap, the response is 413 at once, without reading.
+  - **The streamed byte count is authoritative for every cap**, whether `Content-Length` is absent (chunked transfer), smaller or larger than the body.
+  - When `Content-Length` is present and the ASGI server delivers a normally completed stream (the final message has `more_body` false), the received length must equal it; otherwise 400. A production HTTP server usually rejects such mismatches before the application sees them; tests use controlled ASGI streams to exercise this path.
+  - **Client disconnect** (`http.disconnect`) or a transport-level rejection aborts the request before any database write. No response is guaranteed to reach a disconnected client.
+- **Caps** (initial engineering defaults, not measured):
+  - **File bytes:** `MAX_UPLOAD_BYTES = 2,097,152` (2 MiB). The cap applies to the file part's content.
+  - **Total request bytes:** `MAX_REQUEST_BYTES = 2,162,688` (2 MiB plus 64 KiB for headers and fields). The cap applies to the whole multipart body.
+  - **Parts:** at most 8, and each part's headers at most 8 KiB.
+  - **Text fields:** at most 1 KiB each before validation.
+  - Exceeding any byte cap is a **413 as soon as it is detected**, and reading stops.
+  - At 2 MiB, a document stays well within M3d's 4,096-chunk cap for ordinary prose.
+- **Fields** (one `Content-Disposition: form-data` part each):
+
+  | Name | Required | Validation |
+  |---|---|---|
+  | `file` | yes | exactly one part; content 1 byte to 2 MiB; its part `Content-Type` decides the media type |
+  | `document_key` | yes | M3c's document-key pattern, 1–64 |
+  | `title` | yes | M3c's title rule, 1–200, not blank, no control characters |
+  | `source_type` | yes | `vendor_statement`, `contract` or `third_party_report` |
+  | `version_label` | no | M3c's label rule, 1–64 |
+  | `effective_date` | no | ISO `YYYY-MM-DD` |
+
+  - **Part headers:** every part needs a `Content-Disposition: form-data` header with a `name` parameter (quoted or token form, case-insensitive type); otherwise 422. Other part headers are ignored, except the file part's `Content-Type`.
+  - **Text parts** must be valid UTF-8 and carry no `filename`; otherwise 422.
+  - **Repeated or unknown parts:** a repeated field, a second `file` part, or any other part name is a 422. That includes `tenant_id`, `actor_id`, `role`, `vendor_id` and `status`.
+- **Filename:** the `file` part's `filename` is optional and **ignored**. It is never stored, logged, echoed or used as a filesystem path.
+- **File media type:** taken only from the file part's `Content-Type`, never sniffed from the name or content.
+  - Accepted: `text/plain` or `text/markdown`, case-insensitive, optionally with `charset=utf-8`.
+  - 415: any other type, any other charset or parameter, or a missing part `Content-Type`.
+- **Content:** passed unchanged to `RevisionContent.from_bytes`.
+  - The bytes must be strict UTF-8 without NUL, so invalid UTF-8 and NUL are 422.
+  - A BOM and CRLF are kept exactly. They change the hash, and the chunker handles them (M3d A).
+  - **A zero-byte file is a 422** (`RevisionContent` requires non-empty bytes).
+  - **Whitespace-only content is accepted** (202). The worker later fails the revision with `empty_document`, and `ingestion_state` reads `failed`.
+- **Parser and memory:**
+  - **Dependency (accepted in principle; not selected or installed here):** an established streaming multipart library, with `python-multipart` the expected candidate. Only a low-level streaming callback API is used, fed by the bounded reader; FastAPI's `Form`/`UploadFile` handling is not used.
+  - **Implementation prerequisites:** the exact release, its age under the dependency-age policy (at least two weeks old, with an `exclude-newer-package` entry), compatibility with the locked FastAPI and Starlette versions, and a check of published security advisories. The policy is never bypassed, and a newer release is never added silently.
+  - **Completion is tracked explicitly.** The implementation must verify how the chosen library reports truncation, and must not assume that its `finalize()` detects every truncated body. The handler records each part's begin and end and the final closing boundary itself. A body is complete only if the closing boundary was seen and every begun part ended.
+  - **No success response is ever produced for a truncated multipart body**, including truncated headers or part data.
+  - **Boundary syntax:** 1–70 characters from RFC 2046's allowed set, not ending in a space, quoted or unquoted; otherwise 415.
+  - The file bytes accumulate in one in-memory `bytearray`, bounded by the 2 MiB cap. **No temporary file is ever created**, so there is nothing on disk to clean up. Buffers are released on every path, including errors and client disconnects.
+  - The alternative of a hand-written multipart parser was rejected: it would add parsing risk without reducing dependencies meaningfully.
+- **Error precedence.** Errors fall into three phases. Within the streaming phase, the **first error detected wins**, and reading stops at once.
+  1. **Before the body** (no body byte is read): 401 or 403; 422 for a malformed `vendor_id`; 404 for a missing or foreign vendor; 400 for an invalid `Content-Length` header; 413 when it exceeds the total cap; 415 for a request `Content-Type` that is not multipart with a valid boundary.
+  2. **While streaming** (each error ends reading immediately, in the order the bytes reveal them):
+     - 413: the total, file, text-part or part-header byte cap, or the part count, is exceeded;
+     - 422: the parser reports malformed input, which can prevent any further meaningful parsing;
+     - 422 (structural, detected at the part's headers): a missing or invalid `Content-Disposition` or `name`, an unknown part name (including tenant fields), a repeated field, a second `file` part, or a `filename` on a text part;
+     - a client disconnect: abort without a database write.
+
+     Once reading has stopped, nothing after that point is examined. A later cap violation therefore never overrides an earlier parser or structural error, and an invalid request is never drained just to establish a global precedence. The server may close the connection instead of reading the remaining body.
+  3. **After a normally completed stream** (deferred checks, bounded because everything read is within the caps), in this order:
+     1. 400 for a declared `Content-Length` that differs from the received length;
+     2. 422 for an incomplete body: no closing boundary, or a part that never ended;
+     3. 422 for a missing required field;
+     4. 415 for the file part's media type;
+     5. 422 for field values;
+     6. 422 for the content: empty, invalid UTF-8 or NUL.
+  4. **Creation:** 404 for a vendor deleted meanwhile, 409 for a document or revision conflict (C), 503 for a database failure.
+- **Exact mixed-fault outcomes** (each is a planned test):
+  - a repeated field followed by excess parts → 422 (the repeated field is detected first; reading stops before the part cap);
+  - malformed multipart followed by an oversized tail → 422 (reading stops at the parser error; the tail is never read);
+  - otherwise valid fields with no closing boundary, on a normally completed stream → 422;
+  - a declared length shorter or longer than a normally completed stream's actual length → 400;
+  - an oversized file part followed by a malformed part → 413 (the cap is crossed first).
+- **Receive boundaries do not define precedence.** For the same body bytes, the outcome is the same however the ASGI server partitions them into receive messages:
+  - Errors are detected in the order the body's bytes reveal them. Each received message is fed to the parser in bounded slices, and byte caps are enforced at the exact position where the running count crosses them, not after the whole message.
+  - Receiving a large message that also contains a later oversized tail never lets that tail's 413 override an earlier malformed or structural (for example repeated-field) error in the same bytes.
+  - Byte-at-a-time processing is not required. Bounded slices and parser callbacks are acceptable, as long as the slice boundaries and callbacks reproduce this byte-order detection.
+- **Problem bodies:**
+  - 413 and 415 use the generic problem body.
+  - Multipart 422 entries are built by the endpoint with `loc` from a reviewed allowlist (`["body", "<known field name>"]`, or just `["body"]` for an unknown or repeated part) and a fixed `type`.
+  - Unknown part names and submitted values are never echoed.
+
+**C. Atomic creation and duplicates**
+
+- **One caller-owned transaction** (`transaction(session_factory)`):
+  1. `create_revision(...)`;
+  2. if `created`, `enqueue(session, actor, kind="ingest_revision", idempotency_key=str(revision.id), payload={"revision_id": str(revision.id)})` with the default attempts;
+  3. commit.
+
+  Any error rolls back both, so a new revision never exists without its job, and vice versa.
+- **Observation time of the response:** after the required writes and before the commit, the creation transaction reads the response state in **one statement**: the revision row, its canonical job (left join) and one `clock_timestamp()` for `lease_expired`. That gives one internally consistent snapshot. It is converted to an immutable `UploadResult`, which is sent **only after a successful commit**. Nothing is re-read after the commit, and fields observed at different times are never mixed. If the commit fails, the result is discarded and the request ends with the mapped error.
+- **The response reports what was observed, not a promise.** A worker can claim or settle the revision immediately after the commit, so a `pending` or `queued` value says nothing about the state a moment later.
+- **New revision:** `202 Accepted` with an `UploadResult`:
+  - `created: true`, `document_id`, `revision_id` and `revision_no`;
+  - `revision_status` (`pending`) and `ingestion_state` (`queued`);
+  - `job`: a `JobSummary`.
+- **Identical bytes and metadata for the same document:** `200 OK` with the same `UploadResult` shape and `created: false`. It shows the **existing** revision's stored status, its derived `ingestion_state` and its canonical job, so it is not always "pending".
+  - A processing revision reads `in_progress`; an active one `active`; a superseded one `superseded`; a failed one `failed`.
+  - An unsettled revision whose job is `dead` reads `stalled`, and the job is shown as it is. A terminal job is never reset or re-queued, and a settled revision is never re-ingested.
+- **A revision without its canonical job** cannot be produced by M3e, because creation is atomic; it would need direct database changes.
+  - If such a revision is **unsettled**, the duplicate upload calls `enqueue` in its transaction. That idempotently creates the missing job and never alters an existing one. This is the only repair, and it happens on POST only.
+  - If it is **settled**, nothing is enqueued and `job` is `null`.
+- **Conflicts:** all are generic, never naming the differing field.
+  - `DocumentConflictError` (same key, different title or source type) → 409;
+  - `RevisionConflictError` (same bytes, different media type, label or date) → 409.
+- **Concurrent identical uploads** serialise on the document lock (M3c). The first creates the revision and job; the rest see them and return 200 duplicates. A concurrent creation of the same document key resolves through `ON CONFLICT` and the lock.
+- **Other errors:**
+  - `RevisionCreateRaceError` and `JobEnqueueRaceError` arise only under stricter isolation, and become a generic 503 (retry).
+  - `JobIdempotencyConflictError` would mean a corrupted canonical job, and becomes a generic 500 with the fixed log event `document.upload_inconsistent`, carrying no values.
+  - `VendorNotFoundError` → 404; `PermissionDeniedError` → 403.
+
+**D. Read models and persistence**
+
+- **New module:** `evidenceguard_persistence.document_views`. Its read-only functions take a caller-owned `Session` and the `ActorContext`, and filter every statement by `actor.tenant_id`:
+  - `list_documents(vendor_id, limit, offset)`;
+  - `get_document(document_id)`;
+  - `list_revisions(document_id, limit, offset)`;
+  - `get_revision_by_no(document_id, revision_no)`;
+  - `list_chunks(document_id, revision_no, limit, offset)`;
+  - `get_job_view(job_id)`.
+- **Parent and child checks:** every child lookup joins or filters on the parent under the same tenant: vendor → document → revision → chunk set → chunks. A parent outside the tenant yields nothing, and the response is 404.
+- **Columns:** revision reads use explicit column lists that exclude `content_text`. Chunk reads select `text` only for the chunk endpoint.
+- **The projection in SQL:** a `LEFT JOIN jobs` on `jobs.tenant_id = revision.tenant_id AND jobs.kind = 'ingest_revision' AND jobs.idempotency_key = CAST(revision.id AS text)`, with `lease_expired` computed against the response's single captured database time. PostgreSQL renders UUIDs in the canonical lowercase hyphenated form used as the key. The existing unique `(tenant_id, kind, idempotency_key)` index serves the join.
+- **Transactions and threads:**
+  - **One consistent snapshot per GET response.** Each M3e read operation is one short transaction whose **first statement** is `SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY`, before any data query. Every query for that response then sees the same snapshot:
+    - parent existence checks;
+    - document pointers and the active and latest revision views;
+    - the canonical job and `ingestion_state`;
+    - chunk-set metadata, `stored_count`, `total` and `items`.
+  - **One database time per response:** the second statement reads `clock_timestamp()` once. Every `lease_expired` in the response is computed against that single value, passed as a parameter.
+  - **Short transactions:** results are converted to immutable response values inside the transaction, and the transaction ends (rollback, since nothing was written) **before** the response body is serialized and sent. Routes are synchronous, so FastAPI runs them in a worker thread.
+  - **No leaking settings:** `SET TRANSACTION` applies only to the current transaction; PostgreSQL discards it at commit or rollback. No session-level `SET`, `default_transaction_isolation` or connection `execution_options` isolation is used, so a pooled connection returns to the pool with its defaults, and a later upload runs at the default READ COMMITTED, read-write.
+  - **Uploads keep the existing isolation:** the creation write transaction stays at the default READ COMMITTED, as M3a and M3c expect.
+  - **What this guarantees:** internal consistency **within one response**, not a shared snapshot across separate HTTP requests.
+  - The upload route is `async`, to stream the body without blocking. Its vendor lookup and creation transaction run through `run_in_threadpool`, never on the event loop.
+- **Failures:**
+  - `DatabaseConfigurationError` and `SQLAlchemyError` become a generic 503.
+  - **No GET writes:** none creates jobs, changes revision state, or repairs or reconciles data.
+
+**E. The `ingestion_state` projection**
+
+- **Two distinct fields:** `status` is the stored, authoritative revision status. `ingestion_state` is derived at read time and never stored.
+- **Canonical job lookup:** the job with `(tenant_id = revision.tenant_id, kind = "ingest_revision", idempotency_key = canonical revision ID)`. At most one exists, by the unique index.
+- **Rules,** checked in order:
+
+  | Revision `status` | Canonical job | `ingestion_state` |
+  |---|---|---|
+  | `active`, `superseded` or `failed` | any, or none | equal to `status` |
+  | `pending` or `processing` | `queued` | `queued` |
+  | `pending` or `processing` | `running` (lease current or expired) | `in_progress` |
+  | `pending` or `processing` | `dead`, `failed` or `succeeded` | `stalled` |
+  | `pending` or `processing` | none | `stalled` |
+
+- **`in_progress` is not a progress guarantee.** When the lease has expired, `ingestion_job.lease_expired` is `true`. This honestly shows that the attempt is awaiting reclaim, or exhaustion to `dead`, at the next claim.
+- **`stalled`** means no further attempt will run and the content was not activated. In v1 there is no operator retry: identical bytes return the same revision and the same terminal job. Recovery is uploading changed bytes (M3d E).
+- **Acceptance obligation:** this projection remains **required for overall M3 acceptance** until it is implemented and verified in CI.
+
+**F. Privacy and observability**
+
+- **Logging:**
+  - The existing `request.completed` event (route template, status, duration, request ID) is unchanged.
+  - M3e adds only the fixed `document.upload_inconsistent` event. It carries no values.
+  - Nothing logs multipart bodies, document text, chunk text, filenames, field values, credentials or database exception text.
+- **Errors:**
+  - Parser and validation failures map to fixed problem bodies.
+  - The endpoint never passes parser exception messages, part names it did not expect, or submitted values into a response or log.
+  - Response models use `extra="forbid"`; an internal model error would be a generic 500, never echoed.
+- **Request IDs and headers:** request IDs are unchanged. `X-Request-ID` remains the only client-influenced header that is logged, as today.
+- **Errors versus intended responses:**
+  - **Errors and logs** never contain submitted content, filenames, arbitrary field names, field values or internal exception text.
+  - **Authorized successful responses** intentionally contain their documented metadata. `ChunkView` intentionally contains chunk text, for authorized inspection.
+  - **Document and revision views** never contain raw source content (`content_text`).
+  - **Job views** never contain the payload, `idempotency_key`, `locked_by`, `tenant_id`, exception text or free-form errors.
+
+**G. Verification plan and implementation boundaries**
+
+- **Intended files:**
+  - `apps/api/evidenceguard_api/documents.py` (routers and models);
+  - `apps/api/evidenceguard_api/uploads.py` (bounded reader and multipart handling);
+  - `apps/api/evidenceguard_api/app.py` (wiring a `DocumentStore` through `app.state`);
+  - `packages/persistence/evidenceguard_persistence/document_views.py`;
+  - tests and ADR-0011.
+- **Dependency:** one established streaming multipart library (`python-multipart` expected), added to `pyproject.toml` and `uv.lock` only after the release-age, compatibility and advisory prerequisites in B are met; OpenAPI request-body documentation for the upload. There are no migrations or workflow changes.
+- **Database-independent tests** (fake stores and ASGI clients):
+  - **Byte limits:**
+    - a declared `Content-Length` above the cap → 413 without reading;
+    - an absent length (chunked) → 413 as soon as the stream crosses the cap;
+    - a misleading small length → 413 or 400, never an unbounded read;
+    - file cap and total cap each enforced separately, and part-header and part-count caps.
+  - **Malformed multipart:** an invalid boundary parameter → 415; a missing `Content-Disposition` or `name` → 422; truncated part headers or part data, and a missing closing boundary on a normally completed stream → 422; never a 2xx for a truncated body.
+  - **Completion tracking:** the parser's own end-of-input behaviour is exercised for the chosen library, and the handler's explicit completion tracking rejects every truncation case.
+  - **Content-Length:** shorter and longer declared lengths with a normally completed (controlled) ASGI stream → 400; a client disconnect mid-body → abort with no store call.
+  - **Fields:** duplicate fields, a second file, unknown parts (including `tenant_id`), a filename on a text part, and a missing required field; buffers released on every path; no temporary files created.
+  - **Authentication and roles:** a missing or revoked key → 401, and an admin → 403, with the body stream untouched in both cases; a foreign vendor → 404 before the body is read.
+  - **Tenant overrides:** attempted header and query overrides of the tenant are ignored.
+  - **Media and content:** unsupported or missing part media type and a wrong charset → 415; invalid UTF-8, NUL and zero bytes → 422; whitespace-only → 202; BOM and CRLF stored exactly.
+  - **Precedence:** the three phases in B, and each listed mixed-fault outcome exactly: a repeated field then excess parts → 422; malformed input then an oversized tail → 422 with the tail unread; no closing boundary → 422; length mismatches → 400; an oversized file then a malformed part → 413.
+  - **Receive partitioning:** each mixed-fault body above is presented in one receive message, split across several messages, and split inside part headers, boundaries and file data. Every presentation must give the same status and no store or database call.
+  - **Results:** the `UploadResult` shapes for new (202) and duplicate (200) uploads; conflicts → generic 409; each creation error's mapping.
+  - **Pagination and lookups:** bounded pagination validation; a `revision_no` not belonging to the document → 404.
+  - **Projection:** every row of the `ingestion_state` table, from pure inputs, including a dead job, an expired running lease and a missing job.
+  - **Privacy of errors and logs:** problem bodies and log records never contain submitted content, filenames, unknown field names, field values or exception text, for every error path above.
+  - **Intended success fields:** authorized document, revision and job responses contain exactly their documented fields (no `content_text`, payload, `idempotency_key`, `locked_by` or `tenant_id`), and `ChunkView` contains the chunk text and provenance.
+  - **OpenAPI:** the schema documents the new endpoints.
+  - **Installed wheel:** the app imports, the routes are registered, and an upload with a test double works.
+- **PostgreSQL integration tests:**
+  - **Uploads:** new uploads commit revision and job together; an injected `enqueue` failure rolls both back; concurrent identical uploads give one revision and one job, with the others 200; concurrent different bytes get consecutive numbers.
+  - **Duplicates:** for a processing, active, superseded, failed or dead-job revision, the response reports the true state, nothing is reset, and no job is created for a settled revision.
+  - **Tenancy:** cross-tenant reads of vendors, documents, revisions, chunks and jobs → 404.
+  - **Reads:** document, revision and chunk ordering and bounds; chunk provenance (body span and repeated header) and `verified_complete` for active versus processing and failed partial sets.
+  - **Projection in SQL:** every `ingestion_state` row against real job rows, including an expired lease and `dead`.
+  - **Side effects:** GETs leave every row unchanged.
+  - **Read consistency** (event-controlled concurrency):
+    - an activation committing between the document view's queries still yields one consistent response (pointer, active and latest revision, and projection from one snapshot);
+    - a chunk batch committing between the count and page queries leaves `stored_count`, `total` and `items` consistent within the response;
+    - a revision's projection never mixes a revision status and a job status from different times;
+    - after a REPEATABLE READ, READ ONLY read on a pooled connection, a later upload on the same connection runs read-write at READ COMMITTED (settings restored).
+  - **Upload observation:** the 202 and 200 bodies match the state read inside the creation transaction, even when a worker changes the job immediately after the commit.
+  - **End to end:** upload, then a real `run_worker` with the production handler, then views show `active` and the verified chunks.
+- **Pending:** PostgreSQL execution, until an authorized publication and CI. No M3e implementation, test or result exists yet.
 
 **M4 – Embeddings, retrieval and corpus**
 - Provider interface, `HashingEmbedder`, Voyage adapter (mocked in CI), RRF search over snapshot revisions, `sample_data/` including the injected variant, ground truth with acceptable and wrong claims, and the retrieval contract suite.

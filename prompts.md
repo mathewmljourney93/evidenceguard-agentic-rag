@@ -10628,3 +10628,640 @@ End with:
 - **Stop conditions:** a failed, cancelled or still-pending feature check, or any failed precondition, stops the task before `main` changes. Code is not fixed and nothing is reverted automatically.
 - **Not done:** no force-push, amend, rebase, squash, branch deletion, tag, Docker or database contact. The documentation's state predates the `main` update and is intentionally left as it is.
 - **Still pending:** Compose, M3e–M3f and overall M3 acceptance.
+
+**Outcome note for Prompt 85 (recorded in Prompt 86):**
+- **Commit:** `cdf7260d02b8af9affb369cc805d666be61f9ac0` (`docs: record verified M3d results and main publication authorization`). Its parent is `74904e6`, it uses the noreply identity, and its four reviewed documents are byte-identical to the accepted tree `ae6263f`; only `prompts.md` differs. Before publication, the full-history Gitleaks scan reported 34 commits scanned and no leaks found.
+- **Feature push:** the push of `feat/document-ingestion` exited 0, moving it from `74904e6` to `cdf7260`. The push-triggered [ci run 38701060085](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701060085) (Ubuntu, Windows and PostgreSQL integration) and [secret-scan run 38701060034](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701060034) all concluded `success`.
+- **Fast-forward of `main`:** the preconditions were re-checked after a fresh fetch. Local `main` was fast-forwarded with `git merge --ff-only cdf7260d02b8af9affb369cc805d666be61f9ac0`, with no merge commit, and `git push origin refs/heads/main:refs/heads/main` exited 0, moving `main` from `6f8ffde` to `cdf7260`.
+- **CI on `main`:** the push-triggered [ci run 38701376504](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504) and [secret-scan run 38701376501](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376501) concluded `success`.
+- **Log access:** Claude read only the conclusions through the anonymous API. The job logs need authentication, so no pytest summaries were observed in that session.
+
+**Reviewer-evidence note for `main` (recorded in Prompt 86):** the external reviewer independently retrieved the metadata and logs for `cdf7260` on `main`. Both runs were push-triggered on `main` and concluded `success`:
+- Ubuntu job 116310119787: `1020 passed, 178 skipped in 19.71s`;
+- Windows job 116310119664: `1019 passed, 179 skipped in 16.16s`;
+- PostgreSQL job 116310119317: `178 passed, 1020 deselected in 53.28s`;
+- secret-scan job 116310119403: 34 commits scanned, no leaks found.
+
+The reviewer did not run the suite locally.
+
+## Prompt 86: Record M3d main verification and specify M3e APIs
+
+- **Stage:** Documentation and specification only, on branch `docs/m3e-api-spec` (staged and uncommitted for review; no commit, push or merge)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 86 is the next unused number after Prompt 85; verified before appending.
+
+````text
+Prompt 86 — Record M3d main verification and specify M3e APIs
+
+Work only inside D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+This is a documentation/specification task. No implementation, commit, push, merge, history rewrite, Docker, database contact, dependency installation or global configuration change.
+
+1. Verify starting state
+
+Expected:
+- Branch: main
+- HEAD and origin/main:
+  cdf7260d02b8af9affb369cc805d666be61f9ac0
+- Clean working tree.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+
+Read remote refs read-only. If anything differs, stop and report it without changing anything.
+
+Create docs/m3e-api-spec from this HEAD.
+
+Read the relevant plan sections, ADR-0006 through ADR-0010, and existing API authentication, database, problem-response, revision, job and chunk interfaces. Use targeted reads rather than loading the full prompt archive.
+
+2. Record M3d main publication
+
+Update README.md, ADR-0010, docs/plan.md and docs/threat-model.md to record M3d on main at cdf7260.
+
+The external reviewer independently retrieved metadata and logs for this exact SHA:
+
+Main CI:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376504
+
+- Ubuntu job 116310119787:
+  1020 passed, 178 skipped in 19.71s
+- Windows job 116310119664:
+  1019 passed, 179 skipped in 16.16s
+- PostgreSQL job 116310119317:
+  178 passed, 1020 deselected in 53.28s
+
+Main secret scan:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38701376501
+- Job 116310119403:
+  34 commits scanned, no leaks found
+
+Both runs were push-triggered on main and concluded success.
+
+Attribute retrieval to the external reviewer, who did not run the suite locally. Preserve prior feature-branch evidence as historical results.
+
+M3e, M3f, Compose verification and overall M3 acceptance remain pending.
+
+3. Specify M3e in docs/plan.md
+
+Produce a concrete proposed design for review, grounded in existing interfaces. Clearly separate existing accepted decisions from new proposed defaults. Recommend one approach for each open detail.
+
+Do not implement it.
+
+A. Endpoint scope and contracts
+
+Cover the planned:
+- POST /v1/vendors/{id}/documents
+- GET /v1/documents/{id}
+- GET /v1/documents/{id}/revisions/{rev}/chunks
+- GET /v1/jobs/{id}
+
+Resolve the M3e milestone’s “list” requirement explicitly, recommending a vendor-scoped document-list endpoint if needed.
+
+For each endpoint specify:
+- authorization;
+- path/query/form fields;
+- exact response shape;
+- status codes and safe errors;
+- sorting and bounded pagination;
+- foreign-tenant and missing-object behavior.
+
+Use reviewer/approver authorization consistent with vendors. No admin bypass. Tenant scope comes only from authentication.
+
+Define whether {rev} is a revision number or UUID and consistently validate the document/revision relationship.
+
+Do not return unbounded nested revision histories. Give a concrete bounded design.
+
+B. Upload parsing and limits
+
+Keep multipart uploads and the accepted text/plain/text/markdown scope.
+
+Specify:
+- file part and metadata field names;
+- required/optional fields and validation;
+- duplicate and unknown form fields;
+- rejection of tenant fields;
+- file count, metadata bounds and filename handling;
+- a concrete file-byte cap and total-request cap;
+- behavior with absent, incorrect or chunked Content-Length;
+- strict UTF-8, BOM, CRLF, NUL and media-type handling;
+- distinctions between zero-byte invalid input and whitespace-only content that the worker later marks empty_document.
+
+The byte limits must be enforced while receiving the body, before an unbounded multipart parse or file read. Content-Length alone is insufficient.
+
+Explain authentication timing, parser/framework limits, temporary-file cleanup on every path, and any proposed multipart dependency. Avoid promising that a normal FastAPI dependency necessarily runs before body parsing.
+
+Define 413, 415 and 422 behavior and error precedence. Preserve generic privacy-safe problem responses.
+
+Uploaded filenames must never become filesystem paths.
+
+C. Atomic revision and job creation
+
+Reuse create_revision and enqueue in one caller-owned transaction:
+- kind ingest_revision;
+- payload revision_id;
+- canonical revision-ID idempotency key;
+- existing attempt default.
+
+Specify:
+- new revision plus new job: both commit or neither;
+- exact duplicate uploads: 200 and the existing revision/job;
+- metadata conflicts and concurrent duplicate uploads;
+- response fields for already-processing, active, superseded, failed or dead-job cases;
+- no resetting terminal jobs or silently re-ingesting settled revisions;
+- behavior if a revision exists without its canonical ingestion job.
+
+Do not always label a duplicate response pending.
+
+Preserve the existing immutable document metadata and content identity rules.
+
+D. Read models and persistence
+
+Define tenant-scoped queries and API database integration:
+- all parent-child relationships checked under tenant scope;
+- stable ordering with tie-breakers;
+- bounded pagination and existing offset-pagination limitations;
+- explicit handling of database failures;
+- blocking database work kept off the event loop.
+
+Document views exclude raw source content.
+
+Chunk views may expose text for authorized inspection, with the accepted section, line, character and repeated-header provenance. Specify whether partial/failed ingestion chunks are visible and how their completeness is represented. Never imply a repeated-header chunk is one contiguous source passage.
+
+Job views expose only reviewed operational fields. Do not expose raw payloads, owner identifiers, idempotency keys, exception text or unrestricted error details.
+
+GET operations must not create jobs, change revision state or repair data.
+
+E. Required ingestion_state projection
+
+Implement the accepted M3d section E design in M3e:
+- settled revision states take precedence;
+- unsettled plus queued job → queued;
+- unsettled plus running job → in_progress, including expired leases, without a progress guarantee;
+- unsettled plus dead/failed/succeeded or missing canonical job → stalled.
+
+Define the response fields and canonical job lookup precisely. Explain stored revision status separately from derived ingestion_state.
+
+If lease information is exposed, use it to explain expiry honestly without claiming progress. Preserve the documented lack of an operator retry in v1.
+
+This projection remains a required overall M3 acceptance item until implemented and verified.
+
+F. Privacy and observability
+
+Preserve existing request IDs, fixed log events and generic problem responses.
+
+Specify protections against logging:
+- multipart bodies and document text;
+- filenames and arbitrary submitted metadata;
+- credentials and database exceptions.
+
+Review any proposed response validation errors so submitted values are not echoed accidentally.
+
+G. Verification and implementation boundaries
+
+List intended files, any narrow dependency/configuration changes and planned ADR-0011.
+
+Separate database-independent tests from real PostgreSQL tests.
+
+Plan meaningful cases for:
+- upload byte limits with absent/misleading Content-Length;
+- malformed multipart, duplicate fields/files and cleanup;
+- authentication, roles and cross-tenant access;
+- media type, UTF-8, NUL, empty bytes and whitespace-only input;
+- unknown tenant fields and attempted header overrides;
+- duplicate and conflicting uploads;
+- atomic rollback and concurrent idempotency;
+- bounded lists and document/revision mismatch;
+- chunk provenance and partial-set policy;
+- safe job responses;
+- every ingestion_state row, especially dead and expired-running jobs;
+- privacy-safe errors/logging;
+- installed-wheel API smoke checks.
+
+PostgreSQL execution remains pending an authorized publication and CI. No M3e implementation or result exists yet.
+
+4. Prompt history
+
+Append:
+- Prompt 85’s actual main-publication outcome;
+- the later reviewer-observed main results above;
+- this prompt verbatim under the next unused number, expected 86;
+- an accurate outcome note.
+
+Preserve earlier history byte-for-byte. Do not pre-record specification acceptance, implementation or commits.
+
+5. Verification and staging
+
+Allowed tracked changes:
+README.md
+docs/decisions/0010-document-ingestion.md
+docs/plan.md
+docs/threat-model.md
+prompts.md
+
+Check consistency, relative links/anchors, private content, git diff --cached --check and staged Gitleaks.
+
+No application tests or builds are necessary.
+
+Leave the five files staged and uncommitted.
+
+6. File-based review handoff
+
+Export the complete staged diff excluding prompts.md to:
+.local/p86/m3e-api-spec.diff
+
+Write it directly from Git output as UTF-8 without BOM. Do not print the diff.
+
+Give a concise summary of decisions, proposed defaults, actual checks, Git state and limitations.
+
+Report the baseline commit, final staged tree, exact diff path, byte size and SHA-256.
+
+End with:
+“Return this output plus .local/p86/m3e-api-spec.diff to the external reviewer.”
+
+Keep the current Claude session. Nothing may be committed, pushed or merged.
+````
+
+**Outcome note (written before review; the changes are staged and uncommitted):**
+- **Starting state verified:** branch `main` with HEAD, `origin/main` and a read-only `git ls-remote` all at `cdf7260`, the expected origin and a clean tree. Branch `docs/m3e-api-spec` was created from that HEAD.
+- **Read before editing** (targeted reads): the vendor endpoints, authentication, the shared database resource and the problem responses in the API; ADR-0006's pagination; M3c's creation seam; M3d section E; and the job snapshot fields. `python-multipart` was confirmed absent from `pyproject.toml` and `uv.lock`.
+- **M3d publication recorded:** `README.md`, ADR-0010, `docs/plan.md` and `docs/threat-model.md` now record M3d on `main` at `cdf7260`.
+  - The reviewer-retrieved results above are attributed to the reviewer.
+  - Earlier statements that said "not merged" or "unmerged branch" are corrected.
+  - Statements about the M3c baseline are scoped to `6f8ffde`.
+  - The `74904e6` feature-branch evidence is kept as historical.
+- **M3e specification added (proposed, not implemented):** a new M3e section in `docs/plan.md`, separating accepted decisions from proposed defaults. It covers:
+  - **Endpoints:** six, including a vendor-scoped document list and a bounded revision list; `{rev}` is the revision number.
+  - **Uploads:** a bounded multipart design. No body parameters, so authentication and the vendor check happen before any body read. Caps of 2 MiB for the file and 2 MiB plus 64 KiB for the request, enforced while streaming. In-memory buffering with no temporary files. The proposed `python-multipart` dependency, used only through its streaming parser. A defined 413/415/422 precedence.
+  - **Creation:** atomic revision-and-job creation, with 202 for new uploads and 200 reporting the true state for duplicates.
+  - **Reads:** tenant-scoped read models, chunk provenance and a partial-set policy (`verified_complete` only for `active` or `superseded` revisions), and reviewed job fields.
+  - **Projection:** the required `ingestion_state` projection.
+  - **Privacy and tests:** privacy rules, and a test plan split into database-independent and PostgreSQL tests.
+
+  The first-release API table and the threat model point to the specification.
+- **Checks:** the consistency, link and anchor, private-content, `git diff --cached --check` and staged Gitleaks checks run after this entry is staged; results are in the session handoff. No application tests or builds were run.
+- **Not done:** no implementation, dependency installation, commit, push or merge. M3e, M3f, Compose verification and overall M3 acceptance remain pending.
+- **Review status:** pending.
+
+**Review note (recorded in Prompt 87):**
+- **M3d `main` publication documentation accepted.** The reviewer inspected `.local/p86/m3e-api-spec.diff`; its checksum matched the reported value.
+- **M3e specification not yet accepted.** The reviewer inspected it and requested the corrections in Prompt 87: read consistency, the upload-response observation time, the multipart parsing contract, the dependency wording and the privacy wording. M3e remains proposed.
+- **No project tests run:** the reviewer did not run the project tests.
+
+## Prompt 87: Correct M3e read consistency and upload parsing contracts
+
+- **Stage:** Documentation corrections on branch `docs/m3e-api-spec` (staged and uncommitted for review; no commit, push or merge)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 87 is the next unused number after Prompt 86; verified before appending.
+
+````text
+Prompt 87 — Correct M3e read consistency and upload parsing contracts
+
+Work only inside D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+Documentation corrections only. No implementation, commit, push, merge, dependency installation, Docker, database contact or global configuration change.
+
+1. Verify starting state
+
+Expected:
+- Branch: docs/m3e-api-spec
+- HEAD:
+  cdf7260d02b8af9affb369cc805d666be61f9ac0
+- Staged tree:
+  89a9b73396f2b597e78ae143a69e52643170f75e
+- Five staged files:
+  README.md
+  docs/decisions/0010-document-ingestion.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+
+If anything differs, stop and report it without changing anything.
+
+Record the current staged tree as the incremental baseline.
+
+2. Preserve accepted material
+
+The reviewer accepts the M3d main-publication documentation. Its uploaded diff checksum matched the reported value.
+
+Keep README.md, ADR-0010 and docs/threat-model.md byte-identical to the starting staged tree.
+
+Keep M3e’s endpoint scope, authorization, upload caps, source formats, atomic creation, immutable revision rules and accepted ingestion_state projection.
+
+Only docs/plan.md and prompts.md may change.
+
+3. Correct read consistency
+
+A. Chunk pagination
+
+Remove the blanket claim that chunk pages are stable because individual rows are immutable.
+
+An unsettled revision can receive additional chunk batches. Its count and page contents can change between requests.
+
+Specify:
+- stable ordinal ordering;
+- partial-set pages are observations at a particular read snapshot;
+- no cross-request snapshot guarantee while writes continue;
+- settled chunk sets are immutable under the application invariant;
+- verified_complete is not inferred merely from a matching row count.
+
+Preserve the accepted visibility policy and repeated-header provenance.
+
+B. One consistent snapshot per GET response
+
+“One transaction” at default READ COMMITTED is insufficient when several SELECTs build one response.
+
+Specify a short REPEATABLE READ, READ ONLY transaction for the M3e read operations, established before their first data query. Keep the upload write transaction at the existing isolation.
+
+Within one GET response, use the same snapshot for:
+- parent existence checks;
+- document pointers and active/latest revision views;
+- canonical job and ingestion_state;
+- chunk-set metadata, stored_count, total and items.
+
+Capture one database-time value for lease-expired calculations within that response.
+
+Do not keep transactions open while sending response bodies. Define how connection-level settings are scoped/reset so pooled connections do not leak isolation or read-only settings into later writes.
+
+This guarantees internal consistency within one response, not a shared snapshot across separate HTTP requests.
+
+C. Upload response observation time
+
+Specify exactly when the UploadResult state is observed:
+- construct one internally consistent response snapshot within the creation transaction after the required writes;
+- send it only after successful commit;
+- do not independently re-read selected fields after commit and mix observation times.
+
+A worker may change the state immediately after commit. Explain that the response reports the observed snapshot, not a promise that the state will remain pending or queued.
+
+Preserve 202 for newly created revisions and 200 for duplicates.
+
+Add planned PostgreSQL concurrency tests for:
+- activation between document-view reads;
+- a chunk batch committing between count and page reads;
+- consistent revision/job projection;
+- pooled-connection settings restored before a later upload write.
+
+4. Tighten the multipart contract
+
+A. Explicit parser completion
+
+Specify validation of:
+- required disposition headers and field names;
+- syntactically valid boundary parameters;
+- final closing boundary;
+- truncated headers or part data;
+- client disconnect.
+
+Do not assume that calling MultipartParser.finalize() necessarily detects every truncated body. Implementation must verify the selected library’s actual behavior and explicitly track parser completion where needed.
+
+No success response is allowed for a truncated multipart body.
+
+B. Content-Length
+
+Keep streaming byte counts authoritative for size enforcement.
+
+When Content-Length is present and the ASGI server provides a normal completed stream, require the actual received body length to match it; otherwise 400.
+
+For disconnects or transport rejection, abort without database writes. Do not guarantee a response can always be delivered after disconnect.
+
+Tests may use controlled ASGI streams for mismatches a production HTTP server would reject before the application sees them.
+
+C. Error precedence and bounds
+
+Make the current precedence implementable:
+- duplicate/unknown fields and a second file are structural 422 errors;
+- exceeding a part-count or byte cap is 413;
+- malformed parser input may prevent further meaningful parsing.
+
+Specify which errors are deferred while bounded parsing continues and which terminate immediately. Do not promise that a later cap violation overrides an earlier parser failure after reading has already stopped.
+
+Retain bounded memory and immediate enforcement of hard caps. Never drain an arbitrarily large invalid request solely to establish global error precedence.
+
+Add mixed-fault tests with exact expected outcomes, including:
+- duplicate field followed by excess parts;
+- malformed multipart before a later oversized tail;
+- missing closing boundary despite otherwise valid fields;
+- short/long declared lengths with a normally completed ASGI stream.
+
+5. Clarify dependency and privacy wording
+
+The reviewer accepts using an established streaming multipart library in principle. No dependency is installed or selected by this prompt.
+
+Keep release-age, compatibility and advisory checks as implementation prerequisites. Do not bypass the age policy or add a newer release silently.
+
+Correct the broad privacy-test statement:
+- errors and logs must not contain submitted content, filenames, arbitrary field names, values or internal exceptions;
+- authorized successful responses intentionally contain documented metadata and, for ChunkView, chunk text;
+- document views exclude raw source content;
+- job views exclude the specified internal fields.
+
+Add tests for both safe error/log behavior and intended authorized success fields.
+
+6. Prompt history and verification
+
+Append this prompt verbatim under the next unused number, expected 87, plus an accurate review/outcome note.
+
+Record:
+- M3d publication documentation accepted;
+- M3e remains proposed;
+- reviewer inspected the specification and checked its checksum;
+- reviewer did not run project tests;
+- corrections made and checks actually run.
+
+Preserve earlier history byte-for-byte.
+
+Run documentation consistency, relative-link/anchor and private-content checks, git diff --cached --check and staged Gitleaks.
+
+No application tests or builds.
+
+Keep all five files staged and uncommitted. Confirm the three unchanged documents remain byte-identical.
+
+7. File-based handoff
+
+Export the complete incremental diff against:
+89a9b73396f2b597e78ae143a69e52643170f75e
+
+Exclude prompts.md and save as:
+.local/p87/m3e-spec-corrections.diff
+
+Use UTF-8 without BOM. Do not print the diff.
+
+Report the changes, actual checks, branch, HEAD, new staged tree, staged paths, file size and SHA-256.
+
+End with:
+“Return this output plus .local/p87/m3e-spec-corrections.diff to the external reviewer.”
+
+Keep the current session. Nothing may be implemented, committed, pushed or merged.
+````
+
+**Outcome note (written before review; the changes are staged and uncommitted):**
+- **Starting state verified:** branch `docs/m3e-api-spec`, HEAD `cdf7260`, staged tree `89a9b73` with the five expected paths, and nothing unstaged or untracked. That tree was recorded as the incremental baseline under `.local/p87/`.
+- **Corrections (in `docs/plan.md` only):**
+  - **Chunk pages:** the blanket stability claim is removed. Chunk pages are ordinal-ordered. Settled sets are immutable; unsettled sets can grow between requests, and each page is an observation at one read snapshot. `verified_complete` is never inferred from a matching count.
+  - **One snapshot per GET response:** a transaction-scoped `SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY` as the first statement, and one captured database time for every `lease_expired`. The transaction ends before the body is sent. No session-level settings are used, so pooled connections keep their defaults. The guarantee is consistency within one response only.
+  - **Upload observation time:** the `UploadResult` is read in one statement inside the creation transaction after the writes, and sent only after the commit. It is never re-read afterwards, and it reports an observation, not a promise.
+  - **Multipart contract:** required `Content-Disposition` and `name`, boundary syntax, explicit completion tracking (closing boundary and part ends) without relying on `finalize()`, and no 2xx for truncated bodies. A `Content-Length` mismatch on a normally completed stream is 400. A disconnect aborts without writes or a guaranteed response.
+  - **Error precedence:** three implementable phases. Errors found while streaming terminate reading immediately, and the first one detected wins. Deferred checks run only after a normally completed stream. Exact mixed-fault outcomes are listed.
+  - **Dependency wording:** an established streaming multipart library is accepted in principle, with none selected or installed. Release age, compatibility and advisories are implementation prerequisites.
+  - **Privacy wording:** errors and logs are separated from intended authorized response fields.
+  - **New planned tests:** read-consistency and pooled-setting tests in PostgreSQL, upload-observation tests, and mixed-fault, completion and privacy tests.
+- **Unchanged:** endpoint scope, authorization, caps, source formats, atomic creation, revision rules and the projection. `README.md`, ADR-0010 and `docs/threat-model.md` are byte-identical to `89a9b73`.
+- **Checks:** run after this entry is staged; results are in the session handoff. No application tests or builds were run.
+- **Review status:** M3e remains **proposed** and unimplemented. Nothing is committed, pushed or merged.
+
+**Review note (recorded in Prompt 88):**
+- **Accepted:** the external reviewer accepted the complete M3e specification (Prompt 86) and its corrections (Prompt 87), subject to one final clarification made in Prompt 88: ASGI receive-message boundaries do not define error precedence.
+- **How it was reviewed:** the reviewer inspected the supplied diffs `.local/p86/m3e-api-spec.diff` and `.local/p87/m3e-spec-corrections.diff`, and independently checked both reported SHA-256 checksums, which matched. The reviewer did not run project tests or documentation checks.
+- **Still pending:** the M3e implementation and its verification.
+
+## Prompt 88: Accept and commit the M3e specification locally
+
+- **Stage:** Documentation acceptance and a local commit on branch `docs/m3e-api-spec` (no push or merge)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 88 is the next unused number after Prompt 87; verified before appending.
+
+````text
+Prompt 88 — Accept and commit the M3e specification locally
+
+Work only inside D:\Claude\evidenceguard_agentic_rag. Follow CLAUDE.md.
+
+The external reviewer accepts the M3e specification from Prompt 86 plus the Prompt 87 corrections, with the narrow test clarification below.
+
+Local documentation commit only. No implementation, dependency installation, push, merge, history rewrite, Docker, database contact or global configuration change.
+
+1. Verify starting state
+
+Expected:
+- Branch: docs/m3e-api-spec
+- HEAD:
+  cdf7260d02b8af9affb369cc805d666be61f9ac0
+- Staged tree:
+  07d71534733ea870753b95c03d29918729f4b962
+- Five staged paths:
+  README.md
+  docs/decisions/0010-document-ingestion.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Expected origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Effective author and committer:
+  257921624+mathewmljourney93@users.noreply.github.com
+
+If anything differs, stop and report it without changing anything.
+
+Record the accepted staged tree before editing.
+
+2. Final narrow clarification
+
+In the M3e multipart specification and planned tests, clarify that ASGI receive-message boundaries do not define semantic error precedence.
+
+For the same body bytes:
+- preserve the specified order of detection;
+- enforce byte caps at the correct position while feeding the parser;
+- do not let receiving one large ASGI message make a later oversized tail override an earlier malformed or duplicate part;
+- do not require byte-at-a-time processing; bounded slices and parser callbacks are acceptable.
+
+Add planned tests presenting the same mixed-fault bodies:
+- in one receive message;
+- split across multiple messages;
+- with splits inside headers, boundaries and file data.
+
+Require equivalent status outcomes and no database writes. Do not claim tests have been implemented or run.
+
+Do not otherwise redesign the parser contract or scope.
+
+3. Record specification acceptance
+
+Update README.md and docs/plan.md narrowly:
+- M3e specification accepted at external review.
+- Implementation pending.
+- Numeric caps and pagination bounds are initial engineering choices, not measured results.
+- The multipart library is accepted in principle, with exact release selection subject to the existing age, compatibility and advisory prerequisites.
+- M3f, Compose verification and overall M3 acceptance remain pending.
+
+Make the M3e status and decision wording internally consistent. Preserve accepted endpoint, transaction, projection and privacy contracts.
+
+Keep ADR-0010 and docs/threat-model.md byte-identical to the accepted staged tree.
+
+4. Prompt history
+
+Append a review note under Prompt 87 recording:
+- acceptance of the complete M3e specification and corrections, with the final ASGI partitioning clarification;
+- that the reviewer inspected the supplied diffs and independently checked both reported checksums;
+- that the reviewer did not run project tests or documentation checks;
+- that implementation and its verification remain pending.
+
+Append this prompt verbatim using the next unused number, expected 88, with a truthful pre-commit note.
+
+Preserve earlier history byte-for-byte. Do not pre-record successful commits or include this commit’s own SHA in its content.
+
+5. Verify and commit locally
+
+Only README.md, docs/plan.md and prompts.md may change relative to the accepted staged tree.
+
+Verify:
+- exactly the five authorized files staged;
+- ADR-0010 and threat model byte-identical;
+- no artifacts, secrets or unrelated changes;
+- documentation consistency and relative links/anchors;
+- git diff --cached --check;
+- staged Gitleaks;
+- effective identity.
+
+No application tests or builds are needed.
+
+Commit with subject:
+docs: record accepted M3e upload and document API specification
+
+Preserve the existing co-author convention.
+
+After committing:
+- verify parent, identity and committed paths;
+- run full-history Gitleaks;
+- confirm a clean working tree;
+- confirm main was not changed.
+
+Do not push or start implementation.
+
+6. Export and hand off
+
+Export the complete incremental diff from:
+07d71534733ea870753b95c03d29918729f4b962
+
+to the new commit, excluding prompts.md, as:
+.local/p88/m3e-spec-acceptance.diff
+
+Write UTF-8 without BOM directly from Git output. Do not print the diff.
+
+Report:
+- commit SHA, parent, subject and identity;
+- changed paths;
+- actual verification results;
+- prompt-history additions;
+- final Git state;
+- baseline, final commit, diff path, byte size and SHA-256.
+
+Keep the current Claude session.
+
+End with:
+“Return this output plus .local/p88/m3e-spec-acceptance.diff to the external reviewer.”
+````
+
+**Pre-commit note (written before the commit; the commit's own SHA is not recorded here):**
+- **Starting state verified:** branch `docs/m3e-api-spec`, HEAD `cdf7260`, staged tree `07d7153` with the five expected paths and nothing unstaged or untracked. The origin and the noreply author and committer identity were as expected. The accepted tree was recorded under `.local/p88/`.
+- **Clarification (`docs/plan.md`):** ASGI receive-message boundaries do not define precedence.
+  - For the same body bytes, errors are detected in byte order, with caps enforced at the exact crossing position while bounded slices are fed to the parser.
+  - A later oversized tail in the same large message never overrides an earlier malformed or structural error.
+  - Byte-at-a-time processing is not required.
+  - Planned tests present each mixed-fault body in one message, across several messages, and split inside headers, boundaries and file data, requiring the same status and no store or database call. The tests are planned, not implemented or run.
+- **Acceptance wording (`README.md`, `docs/plan.md`):**
+  - the M3e specification is accepted at external review, and its implementation is pending;
+  - the caps and pagination bounds are initial engineering choices, not measured results;
+  - the multipart library is accepted in principle, with release selection subject to the age, compatibility and advisory prerequisites;
+  - M3f, Compose verification and overall M3 acceptance remain pending.
+
+  ADR-0010 and `docs/threat-model.md` are byte-identical to `07d7153`.
+- **Checks for this commit:** the documentation, staged-scan and identity checks, and the post-commit checks, run after this entry is staged; results are in the session handoff. No application tests or builds were run.
+- **Not done:** no M3e implementation, no dependency installed, nothing pushed or merged.
