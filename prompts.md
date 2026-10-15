@@ -12022,3 +12022,337 @@ End with:
   - The local Windows result was `1260 passed, 205 skipped`: 204 PostgreSQL skips plus one POSIX-only Windows signal skip.
   - The 26 new M3e PostgreSQL tests have **never run**, and the full 204-test PostgreSQL suite is **unverified** against this implementation.
   - Any CI result belongs to the session handoff and later history, not to this note.
+
+**Publication outcome (recorded in Prompt 93):**
+- **History commit:** `ccdf08d3b901c348da8fbe03a87421e6d9c92ca7` ("docs: record M3e branch publication authorization"), parent `0dd1ebd`, changing only `prompts.md`. Full-history Gitleaks before the push scanned 37 commits and found no leaks.
+- **Push:** `git push --set-upstream origin refs/heads/feat/document-api:refs/heads/feat/document-api` exited 0 and created the remote branch. Remote `feat/document-api` matched `ccdf08d` exactly; remote `main` stayed at `cdf7260`. No force-push, other branch or tag.
+- **What Claude observed** through the public GitHub API: [ci run 38755179760](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38755179760) and [secret-scan run 38755179509](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38755179509) were push events on `feat/document-api` with head SHA `ccdf08d`. All four jobs concluded `success`: Ubuntu verify, Windows verify, PostgreSQL integration and full-history Gitleaks.
+- **What Claude could not observe:** the job-log endpoint requires repository admin rights, so Claude could not retrieve the logs, and reported every test count as unobserved.
+
+**Reviewer evidence note (recorded in Prompt 93):** the external reviewer independently retrieved both workflow records and all four job logs. Both runs were successful push events on `feat/document-api` at exact head SHA `ccdf08d3b901c348da8fbe03a87421e6d9c92ca7`. The reviewer did not execute the suite locally. Observed results:
+- Ubuntu job 116491605348: `1261 passed, 204 skipped in 18.44s`.
+- Windows job 116491604657: `1260 passed, 205 skipped in 33.03s`.
+- PostgreSQL integration job 116491605959: `204 passed, 1261 deselected in 59.29s`. Collection reported 204 selected, and the `tests/test_document_api_postgres.py` line showed all 26 tests passing.
+- Secret-scan job 116491603175: 37 commits scanned, no leaks found.
+
+## Prompt 93: Record verified M3e CI results for review
+
+- **Stage:** Documentation of verified CI results on `feat/document-api`; staged and uncommitted for review (no commit, push or merge)
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 93 is the next unused number after Prompt 92; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 93: Record verified M3e CI results for review
+
+Update the documentation to record the independently retrieved M3e CI evidence. Leave the changes staged and uncommitted.
+
+No commit, push, merge or main update is authorized. Do not change application code, tests, dependencies, migrations, workflows or configuration. Do not start M3f, Docker or a local database.
+
+1. Verify the starting state
+
+Expected:
+- Branch: feat/document-api.
+- HEAD and upstream: ccdf08d3b901c348da8fbe03a87421e6d9c92ca7.
+- Parent: 0dd1ebde0430322a6283420973fcb7b6f63d6019.
+- Working tree clean.
+- Local and remote main:
+  cdf7260d02b8af9affb369cc805d666be61f9ac0.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Existing noreply identity unchanged.
+
+Read fresh remote refs. Stop on a material mismatch without overwriting work.
+
+2. Record the verified evidence
+
+The external reviewer independently retrieved both workflow records and all four job logs.
+
+Both runs were successful push events on feat/document-api with exact head commit `ccdf08d3b901c348da8fbe03a87421e6d9c92ca7`
+
+CI run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38755179760
+
+Observed results:
+- Ubuntu job 116491605348:
+  1261 passed, 204 skipped in 18.44s.
+- Windows job 116491604657:
+  1260 passed, 205 skipped in 33.03s.
+- PostgreSQL integration job 116491605959:
+  204 passed, 1261 deselected in 59.29s.
+  Collection reported 204 selected.
+  The tests/test_document_api_postgres.py line showed all 26 tests passing.
+
+Secret-scan run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38755179509
+
+- Job 116491603175:
+  37 commits scanned, no leaks found.
+
+Attribute these counts to the job logs retrieved by the external reviewer. The reviewer did not execute the suite locally.
+
+These are observed results for ccdf08d, not inferred counts or results for a future documentation commit.
+
+3. Update only these five files
+
+- README.md
+- docs/decisions/0011-document-api.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Make narrow status corrections:
+- M3e is reviewed and verified in CI on feat/document-api at ccdf08d.
+- PostgreSQL, Ubuntu and Windows verification of that version is complete.
+- The full 204-test integration suite passed, including the 26 new M3e tests.
+- Replace current claims that those tests have never executed or that Linux verification remains pending.
+- Keep historical statements and results correctly scoped.
+- M3e is not merged; main remains at cdf7260.
+- Compose, M3f and overall M3 acceptance remain pending.
+- Do not claim performance benchmarks or general security guarantees.
+
+Avoid repeating the full evidence in every paragraph. Use concise references where appropriate.
+
+4. Prompt history
+
+Preserve earlier prompts.md bytes.
+
+Append:
+- Prompt 92’s publication outcome, distinguishing Claude’s observed API conclusions from its inability to retrieve logs.
+- A separate reviewer-evidence note with the observed results above.
+- This prompt verbatim.
+- A truthful outcome note marking the documentation as awaiting review.
+
+Do not rewrite the earlier statement that the counts were unobserved by Claude.
+
+5. Checks and handoff
+
+Check:
+- Exactly the five permitted files are staged.
+- Earlier prompt history is byte-identical.
+- Relative documentation links and anchors.
+- Stale current-status wording.
+- Private content and unintended artifacts.
+- git diff --cached --check.
+- Staged Gitleaks scan.
+
+No application tests or builds need rerunning for these documentation-only changes.
+
+Export the COMPLETE staged diff against HEAD, excluding prompts.md, directly from Git to:
+
+.local/p93/m3e-verification-docs.diff
+
+Use UTF-8 without a BOM. Do not print the diff in chat.
+
+Report:
+- Documentation changes.
+- Checks actually run.
+- Branch, HEAD, staged tree, staged paths and working-tree status.
+- Diff path, baseline, final staged tree, byte size and SHA-256.
+- Remaining limitations.
+
+Keep the current Claude session.
+
+End with:
+“Return this output plus .local/p93/m3e-verification-docs.diff to the external reviewer.”
+````
+
+**Outcome note (documentation staged, awaiting review):**
+- **Starting state verified:**
+  - branch `feat/document-api`; HEAD and upstream `ccdf08d` (parent `0dd1ebd`); working tree clean;
+  - local and remote `main` at `cdf7260` (fresh `git fetch` and `git ls-remote`); origin and noreply identity unchanged.
+- **Documentation:** narrow status corrections in `README.md`, ADR-0011, `docs/plan.md` and `docs/threat-model.md`.
+  - **New status:** M3e is reviewed and verified in CI on `feat/document-api` at `ccdf08d`. PostgreSQL, Ubuntu and Windows verification of that version is complete, and the full 204-test integration suite passed, including the 26 M3e tests. The counts are attributed to job logs retrieved by the external reviewer.
+  - **Replaced:** claims that those tests never executed, or that Linux verification was pending, including the stale "M3e–M3f are not implemented" clause in the M3d status line.
+  - **Kept:** historical results with their scope and attribution. M3e is not merged, `main` remains at `cdf7260`, and Compose, M3f and overall M3 acceptance remain pending.
+- **Checks:** the staged-path, history, link, stale-wording, private-content, `git diff --cached --check` and staged Gitleaks checks run after this entry is staged; results are in the session handoff. No application tests or builds were run (documentation only).
+- **Not done:** nothing committed, pushed or merged; no Docker or database contact.
+
+**Formatting exception note (recorded in Prompt 94):** Prompt 93 above is **not verbatim** in one place. Prompt 94 authorized a one-time formatting exception, limited to that then-uncommitted entry.
+- **Why:** the staged Gitleaks scan had mistaken a public commit identifier for a credential (rule `generic-api-key`). The identifier was the published head commit of `feat/document-api`, which in the original text sat on its own line after the label `head SHA:`.
+- **Change:** the identifier was moved inline with the preceding sentence and enclosed in backticks, and its immediate label `SHA:` was replaced with `commit`. Moving it inline alone, with the label kept, was still flagged; with the label replaced, the scan found no leaks.
+- **Unchanged:** the identifier itself and the instruction's meaning. No `.gitleaksignore`, allowlist, inline suppression, rule change or exclusion was added, and scanning was not disabled. No previously committed prompt-history byte changed.
+
+**Review note (recorded in Prompt 94):**
+- **Accepted:** the external reviewer accepted the Prompt 93 documentation diff (`.local/p93/m3e-verification-docs.diff`, 36,870 bytes) and independently matched its SHA-256 (`3037542263977899b086f46f171626723ddaeccadf17ba7471a5f32a219e543d`).
+- **Basis:** acceptance rests on that diff and on GitHub evidence the reviewer retrieved independently. The reviewer did not run the suite locally.
+
+## Prompt 94: Resolve the prompt-history false positive and publish M3e to main
+
+- **Stage:** Prompt-history formatting correction, a documentation commit, publication of `feat/document-api`, and a fast-forward of `main` only after four green checks
+- **Date:** 2026-10-15 (session date)
+- **Numbering:** 94 is the next unused number after Prompt 93; verified before appending.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 94: Resolve the prompt-history false positive and publish M3e to main
+
+You are authorized to:
+- Make the narrowly defined Prompt 93 formatting correction below.
+- Commit the reviewed documentation.
+- Push feat/document-api.
+- Fast-forward and push main only after all four checks pass for the exact new commit.
+
+1. Verify the starting state
+
+Expected:
+- Branch: feat/document-api.
+- HEAD and upstream: ccdf08d3b901c348da8fbe03a87421e6d9c92ca7.
+- Staged tree: e393d0360ca6811522b21e131b3462e53e3b1fe0.
+- Exactly five staged files:
+  README.md
+  docs/decisions/0011-document-api.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Local and remote main: cdf7260d02b8af9affb369cc805d666be61f9ac0.
+- Origin and noreply author/committer identity unchanged.
+
+Record the accepted staged tree before editing. Read fresh remote refs and stop on a material mismatch without overwriting work.
+
+2. Resolve the public-commit false positive
+
+The reviewer accepts the four documentation files exactly as staged. Keep them byte-identical to the accepted tree.
+
+A one-time exception to verbatim prompt recording is authorized ONLY within the uncommitted Prompt 93 entry:
+- Put its flagged public commit reference inline with the preceding sentence.
+- Enclose the commit identifier in backticks.
+- If needed, replace only its immediate label with “commit”.
+- Preserve the identifier and the instruction’s meaning.
+
+Do not change any previously committed prompt-history bytes.
+
+Append a clearly labelled note explaining:
+- Prompt 93 was recorded with this narrowly authorized formatting exception.
+- Gitleaks had mistaken a public commit identifier for a credential.
+- The identifier and instruction’s meaning are unchanged.
+- This is not verbatim formatting.
+
+Do not add .gitleaksignore, allowlists, inline scanner suppression, rule changes or exclusions. Do not disable scanning.
+
+Rerun the staged scan after the correction. If it still flags the reference, stop and report the result rather than broadening the exception.
+
+3. Prompt history
+
+Append:
+- The reviewer’s acceptance of the Prompt 93 documentation diff and independently matched checksum.
+- That acceptance rests on the diff and independently retrieved GitHub evidence; the reviewer did not run the suite locally.
+- This prompt verbatim.
+- A preflight note recording the verified state, the formatting exception and publication authorization.
+
+Do not pre-record successful pushes, CI or main publication.
+
+Keep every earlier byte unchanged except the expressly authorized formatting correction within the currently uncommitted Prompt 93 entry.
+
+4. Commit the documentation
+
+Verify:
+- Exactly the five authorized files are staged.
+- The four reviewed documents are byte-identical to accepted tree e393d0360ca6811522b21e131b3462e53e3b1fe0.
+- Application code, tests, dependencies, migrations, configuration and workflows are unchanged.
+- Prompt-history changes match the narrow exception and authorized additions.
+- Private-content checks, documentation links and git diff --cached --check pass.
+- Staged Gitleaks passes without suppression.
+- Author and committer use the noreply identity.
+
+Commit with subject:
+docs: record verified M3e results and main publication authorization
+
+Retain the existing co-author convention.
+
+Verify the parent, paths and clean working tree. Run the full-history Gitleaks scan before publication. Stop if it fails.
+
+No local application tests or builds need rerunning for documentation-only changes.
+
+5. Publish the feature branch first
+
+Run git directly and preserve its exit status:
+
+git push origin refs/heads/feat/document-api:refs/heads/feat/document-api
+
+Monitor the exact new commit for:
+- Ubuntu verification.
+- Windows verification.
+- PostgreSQL integration.
+- Full-history Gitleaks.
+
+Allow up to 20 minutes. Confirm run SHA, branch and event.
+
+If any required check fails, is cancelled or remains pending beyond the bound, stop. Do not change main or make implementation fixes.
+
+6. Fast-forward main only after four green checks
+
+Fetch fresh refs and verify:
+- Remote main is still cdf7260d02b8af9affb369cc805d666be61f9ac0.
+- Remote feat/document-api equals the new commit.
+- Remote main is an ancestor of that commit.
+- Local main equals origin/main with no independent commits.
+- The working tree is clean.
+
+If all preconditions hold:
+- Switch to main.
+- Fast-forward it using git merge --ff-only with the exact new commit.
+- Push only main:
+
+git push origin refs/heads/main:refs/heads/main
+
+No force-push, merge commit, squash, amend, rebase, tags or branch deletion.
+
+Monitor all four checks again for the exact commit and the main push, with the same 20-minute bound.
+
+If main CI fails, report it and stop. Do not rewrite or roll back history automatically.
+
+7. Report results honestly
+
+Use existing available tooling. Do not install tools or add credentials just to read logs.
+
+Report actual pytest summaries when accessible. Otherwise report successful job conclusions and links, with counts explicitly unobserved.
+
+The previously verified counts belong to ccdf08d:
+- Ubuntu: 1261 passed, 204 skipped.
+- Windows: 1260 passed, 205 skipped.
+- PostgreSQL: 204 passed, 1261 deselected.
+- Secret scan: 37 commits, no leaks.
+
+Do not reuse those as observed results for the new commit.
+
+Report:
+- The exact prompt-formatting change.
+- Commit SHA, parent and identity.
+- Checks and scanner results.
+- Feature and main pushes with Git exit statuses.
+- Workflow/job links and conclusions for each push.
+- Refs before and after, and final working-tree status.
+- Remaining limits.
+
+Leave the reviewed documentation unchanged after publication; later work can record the main results.
+
+Compose, M3f and overall M3 acceptance remain pending. Do not start them.
+
+No diff attachment is required: the four reviewed documents must remain byte-identical, and only prompts.md may change from the accepted staged tree.
+
+Keep the current Claude session.
+
+End with:
+“Return this output only to the external reviewer; no diff attachment is required.”
+````
+
+**Preflight note (written before the commit; no push, CI or `main` result is recorded here):**
+- **Starting state verified:**
+  - branch `feat/document-api`; HEAD and upstream `ccdf08d`;
+  - staged tree `e393d0360ca6811522b21e131b3462e53e3b1fe0` with exactly the five authorized files; nothing unstaged or untracked;
+  - fresh remote refs: local and remote `main` at `cdf7260`, remote `feat/document-api` at `ccdf08d`;
+  - origin and the noreply author and committer identity unchanged.
+
+  The accepted staged tree is recorded under `.local/p94/`.
+- **Formatting exception:** applied only within the uncommitted Prompt 93 entry, as described in the note above. After it, the staged Gitleaks scan found no leaks, without any suppression.
+- **Reviewed documents:** `README.md`, `docs/decisions/0011-document-api.md`, `docs/plan.md` and `docs/threat-model.md` are to stay byte-identical to the accepted tree. No application code, tests, dependencies, migrations, configuration or workflows change.
+- **Authorization (Prompt 94):**
+  - commit this documentation, then push `feat/document-api` only;
+  - fast-forward `main` to the exact new commit and push only `main`, **only after** Ubuntu, Windows, PostgreSQL integration and full-history Gitleaks all pass for that commit;
+  - no force-push, merge commit, squash, amend, rebase, tag or branch deletion.
+- **Earlier CI counts** (Ubuntu `1261 passed, 204 skipped`; Windows `1260 passed, 205 skipped`; PostgreSQL `204 passed, 1261 deselected`; secret scan 37 commits, no leaks) belong to `ccdf08d` only, not to the new commit.
+- **Still pending:** Compose, M3f and overall M3 acceptance.
