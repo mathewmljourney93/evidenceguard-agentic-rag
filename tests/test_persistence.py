@@ -27,6 +27,7 @@ from evidenceguard_persistence.models import (
     CHUNK_HEADER_ONLY_TABLES_CHECK,
     CHUNK_LINES_CHECK,
     CHUNK_ORDINAL_CHECK,
+    CHUNK_SEARCH_VECTOR_EXPRESSION,
     CHUNK_SECTION_PATH_CHECK,
     CHUNK_SET_CHUNK_COUNT_CHECK,
     CHUNK_SET_CHUNKER_VERSION_CHECK,
@@ -37,6 +38,15 @@ from evidenceguard_persistence.models import (
     DOCUMENT_LATEST_REVISION_NO_CHECK,
     DOCUMENT_SOURCE_TYPE_CHECK,
     DOCUMENT_TITLE_CHECK,
+    EMBEDDING_IS_ZERO_CHECK,
+    EMBEDDING_UNIT_NORM_CHECK,
+    EMBEDDING_VECTOR_SHA256_CHECK,
+    EMBEDDING_ZERO_POLICY_CHECK,
+    INDEX_DIMS_CHECK,
+    INDEX_MANIFEST_WHEN_READY_CHECK,
+    INDEX_READY_AT_WHEN_READY_CHECK,
+    INDEX_STATUS_CHECK,
+    INDEX_VECTOR_MANIFEST_CHECK,
     JOB_ATTEMPT_CHECK,
     JOB_FINISHED_CHECK,
     JOB_IDEMPOTENCY_KEY_CHECK,
@@ -48,6 +58,13 @@ from evidenceguard_persistence.models import (
     JOB_QUEUED_INDEX_WHERE,
     JOB_RUNNING_INDEX_WHERE,
     JOB_STATUS_CHECK,
+    PROFILE_ALGORITHM_VERSION_CHECK,
+    PROFILE_DIMS_CHECK,
+    PROFILE_FINGERPRINT_CHECK,
+    PROFILE_MODEL_ID_CHECK,
+    PROFILE_NORMALIZATION_CHECK,
+    PROFILE_PROVIDER_ID_CHECK,
+    PROFILE_ZERO_POLICY_CHECK,
     REVISION_ACTIVATED_AT_WHEN_ACTIVE_CHECK,
     REVISION_BYTE_SIZE_CHECK,
     REVISION_FAILED_AT_WHEN_FAILED_CHECK,
@@ -222,19 +239,21 @@ def test_migration_resources_are_packaged() -> None:
     assert (migrations / "versions" / "v0002_jobs.py").is_file()
     assert (migrations / "versions" / "v0003_documents.py").is_file()
     assert (migrations / "versions" / "v0004_chunks.py").is_file()
+    assert (migrations / "versions" / "v0005_embeddings.py").is_file()
 
 
 def test_migration_history_has_one_head() -> None:
     script = ScriptDirectory.from_config(alembic_config())
 
-    assert script.get_heads() == ["0004"]
+    assert script.get_heads() == ["0005"]
+    assert script.get_revision("0005").down_revision == "0004"
     assert script.get_revision("0004").down_revision == "0003"
     assert script.get_revision("0003").down_revision == "0002"
     assert script.get_revision("0002").down_revision == "0001"
     assert script.get_revision("0001").down_revision is None
 
 
-def test_schema_tables_are_m2a_jobs_documents_and_chunks() -> None:
+def test_schema_tables_are_m2a_jobs_documents_chunks_and_embeddings() -> None:
     assert set(Base.metadata.tables) == {
         "tenants",
         "users",
@@ -245,6 +264,9 @@ def test_schema_tables_are_m2a_jobs_documents_and_chunks() -> None:
         "document_revisions",
         "chunk_sets",
         "chunks",
+        "embedding_profiles",
+        "embedding_indexes",
+        "chunk_embeddings",
     }
     assert {role.value for role in UserRole} == {"reviewer", "approver", "admin"}
 
@@ -253,20 +275,24 @@ def test_schema_tables_are_m2a_jobs_documents_and_chunks() -> None:
 
 
 def _offline_sql(
-    monkeypatch: pytest.MonkeyPatch, *, upgrade: bool, revisions: str = "0001:base"
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    upgrade: bool,
+    revisions: str = "0001:base",
+    target: str = "head",
 ) -> str:
     monkeypatch.delenv(DATABASE_URL_ENV, raising=False)
     buffer = io.StringIO()
     config = alembic_config(output_buffer=buffer)
     if upgrade:
-        command.upgrade(config, "head", sql=True)
+        command.upgrade(config, target, sql=True)
     else:
         command.downgrade(config, revisions, sql=True)
     return buffer.getvalue()
 
 
 def test_offline_upgrade_sql_renders_without_a_database(monkeypatch: pytest.MonkeyPatch) -> None:
-    sql = _offline_sql(monkeypatch, upgrade=True)
+    sql = _offline_sql(monkeypatch, upgrade=True, target="0004")
 
     for table in ("tenants", "users", "api_keys", "vendors"):
         assert f"CREATE TABLE {table} (" in sql
@@ -402,8 +428,8 @@ def test_offline_upgrade_creates_chunks_with_the_model_constraints(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Migration 0004's literal constraint text must equal the model's (alembic check does not
-    compare CHECK constraints)."""
-    sql = _offline_sql(monkeypatch, upgrade=True)
+    compare CHECK constraints). Rendered up to 0004, which creates no extension (0005 does)."""
+    sql = _offline_sql(monkeypatch, upgrade=True, target="0004")
 
     assert "CREATE TABLE chunk_sets (" in sql
     assert "CREATE TABLE chunks (" in sql
@@ -453,3 +479,114 @@ def test_offline_downgrade_from_0004_drops_chunks_then_chunk_sets_only(
     for table in ("document_revisions", "documents", "jobs", "vendors", "tenants"):
         assert f"DROP TABLE {table};" not in sql
     assert "UPDATE alembic_version SET version_num='0003'" in sql
+
+
+def test_offline_upgrade_to_0005_creates_the_extension_and_embedding_schema(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Migration 0005's literal constraint text must equal the model's (alembic check does not
+    compare CHECK constraints or generated-column expressions)."""
+    sql = _offline_sql(monkeypatch, upgrade=True)
+    upper = sql.upper()
+
+    assert upper.count("CREATE EXTENSION") == 1
+    assert "CREATE EXTENSION IF NOT EXISTS vector;" in sql
+    assert sql.index("CREATE EXTENSION IF NOT EXISTS vector;") < sql.index(
+        "CREATE TABLE chunk_embeddings ("
+    )
+    assert (
+        "ALTER TABLE chunk_sets ADD CONSTRAINT uq_chunk_sets_binding UNIQUE (tenant_id, "
+        "revision_id, chunker_version, chunk_count, manifest_sha256)" in sql
+    )
+    assert (
+        "ALTER TABLE chunks ADD CONSTRAINT uq_chunks_membership UNIQUE (tenant_id, revision_id, "
+        "chunker_version, id, content_sha256)" in sql
+    )
+    assert (
+        "ALTER TABLE chunks ADD COLUMN search_vector TSVECTOR GENERATED ALWAYS AS "
+        f"({CHUNK_SEARCH_VECTOR_EXPRESSION}) STORED" in sql
+    )
+    assert "CREATE INDEX ix_chunks_search_vector ON chunks USING gin (search_vector)" in sql
+    for check in (
+        PROFILE_PROVIDER_ID_CHECK,
+        PROFILE_MODEL_ID_CHECK,
+        PROFILE_ALGORITHM_VERSION_CHECK,
+        PROFILE_DIMS_CHECK,
+        PROFILE_NORMALIZATION_CHECK,
+        PROFILE_FINGERPRINT_CHECK,
+        PROFILE_ZERO_POLICY_CHECK,
+        INDEX_STATUS_CHECK,
+        INDEX_DIMS_CHECK,
+        INDEX_VECTOR_MANIFEST_CHECK,
+        INDEX_READY_AT_WHEN_READY_CHECK,
+        INDEX_MANIFEST_WHEN_READY_CHECK,
+        EMBEDDING_VECTOR_SHA256_CHECK,
+        EMBEDDING_IS_ZERO_CHECK,
+        EMBEDDING_ZERO_POLICY_CHECK,
+        EMBEDDING_UNIT_NORM_CHECK,
+    ):
+        assert f"CHECK ({check})" in sql
+    assert "embedding VECTOR(1024) NOT NULL" in sql
+    assert "status VARCHAR(16) DEFAULT 'building' NOT NULL" in sql
+    assert "vector_manifest_sha256 VARCHAR(64)," in sql  # nullable while building
+    assert "ready_at TIMESTAMP WITH TIME ZONE," in sql
+    assert (
+        "CONSTRAINT fk_embedding_indexes_chunk_set FOREIGN KEY(tenant_id, revision_id, "
+        "chunker_version, chunk_count, manifest_sha256) REFERENCES chunk_sets (tenant_id, "
+        "revision_id, chunker_version, chunk_count, manifest_sha256)" in sql
+    )
+    assert (
+        "CONSTRAINT fk_embedding_indexes_profile FOREIGN KEY(tenant_id, profile_id, dims, "
+        "allows_zero_vectors) REFERENCES embedding_profiles (tenant_id, id, dims, "
+        "allows_zero_vectors)" in sql
+    )
+    assert (
+        "CONSTRAINT fk_chunk_embeddings_index FOREIGN KEY(tenant_id, index_id, revision_id, "
+        "chunker_version, allows_zero_vectors) REFERENCES embedding_indexes (tenant_id, id, "
+        "revision_id, chunker_version, allows_zero_vectors)" in sql
+    )
+    assert (
+        "CONSTRAINT fk_chunk_embeddings_chunk FOREIGN KEY(tenant_id, revision_id, "
+        "chunker_version, chunk_id, content_sha256) REFERENCES chunks (tenant_id, revision_id, "
+        "chunker_version, id, content_sha256)" in sql
+    )
+    assert "CONSTRAINT pk_chunk_embeddings PRIMARY KEY (tenant_id, index_id, chunk_id)" in sql
+    assert sql.index("CREATE TABLE embedding_profiles (") < sql.index(
+        "CREATE TABLE embedding_indexes ("
+    )
+    assert sql.index("CREATE TABLE embedding_indexes (") < sql.index(
+        "CREATE TABLE chunk_embeddings ("
+    )
+    assert "UPDATE alembic_version SET version_num='0005'" in sql
+    for forbidden in ("HNSW", "IVFFLAT", "TRIGGER", "CASCADE"):
+        assert forbidden not in upper
+
+
+def test_offline_downgrade_from_0005_removes_its_objects_and_keeps_the_extension(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sql = _offline_sql(monkeypatch, upgrade=False, revisions="0005:0004")
+    order = [
+        "DROP TABLE chunk_embeddings;",
+        "DROP TABLE embedding_indexes;",
+        "DROP TABLE embedding_profiles;",
+        "DROP INDEX ix_chunks_search_vector;",
+        "ALTER TABLE chunks DROP COLUMN search_vector;",
+        "ALTER TABLE chunks DROP CONSTRAINT uq_chunks_membership;",
+        "ALTER TABLE chunk_sets DROP CONSTRAINT uq_chunk_sets_binding;",
+    ]
+    positions = [sql.index(statement) for statement in order]
+    assert positions == sorted(positions)
+    upper = sql.upper()
+    assert "EXTENSION" not in upper and "CASCADE" not in upper
+    for table in ("chunks", "chunk_sets", "document_revisions", "jobs", "tenants"):
+        assert f"DROP TABLE {table};" not in sql
+    assert "UPDATE alembic_version SET version_num='0004'" in sql
+
+
+def test_a_full_offline_downgrade_never_drops_the_extension(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sql = _offline_sql(monkeypatch, upgrade=False, revisions="0005:base")
+    assert "DROP TABLE tenants;" in sql
+    assert "EXTENSION" not in sql.upper()

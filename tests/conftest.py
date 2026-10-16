@@ -159,11 +159,18 @@ def test_database_url() -> URL:
 
 @pytest.fixture
 def empty_database(test_database_url: URL) -> Iterator[Engine]:
-    """Reset the disposable test database to an empty public schema."""
+    """Reset the disposable test database to an empty public schema.
+
+    Migration 0005 installs ``vector`` in ``public`` and its downgrade deliberately keeps it, so
+    a downgraded database may still have it. Dropping the schema with ``CASCADE`` also drops an
+    extension whose objects live in it; the assertion below proves each test starts without
+    ``vector`` rather than assuming it (M4b, ADR-0014)."""
     engine = create_engine(test_database_url, poolclass=NullPool, hide_parameters=True)
     with engine.begin() as connection:
         connection.exec_driver_sql("DROP SCHEMA public CASCADE")
         connection.exec_driver_sql("CREATE SCHEMA public")
+        extensions = set(connection.exec_driver_sql("SELECT extname FROM pg_extension").scalars())
+    assert extensions == {"plpgsql"}, "the reset test database still has an extension"
     try:
         yield engine
     finally:

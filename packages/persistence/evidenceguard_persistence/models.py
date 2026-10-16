@@ -36,6 +36,19 @@ codes to ``RevisionFailureCode`` is application validation. Trusted application 
 ``evidenceguard_persistence.documents`` enforce the rest: that the pointer names the revision
 whose status is ``active``, the transition graph, revision-number allocation and immutability.
 There are no triggers.
+
+``embedding_profiles``, ``embedding_indexes`` and ``chunk_embeddings`` (M4b, ADR-0014) hold
+tenant-scoped embedding identities, one index per revision/chunker/profile and one canonical
+float32 vector per index and chunk. Composite foreign keys bind each index to its chunk set
+(count and manifest included) and profile (dimensions and zero policy included), and each row
+to its index and to a chunk of that index's revision and chunker version with the same text
+digest. Every column is ``NOT NULL`` except an index's ``ready_at`` and
+``vector_manifest_sha256``, because neither CHECKs nor composite foreign keys reject NULLs on
+their own. pgvector's type modifier rejects wrong dimensions and non-finite values; CHECKs over
+``vector_norm`` and ``vector_send`` bind the zero flag, the unit norm, the zero policy and the
+stored-byte digest. Readiness, immutability and the fingerprint's derivation are application
+invariants (``evidenceguard_persistence.embeddings``). ``chunks.search_vector`` is a stored
+generated ``to_tsvector('simple'::regconfig, text)`` with a GIN index.
 """
 
 from datetime import date, datetime
@@ -47,6 +60,7 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     CheckConstraint,
+    Computed,
     Date,
     DateTime,
     ForeignKey,
@@ -59,11 +73,15 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     Uuid,
+    cast,
     func,
     text,
 )
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, TSVECTOR
+from sqlalchemy.dialects.postgresql.base import ischema_names
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.sql.elements import ColumnElement
+from sqlalchemy.types import UserDefinedType
 
 from evidenceguard_domain.chunks import (
     CHUNKER_VERSION_MAX_LENGTH,
@@ -196,6 +214,70 @@ CHUNK_HEADER_BEFORE_BODY_CHECK = (
 CHUNK_SET_PRIMARY_KEY = "pk_chunk_sets"
 # Defined here: inside ``Chunk`` the column attribute ``text`` shadows ``sqlalchemy.text``.
 EMPTY_TEXT_ARRAY = text("'{}'")
+
+# --- M4b: embeddings and the lexical representation (ADR-0014) ------------------------------
+
+CHUNK_SET_BINDING_KEY = "uq_chunk_sets_binding"
+CHUNK_MEMBERSHIP_KEY = "uq_chunks_membership"
+CHUNK_SEARCH_VECTOR_EXPRESSION = "to_tsvector('simple'::regconfig, text)"
+CHUNK_SEARCH_VECTOR_INDEX = "ix_chunks_search_vector"
+
+EMBEDDING_IDENTIFIER_PATTERN = "^[a-z][a-z0-9._-]{0,63}$"
+PROFILE_PROVIDER_ID_CHECK = f"provider_id ~ '{EMBEDDING_IDENTIFIER_PATTERN}'"
+PROFILE_MODEL_ID_CHECK = f"model_id ~ '{EMBEDDING_IDENTIFIER_PATTERN}'"
+PROFILE_ALGORITHM_VERSION_CHECK = f"algorithm_version ~ '{EMBEDDING_IDENTIFIER_PATTERN}'"
+PROFILE_DIMS_CHECK = "dims = 1024"
+PROFILE_NORMALIZATION_CHECK = "normalization = 'l2'"
+PROFILE_FINGERPRINT_CHECK = f"fingerprint ~ '{SHA256_PATTERN}'"
+PROFILE_ZERO_POLICY_CHECK = "allows_zero_vectors = (provider_id = 'offline')"
+PROFILE_FINGERPRINT_KEY = "uq_embedding_profiles_tenant_id_fingerprint"
+PROFILE_BINDING_KEY = "uq_embedding_profiles_binding"
+
+INDEX_STATUS_CHECK = "status IN ('building', 'ready')"
+INDEX_DIMS_CHECK = "dims = 1024"
+INDEX_VECTOR_MANIFEST_CHECK = (
+    f"vector_manifest_sha256 IS NULL OR vector_manifest_sha256 ~ '{SHA256_PATTERN}'"
+)
+INDEX_READY_AT_WHEN_READY_CHECK = "(status = 'ready') = (ready_at IS NOT NULL)"
+INDEX_MANIFEST_WHEN_READY_CHECK = "(status = 'ready') = (vector_manifest_sha256 IS NOT NULL)"
+INDEX_SOURCE_KEY = "uq_embedding_indexes_source"
+INDEX_BINDING_KEY = "uq_embedding_indexes_binding"
+INDEX_CHUNK_SET_FK = "fk_embedding_indexes_chunk_set"
+INDEX_PROFILE_FK = "fk_embedding_indexes_profile"
+INDEX_ELIGIBILITY_INDEX = "ix_embedding_indexes_eligibility"
+
+EMBEDDING_PRIMARY_KEY = "pk_chunk_embeddings"
+EMBEDDING_INDEX_FK = "fk_chunk_embeddings_index"
+EMBEDDING_CHUNK_FK = "fk_chunk_embeddings_chunk"
+EMBEDDING_VECTOR_SHA256_CHECK = "vector_sha256 = encode(sha256(vector_send(embedding)), 'hex')"
+EMBEDDING_IS_ZERO_CHECK = "is_zero = (vector_norm(embedding) = 0)"
+EMBEDDING_ZERO_POLICY_CHECK = "NOT is_zero OR allows_zero_vectors"
+EMBEDDING_UNIT_NORM_CHECK = "is_zero OR abs(vector_norm(embedding) - 1) <= 1e-6"
+
+
+class Vector(UserDefinedType[str]):
+    """pgvector's ``vector(n)`` column type, without a third-party dependency.
+
+    Values are bound as pgvector text literals (``StoredVector.literal()``) inside an explicit
+    ``CAST(… AS VECTOR(n))``, so the type modifier checks the dimensions. Reads never parse
+    text: callers select ``vector_send(column)`` as ``bytea`` and decode exact float32 values.
+    The type is registered for PostgreSQL reflection, so ``alembic check`` compares it.
+    """
+
+    cache_ok = True
+
+    def __init__(self, dims: int = 1024) -> None:
+        self.dims = dims
+
+    def get_col_spec(self, **kw: Any) -> str:
+        return f"VECTOR({self.dims})"
+
+    def bind_expression(self, bindvalue: Any) -> ColumnElement[str]:
+        return cast(bindvalue, self)
+
+
+# Reflection: PostgreSQL reports the column type as ``vector``; map it to this type.
+ischema_names.setdefault("vector", Vector)
 
 
 class Base(DeclarativeBase):
@@ -424,6 +506,14 @@ class ChunkSet(Base):
     __table_args__ = (
         PrimaryKeyConstraint("tenant_id", "revision_id", name=CHUNK_SET_PRIMARY_KEY),
         UniqueConstraint("tenant_id", "revision_id", "chunker_version"),
+        UniqueConstraint(
+            "tenant_id",
+            "revision_id",
+            "chunker_version",
+            "chunk_count",
+            "manifest_sha256",
+            name=CHUNK_SET_BINDING_KEY,
+        ),
         ForeignKeyConstraint(
             ["tenant_id", "revision_id"], ["document_revisions.tenant_id", "document_revisions.id"]
         ),
@@ -445,13 +535,23 @@ class Chunk(Base):
 
     ``id`` is the deterministic chunk ID. ``(tenant_id, id)`` is unique for later tenant-scoped
     references from embeddings and citations. Rows are never updated or deleted by application
-    code.
+    code. ``search_vector`` (M4b) is generated by PostgreSQL from ``text``; it is never written,
+    compared or included in the manifest.
     """
 
     __tablename__ = "chunks"
     __table_args__ = (
         UniqueConstraint("tenant_id", "revision_id", "chunker_version", "ordinal"),
         UniqueConstraint("tenant_id", "id"),
+        UniqueConstraint(
+            "tenant_id",
+            "revision_id",
+            "chunker_version",
+            "id",
+            "content_sha256",
+            name=CHUNK_MEMBERSHIP_KEY,
+        ),
+        Index(CHUNK_SEARCH_VECTOR_INDEX, "search_vector", postgresql_using="gin"),
         ForeignKeyConstraint(
             ["tenant_id", "revision_id", "chunker_version"],
             ["chunk_sets.tenant_id", "chunk_sets.revision_id", "chunk_sets.chunker_version"],
@@ -484,4 +584,148 @@ class Chunk(Base):
     header_line_end: Mapped[int | None] = mapped_column(Integer)
     header_char_start: Mapped[int | None] = mapped_column(Integer)
     header_char_end: Mapped[int | None] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    search_vector: Mapped[str | None] = mapped_column(
+        TSVECTOR, Computed(CHUNK_SEARCH_VECTOR_EXPRESSION, persisted=True)
+    )
+
+
+class EmbeddingProfile(Base):
+    """An immutable embedding identity for one tenant (M4a's five fields and fingerprint)."""
+
+    __tablename__ = "embedding_profiles"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "id"),
+        UniqueConstraint("tenant_id", "fingerprint", name=PROFILE_FINGERPRINT_KEY),
+        UniqueConstraint(
+            "tenant_id", "id", "dims", "allows_zero_vectors", name=PROFILE_BINDING_KEY
+        ),
+        CheckConstraint(PROFILE_PROVIDER_ID_CHECK, name="provider_id"),
+        CheckConstraint(PROFILE_MODEL_ID_CHECK, name="model_id"),
+        CheckConstraint(PROFILE_ALGORITHM_VERSION_CHECK, name="algorithm_version"),
+        CheckConstraint(PROFILE_DIMS_CHECK, name="dims"),
+        CheckConstraint(PROFILE_NORMALIZATION_CHECK, name="normalization"),
+        CheckConstraint(PROFILE_FINGERPRINT_CHECK, name="fingerprint"),
+        CheckConstraint(PROFILE_ZERO_POLICY_CHECK, name="zero_policy"),
+    )
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
+    tenant_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("tenants.id"))
+    provider_id: Mapped[str] = mapped_column(String(64))
+    model_id: Mapped[str] = mapped_column(String(64))
+    algorithm_version: Mapped[str] = mapped_column(String(64))
+    dims: Mapped[int] = mapped_column(Integer)
+    normalization: Mapped[str] = mapped_column(String(16))
+    fingerprint: Mapped[str] = mapped_column(String(64))
+    allows_zero_vectors: Mapped[bool] = mapped_column(Boolean)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class EmbeddingIndex(Base):
+    """One revision's embeddings under one profile: ``building`` until verified complete, then
+    ``ready`` and immutable. It copies its chunk set's binding and its profile's dimensions and
+    zero policy, each checked by a composite foreign key."""
+
+    __tablename__ = "embedding_indexes"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "id"),
+        UniqueConstraint(
+            "tenant_id", "revision_id", "chunker_version", "profile_id", name=INDEX_SOURCE_KEY
+        ),
+        UniqueConstraint(
+            "tenant_id",
+            "id",
+            "revision_id",
+            "chunker_version",
+            "allows_zero_vectors",
+            name=INDEX_BINDING_KEY,
+        ),
+        ForeignKeyConstraint(
+            ["tenant_id", "revision_id", "chunker_version", "chunk_count", "manifest_sha256"],
+            [
+                "chunk_sets.tenant_id",
+                "chunk_sets.revision_id",
+                "chunk_sets.chunker_version",
+                "chunk_sets.chunk_count",
+                "chunk_sets.manifest_sha256",
+            ],
+            name=INDEX_CHUNK_SET_FK,
+        ),
+        ForeignKeyConstraint(
+            ["tenant_id", "profile_id", "dims", "allows_zero_vectors"],
+            [
+                "embedding_profiles.tenant_id",
+                "embedding_profiles.id",
+                "embedding_profiles.dims",
+                "embedding_profiles.allows_zero_vectors",
+            ],
+            name=INDEX_PROFILE_FK,
+        ),
+        CheckConstraint(INDEX_STATUS_CHECK, name="status"),
+        CheckConstraint(INDEX_DIMS_CHECK, name="dims"),
+        CheckConstraint(INDEX_VECTOR_MANIFEST_CHECK, name="vector_manifest_sha256"),
+        CheckConstraint(INDEX_READY_AT_WHEN_READY_CHECK, name="ready_at_when_ready"),
+        CheckConstraint(INDEX_MANIFEST_WHEN_READY_CHECK, name="manifest_when_ready"),
+        Index(INDEX_ELIGIBILITY_INDEX, "tenant_id", "profile_id", "status"),
+    )
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
+    tenant_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("tenants.id"))
+    revision_id: Mapped[UUID] = mapped_column(Uuid)
+    chunker_version: Mapped[str] = mapped_column(String(CHUNKER_VERSION_MAX_LENGTH))
+    chunk_count: Mapped[int] = mapped_column(Integer)
+    manifest_sha256: Mapped[str] = mapped_column(String(64))
+    profile_id: Mapped[UUID] = mapped_column(Uuid)
+    dims: Mapped[int] = mapped_column(Integer)
+    allows_zero_vectors: Mapped[bool] = mapped_column(Boolean)
+    status: Mapped[str] = mapped_column(String(16), server_default=text("'building'"))
+    vector_manifest_sha256: Mapped[str | None] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    ready_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class ChunkEmbedding(Base):
+    """One canonical float32 vector for one chunk in one index. Never updated or deleted."""
+
+    __tablename__ = "chunk_embeddings"
+    __table_args__ = (
+        PrimaryKeyConstraint("tenant_id", "index_id", "chunk_id", name=EMBEDDING_PRIMARY_KEY),
+        ForeignKeyConstraint(
+            ["tenant_id", "index_id", "revision_id", "chunker_version", "allows_zero_vectors"],
+            [
+                "embedding_indexes.tenant_id",
+                "embedding_indexes.id",
+                "embedding_indexes.revision_id",
+                "embedding_indexes.chunker_version",
+                "embedding_indexes.allows_zero_vectors",
+            ],
+            name=EMBEDDING_INDEX_FK,
+        ),
+        ForeignKeyConstraint(
+            ["tenant_id", "revision_id", "chunker_version", "chunk_id", "content_sha256"],
+            [
+                "chunks.tenant_id",
+                "chunks.revision_id",
+                "chunks.chunker_version",
+                "chunks.id",
+                "chunks.content_sha256",
+            ],
+            name=EMBEDDING_CHUNK_FK,
+        ),
+        CheckConstraint(EMBEDDING_VECTOR_SHA256_CHECK, name="vector_sha256"),
+        CheckConstraint(EMBEDDING_IS_ZERO_CHECK, name="is_zero"),
+        CheckConstraint(EMBEDDING_ZERO_POLICY_CHECK, name="zero_policy"),
+        CheckConstraint(EMBEDDING_UNIT_NORM_CHECK, name="unit_norm"),
+    )
+
+    tenant_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("tenants.id"))
+    index_id: Mapped[UUID] = mapped_column(Uuid)
+    chunk_id: Mapped[UUID] = mapped_column(Uuid)
+    revision_id: Mapped[UUID] = mapped_column(Uuid)
+    chunker_version: Mapped[str] = mapped_column(String(CHUNKER_VERSION_MAX_LENGTH))
+    allows_zero_vectors: Mapped[bool] = mapped_column(Boolean)
+    content_sha256: Mapped[str] = mapped_column(String(64))
+    embedding: Mapped[str] = mapped_column(Vector(1024))
+    vector_sha256: Mapped[str] = mapped_column(String(64))
+    is_zero: Mapped[bool] = mapped_column(Boolean)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

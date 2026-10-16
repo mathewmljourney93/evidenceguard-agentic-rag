@@ -16520,3 +16520,492 @@ Co-Authored-By Claude trailer. After the commit: verify the parent, the four pat
 full-history Gitleaks, a clean tree, and main/origin/main unchanged. Actual results
 and the commit SHA are reported in the handoff, not recorded here. No push, merge or
 implementation.
+
+**Prompt 116 outcome (recorded in Prompt 117 by Claude Code):** committed locally as
+e5ed17e7638bf2a223d08e6fc22a2cba6f3c758e (parent
+5fdaa1cecbcac876af007e6f4328436ef6faeda2, tree
+1ea9ff391f2627a8e8f486c452c568bd5b4f793d) on docs/m4b-persistence-spec. Subject:
+"docs: record accepted embedding persistence specification", with the noreply author
+and committer and a Co-Authored-By Claude trailer. Exactly README.md, ADR-0013,
+docs/plan.md and prompts.md were committed. Pre-commit checks passed: four-path scope,
+identical history prefix, 103 links and anchors, privacy, cached whitespace and staged
+Gitleaks. After the commit, full-history Gitleaks scanned 49 commits and found no leaks,
+the tree was clean, and main/origin/main were unchanged at 5fdaa1c. Nothing was pushed.
+The acceptance diff .local/p116/m4b-spec-acceptance.diff was 19,049 bytes, SHA-256
+6ccbc138e290ff593eab954084ac470580ffbc1a501aa7fff2e3b00b6ae910ea.
+
+**Prompt 116 review (recorded in Prompt 117):** the external reviewer accepted the
+Prompt 116 incremental diff after independently matching its SHA-256. No new project
+checks were run by the reviewer.
+
+## Prompt 117: Implement the accepted M4b embedding persistence specification
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Session:** Claude Code.
+- **Scope/status:** implementation staged for external review; no commit or publication.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 117 — Implement the accepted M4b embedding persistence specification. Stage for external review; do not commit or publish.
+
+Read CLAUDE.md, applicable repository instructions, the accepted M4b specification in docs/plan.md, ADR-0013 and existing persistence/fencing conventions. Avoid reloading full prompt history or printing diffs.
+
+1. Verify starting state
+
+Expected:
+- Branch: docs/m4b-persistence-spec.
+- HEAD:
+  e5ed17e7638bf2a223d08e6fc22a2cba6f3c758e.
+- Parent:
+  5fdaa1cecbcac876af007e6f4328436ef6faeda2.
+- Working tree clean.
+- Local main and origin/main:
+  5fdaa1cecbcac876af007e6f4328436ef6faeda2.
+- Expected origin and noreply identity unchanged.
+
+Stop on material mismatch. Record the baseline under .local/p117/.
+
+Create feat/embedding-persistence from HEAD if it does not exist. Do not overwrite an existing branch. The local specification commit remains beneath this branch; do not publish it separately.
+
+2. Implement the accepted specification
+
+Implement M4b only:
+- pure canonical storage values and validation;
+- the small in-repo SQLAlchemy vector type and reflection support;
+- embedding profiles, indexes and rows;
+- migration 0005;
+- generated full-text representation;
+- metadata creation, bounded fenced writes and readiness/completeness verification;
+- meaningful database-independent and real PostgreSQL tests;
+- ADR-0014 and truthful implementation-status documentation.
+
+Follow the exact accepted schema, composite constraints, NOT NULL rules, identity bindings, UUID namespaces, numeric format and digest rules. Record literal namespace constants and independent fixtures.
+
+No new Python dependency. Do not change uv.lock.
+
+A. Numeric boundary
+- Validate M4a provider values first.
+- Canonicalize float32 and negative zero exactly as specified.
+- Revalidate the stored representation; do not renormalize or widen tolerance.
+- Validate the complete batch before its write helper issues SQL.
+- Preserve fixed, privacy-safe errors.
+- Equality and replay comparisons concern canonical stored values, not float64 provider values.
+- Pin binary-send/digest fixtures and test the accepted lower-norm rounding rejection.
+- Do not change the accepted M4a contract to make storage validation pass.
+
+B. Persistence and fencing
+- Profiles and indexes are tenant-scoped with the accepted composite FKs and unique keys.
+- Metadata creation uses the caller's transaction; no production caller is wired yet.
+- Vector writes/readiness require the real job fence, kind index_revision and exactly the validated index_id payload.
+- Look up and lock the index only within the job tenant.
+- Respect job → index lock order.
+- Recheck fresh ownership after waits on every successful path, including no-ops.
+- Reject writes to ready indexes.
+- Compare replayed immutable fields; never overwrite conflicting rows.
+- Completeness checks exact source membership/manifests, profile identity and stored-vector manifest, not count alone.
+- Reuse the accepted public chunk query/manifest helpers without changing M3 activation locking.
+- Readiness and job success must be capable of committing atomically through the existing fence.
+- No unfenced production vector-write or readiness bypass for tests.
+
+C. Migration and full text
+- Match models and migration exactly.
+- Create vector only in migration 0005, using IF NOT EXISTS.
+- Downgrade removes this migration's own objects and always preserves vector.
+- No extension-drop logic, ownership marker or CASCADE in the migration.
+- Preserve offline upgrade/downgrade rendering.
+- Use the accepted explicit simple text configuration.
+- Do not change chunk text, IDs, source spans or ingestion behaviour.
+- Do not add HNSW/IVFFlat indexes.
+
+If the specification proves impossible or internally inconsistent, report the concrete issue before redesigning it.
+
+3. Files and scope
+
+Expected new files:
+- packages/domain/evidenceguard_domain/embedding_storage.py
+- packages/persistence/evidenceguard_persistence/embeddings.py
+- packages/persistence/evidenceguard_persistence/migrations/versions/v0005_embeddings.py
+- tests/test_embedding_storage.py
+- tests/test_embedding_store.py
+- a dedicated marked PostgreSQL embedding-persistence test module
+- docs/decisions/0014-embedding-persistence.md, if that number is available
+
+Update existing models, integration fixtures, migration/schema/head expectations and safety-test references only as required by the accepted specification.
+
+README, plan, relevant threat-model statements and prompts.md may be updated truthfully. Explain any additional file change.
+
+No live adapter, provider calls, indexing handler, enqueue/backfill command, worker registration, retrieval service/API, corpus evaluation or M4c implementation.
+
+Do not change workflows, Compose or Dockerfile merely to avoid a failing check. Report any concrete necessary change for review.
+
+4. Meaningful tests
+
+Implement the accepted test plan, including:
+- independent float32/wire/digest/UUID fixtures;
+- strict storage-value validation and private errors;
+- statement/protocol checks, explicitly distinguished from database evidence;
+- real composite-FK and required-NULL rejection;
+- numeric CHECKs, offline zero policy and stored-byte equality;
+- application/database agreement on canonical vectors;
+- bounded batch writes, no-op replay and conflicting replay;
+- partial/incomplete indexes and ready-state immutability;
+- job kind/payload/tenant binding;
+- stale leases, concurrent writers, lock timeout and stale already-ready no-op;
+- transactional rollback and atomic readiness/job success;
+- generated full-text correctness;
+- migration up/down/up, extension retention and unrelated-object survival;
+- reflection/alembic drift and offline SQL.
+
+Use real enqueue, claim and fenced transactions for PostgreSQL cases. Ensure event/barrier tests assert their interleaving actually occurred and have bounded waits.
+
+Preserve the disposable-database guard. Fixture reset may need the accepted assertion or test-only extension cleanup; do not weaken safety or assume downgrade removes vector.
+
+5. Verification
+
+Use existing locked project commands for:
+- focused database-independent tests;
+- Ruff format/lint;
+- strict mypy;
+- full local suite;
+- integration-test collection without executing against a database;
+- distribution build and clean installed-wheel checks;
+- offline migration rendering;
+- git diff --cached --check;
+- staged Gitleaks without suppression;
+- private-content/artifact checks and documentation links.
+
+For installed-wheel verification, directly import the new modules and M4a embedding provider using isolated Python outside the source checkout. Verify module paths resolve to site-packages, run a small offline hashing/canonicalization check and render migration SQL without a database. This may close the previously documented embedding-specific wheel limitation only if it actually passes.
+
+Normal locked environment setup and the project's existing declared build-backend resolution are authorized. Do not add dependencies, change lockfiles, bypass release-age policy or install tools globally. If a prerequisite remains unavailable, report the blocked check accurately.
+
+No local Docker, database contact or live provider calls. PostgreSQL tests are written and collected only; they remain unverified until authorized CI.
+
+6. Documentation and prompt history
+
+Record implementation as staged and awaiting review. Separate checks run locally from PostgreSQL/Linux/CI checks still pending.
+
+Preserve the accepted specification and historical evidence. Explain implementation deviations, if any. Do not claim retrieval, semantic quality or overall M4 completion.
+
+Append:
+- Prompt 116 outcome;
+- reviewer acceptance of its incremental diff, checksum independently matched, no new project checks;
+- Prompt 117 verbatim;
+- truthful outcome note.
+
+Preserve earlier prompt-history bytes.
+
+7. Stage and export
+
+Stage only relevant source, migration, tests and documentation. No .local/, distributions, environments, caches or build artifacts.
+
+Export the complete staged diff against HEAD, excluding prompts.md:
+.local/p117/m4b-implementation.diff
+
+UTF-8 without BOM. Report baseline commit, final staged tree, paths, statistics, byte size and SHA-256. Do not print the diff.
+
+Handoff: implementation summary, deviations/questions, actual checks and skip accounting, unexecuted PostgreSQL tests, final Git state and export metadata.
+
+No commit, push, merge, amend, rebase, tag, branch deletion or M4c work.
+
+Return this output plus .local/p117/m4b-implementation.diff to the external reviewer.
+````
+
+**Prompt 117 outcome (Claude Code; implementation staged for external review, not
+committed):** verified docs/m4b-persistence-spec at e5ed17e (parent 5fdaa1c), a clean
+tree, local main and origin/main at 5fdaa1c, and the expected origin and noreply
+identity. Created feat/embedding-persistence from HEAD; baseline saved under .local/p117/.
+
+Implemented M4b per the accepted specification, as documented in ADR-0014:
+- pure canonical storage values (float32 rounding, `-0.0` canonicalization,
+  post-rounding revalidation with no renormalization, wire bytes and digests, UUID5
+  IDs, whole-batch validation before SQL);
+- an in-repo `Vector` type with reflection registration;
+- three tenant-scoped tables with composite FKs, NOT NULL and pgvector-backed CHECKs;
+- two FK-target keys and a generated `simple` tsvector with a GIN index on existing
+  tables;
+- migration 0005 (`IF NOT EXISTS` extension; the downgrade keeps the extension, with
+  no CASCADE);
+- caller-transaction metadata creation;
+- fenced writes and readiness with job binding, job → index locks and fresh ownership
+  re-checks on every successful path.
+
+Implementation choices within the specification are recorded in ADR-0014: namespace
+literals, explicit constraint names, a nullable generated column, a local migration
+DDL type, reflection registration, additional fixed errors and the tolerance edges.
+Existing tests were updated only for head 0005, table sets, the extension expectation,
+the renamed extension test and its safety reference, and the readiness heads. The
+`empty_database` fixture gained the accepted plpgsql-only assertion. No source outside
+M4b, dependency, lockfile, workflow, Compose, Dockerfile or threat-model change was made.
+
+Local Windows checks actually run (locked environment, offline, no sync):
+- Ruff format and lint, strict mypy (113 files): clean;
+- focused embedding tests: 102 passed;
+- full suite: 1585 passed, 234 skipped (233 integration tests without a database,
+  one POSIX-only signal test);
+- integration collection: 233 collected (29 in tests/test_embeddings_postgres.py);
+- `uv build`: succeeded;
+- clean installed-wheel checks outside the checkout, with dependencies from uv.lock
+  and the wheel with `--no-deps`: the existing CI checks plus direct site-packages
+  imports and execution of the M4a provider and M4b canonicalization, and offline
+  upgrade/downgrade SQL, all passed.
+
+That closes the embedding-specific wheel limitation locally on Windows only; CI's
+wheel step is unchanged. PostgreSQL, Linux, container and CI checks have not run:
+constraints, migration, numeric storage, reflection, fixture reset, extension lifecycle
+and concurrency remain unverified. No Docker, database or provider contact. No
+retrieval, semantic-quality or overall M4 claim. Staged-scope, whitespace, Gitleaks,
+privacy and link results are reported in the handoff, not pre-recorded here.
+
+**Prompt 117 outcome (recorded in Prompt 118, from Claude Code's Prompt 117 handoff):** M4b was
+implemented on `feat/embedding-persistence` from `e5ed17e` and staged, not committed: 16 paths
+in staged tree `7c2ec10f4792abb710e611afd4be34b7c7c2b853`. Local Windows checks reported in
+that handoff:
+- Ruff format and lint, strict mypy (113 files): clean;
+- focused embedding tests: 102 passed;
+- full suite: 1585 passed, 234 skipped (233 PostgreSQL/integration tests without a database,
+  one POSIX-only signal test);
+- integration collection: 233 collected (29 in `tests/test_embeddings_postgres.py`);
+- `uv build`: succeeded;
+- clean installed-wheel checks in an isolated venv outside the checkout, including direct
+  embedding-provider and M4b storage execution: passed;
+- cached whitespace check, staged Gitleaks, links, encoding and privacy checks: passed.
+
+No PostgreSQL, Linux, container or CI check ran. The export
+`.local/p117/m4b-implementation.diff` was 196,203 bytes, SHA-256
+`47687999bb849967aedd1005494b1b43a4116536ea14a2f8ff4e1e1c50db8a4d`.
+
+**Prompt 117 review (recorded in Prompt 118):** the external reviewer inspected the complete
+Prompt 117 implementation diff and independently matched its SHA-256
+`47687999bb849967aedd1005494b1b43a4116536ea14a2f8ff4e1e1c50db8a4d`. The reviewer also inspected
+the existing M3 chunk-store and job-fence source. Independent standard-library probes passed
+for wire encoding and digests, both float32 norm boundaries, the accepted lower-boundary
+rejection, invalid numeric inputs and 200 seeded vector round trips. The reviewer did not run
+the project suite, installed-wheel checks, PostgreSQL or Docker; acceptance also rests on
+Claude Code's reported Prompt 117 verification. The M4b implementation and its recorded
+implementation choices are accepted for a local commit, with documentation corrections. This
+does not establish PostgreSQL behaviour, current-version CI verification or overall M4
+acceptance.
+
+## Prompt 118: Record M4b implementation acceptance and commit locally
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Session:** Claude Code.
+- **Scope:** documentation corrections and a local commit; no publication.
+
+````text
+Written for: Mathew and the external reviewer.
+
+# Prompt 118: Record M4b implementation acceptance and commit locally
+
+Read CLAUDE.md and any applicable repository instructions. Preserve the existing session preference: this session began at Prompt 114; a new session is not needed merely for this task.
+
+The external reviewer inspected the complete Prompt 117 implementation diff and independently matched its SHA-256:
+`47687999bb849967aedd1005494b1b43a4116536ea14a2f8ff4e1e1c50db8a4d`.
+
+The reviewer also inspected the existing M3 chunk-store and job-fence source. Independent standard-library probes passed for wire encoding and digests, both float32 norm boundaries, the accepted lower-boundary rejection, invalid numeric inputs, and 200 seeded vector round trips.
+
+The reviewer did not run the project suite, installed-wheel checks, PostgreSQL or Docker. Acceptance also rests on Claude Code's reported Prompt 117 verification.
+
+The M4b implementation and its recorded implementation choices are accepted for a LOCAL COMMIT, with the documentation corrections below. This does not establish PostgreSQL behaviour, current-version CI verification or overall M4 acceptance.
+
+## 1. Verify the starting state
+
+Expected:
+- Branch: `feat/embedding-persistence`.
+- HEAD: `e5ed17e7638bf2a223d08e6fc22a2cba6f3c758e`.
+- HEAD parent: `5fdaa1cecbcac876af007e6f4328436ef6faeda2`.
+- Staged tree: `7c2ec10f4792abb710e611afd4be34b7c7c2b853`.
+- Exactly the same 16 staged paths as Prompt 117:
+  - README.md
+  - docs/decisions/0014-embedding-persistence.md
+  - docs/plan.md
+  - packages/domain/evidenceguard_domain/embedding_storage.py
+  - packages/persistence/evidenceguard_persistence/embeddings.py
+  - packages/persistence/evidenceguard_persistence/migrations/versions/v0005_embeddings.py
+  - packages/persistence/evidenceguard_persistence/models.py
+  - tests/conftest.py
+  - tests/test_embedding_storage.py
+  - tests/test_embedding_store.py
+  - tests/test_embeddings_postgres.py
+  - tests/test_persistence.py
+  - tests/test_persistence_postgres.py
+  - tests/test_persistence_safety.py
+  - tests/test_readiness.py
+  - prompts.md
+- Nothing unstaged or untracked outside ignored local artifacts.
+- Local main and origin/main remain at `5fdaa1cecbcac876af007e6f4328436ef6faeda2`.
+- Origin remains `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`.
+- Effective author and committer:
+  `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>`.
+
+Use local checks. No fetch or remote mutation is required for this local documentation-and-commit task.
+
+If the state differs materially, stop and report it without overwriting work.
+
+Before editing, record the accepted staged tree and necessary baseline evidence under `.local/p118/`.
+
+## 2. Documentation changes only
+
+Only these files may change from the accepted staged tree:
+- README.md
+- docs/decisions/0014-embedding-persistence.md
+- docs/plan.md
+- prompts.md
+
+Every other staged file must remain byte-identical to the accepted tree.
+
+### Correct two stale README statements
+
+1. In “Milestone record and remaining work”, the sentence currently says M4b is implemented and staged, then says “M4b–M4f remain unimplemented”.
+
+   Correct that remaining range to M4c–M4f, while applying the local acceptance status described below.
+
+2. The “Remaining after M3” bullet still lists direct embedding-provider execution from an isolated installed wheel as generally unverified.
+
+   Replace that with the precise remaining limitation:
+   - direct embedding-provider execution and the new storage modules were verified from an isolated installed wheel locally on Windows in Prompt 117;
+   - the existing CI installed-wheel step does not exercise embeddings directly;
+   - adding equivalent embedding-specific CI wheel coverage remains a possible follow-up.
+
+Do not imply the reviewer independently ran the wheel checks, or that CI already contains this additional check.
+
+### Record narrow implementation acceptance
+
+Update the current M4b status in README, the plan and ADR-0014 to say:
+- accepted at external review in Prompt 118 for a local commit;
+- PostgreSQL and current-version Linux/CI verification remain pending;
+- no publication or merge is authorized or completed by this task;
+- the 29 new PostgreSQL tests are written and collected but have never executed;
+- all 233 integration tests remain unverified against this implementation;
+- M4c–M4f and overall M4 acceptance remain pending;
+- local Compose remains unverified.
+
+ADR-0014 may change from its staged-review status to Accepted, explicitly scoped to this local implementation acceptance and pending CI.
+
+Keep the historical Prompt 117 results and their attribution:
+- focused tests: 102 passed;
+- full local Windows suite: 1585 passed, 234 skipped;
+- skips: 233 PostgreSQL/integration tests plus one POSIX-only signal test;
+- build and isolated installed-wheel checks passed locally on Windows.
+
+Do not turn those historical results into newly executed checks or CI evidence.
+
+Preserve:
+- the accepted specification and its existing anchor;
+- schema, numeric, fencing and extension-lifecycle decisions;
+- the recorded implementation choices;
+- migration retention of the vector extension;
+- all application code, tests, migrations and configuration;
+- the distinction between local wheel verification and CI coverage.
+
+Do not add embedding-specific CI work in this task.
+
+## 3. Append prompt history accurately
+
+Preserve all earlier committed and staged prompt-history bytes as an identical prefix.
+
+Append:
+- the Prompt 117 outcome, attributed to its handoff;
+- a reviewer acceptance note containing the exact review scope and independent probes described above;
+- Prompt 118 verbatim;
+- a pre-commit note recording the verified state, permitted changes and checks actually performed.
+
+Do not claim the reviewer ran the project suite, PostgreSQL, installed-wheel checks or Docker.
+
+Do not pre-record the new commit's SHA, publication or CI outcomes.
+
+Use inline, backticked commit identifiers in your own notes to avoid the previously encountered Gitleaks false positive.
+
+## 4. Verify before committing
+
+Run the relevant documentation and commit checks:
+- exactly the expected 16 paths remain staged;
+- only the four permitted documentation/history files differ from accepted tree `7c2ec10f4792abb710e611afd4be34b7c7c2b853`;
+- every other file is byte-identical;
+- earlier prompts.md bytes are unchanged;
+- relative links and anchors resolve;
+- current status statements are consistent;
+- no private content, credentials, artifacts, CR characters or BOM were introduced;
+- `git diff --cached --check`;
+- staged Gitleaks, without allowlisting or suppression;
+- effective author and committer identity.
+
+Application tests and builds need not be repeated because implementation files must remain byte-identical. Do not install dependencies, contact a database or provider, or run Docker.
+
+If a check fails, correct only an authorized documentation issue. Stop for an unexpected implementation or security finding.
+
+## 5. Commit locally
+
+Commit the complete reviewed M4b implementation and the authorized documentation/history changes with subject:
+
+`feat: add tenant-scoped embedding persistence and index readiness`
+
+Use the expected noreply author and committer. Follow the repository's existing Claude Code attribution convention.
+
+After committing, verify:
+- parent is `e5ed17e7638bf2a223d08e6fc22a2cba6f3c758e`;
+- exactly the expected 16 paths were committed;
+- every file outside the four permitted documentation/history paths is byte-identical to the accepted tree;
+- working tree is clean;
+- main and origin/main are unchanged;
+- full-history Gitleaks passes without suppression.
+
+No push, merge, amend, rebase, tag, branch deletion, M4c implementation or other work is authorized.
+
+## 6. Export and hand off
+
+Export an incremental diff directly from Git:
+- baseline: accepted tree `7c2ec10f4792abb710e611afd4be34b7c7c2b853`;
+- final: the new local commit;
+- exclude prompts.md;
+- path: `.local/p118/m4b-commit-incremental.diff`;
+- UTF-8 without BOM.
+
+Do not print the complete diff in chat.
+
+Report:
+- commit SHA, parent and tree;
+- identity and attribution;
+- committed paths;
+- concise documentation changes;
+- checks actually run;
+- byte-identity result;
+- historical verification and remaining limitations;
+- final Git state;
+- export baseline, final commit, paths, statistics, byte size and SHA-256.
+
+End with this explicit instruction:
+
+Mathew: return this output plus `.local/p118/m4b-commit-incremental.diff` to the external reviewer.
+````
+
+**Prompt 118 pre-commit note (Claude Code; written before the commit):** verified locally, without
+a fetch:
+- branch `feat/embedding-persistence`, HEAD `e5ed17e`, parent `5fdaa1c`;
+- accepted staged tree `7c2ec10f4792abb710e611afd4be34b7c7c2b853` with exactly the 16
+  expected paths, and nothing unstaged or untracked;
+- local main and origin/main at `5fdaa1c`;
+- the expected origin and noreply author/committer.
+
+The accepted tree, paths, blobs and history prefix are recorded under `.local/p118/`.
+
+Only README.md, ADR-0014, docs/plan.md and this history changed:
+- README: the remaining range is corrected to M4c–M4f, and "Remaining after M3" now states
+  the precise wheel limitation (local Windows verification in Prompt 117, CI's wheel step not
+  exercising embeddings, equivalent CI coverage a possible follow-up).
+- README, plan and ADR-0014 record acceptance for a local commit in Prompt 118. No
+  publication or merge; the 29 new PostgreSQL tests never executed; all 233 integration tests
+  unverified against it; PostgreSQL and current-version Linux/CI pending; M4c–M4f and overall
+  M4 pending; local Compose unverified.
+- The plan's top-level status and a stale M3-section status line were also corrected; the
+  latter is now marked historical.
+
+The Prompt 117 results stay historical and attributed. The accepted specification, its anchor
+and all code, tests, migrations and configuration are unchanged.
+
+Checks planned before the commit: 16-path scope, byte identity of the twelve other files
+against the accepted tree, history prefix, links and anchors, status consistency,
+privacy/CR/BOM, cached whitespace, staged Gitleaks and identity. Application tests and builds
+are not repeated, because implementation files are byte-identical. Actual results and the
+commit SHA are reported in the handoff, not recorded here. No push, merge or M4c work.

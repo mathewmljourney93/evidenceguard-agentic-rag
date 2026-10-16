@@ -308,7 +308,7 @@ def _run_integration_fixture(tmp_path: Path, test_url: str, app_url: str | None)
             "-p",
             "no:cacheprovider",
             "-q",
-            "tests/test_persistence_postgres.py::test_no_extensions_are_created",
+            "tests/test_persistence_postgres.py::test_only_the_vector_extension_is_created",
         ],
         cwd=ROOT,
         env=env,
