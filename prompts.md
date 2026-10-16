@@ -15877,3 +15877,646 @@ Return this output only to the external reviewer; no diff attachment is required
 - No local application tests/builds, Docker, database/provider contact, M4b work,
   history rewriting or tags. Documents stay unchanged after publication;
   recording main evidence belongs to a later reviewed task.
+
+**Prompt 113 outcome (recorded in Prompt 114 by Claude Code):** at the start of
+Prompt 114, local and fresh remote `main` and `feat/embedding-contracts` were all at
+5fdaa1cecbcac876af007e6f4328436ef6faeda2 (parent
+d501bd6de68a965c283a2187665170502af083e2), with a clean tree, the expected origin
+and the noreply author/committer identity. The documentation commit was therefore
+created and published, and `main` was fast-forwarded to it. This session did not
+receive the implementing Codex session's handoff: feature-branch push-run IDs and
+results for 5fdaa1c are not recorded here, and nothing beyond the repository
+state and the reviewer evidence below is claimed.
+
+**Reviewer main evidence for 5fdaa1c (supplied in Prompt 114):** the external
+reviewer retrieved both main workflow records and all five job logs for exact
+commit 5fdaa1cecbcac876af007e6f4328436ef6faeda2. Both runs were push events on
+main with conclusion success. CI run 38791558180: Ubuntu job 116617134276
+`1480 passed, 204 skipped in 28.81s`; Windows job 116617133905 `1479 passed,
+205 skipped in 33.37s`; PostgreSQL job 116617134528 `204 passed, 1480 deselected
+in 62.80s (0:01:02)`; container job 116617133613: configuration, context, build,
+image checks, smoke and cleanup passed, with 74 context files and all 19 planted
+fixtures excluded; application services used the CI-built image; upload 202,
+successful ingestion, active revision with two verified chunks; duplicate upload
+200; the idle worker exited 0 without an OOM kill. Distribution builds and the
+existing installed-wheel checks passed. Secret-scan run 38791558235, job
+116617134227: 48 commits scanned, no leaks found. The implementing Codex session
+and the reviewer retrieved the logs independently; the reviewer did not execute
+the project suite or Docker locally. Direct embedding-provider execution from an
+isolated installed wheel remains unverified. Earlier d501bd6 feature-branch
+evidence remains historical.
+
+## Prompt 114: Record M4a main verification and propose the M4b persistence specification
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Session:** Claude Code (resuming after Codex Prompts 107–113).
+- **Scope/status:** documentation only, staged for external review; no commit or publication.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 114 — Record M4a main verification and propose the detailed M4b persistence specification. Documentation only; stage for review.
+
+You are Claude Code, resuming after Codex completed Prompts 107–113. References to the implementing Codex session describe historical work; preserve that attribution. Record your new work accurately as Claude Code work.
+
+Do not repeat completed tasks or rewrite earlier prompt history.
+
+Read applicable AGENTS.md instructions, CLAUDE.md, the accepted M4 direction, ADR-0013, existing persistence models/migrations, chunk storage and fenced-write conventions. Avoid reloading full prompt history or printing diffs.
+
+1. Verify starting state
+
+Expected:
+- Branch: main.
+- HEAD, origin/main and remote main:
+  5fdaa1cecbcac876af007e6f4328436ef6faeda2.
+- Parent:
+  d501bd6de68a965c283a2187665170502af083e2.
+- Local and remote feat/embedding-contracts at HEAD.
+- Working tree clean.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Author and committer identity:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>.
+
+Read fresh remote refs. Stop on a material mismatch without changing files, staging or branches.
+
+Create docs/m4b-persistence-spec from HEAD if it does not exist. Do not overwrite an existing branch. Record the baseline under .local/p114/.
+
+2. Record independently verified main evidence
+
+The external reviewer retrieved both main workflow records and all five job logs for exact commit `5fdaa1cecbcac876af007e6f4328436ef6faeda2`.
+
+Both runs were push events on main, conclusion success.
+
+CI:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38791558180
+
+Observed:
+- Ubuntu job 116617134276:
+  1480 passed, 204 skipped in 28.81s.
+- Windows job 116617133905:
+  1479 passed, 205 skipped in 33.37s.
+- PostgreSQL job 116617134528:
+  204 passed, 1480 deselected in 62.80s (0:01:02).
+- Container job 116617133613:
+  configuration, context, build, image checks, smoke and cleanup passed;
+  74 context files, all 19 planted fixtures excluded;
+  application services used the CI-built image;
+  upload 202, successful ingestion, active revision with two verified chunks;
+  duplicate upload 200;
+  idle worker exited 0 without OOM kill.
+- Distribution builds and existing installed-wheel checks passed.
+
+Secret scan:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38791558235
+Job 116617134227:
+48 commits scanned, no leaks found.
+
+The implementing Codex session and external reviewer independently retrieved logs. The reviewer did not execute the project suite or Docker locally.
+
+Preserve the distinction that direct embedding-provider execution from an isolated installed wheel remains unverified. Preserve earlier feature-branch evidence as historical.
+
+3. Propose M4b in docs/plan.md
+
+M4b is embedding persistence, full-text representation and index completeness/readiness. Keep it proposed and unimplemented.
+
+Preserve accepted decisions:
+- indexing readiness is separate from document activation;
+- M3 activation and immutable chunks remain unchanged;
+- tenant/revision/profile isolation;
+- exact vector operations, no approximate index;
+- fixed 1024-dimensional baseline;
+- existing job fencing architecture;
+- later snapshot-relative supersession;
+- no silent omission of unready active revisions at snapshot capture.
+
+Produce a concrete specification covering:
+
+A. Schema
+- Exact tables, columns, keys, composite foreign keys, uniqueness, checks and indexes.
+- Immutable embedding profile identity/fingerprint and tenant scope.
+- Index binding to revision, chunker, source manifest/count and profile.
+- Embedding-row membership in the correct index, revision, chunk and tenant.
+- Partial versus ready state, timestamps and permissible transitions.
+- How schema constraints prevent mismatched dimensions/profiles and cross-tenant or cross-revision rows.
+- Identify which invariants are database-enforced and which rely on trusted application code.
+
+B. Numeric storage
+- pgvector representation and SQLAlchemy/psycopg integration.
+- Application validation before storage and validation after conversion to the stored representation.
+- Finite values, unit-norm tolerance and permitted offline zero vectors.
+- Float32 rounding, deterministic canonicalization and idempotent replay comparisons.
+- Define whether equality refers to provider values or canonical stored values; do not promise exact float64 round trips.
+- Future cosine queries must exclude zero vectors explicitly.
+
+C. Completeness and immutability
+- Bounded idempotent batch writes and conflict handling.
+- How completeness verifies exact chunk membership, hashes, profile and stored vectors rather than row count alone.
+- Ready indexes become immutable.
+- Define how M4c will combine readiness with fenced job success atomically, without implementing its handler now.
+- Define lock ordering and ownership responsibilities at the M4b/M4c boundary; do not introduce an unfenced production write path merely to simplify tests.
+- Clarify whether lexically searchable chunks can ever become eligible before vector readiness.
+
+D. Full-text representation
+- Exact source text and explicit PostgreSQL simple configuration.
+- Generated versus maintained tsvector choice and indexing rationale.
+- No changes to chunk text, IDs or source spans.
+- Tenant/snapshot filters must precede future channel limits.
+- M4d ranking and retrieval execution remain outside this slice.
+
+E. Migration and dependencies
+- Next migration number after inspecting the actual chain.
+- Create the vector extension only when this migration first needs it.
+- Online and offline migration behaviour, upgrade/downgrade ordering and extension ownership.
+- Do not drop an extension used by unrelated objects on downgrade.
+- Required PostgreSQL privileges and test/CI implications.
+- Propose any Python dependency only if necessary. Research official documentation, release age and advisories before recommending an exact release.
+- No installation or policy bypass.
+
+F. Tests and scope
+- Meaningful database-independent contract/serialization tests.
+- Real PostgreSQL tests for composite constraints, wrong dimensions, invalid numerics, zero handling, float32 replay, partial readiness, conflicting writes, immutability and migration round trips.
+- Relevant fenced-write, concurrency and rollback cases.
+- Separate written/planned tests from execution evidence.
+- Intended implementation files and any required CI/container changes.
+- No live providers, indexing handler, review orchestration, retrieval endpoint, corpus evaluation or M4c implementation.
+
+List unresolved decisions with recommended choices and tradeoffs. Do not silently broaden accepted scope.
+
+4. Authorized changes
+
+Only:
+- README.md
+- docs/decisions/0013-embeddings.md
+- docs/plan.md
+- prompts.md
+
+Update M4a status to verified and on main at 5fdaa1c. Add the proposed M4b specification to the plan and a concise README planning reference.
+
+Preserve historical results and limitations. Do not create ADR-0014 until the implementation task unless separately authorized.
+
+Append Prompt 113 outcome, reviewer main evidence, Prompt 114 verbatim and a truthful outcome note. Preserve earlier prompt-history bytes.
+
+5. Checks and review export
+
+Stage exactly the four authorized files.
+
+Check:
+- earlier prompts.md content remains an identical prefix;
+- relative links and anchors;
+- status consistency;
+- private content and unintended artifacts;
+- git diff --cached --check;
+- staged Gitleaks without suppression or allowlisting.
+
+No application tests, build, dependency installation, Docker, database contact or provider calls.
+
+Export the full staged diff against HEAD, excluding prompts.md:
+.local/p114/m4b-persistence-spec.diff
+
+Use UTF-8 without BOM. Report baseline commit, final staged tree, changed paths, statistics, byte size and SHA-256. Do not print the diff.
+
+Report the proposed design, decisions needed, checks and Git state concisely.
+
+No commit, push, merge, amend, rebase, tag, branch deletion or implementation is authorized.
+
+6. Session and handoff rules
+
+Do not recommend a new session after one or two tasks. Continue through implementation and corrections. Around 20 substantial prompts, or if actual context problems arise, recommend a handover at a suitable checkpoint. Count only prompts actually handled in this Claude session; do not count Codex's prompts as Claude-session work.
+
+When supplying any subsequent prompt to Mathew, provide the complete copy-paste prompt, including necessary context and instructions. Do not provide only a preamble, amendment or reference to an earlier prompt.
+
+Return this output plus .local/p114/m4b-persistence-spec.diff to the external reviewer.
+````
+
+**Prompt 114 outcome (Claude Code; documentation awaiting external review):**
+verified main, HEAD, origin/main and fresh remote main and feat/embedding-contracts
+at 5fdaa1c (parent d501bd6), a clean tree, the expected origin and the noreply
+identity. Created docs/m4b-persistence-spec from HEAD; baseline saved under
+.local/p114/. Changed only README.md, ADR-0013, docs/plan.md and this append-only
+history. M4a is recorded as verified and on main at 5fdaa1c, from the reviewer's
+main evidence; the d501bd6 feature-branch evidence is kept as historical, and the
+limitation on direct installed-wheel embedding execution is preserved. The plan
+adds a PROPOSED, unimplemented M4b specification: migration 0005, three tables,
+additive FK-target keys on chunks and chunk_sets, a generated `simple` tsvector,
+float32 canonicalization, CHECK-bound vector digests, fenced batch writes and
+readiness, the M4c boundary and lock order, a planned test matrix and 12
+unresolved decisions. Dependency research used official PyPI metadata, changelogs
+and GitHub advisory pages only; nothing was installed. No ADR-0014, source, test,
+migration, workflow or dependency change was made. No application tests, builds,
+Docker, database or provider contact. Staged-scope, prefix, link, privacy,
+whitespace and Gitleaks results are reported in the handoff, not pre-recorded here.
+
+**Prompt 114 review (recorded in Prompt 115):** the external reviewer inspected the
+Prompt 114 diff and independently matched its SHA-256
+7e014c5f780ea829799ef82f92070803f0242fe4b602fc3ddf41daa54ded936d. The M4a
+publication documentation is accepted. For M4b, recommendations 1–4 and 6–12 were
+approved as recommended, subject to corrections: additive composite FK-target
+unique keys; generated stored tsvector and GIN index; pgvector-backed
+numeric/checksum checks; no new Python dependency and a small in-repo SQLAlchemy
+type; application-enforced immutability without triggers; building/ready states;
+deterministic UUID5 profile/index IDs; batches of at most 32; metadata creation in
+the caller's transaction; no lexical-only eligibility before index readiness;
+copied, FK-bound chunk content hashes. Decision 5 was settled differently: preserve
+the vector extension on downgrade. Corrections requested: the extension lifecycle;
+removing the claim that every M4a-valid vector passes post-float32 validation;
+explicit NOT NULL; job-kind/payload/tenant/fresh-ownership binding for writes and
+readiness, including already-ready no-ops; exact reuse of chunk-set helpers rather
+than calling `require_complete_chunk_set` without its arguments; the
+`identity.fingerprint` property. The reviewer inspected the pgvector 0.8.7
+source/function declarations and the existing completeness helper, and ran a
+standard-library float32 probe (norm 0.999999001 → float32 0.9999989867210388,
+outside 1e-6). The reviewer ran no project suite, Docker or database tests. The
+complete M4b specification remains proposed; no implementation is authorized.
+
+## Prompt 115: Correct the proposed M4b persistence specification and record review decisions
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Session:** Claude Code.
+- **Scope/status:** documentation only, staged for external review; no commit or implementation.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 115 — Correct the proposed M4b persistence specification and record review decisions. Documentation only; no implementation or commit.
+
+Read CLAUDE.md and the relevant M4b specification. Do not reload full prompt history or print diffs.
+
+1. Verify starting state
+
+Expected:
+- Branch: docs/m4b-persistence-spec.
+- HEAD:
+  5fdaa1cecbcac876af007e6f4328436ef6faeda2.
+- Staged tree:
+  f555a70936228eeb7153ec8fa5cc973151767db6.
+- Exactly README.md, docs/decisions/0013-embeddings.md, docs/plan.md and prompts.md staged.
+- Nothing unstaged or untracked outside ignored local artifacts.
+- main and origin/main unchanged at HEAD.
+- Expected origin and noreply identity unchanged.
+
+Stop on material mismatch. Record the baseline tree under .local/p115/.
+
+2. Review decisions
+
+The reviewer inspected the Prompt 114 diff and independently matched its checksum. The M4a publication documentation is accepted.
+
+For M4b, approve the recommended choices numbered 1–4 and 6–12 in the proposal, subject to the corrections below:
+- additive composite FK-target unique keys;
+- generated stored tsvector and GIN index;
+- pgvector-backed numeric/checksum checks;
+- no new Python dependency and a small in-repo SQLAlchemy type;
+- application-enforced immutability without triggers;
+- building/ready states;
+- deterministic UUID5 profile/index IDs;
+- batches of at most 32;
+- metadata creation in the caller's transaction;
+- no lexical-only eligibility before index readiness;
+- copied, FK-bound chunk content hashes.
+
+Decision 5 is settled differently: preserve the vector extension on downgrade.
+
+The complete M4b specification remains proposed pending review of these corrections. No implementation is authorized.
+
+3. Extension lifecycle correction
+
+Replace the proposed guarded extension drop:
+- Upgrade creates vector with IF NOT EXISTS when migration 0005 first needs it.
+- Downgrade removes this migration's tables, indexes, generated column and added constraints, in dependency-safe order.
+- Downgrade leaves the vector extension installed, whether preinstalled or created by this migration.
+- No ownership marker, pg_depend-based drop logic or CASCADE.
+- Explain this deliberate residual infrastructure and that extension removal is an explicit administrative operation outside Alembic downgrade.
+
+Update planned tests:
+- extension absent before the first upgrade in a fresh test database;
+- extension present at head;
+- extension retained after downgrade to 0004;
+- re-upgrade succeeds;
+- a preinstalled extension and unrelated vector-using objects survive;
+- fresh-empty-database safety checks remain intact.
+
+Inspect the existing integration-fixture cleanup and migration tests. Specify any adjustments needed because a downgraded database may now retain vector; do not weaken the disposable-database guard or pretend extension absence is still guaranteed after downgrade.
+
+Offline SQL rendering must remain supported without database introspection.
+
+4. Float32 correction
+
+Remove the statement that all M4a-valid vectors necessarily pass storage validation after rounding.
+
+The reviewer independently reproduced:
+- provider coordinate/norm: 0.999999001;
+- accepted by M4a's absolute 1e-6 norm tolerance;
+- float32 value: 0.9999989867210388;
+- outside the same 1e-6 storage tolerance.
+
+Retain the proposed policy:
+- validate the provider vector;
+- round to float32 and canonicalize negative zero;
+- revalidate the canonical stored vector;
+- reject with a fixed error if post-conversion validation fails;
+- no silent renormalization or widened tolerance;
+- perform this validation before SQL;
+- no partial batch writes on a rejected vector.
+
+Explain that provider-contract validity does not guarantee storage-contract validity.
+
+Add planned tests for:
+- this concrete lower-boundary example;
+- successful rounding cases;
+- upper/lower tolerance boundaries;
+- application/database agreement for canonical vectors;
+- fixed privacy-safe rejection and unchanged database state.
+
+Do not label the numerical reproduction as a project-suite or database test.
+
+5. Complete the schema contract
+
+Explicitly state NOT NULL for all required columns, including:
+- identity fields, dimensions, fingerprints and zero policy;
+- index source/profile bindings and status;
+- embedding membership, content/vector digests and is_zero;
+- required timestamps.
+
+Only ready_at and vector_manifest_sha256 are nullable as specified for building indexes.
+
+Explain that CHECKs and composite foreign keys do not by themselves reject NULL inputs. Include planned direct-SQL null rejection tests for required fields, especially booleans and copied FK columns.
+
+Specify initial building state and NULL ready metadata, and retain the existing ready-state consistency checks.
+
+6. Fence and completeness clarifications
+
+For both vector writes and readiness:
+- require job kind index_revision;
+- obtain index_id from the locked job's validated payload;
+- enforce tenant scope;
+- use job → index lock ordering;
+- recheck fresh ownership after lock/uniqueness waits on every successful path, including already-ready idempotent no-ops;
+- readiness and successful job completion remain in one fenced transaction.
+
+Add planned tests for wrong job kind, malformed/mismatched payload, foreign tenant and stale ownership after waiting on an already-ready index.
+
+The reviewer inspected the existing require_complete_chunk_set signature:
+require_complete_chunk_set(session, revision, *, expected)
+
+Specify exactly how M4b obtains the RevisionSnapshot and ExpectedChunkSet from its immutable index/chunk-set binding, or which pure manifest helper it reuses. Do not imply the activation callback can be called without its required arguments. Do not change M3 locking or activation semantics.
+
+Correct fingerprint access to the existing property identity.fingerprint, not identity.fingerprint().
+
+7. Scope and prompt history
+
+Change only docs/plan.md and prompts.md relative to baseline f555a70936228eeb7153ec8fa5cc973151767db6.
+
+Keep README.md and ADR-0013 byte-identical to that baseline. Keep the M4b heading/anchor stable unless an unavoidable link correction is explained.
+
+Append:
+- review note recording accepted M4a documentation, matched checksum, settled M4b choices and requested corrections;
+- reviewer inspected pgvector 0.8.7 source/function declarations and the existing completeness helper, and ran a standard-library float32 probe;
+- reviewer ran no project suite, Docker or database tests;
+- Prompt 115 verbatim and a truthful outcome note.
+
+Preserve earlier prompt-history bytes.
+
+8. Checks and review export
+
+Keep exactly the existing four files staged.
+
+Check:
+- only plan and prompt history changed from the baseline tree;
+- README and ADR-0013 byte identity;
+- earlier prompts.md prefix unchanged;
+- links/anchors, status consistency, private content/artifacts;
+- git diff --cached --check;
+- staged Gitleaks without suppression.
+
+Do not run application tests, builds, installations, Docker, databases or providers.
+
+Export the complete incremental diff from baseline staged tree
+f555a70936228eeb7153ec8fa5cc973151767db6
+to the final staged tree, excluding prompts.md:
+.local/p115/m4b-spec-corrections.diff
+
+UTF-8 without BOM. Report baseline/final, paths, statistics, byte size and SHA-256. Do not print the diff.
+
+No commit, push, merge, amend, rebase, tag, branch deletion or implementation.
+
+Return this output plus .local/p115/m4b-spec-corrections.diff to the external reviewer.
+````
+
+**Prompt 115 outcome (Claude Code; corrections awaiting external review):**
+verified the branch docs/m4b-persistence-spec, HEAD 5fdaa1c, staged tree
+f555a70936228eeb7153ec8fa5cc973151767db6 with exactly the four expected paths,
+nothing unstaged or untracked, main/origin/main at HEAD, and the expected origin
+and noreply identity. Baseline saved under .local/p115/.
+
+Only docs/plan.md and this history changed; README.md and ADR-0013 are unchanged
+from the baseline, and the M4b heading and anchor are unchanged. The plan records
+the settled choices: 1–4 and 6–12 approved, and 5 replaced by preserving the
+extension. It replaces the guarded drop with a downgrade that leaves `vector`
+installed (no marker, pg_depend logic or CASCADE). It specifies the test-fixture
+implications, notably that the `DROP SCHEMA public CASCADE` reset should remove
+`vector` (to be confirmed in CI, with an assertion added to the fixture); the
+disposable-database guard is unchanged. It removes the claim that every M4a-valid
+vector survives rounding and adds post-rounding rejection before any SQL. It adds
+explicit NOT NULL with the reason, the job-kind/payload/tenant/fresh-ownership
+binding including already-ready no-ops, reuse of the chunk-set statement builders
+and the pure manifest helpers instead of calling `require_complete_chunk_set`, the
+`identity.fingerprint` property, and the corresponding planned tests.
+
+Claude Code also ran a standard-library float32 probe locally, outside the project
+suite. It reproduced the reviewer's lower-boundary values and showed 1.000001
+rounding to 1.0000009536743164, inside the tolerance. No application tests,
+builds, installs, Docker, database or provider contact. Staged-scope, byte-identity,
+prefix, link, privacy, whitespace and Gitleaks results are reported in the handoff,
+not pre-recorded here.
+
+**Prompt 115 acceptance (recorded in Prompt 116):** the external reviewer accepts the
+complete M4b specification from Prompt 114, as corrected in Prompt 115. The reviewer
+inspected both specification diffs and independently matched both checksums
+(Prompt 114: 7e014c5f780ea829799ef82f92070803f0242fe4b602fc3ddf41daa54ded936d;
+Prompt 115: 9f34fcd8f2fda42232dbbe3726663c92dbce92044e8ed0c4e9b70994958df481). The
+reviewer also inspected the pgvector 0.8.7 vector-send/norm source and function
+declarations and the existing chunk completeness helper, and reproduced the float32
+tolerance issue with a standard-library probe. The reviewer ran no project suite,
+Docker or database tests. Accepted staged tree
+13f53832b3af49ca658f229fbda520572ef3bf97.
+
+Accepted decisions:
+- the three-table schema and composite tenant/revision/profile constraints;
+- explicit required-column NOT NULL constraints;
+- the generated stored full-text representation and GIN index;
+- float32 canonicalization, stored-byte digests and post-rounding rejection;
+- no new Python dependency;
+- bounded fenced writes and completeness/readiness checks;
+- job-kind/payload binding and fresh ownership checks, including no-ops;
+- application-enforced immutability;
+- metadata creation in the caller's transaction;
+- preserving vector on downgrade;
+- the documented test-fixture adjustments and real PostgreSQL verification
+  requirements.
+
+These are design decisions, not execution evidence. The migration, constraints,
+numeric storage, reflection, fixture reset and concurrency behaviour remain
+unimplemented and unverified. M4c–M4f still require detailed reviews before
+implementation. No indexing handler or retrieval functionality is authorized.
+
+## Prompt 116: Record acceptance of the corrected M4b specification and commit locally
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Session:** Claude Code.
+- **Scope:** acceptance wording and a local documentation commit; no implementation or publication.
+
+````text
+Written for: Mathew and the external reviewer.
+
+Prompt 116 — Record acceptance of the corrected M4b specification and commit the documentation locally. No implementation or publication.
+
+Read CLAUDE.md and applicable repository instructions. Avoid reloading full prompt history or printing diffs.
+
+1. Verify starting state
+
+Expected:
+- Branch: docs/m4b-persistence-spec.
+- HEAD:
+  5fdaa1cecbcac876af007e6f4328436ef6faeda2.
+- Staged tree:
+  13f53832b3af49ca658f229fbda520572ef3bf97.
+- Exactly four staged paths:
+  README.md
+  docs/decisions/0013-embeddings.md
+  docs/plan.md
+  prompts.md
+- Nothing unstaged or untracked outside ignored artifacts.
+- Local main and origin/main unchanged at HEAD.
+- Expected origin and noreply identity unchanged.
+
+Stop on a material mismatch. Record the accepted staged tree under .local/p116/.
+
+2. Acceptance decision
+
+The external reviewer accepts the complete M4b specification from Prompt 114, corrected in Prompt 115.
+
+The reviewer:
+- inspected both specification diffs and independently matched both checksums;
+- inspected pgvector 0.8.7 vector-send/norm source and function declarations;
+- inspected the existing chunk completeness helper;
+- reproduced the float32 tolerance issue with a standard-library probe;
+- ran no project suite, Docker or database tests.
+
+Accepted decisions include:
+- the three-table schema and composite tenant/revision/profile constraints;
+- explicit required-column NOT NULL constraints;
+- generated stored full-text representation and GIN index;
+- float32 canonicalization, stored-byte digests and post-rounding rejection;
+- no new Python dependency;
+- bounded fenced writes and completeness/readiness checks;
+- job-kind/payload binding and fresh ownership checks, including no-ops;
+- application-enforced immutability;
+- metadata creation in the caller's transaction;
+- preserving vector on downgrade;
+- the documented test-fixture adjustments and real PostgreSQL verification requirements.
+
+These are design decisions, not execution evidence. Migration, constraints, numeric storage, reflection, fixture reset and concurrency behaviour remain unimplemented and unverified.
+
+M4c–M4f still require detailed reviews before implementation. No indexing handler or retrieval functionality is authorized by this specification acceptance.
+
+3. Narrow documentation edits
+
+Only the existing four staged files may change.
+
+Update README, ADR-0013 and plan consistently:
+- M4a remains verified and on main at 5fdaa1c;
+- M4b specification accepted at external review, Prompt 116;
+- M4b implementation pending;
+- overall M4 acceptance pending.
+
+In the plan:
+- update the M4b heading/status and all affected relative anchors;
+- change the unresolved-decisions heading to settled review decisions;
+- preserve the historical recommendations, clearly labelled historical;
+- retain the corrected normative extension policy;
+- preserve the schema, numeric rules, fencing, test plan and limitations without redesign.
+
+Do not claim any M4b tests have run. Keep the direct installed-wheel embedding limitation and local Compose limitation.
+
+Do not change source, tests, migrations, dependencies, workflows, configuration, CLAUDE.md or create ADR-0014.
+
+4. Prompt history
+
+Append:
+- acceptance note under Prompt 115 with the reviewer's actual work and decision above;
+- Prompt 116 verbatim;
+- truthful pre-commit note.
+
+Preserve earlier bytes. Do not include the new commit's own SHA or pre-record publication.
+
+5. Checks and local commit
+
+Verify:
+- exactly four permitted paths staged;
+- differences against the accepted tree are only acceptance wording, necessary anchor updates and prompt history;
+- earlier prompts.md content is an identical prefix;
+- links/anchors and consistent status;
+- private content and unintended artifacts;
+- git diff --cached --check;
+- staged Gitleaks without suppression;
+- effective noreply author and committer identity.
+
+Commit with subject:
+docs: record accepted embedding persistence specification
+
+Use the repository's established Claude co-author convention.
+
+After committing:
+- verify parent 5fdaa1cecbcac876af007e6f4328436ef6faeda2;
+- verify exactly the four committed paths;
+- run full-history Gitleaks;
+- confirm clean working tree;
+- confirm main and origin/main unchanged.
+
+No application tests, builds, dependency installation, Docker, database contact or provider calls are needed.
+
+Stop on failed checks without suppression, amend or reset.
+
+6. Export and handoff
+
+Export the complete incremental diff from accepted tree
+13f53832b3af49ca658f229fbda520572ef3bf97
+to the new commit, excluding prompts.md:
+.local/p116/m4b-spec-acceptance.diff
+
+UTF-8 without BOM. Report baseline/final, paths, statistics, byte size and SHA-256. Do not print the diff.
+
+Report commit SHA, parent, attribution, checks and final Git state.
+
+No push, merge, force-push, amend, rebase, tag, branch deletion or implementation.
+
+Return this output plus .local/p116/m4b-spec-acceptance.diff to the external reviewer.
+````
+
+**Prompt 116 pre-commit note (Claude Code; written before the commit):** verified the
+branch docs/m4b-persistence-spec, HEAD 5fdaa1c, accepted staged tree 13f53832 with
+exactly the four expected paths, nothing unstaged or untracked, local main and
+origin/main at HEAD, and the expected origin and noreply identity. The accepted
+tree is recorded under .local/p116/.
+
+Edits relative to the accepted tree are acceptance wording only:
+- the M4b heading becomes "ACCEPTED at review, Prompt 116; implementation pending",
+  with every relative anchor in README, ADR-0013 and the plan updated to the new
+  slug;
+- the status text in all three documents is consistent;
+- the decisions heading is now "Settled review decisions", and the numbered list
+  is labelled as the historical Prompt 114 recommendation text;
+- section E's normative policy of preserving the extension is retained.
+
+The schema, numeric rules, fencing, test plan and limitations are unchanged. No M4b
+test has run. The installed-wheel embedding and local Compose limitations are kept.
+No source, tests, migrations, dependencies, workflows, configuration, CLAUDE.md or
+ADR-0014 changed.
+
+Planned before commit: four-path scope, prefix, links/anchors, privacy/artifacts,
+cached whitespace, staged Gitleaks and identity checks. Commit subject: "docs: record
+accepted embedding persistence specification", with the repository's
+Co-Authored-By Claude trailer. After the commit: verify the parent, the four paths,
+full-history Gitleaks, a clean tree, and main/origin/main unchanged. Actual results
+and the commit SHA are reported in the handoff, not recorded here. No push, merge or
+implementation.

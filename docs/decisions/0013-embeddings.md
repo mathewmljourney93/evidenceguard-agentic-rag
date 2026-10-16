@@ -1,11 +1,13 @@
 # ADR-0013: Embedding contracts and deterministic offline hashing
 
 - **Status:** Accepted (M4a implementation reviewed in Prompt 110; specification
-  accepted in Prompt 108). Reviewed and verified in feature-branch CI at `d501bd6`
-  on `feat/embedding-contracts`, not merged. Main remains at `85cb0d6`.
+  accepted in Prompt 108). Verified and on `main` at `5fdaa1c` (fast-forward of
+  `feat/embedding-contracts`; see [main CI evidence](#main-ci-evidence-at-5fdaa1c)).
+  Earlier feature-branch verification at `d501bd6` is retained as historical.
   Linux/Windows verification, CI builds and existing clean installed-wheel checks
   passed; direct isolated installed-wheel embedding-provider execution remains
-  unverified. M4b–M4f and overall M4 acceptance remain pending.
+  unverified. The M4b specification was accepted at review in Prompt 116, and its
+  implementation is pending. M4c–M4f and overall M4 acceptance remain pending.
 - **Date:** 2026-10-16
 - **Builds on:** the accepted M4a specification in [the plan](../plan.md#m4a-first-implementation-slice-specification-accepted-at-review-prompt-108-implementation-accepted-for-a-local-commit-prompt-110)
   and [ADR-0010](0010-document-ingestion.md). M3 ingestion and activation are unchanged.
@@ -81,9 +83,10 @@ bounds, strict types, copying, malicious provider outputs and privacy.
 
 ## Feature-branch CI evidence at d501bd6
 
-M4a is reviewed and verified in CI on `feat/embedding-contracts` at exact commit
-`d501bd6de68a965c283a2187665170502af083e2`. It is **not merged**;
-`main` remains at `85cb0d622a5b49c11439b0b9f67abceaa82edb29`.
+Historical record. M4a is reviewed and verified in CI on `feat/embedding-contracts` at exact commit
+`d501bd6de68a965c283a2187665170502af083e2`. At that point it was **not merged**;
+`main` was at `85cb0d622a5b49c11439b0b9f67abceaa82edb29`. It later reached
+`main` at `5fdaa1c` (below).
 Both workflow records are successful **push** events on that feature branch and SHA.
 The implementing Codex session and the external reviewer independently retrieved
 both records and all five job logs. The reviewer did not execute the project
@@ -107,6 +110,28 @@ suite or Docker locally. This records observed logs, not fresh local execution.
 [job 116609328947](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38789281505/job/116609328947):
 47 commits scanned, no leaks found.
 
+## Main CI evidence at 5fdaa1c
+
+`main` was fast-forwarded to exact commit
+`5fdaa1cecbcac876af007e6f4328436ef6faeda2` (parent `d501bd6`, adding only
+documentation), which is also the `feat/embedding-contracts` head. Both workflow
+records are successful **push** events on `main` for that SHA. The implementing
+Codex session and the external reviewer independently retrieved both records and
+all five job logs; the reviewer did not execute the project suite or Docker locally.
+
+[CI run 38791558180](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38791558180):
+
+- [Ubuntu job 116617134276](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38791558180/job/116617134276): `1480 passed, 204 skipped in 28.81s`.
+- [Windows job 116617133905](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38791558180/job/116617133905): `1479 passed, 205 skipped in 33.37s`.
+- [PostgreSQL job 116617134528](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38791558180/job/116617134528): `204 passed, 1480 deselected in 62.80s (0:01:02)`.
+- [Container job 116617133613](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38791558180/job/116617133613): configuration, context, build, image checks, smoke and cleanup passed; 74 context files with all 19 planted fixtures excluded; application services used the CI-built image; upload returned 202, ingestion succeeded and the revision became active with two verified chunks; duplicate upload returned 200; the idle worker exited 0 without an OOM kill.
+- Distribution builds and the existing installed-wheel checks passed. They still
+  do not directly execute the embedding provider from an isolated installed wheel.
+
+[Secret-scan run 38791558235](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38791558235),
+[job 116617134227](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38791558235/job/116617134227):
+48 commits scanned, no leaks found.
+
 ## Verification and limits
 
 Historical Prompt 109 local Windows checks (1479 passed, 205 skipped: 204
@@ -116,13 +141,17 @@ checks passed) are recorded in the
 attempt used offline mode with build isolation disabled and failed because the
 local environment lacked `hatchling`; no dependency was installed. This remains
 historical local evidence, not a current CI build failure. Later CI builds and
-existing installed-wheel checks passed for `d501bd6` as recorded above; direct
+existing installed-wheel checks passed for `d501bd6` and again on `main` at
+`5fdaa1c`, as recorded above; direct
 embedding-provider execution from an isolated installed wheel remains unverified.
 Local Compose remains unverified; the container smoke is CI-only evidence.
 
 This slice adds no persistence, migration, pgvector, indexing job, worker
 registration, live adapter, corpus evaluation, ranking or review workflow.
 It demonstrates deterministic lexical contracts, not semantic quality or an
-end-to-end prompt-injection defence. M4b–M4f remain unimplemented and require
-their own detailed specification reviews. No benchmark or production-readiness
+end-to-end prompt-injection defence. M4b–M4f remain unimplemented. The M4b
+persistence specification was
+[accepted at review in the plan](../plan.md#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending)
+in Prompt 116 and gets its own ADR only when implementation is authorized;
+M4c–M4f still require their own detailed specification reviews. No benchmark or production-readiness
 claim follows.

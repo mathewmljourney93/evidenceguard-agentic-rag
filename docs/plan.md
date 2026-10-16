@@ -2585,12 +2585,16 @@ They are set once as job environment variables.
 
 **M4 – Embeddings, retrieval and corpus**
 
-**Status (Prompt 112): [DECISION] M4a–M4f sequence and complete M4a specification
-accepted at external review; M4a reviewed and verified in CI at `d501bd6` on
-`feat/embedding-contracts`, not merged. Main remains at `85cb0d6`. Linux/Windows
+**Status (Prompt 116): [DECISION] M4a–M4f sequence and complete M4a specification
+accepted at external review; M4a verified and on `main` at `5fdaa1c` (main push
+CI and secret scan green; see [ADR-0013 main evidence](decisions/0013-embeddings.md#main-ci-evidence-at-5fdaa1c)).
+Earlier feature-branch verification at `d501bd6` is historical. Linux/Windows
 verification, CI builds and existing installed-wheel checks passed; direct
 embedding-provider execution from an isolated installed wheel remains unverified.
-M4b–M4f and overall M4 acceptance remain pending.** M1, M2 and M3 remain accepted.
+The [M4b persistence specification](#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending)
+was accepted at external review in Prompt 116 (proposed in Prompt 114, corrected
+in Prompt 115). M4b implementation is pending and unverified. M4c–M4f still need
+detailed reviews, and overall M4 acceptance remains pending.** M1, M2 and M3 remain accepted.
 
 The reviewer inspected the full Prompt 107 diff, independently matched its
 SHA-256 checksum and checked the existing chunk domain and chunker source
@@ -2626,7 +2630,7 @@ Accepted dependency-ordered sequence (Prompt 108; each later slice needs its own
 | Slice | Scope and completion evidence |
 |---|---|
 | M4a | Immutable embedding identity/batch contracts, provider protocol, deterministic offline hashing and validation. Detailed below; no persistence or provider access. |
-| M4b | Embedding profiles/index records, tenant-scoped storage and migration, full-text representation, exact vector operations and completeness/readiness. Real PostgreSQL constraints, migration round trips and filtering tests. Introduce pgvector here when vector storage/operators first require it; M4a needs no extension. |
+| M4b | Embedding profiles/index records, tenant-scoped storage and migration, full-text representation, exact vector operations and completeness/readiness. Real PostgreSQL constraints, migration round trips and filtering tests. Introduce pgvector here when vector storage/operators first require it; M4a needs no extension. Detailed specification [accepted at review in Prompt 116](#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending) (proposed in Prompt 114, corrected in Prompt 115); implementation pending. |
 | M4c | Separate durable `index_revision` jobs over completed immutable chunk sets, enqueue/backfill seam and registered handler. Test leases/fences, replay, partial batches, conflicting retries, cancellation and atomic readiness/job finish. No review workflow. |
 | M4d | Explicit snapshot input/capture seam, eligibility validation, deterministic lexical/vector/RRF retrieval and bounded results. PostgreSQL isolation, snapshot-after-supersession, ranking and tie tests. No review endpoints or report generation. |
 | M4e | Synthetic clean/injected corpus, stable anchor-to-chunk ground truth, Recall@5/@8 and retrieval contracts. Include cross-tenant, cross-vendor and superseded traps and missing answers; no semantic-quality claim. |
@@ -2724,10 +2728,11 @@ claims. End-to-end canary/output behaviour and claim judgments remain M5/M7.
 #### M4a local verification (Prompt 109)
 
 The specification remains accepted (Prompt 108), and the implementation was
-accepted for a local commit in Prompt 110. It is now reviewed and verified in
-feature-branch CI at `d501bd6`, not merged; see the full [CI evidence and wheel
-check scope](decisions/0013-embeddings.md#feature-branch-ci-evidence-at-d501bd6).
-Linux/Windows verification and CI builds are complete for that version; direct
+accepted for a local commit in Prompt 110. It was verified in feature-branch CI
+at `d501bd6` (historical; see the [CI evidence and wheel
+check scope](decisions/0013-embeddings.md#feature-branch-ci-evidence-at-d501bd6))
+and is now verified and on `main` at `5fdaa1c` ([main CI evidence](decisions/0013-embeddings.md#main-ci-evidence-at-5fdaa1c)).
+Linux/Windows verification and CI builds are complete for both commits; direct
 embedding-provider execution from an isolated installed wheel remains unverified. It adds frozen
 identity/usage/batch values, canonical fingerprints, strict request/result
 validation, the provider protocol and deterministic `HashingEmbedder`, with
@@ -2873,6 +2878,566 @@ M4b–M4f need detailed reviews before their implementation, including pgvector
 schema and live-adapter request/timeout/retry/token limits. No dependency or
 provider documentation research was needed for M4a; historical model/pricing
 notes in §2 are not freshly verified availability or price claims.
+
+#### M4b persistence specification (ACCEPTED at review, Prompt 116; implementation pending)
+
+**Status.** [DECISION] Accepted at external review in Prompt 116. Claude Code
+wrote it in Prompt 114 and corrected it in Prompt 115. The reviewer settled
+decisions 1–4 and 6–12 as recommended and decision 5 differently: the extension is
+preserved on downgrade (Prompt 115).
+
+These are design decisions, not execution evidence. Nothing below is implemented
+or verified: the migration, constraints, numeric storage, reflection, fixture
+reset and concurrency behaviour remain unimplemented and untested, and no M4b test
+has run. Implementation needs its own authorization and ADR-0014. Acceptance
+authorizes no indexing handler or retrieval functionality; M4c–M4f still require
+detailed reviews. Items marked [DECISION] in earlier sections stay authoritative.
+
+**Scope.** Embedding profiles, index records, embedding rows, the lexical
+representation, migration `0005`, pgvector numeric storage, bounded fenced
+batch writes and the completeness/readiness check, plus their tests. Out of scope:
+the `index_revision` handler, enqueue/backfill wiring and handler registration
+(M4c); snapshot capture, ranking, RRF and retrieval execution (M4d); corpus and
+evaluation (M4e); the Voyage adapter and any live provider call (M4f); review
+orchestration and endpoints (M5). M3 activation, `require_complete_chunk_set`,
+chunk text, IDs, spans and the chunk write path stay unchanged.
+
+**Preserved accepted decisions.** Indexing readiness is separate from revision
+status and activation. Tenant/revision/profile isolation through composite keys.
+Exact vector operations only: no HNSW or IVFFlat. A fixed 1024-dimensional column.
+The existing job fence, lease and lock-order architecture. Snapshot-relative
+supersession (M4d). Capture refuses an unready active revision rather than
+omitting it (M4d).
+
+##### A. Schema (migration `0005`)
+
+The chain on `main` is `0001` → `0002` → `0003` → `0004` (head). M4b adds
+`v0005_embeddings.py` (revision `0005`, revises `0004`), written to match the
+models, with constraint text spelled out as in earlier revisions. Named
+constraints follow the existing `NAMING_CONVENTION`. No triggers (existing convention).
+
+*Additive constraints on existing tables (FK targets only; no data change):*
+
+- `chunk_sets`: `UNIQUE (tenant_id, revision_id, chunker_version, chunk_count,
+  manifest_sha256)`. The existing primary key already allows one set per revision,
+  so this is always satisfiable. It lets an index row prove, in the database, that
+  its copied count and manifest are the chunk set's.
+- `chunks`: `UNIQUE (tenant_id, revision_id, chunker_version, id, content_sha256)`.
+  `id` is already unique, so this always holds. It lets an embedding row prove that
+  its chunk belongs to the index's revision and chunker version, and that its
+  copied text digest is the chunk's.
+- `chunks`: the generated `search_vector` column and its GIN index (section D).
+
+*`embedding_profiles`* (immutable; one row per tenant and identity):
+
+| Column | Type | Rule |
+|---|---|---|
+| `id` | uuid | PK; `uuid5(PROFILE_NAMESPACE, f"{tenant_id}:{fingerprint}")` (see decision 8) |
+| `tenant_id` | uuid | FK → `tenants.id` |
+| `provider_id`, `model_id`, `algorithm_version` | varchar(64) | CHECK `~ '^[a-z][a-z0-9._-]{0,63}$'` (the M4a pattern) |
+| `dims` | integer | CHECK `dims = 1024` (this slice's fixed column) |
+| `normalization` | varchar(16) | CHECK `= 'l2'` |
+| `fingerprint` | varchar(64) | CHECK `~ '^[0-9a-f]{64}$'`; M4a `EmbeddingIdentity` fingerprint |
+| `allows_zero_vectors` | boolean | CHECK `allows_zero_vectors = (provider_id = 'offline')` |
+| `created_at` | timestamptz | default `now()`; metadata, never compared |
+
+Keys: `UNIQUE (tenant_id, id)`; `UNIQUE (tenant_id, fingerprint)`;
+`UNIQUE (tenant_id, id, dims, allows_zero_vectors)` as the index FK target.
+Profiles are tenant-scoped (accepted direction); the same identity in two tenants
+gives two rows with different IDs.
+
+*`embedding_indexes`* (one per revision, chunker version and profile):
+
+| Column | Type | Rule |
+|---|---|---|
+| `id` | uuid | PK; `uuid5(INDEX_NAMESPACE, f"{tenant_id}:{revision_id}:{chunker_version}:{profile_id}")` |
+| `tenant_id` | uuid | FK → `tenants.id` |
+| `revision_id`, `chunker_version`, `chunk_count`, `manifest_sha256` | as `chunk_sets` | composite FK → the new `chunk_sets` unique key |
+| `profile_id` | uuid | with `dims`, `allows_zero_vectors`: composite FK → profile key above |
+| `dims` | integer | CHECK `= 1024` (copied, FK-checked) |
+| `allows_zero_vectors` | boolean | copied, FK-checked |
+| `status` | varchar(16) | CHECK `IN ('building', 'ready')` |
+| `vector_manifest_sha256` | varchar(64) null | CHECK hex; `(status = 'ready') = (vector_manifest_sha256 IS NOT NULL)` |
+| `created_at` | timestamptz | default `now()` |
+| `ready_at` | timestamptz null | `(status = 'ready') = (ready_at IS NOT NULL)`; set from `clock_timestamp()` |
+
+Keys: `UNIQUE (tenant_id, id)`; `UNIQUE (tenant_id, revision_id, chunker_version,
+profile_id)`; `UNIQUE (tenant_id, id, revision_id, chunker_version,
+allows_zero_vectors)` as the embedding FK target. Index on `(tenant_id, profile_id,
+status)` for M4d's eligibility read.
+
+*`chunk_embeddings`* (immutable; one per index and chunk):
+
+| Column | Type | Rule |
+|---|---|---|
+| `tenant_id`, `index_id`, `chunk_id` | uuid | PK `(tenant_id, index_id, chunk_id)` |
+| `revision_id`, `chunker_version`, `allows_zero_vectors` | copied | composite FK `(tenant_id, index_id, revision_id, chunker_version, allows_zero_vectors)` → index key |
+| `content_sha256` | varchar(64) | composite FK `(tenant_id, revision_id, chunker_version, chunk_id, content_sha256)` → new `chunks` key |
+| `embedding` | `vector(1024)` | not null; pgvector enforces the dimension and finite values |
+| `vector_sha256` | varchar(64) | CHECK `vector_sha256 = encode(sha256(vector_send(embedding)), 'hex')` |
+| `is_zero` | boolean | CHECK `is_zero = (vector_norm(embedding) = 0)` |
+| — | — | CHECK `NOT is_zero OR allows_zero_vectors` |
+| — | — | CHECK `is_zero OR abs(vector_norm(embedding) - 1) <= 1e-6` |
+| `created_at` | timestamptz | default `now()`; never compared |
+
+`vector_send`, `vector_norm` and `sha256` are `IMMUTABLE STRICT` in PostgreSQL 17
+and pgvector 0.8.7, so they are valid in CHECK constraints. `vector_norm`
+accumulates in double precision, so it is zero exactly when every coordinate is zero.
+
+*Nullability (Prompt 115).* Every column in the three new tables is `NOT NULL`
+except `embedding_indexes.ready_at` and `embedding_indexes.vector_manifest_sha256`.
+Specifically, the following are `NOT NULL`:
+
+- `embedding_profiles`: `id`, `tenant_id`, `provider_id`, `model_id`,
+  `algorithm_version`, `dims`, `normalization`, `fingerprint`,
+  `allows_zero_vectors`, `created_at`.
+- `embedding_indexes`: `id`, `tenant_id`, `revision_id`, `chunker_version`,
+  `chunk_count`, `manifest_sha256`, `profile_id`, `dims`, `allows_zero_vectors`,
+  `status`, `created_at`.
+- `chunk_embeddings`: `tenant_id`, `index_id`, `chunk_id`, `revision_id`,
+  `chunker_version`, `allows_zero_vectors`, `content_sha256`, `embedding`,
+  `vector_sha256`, `is_zero`, `created_at`.
+
+This matters because neither CHECKs nor composite FKs reject NULL inputs on
+their own. A CHECK whose expression evaluates to NULL passes. A composite FK
+with any NULL column is not checked under the default `MATCH SIMPLE`. A NULL
+`is_zero` or `allows_zero_vectors` would therefore slip past the zero-policy CHECK,
+and a NULL copied `revision_id` or `content_sha256` would skip the membership FK.
+`status` defaults to `'building'`, and the insert never supplies ready metadata.
+A new index is therefore `building` with `ready_at` and `vector_manifest_sha256`
+NULL. The ready-state pairing CHECKs above remain unchanged.
+
+*Lifecycle and transitions.* An index moves only `building` → `ready`, never back,
+and never `ready` → anything. There is no `failed` state: failures belong to the
+M4c job, and an abandoned `building` index is simply ineligible (decision 7). Rows
+are inserted only while their index is `building`; no row is ever updated or
+deleted by application code. Profiles are never updated. An index may be created
+only for a revision with `activated_at IS NOT NULL` (active, or superseded after
+being active). That value is never cleared once set, so this check reads it
+without a lock.
+
+*Enforcement boundary.*
+
+| Invariant | Enforced by |
+|---|---|
+| Required columns present (all but `ready_at` and `vector_manifest_sha256`), so CHECKs and FKs cannot be bypassed by NULL | PostgreSQL `NOT NULL` |
+| Tenant match across profile, index, chunk set, chunk and embedding | PostgreSQL composite FKs |
+| Embedding's chunk belongs to the index's revision and chunker version; copied text digest equals the chunk's | PostgreSQL composite FK (new `chunks` key) |
+| Index's count/manifest equal the chunk set's; dims/zero policy equal the profile's | PostgreSQL composite FKs |
+| One row per index/chunk; one index per revision/chunker/profile; one profile per tenant/fingerprint | PostgreSQL unique keys |
+| 1024 dimensions; no NaN/infinity | pgvector type modifier and input checks |
+| Unit norm (tolerance 1e-6) or zero; zero only for zero-permitting profiles; digest matches stored vector | PostgreSQL CHECKs (pgvector functions) |
+| Ready ⇔ `ready_at` ⇔ vector manifest present | PostgreSQL CHECKs |
+| Fingerprint equals the hash of the five identity fields | Trusted application code (JSON canonicalization is not reproduced in SQL); re-verified at readiness |
+| Index only for an ever-activated revision; complete before ready; `building` → `ready` only; no writes to ready indexes; no updates/deletes; `-0.0` canonicalized | Trusted application code, under the locks below |
+| Profile identity matches the caller's provider | Trusted application code |
+
+As with chunks, privileged direct database modification bypasses the
+application invariants; this is not a sandbox.
+
+##### B. Numeric storage
+
+*Representation.* `vector(1024)` stores 1024 IEEE-754 float32 values. Provider
+values are float64 Python floats, so storage is lossy by design. **Equality, replay
+and digests refer to canonical stored float32 values, never provider float64
+values.** No exact float64 round trip is promised.
+
+*Canonicalization (pure domain code, before storage).* Starting from an
+M4a-validated vector (strict finite reals, correct count/dims, norm or zero policy):
+
+1. Convert each coordinate to float32 with `struct.pack('>f', x)` (IEEE
+   round-to-nearest). Overflow raises the fixed invalid-embedding error.
+2. Replace `-0.0` with `0.0`, so equal vectors have equal bytes.
+3. Re-validate the canonical float32 vector against the storage contract: finite;
+   zero exactly when every coordinate is zero; a nonzero provider vector that
+   rounds to all zeros is rejected; nonzero norm (computed in float64 over the
+   float32 values) within the same absolute 1e-6 of 1. Failure raises the fixed,
+   privacy-safe invalid-embedding error. There is no silent renormalization and no
+   widened tolerance.
+
+   **Provider-contract validity does not guarantee storage-contract validity.** A
+   vector accepted by M4a can fail after rounding. The reviewer's
+   standard-library probe (Prompt 115; not a project-suite or database test): a
+   coordinate, and so a norm, of `0.999999001` passes M4a's 1e-6 tolerance, but
+   its float32 value `0.9999989867210388` is outside it. Such vectors are rejected,
+   not stored.
+
+   The whole batch is canonicalized and re-validated **before any SQL**. One
+   rejected vector rejects the batch: no partial batch write, and the database is
+   unchanged.
+4. Wire bytes: `struct.pack('>HH1024f', 1024, 0, *coords)`, identical to
+   pgvector's binary send format (int16 dims, int16 zero, big-endian float4).
+   `vector_sha256` is the SHA-256 hex digest of these bytes.
+
+*Write path.* Bind a text literal `[c0,c1,…]` where each coordinate is Python
+`repr` of the float32-exact double, cast to `vector(1024)`. pgvector parses with
+`strtof`. The decimal is the shortest string identifying a double that is
+exactly a float32, so `strtof` returns that float32 exactly. The database CHECK then
+proves that the stored bytes hash to the application's `vector_sha256`. A rounding
+difference fails the insert rather than storing a different vector.
+
+*Read path.* Read `vector_send(embedding)` as `bytea` and decode with the same
+struct format. That gives exact float32 bits, with no text parsing. Text output
+(shortest float32 decimal) is never parsed back for comparison.
+
+*SQLAlchemy/psycopg integration (decision 4).* A small in-repo SQLAlchemy
+`UserDefinedType` renders `vector(1024)` in DDL and binds through
+`CAST(:value AS vector(1024))`. Its reflection name is registered for
+`alembic check`, and reads use explicit `func.vector_send(...)`. psycopg needs
+no adapter, because values cross as text in and `bytea` out. No new Python dependency.
+
+*Zero vectors.* Stored only under offline profiles, with `is_zero = true`.
+pgvector's cosine distance against a zero vector is NaN, so every future cosine
+query must include `NOT is_zero` explicitly, and M4d skips zero query vectors (accepted).
+
+##### C. Writes, completeness and immutability
+
+Proposed module `evidenceguard_persistence/embeddings.py`. Its style follows `chunks.py`:
+fixed-message errors, tenant from the job, no commits or transaction-control SQL,
+and statements built by functions so tests can inspect them.
+
+*Caller-transaction operations (no vectors, no readiness):*
+
+- `ensure_profile(session, tenant_id, identity)`: `INSERT … ON CONFLICT DO NOTHING`
+  on `(tenant_id, fingerprint)`, then read the row back and compare all identity
+  fields. A difference raises `EmbeddingProfileConflictError`.
+- `create_index(session, tenant_id, revision_id, profile)`: requires the revision to
+  exist in the tenant with `activated_at IS NOT NULL`, and a chunk set to exist.
+  It copies the chunk-set binding, inserts with `ON CONFLICT DO NOTHING`, then
+  compares all bound fields. It returns an immutable `IndexSnapshot`. M4c calls it
+  in the same transaction as `enqueue` (payload `{"index_id": …}`), like
+  `create_revision`. M4b wires no production caller (decision 10).
+
+*Fenced operations* take `FencedSession` and the fence's `JobSnapshot`. Both
+start with the same job binding (Prompt 115):
+
+- **Job binding.** Require `job.kind == "index_revision"`. Require the validated
+  `JobPayload` (canonical UUID values, already enforced by M3a) to contain exactly
+  the key `index_id`. Anything else raises a fixed `IndexJobMismatchError` before
+  any further lock or write. The index is looked up only by `(job.tenant_id,
+  index_id)`. A missing row, including one that exists in another tenant, raises
+  the fixed `IndexNotFoundError`; foreign rows are never read or locked.
+- **Lock order:** job row (already locked by the fence) → that index row
+  `FOR UPDATE`. No document, revision, chunk-set or chunk locks.
+- **Fresh ownership.** On every successful return path, including no-ops,
+  `recheck_ownership` runs after the last lock or unique-index wait and before
+  the block can commit, and the re-read job's tenant must equal the index's tenant.
+
+- `write_embeddings(session, job, identity, rows)`: one bounded batch of 1–32
+  `StoredEmbedding(chunk_id, content_sha256, canonical vector, vector_sha256)`
+  values with distinct chunk IDs, already canonicalized and re-validated before
+  any SQL (section B). Steps:
+  1. Bind the job and lock the index row; require `building`, otherwise raise
+     `EmbeddingWriteRefusedError` before any insert.
+  2. Require the profile's stored fingerprint to equal the `identity.fingerprint`
+     property.
+  3. Pre-read `(id, content_sha256)` of those chunks in the index's revision and
+     chunker version. A missing or different chunk raises a fixed error before
+     insert (the composite FKs remain the backstop).
+  4. Run `INSERT … ON CONFLICT (tenant_id, index_id, chunk_id) DO NOTHING
+     RETURNING chunk_id`.
+  5. For each row not returned, compare the stored `content_sha256`,
+     `vector_sha256` and `is_zero` exactly. Any difference raises
+     `EmbeddingConflictError`. Nothing is overwritten.
+  6. Call `recheck_ownership` and require the job's tenant.
+- `mark_index_ready(session, job, identity)`: bind the job and lock the index row.
+  If the index is already `ready` and its profile fingerprint equals
+  `identity.fingerprint`, write nothing. It still calls `recheck_ownership`
+  after the lock wait, so a lease that expired or was reassigned while waiting
+  raises `LeaseLostError` and the job cannot succeed. Otherwise run
+  `require_complete_index`, set `status = 'ready'`, `ready_at = clock_timestamp()`
+  and the vector manifest, then call `recheck_ownership`. M4c calls it only inside
+  `ctx.fenced(finish=True)`, so readiness and job success commit or roll back together.
+
+*Completeness (`require_complete_index`)* runs under the index lock and checks more
+than the row count:
+
+1. The profile's five stored identity fields hash to its stored fingerprint, which
+   equals the caller's `identity.fingerprint` and dims 1024.
+2. Chunk-set verification uses the immutable index binding and does **not** call
+   `require_complete_chunk_set(session, revision, *, expected)`. That function is
+   M3's activation callback: it needs a `RevisionSnapshot` locked by
+   `activate_revision`, and M4b neither locks revisions nor builds snapshots.
+   Instead, a new private helper in `embeddings.py` reuses the existing public
+   pieces without changing `chunks.py`:
+   - `chunk_set_statement(tenant_id, revision_id)`, whose stored
+     `(chunker_version, chunk_count, manifest_sha256)` must equal the index's
+     bound values;
+   - `manifest_rows_statement(tenant_id, revision_id, chunker_version)` with
+     `MANIFEST_COLUMNS`, which must return exactly ordinals `0 … count-1`;
+   - the pure domain helpers `manifest_entry` and `manifest_sha256`, whose rebuilt
+     digest must equal both the stored and the bound `manifest_sha256`.
+
+   Tenant, revision and chunker version come only from the locked index row. An
+   `ExpectedChunkSet(chunker_version, chunk_count, manifest_sha256)` may be
+   constructed from those bound values for validation, but no `RevisionSnapshot`
+   is fabricated. M3 locking, activation and the activation callback are unchanged.
+3. A single join of chunks to this index's embeddings, ordered by ordinal, returns
+   one embedding for every chunk, with matching `content_sha256` and no extra rows
+   (embedding count equals `chunk_count`).
+4. The vector manifest is the SHA-256 of ASCII lines
+   `f"{ordinal}:{chunk_id}:{content_sha256}:{vector_sha256}\n"` in ordinal order.
+   Each `vector_sha256` is CHECK-bound to the stored vector bytes, and finiteness,
+   dims, norm and zero policy are CHECK-enforced. So completeness verifies the
+   stored vectors without transferring up to 4,096 × 1,024 coordinates inside the
+   fenced transaction.
+
+Any failure raises `IndexIncompleteError`; nothing changes.
+
+*Immutability.* Ready indexes and all embedding rows are immutable by application
+invariant: writers require `building` under the row lock, and no update/delete
+statement exists. Triggers are not proposed (decision 6).
+
+*M4b/M4c boundary and atomic readiness.* M4c's handler embeds outside any fence
+(provider calls and hashing never hold locks). It first reads already-stored chunk
+IDs and skips them, so committed batches are reused and a nondeterministic live
+provider is not re-asked for them. Each batch then goes through
+`with ctx.fenced(): write_embeddings(...)`. Readiness and job success commit together in
+`with ctx.fenced(finish=True) as f: mark_index_ready(f.session, f.job, identity)`.
+That uses the existing worker path, which runs `fence.succeed()` in the same transaction.
+
+*Lock order.* M4b's fenced operations take job row (the fence) → `embedding_indexes`
+row. They read only immutable rows: profiles, chunk sets, chunks, and
+`activated_at` once set. So they take no document or revision locks and cannot deadlock
+with activation. Any future path that takes both obeys job → document →
+revisions (ascending ID) → `embedding_indexes` (ascending ID) → `chunk_embeddings`.
+Each operation is one short transaction; a lock wait beyond the fence's 5-second
+`lock_timeout` maps to `JobLockTimeoutError`. Ownership is re-checked after the
+last lock or unique-index wait on every successful path, including idempotent
+no-ops, before commit.
+
+*Tests and fences.* PostgreSQL tests obtain fences through the real `enqueue` →
+`claim` → `fenced_transaction` path with a job of kind `index_revision`. They add
+no handler registration, no test-only bypass and no unfenced production write path.
+
+*Lexical eligibility.* Lexically searchable chunks never become eligible before
+vector readiness. Eligibility is per revision and profile and requires a ready
+index for both channels. With the accepted refusal policy, an active revision
+whose index is not ready blocks capture; it is never searched lexically alone (decision 11).
+
+##### D. Full-text representation
+
+- Source text: exactly the stored `chunks.text`, the same text that is embedded.
+  No header prefix, section path or normalization.
+- `chunks.search_vector tsvector GENERATED ALWAYS AS (to_tsvector('simple'::regconfig,
+  text)) STORED`. The two-argument, explicit-`regconfig` form is IMMUTABLE and
+  independent of `default_text_search_config`. M4d uses the same explicit `simple`
+  configuration for queries.
+- GIN index on `(search_vector)`. It is exact (not approximate) and only accelerates
+  matching, so results do not depend on it.
+- Rationale for a generated column over a maintained one (decision 2): it is always
+  consistent with the immutable text, has no write path, lag or backfill, and leaves
+  the chunk insert statement and comparison fields unchanged. Cost: the migration
+  rewrites `chunks` under an exclusive lock, and rows get larger. Chunk text, IDs and
+  spans are unchanged.
+- Required query shape for M4d: tenant, snapshot revision, profile, readiness and
+  (vector) `NOT is_zero` filters sit in the same `WHERE` as the match. They come
+  before the per-channel `ORDER BY … LIMIT 20`, never applied after a limited
+  subquery. Ranking and retrieval execution remain M4d.
+
+##### E. Migration and dependencies
+
+*Upgrade order:* `CREATE EXTENSION IF NOT EXISTS vector`, the two additive unique
+constraints, `chunks.search_vector` and its GIN index, `embedding_profiles`,
+`embedding_indexes`, `chunk_embeddings`. *Downgrade order* (dependency-safe):
+`chunk_embeddings`, then `embedding_indexes`, then `embedding_profiles`, then the
+GIN index and `chunks.search_vector`, then the two added unique constraints. The
+embedding FKs depend on those constraints, so the constraints are dropped after
+the tables. Downgrade issues no extension statement.
+
+*Extension lifecycle ([DECISION] settled in Prompt 115, replacing proposal 5).*
+`0005` runs `CREATE EXTENSION IF NOT EXISTS vector`, because it is the first
+migration that needs the extension. Downgrade removes only this migration's own
+objects and **leaves `vector` installed**, whether it was preinstalled or created by
+`0005`. There is no ownership marker, no `pg_depend`-based drop logic and no
+`CASCADE`.
+
+This residual infrastructure is deliberate. An extension is database-wide and
+may serve unrelated objects, and Alembic cannot know who else relies on it.
+Removing it is an explicit administrative operation (`DROP EXTENSION vector`, run
+by its owner or a superuser after checking dependants), outside Alembic downgrade.
+Re-upgrade succeeds because of `IF NOT EXISTS`.
+
+Every statement is plain DDL, valid in online mode and in offline `--sql`
+rendering. No step inspects the database from Python, so the existing
+installed-wheel offline-rendering check keeps working. No `VERSION` is pinned in
+SQL; tests assert the CI image's version.
+
+*Test-database implications.* A database downgraded from `0005` may now retain
+`vector`, so tests must not assume the extension is absent after a downgrade. The
+disposable-database guard (`require_disposable_test_database`: `_test` suffix and
+a target distinct from the application database) is unchanged. The
+`empty_database` fixture resets with `DROP SCHEMA public CASCADE`, followed by
+`CREATE SCHEMA public`. `vector` is installed in `public`, and dropping a schema
+with `CASCADE` also drops extensions whose objects live in it, so each fresh test
+database should start without `vector`. This is PostgreSQL behaviour still to be
+confirmed in CI, not assumed. The fixture adds one assertion after its reset:
+`pg_extension` is exactly `{plpgsql}`. If CI disproves the schema-cascade
+behaviour, the fixture, not the migration, adds `DROP EXTENSION IF EXISTS vector`
+to its reset, under the same guard. The fixture's existing `CASCADE` stays
+test-only, and the migration's no-`CASCADE` rule is unaffected. Existing
+fresh-empty-database safety checks (the unmigrated `/readyz` test asserting only
+`plpgsql`) remain as they are.
+
+*Privileges.* pgvector's control file does not mark it `trusted`, so creating it
+needs a superuser. The CI and Compose databases use the image's bootstrap role
+(`POSTGRES_USER`), which is a superuser, so no workflow or Compose change is
+expected. That is to be confirmed in CI, not assumed. For other deployments a DBA
+pre-installs the extension. `IF NOT EXISTS` then skips creation, which should need
+no superuser; this is unverified, and an optional non-superuser test is proposed.
+Downgrade needs no extension privilege, because it never drops the extension.
+
+*Python dependency research (Prompt 114, official PyPI metadata and changelogs).*
+pgvector-python 0.5.1 (uploaded 2026-10-09) is younger than the two-week policy
+and is excluded. 0.5.0 (2026-07-06) has no declared dependencies (NumPy was
+removed in 0.5.0), requires Python ≥ 3.10 and SQLAlchemy ≥ 2. PyPI lists no
+vulnerabilities, and the project publishes no security advisories. The pgvector
+extension's GitHub advisories page lists none either. Its 0.8.2/0.8.6/0.8.7
+buffer-overflow fixes concern HNSW/IVFFlat index builds, which this design never
+creates. **Recommendation: add no Python dependency** (decision 4). If the reviewer
+prefers the library, pin exactly `pgvector==0.5.0` with an `exclude-newer-package`
+cutoff. Canonical float32 handling would still be needed, because its SQLAlchemy
+type returns Python float lists. No installation is done in this proposal.
+
+##### F. Tests (planned, not written or run)
+
+*Database-independent:*
+
+- Canonicalization: round-to-nearest fixtures with independently calculated
+  float32 bits, `-0.0` handling, overflow, rounds-to-zero rejection, offline zero
+  accepted, live zero rejected.
+- Post-rounding storage validation (Prompt 115). The concrete lower-boundary
+  example: a vector whose norm is `0.999999001` passes M4a validation and is
+  rejected after rounding to `0.9999989867210388`. Successful rounding cases
+  (`1.0`, `0.9999995` → `0.9999995231628418`, `1.000001` → `1.0000009536743164`,
+  and 1,024 coordinates of `1/32`). The adjacent float32 values on each side of
+  both tolerance boundaries, `1 - 1e-6` and `1 + 1e-6`, pinned as independently
+  calculated literals. A batch with one failing vector raises the fixed error,
+  carries no vector, text or ID in its message or repr, and issues no SQL (asserted
+  through the fake session). These are planned project tests; the Prompt 115
+  reviewer probe is not one of them.
+- Pinned literal fixtures: wire bytes, `vector_sha256`, the vector-manifest digest,
+  and profile/index uuid5 IDs.
+- Text-literal formatting and parse-back equality for edge values (subnormal,
+  ±max float32 within range, 1/32).
+- Statement construction: tenant predicates, conflict targets, `FOR UPDATE` lock
+  order, and no `CASCADE`.
+- Fake-session protocol tests in the `test_chunk_store.py` style: refusal before
+  insert, conflict comparison, ownership re-check last, fixed error messages with no
+  vectors or IDs. These are labelled as protocol tests, never as constraint evidence.
+
+*Real PostgreSQL (guarded integration job):*
+
+- Migration and extension lifecycle (Prompt 115):
+  - `vector` is absent in a fresh reset test database before the first upgrade
+    (the fixture assertion);
+  - present at head;
+  - **retained** after downgrade to `0004`, with every `0005` table, index,
+    generated column and added constraint gone;
+  - re-upgrade to head succeeds;
+  - a preinstalled `vector` plus an unrelated `vector`-using table created before
+    upgrade both survive upgrade, downgrade to `0004` and re-upgrade, unchanged;
+  - `alembic check` reports no drift, and offline SQL renders for upgrade and
+    downgrade without a connection and contains no `DROP EXTENSION` or `CASCADE`;
+  - the existing fresh-empty-database checks (unmigrated `/readyz`, no tables,
+    only `plpgsql`) still pass.
+- NOT NULL (Prompt 115): direct SQL inserting NULL into each required column is
+  rejected with a not-null violation. This covers especially `is_zero`, both
+  `allows_zero_vectors` columns, every copied FK column (`revision_id`,
+  `chunker_version`, `chunk_count`, `manifest_sha256`, `dims`, `content_sha256`),
+  `vector_sha256`, `fingerprint` and `status`. A new index is `building` with NULL
+  `ready_at` and `vector_manifest_sha256`.
+- Composite constraints: cross-tenant profile/index/chunk, another revision's chunk,
+  another chunker version, mismatched copied `content_sha256`, count/manifest or
+  dims/zero-policy mismatch. Each row is rejected.
+- Numerics: wrong dimension, NaN, infinity, an out-of-range literal, non-unit
+  norm, zero under a non-zero profile and `vector_sha256` mismatch are rejected.
+  An offline zero is stored with `is_zero`. Float32 replay: the stored
+  `vector_send` bytes equal the application wire bytes for adversarial coordinates.
+  Application/database agreement: for canonical vectors that pass application
+  validation, the database CHECKs accept them and `vector_norm` agrees within the
+  tolerance. A batch rejected by application storage validation leaves the tables
+  unchanged (row counts and index state compared before and after).
+- Writes: identical replay is a no-op; a changed vector or digest conflicts without
+  overwriting; a batch over 32 rows is refused before SQL; a write to a ready index
+  is refused.
+- Readiness: partial index stays `building`; missing row, extra or foreign rows
+  (impossible through FKs, asserted), wrong profile fingerprint and manifest
+  mismatch each refuse readiness. Readiness is idempotent; no transition leaves
+  `ready`.
+- Fencing and concurrency: an expired or reassigned lease rolls back the batch;
+  two concurrent writers on one index serialise on the row lock; a lock wait past
+  `lock_timeout` maps to `JobLockTimeoutError`. Rollback after a mid-batch error
+  leaves no rows. Readiness rolls back with a failed `fence.succeed()` (simulated
+  through the real fence).
+- Job binding (Prompt 115), for both writes and readiness: a wrong job kind; a
+  payload without `index_id`, with an extra key, or with an `index_id` naming
+  another tenant's index or no index. Each raises its fixed error with no write
+  and no foreign-row lock. Stale ownership after waiting on the row lock of an
+  **already-ready** index raises `LeaseLostError` from the no-op path, and the job
+  does not succeed.
+- Lexical: the generated `search_vector` matches `to_tsvector('simple', text)`, and
+  chunk insert/compare behaviour is unchanged.
+- Existing tests to update: `test_no_extensions_are_created` (expect `{plpgsql,
+  vector}` at head; rename and update its reference in
+  `test_persistence_safety.py`), expected head `0005` and the head table set.
+  Existing no-extension assertions on freshly reset empty databases stay. No
+  assertion may expect absence after a downgrade from `0005`. The
+  upgrade/downgrade/upgrade test down to `base` keeps its table and version
+  assertions, and `vector` is expected to remain after it.
+
+*Intended implementation files:* `packages/domain/evidenceguard_domain/embedding_storage.py`,
+`packages/persistence/evidenceguard_persistence/models.py`, `…/embeddings.py`,
+`…/migrations/versions/v0005_embeddings.py`, `tests/test_embedding_storage.py`,
+`tests/test_embedding_store.py`, PostgreSQL tests (existing file or a new marked
+file), updates to `tests/test_persistence_postgres.py` and
+`tests/test_persistence_safety.py`, ADR-0014, README and plan. No change is expected
+to workflows, Compose, the Dockerfile, `pyproject.toml` or `uv.lock`; the
+container smoke migration runs `0005` unchanged.
+
+*Evidence rule.* Every result above is planned. Only checks actually run against a
+real database count as constraint, migration or lease evidence. SQL-compilation and
+fake-session tests do not.
+
+##### Settled review decisions
+
+**Review outcome:** [DECISION] in Prompt 115, recommendations 1–4 and 6–12 below
+were approved as recommended, subject to the corrections now in this section.
+Decision 5 was settled differently: the extension is preserved on downgrade (the
+normative policy is in section E). The complete corrected specification was
+accepted in Prompt 116. The numbered list below is the **historical Prompt 114
+recommendation text**, kept unchanged except for the superseded note on item 5.
+
+1. **Additive FK-target unique keys on `chunks` and `chunk_sets`.** Recommend yes:
+   the database then proves revision, chunker and digest membership. Tradeoff: two
+   extra indexes and a change to existing tables, without changing any data. The
+   alternative is application-only checks.
+2. **Generated stored `tsvector` plus GIN.** Recommend yes; it matches §4's
+   "generated `tsvector`". Alternatives: an expression GIN index only (no table
+   rewrite, but every query must repeat the exact expression) or a maintained table
+   (write path and lag).
+3. **CHECKs that use pgvector functions** (norm, zero flag, digest). Recommend yes.
+   Tradeoff: insert CPU and coupling to pgvector function semantics, which the tests pin.
+4. **No new Python dependency.** Recommend an in-repo type. The alternative is
+   exactly `pgvector==0.5.0`.
+5. **Extension downgrade.** Recommend a guarded drop with no ownership marker.
+   Tradeoff: an unused, DBA-preinstalled extension would be removed on a full
+   downgrade. Alternatives: never drop, or record ownership in a marker.
+   *Superseded in Prompt 115: never drop; downgrade preserves `vector`.*
+6. **Immutability without triggers.** Recommend application-enforced, following the
+   existing convention, with tests. Alternative: rejecting triggers.
+7. **Index states `building`/`ready` only.** Recommend yes; failure lives on the job.
+8. **Deterministic uuid5 profile/index IDs.** Recommend yes, for idempotent
+   enqueue/backfill keys. The namespaces become fixed constants.
+9. **Batch bound of 32 rows.** Recommend matching M4a's provider batch (about
+   400 KB of literal per statement).
+10. **`create_index`/`ensure_profile` in the caller's transaction.** Recommend yes,
+    mirroring `create_revision` with `enqueue`. They store metadata only; vectors
+    and readiness stay fenced.
+11. **No lexical-only eligibility before readiness.** Recommend yes, consistent with
+    the accepted refusal policy.
+12. **`content_sha256` copied into embeddings.** Recommend yes, FK-checked. It binds
+    each vector to the exact text that was embedded.
 
 **M5 – Review workflow (fake model in CI)**
 - Provider interface; Anthropic and scripted fake providers; `prompts/verifier/v1.md` and `prompts/risk_analyst/v1.md`; planner; orchestration; review snapshot; provenance checks; status derivation; report renderer; provider-call records and spans.
