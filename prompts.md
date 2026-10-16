@@ -19676,3 +19676,362 @@ new CI wheel-runner verification remain pending; all 251 integration tests, incl
 18 indexing cases, remain unexecuted against this M4c version. Local Compose is
 unverified; M4d?M4f and overall M4 acceptance remain pending. No publication or merge
 is authorized or completed. This note records no new commit identifier or CI result.
+
+
+## Prompt 128 recovery and publication authorization (OpenAI Codex)
+
+Prompt 127 outcome, attributed to its handoff: local implementation commit
+`cd5b99c78f0c6ea79d578251fe2f808b63b7fbf4`, parent
+`629cf18b1b48b8df14d611e438ce284f81e71ee9`, tree
+`c202db67d5fc133fcbd9f6ed838844fef3fb42ec`; clean working tree on
+`feat/revision-indexing`. All 12 implementation/test/tooling files remained
+byte-identical to accepted tree `8457505b26fd7072d923df6c512e82d06005c620`.
+Only the five permitted documentation/history files differed. Documentation/history,
+125 relative-link/anchor, whitespace, encoding and history-prefix checks passed.
+Staged Gitleaks passed; full-history Gitleaks scanned 54 commits with no leaks and
+no suppression. No application checks were repeated, and no push or merge occurred.
+Claude Code implemented/corrected M4c in Prompts 125-126; OpenAI Codex assisted with
+acceptance documentation and the local commit in Prompt 127. This is a continuation
+of that fresh Codex session; earlier Claude prompts were not handled by Codex.
+
+External review acceptance: the reviewer inspected the Prompt 127 incremental
+documentation diff and independently matched its SHA-256
+`b312d7dfcdec4c1d4fd424bf29db7b1f8d0a210fde27c9b0fc6703f919c0ec09`.
+File `.local/p127/m4c-commit-incremental.diff`, accepted baseline tree
+`8457505b26fd7072d923df6c512e82d06005c620`, final commit
+`cd5b99c78f0c6ea79d578251fe2f808b63b7fbf4`: README, ADR-0015, plan and threat
+model only, excluding prompts.md; 4 files, +60/-21, 32,836 bytes. Acceptance covers
+local implementation status wording and its evidence limitations. The reviewer
+ran no project suite, build, installed-wheel check, PostgreSQL or Docker for this
+incremental review. Earlier implementation-review probes remain separately
+attributed above. Neither specification nor local acceptance is CI verification.
+
+### Prompt 128 (verbatim; line endings normalized to LF)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 128: Publish the M4c feature branch and verify exact-commit CI
+
+M4c is accepted for its local implementation commit. Publish only the feature branch, then monitor and inspect CI for the exact published commit. Do not merge or update main.
+
+## Repository and instructions
+
+Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+Read CLAUDE.md and any applicable AGENTS.md first. Read the current status, accepted M4c specification and ADR-0015 as needed. Do not load all of prompts.md into context; inspect the relevant tail and verify earlier history by byte comparison.
+
+This is a continuation of the fresh Codex session that handled Prompt 127. Do not count the preceding Claude Code prompts as work performed in this Codex session.
+
+## Expected starting state
+
+- Branch: feat/revision-indexing.
+- HEAD: cd5b99c78f0c6ea79d578251fe2f808b63b7fbf4.
+- Parent: 629cf18b1b48b8df14d611e438ce284f81e71ee9.
+- HEAD tree: c202db67d5fc133fcbd9f6ed838844fef3fb42ec.
+- Subject: feat: add offline revision indexing and bounded backfill.
+- Working tree and index: clean.
+- Local main and origin/main:
+  872d0af367be890cce25b2cce0d71a627c993479.
+- No upstream or remote feat/revision-indexing branch is expected.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Expected author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Verify these facts. Fetch fresh remote refs and check them read-only before publication. Confirm remote main is still at the expected SHA and is an ancestor of HEAD.
+
+If the branch, HEAD, working tree, remote refs or publication scope differs materially, stop and report the discrepancy. Do not reset, discard changes or silently substitute another baseline.
+
+Save the starting checkpoint under .local/p128/.
+
+## Review acceptance
+
+The external reviewer accepted the Prompt 127 incremental documentation diff.
+
+- File: .local/p127/m4c-commit-incremental.diff
+- Baseline accepted tree:
+  8457505b26fd7072d923df6c512e82d06005c620
+- Final commit:
+  cd5b99c78f0c6ea79d578251fe2f808b63b7fbf4
+- Scope: README.md, ADR-0015, docs/plan.md and docs/threat-model.md; prompts.md excluded.
+- Statistics: 4 files, +60/−21.
+- Size: 32,836 bytes.
+- SHA-256:
+  b312d7dfcdec4c1d4fd424bf29db7b1f8d0a210fde27c9b0fc6703f919c0ec09
+
+The reviewer inspected the incremental diff and independently matched its checksum. Acceptance covers the local implementation status wording and its evidence limitations. The reviewer did not run a project suite, build, installed-wheel check, PostgreSQL or Docker for this incremental review.
+
+Keep earlier implementation-review evidence separately attributed. Do not describe specification acceptance or local acceptance as CI verification.
+
+## Authorized work
+
+You are authorized to:
+
+1. Perform publication preflight checks.
+2. Append the required history records to prompts.md.
+3. Commit that history-only change locally.
+4. Publish feat/revision-indexing using the explicit command below.
+5. Monitor and inspect the push-triggered CI and secret-scan runs for the exact published SHA.
+6. Retrieve job logs through normally available authorized tooling.
+
+No further confirmation is needed for those steps.
+
+You are not authorized to update main, change implementation files, repair failures, rerun workflows, change credentials or configuration, or publish any other branch or tag.
+
+## Publication preflight
+
+Inspect the complete range from fresh origin/main through HEAD. It should contain:
+
+- 629cf18b1b48b8df14d611e438ce284f81e71ee9:
+  the accepted M4c specification and M4b main evidence;
+- cd5b99c78f0c6ea79d578251fe2f808b63b7fbf4:
+  the accepted M4c implementation;
+- subsequently, the new history-only commit created in this task.
+
+Verify:
+
+- Expected noreply identities and accurate assistance attribution.
+- The changes match the reviewed specification and implementation scope.
+- No tracked .local files, build outputs, backups, bundles, credentials, real environment files or unexpected binaries.
+- Any existing .env.example contains placeholders and is unchanged.
+- No unexpected private content in the publication additions.
+- Gitleaks over the unpublished range is clean.
+- No suppression, allowlist or secret-scanner rule change is introduced.
+
+The reviewed implementation intentionally changes CI and the container helper:
+- registry assertions now expect ingest_revision and index_revision;
+- the wheel check directly executes the offline embedding/storage path and imports indexing;
+- the Compose smoke triggers production indexing and checks its database result.
+
+Those are authorized changes. No migration, dependency, lockfile, Dockerfile or Compose change is expected in the M4c implementation.
+
+Verify the workflows still trigger on this branch push and include all five required jobs:
+- Ubuntu verify;
+- Windows verify;
+- PostgreSQL integration;
+- container;
+- full-history Gitleaks.
+
+Confirm the integration job runs pytest -m integration with EG_REQUIRE_INTEGRATION=1, and tests/test_indexing_postgres.py is included by its integration marker.
+
+## Prompt history and history-only commit
+
+Append to prompts.md, following repository conventions:
+
+1. The Prompt 127 outcome, attributed to its handoff:
+   - commit, parent and clean state;
+   - implementation files unchanged from the accepted tree;
+   - successful documentation/history checks;
+   - full-history Gitleaks: 54 commits, no leaks;
+   - no application checks repeated;
+   - no push or merge in Prompt 127.
+2. The external review acceptance above.
+3. Prompt 128 verbatim, including its opening “Written for” line.
+4. A preflight note recording what was actually verified before publication.
+
+Do not pre-record a push, CI result or commit identifier that does not yet exist.
+
+Keep the committed prompts.md bytes as an identical prefix. Do not rewrite earlier history or its formatting-exception notes.
+
+In your own notes, use inline, backticked commit identifiers and avoid introducing the previously encountered “SHA:” followed by a bare identifier formatting pattern.
+
+Only prompts.md may change in this task.
+
+Before committing:
+- verify exactly prompts.md is staged;
+- verify the earlier history prefix;
+- scan additions for private content and encoding problems;
+- run git diff --cached --check;
+- run the staged Gitleaks scan without suppression;
+- verify effective author and committer identity.
+
+Commit subject:
+docs: record M4c branch publication authorization
+
+Use the expected noreply author and committer. Attribute this history/publication assistance accurately to OpenAI Codex. Do not add a Claude co-author trailer for work performed by Codex.
+
+Preserve the existing implementation commit’s accurate attribution to Claude Code’s implementation/corrections and Codex’s documentation/commit assistance.
+
+After the commit:
+- record its full SHA, parent and tree;
+- verify only prompts.md changed against its parent;
+- verify every other file is byte-identical;
+- verify the working tree is clean;
+- run full-history Gitleaks.
+
+If a required check fails, stop before pushing and report it. Do not weaken checks or edit unrelated files.
+
+## Publish only the feature branch
+
+Immediately before pushing, recheck remote main and the feature ref.
+
+If the expected conditions still hold, run:
+
+git push --set-upstream origin refs/heads/feat/revision-indexing:refs/heads/feat/revision-indexing
+
+Preserve and report the actual command exit status. Do not hide it behind a pipeline.
+
+No force-push. No other refs or tags.
+
+After a successful push:
+- verify remote feat/revision-indexing equals the exact local HEAD;
+- verify tracking is set correctly;
+- verify remote main remains at
+  872d0af367be890cce25b2cce0d71a627c993479.
+
+If the push fails or fresh refs contradict the preconditions, stop and report. Do not retry blindly.
+
+## Exact-commit CI verification
+
+Find the push-triggered CI and secret-scan runs for:
+- branch feat/revision-indexing;
+- the exact full SHA just published.
+
+Do not use results from an earlier SHA, another branch, a pull-request merge ref or a different event.
+
+Monitor for up to 25 minutes using bounded polling. Report run URLs, event, branch, head SHA, attempt and conclusions.
+
+All five jobs are required:
+1. verify on Ubuntu;
+2. verify on Windows;
+3. PostgreSQL integration;
+4. container;
+5. full-history Gitleaks.
+
+For both verify jobs, check the format, lint, mypy, test, distribution-build and installed-wheel steps. In particular, inspect the new embedding/indexing wheel check.
+
+For the container job, verify that all six required steps actually executed and succeeded:
+- rendered Compose configuration;
+- effective build context;
+- application image build;
+- runtime image checks;
+- Compose smoke;
+- scoped cleanup.
+
+A skipped required step does not satisfy verification.
+
+Retrieve logs if normally available. Do not extract credentials from Git Credential Manager or other credential stores, print tokens, alter authentication configuration or introduce credentials just to obtain logs.
+
+If logs are available, report observed evidence:
+- Ubuntu and Windows pytest summaries;
+- PostgreSQL pytest summary and confirmation that the 18 indexing tests ran;
+- distribution builds and the new installed-wheel embedding/indexing check;
+- container context and image checks;
+- ingestion and duplicate-upload checks;
+- production backfill command and indexing verification:
+  matching tenant, revision and offline profile;
+  ready index;
+  succeeded canonical indexing job;
+  embedding row count matching chunk_count;
+- idle-worker exit state;
+- service-log privacy check and cleanup;
+- Gitleaks commit count and conclusion.
+
+Do not print generated credentials, raw create-key output or sensitive logs.
+
+If logs cannot be retrieved, report job and step conclusions as observations and log-only details as unobserved. Give the actual access error. Do not infer exact counts or claim individual tests ran solely from a green job.
+
+Historical local results from Prompt 126 are:
+- 54 handler tests passed;
+- focused tests: 273 passed, 1 skipped;
+- full Windows suite: 1715 passed, 252 skipped;
+- skips: 251 PostgreSQL integration tests without a database and one POSIX-only signal test;
+- collection: 1967 total, comprising 251 integration and 1716 database-independent tests;
+- Ruff, strict mypy, build and isolated installed-wheel checks passed locally on Windows.
+
+These are historical results, not results for the new published commit. The expected integration count is 251, including 18 indexing cases, but only logs can establish the observed CI count.
+
+If CI fails, times out, is cancelled, or skips a required check:
+- report the exact failing or incomplete run/job/step;
+- preserve the published state;
+- do not repair code, rerun jobs, create another commit or update main.
+
+Leave no background polling running after this task.
+
+## Scope and evidence limits
+
+No local Docker, database or external-provider contact. The offline HashingEmbedder may execute in the authorized CI checks.
+
+Do not change documentation after CI in this task. Recording CI evidence is a later reviewed documentation task.
+
+Keep these limitations:
+- local Compose remains unverified;
+- the smoke checks idle-worker shutdown, not in-flight drain;
+- indexing does not automatically enqueue on activation;
+- stalled indexes have no recovery path;
+- provider calls are not exactly-once;
+- reused vectors are not compared against fresh provider output;
+- the offline hashing baseline makes no semantic-quality claim;
+- M4d–M4f and overall M4 acceptance remain pending.
+
+## Final handoff
+
+Return a concise, self-contained handoff with:
+- preflight result;
+- history commit SHA, parent, tree, identity and changed path;
+- actual push command and exit status;
+- exact published SHA and remote-ref verification;
+- exact-commit run/job links and conclusions;
+- observed log evidence, clearly separated from unobserved details;
+- final branch, tracking and working-tree state;
+- confirmation main remains unchanged;
+- outstanding limitations and any failures.
+
+No merge, main update, amend, rebase, tag or branch deletion.
+
+Because only prompt history is newly changed, no diff attachment is required.
+
+End with:
+“Mathew: return this output only to the external reviewer; no diff attachment is required.”
+
+
+### Prompt 128 publication preflight (OpenAI Codex; before publication)
+
+Read CLAUDE.md and applicable user-provided AGENTS instructions; targeted current
+status, ADR-0015, accepted specification context, recent history and workflow reads.
+Starting state matched the requested branch, HEAD, parent, tree, subject, clean index
+and working tree, origin and expected noreply identities. No upstream or remote
+feature branch existed. Fresh `git fetch --no-tags origin` and `git ls-remote --heads`
+confirmed remote main at `872d0af367be890cce25b2cce0d71a627c993479`; it is an
+ancestor of HEAD. A redundant sandboxed network read failed for lack of network
+access; the same read succeeded with elevated execution. No remote mismatch was found.
+Checkpoint, per-file blobs and committed history prefix are saved in `.local/p128/`.
+
+Inspected the complete unpublished range: exactly the accepted specification/main
+M4b evidence commit `629cf18b1b48b8df14d611e438ce284f81e71ee9` and accepted
+implementation commit `cd5b99c78f0c6ea79d578251fe2f808b63b7fbf4`, with expected
+noreply authors/committers and accurate assistance attribution. Publication paths
+match the reviewed scope, including the earlier ADR-0014 main evidence. The 12
+implementation/test/tooling files match the accepted tree byte-for-byte, and the
+Prompt 127 four-document export matches both its Git range and reviewed checksum.
+No tracked local artifacts, build outputs, backups, bundles, credentials, real
+environment files or unexpected binaries were found in the publication additions;
+`.env.example` contains placeholders and is unchanged. The allowed file set excludes
+migrations, dependencies, lockfiles, Dockerfile and Compose changes. No private
+content, secret suppression, allowlist or scanner-rule change was introduced.
+`gitleaks git --log-opts='origin/main..HEAD' --redact --verbose .` passed without
+suppression: 2 unpublished commits, no leaks.
+
+Inspected both workflow definitions and the authorized workflow/container-helper
+diffs: branch pushes are unfiltered; Ubuntu and Windows verify jobs, PostgreSQL
+integration, container and full-history Gitleaks are required. Verify runs format,
+lint, mypy, pytest, distribution build and installed-wheel checks. The new wheel
+script executes the offline embedding/storage path from site-packages and imports
+indexing, with both production registry kinds. Integration runs
+`uv run --locked pytest -m integration` with `EG_REQUIRE_INTEGRATION=1`;
+`tests/test_indexing_postgres.py` has the integration module marker and 18 tests.
+The container job includes all six required config, effective-context, image-build,
+image-check, smoke and cleanup steps. Its smoke runs production backfill/indexing
+and verifies tenant, revision, offline profile, ready index, succeeded canonical
+job and matching counts. These are preflight source observations, not CI results.
+
+Only prompts.md is changed in this task. Existing history is preserved as an
+identical prefix. No application tests, build, local Docker, database or external
+provider were run. OpenAI Codex performs this history/publication assistance;
+Claude Code's earlier implementation/correction attribution is preserved. No
+publication, new commit identifier or CI result is pre-recorded here. The authorized
+next steps are staged/history/encoding/identity/whitespace and secret-scan checks,
+a history-only commit, full-history scan, immediate remote precondition recheck,
+then the single explicit feature-branch push and exact-commit CI monitoring.
+No main update, merge, implementation repair or workflow rerun is authorized.
