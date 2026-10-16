@@ -1,6 +1,6 @@
 # EvidenceGuard implementation plan
 
-**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`; CI's installed-wheel step does not exercise embeddings directly (embedding-specific wheel execution was verified only locally on Windows in Prompt 117). The M4b specification was accepted in Prompt 116, and the M4b implementation was accepted for a local commit in Prompt 118, with PostgreSQL and current-version Linux/CI verification pending and no publication or merge. M4c–M4f remain unimplemented and require detailed specification reviews; overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
+**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`; CI's installed-wheel step does not exercise embeddings directly (embedding-specific wheel execution was verified only locally on Windows in Prompt 117). The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed and verified in CI on `feat/embedding-persistence` at `90240e3`, not merged, with `main` still at `5fdaa1c`. M4c–M4f remain unimplemented and require detailed specification reviews; overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
 
 EvidenceGuard is a vendor-risk review copilot. It ingests synthetic vendor documents, retrieves evidence the tenant is authorized to see, classifies each review question against that evidence, and drafts a cited report. A human must approve the exact report revision before it can be finalized or exported. It is decision support, not legal advice or compliance certification.
 
@@ -2585,7 +2585,7 @@ They are set once as job environment variables.
 
 **M4 – Embeddings, retrieval and corpus**
 
-**Status (Prompt 118): [DECISION] M4a–M4f sequence and complete M4a specification
+**Status (Prompt 120): [DECISION] M4a–M4f sequence and complete M4a specification
 accepted at external review; M4a verified and on `main` at `5fdaa1c` (main push
 CI and secret scan green; see [ADR-0013 main evidence](decisions/0013-embeddings.md#main-ci-evidence-at-5fdaa1c)).
 Earlier feature-branch verification at `d501bd6` is historical. Linux/Windows
@@ -2596,11 +2596,12 @@ The [M4b persistence specification](#m4b-persistence-specification-accepted-at-r
 was accepted at external review in Prompt 116 (proposed in Prompt 114, corrected
 in Prompt 115). The M4b implementation on `feat/embedding-persistence`
 ([ADR-0014](decisions/0014-embedding-persistence.md)) was accepted at external review in
-Prompt 118 **for a local commit only**; no publication or merge is authorized or
-completed. Its 29 new PostgreSQL tests are written and collected but have never
-executed, all 233 integration tests remain unverified against it, and PostgreSQL and
-current-version Linux/CI verification are pending. M4c–M4f still need detailed
-reviews, overall M4 acceptance remains pending, and local Compose remains unverified.** M1, M2 and M3 remain accepted.
+Prompt 118 and is **reviewed and verified in CI at `90240e3`, not merged**; `main`
+remains at `5fdaa1c`. Current-version PostgreSQL (`233 passed`, including all 29 M4b
+cases), Linux, Windows, build and container verification completed for that
+feature-branch commit; see the [CI evidence](decisions/0014-embedding-persistence.md#feature-branch-ci-evidence-at-90240e3). M4c–M4f still need
+detailed reviews, overall M4 acceptance remains pending, and local Compose remains
+unverified.** M1, M2 and M3 remain accepted.
 
 The reviewer inspected the full Prompt 107 diff, independently matched its
 SHA-256 checksum and checked the existing chunk domain and chunker source
@@ -2636,7 +2637,7 @@ Accepted dependency-ordered sequence (Prompt 108; each later slice needs its own
 | Slice | Scope and completion evidence |
 |---|---|
 | M4a | Immutable embedding identity/batch contracts, provider protocol, deterministic offline hashing and validation. Detailed below; no persistence or provider access. |
-| M4b | Embedding profiles/index records, tenant-scoped storage and migration, full-text representation, exact vector operations and completeness/readiness. Real PostgreSQL constraints, migration round trips and filtering tests. Introduce pgvector here when vector storage/operators first require it; M4a needs no extension. Detailed specification [accepted at review in Prompt 116](#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending) (proposed in Prompt 114, corrected in Prompt 115); implemented in Prompt 117 and accepted for a local commit in Prompt 118 ([ADR-0014](decisions/0014-embedding-persistence.md)); PostgreSQL and CI verification pending. |
+| M4b | Embedding profiles/index records, tenant-scoped storage and migration, full-text representation, exact vector operations and completeness/readiness. Real PostgreSQL constraints, migration round trips and filtering tests. Introduce pgvector here when vector storage/operators first require it; M4a needs no extension. Detailed specification [accepted at review in Prompt 116](#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending) (proposed in Prompt 114, corrected in Prompt 115); implemented in Prompt 117, accepted in Prompt 118, and verified in feature-branch CI at `90240e3`, not merged ([ADR-0014](decisions/0014-embedding-persistence.md)). |
 | M4c | Separate durable `index_revision` jobs over completed immutable chunk sets, enqueue/backfill seam and registered handler. Test leases/fences, replay, partial batches, conflicting retries, cancellation and atomic readiness/job finish. No review workflow. |
 | M4d | Explicit snapshot input/capture seam, eligibility validation, deterministic lexical/vector/RRF retrieval and bounded results. PostgreSQL isolation, snapshot-after-supersession, ranking and tie tests. No review endpoints or report generation. |
 | M4e | Synthetic clean/injected corpus, stable anchor-to-chunk ground truth, Recall@5/@8 and retrieval contracts. Include cross-tenant, cross-vendor and superseded traps and missing answers; no semantic-quality claim. |
@@ -2896,25 +2897,30 @@ These are design decisions, not execution evidence. At acceptance (Prompt 116)
 nothing below was implemented or verified. Implementation needs its own
 authorization and ADR-0014.
 
-**Implementation (Prompt 117; accepted for a local commit in Prompt 118).** Claude Code
+**Implementation (Prompt 117; accepted in Prompt 118; verified in feature-branch CI at `90240e3`, not merged).** Claude Code
 implemented this specification as recorded in
 [ADR-0014](decisions/0014-embedding-persistence.md), which lists the implementation
 choices made within it (UUID namespace literals, explicit constraint names, a
 nullable generated `search_vector`, a local migration DDL type, reflection
-registration and additional fixed errors). Local Windows checks ran: lint, format,
+registration and additional fixed errors). Historical Prompt 117 local Windows checks ran: lint, format,
 strict typing, 102 focused database-independent tests, the full suite (1585 passed,
 234 skipped: 233 integration tests without a database and one POSIX-only signal
-test), integration collection, the build and clean installed-wheel checks. The 29
-PostgreSQL tests in `tests/test_embeddings_postgres.py`, and the updated existing
-PostgreSQL tests, have **not run**: the migration, constraints, numeric storage,
-reflection, fixture reset and concurrency behaviour remain unverified until
-authorized CI. Those local results are historical Prompt 117 evidence by Claude
-Code, not CI evidence. The external reviewer accepted the implementation for a
-local commit in Prompt 118 after inspecting the diff, matching its checksum and
-running independent standard-library probes; the reviewer ran no project suite,
-installed-wheel check, PostgreSQL or Docker. No publication or merge is authorized
-or completed; all 233 integration tests remain unverified against this
-implementation, and M4c–M4f and overall M4 acceptance remain pending. Acceptance
+test), integration collection, the build and clean installed-wheel checks. At that
+point (historical, Prompts 117–118) no PostgreSQL test had run. Those local results are
+Prompt 117 evidence by Claude Code, not CI evidence. The external reviewer accepted
+the implementation for a local commit in Prompt 118 after inspecting the diff,
+matching its checksum and running independent standard-library probes, without
+running the project suite, an installed-wheel check, PostgreSQL or Docker.
+
+**Feature-branch CI (Prompt 119; evidence retrieved by the reviewer and recorded in
+Prompt 120).** Both push runs for `90240e3` on `feat/embedding-persistence`
+succeeded: Ubuntu `1586 passed, 233 skipped`, Windows `1585 passed, 234 skipped`,
+PostgreSQL `233 passed, 1586 deselected` (all 29 M4b cases passed, none failed or
+skipped), the container job with all six required steps, and Gitleaks (51 commits,
+no leaks). This verifies the M4b paths the tests cover, nothing beyond them. CI's
+installed-wheel checks do not execute embeddings directly; that remains verified
+only locally on Windows. M4b is not merged; M4c–M4f and overall M4 acceptance remain
+pending. Full links and attribution: [ADR-0014](decisions/0014-embedding-persistence.md#feature-branch-ci-evidence-at-90240e3). Acceptance
 authorizes no indexing handler or retrieval functionality; M4c–M4f still require
 detailed reviews. Items marked [DECISION] in earlier sections stay authoritative.
 

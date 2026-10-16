@@ -1,15 +1,15 @@
 # ADR-0014: Embedding persistence, full-text representation and index readiness
 
-- **Status:** Accepted, **scoped to a local implementation commit and pending CI**. Claude
-  Code implemented it in Prompt 117, and it was accepted at external review in Prompt 118 for
-  a local commit only; no publication or merge is authorized or completed. The
+- **Status:** Accepted (implementation accepted at external review for a local commit in
+  Prompt 118). **Reviewed and verified in CI on `feat/embedding-persistence` at `90240e3`**,
+  not merged; `main` remains at `5fdaa1c`. Current-version PostgreSQL, Linux, Windows, build
+  and container verification completed for that feature-branch commit (see
+  [feature-branch CI evidence](#feature-branch-ci-evidence-at-90240e3)). The
   [specification](../plan.md#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending)
-  was accepted at review in Prompt 116. Database-independent checks ran locally on Windows in
-  Prompt 117. The 29 new PostgreSQL tests are written and collected but have **never run**,
-  and all 233 integration tests remain unverified against this implementation: constraints,
-  numeric storage, reflection, fixture reset, extension lifecycle and concurrency remain
-  unverified until PostgreSQL and current-version Linux/CI checks run. M4c–M4f and overall M4
-  acceptance remain pending; local Compose remains unverified.
+  was accepted at review in Prompt 116. CI's existing installed-wheel step does not execute
+  embeddings directly; embedding-specific installed-wheel execution remains verified only
+  locally on Windows (Prompt 117). M4c–M4f and overall M4 acceptance remain pending; local
+  Compose remains unverified.
 - **Date:** 2026-10-16
 - **Builds on:** [ADR-0013](0013-embeddings.md) (M4a contracts), [ADR-0010](0010-document-ingestion.md)
   (chunks), [ADR-0007](0007-durable-job-core.md) and [ADR-0008](0008-worker-runtime.md) (fences).
@@ -100,9 +100,12 @@ then the three tables. Downgrade removes exactly these objects in reverse depend
 **always leaves `vector` installed**; removing it is an administrative operation outside
 Alembic. There is no `CASCADE`, extension-drop logic, ownership marker, trigger, HNSW or
 IVFFlat. Offline `--sql` rendering needs no database. Creating the untrusted extension needs a
-superuser; the CI and Compose databases use the image's bootstrap superuser (to be confirmed in
-CI). The `empty_database` fixture now asserts that its `DROP SCHEMA public CASCADE` reset leaves
-only `plpgsql`. If CI disproves that, every integration test fails loudly; the guard is unchanged.
+superuser; the CI and Compose databases use the image's bootstrap superuser. The
+`empty_database` fixture asserts that its `DROP SCHEMA public CASCADE` reset leaves only
+`plpgsql`; the disposable-database guard is unchanged. The passing PostgreSQL CI run at
+`90240e3` (233 passed, none failed or skipped) is consistent with both in the CI database:
+extension creation succeeded and no reset assertion failed. That is CI-image evidence, not a
+statement about other deployments, and local Compose remains unverified.
 
 ## Implementation choices within the specification
 
@@ -166,7 +169,59 @@ inputs and 200 seeded vector round trips. The reviewer ran no project suite, ins
 check, PostgreSQL or Docker; acceptance also rests on the Prompt 117 verification reported by
 Claude Code above.
 
-**Not run:** PostgreSQL tests (no Docker or database contact was authorized), Linux,
-the container smoke and CI. Until they pass in authorized CI, no constraint, migration,
-reflection, extension-retention, lease or race behaviour is verified. No retrieval,
-semantic-quality, benchmark or production-readiness claim follows.
+**Historical, at Prompt 117 and 118 (before CI):** PostgreSQL tests (no Docker or database
+contact was authorized), Linux, the container smoke and CI had not run at that point. They
+have since run in CI at `90240e3`, recorded below.
+
+## Feature-branch CI evidence at 90240e3
+
+M4b is reviewed and verified in CI on `feat/embedding-persistence` at exact commit
+`90240e3969e93e32cabd11a49664ca27a8553593`, which adds only prompt history after the
+implementation commit `691a44c`. It is **not merged**; `main` remains at
+`5fdaa1cecbcac876af007e6f4328436ef6faeda2`. Both workflow records are successful **push**
+events on that branch and SHA. These results belong to `90240e3`, not to any later
+documentation commit or `main` push.
+
+**Attribution.** The external reviewer independently retrieved both workflow records, the
+job and step records, and all five job logs; the counts and log output below come from that
+retrieval. The reviewer did not run the suite or Docker locally. Claude Code's anonymous API
+session in Prompt 119 separately observed the same runs, jobs and steps with all conclusions
+`success`. It could not download logs (HTTP 403), so it observed no counts or log output.
+
+[CI run 38856680385](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38856680385):
+
+- [Ubuntu job 116829602477](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38856680385/job/116829602477): `1586 passed, 233 skipped in 28.62s`. Formatting, lint, type checking, tests, distribution build and the existing installed-wheel checks passed.
+- [Windows job 116829602600](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38856680385/job/116829602600): `1585 passed, 234 skipped in 37.31s`. Formatting, lint, type checking, tests, distribution build and the existing installed-wheel checks passed.
+- [PostgreSQL 17 + pgvector job 116829602553](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38856680385/job/116829602553): `233 passed, 1586 deselected in 96.48s (0:01:36)`. The log shows all 29 collected cases in `tests/test_embeddings_postgres.py` passing, and the integration run had no failed or skipped tests.
+- [Container job 116829602560](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38856680385/job/116829602560): all six required steps executed and succeeded (rendered Compose configuration, effective build context, application image build, image checks, Compose smoke, cleanup). Observed:
+  - `compose config: ok`;
+  - `context: ok (77 files; 19 planted fixtures excluded)`;
+  - image UID and GID 10001;
+  - eg-api, eg-worker and eg-admin help checks, installed imports, offline migration SQL and runtime contents checks passed;
+  - the stack started with the database healthy, migration complete and API healthy, and migrate, API and worker used the CI-built image;
+  - an API key was created and held in memory only;
+  - upload returned 202, the ingestion job succeeded, the revision became active with two verified chunks, and a duplicate upload returned the existing revision with 200;
+  - the idle worker exited 0 without an OOM kill;
+  - `smoke: ok` and `cleanup: ok`.
+
+[Secret-scan run 38856680352](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38856680352),
+[Gitleaks job 116829602242](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38856680352/job/116829602242): `51 commits scanned`, `no leaks found`.
+
+**What the PostgreSQL run verifies.** It verifies the M4b paths those 29 tests and the
+updated existing tests cover:
+- constraints and required-column rejection;
+- stored float32 bytes, digests and numeric checks;
+- migration round trips, and vector reflection through the existing migration-drift check;
+- the fixture reset;
+- extension retention and unrelated-object survival;
+- fenced writes, replay, readiness and atomic job completion;
+- the tested concurrency, lease-loss and lock-timeout cases.
+
+It verifies nothing beyond those tests.
+
+**Limits.** The container smoke still covers ingestion and idle-worker shutdown only. It runs no
+embedding indexing, because no indexing handler exists, and proves no in-flight shutdown bound.
+CI's installed-wheel checks passed but do not execute the embedding provider directly;
+embedding-specific installed-wheel execution remains verified only locally on Windows
+(Prompt 117). Local Compose remains unverified. No retrieval, semantic-quality, benchmark,
+production-readiness or general security claim follows.
