@@ -17009,3 +17009,250 @@ against the accepted tree, history prefix, links and anchors, status consistency
 privacy/CR/BOM, cached whitespace, staged Gitleaks and identity. Application tests and builds
 are not repeated, because implementation files are byte-identical. Actual results and the
 commit SHA are reported in the handoff, not recorded here. No push, merge or M4c work.
+
+**Prompt 118 outcome (recorded in Prompt 119, from Claude Code's Prompt 118 handoff):** committed
+locally as `691a44c7e7200d72f701843feb885ff65a5916c0` (parent
+`e5ed17e7638bf2a223d08e6fc22a2cba6f3c758e`, tree `59dc7e0b5829b85fb2ae3d3a3cc0648d5f122ca2`) on
+`feat/embedding-persistence`. Subject: "feat: add tenant-scoped embedding persistence and index
+readiness", with the noreply author and committer and a Co-Authored-By Claude trailer.
+
+Exactly the 16 accepted paths were committed. Only README.md, ADR-0014, docs/plan.md and
+prompts.md differed from accepted tree `7c2ec10f4792abb710e611afd4be34b7c7c2b853`; the other 12
+files were byte-identical. Checks that passed:
+- the history prefix;
+- 112 links and anchors;
+- privacy, CR and BOM;
+- the cached whitespace check;
+- staged Gitleaks;
+- full-history Gitleaks after the commit (50 commits, no leaks).
+
+The tree was clean, main/origin/main were unchanged at `5fdaa1c`, and nothing was pushed. The
+incremental diff `.local/p118/m4b-commit-incremental.diff` was 24,389 bytes, SHA-256
+`a68f11ab343a53af78efc378bb683e958605711eed772e1672a1fdfc5a2aa671`.
+
+**Prompt 118 review (recorded in Prompt 119):** the external reviewer inspected the complete
+Prompt 118 incremental diff and independently matched its SHA-256
+`a68f11ab343a53af78efc378bb683e958605711eed772e1672a1fdfc5a2aa671`. The documentation changes
+are accepted. The reviewer ran no additional application tests, builds, PostgreSQL or Docker
+checks.
+
+## Prompt 119: Publish the M4b feature branch and verify exact-commit CI
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Session:** Claude Code.
+- **Scope:** prompt-history commit, publication of `feat/embedding-persistence` only, and
+  exact-commit CI monitoring. No merge or main update.
+
+````text
+Written for: Mathew and the external reviewer.
+
+# Prompt 119: Publish the M4b feature branch and verify exact-commit CI
+
+Read CLAUDE.md and applicable repository instructions. Continue the current session; this is its sixth substantial prompt, so no session switch is needed on that count.
+
+The external reviewer inspected the complete Prompt 118 incremental diff and independently matched its SHA-256:
+`a68f11ab343a53af78efc378bb683e958605711eed772e1672a1fdfc5a2aa671`.
+
+The documentation changes are accepted. The reviewer ran no additional application tests, builds, PostgreSQL or Docker checks.
+
+Authorize publication of ONLY `feat/embedding-persistence`, including the accepted specification commit, implementation commit and the prompt-history commit described below. Do not merge or update main.
+
+## 1. Verify the starting state
+
+Expected:
+- Branch: `feat/embedding-persistence`.
+- HEAD: `691a44c7e7200d72f701843feb885ff65a5916c0`.
+- Parent: `e5ed17e7638bf2a223d08e6fc22a2cba6f3c758e`.
+- HEAD tree: `59dc7e0b5829b85fb2ae3d3a3cc0648d5f122ca2`.
+- Working tree clean, with nothing staged, unstaged or untracked outside ignored local artifacts.
+- No upstream or remote branch for `feat/embedding-persistence`.
+- Local main and origin/main:
+  `5fdaa1cecbcac876af007e6f4328436ef6faeda2`.
+- Origin:
+  `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`.
+- Effective author and committer:
+  `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>`.
+
+Fetch fresh remote refs and inspect them read-only. Confirm:
+- remote main remains at the expected commit;
+- remote main is an ancestor of HEAD;
+- the remote feature branch does not exist.
+
+Record baseline evidence under `.local/p119/`.
+
+If the expected state differs materially, stop and report the mismatch without overwriting work or publishing anything.
+
+## 2. Publication preflight
+
+Inspect everything that would become public relative to fresh remote main.
+
+Expected existing commits:
+- `e5ed17e7638bf2a223d08e6fc22a2cba6f3c758e`: accepted M4b specification.
+- `691a44c7e7200d72f701843feb885ff65a5916c0`: reviewed M4b implementation.
+
+Check:
+- intended paths and identities;
+- no tracked local artifacts, backups, bundles, build outputs, credentials or real environment files;
+- private-content and secret scans over the publication range;
+- no unexpected dependency, lockfile, workflow, Compose or Dockerfile changes.
+
+The unchanged, placeholder-only `.env.example` is permitted.
+
+Inspect the workflows and confirm the five required jobs still run on this branch's push:
+1. Ubuntu verification.
+2. Windows verification.
+3. PostgreSQL integration with `EG_REQUIRE_INTEGRATION=1`.
+4. Container verification.
+5. Full-history Gitleaks.
+
+Confirm the integration command collects the new M4b module through the existing integration marker. Do not modify workflows or tests.
+
+## 3. Append history and commit it
+
+Modify only prompts.md.
+
+Preserve all earlier bytes as an identical prefix. Append:
+- the Prompt 118 local-commit outcome, attributed to its handoff;
+- the reviewer's acceptance of the incremental diff and independently matched checksum;
+- Prompt 119 verbatim;
+- a preflight note stating the verified publication scope and authorization.
+
+Keep historical verification distinct:
+- Prompt 117 Windows: 1585 passed, 234 skipped.
+- Those skips were 233 integration tests and one POSIX-only signal test.
+- The 29 new M4b PostgreSQL tests have never executed.
+- All 233 integration tests remain unverified against M4b before this CI run.
+- Direct embedding-provider and storage execution from an isolated installed wheel passed locally on Windows only.
+- CI's existing wheel checks do not exercise embeddings directly.
+
+Do not pre-record push results, CI outcomes or the new commit's own SHA.
+
+Check:
+- prompts.md prefix unchanged;
+- only prompts.md staged;
+- no private content;
+- `git diff --cached --check`;
+- staged Gitleaks without suppression;
+- expected author and committer.
+
+Commit with subject:
+`docs: record M4b branch publication authorization`
+
+Follow the repository's existing Claude Code attribution convention.
+
+Verify the new commit:
+- parent is `691a44c7e7200d72f701843feb885ff65a5916c0`;
+- changes only prompts.md;
+- all other files remain byte-identical;
+- working tree is clean.
+
+Run full-history Gitleaks before pushing. Stop if any required preflight or scan fails.
+
+## 4. Publish only the feature branch
+
+Run directly, preserving git's actual exit status:
+
+git push --set-upstream origin refs/heads/feat/embedding-persistence:refs/heads/feat/embedding-persistence
+
+No force-push, tags or other refs.
+
+Record the exact published commit and confirm the remote feature ref equals it. Confirm remote main is unchanged.
+
+If git reports a network failure, inspect the remote before considering one retry of the identical authorized command. Do not mask failures through a pipeline or retry indefinitely.
+
+## 5. Monitor exact-commit CI
+
+Monitor push-triggered workflow runs for:
+- this repository;
+- `feat/embedding-persistence`;
+- the exact published head commit.
+
+Use a maximum overall monitoring window of 25 minutes. Poll at reasonable intervals and leave no background polling running afterward.
+
+Require all five jobs to succeed. For the container job, confirm these required steps actually executed and succeeded, rather than being skipped:
+- rendered Compose configuration;
+- effective build context;
+- application image build;
+- runtime image checks;
+- Compose smoke;
+- cleanup.
+
+Retrieve job logs using available access if possible. Do not add credentials, change account configuration or request new privileges.
+
+From retrieved logs, report actual observations:
+- Ubuntu and Windows pytest summaries;
+- PostgreSQL pytest summary;
+- whether the M4b integration module ran, to the extent the logs establish it;
+- migration/reflection or fixture failures, if any;
+- build and existing installed-wheel results;
+- container context, image, smoke and cleanup output;
+- Gitleaks commit count and result.
+
+Do not treat the expected 233 integration tests as an observed count unless the logs confirm it. Do not claim unchanged CI wheel checks directly executed embeddings.
+
+If logs are unavailable, report job and step conclusions separately from unobserved counts and output.
+
+If any job fails, is cancelled, is unexpectedly skipped, or monitoring times out:
+- stop and report the exact state and available failure evidence;
+- do not change code, fixtures, migrations, workflows or dependencies;
+- do not commit a repair, rerun workflows or publish another commit.
+
+In particular, a fixture-reset, extension-lifecycle or vector-reflection failure needs a subsequent reviewed correction. This prompt authorizes verification, not implementation repairs.
+
+## 6. Final handoff
+
+Do not update documentation after CI in this task.
+
+Report concisely:
+- starting-state and preflight results;
+- history commit SHA, parent, identity and changed path;
+- checks actually run;
+- push command and actual exit status;
+- exact published SHA;
+- workflow and job links, event, branch, head commit and conclusions;
+- required container-step conclusions;
+- observed log results and anything unobserved;
+- final local/remote refs and working-tree state;
+- remaining verification or failures.
+
+Do not rerun local application tests, builds, Docker or database operations. CI performs the authorized verification.
+
+Do not merge, update main, amend, rebase, tag, delete branches, start M4c or mark overall M4 accepted.
+
+End with:
+
+Mathew: return this output only to the external reviewer; no diff attachment is required.
+````
+
+**Prompt 119 preflight note (Claude Code; written before the history commit and push):**
+
+Verified state, from fresh remote refs:
+- `feat/embedding-persistence` at `691a44c` (parent `e5ed17e`, tree `59dc7e0`), clean;
+- no upstream or remote feature branch;
+- local main, origin/main and remote main at `5fdaa1c`, an ancestor of HEAD;
+- the expected origin and noreply author/committer.
+
+The publication scope relative to remote main is `e5ed17e` (accepted M4b specification),
+`691a44c` (reviewed M4b implementation) and this prompt-history commit, all with the noreply
+identity. Preflight results:
+- 17 intended paths, with no dependency, lockfile, workflow, Compose or Dockerfile change;
+- no tracked artifacts, backups, bundles, builds or real environment files (only the unchanged,
+  placeholder `.env.example`);
+- Gitleaks over the range and the private-content scan: clean;
+- both workflows trigger on any branch push, with no branch filters;
+- the five jobs are Ubuntu and Windows verification, PostgreSQL integration
+  (`pytest -m integration`, `EG_REQUIRE_INTEGRATION=1`), the container job and full-history
+  Gitleaks;
+- `tests/test_embeddings_postgres.py` is marked `integration`.
+
+Authorization: publish only `feat/embedding-persistence`, with no merge or main update.
+
+Historical verification, kept distinct:
+- Prompt 117 Windows: 1585 passed, 234 skipped (233 integration tests and one POSIX-only signal
+  test).
+- The 29 new M4b PostgreSQL tests have never executed, and all 233 integration tests remain
+  unverified against M4b before this CI run.
+- Direct embedding-provider and storage execution from an isolated installed wheel passed
+  locally on Windows only; CI's existing wheel checks do not exercise embeddings directly.
+
+Push results and CI outcomes are reported in the handoff, not recorded here.
