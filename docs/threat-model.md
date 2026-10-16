@@ -195,18 +195,32 @@ Local Compose is unverified. It is a development stack only, with no production-
 
 **Limits** (ADR-0012): the database credentials are disposable and public. Stopping the worker has an external 60 s budget, not a guaranteed shutdown bound (ADR-0008). The smoke stops an idle worker only. Cleanup can be prevented by runner loss. The uv builder-tool image is used under a narrowly approved exception to the two-week age policy, for its exact digest only (no runtime uv; no change to the Python base or the general policy). The exception does not claim age compliance or general safety. There is no production deployment.
 
-## Revision indexing (M4c, accepted for a local commit; not verified in CI)
+## Revision indexing (M4c, verified in feature-branch CI; not merged)
 
 Implemented by Claude Code in Prompt 125 and corrected in Prompt 126 under the accepted M4c
 specification ([ADR-0015](decisions/0015-revision-indexing.md)). The complete corrected implementation
-is **accepted at external review in Prompt 127 for a local commit, pending current-version CI**.
-No publication or merge is authorized or completed by this task. PostgreSQL, Linux and real
-container indexing verification remain pending CI. All 251 integration tests remain unexecuted
-against this M4c version, including the 18 indexing cases. Claude Code ran the new wheel script
+was accepted at external review in Prompt 127 and is **reviewed and verified in CI on
+`feat/revision-indexing` at `600a366`, not merged**; `main` remains at `872d0af`, and
+publication to `main` is pending. Historical local checks: Claude Code ran the new wheel script
 locally on Windows in Prompts 125–126 and the corrected installed-wheel provider-resolution probe
-in Prompt 126; neither Codex nor the reviewer ran those checks. The new wheel step has not run
-on CI runners; the existing coverage on `main` at `872d0af` predates this extension. M4d–M4f
-and overall M4 acceptance remain pending. Local Compose remains unverified.
+in Prompt 126; neither Codex nor the reviewer ran those checks.
+
+CI-verified paths at `600a366` (logs independently retrieved by the external reviewer; see the
+[feature-branch CI evidence](decisions/0015-revision-indexing.md#feature-branch-ci-evidence-at-600a366)):
+- all 18 PostgreSQL indexing cases, covering tenant-scoped enqueue and backfill, concurrent
+  enqueue, stalled and conflict reporting, atomic readiness with job success, committed-row reuse,
+  a competing writer, and lease loss and cancellation while the provider blocks, passed with the
+  other 233 integration tests;
+- the installed wheel on Ubuntu and Windows executed the offline embedding and canonical storage
+  path and imported the indexing modules (no database; it does not establish indexing by itself);
+- the container smoke ran the production `eg-admin backfill-indexes` command and worker indexing
+  path, gating matching tenant, revision and offline profile, canonical-job success, index
+  readiness, matching embedding and chunk counts, and the absence of the API key from service
+  logs. Raw database rows and the generated key were not emitted or independently inspected.
+
+These results cover the exercised paths only; they are not a production-readiness or general
+security guarantee. M4d–M4f and overall M4 acceptance remain pending. Local Compose remains
+unverified.
 
 | Threat | Mitigation |
 |---|---|
@@ -220,8 +234,9 @@ and overall M4 acceptance remain pending. Local Compose remains unverified.
 and a cancellation latched after the last check may not stop a non-finish transaction already
 under way; the accepted lease-expiry/commit window remains. Reused committed vectors are not
 re-verified against provider output, and provider calls are not exactly-once. A stalled index
-(terminal canonical job) has no recovery in M4c. The offline provider is a lexical-hash
-baseline with no semantic-quality claim.
+(terminal canonical job) has no recovery in M4c, and activation does not enqueue indexing
+automatically. The container smoke covers idle-worker shutdown only. The offline provider is a
+lexical-hash baseline with no semantic-quality claim, and no live provider was verified.
 
 ## Not implemented yet
 

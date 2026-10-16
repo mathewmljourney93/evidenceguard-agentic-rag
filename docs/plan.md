@@ -1,6 +1,6 @@
 # EvidenceGuard implementation plan
 
-**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`; the existing installed-wheel coverage on `main` at `872d0af` predates the M4c embedding/indexing extension; the new script ran locally on Windows in Prompts 125–126, including the corrected provider-resolution probe in Prompt 126, but has not run on CI runners. The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); M4c was implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 (ADR-0015), with PostgreSQL, Linux and container verification pending CI. M4d–M4f remain unimplemented and require detailed specification reviews; overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
+**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`; the existing installed-wheel coverage on `main` at `872d0af` predates the M4c embedding/indexing extension; the new script ran locally on Windows in Prompts 125–126 (historical), including the corrected provider-resolution probe in Prompt 126, and passed on Ubuntu and Windows CI runners at `600a366`. The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); M4c was implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 (ADR-0015); it is reviewed and verified in CI on `feat/revision-indexing` at `600a366` (PostgreSQL, Linux, Windows, installed-wheel and container indexing; see the [ADR-0015 feature-branch CI evidence](decisions/0015-revision-indexing.md#feature-branch-ci-evidence-at-600a366)), not merged; publication to `main` is pending. M4d–M4f remain unimplemented and require detailed specification reviews; overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
 
 EvidenceGuard is a vendor-risk review copilot. It ingests synthetic vendor documents, retrieves evidence the tenant is authorized to see, classifies each review question against that evidence, and drafts a cited report. A human must approve the exact report revision before it can be finalized or exported. It is decision support, not legal advice or compliance certification.
 
@@ -2585,13 +2585,14 @@ They are set once as job environment variables.
 
 **M4 – Embeddings, retrieval and corpus**
 
-**Status (Prompt 126): [DECISION] M4a–M4f sequence and complete M4a specification
+**Status (Prompt 129): [DECISION] M4a–M4f sequence and complete M4a specification
 accepted at external review; M4a verified and on `main` at `5fdaa1c` (main push
 CI and secret scan green; see [ADR-0013 main evidence](decisions/0013-embeddings.md#main-ci-evidence-at-5fdaa1c)).
 Earlier feature-branch verification at `d501bd6` is historical. Linux/Windows
-verification, CI builds and existing installed-wheel checks passed; CI's
-installed-wheel step still does not execute the embedding provider, which was
-verified from an isolated installed wheel only locally on Windows in Prompt 117.
+verification, CI builds and existing installed-wheel checks passed. At `main`
+(`872d0af`), CI's installed-wheel step does not execute the embedding provider
+(verified from an isolated installed wheel locally on Windows in Prompt 117); the
+M4c extension executes it on Ubuntu and Windows CI runners at `600a366`, not yet on `main`.
 The [M4b persistence specification](#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending)
 was accepted at external review in Prompt 116 (proposed in Prompt 114, corrected
 in Prompt 115). The M4b implementation on `feat/embedding-persistence`
@@ -2602,7 +2603,7 @@ container verification; see the [main CI evidence](decisions/0014-embedding-pers
 feature-branch verification at `90240e3` is historical. The
 [M4c indexing specification](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending)
 was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in
-Prompt 123). M4c is implemented on `feat/revision-indexing` and **staged for review, not committed, accepted or published** (Prompt 125, [ADR-0015](decisions/0015-revision-indexing.md)). It was corrected in Prompt 126. Local Windows database-independent checks and the new wheel script passed locally; its PostgreSQL tests, the wheel step in CI and the container indexing smoke have not run, so PostgreSQL, Linux and container verification is pending CI. M4d–M4f still need detailed
+Prompt 123). M4c was implemented on `feat/revision-indexing` by Claude Code in Prompt 125 ([ADR-0015](decisions/0015-revision-indexing.md)) and corrected in Prompt 126, with historical local Windows checks in Prompts 125–126; it was accepted at external review for a local commit in Prompt 127 and is **reviewed and verified in CI on `feat/revision-indexing` at `600a366`, not merged** (PostgreSQL `251 passed`, including all 18 indexing cases, plus Linux, Windows, installed-wheel and container indexing verification; see the [ADR-0015 feature-branch CI evidence](decisions/0015-revision-indexing.md#feature-branch-ci-evidence-at-600a366)). Publication to `main` is pending. M4d–M4f still need detailed
 reviews, overall M4 acceptance remains pending, and local Compose remains unverified.** M1, M2 and M3 remain accepted.
 
 The reviewer inspected the full Prompt 107 diff, independently matched its
@@ -2640,7 +2641,7 @@ Accepted dependency-ordered sequence (Prompt 108; each later slice needs its own
 |---|---|
 | M4a | Immutable embedding identity/batch contracts, provider protocol, deterministic offline hashing and validation. Detailed below; no persistence or provider access. |
 | M4b | Embedding profiles/index records, tenant-scoped storage and migration, full-text representation, exact vector operations and completeness/readiness. Real PostgreSQL constraints, migration round trips and filtering tests. Introduce pgvector here when vector storage/operators first require it; M4a needs no extension. Detailed specification [accepted at review in Prompt 116](#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending) (proposed in Prompt 114, corrected in Prompt 115); implemented in Prompt 117, accepted in Prompt 118, verified in CI and on `main` at `872d0af` ([ADR-0014](decisions/0014-embedding-persistence.md)). |
-| M4c | Separate durable `index_revision` jobs over completed immutable chunk sets, enqueue/backfill seam and registered handler. Test leases/fences, replay, partial batches, conflicting retries, cancellation and atomic readiness/job finish. No review workflow. Detailed specification [accepted at review in Prompt 124](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending) (proposed in Prompt 122, corrected in Prompt 123); implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 ([ADR-0015](decisions/0015-revision-indexing.md)); PostgreSQL and container verification pending CI. |
+| M4c | Separate durable `index_revision` jobs over completed immutable chunk sets, enqueue/backfill seam and registered handler. Test leases/fences, replay, partial batches, conflicting retries, cancellation and atomic readiness/job finish. No review workflow. Detailed specification [accepted at review in Prompt 124](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending) (proposed in Prompt 122, corrected in Prompt 123); implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 ([ADR-0015](decisions/0015-revision-indexing.md)); verified in CI on `feat/revision-indexing` at `600a366`, including PostgreSQL and container indexing; not merged, publication to `main` pending. |
 | M4d | Explicit snapshot input/capture seam, eligibility validation, deterministic lexical/vector/RRF retrieval and bounded results. PostgreSQL isolation, snapshot-after-supersession, ranking and tie tests. No review endpoints or report generation. |
 | M4e | Synthetic clean/injected corpus, stable anchor-to-chunk ground truth, Recall@5/@8 and retrieval contracts. Include cross-tenant, cross-vendor and superseded traps and missing answers; no semantic-quality claim. |
 | M4f | Voyage adapter behind the same contract, injected transport mocked in CI, fixed profile/configuration, bounded calls and safe error mapping. No live calls required for M4 acceptance; live quality evidence belongs to M7. |
@@ -3489,7 +3490,7 @@ Prompt 123. At acceptance (Prompt 124) nothing was implemented; acceptance estab
 design and the planned verification requirements, not implementation or execution evidence.
 
 **Implementation (Claude Code, Prompt 125, corrected in Prompt 126; accepted at external
-review in Prompt 127 for a local commit, pending current-version CI).** Claude Code implemented this specification as recorded in
+review in Prompt 127 for a local commit; verified in CI at `600a366`, not merged).** Claude Code implemented this specification as recorded in
 [ADR-0015](decisions/0015-revision-indexing.md). Historical Prompt 125 local Windows checks: lint,
 format, strict typing, the focused tests, the full suite (1703 passed, 250 skipped: 249
 integration tests without a database and one POSIX-only signal test), integration collection, the
@@ -3515,11 +3516,11 @@ job reported `stalled`). Prompt 126 local Windows checks, attributed to Claude C
   control flow from `site-packages`.
 
 These runs executed the offline `HashingEmbedder` only; no external provider or network was
-contacted. The 18 PostgreSQL tests in `tests/test_indexing_postgres.py`, the other integration
-tests, the wheel step in CI (Linux and Windows runners) and the container indexing smoke have
-**not run**. Indexing against a real database, the enqueue races, lease and cancellation outcomes
-and the production-path smoke remain unverified until CI. All 251 integration tests remain
-unexecuted against this M4c version, including the 18 indexing cases.
+contacted. Historical (before CI): at that point the 18 PostgreSQL tests in
+`tests/test_indexing_postgres.py`, the other integration tests, the wheel step in CI (Linux and
+Windows runners) and the container indexing smoke had **not run**, and all 251 integration tests,
+including the 18 indexing cases, were unexecuted against this M4c version. CI at `600a366`
+later ran them (below).
 
 **External acceptance (Prompt 127).** The reviewer accepted the complete implementation with
 Prompt 126 corrections for a local commit, pending PostgreSQL and current-version CI
@@ -3532,10 +3533,25 @@ cancellation and lease loss take precedence over ordinary resolution failure, an
 factory failure becomes a fixed error without the original exception chained. The reviewer
 did not run the project suite, installed-wheel checks, PostgreSQL or Docker. Codex assists
 with acceptance documentation and the local commit only; no application checks were rerun.
-No publication or merge is authorized or completed by this task. PostgreSQL, Linux, real
-container indexing and the new wheel step on CI runners remain pending; local Compose is
-unverified. M4d–M4f and overall M4 acceptance remain pending. The accepted specification
+Prompt 127 authorized and completed no publication or merge; at that point PostgreSQL, Linux,
+real container indexing and the new wheel step on CI runners were pending (later verified at
+`600a366`, below); local Compose is unverified. M4d–M4f and overall M4 acceptance remain pending. The accepted specification
 heading and anchor above remain the historical Prompt 124 baseline.
+
+**Exact-commit CI verification (`600a366`, Prompts 128–129).** OpenAI Codex published
+`feat/revision-indexing` in Prompt 128 with a history-only commit
+`600a366453bd94811ab1d741dc0b28adeb427031`. Both push workflows for that exact commit passed
+(attempt 1); the external reviewer independently retrieved both run records and all five job
+logs, and Claude Code recorded them in Prompt 129 without retrieving them itself. Observed:
+Ubuntu `1716 passed, 251 skipped`, Windows `1715 passed, 252 skipped`, PostgreSQL
+`251 passed, 1716 deselected` with all 18 indexing cases passing, distribution builds and the
+installed-wheel offline embedding/storage execution and indexing imports on both platforms, the
+container job with all six required steps (its smoke ran the production `backfill-indexes`
+command and worker indexing to a ready index with matching counts), and Gitleaks (55 commits,
+no leaks). Details, links and limits are in the
+[ADR-0015 feature-branch CI evidence](decisions/0015-revision-indexing.md#feature-branch-ci-evidence-at-600a366).
+This covers the exercised paths only; nobody ran these checks locally for this verification.
+M4c is **not merged**: `main` remains at `872d0af` and publication to `main` is pending.
 
 Within this accepted section, the items labelled [REC] (written as recommendations in
 Prompts 122–123) now form the **accepted implementation contract** for M4c. Explicitly deferred
