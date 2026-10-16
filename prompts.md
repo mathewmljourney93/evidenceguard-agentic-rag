@@ -17827,3 +17827,891 @@ Stop conditions: any failed check or scan stops before publication. Any failed, 
 skipped job, or a timeout, stops with main unchanged (or, after the main push, is reported
 without a revert). There is no repair, rerun, force-push, extra commit or document update after
 publication. Results are reported in the handoff, not recorded here.
+
+**Prompt 121 publication outcome (recorded in Prompt 122, from Claude Code's Prompt 121
+handoff):** the documentation commit `872d0af367be890cce25b2cce0d71a627c993479` (parent `90240e3`,
+tree `d3644013aadefd3f2bb955d0d6bfeb0e4d105f3f`) changed only prompts.md against the accepted tree,
+with README, ADR-0014 and the plan byte-identical. It was made with the noreply identity and a
+Co-Authored-By Claude trailer. Full-history Gitleaks: 52 commits, no leaks.
+
+Publication:
+- The feature push `git push origin refs/heads/feat/embedding-persistence:refs/heads/feat/embedding-persistence`
+  exited 0 (`90240e3..872d0af`).
+- Claude Code's API observation of feature CI run `38915164026` and secret scan
+  `38915164094` (push events, exact SHA): all five jobs and all steps `success`, including the
+  six container steps.
+- The main preconditions were rechecked against fresh refs.
+- `git merge --ff-only 872d0af367be890cce25b2cce0d71a627c993479` exited 0 (no merge commit), and
+  `git push origin refs/heads/main:refs/heads/main` exited 0 (`5fdaa1c..872d0af`).
+- Claude Code's API observation of main CI run `38915642574` and secret scan `38915642567`
+  (push events on main, exact SHA): all five jobs and all steps `success`.
+
+Job logs returned HTTP 403, so Claude Code observed no counts or log output for either push.
+
+**Reviewer evidence for the main push (recorded in Prompt 122; independent retrieval):** the
+external reviewer retrieved both main-push workflow records, the job and step records, and all
+five main-push job logs, for exact head commit `872d0af367be890cce25b2cce0d71a627c993479`.
+- Ubuntu job 117022270662: `1586 passed, 233 skipped in 30.44s`.
+- Windows job 117022270941: `1585 passed, 234 skipped in 38.81s`.
+- Formatting, lint, typing, distribution builds and the existing installed-wheel checks passed
+  on both.
+- PostgreSQL job 117022270570: `233 passed, 1586 deselected in 75.21s (0:01:15)`; all 29 cases in
+  `tests/test_embeddings_postgres.py` passed.
+- Container job 117022270368: all six required steps executed and succeeded. Logs confirm:
+  - compose config ok;
+  - context ok (77 files; 19 planted fixtures excluded);
+  - UID and GID 10001;
+  - the three CLI help checks, installed imports, offline migration SQL and runtime contents
+    checks;
+  - database healthy, migration completed and API healthy, with migrate, API and worker on the
+    CI-built image;
+  - a generated API key held in memory;
+  - upload 202, successful ingestion, the revision active with two verified chunks, and
+    duplicate upload 200;
+  - the idle worker exited 0 without an OOM kill;
+  - smoke ok and cleanup ok.
+- Gitleaks job 117022268580: `52 commits scanned`, `no leaks found`.
+
+The reviewer ran no suite, build, PostgreSQL or Docker locally and did not retrieve the
+feature-push logs for this commit; those feature-push conclusions remain attributed to Claude
+Code's handoff. Main-push counts are not feature-push results, and the `90240e3` evidence stays
+tied to that commit.
+
+Limits: CI's wheel checks do not execute embeddings directly, which is verified only locally on
+Windows (Prompt 117). The smoke runs ingestion, not indexing; shutdown coverage is idle-worker
+only; local Compose is unverified. M4c–M4f and overall M4 acceptance are pending.
+
+## Prompt 122: Record M4b main evidence and propose the detailed M4c specification
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Session:** Claude Code.
+- **Scope/status:** documentation only, staged for external review; no commit or implementation.
+
+````text
+Written for: Mathew and the external reviewer.
+
+# Prompt 122: Record M4b main evidence and propose the detailed M4c specification
+
+Read CLAUDE.md and applicable repository instructions. Continue the current session; this is its ninth substantial prompt, so no session switch is needed on that count.
+
+Authorize documentation and staging only. Record the verified M4b main publication and prepare a detailed M4c specification for external review. M4c must remain proposed and unimplemented.
+
+## 1. Verify the starting state
+
+Expected:
+- Current branch: main.
+- HEAD, local main, origin/main and remote main:
+  `872d0af367be890cce25b2cce0d71a627c993479`.
+- Parent:
+  `90240e3969e93e32cabd11a49664ca27a8553593`.
+- HEAD tree:
+  `d3644013aadefd3f2bb955d0d6bfeb0e4d105f3f`.
+- Local and remote feat/embedding-persistence at the same HEAD.
+- Working tree clean.
+- Origin:
+  `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`.
+- Expected noreply author and committer identity.
+
+Check remote refs read-only. If the state differs materially, stop without overwriting work.
+
+Create `docs/m4c-indexing-spec` from HEAD, provided it does not already exist. Record baseline evidence under `.local/p122/`.
+
+## 2. Record independently retrieved main evidence
+
+The external reviewer retrieved both main-push workflow records, the CI job/step records and all five main-push job logs.
+
+Both runs were successful push events on main with exact head commit:
+`872d0af367be890cce25b2cce0d71a627c993479`.
+
+CI:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38915642574
+
+Secret scan:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38915642567
+
+Observed results:
+
+- Ubuntu job 117022270662:
+  `1586 passed, 233 skipped in 30.44s`
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38915642574/job/117022270662
+
+- Windows job 117022270941:
+  `1585 passed, 234 skipped in 38.81s`
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38915642574/job/117022270941
+
+- PostgreSQL job 117022270570:
+  `233 passed, 1586 deselected in 75.21s (0:01:15)`
+  All 29 cases in tests/test_embeddings_postgres.py passed.
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38915642574/job/117022270570
+
+- Container job 117022270368:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38915642574/job/117022270368
+
+  All six required steps executed and succeeded: configuration, effective context, application image build, image checks, Compose smoke and cleanup.
+
+  Logs confirm:
+  - compose config: ok;
+  - context: ok (77 files; 19 planted fixtures excluded);
+  - UID and GID 10001;
+  - all three CLI help checks, installed imports, offline migration SQL and runtime contents checks passed;
+  - database healthy, migration completed and API healthy;
+  - migrate, API and worker used the CI-built image;
+  - generated API key held in memory;
+  - upload 202 and successful ingestion;
+  - active revision with two verified chunks;
+  - duplicate upload 200;
+  - idle-worker exit 0 without OOM kill;
+  - smoke: ok;
+  - cleanup: ok.
+
+- Gitleaks job 117022268580:
+  `52 commits scanned`, `no leaks found`
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38915642567/job/117022268580
+
+Formatting, lint, typing, distribution builds and existing installed-wheel checks passed on Ubuntu and Windows.
+
+Attribution:
+- The reviewer retrieved these records and logs but ran no suite, build, PostgreSQL or Docker locally.
+- Claude's Prompt 121 session observed job and step conclusions but could not download logs.
+- The reviewer did not independently retrieve the feature-push logs for this commit; those feature-push conclusions remain attributed to Claude's handoff.
+- Do not reuse main-push counts as feature-push results.
+- Earlier 90240e3 evidence remains historical and tied to that commit.
+
+Limits:
+- CI's existing wheel checks do not directly execute embeddings; embedding-specific installed-wheel execution remains verified locally on Windows only, from Prompt 117.
+- The container smoke runs ingestion, not embedding indexing.
+- Shutdown coverage remains idle-worker only.
+- Local Compose remains unverified.
+- M4c–M4f and overall M4 acceptance remain pending.
+
+## 3. Authorized files and publication status
+
+Modify only:
+- README.md
+- docs/decisions/0014-embedding-persistence.md
+- docs/plan.md
+- prompts.md
+
+Record M4b as reviewed, verified in CI and on main at 872d0af.
+
+Put full main evidence in ADR-0014, with concise references in README and the plan. Preserve the earlier feature-branch evidence and anchors, labelling it historical where appropriate.
+
+Correct current “not merged” and “main remains at 5fdaa1c” statements for M4b. Keep genuine historical statements explicitly scoped to their baseline.
+
+Do not broaden acceptance to overall M4.
+
+## 4. Prepare the detailed M4c proposal in docs/plan.md
+
+Read the actual M4a provider boundary, M4b storage functions, job lifecycle, worker context/runtime/cancellation and production registry before specifying their integration.
+
+Use targeted reads. Do not reload or print the complete prompt history.
+
+Preserve accepted decisions:
+- separate durable index_revision jobs;
+- UUID-only payload containing exactly index_id;
+- tenant-scoped immutable index/profile/chunk-set binding;
+- ever-activated revisions only, including now-superseded revisions when explicitly indexed;
+- atomic index creation and idempotent enqueue;
+- provider computation outside fences;
+- bounded fenced vector writes;
+- reuse of committed rows;
+- readiness and job success together through ctx.fenced(finish=True);
+- no mutation of settled chunks or demotion of active revisions;
+- no retrieval or M5 workflow.
+
+The detailed proposal must resolve or explicitly present for review:
+
+### Enqueue and bounded backfill
+- Exact internal function signatures, trusted actor/tenant inputs and authorization responsibilities.
+- Deterministic idempotency key and behavior for existing building/ready indexes and queued/running/terminal jobs.
+- No resetting terminal jobs or silently replacing conflicting identities.
+- What happens when a building index has a missing, failed or dead canonical job.
+- Explicit bounded selection, ordering, pagination/cursor and transaction boundaries.
+- Whether M4c exposes a CLI or an internal seam only, with a recommendation.
+- Whether activation wiring is deferred or proposed now; do not silently change M3 activation.
+- Concurrency and atomicity of duplicate enqueue/backfill requests.
+
+### Handler and provider selection
+- Exact production registry integration and supported initial profile.
+- Resolve the provider from the stored identity through a fixed supported mapping.
+- Reject unsupported/mismatched profiles without importing a live adapter or making network calls.
+- Use M4a's validated provider boundary and M4b's canonical storage conversion.
+- Specify injected provider doubles for tests while preserving production defaults.
+- No provider identifiers, document text or credentials in job payloads.
+
+### Batching, replay and completeness
+- Bounded source reads and provider batches respecting both the 32-text and 128,000-byte caps.
+- Stable ordinal ordering and text-hash verification.
+- Read/connection lifetimes: no database transaction or job/index lock held during provider computation.
+- Read and reuse already committed embeddings; do not recompute or overwrite them on retry.
+- Missing-row processing and conflicting replay behavior.
+- Short fenced writes with the accepted job → index lock order.
+- Exact final completeness and atomic readiness/job success.
+- Already-ready retry behavior and fresh ownership checks.
+- Explain the limit: repeated uncommitted computation can occur; no exactly-once provider-call claim.
+
+### Cancellation and failures
+- Cancellation checks before and after provider work, before writes and before final completion.
+- Lease loss and cancellation cause no stale writes or terminal outcome.
+- Map invalid provider output, unsupported profile, source inconsistency, storage conflict and transient/unexpected failure to explicit existing or proposed fixed error codes.
+- Distinguish retryable from permanent outcomes and exhausted/dead behavior.
+- Preserve existing worker shutdown semantics; synchronous calls do not gain a guaranteed total deadline.
+- Privacy: no raw text, vectors, keys or exception details in logs, outcomes or representations.
+
+### Proposed implementation and tests
+- Intended modules and minimal changes to existing files.
+- Whether any migration or configuration change is needed, with justification.
+- ADR-0015 as a later implementation deliverable, not a new file in this task.
+- Database-independent tests for provider selection, caps, replay, cancellation, safe failures and handler registration.
+- Deterministic PostgreSQL tests for enqueue atomicity/concurrency, partial committed batches, retry reuse, conflicts, stale leases, readiness/job atomicity and terminal-job behavior.
+- Production-path offline indexing verification, distinct from the existing ingestion smoke.
+- Installed-wheel checks appropriate to the new handler.
+- Mark every new test as planned, not executed.
+
+Keep the proposal focused on M4c. Do not redesign M4a/M4b or specify M4d–M4f implementation.
+
+Clearly separate:
+- previously accepted decisions;
+- facts established from current source;
+- new recommendations and initial engineering defaults;
+- unresolved reviewer decisions.
+
+Give recommendations for unresolved decisions. Do not mark the proposal accepted or invent execution evidence.
+
+## 5. Prompt history
+
+Preserve all earlier bytes as an identical prefix.
+
+Append:
+- Prompt 121 publication outcome, attributed to its handoff;
+- a separate reviewer-evidence note for the main logs above;
+- Prompt 122 verbatim;
+- an outcome note marking M4c as proposed and awaiting review.
+
+Do not rewrite Claude's earlier “counts unobserved” notes.
+
+## 6. Checks and export
+
+Run documentation checks only:
+- exactly the four authorized files changed and staged;
+- history prefix unchanged;
+- relative links and anchors;
+- status and scope consistency;
+- private-content and artifact scan;
+- LF/no-BOM checks;
+- git diff --cached --check;
+- staged Gitleaks without suppression.
+
+Do not run application tests, builds, installs, Docker, databases or providers. No source, tests, migrations, dependencies, workflows or configuration changes.
+
+Export the complete staged diff directly from Git:
+- baseline: 872d0af367be890cce25b2cce0d71a627c993479;
+- final: the final staged tree;
+- exclude prompts.md;
+- file: .local/p122/m4c-indexing-spec.diff;
+- UTF-8 without BOM.
+
+Do not print the complete diff in chat.
+
+Report concise changes, proposed decisions, checks actually run, Git state and export metadata: baseline, final tree, paths, statistics, bytes and SHA-256.
+
+No commit, push, merge, M4c implementation or overall M4 acceptance is authorized.
+
+End with:
+
+Mathew: return this output plus `.local/p122/m4c-indexing-spec.diff` to the external reviewer.
+````
+
+**Prompt 122 outcome (Claude Code; documentation staged, M4c proposed and awaiting review):**
+verified main, with HEAD, local and remote main, origin/main and the local and remote feature
+branch all at `872d0af` (parent `90240e3`, tree `d364401`), a clean tree, and the expected origin
+and identity. Created `docs/m4c-indexing-spec` from HEAD; baseline under `.local/p122/`.
+
+Only README.md, ADR-0014, docs/plan.md and this history changed:
+- M4b is recorded as reviewed, verified in CI and on main at `872d0af`. ADR-0014 adds a "Main CI
+  evidence at 872d0af" section with the reviewer-retrieved main-push results, kept separate from
+  Claude Code's conclusions-only observations, and labels the `90240e3` feature-branch evidence
+  historical (its anchor is kept).
+- README and the plan reference it concisely.
+- The plan adds a **proposed, unimplemented** M4c specification, written after targeted reads of
+  the provider boundary, the M4b store, the job core, the worker context, runtime and registry,
+  the ingestion handler, the admin CLI and the CI assertions. It labels [DECISION], [FACT], [REC]
+  and [OPEN] items and contains:
+  - the enqueue and bounded-backfill seams;
+  - a handler with a fixed offline provider mapping;
+  - batching that reuses committed rows;
+  - cancellation and failure mapping with existing codes;
+  - the necessary registry-assertion CI changes, and a recommended production-path indexing
+    smoke and wheel check;
+  - a planned test matrix and five open decisions.
+
+No code, tests, migrations, workflows, configuration or dependencies changed, and no application
+tests, builds, Docker, database or provider contact took place. M4c is not accepted or
+implemented, and overall M4 is not accepted. Check results and export metadata are reported in
+the handoff.
+
+**Prompt 122 review (recorded in Prompt 123):** the external reviewer inspected the complete
+Prompt 122 diff and independently matched its SHA-256
+`993890cb0365003549965fec890e4f1803daf1b668a0ac56b791f4e3b332ab2d`. The reviewer checked the current
+worker context and runtime, the job `enqueue` function and the embedding write/readiness
+functions against the proposal. No application suite, build, PostgreSQL or Docker checks were
+run. The M4b publication documentation is accepted, subject to one correction: `872d0af` changes
+README, ADR-0014, the plan and prompt history relative to `90240e3`, not only prompt history. M4c
+remains proposed and unaccepted pending review of the corrections.
+
+**Settled M4c decisions (Prompt 123):**
+1. trusted internal enqueue/backfill seams with the existing reviewer, approver or admin roles,
+   and no public API endpoint;
+2. `eg-admin backfill-indexes`, fixed to `HASH_IDENTITY`, using the trusted-operator model;
+3. stalled canonical jobs reported without reset, replacement or rescheduling, with recovery
+   generations deferred;
+4. activation wiring deferred, preserving M3 activation and ingestion;
+5. reuse of the existing fixed job error codes.
+
+Initial engineering defaults, not performance claims: pages of at most 32 chunks and 128,000
+UTF-8 bytes; backfill default limit 50, maximum 100; 3 job attempts. The embedding-specific CI
+wheel check and the production-path offline indexing smoke are required M4c acceptance checks.
+
+## Prompt 123: Correct the M4c specification and record settled review decisions
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Session:** Claude Code.
+- **Scope/status:** documentation only, staged for external review; no commit or implementation.
+
+````text
+Written for: Mathew and the external reviewer.
+
+# Prompt 123: Correct the M4c specification and record settled review decisions
+
+Read CLAUDE.md and applicable repository instructions. Continue this session; this is its tenth substantial prompt, so no switch is needed on that count.
+
+The external reviewer inspected the complete Prompt 122 diff and independently matched its SHA-256:
+`993890cb0365003549965fec890e4f1803daf1b668a0ac56b791f4e3b332ab2d`.
+
+The reviewer checked the current worker context/runtime, job enqueue function and embedding write/readiness functions against the proposal. No application suite, build, PostgreSQL or Docker checks were run.
+
+The M4b publication documentation is accepted subject to the factual correction below. M4c remains proposed and unaccepted pending review of these corrections.
+
+This task authorizes documentation changes and staging only.
+
+## 1. Verify the starting state
+
+Expected:
+- Branch: `docs/m4c-indexing-spec`.
+- HEAD:
+  `872d0af367be890cce25b2cce0d71a627c993479`.
+- Staged tree:
+  `48af39f62d0108a4df68ddca7e96e0abaf0fe549`.
+- Exactly four staged paths:
+  - README.md
+  - docs/decisions/0014-embedding-persistence.md
+  - docs/plan.md
+  - prompts.md
+- Nothing unstaged or untracked outside ignored local artifacts.
+- Local main and origin/main at HEAD.
+- Origin and expected noreply identity unchanged.
+
+Record the baseline staged tree and per-file blobs under `.local/p123/`.
+
+Stop on a material mismatch without overwriting work. No remote mutation is authorized.
+
+## 2. Correct the M4b commit description
+
+In ADR-0014's new “Main CI evidence at 872d0af” section, the sentence says that 872d0af “adds only prompt history”.
+
+That is incorrect relative to its parent 90240e3.
+
+Replace it with the accurate description:
+- it changes README.md, ADR-0014, docs/plan.md and prompts.md;
+- those are verification documentation and prompt history;
+- source, tests, migrations, dependencies and workflows are unchanged.
+
+The “only prompt history” statement belongs to the earlier publication-history commit 90240e3, not 872d0af.
+
+Preserve all CI evidence, counts, links, attribution and limits.
+
+## 3. Record settled M4c review decisions
+
+The reviewer accepts these choices for the specification:
+1. Trusted internal enqueue/backfill seams using existing reviewer, approver or admin roles; no public API endpoint.
+2. Add `eg-admin backfill-indexes`, fixed to HASH_IDENTITY, using the existing trusted-operator model.
+3. Report stalled canonical jobs without resetting, replacing or rescheduling terminal jobs. Recovery generations remain deferred.
+4. Defer activation wiring; preserve M3 activation and ingestion semantics.
+5. Reuse existing fixed job error codes for this offline-only slice.
+
+Accept these initial engineering defaults:
+- provider/write pages: at most 32 chunks and 128,000 UTF-8 bytes;
+- backfill default limit 50, maximum 100;
+- existing default of three job attempts.
+
+These are engineering choices, not measured performance claims.
+
+The embedding-specific CI wheel check and the production-path offline indexing smoke are REQUIRED M4c acceptance checks, not optional recommendations.
+
+Do not mark the complete M4c specification accepted yet. Record the choices as settled at review while the corrected specification remains proposed.
+
+## 4. Correct source facts and enqueue outcomes
+
+### Ready-index behavior
+
+The facts section incorrectly says write_embeddings and mark_index_ready both treat a ready index as a no-op.
+
+Correct it:
+- write_embeddings refuses writes to a ready index with EmbeddingWriteRefusedError;
+- mark_index_ready provides the fresh-ownership-checked already-ready no-op.
+
+### Enqueue results
+
+The existing enqueue function returns only JobSnapshot. It does not say whether this invocation inserted the job. A pre-read cannot establish that reliably under concurrent enqueue, and queued/attempt-zero state does not distinguish creation from an existing untouched job.
+
+Simplify the proposed IndexEnqueueResult outcome to:
+- `pending`: canonical job is queued or running, whether newly created or already present;
+- `ready`: index observed ready; no new job is enqueued;
+- `stalled`: building index with an existing terminal canonical job.
+
+Keep the job snapshot where appropriate. Do not add a creation flag to M3a enqueue or infer creation from timestamps, attempts, pre-reads or PostgreSQL system columns.
+
+Retain:
+- atomic index creation and enqueue;
+- deterministic idempotency key;
+- missing-job creation for a building index;
+- terminal-job immutability;
+- idempotency conflicts with transaction rollback.
+
+Describe the returned status as an observation within the transaction, not a promise that the job stays queued/running after commit.
+
+Correct the isolation wording: the supported seam uses READ COMMITTED. Stronger isolation can also produce database serialization failures; do not imply every concurrency failure becomes JobEnqueueRaceError.
+
+Update CLI counts, result types and planned tests to match the simplified outcomes.
+
+## 5. Make backfill and CLI behavior precise
+
+Specify:
+- validate actor, identity, limit and cursor before starting writes;
+- all selection and enqueue queries remain tenant-scoped;
+- each selected revision has an independent write transaction;
+- fixed per-item `ineligible` and `conflict` outcomes apply only to explicitly named expected domain failures;
+- rollback that item's transaction before continuing;
+- unexpected database, programming or infrastructure failures propagate and fail the operation, rather than becoming a successful per-item result.
+
+A per-item failure may have no index ID because its transaction rolled back. Make index_id nullable for those results.
+
+Clarify partial progress: previously committed items remain committed if a later unexpected failure aborts the operation. No all-page atomicity claim.
+
+Clarify selection races:
+- revisions are active at the selection observation;
+- if a selected revision becomes superseded before its enqueue transaction, it may still be indexed because it was activated and its chunks are immutable;
+- do not claim it remains active throughout the run;
+- revisions already superseded at selection are excluded from ordinary backfill;
+- explicit enqueue continues to allow ever-activated superseded revisions.
+
+The cursor advances over selected IDs, including per-item failures. A retry of skipped/conflicted candidates may require restarting from the beginning. Newly activated UUIDs below the cursor can also require a fresh pass.
+
+Define CLI behavior:
+- one bounded page per invocation;
+- prints fixed outcome counts and next cursor only;
+- existing argparse validation and privacy conventions;
+- exit 0 for a page without stalled/ineligible/conflict results;
+- nonzero for stalled/ineligible/conflict or an unexpected operation failure;
+- no raw exception text or content;
+- no automatic retry loop or terminal-job recovery.
+
+## 6. Correct cancellation and transaction guarantees
+
+The current JobContext checks local cancellation/lease state at explicit boundaries. It does not atomically guard every SQL statement or interrupt statements already in flight.
+
+Remove the claim that a latched cancellation prevents “any further write or terminal outcome” without qualification.
+
+State the actual guarantees:
+- explicit checks before and after provider computation;
+- fenced entry checks before opening and after acquiring the job lock;
+- another local check before success in a finish=True block;
+- database ownership checks remain authoritative;
+- cancellation latched after the last applicable check may not stop an already-started non-finish transaction from committing;
+- checks do not interrupt synchronous provider or database calls;
+- the existing accepted lease-expiry/commit window and shutdown limitations remain.
+
+A cancellation may cause the runtime to record retryable worker_shutdown while ownership remains valid. Do not claim cancellation produces no lifecycle outcome. Lease loss prevents an outcome by the stale worker.
+
+Specify the provider-exception path:
+- when provider execution or validation raises, check ctx.check() before converting that failure into PermanentJobError or RetryableJobError;
+- a cancellation or lease loss already latched during that call must take precedence over classification of the provider failure;
+- preserve control-flow exceptions;
+- acknowledge the same explicit-boundary race rather than claiming atomic cancellation.
+
+The calls using ctx.fenced() for reads still acquire the job-row lock and use the ordinary fenced transaction. Call them “short read-purpose fenced transactions”, not PostgreSQL READ ONLY transactions. Add no SET TRANSACTION READ ONLY.
+
+Hash verification, batch canonicalization and provider computation should occur after the read fence closes, keeping the job lock short.
+
+Planned tests must cover:
+- cancellation or lease loss before provider work;
+- successful provider return after cancellation/lease loss;
+- provider/validation failure after cancellation/lease loss is latched;
+- before-write and before-finish boundaries;
+- actual runtime outcome semantics;
+- the documented limitations without inventing stronger guarantees.
+
+## 7. Correct replay and provider-selection details
+
+The proposed handler skips already-committed embeddings. Therefore it cannot generally discover that an existing valid stored vector differs from a newly computed provider vector without recomputing it.
+
+Preserve reuse:
+- previously committed valid rows are reused without provider calls;
+- do not promise semantic or provider-output verification of reused vectors;
+- M4b constraints bind stored bytes, profile and source membership, not the semantic correctness of an embedding.
+
+Replace the ambiguous planned test “a conflicting pre-existing row gives a permanent failure” with two precise tests:
+1. A previously committed row is reused without recomputation, and remains unchanged.
+2. A controlled competing writer commits a different valid vector after a missing chunk has been selected but before this attempt's write. The M4b replay comparison detects the conflict, nothing is overwritten, and the handler records the specified permanent failure while ownership remains valid.
+
+Use a separate valid job/fence for the competing writer and deterministic barriers/hooks, not a reclaimed stale owner that is expected to write successfully.
+
+Make the provider mapping immutable or defensively copied when the handler factory is created, including injected test mappings.
+
+Require stored identity reconstruction and fingerprint verification before provider resolution. Provider identity must match the captured stored identity. No live adapter or environment-based selection.
+
+Use privacy-safe source-page values whose representations omit text, and preserve tenant/revision/chunker scoping for every read.
+
+## 8. Required CI acceptance checks
+
+Keep the necessary registry assertions updated in the future implementation plan.
+
+Specify that the future wheel step:
+- runs outside the checkout with isolated Python;
+- verifies imports resolve to site-packages;
+- directly runs the offline provider and canonical storage conversion;
+- imports the indexing modules and checks both production registry kinds;
+- does not claim real database indexing from that wheel-only check.
+
+The future container smoke must:
+- use the production CLI and registered worker;
+- trigger offline backfill for the synthetic tenant;
+- wait with bounded timeouts;
+- verify the index belongs to the same tenant and ingested revision and the expected offline profile;
+- verify index readiness, canonical job success and embedding count matching chunk_count;
+- retain the existing image-identity, privacy, idle-shutdown and cleanup checks.
+
+A readiness row count alone must not be described as proving indexing ran for the intended tenant/revision/profile.
+
+These remain planned checks, not execution evidence.
+
+## 9. Scope, history and verification
+
+Only modify from the baseline staged tree:
+- docs/decisions/0014-embedding-persistence.md: the commit-description correction;
+- docs/plan.md: the M4c corrections and settled choices;
+- prompts.md: append-only history.
+
+README.md must remain byte-identical to baseline tree 48af39f62d0108a4df68ddca7e96e0abaf0fe549.
+
+Keep the existing M4c heading and anchor stable. The complete specification remains proposed, corrected in Prompt 123 and awaiting review.
+
+Append:
+- the review outcome and reviewer work described above;
+- settled decisions;
+- Prompt 123 verbatim;
+- an outcome note marking review pending.
+
+Preserve the earlier prompts.md bytes as an identical prefix.
+
+Run documentation checks:
+- scope and byte identity;
+- history prefix;
+- links and anchors;
+- status and consistency;
+- private-content/artifact scan;
+- LF/no-BOM;
+- git diff --cached --check;
+- staged Gitleaks without suppression.
+
+No implementation, tests, builds, installs, Docker, databases or provider calls. No commit, push or merge.
+
+## 10. Export and handoff
+
+Export the incremental diff directly from Git:
+- baseline staged tree:
+  `48af39f62d0108a4df68ddca7e96e0abaf0fe549`;
+- final: corrected staged tree;
+- exclude prompts.md;
+- path: `.local/p123/m4c-spec-corrections.diff`;
+- UTF-8 without BOM.
+
+Do not print the complete diff in chat.
+
+Report corrections, settled decisions, remaining questions, checks, final Git state and export metadata including bytes and SHA-256.
+
+End with:
+
+Mathew: return this output plus `.local/p123/m4c-spec-corrections.diff` to the external reviewer.
+````
+
+**Prompt 123 outcome (Claude Code; corrections staged, review pending):** verified
+`docs/m4c-indexing-spec` at HEAD `872d0af`, staged tree `48af39f` with the four expected paths,
+main/origin/main at HEAD, and the expected origin and identity. Baseline staged tree and
+per-file blobs saved under `.local/p123/`.
+
+Changes:
+- ADR-0014: the `872d0af` description is corrected (README, ADR-0014, the plan and prompt
+  history changed; no source, tests, migrations, dependencies or workflows). All evidence is
+  preserved.
+- docs/plan.md: the M4c section is corrected with its heading and anchor unchanged. It records
+  the settled decisions and defaults, and makes the wheel and production-path smoke checks
+  required. It also:
+  - corrects the facts for `write_embeddings` (refuses ready indexes) and `mark_index_ready`
+    (the no-op);
+  - simplifies enqueue outcomes to `pending`, `ready` and `stalled`, as in-transaction
+    observations, with no creation inference;
+  - corrects the READ COMMITTED and serialization wording;
+  - makes backfill validation, per-item expected-error handling with rollback, a nullable
+    `index_id`, partial progress, selection races and cursor semantics precise;
+  - defines CLI outcome counts and exit codes 0, 3, 1 and 2;
+  - replaces the cancellation claims with the actual explicit-boundary guarantees, including
+    the provider-exception `ctx.check()` precedence and `worker_shutdown` as an outcome;
+  - renames the reads as short read-purpose fenced transactions, with hashing and computation
+    after the read fence;
+  - states reuse without provider verification, with the competing-writer conflict test using
+    a separate valid job;
+  - adds the immutable provider mapping, fingerprint verification before resolution and
+    text-free page representations;
+  - expands the required wheel and smoke checks and the planned tests.
+
+  The plan status lines were updated.
+
+README.md is byte-identical to the baseline. The complete M4c specification remains proposed
+and awaiting review; nothing is implemented. No application tests, builds, Docker, database or
+provider contact. Check results and export metadata are reported in the handoff.
+
+**Prompt 123 acceptance (recorded in Prompt 124):** the external reviewer inspected the complete
+Prompt 123 correction diff and independently matched its SHA-256
+`65d18f8d377452ba3e9d79160305cbd26121afa7761b13ead13d001db9f1ac70`. Both specification diffs were
+reviewed; the Prompt 122 diff checksum
+(`993890cb0365003549965fec890e4f1803daf1b668a0ac56b791f4e3b332ab2d`) is recorded above. During the
+review the reviewer checked the existing worker and context, job enqueue and embedding-store
+source. The reviewer ran no application suite, build, PostgreSQL or Docker checks.
+
+Accepted:
+- the corrected M4b publication record;
+- the complete M4c specification from Prompt 122 with the Prompt 123 corrections;
+- the five settled decisions and initial engineering defaults;
+- CLI exit code 3 for a completed page containing stalled, ineligible or conflict items
+  (0 clean, 3 such items, 1 operation failure, 2 usage error);
+- the required embedding-specific CI wheel checks and the production-path indexing smoke.
+
+Accepted staged tree `5b73e7492e2b7c6749c0f9f6a2c3520e5c2f679d`. This acceptance establishes the
+design and the planned verification requirements only. It is not M4c implementation or
+execution evidence: no M4c code, tests, CLI, handler, backfill, wheel extension or smoke exists.
+
+## Prompt 124: Record M4c specification acceptance and commit locally
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Session:** Claude Code.
+- **Scope:** acceptance wording and a local documentation commit; no publication or
+  implementation.
+
+````text
+Written for: Mathew and the external reviewer.
+
+# Prompt 124: Record M4c specification acceptance and commit locally
+
+Read CLAUDE.md and applicable repository instructions. Continue this session; this is its eleventh substantial prompt, so no session switch is needed on that count.
+
+The external reviewer inspected the complete Prompt 123 correction diff and independently matched its SHA-256:
+`65d18f8d377452ba3e9d79160305cbd26121afa7761b13ead13d001db9f1ac70`.
+
+The reviewer accepts:
+- the corrected M4b publication record;
+- the complete M4c specification from Prompt 122 with the Prompt 123 corrections;
+- the five settled design decisions and initial engineering defaults;
+- CLI exit code 3 for a completed page containing stalled, ineligible or conflict items;
+- the required embedding-specific CI wheel checks and production-path indexing smoke.
+
+The reviewer inspected both specification diffs and checked the existing worker/context, job enqueue and embedding-store source during the review. The reviewer ran no application suite, build, PostgreSQL or Docker checks.
+
+Acceptance establishes the design and planned verification requirements. It is not M4c implementation or execution evidence.
+
+Authorize acceptance wording, prompt history and a LOCAL DOCUMENTATION COMMIT only.
+
+## 1. Verify the starting state
+
+Expected:
+- Branch: `docs/m4c-indexing-spec`.
+- HEAD:
+  `872d0af367be890cce25b2cce0d71a627c993479`.
+- HEAD parent:
+  `90240e3969e93e32cabd11a49664ca27a8553593`.
+- Accepted staged tree:
+  `5b73e7492e2b7c6749c0f9f6a2c3520e5c2f679d`.
+- Exactly four staged paths:
+  - README.md
+  - docs/decisions/0014-embedding-persistence.md
+  - docs/plan.md
+  - prompts.md
+- Nothing unstaged or untracked outside ignored local artifacts.
+- Local main and origin/main at HEAD.
+- Origin:
+  `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`.
+- Effective author and committer:
+  `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>`.
+
+Use local checks; no fetch or remote mutation is needed.
+
+Record the accepted staged tree, staged paths, per-file blobs and necessary history-prefix evidence under `.local/p124/`.
+
+Stop on a material mismatch without overwriting work.
+
+## 2. Acceptance wording only
+
+Only these files may change from the accepted staged tree:
+- README.md
+- docs/plan.md
+- prompts.md
+
+ADR-0014 must remain byte-identical to the accepted tree.
+
+In README and the plan, record:
+- the complete M4c indexing specification accepted at external review in Prompt 124;
+- proposed in Prompt 122 and corrected in Prompt 123;
+- implementation pending;
+- no M4c tests, CLI, handler, backfill, wheel extension or indexing smoke have been implemented or executed;
+- M4d–M4f still require their own detailed reviews;
+- overall M4 acceptance remains pending.
+
+Record CLI exit code 3 as accepted:
+- 0: completed page with no stalled/ineligible/conflict items;
+- 3: completed page with any such item;
+- 1: operation failure;
+- 2: usage error.
+
+The existing settled decisions, bounds and required CI checks remain unchanged.
+
+Rename the M4c specification heading to:
+“M4c indexing specification (ACCEPTED at review, Prompt 124; implementation pending)”
+
+Update every reference to the resulting heading anchor in the authorized files. Check for stale references to the old proposed-heading anchor.
+
+Replace the “Unresolved questions” text with a statement that the exit code and complete specification are accepted and no specification decision remains open.
+
+Clarify that the recommendations within this accepted M4c section now constitute the accepted implementation contract, while retaining historical attribution and explicitly deferred work. Do not accidentally mark M4d–M4f recommendations accepted.
+
+Preserve without redesign:
+- pending/ready/stalled enqueue outcomes;
+- READ COMMITTED and transaction boundaries;
+- per-item backfill outcomes and partial-progress semantics;
+- cursor and supersession-race rules;
+- terminal-job immutability;
+- offline-only immutable provider mapping;
+- committed-row reuse and controlled conflict tests;
+- explicit cancellation boundaries and their limitations;
+- existing fixed error-code mapping;
+- required CI wheel and production indexing checks.
+
+Keep the M4b main evidence, counts, links and attribution unchanged.
+
+Keep the current limitations:
+- CI's existing wheel step does not yet directly execute embeddings;
+- local Windows embedding wheel execution is historical Prompt 117 evidence;
+- the existing container smoke runs ingestion, not indexing;
+- local Compose remains unverified;
+- no semantic-quality, production-readiness or general security guarantee follows.
+
+Do not add ADR-0015 yet.
+
+## 3. Append prompt history
+
+Preserve all earlier prompts.md bytes as an identical prefix.
+
+Append:
+- the reviewer acceptance under Prompt 123, including the matched checksum, accepted exit code and review scope;
+- that both specification diffs were reviewed, with the earlier Prompt 122 checksum already recorded in history;
+- the distinction between specification acceptance and implementation evidence;
+- Prompt 124 verbatim;
+- a pre-commit note recording verified state and checks actually performed.
+
+Do not claim the reviewer ran application tests or Docker.
+
+Do not pre-record the new commit's own SHA, publication or CI.
+
+Use inline, backticked commit identifiers in your own notes.
+
+## 4. Verify and commit
+
+Before committing, check:
+- exactly the same four paths remain staged;
+- only README.md, docs/plan.md and prompts.md differ from accepted tree
+  `5b73e7492e2b7c6749c0f9f6a2c3520e5c2f679d`;
+- ADR-0014 is byte-identical;
+- earlier prompt history unchanged;
+- relative links and anchors resolve;
+- no current claim that M4c is implemented or verified;
+- no private content, artifacts, CR characters or BOM;
+- git diff --cached --check;
+- staged Gitleaks without suppression;
+- expected author and committer.
+
+No application tests, builds, installs, Docker, database or provider contact.
+
+Commit locally with subject:
+`docs: record M4b main results and accepted M4c indexing specification`
+
+Use the expected noreply identity and the repository's existing Claude Code attribution convention.
+
+After the commit, verify:
+- parent is `872d0af367be890cce25b2cce0d71a627c993479`;
+- exactly the four expected documentation/history paths were committed;
+- ADR-0014 remains byte-identical to the accepted tree;
+- no source, test, migration, dependency, workflow or configuration changes;
+- working tree clean;
+- main and origin/main unchanged;
+- full-history Gitleaks passes without suppression.
+
+No push, merge, amend, rebase, tag, branch deletion or M4c implementation is authorized.
+
+## 5. Export and handoff
+
+Export an incremental diff directly from Git:
+- baseline: accepted staged tree
+  `5b73e7492e2b7c6749c0f9f6a2c3520e5c2f679d`;
+- final: the new local commit;
+- exclude prompts.md;
+- path: `.local/p124/m4c-spec-acceptance.diff`;
+- UTF-8 without BOM.
+
+Do not print the complete diff in chat.
+
+Report:
+- commit SHA, parent and tree;
+- identity and attribution;
+- committed paths;
+- concise acceptance changes;
+- checks actually run;
+- byte-identity and history-prefix results;
+- final Git state;
+- export baseline, final commit, paths, statistics, byte size and SHA-256;
+- implementation and verification still pending.
+
+End with:
+
+Mathew: return this output plus `.local/p124/m4c-spec-acceptance.diff` to the external reviewer.
+````
+
+**Prompt 124 pre-commit note (Claude Code; written before the commit):** verified locally,
+without a fetch: `docs/m4c-indexing-spec` at HEAD `872d0af` (parent `90240e3`), accepted staged
+tree `5b73e7492e2b7c6749c0f9f6a2c3520e5c2f679d` with exactly the four expected paths, nothing
+unstaged or untracked, main/origin/main at HEAD, and the expected origin and noreply identity.
+The accepted tree, paths, blobs and the history-prefix hash are recorded under `.local/p124/`.
+
+Only README.md, docs/plan.md and this history changed; ADR-0014 is byte-identical.
+- The M4c heading is renamed "ACCEPTED at review, Prompt 124; implementation pending", and every
+  anchor reference is updated (no stale references remain).
+- The section status records acceptance, the [REC] items as the accepted implementation
+  contract, deferred work kept deferred, no M4d–M4f acceptance, and that no M4c test, CLI,
+  handler, backfill, wheel extension or indexing smoke exists.
+- Exit code 3 is recorded as accepted, and "Unresolved questions" is replaced by a review
+  outcome stating that nothing remains open.
+- README and the plan status lines are updated.
+
+The design, bounds, CI requirements, M4b evidence and limitations are unchanged. Checks planned
+before the commit: scope and byte identity, history prefix, links and anchors, no current
+claims of M4c implementation or verification, privacy/CR/BOM, cached whitespace, staged
+Gitleaks and identity. Actual results and the commit SHA are reported in the handoff. No push,
+merge or implementation.

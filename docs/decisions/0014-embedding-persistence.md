@@ -1,9 +1,9 @@
 # ADR-0014: Embedding persistence, full-text representation and index readiness
 
-- **Status:** Accepted (implementation accepted at external review for a local commit in
-  Prompt 118). **Reviewed and verified in CI on `feat/embedding-persistence` at `90240e3`**,
-  not merged; `main` remains at `5fdaa1c`. Current-version PostgreSQL, Linux, Windows, build
-  and container verification completed for that feature-branch commit (see
+- **Status:** Accepted (implementation accepted at external review in Prompt 118).
+  **Reviewed, verified in CI and on `main` at `872d0af`** (fast-forward of
+  `feat/embedding-persistence`; see [main CI evidence](#main-ci-evidence-at-872d0af)).
+  The earlier verification on the feature branch at `90240e3` is historical (see
   [feature-branch CI evidence](#feature-branch-ci-evidence-at-90240e3)). The
   [specification](../plan.md#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending)
   was accepted at review in Prompt 116. CI's existing installed-wheel step does not execute
@@ -175,10 +175,11 @@ have since run in CI at `90240e3`, recorded below.
 
 ## Feature-branch CI evidence at 90240e3
 
-M4b is reviewed and verified in CI on `feat/embedding-persistence` at exact commit
-`90240e3969e93e32cabd11a49664ca27a8553593`, which adds only prompt history after the
-implementation commit `691a44c`. It is **not merged**; `main` remains at
-`5fdaa1cecbcac876af007e6f4328436ef6faeda2`. Both workflow records are successful **push**
+Historical record. M4b was reviewed and verified in CI on `feat/embedding-persistence` at
+exact commit `90240e3969e93e32cabd11a49664ca27a8553593`, which adds only prompt history
+after the implementation commit `691a44c`. At that point it was **not merged**, and `main` was
+at `5fdaa1cecbcac876af007e6f4328436ef6faeda2`; it later reached `main` at `872d0af` (below).
+Both workflow records are successful **push**
 events on that branch and SHA. These results belong to `90240e3`, not to any later
 documentation commit or `main` push.
 
@@ -225,3 +226,47 @@ CI's installed-wheel checks passed but do not execute the embedding provider dir
 embedding-specific installed-wheel execution remains verified only locally on Windows
 (Prompt 117). Local Compose remains unverified. No retrieval, semantic-quality, benchmark,
 production-readiness or general security claim follows.
+
+## Main CI evidence at 872d0af
+
+`main` was fast-forwarded from `5fdaa1c` to exact commit
+`872d0af367be890cce25b2cce0d71a627c993479` in Prompt 121. Its parent is `90240e3`. Relative to
+that parent it changes README.md, ADR-0014, docs/plan.md and prompts.md, which are verification
+documentation and prompt history; source, tests, migrations, dependencies and workflows are
+unchanged. (The earlier commit `90240e3` is the one that changed only prompt history.) Before that, the same commit had passed all five jobs on
+`feat/embedding-persistence`; those feature-push conclusions are attributed to Claude Code's
+Prompt 121 handoff, and their logs were not retrieved. Both main workflow records below are
+successful **push** events on `main` for this SHA.
+
+**Attribution.** The external reviewer retrieved both main-push workflow records, the job and
+step records, and all five main-push job logs; the counts and log output below come from that
+retrieval. The reviewer ran no suite, build, PostgreSQL or Docker locally. Claude Code's
+Prompt 121 session observed only job and step conclusions (all `success`) and could not
+download logs. These main-push counts are not feature-push results, and the `90240e3` evidence
+above stays tied to that commit.
+
+[CI run 38915642574](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38915642574):
+
+- [Ubuntu job 117022270662](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38915642574/job/117022270662): `1586 passed, 233 skipped in 30.44s`.
+- [Windows job 117022270941](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38915642574/job/117022270941): `1585 passed, 234 skipped in 38.81s`.
+- Formatting, lint, typing, distribution builds and the existing installed-wheel checks passed on both.
+- [PostgreSQL job 117022270570](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38915642574/job/117022270570): `233 passed, 1586 deselected in 75.21s (0:01:15)`; all 29 cases in `tests/test_embeddings_postgres.py` passed.
+- [Container job 117022270368](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38915642574/job/117022270368): all six required steps executed and succeeded (configuration, effective context, application image build, image checks, Compose smoke, cleanup). Logs confirm:
+  - `compose config: ok`;
+  - `context: ok (77 files; 19 planted fixtures excluded)`;
+  - UID and GID 10001;
+  - the three CLI help checks, installed imports, offline migration SQL and runtime contents checks;
+  - the database healthy, migration completed and API healthy, with migrate, API and worker on the CI-built image;
+  - a generated API key held in memory;
+  - upload 202 and successful ingestion, the revision active with two verified chunks, and duplicate upload 200;
+  - the idle worker exited 0 without an OOM kill;
+  - `smoke: ok` and `cleanup: ok`.
+
+[Secret-scan run 38915642567](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38915642567),
+[Gitleaks job 117022268580](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38915642567/job/117022268580): `52 commits scanned`,
+`no leaks found`.
+
+**Limits.** CI's existing wheel checks do not execute embeddings directly; embedding-specific
+installed-wheel execution remains verified only locally on Windows (Prompt 117). The container
+smoke runs ingestion, not embedding indexing, and shutdown coverage remains idle-worker only.
+Local Compose remains unverified. M4c–M4f and overall M4 acceptance remain pending.

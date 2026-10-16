@@ -1,6 +1,6 @@
 # EvidenceGuard implementation plan
 
-**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`; CI's installed-wheel step does not exercise embeddings directly (embedding-specific wheel execution was verified only locally on Windows in Prompt 117). The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed and verified in CI on `feat/embedding-persistence` at `90240e3`, not merged, with `main` still at `5fdaa1c`. M4c–M4f remain unimplemented and require detailed specification reviews; overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
+**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`; CI's installed-wheel step does not exercise embeddings directly (embedding-specific wheel execution was verified only locally on Windows in Prompt 117). The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); its implementation is pending and no M4c test, CLI, handler, backfill, wheel extension or indexing smoke has been implemented or executed. M4c–M4f remain unimplemented and require detailed specification reviews; overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
 
 EvidenceGuard is a vendor-risk review copilot. It ingests synthetic vendor documents, retrieves evidence the tenant is authorized to see, classifies each review question against that evidence, and drafts a cited report. A human must approve the exact report revision before it can be finalized or exported. It is decision support, not legal advice or compliance certification.
 
@@ -2585,7 +2585,7 @@ They are set once as job environment variables.
 
 **M4 – Embeddings, retrieval and corpus**
 
-**Status (Prompt 120): [DECISION] M4a–M4f sequence and complete M4a specification
+**Status (Prompt 124): [DECISION] M4a–M4f sequence and complete M4a specification
 accepted at external review; M4a verified and on `main` at `5fdaa1c` (main push
 CI and secret scan green; see [ADR-0013 main evidence](decisions/0013-embeddings.md#main-ci-evidence-at-5fdaa1c)).
 Earlier feature-branch verification at `d501bd6` is historical. Linux/Windows
@@ -2596,12 +2596,14 @@ The [M4b persistence specification](#m4b-persistence-specification-accepted-at-r
 was accepted at external review in Prompt 116 (proposed in Prompt 114, corrected
 in Prompt 115). The M4b implementation on `feat/embedding-persistence`
 ([ADR-0014](decisions/0014-embedding-persistence.md)) was accepted at external review in
-Prompt 118 and is **reviewed and verified in CI at `90240e3`, not merged**; `main`
-remains at `5fdaa1c`. Current-version PostgreSQL (`233 passed`, including all 29 M4b
-cases), Linux, Windows, build and container verification completed for that
-feature-branch commit; see the [CI evidence](decisions/0014-embedding-persistence.md#feature-branch-ci-evidence-at-90240e3). M4c–M4f still need
-detailed reviews, overall M4 acceptance remains pending, and local Compose remains
-unverified.** M1, M2 and M3 remain accepted.
+Prompt 118 and is **reviewed, verified in CI and on `main` at `872d0af`** (main push:
+PostgreSQL `233 passed`, including all 29 M4b cases, plus Linux, Windows, build and
+container verification; see the [main CI evidence](decisions/0014-embedding-persistence.md#main-ci-evidence-at-872d0af)). The earlier
+feature-branch verification at `90240e3` is historical. The
+[M4c indexing specification](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending)
+was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in
+Prompt 123). Implementation is pending: no M4c tests, CLI, handler, backfill, wheel extension or indexing smoke has been implemented or executed. M4d–M4f still need detailed
+reviews, overall M4 acceptance remains pending, and local Compose remains unverified.** M1, M2 and M3 remain accepted.
 
 The reviewer inspected the full Prompt 107 diff, independently matched its
 SHA-256 checksum and checked the existing chunk domain and chunker source
@@ -2637,8 +2639,8 @@ Accepted dependency-ordered sequence (Prompt 108; each later slice needs its own
 | Slice | Scope and completion evidence |
 |---|---|
 | M4a | Immutable embedding identity/batch contracts, provider protocol, deterministic offline hashing and validation. Detailed below; no persistence or provider access. |
-| M4b | Embedding profiles/index records, tenant-scoped storage and migration, full-text representation, exact vector operations and completeness/readiness. Real PostgreSQL constraints, migration round trips and filtering tests. Introduce pgvector here when vector storage/operators first require it; M4a needs no extension. Detailed specification [accepted at review in Prompt 116](#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending) (proposed in Prompt 114, corrected in Prompt 115); implemented in Prompt 117, accepted in Prompt 118, and verified in feature-branch CI at `90240e3`, not merged ([ADR-0014](decisions/0014-embedding-persistence.md)). |
-| M4c | Separate durable `index_revision` jobs over completed immutable chunk sets, enqueue/backfill seam and registered handler. Test leases/fences, replay, partial batches, conflicting retries, cancellation and atomic readiness/job finish. No review workflow. |
+| M4b | Embedding profiles/index records, tenant-scoped storage and migration, full-text representation, exact vector operations and completeness/readiness. Real PostgreSQL constraints, migration round trips and filtering tests. Introduce pgvector here when vector storage/operators first require it; M4a needs no extension. Detailed specification [accepted at review in Prompt 116](#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending) (proposed in Prompt 114, corrected in Prompt 115); implemented in Prompt 117, accepted in Prompt 118, verified in CI and on `main` at `872d0af` ([ADR-0014](decisions/0014-embedding-persistence.md)). |
+| M4c | Separate durable `index_revision` jobs over completed immutable chunk sets, enqueue/backfill seam and registered handler. Test leases/fences, replay, partial batches, conflicting retries, cancellation and atomic readiness/job finish. No review workflow. Detailed specification [accepted at review in Prompt 124](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending) (proposed in Prompt 122, corrected in Prompt 123); implementation pending. |
 | M4d | Explicit snapshot input/capture seam, eligibility validation, deterministic lexical/vector/RRF retrieval and bounded results. PostgreSQL isolation, snapshot-after-supersession, ranking and tie tests. No review endpoints or report generation. |
 | M4e | Synthetic clean/injected corpus, stable anchor-to-chunk ground truth, Recall@5/@8 and retrieval contracts. Include cross-tenant, cross-vendor and superseded traps and missing answers; no semantic-quality claim. |
 | M4f | Voyage adapter behind the same contract, injected transport mocked in CI, fixed profile/configuration, bounded calls and safe error mapping. No live calls required for M4 acceptance; live quality evidence belongs to M7. |
@@ -2897,7 +2899,7 @@ These are design decisions, not execution evidence. At acceptance (Prompt 116)
 nothing below was implemented or verified. Implementation needs its own
 authorization and ADR-0014.
 
-**Implementation (Prompt 117; accepted in Prompt 118; verified in feature-branch CI at `90240e3`, not merged).** Claude Code
+**Implementation (Prompt 117; accepted in Prompt 118; verified in CI and on `main` at `872d0af`).** Claude Code
 implemented this specification as recorded in
 [ADR-0014](decisions/0014-embedding-persistence.md), which lists the implementation
 choices made within it (UUID namespace literals, explicit constraint names, a
@@ -2912,15 +2914,22 @@ the implementation for a local commit in Prompt 118 after inspecting the diff,
 matching its checksum and running independent standard-library probes, without
 running the project suite, an installed-wheel check, PostgreSQL or Docker.
 
-**Feature-branch CI (Prompt 119; evidence retrieved by the reviewer and recorded in
-Prompt 120).** Both push runs for `90240e3` on `feat/embedding-persistence`
+**Feature-branch CI (historical; Prompt 119, evidence retrieved by the reviewer and
+recorded in Prompt 120).** Both push runs for `90240e3` on `feat/embedding-persistence`
 succeeded: Ubuntu `1586 passed, 233 skipped`, Windows `1585 passed, 234 skipped`,
 PostgreSQL `233 passed, 1586 deselected` (all 29 M4b cases passed, none failed or
 skipped), the container job with all six required steps, and Gitleaks (51 commits,
 no leaks). This verifies the M4b paths the tests cover, nothing beyond them. CI's
 installed-wheel checks do not execute embeddings directly; that remains verified
-only locally on Windows. M4b is not merged; M4c–M4f and overall M4 acceptance remain
-pending. Full links and attribution: [ADR-0014](decisions/0014-embedding-persistence.md#feature-branch-ci-evidence-at-90240e3). Acceptance
+only locally on Windows. At that point M4b was not merged. Full links and attribution:
+[ADR-0014](decisions/0014-embedding-persistence.md#feature-branch-ci-evidence-at-90240e3).
+
+**Main publication (Prompt 121; main-push evidence retrieved by the reviewer and
+recorded in Prompt 122).** `main` was fast-forwarded to `872d0af`. The main-push runs
+succeeded: Ubuntu `1586 passed, 233 skipped`, Windows `1585 passed, 234 skipped`,
+PostgreSQL `233 passed, 1586 deselected` with all 29 M4b cases, the container job with
+all six steps, and Gitleaks (52 commits, no leaks). See the
+[main CI evidence](decisions/0014-embedding-persistence.md#main-ci-evidence-at-872d0af). M4c–M4f and overall M4 acceptance remain pending. Acceptance
 authorizes no indexing handler or retrieval functionality; M4c–M4f still require
 detailed reviews. Items marked [DECISION] in earlier sections stay authoritative.
 
@@ -3469,6 +3478,388 @@ recommendation text**, kept unchanged except for the superseded note on item 5.
     the accepted refusal policy.
 12. **`content_sha256` copied into embeddings.** Recommend yes, FK-checked. It binds
     each vector to the exact text that was embedded.
+
+#### M4c indexing specification (ACCEPTED at review, Prompt 124; implementation pending)
+
+**Status.** [DECISION] The **complete M4c specification was accepted at external review in
+Prompt 124**. Claude Code proposed it in Prompt 122 and corrected it in Prompt 123; the choices
+under [Settled review decisions](#settled-m4c-review-decisions-prompt-123) were settled in
+Prompt 123. **Implementation is pending**: no M4c tests, CLI, handler, backfill, wheel extension or indexing smoke has been implemented or executed. Acceptance establishes the design
+and the planned verification requirements; it is not implementation or execution evidence.
+
+Within this accepted section, the items labelled [REC] (written as recommendations in
+Prompts 122–123) now form the **accepted implementation contract** for M4c. Explicitly deferred
+work stays deferred: recovery generations, activation wiring, live adapters and M4d–M4f.
+Nothing here accepts any M4d–M4f recommendation; those slices need their own detailed reviews.
+Labels: **[DECISION]** accepted; **[SETTLED]** settled at review in Prompt 123; **[FACT]**
+established from source on `main` at `872d0af`; **[REC]** an original recommendation, now part
+of the accepted contract.
+
+**Scope.** Explicit enqueue and bounded backfill of `index_revision` jobs, an `eg-admin` command,
+the production handler and its fixed offline provider mapping, bounded batching with reuse of
+committed rows, atomic readiness with job success, cancellation and failure mapping, the tests,
+and the CI changes they require. Out of scope: snapshot capture and retrieval (M4d), corpus
+(M4e), live adapters (M4f), review orchestration (M5), and any redesign of M4a or M4b.
+
+##### Preserved decisions
+
+[DECISION] (Prompt 108; M4b, Prompts 114–118):
+- separate durable `index_revision` jobs whose payload is exactly `{"index_id": "<UUID>"}`;
+- tenant-scoped immutable index, profile and chunk-set binding;
+- only ever-activated revisions, including a now-superseded revision when it is explicitly
+  indexed;
+- atomic index creation and idempotent enqueue;
+- provider computation outside fences, with bounded fenced writes and reuse of committed rows;
+- readiness and job success together through `ctx.fenced(finish=True)`;
+- no mutation of settled chunks and no demotion of active revisions;
+- no retrieval and no M5 workflow.
+
+##### Settled M4c review decisions (Prompt 123)
+
+[SETTLED] The reviewer settled these in Prompt 123; the complete specification, including them,
+was accepted in Prompt 124.
+1. Trusted internal enqueue and backfill seams, callable with the existing reviewer, approver
+   or admin roles. No public API endpoint.
+2. `eg-admin backfill-indexes`, fixed to `HASH_IDENTITY` and using the existing trusted-operator
+   model.
+3. Stalled canonical jobs are reported, never reset, replaced or rescheduled. Recovery
+   generations remain deferred.
+4. Activation wiring is deferred; M3 activation and ingestion semantics are preserved.
+5. The existing fixed job error codes are reused for this offline-only slice.
+6. Initial engineering defaults, not measured performance claims: provider and write pages of
+   at most 32 chunks and 128,000 UTF-8 bytes; a backfill default limit of 50 (maximum 100); and
+   the existing default of 3 job attempts.
+7. The embedding-specific CI wheel check and the production-path offline indexing smoke
+   (both below) are **required** M4c acceptance checks.
+
+##### Facts from current source
+
+- [FACT] `enqueue(session, actor, *, kind, idempotency_key, payload, max_attempts=3)` runs in
+  the caller's transaction and **returns only a `JobSnapshot`**: it does not say whether this
+  call inserted the job. The tenant comes only from `actor`. An identical retry returns the
+  existing job unchanged, even when terminal. A differing payload or `max_attempts` raises
+  `JobIdempotencyConflictError`. At READ COMMITTED, concurrent inserts resolve through the
+  unique key; `JobEnqueueRaceError` is raised when the conflicting row is not visible.
+- [FACT] M4b provides:
+  - `ensure_profile` and `create_index`, which run in the caller's transaction (no fence; the
+    tenant is passed in, and they require an activated revision with a chunk set);
+  - `write_embeddings` (1–32 canonical rows), which runs in the fence and **refuses a ready
+    index with `EmbeddingWriteRefusedError`**;
+  - `mark_index_ready`, which runs in the fence and provides the **already-ready no-op with a
+    fresh ownership re-check**.
+
+  Both fenced functions require kind `index_revision` and exactly `index_id`, lock job →
+  index, and re-check ownership on every successful path.
+- [FACT] `embed_validated(provider, texts, input_type)` validates the request (1–32 texts,
+  ≤128,000 UTF-8 bytes in total, each ≤4,000 code points and ≤16,000 bytes) and the result.
+  It converts **any** provider exception into the fixed `InvalidEmbeddingError`.
+  `stored_embeddings` converts a validated batch to canonical rows, or rejects the whole batch.
+- [FACT] The worker runtime maps:
+  - `RetryableJobError(code)` to re-queue, or `dead` once attempts are exhausted (default 3,
+    backoff 5–60 s);
+  - `PermanentJobError(code)` to `failed`;
+  - `JobCancelledError` while a cancel is requested to retryable `worker_shutdown`;
+  - any other exception to retryable `unexpected_error`.
+
+  Under lease loss the stale worker records nothing.
+- [FACT] `JobContext` checks local cancellation and lease state at explicit boundaries:
+  - `check()`;
+  - `fenced()` before opening the transaction and again after acquiring the job-row lock;
+  - with `finish=True`, once more before recording success.
+
+  These checks are **not** atomic with every SQL statement and do not interrupt a statement or
+  call already in flight. The database fence is the authoritative ownership check, and a
+  transaction that passed its check just before lease expiry may still commit shortly after it
+  (the accepted M3a window).
+- [FACT] `production_registry()` registers only `ingest_revision`. Three places assert exactly
+  that kind set: `tests/test_worker_cli.py`, the CI wheel step in `.github/workflows/ci.yml`,
+  and the image check in `infra/ci/container_ci.py`.
+- [FACT] Import boundaries: persistence may not import retrieval, worker or api; the worker may
+  import retrieval; the api (including `eg-admin`) may import retrieval but not the worker.
+  `eg-admin` prints fixed messages only, exits 2 on usage errors and 1 on failures. The
+  `jobs.kind` CHECK accepts `index_revision`, and the M4b schema needs no change.
+
+##### Enqueue
+
+[REC] A new module, `evidenceguard_persistence/indexing.py`, running in the caller's transaction
+at READ COMMITTED and never committing:
+
+```text
+enqueue_index_revision(session, actor, *, revision_id, identity) -> IndexEnqueueResult
+    IndexEnqueueResult(index: IndexSnapshot, job: JobSnapshot | None,
+                       outcome: "pending" | "ready" | "stalled")
+```
+
+Steps:
+1. Validate before any write: `require_storable_identity(identity)`; the tenant comes only from
+   `actor.tenant_id`; the actor's role must be reviewer, approver or admin.
+2. `ensure_profile` and `create_index`. The revision must be in that tenant and ever activated,
+   with a chunk set; otherwise the fixed `IndexSourceNotEligibleError`.
+3. If the index is observed `ready`: outcome `ready`, `job` is `None`, and nothing is enqueued.
+4. Otherwise call `enqueue(session, actor, kind="index_revision",
+   idempotency_key=str(index.id), payload={"index_id": str(index.id)})`. The key is
+   deterministic, because the index ID is a UUID5 of tenant, revision, chunker and profile. A
+   building index whose canonical job is missing therefore gets that job created.
+5. The outcome follows from the returned snapshot:
+   - `queued` or `running`: `pending`, whether this call created the job or it already existed;
+   - `failed`, `dead`, or the anomalous `succeeded` with a `building` index: `stalled`, with
+     the job returned unchanged. **No reset, rescheduling or replacement.**
+
+The seam does not infer creation from a pre-read, timestamps, attempts or system columns, and
+M3a's `enqueue` is not changed. The outcome is an **observation within this transaction**, not a
+promise about the job's state after commit. Index creation and enqueue commit together or roll
+back together. `JobIdempotencyConflictError` propagates, so the caller's transaction rolls back
+and nothing is replaced.
+
+Concurrency: the supported isolation is READ COMMITTED. Duplicate concurrent requests serialise
+on `uq_embedding_indexes_source` and the jobs idempotency key and observe the same rows. Under
+stronger isolation the database may also raise serialization failures. Not every concurrency
+failure becomes `JobEnqueueRaceError`; such failures propagate to the caller.
+
+##### Backfill
+
+[REC] In the same module:
+
+```text
+backfill_index_revisions(session_factory, actor, *, identity, limit=50, after=None) -> BackfillPage
+    BackfillItem(revision_id, index_id: UUID | None,
+                 outcome: "pending" | "ready" | "stalled" | "ineligible" | "conflict")
+    BackfillPage(items: tuple[BackfillItem, ...], next_after: UUID | None)
+```
+
+- **Validation first.** The actor (role and tenant), identity, `limit` (1–100) and `after`
+  (a UUID or `None`) are validated before any transaction starts.
+- **Selection.** One short read transaction, tenant-scoped, selects revisions with
+  `status = 'active'` and a chunk set and **without** a `ready` index for this profile. Rows are
+  ordered by revision `id` ascending, with `id > after`, up to `limit`. Revisions already
+  superseded when this selection is observed are excluded. Explicit `enqueue_index_revision`
+  still accepts any ever-activated revision.
+- **Writes.** Each selected revision runs `enqueue_index_revision` in **its own** tenant-scoped
+  write transaction. Only the explicitly named expected domain failures become per-item
+  outcomes, each after that item's transaction is rolled back:
+  - `IndexSourceNotEligibleError` becomes `ineligible`;
+  - `JobIdempotencyConflictError`, `EmbeddingProfileConflictError` and `IndexConflictError`
+    become `conflict`.
+
+  Such an item may have no committed index, so its `index_id` is `None`. Any other database,
+  programming or infrastructure failure **propagates and fails the operation**, rather than
+  becoming a successful item.
+- **Partial progress.** Items committed before an unexpected failure stay committed. No
+  all-page atomicity is claimed.
+- **Selection races.** Revisions are active at the selection observation only. A selected
+  revision that becomes superseded before its enqueue transaction may still be indexed: it was
+  activated and its chunks are immutable. Nothing claims it stays active throughout the run.
+- **Cursor.** `next_after` is the last **selected** ID (including per-item failures) when the
+  page is full, otherwise `None`. Retrying skipped or conflicted candidates, or picking up newly
+  activated revisions whose UUIDs sort below the cursor, can require a fresh pass from the
+  beginning.
+
+##### `eg-admin backfill-indexes`
+
+[SETTLED] `eg-admin backfill-indexes --tenant-id UUID [--limit N] [--after UUID]` runs one
+bounded page per invocation, using `HASH_IDENTITY` and a fixed system actor with role admin for
+the tenant. It follows the existing argparse safety and privacy conventions: usage errors exit 2
+with the static message.
+
+It prints only fixed outcome counts (`pending`, `ready`, `stalled`, `ineligible`, `conflict`)
+and the next cursor. It never prints raw exception text, text, vectors or keys. Exit codes:
+- 0: the page completed without `stalled`, `ineligible` or `conflict` items;
+- 3 (accepted in Prompt 124): the page completed with any of them;
+- 1: an unexpected operation failure, with a fixed message.
+
+There is no automatic retry loop and no recovery of terminal jobs.
+
+##### Handler and provider selection
+
+[REC] A new module, `evidenceguard_worker/indexing.py`:
+
+```text
+INDEX_REVISION_KIND = "index_revision"
+SUPPORTED_PROVIDERS = MappingProxyType({HASH_IDENTITY.fingerprint: HashingEmbedder})
+make_index_revision_handler(providers=SUPPORTED_PROVIDERS) -> JobHandler
+index_revision = make_index_revision_handler()
+```
+
+- **Mapping.** The factory copies the supplied mapping into an immutable `MappingProxyType`
+  when it is created, including injected test mappings, so later mutation of the caller's
+  mapping has no effect.
+- **Registration.** `production_registry()` returns both `ingest_revision` and
+  `index_revision`. Tests use the factory with provider doubles and a test-owned registry; the
+  production defaults never change.
+- **Provider resolution.** The stored profile is read, and `EmbeddingIdentity` is
+  reconstructed from its five fields. Its fingerprint must equal the stored fingerprint
+  **before** the provider is looked up. A missing mapping entry is a permanent failure. The
+  provider's `identity` must equal the captured stored identity. No live adapter is imported,
+  and nothing is selected from the environment or the network.
+- **Payload.** Only `index_id`; no provider IDs, text or credentials.
+
+##### Batching, replay and completeness
+
+Two new read functions in `evidenceguard_persistence/indexing.py`, called inside **short
+read-purpose fenced transactions**. These are ordinary `ctx.fenced()` transactions that hold
+the job-row lock; there is no `SET TRANSACTION READ ONLY`.
+- `load_index_target(session, job)` applies M4b's job binding (kind, payload, tenant) and reads
+  the index and profile without an index row lock; the fields read are immutable.
+- `pending_chunks(session, job, index, *, after_ordinal)` returns at most 32
+  `PendingChunk(ordinal, id, text, content_sha256)` values for chunks of the bound tenant,
+  revision and chunker version with `ordinal > after_ordinal` and **no** embedding row in this
+  index, ordered by ordinal. The value's `repr` omits `text`.
+
+One attempt, in order:
+1. The payload keys must be exactly `{index_id}`, or `PermanentJobError` before any database
+   access.
+2. Read fence: `load_index_target`.
+3. If the index is already `ready`: `with ctx.fenced(finish=True): mark_index_ready(...)`. This
+   is the no-op with a fresh ownership re-check, and the job succeeds.
+4. Resolve the provider (above).
+5. Loop, with `after = -1`:
+   - Read fence: `page = pending_chunks(...)`. Stop when the page is empty.
+   - After the read fence closes:
+     - keep the longest prefix whose UTF-8 total is ≤128,000 bytes (every page is non-empty,
+       since one chunk is at most 16,000 bytes);
+     - verify `content_sha256(text)` for each chunk, where a mismatch is permanent;
+     - `ctx.check()`;
+     - compute `embed_validated(provider, texts, "document")` and `stored_embeddings(...)`
+       with no transaction, lock or session open;
+     - `ctx.check()`.
+   - Write fence: `write_embeddings(...)` (short; job → index lock; fresh re-check).
+   - `after` becomes the last ordinal of the kept prefix, so the loop is bounded by
+     `chunk_count`.
+6. `with ctx.fenced(finish=True): mark_index_ready(...)`: M4b's full completeness check, then
+   readiness and job success commit together.
+
+**Reuse.** Rows committed earlier are excluded by `pending_chunks`, so they are reused **without**
+provider calls and never recomputed or overwritten. This does not verify reused vectors against
+new provider output. M4b's constraints bind stored bytes, profile and source membership, not
+semantic correctness.
+
+**Conflict.** If another valid attempt commits a row for a selected chunk between this
+attempt's read and its write, `write_embeddings` compares the replay. An identical row is
+accepted. A differing row raises `EmbeddingConflictError`; nothing is overwritten, and the
+failure is mapped below.
+
+**No exactly-once claim.** A page computed but not committed (crash, lease loss, cancellation,
+a failed commit) is computed again on retry. The offline provider is deterministic.
+
+##### Cancellation, lease loss and failures
+
+Actual guarantees, all at explicit boundaries:
+- `ctx.check()` immediately before and after provider computation;
+- `ctx.fenced()` checks before opening its transaction and after acquiring the job lock;
+- `finish=True` checks once more before recording success;
+- database ownership checks (M3a's fence and M4b's re-checks) remain authoritative.
+
+Limits:
+- A cancellation latched after the last applicable check may not stop an already-started
+  non-finish transaction from committing.
+- Checks do not interrupt synchronous provider or database calls.
+- The accepted lease-expiry/commit window and the existing shutdown limits remain.
+- Cancellation while ownership remains valid makes the runtime record retryable
+  `worker_shutdown`, which **is** a lifecycle outcome. Lease loss means the stale worker
+  records no outcome.
+
+**Provider-exception path.** When provider execution or validation raises (always the fixed
+`InvalidEmbeddingError` from `embed_validated` or `stored_embeddings`), the handler calls
+`ctx.check()` **before** classifying the failure. A cancellation or lease loss latched during
+the call takes precedence, as `JobCancelledError` or `LeaseLostError`. Control-flow exceptions
+are never converted. The same explicit-boundary race applies: a latch occurring after that
+check is not atomic with classification.
+
+Failure mapping, using existing codes only [SETTLED]:
+
+| Condition | Outcome |
+|---|---|
+| Payload keys, `IndexJobMismatchError`, `IndexNotFoundError` | `PermanentJobError(permanent_failure)` |
+| Stored-identity fingerprint mismatch, unsupported fingerprint, provider identity mismatch, `EmbeddingProfileMismatchError` | `permanent_failure` |
+| Text-hash mismatch, `EmbeddingSourceMismatchError`, `IndexIncompleteError` | `permanent_failure` |
+| `InvalidEmbeddingError` from provider output or the post-rounding check (after `ctx.check()`) | `permanent_failure`; the offline provider is deterministic, and M4f must separate transient failures |
+| `EmbeddingConflictError`, `EmbeddingStorageRejectedError` | `permanent_failure`; the index stays `building` and nothing is overwritten |
+| `EmbeddingWriteRefusedError` (another attempt made the index ready) | Step 3's no-op finish |
+| `JobLockTimeoutError` | `RetryableJobError(retryable_failure)` |
+| `LeaseLostError`, `JobCancelledError`, `FenceClosedError` | Propagate untouched (existing runtime handling) |
+| Any other exception | Propagates; the runtime records retryable `unexpected_error` |
+
+When retries are exhausted the job ends `dead`, and enqueue and backfill report the index as
+`stalled`. A failed index keeps its committed rows and stays `building` (ineligible). Nothing
+logs text, vectors, keys or exception details; errors keep fixed messages.
+
+##### Implementation, migration and CI changes
+
+[REC] Files:
+- New `evidenceguard_persistence/indexing.py` and `evidenceguard_worker/indexing.py`.
+- `evidenceguard_worker/handlers.py`: registration.
+- `evidenceguard_api/admin.py`: the `backfill-indexes` command.
+- No migration and no configuration change: the M4b schema and the jobs table already support
+  M4c.
+- **Necessary updates** to the three registry-kind assertions (`tests/test_worker_cli.py`,
+  `ci.yml`, `infra/ci/container_ci.py`).
+- ADR-0015 is an implementation deliverable.
+
+**Required CI acceptance checks** [SETTLED; planned, not execution evidence]:
+- **Wheel step** (`ci.yml`), Ubuntu and Windows:
+  - runs outside the checkout with isolated Python (`-I`);
+  - verifies imports resolve to site-packages;
+  - runs `HashingEmbedder` through `embed_validated` and `stored_embeddings` directly;
+  - imports the indexing modules and asserts both production registry kinds.
+
+  It makes **no** claim of database indexing.
+- **Container smoke** (`infra/ci/container_ci.py`), after the existing ingestion:
+  - run the production `eg-admin backfill-indexes` for the synthetic tenant and let the
+    registered worker process the job, with bounded timeouts;
+  - verify with read-only queries that the index has the **same tenant and ingested revision**
+    and the expected offline profile fingerprint, `status = 'ready'`, its canonical
+    `index_revision` job `succeeded`, and an embedding row count equal to `chunk_count`;
+  - keep the existing image-identity, privacy, idle-shutdown and cleanup checks.
+
+  A readiness row count alone is not described as proving indexing for that
+  tenant/revision/profile.
+
+**Planned tests** (none written or run):
+- **Database-independent:**
+  - registry kinds;
+  - an immutable, defensively copied provider mapping;
+  - stored-identity fingerprint verification before resolution; unsupported fingerprints and
+    identity mismatches fail permanently with no other adapter imported;
+  - page caps at exactly 32 items and at the 128,000-byte boundary with multi-byte text;
+    ordering; hash mismatch; `PendingChunk` representations without text;
+  - the scripted-context handler:
+    - cancellation or lease loss before provider work;
+    - a successful provider return after a latch;
+    - a provider or validation failure after a latch (the latch wins);
+    - the before-write and before-finish boundaries;
+    - each failure-table row;
+    - the already-ready and write-refused paths;
+  - enqueue outcomes `pending`, `ready` and `stalled`;
+  - backfill validation before writes, per-item `ineligible`/`conflict` with rollback,
+    unexpected failures propagating, a nullable `index_id`, and cursor advance over failures;
+  - CLI counts, exit codes 0, 3, 1 and 2, and output without content.
+- **PostgreSQL** (real `enqueue`/`claim`/fence, deterministic barriers or hooks, observed lock
+  waits, bounded waits):
+  - enqueue: atomicity (a rollback leaves neither index nor job), idempotency, and two
+    concurrent enqueues observing one index and one job;
+  - refusal of never-activated and foreign revisions; an explicit superseded revision is
+    allowed;
+  - `stalled` for a dead job, which stays unchanged;
+  - backfill: bounds, cursor, ordering, exclusion of revisions superseded at selection, and
+    partial progress surviving an injected unexpected failure;
+  - the full worker run gives a ready index with job success, and the stored bytes equal the
+    direct offline computation;
+  - a previously committed row is reused without recomputation (a counting provider double)
+    and stays unchanged;
+  - a **competing writer**, using a separate valid job and fence, commits a different valid
+    vector after this attempt selected the chunk but before its write. The conflict is
+    detected, nothing is overwritten, and this attempt records `permanent_failure` while its
+    ownership is valid;
+  - lease expiry and cancellation while the provider double blocks give no write by the stale
+    owner, and the actual runtime outcome is asserted (`worker_shutdown` for cancellation,
+    none for lease loss);
+  - failure at the finish leaves neither readiness nor success;
+  - a 450-chunk revision exercises pagination.
+
+##### Review outcome
+
+[DECISION] Prompt 124 accepted CLI exit code 3 and the complete corrected specification. No
+specification decision remains open; implementation and its verification are pending.
 
 **M5 – Review workflow (fake model in CI)**
 - Provider interface; Anthropic and scripted fake providers; `prompts/verifier/v1.md` and `prompts/risk_analyst/v1.md`; planner; orchestration; review snapshot; provenance checks; status derivation; report renderer; provider-call records and spans.
