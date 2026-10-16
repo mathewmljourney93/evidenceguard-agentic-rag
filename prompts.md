@@ -18715,3 +18715,964 @@ before the commit: scope and byte identity, history prefix, links and anchors, n
 claims of M4c implementation or verification, privacy/CR/BOM, cached whitespace, staged
 Gitleaks and identity. Actual results and the commit SHA are reported in the handoff. No push,
 merge or implementation.
+
+**Prompt 124 outcome (recorded in Prompt 125, from Claude Code's Prompt 124 handoff):** committed
+locally as `629cf18b1b48b8df14d611e438ce284f81e71ee9` (parent `872d0af`, tree
+`ee6b16567ecb0ed3e0e8d61bf0815ba6336b1b35`) on `docs/m4c-indexing-spec`. Subject: "docs: record M4b
+main results and accepted M4c indexing specification", with the noreply identity and a
+Co-Authored-By Claude trailer. Exactly the four documentation/history paths changed, and ADR-0014
+was byte-identical to the accepted tree. Checks that passed: links and anchors, privacy, cached
+whitespace, staged Gitleaks, and full-history Gitleaks after the commit (53 commits, no leaks).
+main/origin/main were unchanged, and nothing was pushed. The acceptance diff
+`.local/p124/m4c-spec-acceptance.diff` was 25,114 bytes, SHA-256
+`eb87426a481acae412da160116e4c856f26772585fba50248aeee4c8becd1a52`.
+
+**Prompt 124 review (recorded in Prompt 125):** the external reviewer inspected the complete
+Prompt 124 acceptance diff and independently matched its SHA-256
+`eb87426a481acae412da160116e4c856f26772585fba50248aeee4c8becd1a52`. The acceptance documentation is
+accepted. The reviewer ran no additional application tests, builds, PostgreSQL or Docker checks.
+
+## Prompt 125: Implement M4c indexing, backfill and required CI checks
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Session:** Claude Code.
+- **Scope/status:** implementation staged for external review; no commit or publication.
+
+````text
+Written for: Mathew and the external reviewer.
+
+# Prompt 125: Implement M4c indexing, backfill and required CI checks
+
+Read CLAUDE.md and applicable repository instructions. Continue this session; this is its twelfth substantial prompt, so no session switch is needed on that count.
+
+The external reviewer inspected the complete Prompt 124 acceptance diff and independently matched its SHA-256:
+`eb87426a481acae412da160116e4c856f26772585fba50248aeee4c8becd1a52`.
+
+The acceptance documentation is accepted. The reviewer ran no additional application tests, builds, PostgreSQL or Docker checks.
+
+Authorize implementation of the complete accepted M4c specification, local verification and staging for external review. Do not commit, push or merge.
+
+## 1. Verify the starting state
+
+Expected:
+- Branch: `docs/m4c-indexing-spec`.
+- HEAD:
+  `629cf18b1b48b8df14d611e438ce284f81e71ee9`.
+- Parent:
+  `872d0af367be890cce25b2cce0d71a627c993479`.
+- HEAD tree:
+  `ee6b16567ecb0ed3e0e8d61bf0815ba6336b1b35`.
+- Working tree clean.
+- Local main and origin/main:
+  `872d0af367be890cce25b2cce0d71a627c993479`.
+- Origin:
+  `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`.
+- Expected noreply author and committer identity.
+
+Record baseline evidence under `.local/p125/`.
+
+Create `feat/revision-indexing` from HEAD, provided it does not already exist.
+
+Stop on a material mismatch without overwriting work. No remote mutation is authorized.
+
+## 2. Authoritative scope
+
+Implement the accepted section:
+“M4c indexing specification (ACCEPTED at review, Prompt 124; implementation pending)”
+in docs/plan.md.
+
+Read the actual M4a provider boundary, M4b store, job lifecycle, worker context/runtime, registry, admin CLI and container helper before editing.
+
+Use targeted reads. Do not reload or print the complete prompt history.
+
+Implement:
+- tenant-scoped enqueue and bounded backfill;
+- eg-admin backfill-indexes;
+- the production index_revision handler;
+- offline-only provider resolution;
+- bounded batching and committed-row reuse;
+- fenced writes and atomic readiness/job success;
+- cancellation and fixed failure mapping;
+- required CI wheel and production indexing checks;
+- meaningful tests and ADR-0015.
+
+Do not implement:
+- activation-time enqueue;
+- terminal-job recovery or retry generations;
+- live providers or network calls;
+- retrieval, snapshots, corpus or M4d–M4f;
+- review orchestration or M5.
+
+Preserve M3 activation, chunk immutability, worker shutdown semantics and M4b numeric/schema contracts.
+
+No migration, dependency, uv.lock, Dockerfile or Compose change is authorized.
+
+If the specification proves contradictory or requires a material redesign, stop and explain the issue rather than silently substituting a design.
+
+## 3. Persistence and operator seam
+
+Implement evidenceguard_persistence/indexing.py with the accepted boundaries.
+
+### Enqueue
+- Tenant comes only from the validated actor.
+- Existing reviewer, approver or admin roles.
+- Caller-owned READ COMMITTED transaction; no commit inside the seam.
+- ensure_profile/create_index plus canonical enqueue atomically.
+- Payload exactly index_id, idempotency key str(index.id).
+- Outcomes pending, ready or stalled as transaction observations.
+- No inferred “created” flag and no M3a enqueue redesign.
+- Missing canonical job for a building index is created.
+- Existing terminal jobs remain unchanged.
+- Ready indexes enqueue nothing.
+- Conflicts propagate and roll back the caller's transaction.
+
+### Backfill
+- Validate actor, identity, limit and cursor before transactions.
+- One bounded tenant-scoped selection page.
+- Active at selection, with a chunk set and no ready index for the profile.
+- UUID ordering/cursor and accepted limit 50, maximum 100.
+- One independent write transaction per selected revision.
+- Only the named expected failures become ineligible/conflict after rollback.
+- Unexpected failures propagate; earlier committed items remain committed.
+- Nullable index_id for failed items.
+- Preserve the accepted supersession-race and cursor limitations.
+
+### CLI
+Add eg-admin backfill-indexes using the existing trusted-operator model and fixed HASH_IDENTITY.
+
+One page per invocation. Print fixed outcome counts and next cursor only.
+
+Exit codes:
+- 0: clean completed page;
+- 3: completed page containing stalled/ineligible/conflict;
+- 1: operation failure;
+- 2: usage error.
+
+Retain existing argparse safety, import boundaries and privacy conventions. No automatic retry or terminal-job reset.
+
+## 4. Production handler
+
+Implement evidenceguard_worker/indexing.py and register index_revision alongside ingest_revision.
+
+- Immutable, defensively copied provider mapping.
+- Production mapping contains only the accepted offline identity.
+- Reconstruct the stored identity and verify its fingerprint before resolution.
+- Provider identity must match the captured stored identity.
+- Tests inject doubles through the handler factory and test-owned registries.
+- No environment-based provider selection or live adapter import.
+
+Implement tenant-, revision-, chunker- and index-scoped read helpers and privacy-safe PendingChunk values.
+
+Use short read-purpose ctx.fenced() transactions. They hold the job-row lock and are not PostgreSQL READ ONLY transactions.
+
+After the read fence closes:
+- retain the longest prefix within both 32 chunks and 128,000 UTF-8 bytes;
+- verify source text hashes;
+- check cancellation/lease state;
+- run embed_validated and stored_embeddings with no transaction, lock or session open;
+- check cancellation/lease state again;
+- write through M4b in a short fenced transaction.
+
+Advance the cursor using the kept prefix, not discarded rows.
+
+Reuse previously committed embeddings without recomputation. Do not claim semantic verification of reused vectors or exactly-once provider calls.
+
+Finish through ctx.fenced(finish=True) and mark_index_ready so readiness and job success commit together.
+
+Preserve the already-ready no-op and write-refused recovery path.
+
+## 5. Cancellation and failures
+
+Implement the accepted failure table using existing fixed error codes.
+
+On provider execution/validation failure, call ctx.check() before classifying that failure, allowing already-latched cancellation or lease loss to take precedence.
+
+Preserve control-flow exceptions and the actual worker runtime handling:
+- cancellation can record retryable worker_shutdown while ownership remains valid;
+- a stale worker records no outcome after lease loss;
+- synchronous calls are not interrupted;
+- explicit checks do not atomically guard every SQL statement;
+- the accepted lease-expiry/commit window remains.
+
+Do not modify worker cancellation or shutdown semantics to make stronger guarantees.
+
+No raw text, vectors, keys or exception details in errors, logs, CLI output or representations.
+
+## 6. Required CI changes
+
+Update registry-kind assertions in:
+- tests/test_worker_cli.py;
+- .github/workflows/ci.yml;
+- infra/ci/container_ci.py.
+
+Make only the necessary additions; preserve existing jobs and safeguards.
+
+### Installed-wheel check
+On Ubuntu and Windows:
+- execute outside the checkout with isolated Python;
+- verify relevant module imports resolve to site-packages;
+- directly run HashingEmbedder through embed_validated and canonical storage conversion;
+- import indexing modules;
+- assert both production registry kinds.
+
+This check does not establish real database indexing.
+
+### Container smoke
+Extend the existing smoke after ingestion:
+- invoke the production backfill CLI for the synthetic tenant;
+- let the registered production worker index;
+- wait within explicit bounded deadlines;
+- use read-only queries to verify the intended tenant, ingested revision, offline profile, ready index, succeeded canonical job and embedding count equal to chunk_count.
+
+Retain:
+- exact CI-built service image checks;
+- private credential capture, redaction and fail-closed service-log retrieval;
+- bounded subprocesses and HTTP calls;
+- first-failure precedence;
+- idle-worker shutdown check;
+- ownership-scoped cleanup.
+
+Do not weaken assertions to obtain a passing run.
+
+Docker is unavailable locally: write and test the helper logic with controlled doubles, but do not claim real container execution before CI.
+
+## 7. Tests
+
+Implement the complete accepted test plan, including:
+
+Database-independent:
+- strict seam/backfill inputs and result semantics;
+- CLI counts, exit codes, privacy and invalid arguments;
+- immutable provider mapping and identity/fingerprint checks;
+- item/UTF-8 byte caps and ordinal pagination;
+- hash verification and privacy-safe representations;
+- cancellation/lease checks on both successful and failing provider calls;
+- failure mapping, already-ready and write-refused paths;
+- container-helper indexing logic and privacy/failure behavior.
+
+PostgreSQL integration:
+- atomic index/job creation and rollback;
+- concurrent enqueue idempotency;
+- tenant isolation and revision eligibility;
+- terminal-job immutability and stalled results;
+- backfill bounds/cursor and partial progress;
+- full production-worker indexing with stored-byte agreement;
+- committed-row reuse without provider recomputation;
+- controlled conflicting writer using a separate valid job/fence;
+- lease loss and cancellation while a provider double blocks;
+- atomic readiness/job success and rollback;
+- a 450-chunk revision exercising pagination.
+
+Use deterministic events/barriers/hooks and bounded waits. Assert that intended interleavings actually occurred.
+
+Keep PostgreSQL tests marked integration. Do not replace them with mocks or run them locally without authorization.
+
+Update existing affected tests minimally. If a required file lies outside the anticipated list, explain its necessity in the handoff.
+
+## 8. Documentation and scope
+
+Create docs/decisions/0015-revision-indexing.md.
+
+Update README, plan and threat model as needed to describe:
+- implementation staged for review, not accepted or published;
+- exact implemented behavior and known limits;
+- checks actually executed versus tests written but unexecuted;
+- PostgreSQL/Linux/container verification pending CI;
+- M4d–M4f and overall M4 acceptance pending.
+
+Correct current statements made stale by this implementation, while preserving historical evidence and attribution.
+
+Where current text says M4c still needs specification review, distinguish its accepted specification from its pending implementation review. M4d–M4f still require detailed specification reviews.
+
+Do not rewrite earlier ADR evidence or claim the new CI checks have run.
+
+Append to prompts.md:
+- Prompt 124 outcome;
+- reviewer acceptance of the acceptance diff and matched checksum;
+- Prompt 125 verbatim;
+- a truthful outcome note marking implementation review and CI pending.
+
+Preserve earlier history as an identical byte prefix.
+
+## 9. Local verification
+
+Normal locked environment setup and resolution of already-declared build requirements are authorized if needed. Do not add dependencies, change lockfiles, bypass age policy or install globally.
+
+Run:
+- focused new and affected database-independent tests;
+- full database-independent suite with normal integration skips;
+- integration collection, reporting exact collected counts;
+- Ruff formatting and lint;
+- strict mypy;
+- distribution build;
+- clean installed-wheel checks outside the checkout;
+- offline migration rendering;
+- documentation links/anchors;
+- scope, privacy and artifact scans;
+- git diff --cached --check;
+- staged Gitleaks without suppression.
+
+Use the locked environment and reuse successful checks unless further edits justify rerunning them.
+
+No local Docker, database or live-provider contact.
+
+Report failures honestly. Do not silently omit planned tests or weaken contracts. Clearly identify any verification blocked by the environment.
+
+## 10. Stage, export and hand off
+
+Stage only intended implementation, test, CI-tooling and documentation changes.
+
+Do not commit, push, merge, amend, rebase, tag or delete branches.
+
+Export the complete staged diff directly from Git:
+- baseline:
+  `629cf18b1b48b8df14d611e438ce284f81e71ee9`;
+- final: the final staged tree;
+- exclude prompts.md;
+- path: `.local/p125/m4c-implementation.diff`;
+- UTF-8 without BOM.
+
+Do not print the complete diff in chat.
+
+Report concisely:
+- implementation and any deviations;
+- actual commands/results and exact skip accounting;
+- tests written but not executed;
+- build and installed-wheel scope;
+- changed paths and rationale for unexpected files;
+- branch, HEAD, staged tree and working-tree state;
+- confirmation main is unchanged;
+- export baseline, final tree, paths, statistics, bytes and SHA-256;
+- remaining limitations.
+
+End with:
+
+Mathew: return this output plus `.local/p125/m4c-implementation.diff` to the external reviewer.
+````
+
+**Prompt 125 outcome (Claude Code; implementation staged for external review, not committed;
+CI pending):** verified `docs/m4c-indexing-spec` at `629cf18` (parent `872d0af`, tree
+`ee6b165`), a clean tree, main/origin/main at `872d0af`, and the expected origin and identity.
+Created `feat/revision-indexing` from HEAD; baseline under `.local/p125/`.
+
+Implemented the accepted M4c specification (ADR-0015), with no deviation from the contract:
+- `evidenceguard_persistence/indexing.py`: enqueue (`pending`/`ready`/`stalled` observations,
+  canonical key and payload, no creation inference, terminal jobs unchanged), bounded backfill
+  (validation first, per-item transactions, named expected failures only, nullable `index_id`,
+  cursor), and tenant/revision/chunker/index-scoped reads with text-free `PendingChunk`;
+- `evidenceguard_worker/indexing.py`: the handler, an immutable copied provider mapping (offline
+  only), stored-identity fingerprint verification before resolution, 32-chunk and 128,000-byte
+  pages with the cursor on the kept prefix, hash verification, computation outside fences with
+  `ctx.check()` around it and before failure classification, M4b writes, the already-ready and
+  write-refused paths, and finish through `ctx.fenced(finish=True)`;
+- registration beside `ingest_revision`;
+- `eg-admin backfill-indexes` (exit codes 0/3/1/2, counts and cursor only);
+- the three registry-assertion updates;
+- the CI wheel embedding/indexing script;
+- the container indexing smoke (backfill CLI, bounded read-only `psql` verification of tenant,
+  revision, profile, readiness, job success and count).
+
+The implementation details are recorded in ADR-0015. Tests:
+- new `tests/test_indexing.py` (36), `tests/test_index_handler.py` (42) and
+  `tests/test_indexing_postgres.py` (16, integration);
+- additions to `tests/test_admin_cli.py` and `tests/test_container_ci.py`;
+- minimal updates to `tests/test_worker_cli.py`, the admin subparser set and the container
+  fakes (UUID revision).
+
+README, plan and the threat model were updated; ADR-0015 is new. No migration, dependency,
+lockfile, Dockerfile or Compose change was made.
+
+Local Windows checks actually run (locked, offline, no sync):
+- Ruff format and lint, strict mypy (118 files): clean;
+- focused new and affected tests: 306 passed, 1 skipped (the POSIX-only signal test);
+- full suite: 1703 passed, 250 skipped, being 249 integration tests (233 existing plus 16 new)
+  without a database and one POSIX-only signal test;
+- collection: 1953 tests, 249 integration, 1704 database-independent;
+- `uv build`: succeeded;
+- clean installed-wheel checks in an isolated venv outside the checkout (locked dependencies,
+  the wheel with `--no-deps`): all existing CI wheel commands, `eg-admin backfill-indexes
+  --help`, and the new CI wheel script extracted verbatim from `ci.yml` all passed;
+- offline migration rendering: passed (wheel and unit tests).
+
+Not run: PostgreSQL integration tests, Linux, the CI wheel step on CI runners and the container
+indexing smoke. Indexing against a real database, the enqueue races, lease and cancellation
+outcomes and the production-path smoke remain unverified until CI. No Docker, database or
+provider contact. M4d–M4f and overall M4 acceptance remain pending. Staging, whitespace,
+Gitleaks, privacy and link results are reported in the handoff.
+
+**Prompt 125 review (recorded in Prompt 126):** the external reviewer inspected the Prompt 125
+implementation diff and independently matched its SHA-256
+`88fe6c40a9d34cd3ee82540de0a74d23d1fd26630820ecb9385a18ebaa55cd7d`. M4c implementation is not yet
+accepted.
+
+The reviewer inspected the implementation and tests, and ran an isolated standard-library probe
+of the actual `resolve_provider` function, which reproduced:
+- `LeaseLostError` → `UnsupportedProfileError`;
+- `JobCancelledError` → `UnsupportedProfileError`;
+- `FenceClosedError` → `UnsupportedProfileError`.
+
+That contradicts the accepted requirement that these control-flow exceptions propagate untouched.
+The review also required deterministic cancellation verification in place of a fixed sleep, and
+direct backfill integration coverage for ready-index exclusion and a dead canonical job. The
+reviewer did not run the project suite, PostgreSQL or Docker.
+
+## Prompt 126: Correct provider control flow and deterministic cancellation verification
+
+- **Date:** 2026-10-16 (Asia/Bangkok).
+- **Session:** Claude Code.
+- **Scope/status:** corrections staged for external review; no commit or publication.
+
+````text
+Written for: Mathew and the external reviewer.
+
+# Prompt 126: Correct provider control flow and deterministic cancellation verification
+
+Read CLAUDE.md and applicable repository instructions. Continue this session; this is its thirteenth substantial prompt, so no switch is needed on that count.
+
+The external reviewer inspected the Prompt 125 implementation diff and independently matched its SHA-256:
+`88fe6c40a9d34cd3ee82540de0a74d23d1fd26630820ecb9385a18ebaa55cd7d`.
+
+M4c implementation is not yet accepted.
+
+The reviewer inspected the implementation and tests and ran an isolated standard-library probe of the actual resolve_provider function. The probe reproduced:
+- LeaseLostError -> UnsupportedProfileError
+- JobCancelledError -> UnsupportedProfileError
+- FenceClosedError -> UnsupportedProfileError
+
+The reviewer did not run the project suite, PostgreSQL or Docker.
+
+Authorize the corrections, tests, local verification and staging below. Do not commit, push or merge.
+
+## 1. Verify the starting state
+
+Expected:
+- Branch: `feat/revision-indexing`.
+- HEAD:
+  `629cf18b1b48b8df14d611e438ce284f81e71ee9`.
+- Parent:
+  `872d0af367be890cce25b2cce0d71a627c993479`.
+- Staged tree:
+  `5628bddd0974cc13b08013b3e012e729c4cac8b8`.
+- The same 17 staged paths as Prompt 125.
+- Nothing unstaged or untracked outside ignored local artifacts.
+- Local main and origin/main:
+  `872d0af367be890cce25b2cce0d71a627c993479`.
+- Origin and noreply identity unchanged.
+
+Record the baseline staged tree, paths and relevant blobs under `.local/p126/`.
+
+Stop on a material mismatch without overwriting work. No remote mutation is authorized.
+
+## 2. Preserve provider control-flow exceptions
+
+In apps/worker/evidenceguard_worker/indexing.py, resolve_provider currently catches every Exception from the factory and provider.identity validation and converts it to UnsupportedProfileError.
+
+This includes JobCancelledError, LeaseLostError and FenceClosedError, contradicting the accepted requirement that these control-flow exceptions propagate untouched.
+
+Correct the factory/identity-resolution boundary:
+- explicitly preserve those three exception types;
+- preserve BaseException control flow;
+- retain fixed, private handling of ordinary factory or identity failures;
+- do not expose the original factory exception or its text through the outward error chain.
+
+Also cover cancellation or lease loss latched during a factory/identity operation that raises an ordinary exception:
+- check ctx.check() before classifying the resulting expected profile failure as PermanentJobError;
+- a previously latched cancellation or lease loss must win;
+- retain the accepted explicit-boundary race limitations.
+
+Choose a small implementation consistent with the existing handler structure. Do not redesign M4a's provider boundary or worker runtime.
+
+Do not turn all unexpected errors into permanent failures.
+
+## 3. Add meaningful regression tests
+
+Extend tests/test_index_handler.py to cover:
+
+1. A provider factory raises each of:
+   - JobCancelledError;
+   - LeaseLostError;
+   - FenceClosedError.
+
+   The same control-flow exception must escape, rather than UnsupportedProfileError or PermanentJobError.
+
+2. A provider's identity property raises the same three control-flow exceptions, with the same propagation requirement.
+
+3. A factory or identity operation latches cancellation or lease loss, then raises an ordinary exception:
+   - ctx.check() takes precedence before permanent classification;
+   - no page read, embedding write or success follows.
+
+4. An ordinary factory/identity failure without a latch remains a fixed permanent failure:
+   - no submitted marker or original exception text leaks through the surfaced error/traceback chain.
+
+Retain existing successful provider selection, identity mismatch and immutable-mapping tests.
+
+Run the new regression cases against the Prompt 125 handler temporarily and record which fail. Restore the corrected handler and verify its saved hash before continuing.
+
+Use ignored local copies for this comparison. Do not reset the index or overwrite unrelated staged work.
+
+## 4. Make PostgreSQL cancellation verification deterministic
+
+In tests/test_indexing_postgres.py,
+test_cancellation_while_the_provider_blocks_records_worker_shutdown_and_writes_nothing
+currently uses:
+
+time.sleep(1.0)
+
+to assume the runtime requested cancellation after its drain period.
+
+Replace that assumption with an observed synchronization condition:
+- keep the provider blocked;
+- request shutdown;
+- wait with a bounded deadline until the actual attempt's cancellation state is latched;
+- assert that state was observed;
+- only then release the provider.
+
+Use a test-owned handler wrapper, captured JobContext, event or equivalent narrow test instrumentation. Do not change production worker semantics or add a test-only production API.
+
+Ensure the provider is released in finally, including when an assertion or wait fails, and bound all waits.
+
+Continue to assert the actual database outcome:
+- no embeddings written;
+- index remains building;
+- job is queued with worker_shutdown while ownership remains valid.
+
+Keep the test marked integration. Do not execute PostgreSQL locally.
+
+## 5. Complete missing backfill integration coverage
+
+The accepted test plan includes exclusion of ready indexes and stalled dead jobs through backfill. The current new PostgreSQL module tests a failed canonical job through explicit enqueue, but does not directly establish both backfill behaviors.
+
+Add PostgreSQL tests that:
+- finish one index through the real worker, then confirm backfill excludes that ready index for the same profile;
+- put a canonical indexing job into dead through the real lifecycle, then confirm backfill reports stalled and leaves the terminal job unchanged.
+
+Use existing safe fixtures and real enqueue/claim/fence operations. Do not modify terminal rows directly merely to manufacture the result.
+
+These tests are written and collected only until authorized CI.
+
+## 6. Documentation and scope
+
+Permitted changes from the baseline staged tree:
+- apps/worker/evidenceguard_worker/indexing.py
+- tests/test_index_handler.py
+- tests/test_indexing_postgres.py
+- docs/decisions/0015-revision-indexing.md
+- docs/plan.md
+- README.md
+- docs/threat-model.md, only if needed for accurate verification wording
+- prompts.md
+
+Keep every other staged file byte-identical, including:
+- persistence/indexing.py;
+- admin.py;
+- registry wiring;
+- ci.yml;
+- container_ci.py and its tests;
+- migrations, dependencies, lockfile, Dockerfile and Compose.
+
+Update ADR-0015 to describe the corrected factory/identity boundary and the new tests.
+
+Keep implementation status:
+- staged and awaiting external review;
+- not accepted, committed or published;
+- PostgreSQL, Linux and real container verification pending.
+
+Correct any statement that the extended wheel script has “not run” without qualification:
+- it ran locally on Windows in Prompt 125;
+- execution in CI remains pending.
+
+Where describing provider contact, distinguish execution of the offline HashingEmbedder from external-provider/network contact.
+
+Historical Prompt 125 results must remain historical. Record new results separately.
+
+## 7. Verification
+
+Run:
+- new regression comparison against the Prompt 125 handler;
+- focused handler, indexing, admin and container-helper checks;
+- full local suite with normal integration skips;
+- integration collection with exact counts;
+- Ruff format and lint;
+- strict mypy;
+- build and clean installed-wheel verification of the corrected handler and existing new wheel script;
+- documentation links and anchors;
+- scope and byte-identity checks;
+- privacy/artifact and LF/no-BOM checks;
+- git diff --cached --check;
+- staged Gitleaks without suppression.
+
+Use the existing locked environment. No new dependencies or lockfile changes.
+
+No local Docker, database or external-provider contact.
+
+Do not weaken tests or claim the PostgreSQL cases passed merely because they collected.
+
+## 8. Prompt history
+
+Preserve all earlier prompts.md bytes as an identical prefix.
+
+Append:
+- the review findings and exact isolated probe results;
+- the reviewer's scope and that no project suite, PostgreSQL or Docker was run;
+- Prompt 126 verbatim;
+- a truthful outcome note covering corrections, regression comparison, verification and pending review.
+
+Do not record implementation acceptance.
+
+## 9. Export and handoff
+
+Keep changes staged and uncommitted.
+
+Export the incremental diff directly from Git:
+- baseline staged tree:
+  `5628bddd0974cc13b08013b3e012e729c4cac8b8`;
+- final: corrected staged tree;
+- exclude prompts.md;
+- path: `.local/p126/m4c-corrections.diff`;
+- UTF-8 without BOM.
+
+Do not print the complete diff in chat.
+
+Report:
+- corrections and any deviations;
+- regression failures against the old handler and passing corrected results;
+- actual verification and exact skip/collection accounting;
+- PostgreSQL tests written but not executed;
+- unchanged-file byte identity;
+- branch, HEAD, final staged tree and staged paths;
+- confirmation main is unchanged;
+- export baseline, final tree, statistics, bytes and SHA-256.
+
+No commit, push, merge, amend, rebase, tag, branch deletion or M4d work.
+
+End with:
+
+Mathew: return this output plus `.local/p126/m4c-corrections.diff` to the external reviewer.
+````
+
+**Prompt 126 outcome (Claude Code; corrections staged for external review, not committed;
+implementation acceptance and CI pending):** verified `feat/revision-indexing` at `629cf18`
+(parent `872d0af`), staged tree `5628bddd0974cc13b08013b3e012e729c4cac8b8` with the same 17
+paths, nothing unstaged or untracked, main/origin/main at `872d0af`, and the expected origin and
+identity. The baseline tree, paths, blobs and a copy of the Prompt 125 handler (SHA-256
+`035381ee52263711efe4a861e83a8f507a774e02e1b0f416c373184358c2f8d3`) are saved under
+`.local/p126/`.
+
+Corrections:
+- `resolve_provider` re-raises `JobCancelledError`, `LeaseLostError` and `FenceClosedError`;
+  non-`Exception` `BaseException`s were never caught. Ordinary factory or identity failures
+  still become the fixed `UnsupportedProfileError`, raised outside the handler with no chained
+  original. The handler calls `ctx.check()` before classifying that failure, so a latched
+  cancellation or lease loss wins.
+- 12 new handler regression tests.
+- The PostgreSQL cancellation test now captures the real `JobContext` through a test-owned
+  wrapper and waits (bounded) for `cancel_requested` before releasing the provider in `finally`;
+  the lease-loss and competing-writer tests also release in `finally`.
+- Two new PostgreSQL backfill tests: ready-index exclusion through the real worker, and a dead
+  canonical job, made dead by the real claim, lease-expiry and sweep lifecycle, reported
+  `stalled` and left unchanged.
+
+Regression comparison, using ignored local copies: against the Prompt 125 handler, 10 of the 16
+selected cases failed (all six factory/identity control-flow cases and all four latch-precedence
+cases surfaced `PermanentJobError`); the two private-failure cases and the four existing
+propagation cases passed on both. The corrected handler was restored and its SHA-256
+`1610d5dcc328f7d859d761c6e5d18c3769724204dfa5e8baa1d74faf56e348c7` verified.
+
+Local Windows checks actually run (locked, offline, no sync):
+- handler tests: 54 passed;
+- focused handler, indexing, admin, container-helper and worker-CLI tests: 273 passed,
+  1 skipped;
+- full suite: 1715 passed, 252 skipped, being 251 integration tests without a database (233
+  existing plus 18 in `tests/test_indexing_postgres.py`) and one POSIX-only signal test;
+- collection: 1967 tests, 251 integration and 1716 database-independent;
+- Ruff format and lint, strict mypy: clean;
+- `uv build`, and clean installed-wheel checks outside the checkout: the wheel's handler hash
+  equals the corrected file; all CI wheel commands and the existing new CI wheel script passed;
+  a direct probe of the installed `resolve_provider` confirmed propagation of the three errors
+  and no chained original on ordinary failure.
+
+Only the offline `HashingEmbedder` ran; no external provider, network, Docker or database was
+contacted. Not run: PostgreSQL tests (including the 18 indexing cases), Linux, the wheel step in
+CI and the container indexing smoke. Persistence, admin, registry, CI workflow and container
+helper files are byte-identical to the Prompt 125 staged tree. Implementation acceptance is not
+recorded; review is pending. Staging, whitespace, Gitleaks, privacy and link results are reported
+in the handoff.
+
+
+## Prompt 127 recovery and acceptance handoff
+
+Prompt 126 outcome, attributed to Claude Code's handoff: handler tests 54 passed;
+focused checks 273 passed, 1 POSIX-only skip; full suite 1715 passed, 252 skipped
+(251 integration tests without a database and one POSIX-only signal test). Collection:
+1967 total, 251 integration and 1716 database-independent. Ruff and strict mypy,
+build and isolated installed-wheel checks passed. The corrected installed-wheel
+provider-resolution probe passed. Regression comparison: 10 failures against the old
+handler among 16 selected cases; all corrected cases passed. These are historical
+Claude Code results, not checks run by Codex or the external reviewer. Prompt 125
+results above remain separate and historical.
+
+The external reviewer accepts the complete M4c implementation with Prompt 126
+corrections for a local commit, pending PostgreSQL and current-version CI verification.
+The reviewer inspected the implementation, corrections and supporting tests and
+independently matched the Prompt 125 SHA-256
+`88fe6c40a9d34cd3ee82540de0a74d23d1fd26630820ecb9385a18ebaa55cd7d`
+and Prompt 126 SHA-256
+`9619a490ccceec4db73593e45cebb1368fbf551e3199cbcc89e447b6bdc2acaf`.
+The reviewer reproduced the original provider-resolution control-flow bug and probed
+the corrected functions with isolated standard-library execution: six factory/identity
+control-flow cases preserve the same exception object; cancellation and lease loss
+take precedence over an ordinary resolution failure; an ordinary factory failure
+becomes a fixed error without the original exception chained. The reviewer did not
+run the project suite, installed-wheel checks, PostgreSQL or Docker. All 251 integration
+tests remain unexecuted against this M4c version, including the 18 indexing cases.
+PostgreSQL, Linux, real container indexing and the new wheel step on CI runners remain
+pending. Local Compose is unverified. M4d–M4f and overall M4 acceptance remain pending.
+No publication or merge is authorized or completed by this task.
+
+Session handoff: Claude usage was nearly exhausted, so Prompt 127 begins a fresh
+OpenAI Codex session. Claude Code implemented and corrected M4c in Prompts 125–126;
+OpenAI Codex assists with acceptance documentation and the local commit in Prompt 127.
+This is the first prompt handled by this Codex session.
+
+### Prompt 127 (verbatim; line endings normalized to LF)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 127: Recover the reviewed M4c state, record acceptance and commit locally
+
+You are OpenAI Codex, starting a fresh session in the existing EvidenceGuard repository.
+
+Read CLAUDE.md and any applicable AGENTS.md instructions. Follow the repository's established review, privacy and prompt-history rules. Use targeted reads of the relevant plan section and recent history; do not load or print the entire prompts.md.
+
+This session starts at Prompt 127. Do not count earlier Claude prompts as prompts handled by this Codex session. Suggest a session change around 20 substantial prompts or when actual context problems justify it, not after one or two prompts.
+
+## Context and authorization
+
+M1–M3 are accepted. M4a and M4b are verified and on main. M4c was implemented by Claude Code in Prompt 125 and corrected by Claude Code in Prompt 126.
+
+The external reviewer inspected the implementation and correction diffs and independently matched their SHA-256 values:
+
+Prompt 125:
+`88fe6c40a9d34cd3ee82540de0a74d23d1fd26630820ecb9385a18ebaa55cd7d`
+
+Prompt 126:
+`9619a490ccceec4db73593e45cebb1368fbf551e3199cbcc89e447b6bdc2acaf`
+
+The reviewer accepts the complete M4c implementation with the Prompt 126 corrections for a LOCAL COMMIT, pending PostgreSQL and current-version CI verification.
+
+Reviewer work:
+- inspected the implementation, corrections and supporting tests;
+- reproduced the original provider-resolution control-flow bug;
+- probed the corrected functions independently using isolated standard-library execution;
+- confirmed six factory/identity control-flow cases preserve the same exception object;
+- confirmed cancellation and lease loss take precedence over an ordinary resolution failure;
+- confirmed an ordinary factory failure becomes a fixed error without the original exception chained.
+
+The reviewer did not run the project suite, installed-wheel checks, PostgreSQL or Docker.
+
+Authorize acceptance documentation, append-only prompt history and one local commit. No implementation changes or publication.
+
+## 1. Verify the exact starting state
+
+Expected:
+- Branch: `feat/revision-indexing`.
+- HEAD:
+  `629cf18b1b48b8df14d611e438ce284f81e71ee9`.
+- Parent:
+  `872d0af367be890cce25b2cce0d71a627c993479`.
+- Accepted staged tree:
+  `8457505b26fd7072d923df6c512e82d06005c620`.
+- Exactly these 17 staged paths:
+  - .github/workflows/ci.yml
+  - README.md
+  - apps/api/evidenceguard_api/admin.py
+  - apps/worker/evidenceguard_worker/handlers.py
+  - apps/worker/evidenceguard_worker/indexing.py
+  - docs/decisions/0015-revision-indexing.md
+  - docs/plan.md
+  - docs/threat-model.md
+  - infra/ci/container_ci.py
+  - packages/persistence/evidenceguard_persistence/indexing.py
+  - tests/test_admin_cli.py
+  - tests/test_container_ci.py
+  - tests/test_index_handler.py
+  - tests/test_indexing.py
+  - tests/test_indexing_postgres.py
+  - tests/test_worker_cli.py
+  - prompts.md
+- Nothing unstaged or untracked outside ignored local artifacts.
+- Local main and origin/main:
+  `872d0af367be890cce25b2cce0d71a627c993479`.
+- Origin:
+  `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`.
+- Effective author and committer:
+  `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>`.
+
+Use local checks. No fetch is required.
+
+Record the accepted tree, paths, per-file blobs and history-prefix evidence under `.local/p127/`.
+
+If the state differs materially, stop and report the mismatch. Do not reset, overwrite or recreate the implementation.
+
+## 2. Acceptance documentation only
+
+Only these files may change from the accepted staged tree:
+- README.md
+- docs/decisions/0015-revision-indexing.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Every other staged file must remain byte-identical.
+
+Record:
+- M4c implementation accepted at external review in Prompt 127 for a local commit;
+- implemented by Claude Code in Prompt 125 and corrected in Prompt 126;
+- no publication or merge authorized or completed by this task;
+- PostgreSQL, Linux and real container indexing verification pending CI;
+- all 251 integration tests remain unexecuted against this M4c version, including the 18 indexing cases;
+- M4d–M4f and overall M4 acceptance pending;
+- local Compose unverified.
+
+ADR-0015 may become Accepted, explicitly scoped to local implementation acceptance and pending CI.
+
+Keep historical results and attribution accurate:
+
+Prompt 126, Claude Code on local Windows:
+- handler tests: 54 passed;
+- focused checks: 273 passed, 1 POSIX-only skip;
+- full suite: 1715 passed, 252 skipped;
+- skips: 251 integration tests without a database plus one POSIX-only signal test;
+- collection: 1967 total, 251 integration and 1716 database-independent;
+- Ruff and strict mypy passed;
+- build and isolated installed-wheel checks passed;
+- regression comparison: 10 failures against the old handler among 16 selected cases, all corrected cases passing.
+
+Do not claim Codex or the reviewer ran those checks.
+
+Keep Prompt 125 results historical and separate.
+
+Clarify current wheel wording where needed:
+- the new wheel script ran locally on Windows in Prompts 125–126;
+- the corrected installed-wheel provider-resolution probe ran in Prompt 126;
+- the new CI wheel step has not run on CI runners;
+- main's existing wheel coverage at 872d0af predates that extension.
+
+Preserve older evidence and the accepted specification anchor. Change no design, failure mapping, bounds or acceptance requirements.
+
+## 3. Append history and record the tool switch accurately
+
+Preserve all earlier prompts.md bytes as an identical prefix.
+
+Append:
+- the Prompt 126 outcome, attributed to Claude Code's handoff;
+- the reviewer's acceptance, checksums, independent probes and verification limits;
+- a brief session-handoff note: Claude usage was nearly exhausted, so Prompt 127 begins a fresh OpenAI Codex session;
+- Prompt 127 verbatim;
+- a pre-commit note with verified state and checks actually run.
+
+Do not pre-record the new commit's SHA, push or CI results.
+
+Use inline, backticked commit identifiers in your own notes.
+
+## 4. Verify and commit
+
+Before committing, check:
+- exactly the same 17 paths staged;
+- only the five permitted documentation/history files differ from accepted tree
+  `8457505b26fd7072d923df6c512e82d06005c620`;
+- the other 12 files are byte-identical;
+- prompt-history prefix unchanged;
+- relative links and anchors resolve;
+- acceptance and verification status consistent;
+- no private content, artifacts, CR characters or BOM introduced;
+- git diff --cached --check;
+- staged Gitleaks without suppression;
+- effective noreply author and committer.
+
+Do not rerun application tests or builds: implementation and tests must remain byte-identical. No installs, Docker, databases or external providers.
+
+Commit locally with subject:
+`feat: add offline revision indexing and bounded backfill`
+
+Attribution must be truthful:
+- retain the user's expected noreply author and committer;
+- identify Claude Code's implementation/correction work in Prompts 125–126;
+- identify OpenAI Codex's acceptance-documentation and commit assistance in Prompt 127;
+- do not automatically copy a Claude co-author trailer as attribution for Codex's work;
+- follow applicable repository attribution instructions, with this explicit mixed-assistance description taking precedence over an automatic tool-specific convention.
+
+Do not amend earlier commits.
+
+After committing, verify:
+- parent is `629cf18b1b48b8df14d611e438ce284f81e71ee9`;
+- exactly the expected 17 paths were committed;
+- all 12 implementation/test/tooling files remain byte-identical to the accepted tree;
+- working tree clean;
+- main and origin/main unchanged;
+- full-history Gitleaks passes without suppression.
+
+## 5. Export and handoff
+
+Export an incremental diff directly from Git:
+- baseline: accepted tree
+  `8457505b26fd7072d923df6c512e82d06005c620`;
+- final: the new local commit;
+- exclude prompts.md;
+- path: `.local/p127/m4c-commit-incremental.diff`;
+- UTF-8 without BOM.
+
+Do not print the complete diff in chat.
+
+Report concisely:
+- commit SHA, parent and tree;
+- identity and actual attribution;
+- committed paths;
+- acceptance wording changes;
+- checks actually run;
+- byte-identity and history-prefix results;
+- historical verification and remaining limits;
+- final Git state;
+- export baseline, final commit, paths, statistics, bytes and SHA-256.
+
+No push, merge, force-push, amend, rebase, tag, branch deletion or M4d work.
+
+End with:
+
+Mathew: return this output plus `.local/p127/m4c-commit-incremental.diff` to the external reviewer.
+
+
+### Prompt 127 pre-commit note (OpenAI Codex)
+
+Verified locally: branch `feat/revision-indexing`; starting HEAD
+`629cf18b1b48b8df14d611e438ce284f81e71ee9`, parent and unchanged `main`/`origin/main`
+`872d0af367be890cce25b2cce0d71a627c993479`; accepted staged tree
+`8457505b26fd7072d923df6c512e82d06005c620`; exactly the expected 17 staged paths;
+no unstaged or untracked non-ignored files at entry; expected HTTPS origin and effective
+noreply author/committer. Git metadata writes needed elevated access; verification then
+succeeded. Independently hashed the local Prompt 125 and 126 diff exports: both match
+reviewer checksums. Starting paths, per-file blobs and history-prefix evidence are
+saved under ignored `.local/p127/`.
+
+Acceptance documentation only: README, ADR-0015, plan and threat model now record
+external acceptance for a local commit with pending CI; this history is append-only.
+The accepted specification anchor and all design, failure mapping, bounds and acceptance
+requirements are preserved. Staged verification compared all 17 paths: only the five
+permitted documentation/history files differ from the accepted tree, and all 12 other
+files are byte-identical. The original 1,033,837 history bytes remain an identical prefix
+(SHA-256 `3f4d6be5446bb75cc0467995b5b9027ec4a4db4a3d21c3224593285d6375c324`).
+The supplied Prompt 127 text is appended verbatim with LF line endings.
+
+Checks actually run by Codex before this note: local Git state/identity and blob checks;
+inspection of the acceptance diff and staged change summary; targeted acceptance,
+attribution and privacy review; custom standard-library documentation checks covering
+125 relative links/anchors, UTF-8 with no BOM or CR, exact allowed-file scope, history
+prefix and verbatim prompt inclusion; `git diff --check` and `git diff --cached --check`
+passed. Gitleaks 8.30.1 `gitleaks git --pre-commit --staged --redact --verbose .` passed
+without suppression on the staged acceptance changes (no leaks). Final staging gates
+will be repeated after this note. No application tests, builds, installs, databases,
+Docker or external providers were run. PostgreSQL, Linux, real container indexing and
+new CI wheel-runner verification remain pending; all 251 integration tests, including
+18 indexing cases, remain unexecuted against this M4c version. Local Compose is
+unverified; M4d?M4f and overall M4 acceptance remain pending. No publication or merge
+is authorized or completed. This note records no new commit identifier or CI result.

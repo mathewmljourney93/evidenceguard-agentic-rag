@@ -13,6 +13,7 @@ import pytest
 from sqlalchemy.exc import OperationalError
 
 from evidenceguard_api import admin
+from evidenceguard_domain.context import ActorContext, Role
 from evidenceguard_persistence.accounts import (
     DemoUser,
     RevokeOutcome,
@@ -26,8 +27,10 @@ from evidenceguard_persistence.credentials import (
     parse_api_key,
     secret_sha256,
 )
+from evidenceguard_persistence.indexing import BackfillItem, BackfillOutcome, BackfillPage
 from evidenceguard_persistence.models import UserRole
 from evidenceguard_persistence.settings import DATABASE_URL_ENV
+from evidenceguard_retrieval.embeddings import HASH_IDENTITY
 
 FAILURE_MARKER = "fake-internal-failure-marker"
 TENANT, USER = uuid4(), uuid4()
@@ -43,6 +46,8 @@ class FakeStore:
         self.revoke_outcome = RevokeOutcome.REVOKED
         self.events: list[str] = []
         self.seed_result: tuple[DemoUser, ...] | None = None
+        self.backfills: list[tuple[UUID, int, UUID | None]] = []
+        self.backfill_page = BackfillPage(items=(), next_after=None)
 
     def _maybe_fail(self) -> None:
         if self.error is not None:
@@ -68,6 +73,11 @@ class FakeStore:
         self._maybe_fail()
         self.revoked.append((tenant_id, prefix))
         return self.revoke_outcome
+
+    def backfill_indexes(self, tenant_id: UUID, *, limit: int, after: UUID | None) -> BackfillPage:
+        self._maybe_fail()
+        self.backfills.append((tenant_id, limit, after))
+        return self.backfill_page
 
 
 @pytest.fixture
@@ -410,5 +420,145 @@ def test_every_subparser_disables_abbreviations() -> None:
         "seed-demo": False,
         "create-key": False,
         "revoke-key": False,
+        "backfill-indexes": False,
     }
     assert all(isinstance(sub, admin.SafeArgumentParser) for sub in subparsers.choices.values())
+
+
+# --- backfill-indexes (M4c, ADR-0015) --------------------------------------------------------
+
+
+def _items(*outcomes: BackfillOutcome) -> tuple[BackfillItem, ...]:
+    return tuple(
+        BackfillItem(
+            revision_id=uuid4(),
+            index_id=None
+            if outcome in (BackfillOutcome.INELIGIBLE, BackfillOutcome.CONFLICT)
+            else uuid4(),
+            outcome=outcome,
+        )
+        for outcome in outcomes
+    )
+
+
+def test_backfill_prints_only_counts_and_the_cursor(
+    store: FakeStore, capsys: pytest.CaptureFixture[str]
+) -> None:
+    cursor = uuid4()
+    store.backfill_page = BackfillPage(
+        items=_items(BackfillOutcome.PENDING, BackfillOutcome.PENDING, BackfillOutcome.READY),
+        next_after=cursor,
+    )
+
+    assert _run(store, "backfill-indexes", "--tenant-id", str(TENANT)) == 0
+
+    out, err = capsys.readouterr()
+    assert out.splitlines() == [
+        "pending=2 ready=1 stalled=0 ineligible=0 conflict=0",
+        f"next_after={cursor}",
+    ]
+    assert err == ""
+    for item in store.backfill_page.items:
+        assert str(item.revision_id) not in out
+    assert store.backfills == [(TENANT, 50, None)]  # the accepted default limit
+
+
+def test_backfill_passes_the_limit_and_cursor_and_prints_no_cursor_at_the_end(
+    store: FakeStore, capsys: pytest.CaptureFixture[str]
+) -> None:
+    after = uuid4()
+    assert (
+        _run(
+            store,
+            "backfill-indexes",
+            "--tenant-id",
+            str(TENANT),
+            "--limit",
+            "100",
+            "--after",
+            str(after),
+        )
+        == 0
+    )
+    assert store.backfills == [(TENANT, 100, after)]
+    assert capsys.readouterr().out.splitlines()[-1] == "next_after=-"
+
+
+@pytest.mark.parametrize(
+    "outcome", [BackfillOutcome.STALLED, BackfillOutcome.INELIGIBLE, BackfillOutcome.CONFLICT]
+)
+def test_a_page_with_items_needing_attention_exits_three(
+    store: FakeStore, capsys: pytest.CaptureFixture[str], outcome: BackfillOutcome
+) -> None:
+    store.backfill_page = BackfillPage(
+        items=_items(BackfillOutcome.PENDING, outcome), next_after=None
+    )
+    assert _run(store, "backfill-indexes", "--tenant-id", str(TENANT)) == admin.EXIT_ATTENTION == 3
+    assert f"{outcome.value}=1" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        OperationalError("SELECT 1", {}, Exception(FAILURE_MARKER)),
+        RuntimeError(FAILURE_MARKER),
+    ],
+)
+def test_a_backfill_failure_exits_one_with_a_fixed_message(
+    store: FakeStore, capsys: pytest.CaptureFixture[str], error: Exception
+) -> None:
+    store.error = error
+    assert _run(store, "backfill-indexes", "--tenant-id", str(TENANT)) == 1
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert FAILURE_MARKER not in err
+    assert err.startswith("eg-admin: error: ")
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["backfill-indexes"],
+        ["backfill-indexes", "--tenant-id", SECRET_MARKER],
+        ["backfill-indexes", "--tenant-id", str(TENANT), "--limit", "0"],
+        ["backfill-indexes", "--tenant-id", str(TENANT), "--limit", "101"],
+        ["backfill-indexes", "--tenant-id", str(TENANT), "--limit", "-1"],
+        ["backfill-indexes", "--tenant-id", str(TENANT), "--limit", "1e2"],
+        ["backfill-indexes", "--tenant-id", str(TENANT), "--limit", " 5"],
+        ["backfill-indexes", "--tenant-id", str(TENANT), "--limit", SECRET_MARKER],
+        ["backfill-indexes", "--tenant-id", str(TENANT), "--after", SECRET_MARKER],
+        ["backfill-indexes", "--tenant", str(TENANT)],
+        ["backfill-indexes", "--tenant-id", str(TENANT), SECRET_MARKER],
+    ],
+)
+def test_backfill_usage_errors_exit_two_without_echoing(
+    store: FakeStore, capsys: pytest.CaptureFixture[str], argv: list[str]
+) -> None:
+    with pytest.raises(SystemExit) as info:
+        _run(store, *argv)
+    assert info.value.code == 2
+    out, err = capsys.readouterr()
+    assert SECRET_MARKER not in out + err
+    assert err.endswith(admin.USAGE_ERROR_MESSAGE)
+    assert store.backfills == []
+
+
+def test_backfill_uses_the_fixed_offline_identity_and_a_system_admin_actor(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    seen: dict[str, object] = {}
+
+    def fake_backfill(factory: object, actor: object, **kwargs: object) -> BackfillPage:
+        seen["actor"], seen["kwargs"] = actor, kwargs
+        return BackfillPage(items=(), next_after=None)
+
+    monkeypatch.setattr(admin, "backfill_index_revisions", fake_backfill)
+    store = admin.DatabaseStore(object())  # type: ignore[arg-type]
+    store.backfill_indexes(TENANT, limit=7, after=None)
+
+    actor = seen["actor"]
+    assert isinstance(actor, ActorContext)
+    assert actor.tenant_id == TENANT
+    assert actor.actor_id == admin.SYSTEM_ACTOR_ID
+    assert actor.role is Role.ADMIN
+    assert seen["kwargs"] == {"identity": HASH_IDENTITY, "limit": 7, "after": None}

@@ -22,6 +22,9 @@ KEY = "egk_SmokePrefix0001_synthetic-secret-value-for-tests"
 IMAGE_ID = "sha256:" + "ab" * 32
 PROJECT = "eg-ci-123-1"
 IMAGE = "evidenceguard:ci-123-1"
+TENANT = "11111111-1111-5111-8111-111111111111"
+REVISION = "44444444-4444-5444-8444-444444444444"
+FINGERPRINT = "ad53bb3be5d8c50909b9f984294703d572e8f1844a43c5223ef86cd4a1162376"
 
 
 def _load() -> ModuleType:
@@ -48,6 +51,13 @@ class FakeDocker:
         self.worker_state = "exited 0 false"
         self.logs: dict[str, str] = {}
         self.image_ids: dict[str, str] = {}
+        self.backfill_output = "pending=1 ready=0 stalled=0 ineligible=0 conflict=0\nnext_after=-\n"
+        self.backfill_status = 0
+        # Successive psql rows: building first, then ready (tenant|revision|fingerprint|...).
+        self.index_rows = [
+            f"{TENANT}|{REVISION}|{FINGERPRINT}|building|queued|0|3|3\n",
+            f"{TENANT}|{REVISION}|{FINGERPRINT}|ready|succeeded|3|3|3\n",
+        ]
 
     def __call__(self, args: Sequence[str], timeout: float) -> Any:
         command = list(args)
@@ -75,6 +85,11 @@ class FakeDocker:
             return result(0, seed, "")
         if "create-key" in text:
             return result(0, KEY + "\n", "created key prefix=SmokePrefix0001 key_id=x\n")
+        if "backfill-indexes" in text:
+            return result(self.backfill_status, self.backfill_output, "")
+        if " psql " in f" {text} ":
+            row = self.index_rows.pop(0) if len(self.index_rows) > 1 else self.index_rows[0]
+            return result(0, row, "")
         if " stop " in f" {text} ":
             return result(0, "", "")
         if "{{.State.Status}}" in text:
@@ -110,9 +125,9 @@ class FakeApi:
             self.uploads += 1
             if self.uploads == 1:
                 return response(
-                    202, {"document_id": "doc-1", "revision_id": "rev-1", "job": {"id": "job-1"}}
+                    202, {"document_id": "doc-1", "revision_id": REVISION, "job": {"id": "job-1"}}
                 )
-            return response(200, {"created": False, "revision_id": "rev-1"})
+            return response(200, {"created": False, "revision_id": REVISION})
         if path == "/v1/jobs/job-1":
             status = (
                 self.job_statuses.pop(0) if len(self.job_statuses) > 1 else self.job_statuses[0]
@@ -121,7 +136,7 @@ class FakeApi:
         if path == "/v1/documents/doc-1":
             return response(
                 200,
-                {"active_revision_id": "rev-1", "active_revision": {"ingestion_state": "active"}},
+                {"active_revision_id": REVISION, "active_revision": {"ingestion_state": "active"}},
             )
         if path.endswith("/chunks"):
             return response(
@@ -846,3 +861,121 @@ def test_project_and_image_must_name_the_same_run_and_attempt(project: str, imag
     runner, calls = _cleanup_runner()
     assert ci.cleanup(runner, project, image, out=lambda text: None) == 2
     assert calls == []
+
+
+# --- M4c indexing smoke (ADR-0015) ------------------------------------------------------------
+
+
+def _indexing_failure(docker: FakeDocker) -> str:
+    instance, output = smoke(docker, FakeApi())
+    assert instance.run() == 1
+    (failure,) = [line for line in output if line.startswith("smoke: FAILED: ")]
+    return failure.removeprefix("smoke: FAILED: ")
+
+
+def test_a_successful_smoke_backfills_and_verifies_the_index() -> None:
+    docker = FakeDocker()
+    instance, output = smoke(docker, FakeApi())
+
+    assert instance.run() == 0
+    assert "smoke: backfill-indexes enqueued one offline indexing job" in output
+    assert (
+        "smoke: index ready for the ingested revision; 3 embedding(s), indexing job succeeded"
+        in output
+    )
+    commands = [" ".join(call) for call, _ in docker.calls]
+    backfill = [c for c in commands if "backfill-indexes" in c]
+    assert backfill == [
+        "docker compose -f docker-compose.yml -p eg-ci-123-1 exec -T api eg-admin "
+        f"backfill-indexes --tenant-id {TENANT}"
+    ]
+    queries = [call for call, _ in docker.calls if "psql" in call]
+    assert len(queries) == 2  # polled until ready
+    for call in queries:
+        assert call[call.index("-c") + 1] == "SET default_transaction_read_only = on"
+        query = call[-1]
+        assert f"ei.tenant_id = '{TENANT}'" in query and f"ei.revision_id = '{REVISION}'" in query
+        assert "j.kind = 'index_revision'" in query
+    # Indexing is verified before the idle worker is stopped.
+    index_of = {c: i for i, c in enumerate(commands)}
+    stop = next(i for c, i in index_of.items() if " stop " in f" {c} ")
+    assert max(i for c, i in index_of.items() if "psql" in c) < stop
+
+
+@pytest.mark.parametrize(
+    ("output", "reason"),
+    [
+        ("pending=0 ready=1 stalled=0 ineligible=0 conflict=0\n", "expected exactly one pending"),
+        ("pending=1 ready=0 stalled=1 ineligible=0 conflict=0\n", "expected exactly one pending"),
+        ("pending=2 ready=0 stalled=0 ineligible=0 conflict=0\n", "expected exactly one pending"),
+        ("something else\n", "expected format"),
+        ("", "expected format"),
+    ],
+)
+def test_unexpected_backfill_results_fail(output: str, reason: str) -> None:
+    docker = FakeDocker()
+    docker.backfill_output = output
+    assert reason in _indexing_failure(docker)
+
+
+def test_a_backfill_exit_status_three_fails_the_smoke() -> None:
+    docker = FakeDocker()
+    docker.backfill_status = 3
+    assert _indexing_failure(docker) == "backfill-indexes: exit status 3"
+
+
+@pytest.mark.parametrize(
+    ("row", "reason"),
+    [
+        (
+            f"22222222-2222-5222-8222-222222222222|{REVISION}|{FINGERPRINT}|ready|succeeded|3|3|3",
+            "not the ingested revision's",
+        ),
+        (
+            f"{TENANT}|55555555-5555-5555-8555-555555555555|{FINGERPRINT}|ready|succeeded|3|3|3",
+            "not the ingested revision's",
+        ),
+        (f"{TENANT}|{REVISION}|{'0' * 64}|ready|succeeded|3|3|3", "offline profile"),
+        (f"{TENANT}|{REVISION}|{FINGERPRINT}|building|dead|1|3|3", "job ended as dead"),
+        (f"{TENANT}|{REVISION}|{FINGERPRINT}|building|failed|1|3|3", "job ended as failed"),
+        (f"{TENANT}|{REVISION}|{FINGERPRINT}|ready|succeeded|2|3|3", "does not equal chunk_count"),
+        (f"{TENANT}|{REVISION}|{FINGERPRINT}|ready|succeeded|4|4|4", "does not equal chunk_count"),
+        (f"{TENANT}|{REVISION}|{FINGERPRINT}|ready", "unexpected row format"),
+    ],
+)
+def test_the_index_must_belong_to_the_ingested_revision_and_be_complete(
+    row: str, reason: str
+) -> None:
+    docker = FakeDocker()
+    docker.index_rows = [row + "\n"]
+    assert reason in _indexing_failure(docker)
+
+
+def test_readiness_without_a_succeeded_job_is_not_accepted_and_times_out() -> None:
+    docker = FakeDocker()
+    docker.index_rows = [f"{TENANT}|{REVISION}|{FINGERPRINT}|ready|running|3|3|3\n"]
+    clock = Clock()
+    instance, output = smoke(docker, FakeApi(), clock)
+    assert instance.run() == 1
+    assert "smoke: FAILED: indexing: not ready within 90 s" in output
+
+
+@pytest.mark.parametrize("rows", ["", f"{TENANT}|x\n{TENANT}|y\n"])
+def test_exactly_one_index_row_is_required(rows: str) -> None:
+    docker = FakeDocker()
+    docker.index_rows = [rows]
+    assert "expected one index row" in _indexing_failure(docker)
+
+
+@pytest.mark.parametrize(
+    ("tenant", "revision"),
+    [(TENANT, "x' OR '1'='1"), ("x' OR '1'='1", REVISION), (TENANT, "")],
+)
+def test_a_non_uuid_tenant_or_revision_is_never_interpolated_into_sql(
+    tenant: str, revision: str
+) -> None:
+    docker = FakeDocker()
+    instance, _ = smoke(docker, FakeApi())
+    with pytest.raises(ci.CheckFailed, match="not a UUID"):
+        instance.wait_for_indexing(tenant, revision, 3)
+    assert docker.calls == []

@@ -65,7 +65,30 @@ jobs:
           "${bin}/python" -I -c "import evidenceguard_api, evidenceguard_domain; from evidenceguard_api.app import create_app; create_app(); print(evidenceguard_api.__file__); assert 'site-packages' in evidenceguard_api.__file__"
           "${bin}/eg-api" --help
           "${bin}/eg-worker" --help
-          "${bin}/python" -I -c "from evidenceguard_worker.handlers import production_registry; assert production_registry().kinds == frozenset({'ingest_revision'}); print('production registry: ingest_revision')"
+          "${bin}/python" -I -c "from evidenceguard_worker.handlers import production_registry; assert production_registry().kinds == frozenset({'ingest_revision', 'index_revision'}); print('production registry: ingest_revision, index_revision')"
+          # M4c (ADR-0015): run the offline embedder and canonical storage from the installed
+          # wheel and import the indexing modules. No database is contacted; this check does
+          # not establish database indexing (the container smoke does).
+          "${bin}/python" -I - <<'PY'
+          import uuid
+          import evidenceguard_domain.embedding_storage as storage
+          import evidenceguard_persistence.indexing as index_store
+          import evidenceguard_retrieval.embeddings as provider
+          import evidenceguard_worker.indexing as handler
+          from evidenceguard_worker.handlers import production_registry
+          for module in (storage, index_store, provider, handler):
+              assert "site-packages" in (module.__file__ or ""), module.__name__
+          fingerprint = "ad53bb3be5d8c50909b9f984294703d572e8f1844a43c5223ef86cd4a1162376"
+          assert provider.HASH_IDENTITY.fingerprint == fingerprint
+          batch = provider.embed_validated(provider.HashingEmbedder(), ("wheel check", "!!!"), "document")
+          chunks = [(uuid.UUID(int=1), "a" * 64), (uuid.UUID(int=2), "b" * 64)]
+          rows = storage.stored_embeddings(batch, identity=provider.HASH_IDENTITY, chunks=chunks)
+          assert not rows[0].vector.is_zero and rows[1].vector.is_zero
+          assert len(rows[0].vector.wire_bytes()) == 4100
+          assert tuple(handler.SUPPORTED_PROVIDERS) == (fingerprint,)
+          assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
+          print("offline embedding, canonical storage and indexing modules ran from the installed wheel")
+          PY
           "${bin}/python" -I -c "import io; from alembic import command; from evidenceguard_persistence.migration_config import alembic_config; buf = io.StringIO(); command.upgrade(alembic_config(output_buffer=buf), 'head', sql=True); assert 'CREATE TABLE api_keys' in buf.getvalue(); print('offline migration SQL rendered from the installed wheel')"
 
   integration:

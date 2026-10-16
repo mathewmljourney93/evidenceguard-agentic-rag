@@ -11,7 +11,11 @@ Subcommands (each exits 0 on success, 1 on a failed check, 2 on a usage or safet
   a throwaway ``FROM scratch`` build and compared exactly with the expected file set.
 - ``image``: check the CI-built image (user, entry points, offline migration SQL, contents).
 - ``smoke``: the Compose smoke test (startup, image identity, synthetic account and key, upload,
-  production-worker ingestion, verified views, duplicate upload, idle-worker stop).
+  production-worker ingestion, verified views, duplicate upload, M4c offline indexing through the
+  production ``eg-admin backfill-indexes`` and the registered worker, idle-worker stop).
+  Indexing is verified with read-only ``psql`` queries: the index belongs to the same tenant
+  and ingested revision with the offline profile fingerprint, it is ``ready``, its canonical
+  ``index_revision`` job ``succeeded``, and its embedding count equals ``chunk_count``.
 - ``cleanup``: remove only this run's Compose project and image tag.
 
 Selection comes from the environment, set once by the workflow job: ``EG_COMPOSE_PROJECT``
@@ -73,8 +77,30 @@ DOWN_TIMEOUT = 120
 BUILD_TIMEOUT = 300
 HTTP_TIMEOUT = 10
 INGESTION_DEADLINE = 90
+INDEXING_DEADLINE = 90
 POLL_INTERVAL = 2
 LOG_TAIL = 200
+
+# M4c indexing smoke (ADR-0015). The fingerprint is the offline HASH_IDENTITY's, pinned as a
+# literal so the check does not depend on the code under test.
+OFFLINE_FINGERPRINT = "ad53bb3be5d8c50909b9f984294703d572e8f1844a43c5223ef86cd4a1162376"
+DB_USER = "evidenceguard"
+DB_NAME = "evidenceguard_dev"
+BACKFILL_LINE = re.compile(
+    r"pending=(?P<pending>\d+) ready=(?P<ready>\d+) stalled=(?P<stalled>\d+) "
+    r"ineligible=(?P<ineligible>\d+) conflict=(?P<conflict>\d+)"
+)
+INDEX_QUERY = (
+    "SELECT ei.tenant_id, ei.revision_id, ep.fingerprint, ei.status, coalesce(j.status, '-'), "
+    "(SELECT count(*) FROM chunk_embeddings ce WHERE ce.tenant_id = ei.tenant_id "
+    "AND ce.index_id = ei.id), ei.chunk_count, cs.chunk_count "
+    "FROM embedding_indexes ei "
+    "JOIN embedding_profiles ep ON ep.tenant_id = ei.tenant_id AND ep.id = ei.profile_id "
+    "JOIN chunk_sets cs ON cs.tenant_id = ei.tenant_id AND cs.revision_id = ei.revision_id "
+    "LEFT JOIN jobs j ON j.tenant_id = ei.tenant_id AND j.kind = 'index_revision' "
+    "AND j.idempotency_key = ei.id::text "
+    "WHERE ei.tenant_id = '{tenant}' AND ei.revision_id = '{revision}'"
+)
 
 ROOT_FILES = ("pyproject.toml", "uv.lock", "README.md", "alembic.ini")
 CONTEXT_DIRECTORIES = ("apps", "packages")
@@ -460,7 +486,7 @@ IMPORT_CHECK = (
     "import evidenceguard_api, evidenceguard_domain;"
     " from evidenceguard_api.app import create_app; create_app();"
     " from evidenceguard_worker.handlers import production_registry;"
-    " assert production_registry().kinds == frozenset({'ingest_revision'});"
+    " assert production_registry().kinds == frozenset({'ingest_revision', 'index_revision'});"
     " assert 'site-packages' in evidenceguard_api.__file__; print('imports ok')"
 )
 
@@ -653,11 +679,13 @@ class Smoke:
         job = upload.get("job") or {}
         self.emit("smoke: upload accepted (202)")
         self.wait_for_ingestion(str(job.get("id")))
-        self.check_views(document_id, revision_id)
+        chunk_count = self.check_views(document_id, revision_id)
         duplicate = self.expect("duplicate upload", self.upload(str(vendor.get("id"))), 200)
         if duplicate.get("created") is not False or duplicate.get("revision_id") != revision_id:
             raise CheckFailed("duplicate upload: did not return the existing revision")
         self.emit("smoke: duplicate upload returned the existing revision (200)")
+        self.backfill_indexes(tenant)
+        self.wait_for_indexing(tenant, revision_id, chunk_count)
         self.stop_worker()
 
     def check_image_identity(self) -> None:
@@ -754,7 +782,7 @@ class Smoke:
                 raise CheckFailed(f"ingestion: not succeeded within {INGESTION_DEADLINE} s")
             self._sleep(POLL_INTERVAL)
 
-    def check_views(self, document_id: str, revision_id: str) -> None:
+    def check_views(self, document_id: str, revision_id: str) -> int:
         document = self.expect(
             "document", self.request("document", "GET", f"/v1/documents/{document_id}"), 200
         )
@@ -779,6 +807,86 @@ class Smoke:
         ):
             raise CheckFailed("chunks: the chunk set is not verified complete")
         self.emit(f"smoke: revision active; {count} verified chunk(s)")
+        return count
+
+    def backfill_indexes(self, tenant: str) -> None:
+        """Run the production backfill CLI once; one new pending index is expected."""
+        result = self.command(
+            "backfill-indexes",
+            self.compose(
+                "exec", "-T", "api", "eg-admin", "backfill-indexes", "--tenant-id", tenant
+            ),
+            COMMAND_TIMEOUT,
+        )
+        lines = result.stdout.splitlines()
+        match = BACKFILL_LINE.fullmatch(lines[0].strip()) if lines else None
+        if match is None:
+            raise CheckFailed("backfill-indexes: output did not have the expected format")
+        counts = {name: int(value) for name, value in match.groupdict().items()}
+        if counts != {"pending": 1, "ready": 0, "stalled": 0, "ineligible": 0, "conflict": 0}:
+            raise CheckFailed("backfill-indexes: expected exactly one pending index")
+        self.emit("smoke: backfill-indexes enqueued one offline indexing job")
+
+    def index_state(self, tenant: str, revision: str) -> list[str]:
+        """The index's verification row, read in a read-only session (one row expected)."""
+        query = INDEX_QUERY.format(tenant=str(uuid.UUID(tenant)), revision=str(uuid.UUID(revision)))
+        result = self.command(
+            "index state",
+            self.compose(
+                "exec",
+                "-T",
+                "postgres",
+                "psql",
+                "-U",
+                DB_USER,
+                "-d",
+                DB_NAME,
+                "-v",
+                "ON_ERROR_STOP=1",
+                "-qAt",
+                "-F",
+                "|",
+                "-c",
+                "SET default_transaction_read_only = on",
+                "-c",
+                query,
+            ),
+            COMMAND_TIMEOUT,
+        )
+        rows = [line for line in result.stdout.splitlines() if line.strip()]
+        if len(rows) != 1:
+            raise CheckFailed(f"index state: expected one index row, found {len(rows)}")
+        return rows[0].split("|")
+
+    def wait_for_indexing(self, tenant: str, revision: str, chunk_count: int) -> None:
+        try:
+            uuid.UUID(tenant), uuid.UUID(revision)
+        except ValueError:
+            raise CheckFailed("indexing: tenant or revision is not a UUID") from None
+        deadline = self._clock() + INDEXING_DEADLINE
+        while True:
+            fields = self.index_state(tenant, revision)
+            if len(fields) != 8:
+                raise CheckFailed("index state: unexpected row format")
+            row_tenant, row_revision, fingerprint, status, job_status = fields[:5]
+            if (row_tenant, row_revision) != (tenant, revision):
+                raise CheckFailed("indexing: the index is not the ingested revision's")
+            if fingerprint != OFFLINE_FINGERPRINT:
+                raise CheckFailed("indexing: the index does not use the offline profile")
+            if job_status in ("failed", "dead"):
+                raise CheckFailed(f"indexing: job ended as {job_status}")
+            if status == "ready" and job_status == "succeeded":
+                stored, bound, chunk_set = (int(value) for value in fields[5:8])
+                if not stored == bound == chunk_set == chunk_count:
+                    raise CheckFailed("indexing: embedding count does not equal chunk_count")
+                self.emit(
+                    f"smoke: index ready for the ingested revision; {stored} embedding(s), "
+                    "indexing job succeeded"
+                )
+                return
+            if self._clock() >= deadline:
+                raise CheckFailed(f"indexing: not ready within {INDEXING_DEADLINE} s")
+            self._sleep(POLL_INTERVAL)
 
     def stop_worker(self) -> None:
         # This stops an idle worker after ingestion succeeded. It does not test draining an

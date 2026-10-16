@@ -25,6 +25,7 @@ from evidenceguard_persistence.settings import DATABASE_URL_ENV
 from evidenceguard_worker import __main__ as cli
 from evidenceguard_worker.context import JobContext
 from evidenceguard_worker.handlers import production_registry
+from evidenceguard_worker.indexing import INDEX_REVISION_KIND, index_revision
 from evidenceguard_worker.ingest import INGEST_REVISION_KIND, ingest_revision
 from evidenceguard_worker.registry import HandlerRegistry
 from evidenceguard_worker.runtime import JobStore, Timings
@@ -159,11 +160,13 @@ def test_usage_errors_exit_two_without_echoing_values(
 # --- exit codes -----------------------------------------------------------------------------
 
 
-def test_the_production_registry_registers_exactly_ingest_revision() -> None:
+def test_the_production_registry_registers_exactly_ingestion_and_indexing() -> None:
     registry = production_registry()
 
-    assert registry.kinds == frozenset({INGEST_REVISION_KIND}) == frozenset({"ingest_revision"})
+    assert registry.kinds == frozenset({INGEST_REVISION_KIND, INDEX_REVISION_KIND})
+    assert registry.kinds == frozenset({"ingest_revision", "index_revision"})
     assert registry[INGEST_REVISION_KIND] is ingest_revision
+    assert registry[INDEX_REVISION_KIND] is index_revision
 
 
 def test_no_handlers_exit_four_before_reading_database_settings(

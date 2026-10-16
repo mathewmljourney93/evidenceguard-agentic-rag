@@ -195,6 +195,34 @@ Local Compose is unverified. It is a development stack only, with no production-
 
 **Limits** (ADR-0012): the database credentials are disposable and public. Stopping the worker has an external 60 s budget, not a guaranteed shutdown bound (ADR-0008). The smoke stops an idle worker only. Cleanup can be prevented by runner loss. The uv builder-tool image is used under a narrowly approved exception to the two-week age policy, for its exact digest only (no runtime uv; no change to the Python base or the general policy). The exception does not claim age compliance or general safety. There is no production deployment.
 
+## Revision indexing (M4c, accepted for a local commit; not verified in CI)
+
+Implemented by Claude Code in Prompt 125 and corrected in Prompt 126 under the accepted M4c
+specification ([ADR-0015](decisions/0015-revision-indexing.md)). The complete corrected implementation
+is **accepted at external review in Prompt 127 for a local commit, pending current-version CI**.
+No publication or merge is authorized or completed by this task. PostgreSQL, Linux and real
+container indexing verification remain pending CI. All 251 integration tests remain unexecuted
+against this M4c version, including the 18 indexing cases. Claude Code ran the new wheel script
+locally on Windows in Prompts 125–126 and the corrected installed-wheel provider-resolution probe
+in Prompt 126; neither Codex nor the reviewer ran those checks. The new wheel step has not run
+on CI runners; the existing coverage on `main` at `872d0af` predates this extension. M4d–M4f
+and overall M4 acceptance remain pending. Local Compose remains unverified.
+
+| Threat | Mitigation |
+|---|---|
+| Indexing another tenant's revision | The tenant comes only from the validated actor (enqueue/backfill) or the job (handler). Every selection, enqueue and read is tenant-scoped, and M4b's composite keys back this in the database. |
+| Unauthorized or unbounded operator action | `eg-admin backfill-indexes` follows the existing trusted-operator model, with no API endpoint. It processes one bounded page (limit 1–100) per invocation, never retries or resets a terminal job, and prints only fixed outcome counts and the cursor. |
+| Leaking text, vectors or keys | Job payloads hold only `index_id`. Page values and errors never show text or vectors, the handler does not log, and CLI and runtime output carry fixed counts and codes only. |
+| An unexpected or networked provider | Providers come only from an immutable mapping fixed when the handler is built (production: the offline `HASH_IDENTITY`). The stored identity's fingerprint is verified before resolution, and no live adapter, network or environment is used. |
+| Stale writes after cancellation or lease loss | Provider work runs with no transaction or lock open. `ctx.check()` runs before and after it (and before classifying a provider or provider-resolution failure), each write and the finish are fenced, and M4b re-checks ownership. Cancellation, lease loss and fence closure raised during provider resolution propagate unchanged. Readiness and job success commit together. |
+
+**Limits:** checks happen at explicit boundaries only. They do not interrupt synchronous calls,
+and a cancellation latched after the last check may not stop a non-finish transaction already
+under way; the accepted lease-expiry/commit window remains. Reused committed vectors are not
+re-verified against provider output, and provider calls are not exactly-once. A stalled index
+(terminal canonical job) has no recovery in M4c. The offline provider is a lexical-hash
+baseline with no semantic-quality claim.
+
 ## Not implemented yet
 
 - **Rate limiting, lockout, key expiry and usage auditing** for API keys. Direct domain callers (tests, later the worker) still construct `ActorContext` themselves and are trusted.
