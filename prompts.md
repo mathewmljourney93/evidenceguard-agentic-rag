@@ -20756,3 +20756,1175 @@ or provider calls were run. Claude Code implemented and corrected M4c in Prompts
 125–126; OpenAI Codex handled Prompts 127–128; Claude Code recorded the evidence in
 Prompt 129 and handles this task. No commit identifier, push result or CI outcome for
 this task is pre-recorded here.
+
+### Prompt 130 outcome (Claude Code; attributed to its handoff)
+
+Claude Code committed the accepted Prompt 129 documentation and prompt history as
+`76fa5a3800936d2bebdf13c5401609e09983b0d1` (parent `600a366`, tree
+`1313714d076539b5d33e4ce4f997c557ae3ad3c0`, noreply author and committer; README, ADR-0015,
+plan and threat-model blobs byte-identical to accepted tree `9550df35`; only prompts.md differed).
+Pre-commit checks passed (staged paths, history prefix, 135 links, encoding, private-content
+scan, `git diff --cached --check`, staged Gitleaks); full-history Gitleaks after the commit scanned
+56 commits with no leaks. `git push origin refs/heads/feat/revision-indexing:refs/heads/feat/revision-indexing`
+exited 0 (`600a366..76fa5a3`). The feature-push CI run 38950031289 and secret-scan run 38950031321
+for that exact SHA (push, attempt 1) succeeded with all five jobs and every step `success`. After
+rechecking preconditions, `git switch main` (0), `git merge --ff-only 76fa5a3800936d2bebdf13c5401609e09983b0d1`
+(0, fast-forward from `872d0af`, no merge commit) and `git push origin refs/heads/main:refs/heads/main`
+(0, `872d0af..76fa5a3`) ran; remote `main` equalled `76fa5a3`. The main CI run 38950479536 and
+secret-scan run 38950479604 (push, attempt 1) succeeded with all five jobs and every step
+`success`. These were Claude Code's observations of run, job and step conclusions only: its
+anonymous log download returned HTTP 403 ("Must have admin rights to Repository."), so it observed
+no pytest counts or log lines for either push. No documents were changed after publication.
+
+External reviewer main evidence note: the external reviewer independently retrieved the main run
+records, all five job logs and the job/step summaries for `76fa5a3` (push, branch `main`, attempt
+1, success; every job and step succeeded, none skipped): Ubuntu `1716 passed, 251 skipped in
+23.22s`; Windows `1715 passed, 252 skipped in 37.66s`; both verify jobs passed formatting, lint,
+mypy, builds and installed-wheel checks, and both logs report `offline embedding, canonical storage
+and indexing modules ran from the installed wheel`; PostgreSQL `251 passed, 1716 deselected in
+98.40s (0:01:38)` with all 18 `tests/test_indexing_postgres.py` cases passing; the container job
+with all six steps, `context: ok (79 files; 19 planted fixtures excluded)`, the image checks,
+ingestion, duplicate upload, production backfill, a ready index with two embeddings and a
+succeeded indexing job, idle-worker exit 0, `smoke: ok` and `cleanup: ok`; Gitleaks 56 commits,
+no leaks. Smoke success gates are not raw-row observations; raw rows and generated credentials
+were not emitted or inspected. The reviewer ran no suite, build, wheel check, PostgreSQL or Docker
+locally, and retrieved no logs for the feature-branch push of `76fa5a3`.
+
+### Prompt 131 (verbatim; line endings normalized to LF)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 131: Record M4c main verification and propose the M4d retrieval specification
+
+Record M4c’s verified main baseline and prepare a detailed M4d snapshot/retrieval specification for external review.
+
+Documentation only. M4d must remain proposed, unaccepted and unimplemented. Stage the changes and export a review diff. Do not commit or publish.
+
+## Repository and recovery
+
+Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+Read CLAUDE.md and any applicable AGENTS.md first.
+
+Read the relevant current documentation and actual source boundaries before specifying M4d. Avoid loading all of prompts.md; inspect the relevant tail and verify the earlier history by byte comparison.
+
+## Expected starting state
+
+- Current branch: main.
+- HEAD, origin/main and remote main:
+  76fa5a3800936d2bebdf13c5401609e09983b0d1
+- Parent:
+  600a366453bd94811ab1d741dc0b28adeb427031
+- Tree:
+  1313714d076539b5d33e4ce4f997c557ae3ad3c0
+- Local and remote feat/revision-indexing point to the same commit.
+- Working tree and index: clean.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Expected author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Verify local state and fresh remote refs read-only. Record the checkpoint under .local/p131/.
+
+Create docs/m4d-retrieval-spec from HEAD. If that branch already exists or the expected state differs materially, stop and report rather than overwriting or resetting anything.
+
+## Authorized files
+
+Exactly these five paths may change:
+
+- README.md
+- docs/decisions/0015-revision-indexing.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+No source, tests, migrations, dependencies, lockfile, workflows, configuration, Dockerfile, Compose or CLAUDE.md changes.
+
+Do not create ADR-0016 yet; defer it to implementation.
+
+No application tests, builds, installs, Docker, database or provider contact. Reading source and documentation, documentation checks and secret scanning are authorized.
+
+No commit, push, merge, tag, amend or history rewrite.
+
+## Part 1: Record M4c main evidence
+
+M4c is now reviewed, verified in CI and on main at:
+
+76fa5a3800936d2bebdf13c5401609e09983b0d1
+
+The external reviewer independently retrieved the main run records, all five job logs and job/step summaries. The reviewer ran no suite, build, wheel check, PostgreSQL or Docker locally.
+
+Claude Code’s Prompt 130 observations remain job/step conclusions only; its anonymous log download returned HTTP 403. Preserve that historical attribution.
+
+### Main CI
+
+Run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38950479536
+
+Secret scan:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38950479604
+
+Both:
+- event push;
+- branch main;
+- exact head 76fa5a3800936d2bebdf13c5401609e09983b0d1;
+- attempt 1;
+- conclusion success.
+
+Every job and step succeeded; no required step was skipped.
+
+Ubuntu:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38950479536/job/117140297218
+
+1716 passed, 251 skipped in 23.22s
+
+Windows:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38950479536/job/117140297108
+
+1715 passed, 252 skipped in 37.66s
+
+Both verify jobs passed formatting, lint, mypy, distribution builds and installed-wheel checks.
+
+Both logs explicitly confirm:
+offline embedding, canonical storage and indexing modules ran from the installed wheel
+
+This executes the offline embedding/storage path and imports indexing modules from site-packages; it does not independently establish database indexing.
+
+PostgreSQL:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38950479536/job/117140297207
+
+251 passed, 1716 deselected in 98.40s (0:01:38)
+
+The log shows all 18 cases in tests/test_indexing_postgres.py passing, none skipped or failed.
+
+Container:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38950479536/job/117140297362
+
+All six steps executed successfully:
+configuration, context, build, image checks, smoke and cleanup.
+
+Observed:
+- compose config: ok
+- context: ok (79 files; 19 planted fixtures excluded)
+- UID and GID 10001
+- all three entry-point help checks passed
+- installed imports, offline migration SQL and runtime contents passed
+- database healthy, migrations complete, API healthy
+- migrate, API and worker ran the CI-built image
+- generated key held privately in memory
+- upload 202
+- ingestion job succeeded
+- active revision with two verified chunks
+- duplicate upload 200
+- production backfill enqueued one offline indexing job
+- ready index with two embeddings and succeeded indexing job
+- idle worker exit 0, no OOM kill
+- smoke: ok
+- cleanup: ok
+
+Smoke success gates the matching tenant, revision and offline profile, canonical-job success, readiness, matching embedding/chunk counts and service-log key privacy.
+
+Raw database rows and generated credentials were not emitted or independently inspected. Do not turn successful assertions into a claim that raw rows were observed.
+
+Gitleaks:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38950479604/job/117140297515
+
+56 commits scanned; no leaks found.
+
+### Attribution and historical evidence
+
+- Add full main evidence to ADR-0015.
+- Keep 600a366 feature-branch evidence as historical, preserving its anchor.
+- The reviewer retrieved main logs for 76fa5a3, not its feature-push logs. Do not invent feature-push counts.
+- Record that 76fa5a3 changes verification documentation and prompt history relative to 600a366; implementation files are unchanged.
+- Correct current “not merged” and “main remains at 872d0af” wording for M4c.
+- Keep earlier milestones’ baseline statements properly scoped.
+- The embedding-specific installed-wheel CI limitation is closed for this version.
+- Local Compose, idle-only shutdown coverage and the other implementation limits remain unchanged.
+
+## Part 2: Prepare M4d specification in docs/plan.md
+
+Add a detailed section after M4c and before M4e:
+
+M4d snapshot and retrieval specification (PROPOSED, Prompt 131; not implemented)
+
+Link the M4d slice row and README to it.
+
+Distinguish:
+- decisions already accepted in Prompt 108;
+- facts established by existing code;
+- proposed implementation details;
+- unresolved decisions requiring review.
+
+Do not silently redesign accepted policy or label a new recommendation accepted.
+
+### Inspect the actual boundaries
+
+Read the relevant:
+- actor, tenant and role contracts;
+- embedding identity, validation, provider and canonical-storage modules;
+- documents, revisions, chunks, chunk sets and embedding models;
+- M4b embedding store and M4c indexing seam;
+- existing read-snapshot transaction pattern;
+- retrieval import-boundary tests;
+- database fixture and PostgreSQL test conventions.
+
+Name intended files, public seams and frozen input/result values based on that source.
+
+Keep import direction intact. In particular, do not introduce persistence imports into the pure retrieval package if its existing boundary forbids them. Specify orchestration and SQL placement accordingly.
+
+### Accepted policy to preserve
+
+1. Snapshot capture is trusted and tenant/vendor scoped.
+2. Capture selects the vendor’s active revision pointers, complete immutable chunk sets and ready indexes for the pinned profile in one consistent read transaction.
+3. If any active revision lacks the required complete/ready state, refuse capture rather than silently omit it.
+4. Record the accepted pending/processing exclusions with precise semantics.
+5. An empty eligible set is an explicit error.
+6. A manually supplied revision-ID list alone proves neither authorization nor past eligibility.
+7. A revision active at capture remains eligible for that snapshot after later supersession.
+8. A revision already superseded at capture is excluded from a new snapshot.
+9. New revisions never enter an older snapshot.
+10. Current-state search first captures a fresh snapshot.
+11. Never-activated, failed, incomplete, foreign-tenant/vendor, wrong-profile and non-snapshot chunks remain excluded.
+
+M5 persists snapshot/review authorization and configuration facts. Do not implement or design a new review API in M4d.
+
+### Snapshot contract and trust boundary
+
+Specify:
+- trusted actor-derived tenant and vendor checks;
+- explicit revision/index/chunk-set bindings;
+- profile identity/fingerprint;
+- chunk counts and manifests;
+- retrieval configuration/version;
+- provenance needed to validate and reuse the snapshot;
+- duplicate and malformed-ID handling;
+- immutable values and safe representations.
+
+Explain where authoritative eligibility is established and what constructors can validate structurally.
+
+Do not equate a frozen object, UUID list or hash with an authorization capability. Explain how later retrieval verifies tenant/vendor ownership and immutable bindings while preserving snapshot-relative supersession.
+
+State the trust model and any persistence/provenance limitation that remains until M5. If a policy cannot be enforced without additional machinery, present the issue and recommendation for review.
+
+Specify race behaviour for activation during capture and supersession after capture.
+
+### Transactions and provider work
+
+Propose an implementable consistency model:
+- short consistent read transactions for capture and retrieval;
+- exact transaction settings and their first-statement requirements;
+- one response/result’s counts, eligibility checks and channel queries must not contradict one another;
+- transaction-scoped settings restored on pooled connections;
+- provider calls and expensive Python work outside database transactions;
+- no writes or implicit indexing from capture/retrieval.
+
+Explain the sequence for validating input, obtaining query embeddings, opening read transactions and validating snapshot bindings. Handle changes between those stages explicitly.
+
+Do not claim consistency across separate requests or an atomic boundary spanning a provider call and a database transaction.
+
+### Accepted input and corpus bounds
+
+Preserve:
+- 1–8 distinct nonblank queries;
+- each at most 4,000 code points and 16,000 UTF-8 bytes;
+- 1–100 distinct revision IDs;
+- at most 100,000 eligible chunks;
+- reject excess instead of silently truncating;
+- per-channel candidate limit 20;
+- requested final k 1–20, default 8.
+
+Specify strict types, unknown fields, booleans/coercions, UTF-8/NUL handling, query distinctness, total batching and fixed validation errors.
+
+Explain how capture detects bound violations without accidentally accepting a truncated set.
+
+These are engineering defaults, not performance measurements.
+
+### Lexical and vector channels
+
+Specify concrete SQL/data flow and score meaning:
+- explicit PostgreSQL simple configuration for documents and queries;
+- a recommended query constructor and its exact query semantics;
+- exact pgvector cosine operations, no approximate index;
+- query/provider identity validation;
+- float32 query conversion and binding compatible with existing storage rules;
+- zero query vectors produce no vector candidates;
+- stored zero vectors excluded from cosine candidates;
+- lexical scores must be positive;
+- tenant, vendor, snapshot, profile and ready-index filters before each channel limit.
+
+Do not infer lexical eligibility merely because a search_vector exists.
+
+State how all-zero query vectors can still use the lexical channel, and how no candidates yields an empty result.
+
+### Deterministic fusion and results
+
+Preserve:
+- one list per distinct query/channel;
+- one-based ranks;
+- channel ties by canonical chunk UUID ascending;
+- RRF contribution 1 / (60 + rank);
+- sum contributions across lists;
+- final ties by canonical chunk UUID ascending;
+- each chunk returned once.
+
+Specify numeric comparison/tie handling and the boundary of the determinism claim.
+
+Result values should include pinned profile, provenance, channel/query ranks and scores, and bounded chunk evidence with accurate spans.
+
+Preserve repeated-header provenance as separate spans; do not fabricate a contiguous quotation.
+
+Distinguish authorized evidence text in success values from privacy-safe representations, errors and logs.
+
+### Errors and privacy
+
+Propose fixed errors for:
+- invalid inputs;
+- unauthorized or mismatched scope;
+- unready or empty snapshot capture;
+- snapshot inconsistency;
+- excessive corpus bounds;
+- provider identity/output failure.
+
+Explain error precedence where it matters and whether missing/foreign objects are deliberately indistinguishable.
+
+Do not expose query text, document/chunk content, vectors, credentials, SQL parameters, provider responses or arbitrary exception text in errors/logs.
+
+No content or query logging.
+
+### Planned verification
+
+Separate database-independent tests from PostgreSQL tests. All are planned only.
+
+Include:
+- strict input and immutable-contract boundaries;
+- provider validation and zero vectors;
+- independent lexical/vector/RRF fixtures and tie cases;
+- duplicate candidate fusion and fewer-than-k results;
+- exact filters before channel limits, with tempting forbidden high-score rows;
+- cross-tenant and cross-vendor scope;
+- wrong profile/index/manifest and incomplete/not-ready rejection;
+- active-unindexed capture refusal;
+- empty and excessive capture/corpus bounds;
+- superseded-at-capture exclusion;
+- active-at-capture then superseded remaining eligible;
+- later revision excluded from old snapshot;
+- deterministic interleavings during capture and retrieval;
+- pooled transaction settings restored;
+- provider work outside transactions;
+- no writes, enqueue or indexing side effects;
+- safe errors/reprs/logs and intended success evidence fields;
+- installed-wheel/import-boundary considerations.
+
+Use deterministic barriers/hooks rather than timing sleeps for planned concurrency tests.
+
+Do not claim retrieval quality, injection resistance or benchmark results. Corpus/Recall work remains M4e; mocked Voyage remains M4f.
+
+### Decisions and scope
+
+List new reviewer decisions with recommendations and tradeoffs. Do not manufacture uncertainty about already settled Prompt 108 decisions.
+
+State:
+- intended new/changed files;
+- whether any migration, dependency or workflow change is actually needed;
+- required future acceptance checks;
+- deferred work.
+
+No implementation, test scaffolding, ADR-0016, retrieval endpoint, report generation, live provider, recovery generation or activation wiring in this task.
+
+## Documentation consistency
+
+README, ADR-0015, plan and threat model must agree:
+- M4c is verified and on main at 76fa5a3;
+- M4d is proposed only;
+- M4e–M4f and overall M4 acceptance remain pending.
+
+Historical M4a/M4b wheel limitations may remain as historical facts, but must not read as current limitations after the verified M4c wheel extension.
+
+Preserve accepted specification anchors and historical evidence. Add only a concise M4d “proposed, not implemented” threat-model note; do not describe proposed mitigations as operational.
+
+## Prompt history
+
+Append:
+- Prompt 130 outcome attributed to its handoff, keeping Claude’s observed job/step conclusions separate from its unavailable logs;
+- the external reviewer’s independently retrieved main evidence above;
+- Prompt 131 verbatim, including its opening “Written for” line;
+- an outcome note marking M4d proposed and awaiting review.
+
+Preserve all earlier bytes as an identical prefix. Do not rewrite historical HTTP 403 records or formatting-exception notes.
+
+Use inline, backticked commit identifiers in your own entries.
+
+## Checks and staging
+
+Verify:
+- exactly the five authorized paths changed;
+- earlier prompts.md content is an identical byte prefix;
+- relative links and anchors resolve;
+- no stale current M4c not-merged/pre-CI wording;
+- no claim M4d is accepted, implemented or tested;
+- historical evidence and attribution remain accurate;
+- no private content or artifacts;
+- UTF-8 without BOM and no unintended CR characters.
+
+Stage exactly the five permitted files.
+
+Run:
+- git diff --cached --check;
+- staged Gitleaks using the existing repository procedure.
+
+No suppression, allowlist or scanner-rule changes.
+
+No application tests, builds, installs, Docker, database or provider contact.
+
+## Review export
+
+Export directly from Git:
+.local/p131/m4d-retrieval-spec.diff
+
+- Baseline:
+  76fa5a3800936d2bebdf13c5401609e09983b0d1
+- Final: resulting staged tree.
+- Exclude prompts.md.
+- UTF-8 without BOM.
+
+Report full baseline/final tree identifiers, paths, insertion/deletion statistics, byte size and SHA-256. Do not paste the full diff into chat.
+
+## Final handoff
+
+Report:
+- verified starting state and new branch;
+- M4c main evidence recorded and attribution;
+- concise M4d proposal;
+- decisions requiring review;
+- checks actually run;
+- staged paths and tree;
+- export metadata;
+- remaining limitations.
+
+Nothing committed, pushed, merged or implemented.
+
+End with:
+“Mathew: return this output plus .local/p131/m4d-retrieval-spec.diff to the external reviewer.”
+
+
+### Prompt 131 outcome (Claude Code; staged, M4d proposed and awaiting review)
+
+Starting state matched: `main`, HEAD, `origin/main` and remote `main` at `76fa5a3` (parent
+`600a366`, tree `1313714d`), local and remote `feat/revision-indexing` at the same commit, clean
+working tree and index, expected origin and noreply identities; `git fetch --no-tags origin`
+succeeded and `git ls-remote` was read-only. Branch `docs/m4d-retrieval-spec` did not exist and
+was created from HEAD. Checkpoint saved under `.local/p131/`.
+
+Claude Code recorded the reviewer-retrieved M4c main evidence at `76fa5a3` in ADR-0015 (new main
+evidence section; the `600a366` section relabelled historical with its anchor unchanged), README,
+plan and threat model, keeping Claude Code's Prompt 130 conclusions-only observations and HTTP 403
+separate. It added the M4d snapshot and retrieval specification to docs/plan.md as **proposed,
+not accepted, implemented or tested**, distinguishing accepted Prompt 108 decisions, source facts
+at `76fa5a3`, proposals and nine reviewer decisions (R1–R9), and linked it from the M4d slice row,
+README, ADR-0015 and a concise threat-model note. Claude Code read source and documentation only;
+it ran no application tests, builds, installs, Docker, database or provider calls. Checks run
+before this note was finalized: exactly the five authorized paths changed; the committed
+prompts.md is an identical byte prefix; 146 relative links and anchors in the four documents
+resolve, including the new M4d and main-evidence anchors; stale M4c wording and M4d-acceptance
+sweeps; private-content scan; UTF-8 without BOM and no CR characters. `git diff --cached --check`
+and staged Gitleaks (`gitleaks git --pre-commit --staged --redact --verbose .`, no suppression)
+are run after staging and reported in the Prompt 131 handoff. These changes are staged and
+uncommitted, awaiting external review; no commit, push or merge was made.
+
+## Prompt 132 review outcome and M4d correction request (Claude Code)
+
+External review of Prompt 131: the reviewer inspected the Prompt 131 diff and independently
+matched file `.local/p131/m4d-retrieval-spec.diff`, baseline
+`76fa5a3800936d2bebdf13c5401609e09983b0d1`, final tree
+`addab9a7abfd09b80dc32a1f68231b682bc20c87`, 90,723 bytes, SHA-256
+`d35e4e32fc0a7ee91daeb26bba3c662485e0cd352d290d07e56014db34560b65`. The M4c main-evidence
+documentation (README, ADR-0015, plan and threat model at `76fa5a3`) is accepted. The M4d proposal
+was inspected against the accepted policies and selected source at `76fa5a3` (canonical storage,
+provider validation, the read-snapshot helper and models), with official PostgreSQL and SQLAlchemy
+documentation consulted. The reviewer ran no project tests, build, wheel check, PostgreSQL or
+Docker. The complete M4d specification is not yet accepted.
+
+Settled decisions (recommended options approved): R1 pure fusion in the domain package; R2
+provider/persistence orchestration in the worker package; R3 trusted in-process snapshots with
+database binding rechecks until M5 (a trusted internal programming interface; binding checks do
+not prove past active-at-capture eligibility; no endpoint or untrusted snapshot deserialization;
+a recomputable digest is not authorization; M5 persists and reloads captured facts through trusted
+paths; no protection against malicious in-process code is established); R4 reviewer and approver
+only; R5 exact exclusion count, at most 100 ascending IDs and a truncated flag; R6 a fixed
+not-ready error without IDs; R7 a transaction-local 30,000 ms `statement_timeout`; R8
+`websearch_to_tsquery` with explicit `simple`; R9 a narrow CI installed-wheel extension importing
+the new modules and executing fusion on a fixed fixture, required as a future acceptance check.
+
+Requested corrections: (1) transaction order matching the unchanged `read_snapshot` helper, with
+the snapshot established by its `clock_timestamp()` SELECT, `SET LOCAL statement_timeout` after
+it, narrower locking claims and a per-statement timeout scope; (2) the actual
+`canonical_vector(vector, *, allows_zero)` contract and separate validation for the provider and
+precomputed-vector seams; (3) a privacy-safe provider-property exception boundary; (4) a fixed
+content-free database failure boundary instead of raw SQLAlchemy propagation; (5) a versioned
+canonical encoding and complete value invariants; (6) explicit SQL eligibility joins, real
+PostgreSQL ranking/filtering tests and row-order-independent capture precedence.
+
+### Prompt 132 (verbatim; line endings normalized to LF)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 132: Correct the M4d specification and record settled review decisions
+
+Correct the proposed M4d specification. Record the reviewer’s decisions, but keep the complete specification proposed and awaiting review.
+
+Documentation only. Do not implement, commit, push or merge.
+
+## Repository instructions
+
+Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+Read CLAUDE.md and any applicable AGENTS.md first. Inspect the relevant source and documentation without loading all of prompts.md.
+
+## Expected starting state
+
+- Branch: docs/m4d-retrieval-spec.
+- HEAD:
+  76fa5a3800936d2bebdf13c5401609e09983b0d1
+- Accepted starting staged tree:
+  addab9a7abfd09b80dc32a1f68231b682bc20c87
+- Five staged paths:
+  README.md
+  docs/decisions/0015-revision-indexing.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- No unstaged or unexpected untracked changes.
+- Local main and origin/main at HEAD.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Expected identity:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Verify locally and save the starting tree, paths and per-file blob hashes under .local/p132/. No fetch or remote operation is needed.
+
+If the state differs materially, stop and report. Do not reset or discard changes.
+
+## Review outcome
+
+The reviewer inspected the Prompt 131 diff and independently matched:
+
+- File: .local/p131/m4d-retrieval-spec.diff
+- Baseline:
+  76fa5a3800936d2bebdf13c5401609e09983b0d1
+- Final tree:
+  addab9a7abfd09b80dc32a1f68231b682bc20c87
+- Size: 90,723 bytes.
+- SHA-256:
+  d35e4e32fc0a7ee91daeb26bba3c662485e0cd352d290d07e56014db34560b65
+
+The M4c main-evidence documentation is accepted.
+
+The M4d proposal was inspected against the accepted policies and selected source at 76fa5a3, including canonical storage, provider validation, the read-snapshot helper and models. Official PostgreSQL and SQLAlchemy documentation was also consulted.
+
+The reviewer ran no project tests, build, wheel check, PostgreSQL or Docker.
+
+The complete M4d specification is not yet accepted.
+
+## Authorized changes
+
+Only docs/plan.md and prompts.md may differ from the starting staged tree.
+
+Keep these files byte-identical to that tree:
+- README.md
+- docs/decisions/0015-revision-indexing.md
+- docs/threat-model.md
+
+The same five files remain staged against HEAD, because the earlier documentation changes are still uncommitted.
+
+No source, tests, configuration, workflow, migration, dependency, lockfile or ADR-0016 changes.
+
+Keep the M4d specification heading and anchor unchanged. Update its status paragraph to say corrected in Prompt 132, decisions settled, complete specification awaiting review.
+
+## Settled decisions
+
+Record the recommended options R1–R9 as approved:
+
+R1. Pure fusion in the domain package.
+R2. Provider/persistence orchestration in the worker package.
+R3. Trusted in-process snapshots with database binding rechecks until M5.
+R4. Reviewer and approver roles only.
+R5. Exact exclusion count plus at most 100 ascending IDs and a truncated flag.
+R6. Fixed not-ready error with no revision IDs.
+R7. Transaction-local statement_timeout of 30,000 ms.
+R8. websearch_to_tsquery with explicit simple configuration.
+R9. A narrow CI installed-wheel extension importing the new modules and executing fusion on a fixed fixture.
+
+R9 is a required future acceptance check, not optional. Its workflow edit belongs to implementation, not this task.
+
+For R3, explicitly record:
+- this is a trusted internal programming interface;
+- binding checks do not prove past active-at-capture eligibility;
+- no endpoint or untrusted snapshot deserialization is authorized;
+- a recomputable digest is not an authorization mechanism;
+- M5 must persist and reload the captured facts through trusted paths;
+- approval of this interim trust model does not establish protection against malicious in-process code.
+
+The choices are settled; the corrected specification as a whole remains pending review.
+
+## Correction 1: Make transaction order match the existing helper
+
+The existing document_views.read_snapshot helper executes:
+1. SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY
+2. SELECT clock_timestamp()
+3. yields the session and captured time
+
+The proposal currently says this unchanged helper will set statement_timeout before clock_timestamp. It cannot do that.
+
+Specify the implementable order when reusing the helper unchanged:
+1. isolation/read-only statement;
+2. its single clock_timestamp query;
+3. SET LOCAL statement_timeout = 30000 after the helper yields;
+4. capture or retrieval data statements.
+
+The repeatable-read snapshot is established by the first snapshot-taking SELECT, including the helper’s clock_timestamp SELECT. Do not say it starts only at the later vendor query.
+
+captured_at is informational, not an exact proof of the snapshot’s visibility or past eligibility.
+
+Update race descriptions and planned interleaving tests accordingly. Hooks must be positioned relative to the actual snapshot establishment.
+
+Remove the blanket claim that capture never blocks or is blocked. Ordinary SELECTs take relation locks and can conflict with DDL. State the narrower guarantee: no explicit row locks and no row-lock conflict with ordinary activation/indexing DML.
+
+The 30-second timeout is per statement, not a whole-retrieval or provider-call deadline. State that explicitly. Do not promise an overall execution bound or add an unreviewed retry loop.
+
+Keep transaction-local settings and pooled restoration requirements.
+
+## Correction 2: Correct canonical conversion and standalone validation
+
+The actual signature is:
+canonical_vector(vector, *, allows_zero: bool)
+
+Replace the proposed allows_zero keyword with allows_zero throughout the specification.
+
+Separate the contracts of:
+- search_snapshot, which receives an actual provider;
+- retrieve_with_vectors, which receives a precomputed EmbeddingBatch and has no provider object.
+
+The standalone persistence seam must independently validate:
+- actor, role and tenant scope;
+- request and snapshot structure;
+- batch identity against the snapshot;
+- input_type == "query";
+- vector count against request query count;
+- numeric/dimension rules;
+- canonical float32 conversion.
+
+It must not refer to a provider.identity property it cannot access.
+
+Retain conversion outside the database transaction. Reuse the existing numeric tolerance and zero policy; no renormalization or tolerance widening.
+
+Clarify that validation cannot prove that caller-supplied vectors were computed from the claimed query strings. The precomputed-vector seam is trusted internal input.
+
+## Correction 3: Specify the provider-property exception boundary
+
+The initial provider.identity access can itself raise, before embed_validated is called.
+
+Specify privacy-safe handling for ordinary exceptions during:
+- provider identity access and validation;
+- the embedding call;
+- result validation;
+- canonical conversion.
+
+They must become fixed RetrievalProviderError messages without the original exception retained as cause or context, following the existing outside-except pattern.
+
+Do not claim the initial property access is already protected by embed_validated.
+
+Define the scope precisely:
+- no new JobContext or worker cancellation protocol in M4d;
+- no broad BaseException catch;
+- no changes to M4a or M4c control-flow semantics;
+- existing embed_validated behaviour is described accurately.
+
+Add planned cases for an identity getter throwing an exception containing a private marker, identity mismatch before any call, an identity changing between reads, malformed results and numeric conversion failure.
+
+## Correction 4: Remove unsafe raw database-exception propagation
+
+Delete the claim that SQLAlchemyError may propagate unchanged safely because hide_parameters=True.
+
+That option hides parameter formatting in SQLAlchemy logging/StatementError strings. It does not sanitize arbitrary database/driver messages, exception attributes or exception chains.
+
+Specify a fixed, content-free database failure boundary for the new retrieval seams, for example RetrievalDatabaseError with a fixed code.
+
+Cover:
+- session acquisition and statement execution;
+- timeout and connection failures;
+- row conversion where backend-originated values may appear in exceptions;
+- transaction cleanup.
+
+Do not expose original driver messages, statements, parameters, vectors, query text or exception chains.
+
+Keep the original failure primary if cleanup also fails, with no raw cleanup exception escaping or being logged.
+
+Do not add automatic retries. A database failure must not become a successful empty result.
+
+Map known semantic validation failures to their existing fixed retrieval errors; distinguish those from operational database failures.
+
+Add planned fake-session privacy tests with markers in exception text, statement/parameters and chained exceptions, plus timeout and cleanup-failure cases.
+
+Keep the engine’s existing hide_parameters setting as defence in depth. No engine or workflow change in this task.
+
+Useful official reference:
+https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.create_engine.params.hide_parameters
+
+## Correction 5: Complete canonical hashing and value contracts
+
+The proposal names config_sha256 and snapshot_sha256 but does not define their canonical byte representation.
+
+Specify a versioned canonical encoding:
+- exact field names and nesting;
+- UUID and digest representation;
+- UTC datetime encoding and precision;
+- ordered bindings and exclusion IDs;
+- integer and boolean handling;
+- identity/config representation;
+- UTF-8 JSON rules, sorted keys and compact separators;
+- digest fields excluded from their own input;
+- no Python repr, hash(), locale or default=str.
+
+Prefer deriving digests internally from validated fields rather than trusting a caller-supplied digest. If externally supplied digests remain supported, define their exact verification.
+
+Make the exclusion record a named immutable value with explicit fields, bounds and count/truncated invariants.
+
+Complete the important structural invariants for:
+- RevisionBinding and snapshot bindings, including one binding per document;
+- ChannelHit and channel lists;
+- finite scores and channel-specific ordering;
+- query-position and rank bounds;
+- duplicate list/entry rejection;
+- final result IDs, ranks, counts and provenance consistency.
+
+Do not require a vector distance range narrower than the actual operator’s numeric behaviour without evidence; reject non-finite scores and document numeric assumptions.
+
+Retain exact Fraction comparisons for fusion and float display only.
+
+Add independently pinned canonical bytes/digests and invalid-value fixtures to the planned tests. No probes or tests need to run now.
+
+## Correction 6: Make SQL guarantees and test coverage explicit
+
+The SQL examples currently rely on prior binding verification to establish vendor ownership.
+
+State that dependency clearly, and show or describe the complete joins/filters connecting:
+- tenant;
+- vendor-owned document;
+- revision;
+- snapshot binding;
+- ready index;
+- pinned profile;
+- matching embedding/chunk row.
+
+Apply eligibility before each channel’s ORDER BY/LIMIT.
+
+Preserve old-snapshot supersession behaviour: do not add a current-active filter.
+
+Add real PostgreSQL planned tests for:
+- lexical query semantics: AND, quoted phrase, OR, negation-only and punctuation-only input;
+- positive-score filtering;
+- simple-configuration behaviour;
+- exact cosine ordering using independently chosen vectors;
+- equal-distance and equal-lexical-score UUID tie ordering;
+- stored-zero exclusion and zero-query lexical fallback;
+- multiple-query/channel fusion against independently calculated expected ranks;
+- eligible candidates surviving more than 20 higher-scoring forbidden candidates;
+- ready indexes for multiple profiles without duplicate lexical candidates.
+
+Pure fusion fixtures do not establish that the PostgreSQL statements rank and filter correctly.
+
+Make capture error precedence independent of row iteration order: validate each phase across the selected set before moving to the next phase.
+
+Document source-corruption assumptions rather than claiming hashes or immutable application conventions protect against arbitrary direct database modification.
+
+## Preserve scope
+
+Do not change:
+- accepted Prompt 108 snapshot, supersession, bounds or RRF policy;
+- M4c main evidence or historical feature evidence;
+- provider/storage algorithms;
+- existing source or tests.
+
+No snapshot table, HMAC, API endpoint, migration, dependency, activation wiring, recovery generation, corpus/Recall implementation or live provider work.
+
+Keep the scan-volume figure labelled an estimate, not a measured runtime or memory claim.
+
+## Prompt history
+
+Append:
+- the reviewer’s Prompt 131 review outcome and checksum;
+- acceptance of the M4c main-evidence documentation;
+- settled R1–R9 choices and the requested M4d corrections;
+- review scope: source/document inspection, no project suite or Docker;
+- Prompt 132 verbatim;
+- an outcome note marking the complete M4d specification awaiting review.
+
+Preserve the earlier prompts.md bytes as an identical prefix.
+
+Use inline, backticked commit identifiers in your own notes.
+
+## Checks
+
+Verify:
+- only docs/plan.md and prompts.md differ from starting tree addab9a7abfd09b80dc32a1f68231b682bc20c87;
+- README, ADR-0015 and threat-model blobs are byte-identical;
+- earlier prompts.md bytes remain an identical prefix;
+- links and anchors resolve;
+- no stale contradictory signatures, transaction ordering or privacy claims;
+- settled choices are not described as unresolved;
+- the complete M4d specification is still proposed, unimplemented and awaiting review;
+- no private content, BOM, unintended CR characters or artifacts.
+
+Stage the authorized changes, retaining the existing five staged paths.
+
+Run:
+- git diff --cached --check;
+- staged Gitleaks without suppression or allowlists.
+
+No application tests, builds, installs, Docker, database or provider contact.
+
+## Export
+
+Export directly from Git:
+.local/p132/m4d-spec-corrections.diff
+
+- Baseline tree:
+  addab9a7abfd09b80dc32a1f68231b682bc20c87
+- Final: resulting staged tree.
+- Exclude prompts.md.
+- Expected exported path: docs/plan.md only.
+- UTF-8 without BOM.
+
+Report full baseline/final tree identifiers, statistics, byte size and SHA-256. Do not paste the full diff.
+
+## Final handoff
+
+Report corrections, settled decisions, remaining questions, checks actually run, byte identity, staged state and export metadata.
+
+Nothing implemented, committed, pushed or merged.
+
+End with:
+“Mathew: return this output plus .local/p132/m4d-spec-corrections.diff to the external reviewer.”
+
+
+### Prompt 132 outcome (Claude Code; staged, complete M4d specification awaiting review)
+
+Starting state matched locally: branch `docs/m4d-retrieval-spec`, HEAD, `main` and `origin/main`
+at `76fa5a3`, index writing tree `addab9a7abfd09b80dc32a1f68231b682bc20c87` with the five staged
+paths, nothing unstaged or untracked, expected origin and identity. No fetch or remote operation
+was run. Starting tree, paths and blobs are saved under `.local/p132/`.
+
+Claude Code rewrote the M4d section of docs/plan.md in place, keeping its heading and anchor:
+the status now says corrected in Prompt 132, R1–R9 settled, complete specification awaiting
+review. It records R1–R9 as settled (R3's six conditions explicitly; R9 as a required future
+check) and applies corrections 1–6: helper-order transactions with the snapshot established by
+the helper's `clock_timestamp()` SELECT and a per-statement timeout; the actual
+`canonical_vector(vector, *, allows_zero)` contract with separate provider and precomputed-vector
+validation; an outside-`except` provider boundary for ordinary exceptions; a fixed
+`RetrievalDatabaseError` boundary keeping the original failure primary; the
+`eg-retrieval-canonical-v1` encoding and complete value invariants; and self-contained SQL
+eligibility joins, real PostgreSQL ranking/filtering tests and phase-wise capture precedence.
+README, ADR-0015 and the threat model are unchanged from the starting tree. Claude Code read
+source and documentation only and ran no application tests, builds, installs, Docker, database or
+provider calls. Checks run before this note was finalized: only docs/plan.md and prompts.md
+differ from the starting tree; README, ADR-0015 and threat-model blobs are byte-identical to it;
+the earlier prompts.md bytes are an identical prefix; 147 relative links and anchors resolve;
+stale-signature, transaction-order, privacy and open-decision sweeps; private-content scan; UTF-8
+without BOM and no CR characters; `git diff --cached --check` passed; staged Gitleaks
+(`gitleaks git --pre-commit --staged --redact --verbose .`, no suppression) found no leaks. The
+complete M4d specification remains proposed, unimplemented and awaiting review; nothing was committed,
+pushed or merged.
+
+## Prompt 133 M4d specification acceptance and local commit authorization (Claude Code)
+
+External review acceptance of Prompt 132: the reviewer inspected the original Prompt 131
+specification and the Prompt 132 corrections and independently matched both exports:
+`.local/p131/m4d-retrieval-spec.diff` (90,723 bytes, SHA-256
+`d35e4e32fc0a7ee91daeb26bba3c662485e0cd352d290d07e56014db34560b65`) and
+`.local/p132/m4d-spec-corrections.diff` (77,102 bytes, SHA-256
+`af3d3b5e78dd9956a3e116323eec35ed41aa2f0d59897bc12b88cf6271dfdd43`). The corrected M4d
+specification is accepted with two final clarifications. Acceptance covers the Prompt 108
+policies, the settled R1–R9 decisions, the `eg-retrieval-canonical-v1` encoding and field sets,
+`captured_at` as informational provenance included in the digest, internally derived digests,
+`vector_skipped` in results, the fixed provider and database failure boundaries, standalone batch
+validation mapped to `RetrievalProviderError`, the fake-session tests in
+`tests/test_retrieval_store.py`, the required CI installed-wheel extension, the planned real
+PostgreSQL ranking, isolation and filtering tests, and the explicitly limited trusted in-process
+snapshot model until M5. The reviewer inspected the diffs and selected existing source and
+consulted official documentation; no project suite, build, installed-wheel check, PostgreSQL or
+Docker was run for this specification review. Specification acceptance is not implementation or
+execution evidence.
+
+Reviewer correction: the original Prompt 131 `canonical_vector` call already used the correct
+`allows_zero` keyword. The reviewer's earlier statement in Prompt 132 that it used the wrong
+keyword was mistaken; Prompt 132 made the signature and validation flow explicit but did not
+repair that particular typo. The earlier records are left unchanged.
+
+Final clarifications: (1) the database failure boundary records an explicit pending outcome
+(semantic code or operational classification) before leaving the transaction body, keeps it
+primary if cleanup also fails, raises `RetrievalDatabaseError` with no result when only cleanup
+fails, raises fresh fixed errors outside handlers, never infers a semantic outcome from an
+exception chain, and does not convert `BaseException` process control; (2) the digest rule:
+`captured_at` is in the canonical encoding, captures with different encoded timestamps can have
+different bytes, identical encoded fields give the same digest, timestamps are finite-precision
+and not unique IDs, and neither timestamp nor digest proves authorization, past eligibility or
+uniqueness.
+
+### Prompt 133 (verbatim; line endings normalized to LF)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 133: Record accepted M4d specification and commit documentation locally
+
+Record acceptance of the corrected M4d specification, apply the two final clarifications below, and commit the documentation locally.
+
+Do not implement, push or merge.
+
+## Repository instructions
+
+Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+Read CLAUDE.md and any applicable AGENTS.md first. Inspect relevant documentation and recent history without loading all of prompts.md.
+
+## Expected starting state
+
+- Branch: docs/m4d-retrieval-spec.
+- HEAD:
+  76fa5a3800936d2bebdf13c5401609e09983b0d1
+- Accepted starting staged tree:
+  899b36906905aed41c2113c92d9de2aec7fcb1bf
+- Exactly five staged paths:
+  README.md
+  docs/decisions/0015-revision-indexing.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or unexpectedly untracked.
+- Local main and origin/main at HEAD.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Expected author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Verify locally. No fetch or remote operation is needed.
+
+Record the accepted staged tree, paths, per-file blob hashes and prompt-history prefix under .local/p133/.
+
+If the expected state differs materially, stop and report. Do not reset or discard changes.
+
+## External review acceptance
+
+The reviewer inspected the original specification and the Prompt 132 corrections and independently matched both exports:
+
+Prompt 131:
+- .local/p131/m4d-retrieval-spec.diff
+- 90,723 bytes
+- SHA-256:
+  d35e4e32fc0a7ee91daeb26bba3c662485e0cd352d290d07e56014db34560b65
+
+Prompt 132:
+- .local/p132/m4d-spec-corrections.diff
+- 77,102 bytes
+- SHA-256:
+  af3d3b5e78dd9956a3e116323eec35ed41aa2f0d59897bc12b88cf6271dfdd43
+
+The corrected specification is accepted with the two clarifications below.
+
+Acceptance includes:
+- the accepted Prompt 108 policies;
+- settled R1–R9 decisions;
+- canonical encoding eg-retrieval-canonical-v1 and its field sets;
+- captured_at as informational provenance included in the digest;
+- internally derived digests;
+- vector_skipped in results;
+- fixed provider and database failure boundaries;
+- standalone batch validation mapped to RetrievalProviderError;
+- the fake-session tests in tests/test_retrieval_store.py;
+- the required CI installed-wheel extension;
+- the planned real PostgreSQL ranking, isolation and filtering tests;
+- the explicitly limited trusted in-process snapshot model until M5.
+
+The reviewer inspected the diffs and selected existing source and consulted official documentation. No project suite, build, installed-wheel check, PostgreSQL or Docker was run by the reviewer for this specification review.
+
+Specification acceptance is not implementation or execution evidence.
+
+Reviewer clarification:
+The original Prompt 131 canonical_vector call already used the correct allows_zero keyword. The reviewer’s earlier claim that it used the wrong keyword was mistaken. Prompt 132 usefully made the signature and validation flow explicit; it did not repair that particular typo. Append this correction to history without rewriting earlier records.
+
+## Authorized scope
+
+Only the existing five documentation/history files may change.
+
+No source, tests, migrations, dependencies, lockfile, workflows, configuration, Dockerfile, Compose, CLAUDE.md or ADR-0016 changes.
+
+No application tests, builds, installs, Docker, database or provider contact.
+
+You are authorized to make the local documentation commit after checks pass.
+
+No push, merge, amend, rebase, tag or branch deletion.
+
+## Final clarification 1: Preserve the primary failure explicitly
+
+Replace the database-boundary prescription that discovers a semantic outcome by searching an arbitrary exception chain.
+
+Specify an explicit pending outcome:
+- record the semantic error code or operational failure classification from the transaction body before leaving it;
+- attempt transaction cleanup;
+- if the body failed, its recorded classification stays primary even if cleanup also fails;
+- if the body succeeded but cleanup fails, return no result and raise fixed RetrievalDatabaseError;
+- raise a fresh fixed error outside exception handlers, retaining no original exception objects or chains.
+
+Do not infer the primary semantic outcome merely because a semantic-looking exception occurs somewhere in a backend exception’s context or cause chain.
+
+Keep the existing read_snapshot helper unchanged. The new seam’s wrapper may manage its pending outcome around that helper.
+
+Ordinary database failures are normalized. Process-control BaseException subclasses must not be converted into RetrievalDatabaseError or successful results.
+
+Retain the planned tests for semantic failure plus cleanup failure, operational failure plus cleanup failure, and successful work plus cleanup failure. Add a case where a backend exception happens to have a semantic error in its chain: it must remain an operational failure unless the seam itself recorded that semantic outcome.
+
+This specifies failure precedence, not a new retry or cancellation protocol. M5 job cancellation/lease integration remains deferred.
+
+## Final clarification 2: Do not promise digest uniqueness
+
+Replace:
+“two captures of identical facts have different digests”
+
+with the precise rule:
+- captured_at is included in the canonical snapshot encoding;
+- captures with different encoded timestamps can have different canonical bytes even when their other facts match;
+- captures with identical encoded fields produce the same digest;
+- timestamps have finite precision and are not unique IDs;
+- neither timestamp nor digest proves authorization, past eligibility or uniqueness.
+
+Do not add random IDs, HMACs, secrets or persistence.
+
+## Acceptance wording and links
+
+Update docs/plan.md:
+- Heading:
+  M4d snapshot and retrieval specification (ACCEPTED at review, Prompt 133; implementation pending)
+- Update all references to its new heading anchor.
+- State the complete specification was proposed in Prompt 131, corrected in Prompt 132 and accepted in Prompt 133 with the final clarifications.
+- Its [REC] details now form the accepted implementation contract.
+- Preserve the distinction between Prompt 108 decisions, source facts, settled R1–R9 choices and acceptance of this complete specification.
+- No specification decisions remain open.
+- Implementation and every M4d verification check remain pending.
+- Keep M4e–M4f unaccepted/unimplemented and overall M4 acceptance pending.
+
+Update README:
+- M4c remains verified and on main at 76fa5a3.
+- M4d specification accepted at review; implementation pending.
+- Update its specification link.
+- Do not claim retrieval exists or any M4d test ran.
+
+Update the threat model:
+- M4d’s specification is accepted, but implementation is pending.
+- None of the proposed M4d mitigations operates yet.
+- Preserve the trusted in-process snapshot/past-eligibility limitation.
+- Update the specification link.
+
+In ADR-0015, update only the M4d status wording and specification link as needed. Preserve all M4c evidence, counts, links, attribution and limits.
+
+Do not redesign the schema, transaction model, ranking rules, bounds, package placement or test plan.
+
+## Prompt history
+
+Append:
+- the Prompt 132 review acceptance;
+- both independently matched checksums;
+- the scope of the reviewer’s work and absence of execution evidence;
+- the reviewer’s correction concerning allows_zero;
+- the two final clarifications;
+- Prompt 133 verbatim, including its opening “Written for” line;
+- a pre-commit note with no new commit SHA and no publication recorded.
+
+Preserve every earlier byte as an identical prefix.
+
+Use inline, backticked commit identifiers in your own notes.
+
+## Checks before commit
+
+Verify:
+- exactly the five authorized paths are staged;
+- differences against 899b36906905aed41c2113c92d9de2aec7fcb1bf are limited to the clarifications, acceptance wording, links and prompt history;
+- M4c evidence is unchanged;
+- prior prompts.md content is an identical byte prefix;
+- relative links and anchors resolve;
+- no stale M4d “awaiting specification acceptance” statements remain in current status;
+- historical proposal/review records stay properly scoped;
+- nothing says M4d is implemented, tested, published or merged;
+- no private content, artifacts, BOM or unintended CR characters;
+- git diff --cached --check passes;
+- staged Gitleaks passes without suppression or allowlists;
+- effective author and committer match the expected noreply identity.
+
+If a required check fails, resolve it only within the authorized scope or stop and report.
+
+## Local commit
+
+Commit subject:
+docs: record M4c main results and accepted M4d retrieval specification
+
+Use the expected noreply author and committer and the repository’s Claude Code assistance convention. Preserve accurate earlier Codex attribution.
+
+After committing:
+- record full SHA, parent and tree;
+- verify parent is 76fa5a3800936d2bebdf13c5401609e09983b0d1;
+- verify exactly the five expected committed paths;
+- verify a clean working tree;
+- verify main and origin/main remain unchanged;
+- run full-history Gitleaks without suppression.
+
+Do not publish the branch or update main.
+
+## Incremental review export
+
+Export directly from Git:
+.local/p133/m4d-spec-acceptance.diff
+
+- Baseline:
+  899b36906905aed41c2113c92d9de2aec7fcb1bf
+- Final: the new local commit.
+- Exclude prompts.md.
+- UTF-8 without BOM.
+
+Report full baseline/final identifiers, paths, insertion/deletion statistics, byte size and SHA-256. Do not paste the full diff.
+
+## Final handoff
+
+Report:
+- starting-state verification;
+- final clarifications and acceptance wording;
+- commit SHA, parent, tree, identity and attribution;
+- checks actually run;
+- export metadata;
+- clean branch state;
+- main unchanged;
+- no implementation, application checks, push or merge.
+
+M4d implementation is a separate task. Do not begin it.
+
+End with:
+“Mathew: return this output plus .local/p133/m4d-spec-acceptance.diff to the external reviewer.”
+
+
+### Prompt 133 pre-commit note (Claude Code; before the local commit)
+
+Starting state matched locally: branch `docs/m4d-retrieval-spec`, HEAD, `main` and `origin/main`
+at `76fa5a3`, index writing accepted tree `899b36906905aed41c2113c92d9de2aec7fcb1bf` with the
+five staged paths, nothing unstaged or untracked, expected noreply author and committer. No fetch
+or remote operation was run. The accepted tree, paths, per-file blobs and the prompt-history
+prefix digest are saved under `.local/p133/`.
+
+Claude Code applied the two final clarifications to the M4d section of docs/plan.md, renamed its
+heading to the accepted wording and updated every link to the new anchor; updated the plan, README,
+threat model and the two M4d status lines in ADR-0015 to "specification accepted at review
+(Prompt 133); implementation pending". M4c evidence, counts, links, attribution and limits are
+unchanged. No M4d code, test, ADR-0016, workflow or other source change exists; no application
+tests, builds, installs, Docker, database or provider calls were run. Pre-commit documentation,
+whitespace, encoding, history-prefix and staged Gitleaks checks run before the commit are
+reported in the Prompt 133 handoff. No commit identifier, push or publication is recorded here.

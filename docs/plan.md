@@ -1,6 +1,6 @@
 # EvidenceGuard implementation plan
 
-**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`; the existing installed-wheel coverage on `main` at `872d0af` predates the M4c embedding/indexing extension; the new script ran locally on Windows in Prompts 125–126 (historical), including the corrected provider-resolution probe in Prompt 126, and passed on Ubuntu and Windows CI runners at `600a366`. The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); M4c was implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 (ADR-0015); it is reviewed and verified in CI on `feat/revision-indexing` at `600a366` (PostgreSQL, Linux, Windows, installed-wheel and container indexing; see the [ADR-0015 feature-branch CI evidence](decisions/0015-revision-indexing.md#feature-branch-ci-evidence-at-600a366)), not merged; publication to `main` is pending. M4d–M4f remain unimplemented and require detailed specification reviews; overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
+**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`. The M4c installed-wheel extension, which executes the offline embedding and canonical storage path and imports the indexing modules, ran locally on Windows in Prompts 125–126 (historical) and passed on Ubuntu and Windows CI runners at `600a366` and again on `main` at `76fa5a3`; the earlier M4a/M4b wheel limitations are historical. The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); M4c was implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 (ADR-0015); it is reviewed, verified in CI and on `main` at `76fa5a3` (PostgreSQL, Linux, Windows, installed-wheel and container indexing; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3); earlier feature-branch verification at `600a366` is historical). The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and accepted at external review in Prompt 133; its implementation and every M4d verification check are pending. M4d–M4f remain unimplemented; M4e and M4f still require accepted specifications; overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
 
 EvidenceGuard is a vendor-risk review copilot. It ingests synthetic vendor documents, retrieves evidence the tenant is authorized to see, classifies each review question against that evidence, and drafts a cited report. A human must approve the exact report revision before it can be finalized or exported. It is decision support, not legal advice or compliance certification.
 
@@ -2585,14 +2585,15 @@ They are set once as job environment variables.
 
 **M4 – Embeddings, retrieval and corpus**
 
-**Status (Prompt 129): [DECISION] M4a–M4f sequence and complete M4a specification
+**Status (Prompt 133): [DECISION] M4a–M4f sequence and complete M4a specification
 accepted at external review; M4a verified and on `main` at `5fdaa1c` (main push
 CI and secret scan green; see [ADR-0013 main evidence](decisions/0013-embeddings.md#main-ci-evidence-at-5fdaa1c)).
 Earlier feature-branch verification at `d501bd6` is historical. Linux/Windows
-verification, CI builds and existing installed-wheel checks passed. At `main`
-(`872d0af`), CI's installed-wheel step does not execute the embedding provider
-(verified from an isolated installed wheel locally on Windows in Prompt 117); the
-M4c extension executes it on Ubuntu and Windows CI runners at `600a366`, not yet on `main`.
+verification, CI builds and existing installed-wheel checks passed. Historically
+(M4a at `5fdaa1c`, M4b at `872d0af`), CI's installed-wheel step did not execute the
+embedding provider (verified from an isolated installed wheel locally on Windows in
+Prompt 117). The M4c extension executes it on Ubuntu and Windows CI runners, verified on
+`main` at `76fa5a3`, so that gap is closed for this version.
 The [M4b persistence specification](#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending)
 was accepted at external review in Prompt 116 (proposed in Prompt 114, corrected
 in Prompt 115). The M4b implementation on `feat/embedding-persistence`
@@ -2603,8 +2604,8 @@ container verification; see the [main CI evidence](decisions/0014-embedding-pers
 feature-branch verification at `90240e3` is historical. The
 [M4c indexing specification](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending)
 was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in
-Prompt 123). M4c was implemented on `feat/revision-indexing` by Claude Code in Prompt 125 ([ADR-0015](decisions/0015-revision-indexing.md)) and corrected in Prompt 126, with historical local Windows checks in Prompts 125–126; it was accepted at external review for a local commit in Prompt 127 and is **reviewed and verified in CI on `feat/revision-indexing` at `600a366`, not merged** (PostgreSQL `251 passed`, including all 18 indexing cases, plus Linux, Windows, installed-wheel and container indexing verification; see the [ADR-0015 feature-branch CI evidence](decisions/0015-revision-indexing.md#feature-branch-ci-evidence-at-600a366)). Publication to `main` is pending. M4d–M4f still need detailed
-reviews, overall M4 acceptance remains pending, and local Compose remains unverified.** M1, M2 and M3 remain accepted.
+Prompt 123). M4c was implemented on `feat/revision-indexing` by Claude Code in Prompt 125 ([ADR-0015](decisions/0015-revision-indexing.md)) and corrected in Prompt 126, with historical local Windows checks in Prompts 125–126; it was accepted at external review for a local commit in Prompt 127 and is **reviewed, verified in CI and on `main` at `76fa5a3`** (main push: PostgreSQL `251 passed`, including all 18 indexing cases, plus Linux, Windows, installed-wheel and container indexing verification; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3)). Earlier feature-branch verification at `600a366` is historical. The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and **accepted at external review in Prompt 133; implementation pending**, with no M4d code or test yet. M4e–M4f still need accepted
+specifications, overall M4 acceptance remains pending, and local Compose remains unverified.** M1, M2 and M3 remain accepted.
 
 The reviewer inspected the full Prompt 107 diff, independently matched its
 SHA-256 checksum and checked the existing chunk domain and chunker source
@@ -2641,8 +2642,8 @@ Accepted dependency-ordered sequence (Prompt 108; each later slice needs its own
 |---|---|
 | M4a | Immutable embedding identity/batch contracts, provider protocol, deterministic offline hashing and validation. Detailed below; no persistence or provider access. |
 | M4b | Embedding profiles/index records, tenant-scoped storage and migration, full-text representation, exact vector operations and completeness/readiness. Real PostgreSQL constraints, migration round trips and filtering tests. Introduce pgvector here when vector storage/operators first require it; M4a needs no extension. Detailed specification [accepted at review in Prompt 116](#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending) (proposed in Prompt 114, corrected in Prompt 115); implemented in Prompt 117, accepted in Prompt 118, verified in CI and on `main` at `872d0af` ([ADR-0014](decisions/0014-embedding-persistence.md)). |
-| M4c | Separate durable `index_revision` jobs over completed immutable chunk sets, enqueue/backfill seam and registered handler. Test leases/fences, replay, partial batches, conflicting retries, cancellation and atomic readiness/job finish. No review workflow. Detailed specification [accepted at review in Prompt 124](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending) (proposed in Prompt 122, corrected in Prompt 123); implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 ([ADR-0015](decisions/0015-revision-indexing.md)); verified in CI on `feat/revision-indexing` at `600a366`, including PostgreSQL and container indexing; not merged, publication to `main` pending. |
-| M4d | Explicit snapshot input/capture seam, eligibility validation, deterministic lexical/vector/RRF retrieval and bounded results. PostgreSQL isolation, snapshot-after-supersession, ranking and tie tests. No review endpoints or report generation. |
+| M4c | Separate durable `index_revision` jobs over completed immutable chunk sets, enqueue/backfill seam and registered handler. Test leases/fences, replay, partial batches, conflicting retries, cancellation and atomic readiness/job finish. No review workflow. Detailed specification [accepted at review in Prompt 124](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending) (proposed in Prompt 122, corrected in Prompt 123); implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 ([ADR-0015](decisions/0015-revision-indexing.md)); verified in CI and on `main` at `76fa5a3`, including PostgreSQL and container indexing. |
+| M4d | Explicit snapshot input/capture seam, eligibility validation, deterministic lexical/vector/RRF retrieval and bounded results. PostgreSQL isolation, snapshot-after-supersession, ranking and tie tests. No review endpoints or report generation. Detailed specification [accepted at review in Prompt 133](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) (proposed in Prompt 131, corrected in Prompt 132); implementation pending. |
 | M4e | Synthetic clean/injected corpus, stable anchor-to-chunk ground truth, Recall@5/@8 and retrieval contracts. Include cross-tenant, cross-vendor and superseded traps and missing answers; no semantic-quality claim. |
 | M4f | Voyage adapter behind the same contract, injected transport mocked in CI, fixed profile/configuration, bounded calls and safe error mapping. No live calls required for M4 acceptance; live quality evidence belongs to M7. |
 
@@ -2742,8 +2743,9 @@ accepted for a local commit in Prompt 110. It was verified in feature-branch CI
 at `d501bd6` (historical; see the [CI evidence and wheel
 check scope](decisions/0013-embeddings.md#feature-branch-ci-evidence-at-d501bd6))
 and is now verified and on `main` at `5fdaa1c` ([main CI evidence](decisions/0013-embeddings.md#main-ci-evidence-at-5fdaa1c)).
-Linux/Windows verification and CI builds are complete for both commits; direct
-embedding-provider execution from an isolated installed wheel remains unverified. It adds frozen
+Linux/Windows verification and CI builds are complete for both commits; at that point direct
+embedding-provider execution from an isolated installed wheel was unverified in CI (historical; the
+M4c wheel extension later closed this gap, verified on `main` at `76fa5a3`). It adds frozen
 identity/usage/batch values, canonical fingerprints, strict request/result
 validation, the provider protocol and deterministic `HashingEmbedder`, with
 fixed private errors and the lexical-hash label. See [ADR-0013](decisions/0013-embeddings.md).
@@ -2766,8 +2768,8 @@ with `--offline --no-sync` to avoid network and dependency installation:
   before producing a distribution because `hatchling` was absent from the
   local environment (`ModuleNotFoundError`). No dependency was installed. This
   historical local failure is separate from the later successful CI builds and
-  existing clean installed-wheel checks at `d501bd6`; direct installed-wheel
-  embedding-provider execution remains unverified.
+  existing clean installed-wheel checks at `d501bd6`; at that point direct installed-wheel
+  embedding-provider execution was unverified (historical).
 
 Initial lint/type issues in new code/tests were corrected before the final
 passing checks. An environment-denial test initially interfered with pytest's
@@ -2921,8 +2923,8 @@ succeeded: Ubuntu `1586 passed, 233 skipped`, Windows `1585 passed, 234 skipped`
 PostgreSQL `233 passed, 1586 deselected` (all 29 M4b cases passed, none failed or
 skipped), the container job with all six required steps, and Gitleaks (51 commits,
 no leaks). This verifies the M4b paths the tests cover, nothing beyond them. CI's
-installed-wheel checks do not execute embeddings directly; that remains verified
-only locally on Windows. At that point M4b was not merged. Full links and attribution:
+installed-wheel checks did not then execute embeddings directly; that was verified
+only locally on Windows (historical; closed by the M4c wheel extension at `76fa5a3`). At that point M4b was not merged. Full links and attribution:
 [ADR-0014](decisions/0014-embedding-persistence.md#feature-branch-ci-evidence-at-90240e3).
 
 **Main publication (Prompt 121; main-push evidence retrieved by the reviewer and
@@ -3490,7 +3492,7 @@ Prompt 123. At acceptance (Prompt 124) nothing was implemented; acceptance estab
 design and the planned verification requirements, not implementation or execution evidence.
 
 **Implementation (Claude Code, Prompt 125, corrected in Prompt 126; accepted at external
-review in Prompt 127 for a local commit; verified in CI at `600a366`, not merged).** Claude Code implemented this specification as recorded in
+review in Prompt 127 for a local commit; verified in CI and on `main` at `76fa5a3`).** Claude Code implemented this specification as recorded in
 [ADR-0015](decisions/0015-revision-indexing.md). Historical Prompt 125 local Windows checks: lint,
 format, strict typing, the focused tests, the full suite (1703 passed, 250 skipped: 249
 integration tests without a database and one POSIX-only signal test), integration collection, the
@@ -3551,7 +3553,22 @@ command and worker indexing to a ready index with matching counts), and Gitleaks
 no leaks). Details, links and limits are in the
 [ADR-0015 feature-branch CI evidence](decisions/0015-revision-indexing.md#feature-branch-ci-evidence-at-600a366).
 This covers the exercised paths only; nobody ran these checks locally for this verification.
-M4c is **not merged**: `main` remains at `872d0af` and publication to `main` is pending.
+At that point M4c was not merged and `main` was at `872d0af` (historical).
+
+**Main publication (`76fa5a3`, Prompts 130–131).** Claude Code committed the reviewed
+verification documentation and prompt history as `76fa5a3800936d2bebdf13c5401609e09983b0d1`
+(parent `600a366`; implementation files unchanged) and, after all five feature-push jobs for
+that commit succeeded, fast-forwarded `main` from `872d0af` to it (Prompt 130). Claude Code
+observed run, job and step conclusions only; its anonymous log download returned HTTP 403. The
+external reviewer independently retrieved the main run records and all five job logs, recorded
+in Prompt 131: Ubuntu `1716 passed, 251 skipped`, Windows `1715 passed, 252 skipped`, PostgreSQL
+`251 passed, 1716 deselected` with all 18 indexing cases passing, both builds and the
+installed-wheel embedding/storage execution and indexing imports, the container job with all six
+steps including the production backfill and ready indexing, and Gitleaks (56 commits, no leaks).
+No counts are recorded for the feature-branch push of `76fa5a3`. Details and limits:
+[ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3).
+M4c is **on `main` at `76fa5a3`**. Its limits are unchanged, and M4d–M4f and overall M4
+acceptance remain pending.
 
 Within this accepted section, the items labelled [REC] (written as recommendations in
 Prompts 122–123) now form the **accepted implementation contract** for M4c. Explicitly deferred
@@ -3926,6 +3943,786 @@ logs text, vectors, keys or exception details; errors keep fixed messages.
 
 [DECISION] Prompt 124 accepted CLI exit code 3 and the complete corrected specification. No
 specification decision remains open; implementation and its verification are pending.
+
+#### M4d snapshot and retrieval specification (ACCEPTED at review, Prompt 133; implementation pending)
+
+**Status.** [DECISION] **The complete specification was proposed in Prompt 131, corrected in
+Prompt 132 and accepted at external review in Prompt 133 with two final clarifications (the
+database failure boundary's explicit pending outcome and the digest-uniqueness rule).** Decisions
+R1–R9 were settled in Prompt 132. Claude Code wrote it from the accepted Prompt 108 decisions and
+source on `main` at `76fa5a3`. Acceptance is a design decision, not implementation or execution
+evidence: no code, test scaffolding, migration or ADR-0016 exists, ADR-0016 is deferred to
+implementation, and the implementation and every M4d verification check below are pending.
+No specification decision remains open. Labels: **[DECISION]** accepted in Prompt 108;
+**[SETTLED]** settled at review in Prompt 132 (see
+[M4d review decisions](#m4d-review-decisions-settled-in-prompt-132)); **[FACT]** established from
+source at `76fa5a3`; **[REC]** written as a proposal in Prompts 131–132 and, with acceptance of
+the complete specification in Prompt 133, now part of the **accepted implementation contract**.
+
+**Scope.** A trusted snapshot capture seam, an immutable snapshot value, strict retrieval
+inputs, the lexical and exact-vector channels, deterministic RRF fusion and bounded result
+values with chunk evidence and provenance, fixed provider and database failure boundaries, and
+their tests. Out of scope: review persistence and any review or retrieval API endpoint (M5), report
+generation, the evaluation corpus and Recall (M4e), the Voyage adapter and any live provider call
+(M4f), activation wiring, recovery generations for stalled indexes, any snapshot table or HMAC,
+and any approximate index (E5).
+
+##### Accepted policy preserved (Prompt 108)
+
+[DECISION] These are settled and are not reopened here (see
+[the Prompt 108 decisions](#m4-direction-and-review-decisions)):
+
+1. Snapshot capture is trusted and tenant/vendor scoped.
+2. Capture selects the vendor's active revision pointers, complete immutable chunk sets and
+   ready indexes for the pinned profile in one consistent read transaction.
+3. If any active revision lacks a complete chunk set or a ready index for the profile, capture is
+   refused; the revision is never silently omitted.
+4. Pending/processing revisions are recorded as exclusions (precise semantics below).
+5. An empty eligible set is an explicit error.
+6. A manually supplied revision-ID list alone proves neither authorization nor past eligibility.
+7. A revision active at capture remains eligible for that snapshot after later supersession;
+   retrieval never re-filters by today's `active` status.
+8. A revision already superseded at capture is excluded from a new snapshot.
+9. A new revision never enters an older snapshot.
+10. Current-state search first captures a fresh snapshot.
+11. Never-activated, failed, incomplete, foreign-tenant or foreign-vendor, wrong-profile and
+    non-snapshot chunks remain excluded.
+12. Bounds (initial engineering defaults, not measurements): 1–8 distinct nonblank queries, each
+    at most 4,000 code points and 16,000 UTF-8 bytes; 1–100 revisions; at most 100,000 eligible
+    chunks, rejecting excess rather than truncating; per-channel limit 20; requested k 1–20,
+    default 8.
+13. Explicit PostgreSQL `simple` configuration for documents and queries; filters before each
+    channel's limit; zero lexical scores and zero query vectors ignored; one-based ranks with ties
+    by canonical chunk UUID ascending; RRF contribution `1 / (60 + rank)` summed across lists;
+    final ties by chunk UUID ascending; each chunk returned once with channel ranks, scores,
+    pinned profile and provenance; all-zero hash queries yield no vector candidates; no
+    candidates yields an empty result.
+14. Determinism is claimed for a fixed stored corpus, configuration and database/provider outputs
+    only, not for live embeddings across calls or platforms.
+
+M5 persists the snapshot's authorization and configuration facts atomically with review
+creation. M4d designs no review API.
+
+##### Facts from current source (`76fa5a3`)
+
+- [FACT] **Import boundaries** (`tests/test_packaging.py`): `evidenceguard_retrieval` may import
+  only `evidenceguard_domain` and the standard library, and never `sqlalchemy`, `psycopg`,
+  `httpx`, `socket`, `urllib`, `requests` or `os`. Persistence may not import retrieval, worker
+  or api. The worker may import domain, persistence and retrieval but not api; the api may not
+  import the worker.
+- [FACT] **Provider boundary.** The `EmbeddingProvider` protocol, `embed_validated` and
+  `HASH_IDENTITY` live in `evidenceguard_retrieval.embeddings`. `embed_validated(provider,
+  texts, input_type)` first calls `validate_request` (1–32 texts; each 1–4,000 code points, no
+  NUL, not whitespace-only, strict UTF-8, at most 16,000 bytes; at most 128,000 bytes in total),
+  which raises the fixed `InvalidEmbeddingError` directly. Then, inside one `try`, it reads and
+  validates `provider.identity` **itself**, calls `provider.embed` and runs `validate_result`
+  against that identity, the input type and the count. Any `Exception` there sets a flag, and the
+  fixed `InvalidEmbeddingError` is raised after the `except` block, so no provider exception is
+  retained as cause or context. It does not see any identity a caller read earlier.
+  `EmbeddingBatch`, `EmbeddingIdentity`, `validate_identity` and `validate_result` are pure
+  domain values and functions in `evidenceguard_domain.embeddings`.
+- [FACT] **Canonical storage** (`evidenceguard_domain.embedding_storage`):
+  `canonical_vector(vector, *, allows_zero: bool)` rounds each coordinate to float32 (with
+  `-0.0` → `0.0`), requires the rounded vector to be zero exactly when the source is zero, and
+  revalidates it as a `StoredVector` (finite; zero only when `allows_zero`; otherwise an L2 norm
+  within the absolute `NORM_TOLERANCE` of `1e-6`), with no renormalization. Failures raise
+  `InvalidEmbeddingError`. `StoredVector.literal()` gives the exact pgvector text literal.
+  `allows_zero_vectors(identity)` is true only for provider `offline`. `profile_id(tenant,
+  fingerprint)` and `index_id(tenant, revision, chunker_version, profile)` are deterministic
+  UUID5 values. `EmbeddingIdentity.fingerprint` is the SHA-256 of sorted-key, compact,
+  ASCII-only JSON with `allow_nan=False`.
+- [FACT] **Schema.** `documents(tenant_id, vendor_id, active_revision_id)` with a composite
+  pointer FK to the same tenant and document; `document_revisions.status` in `pending`,
+  `processing`, `failed`, `active`, `superseded`, with one `active` row per document (partial
+  unique index). CHECKs make `activated_at` non-null for `active` and null for `pending`,
+  `processing` and `failed`; it is never cleared. `chunk_sets` has one row per revision in v1,
+  binding `(chunker_version, chunk_count, manifest_sha256)` with `chunk_count` between 1 and
+  4,096. `chunks` are immutable by application invariant, with `search_vector =
+  to_tsvector('simple'::regconfig, text)` stored and generated and a GIN index.
+  `embedding_profiles` are immutable per `(tenant_id, fingerprint)`. `embedding_indexes` bind
+  tenant, revision, chunk-set binding, profile, dims and zero policy, and are `building` or
+  `ready` (immutable once ready, with `vector_manifest_sha256`). `chunk_embeddings` hold
+  `vector(1024)`, `vector_sha256` and `is_zero`, linked by composite FKs to their index and to the
+  exact chunk and content digest. No HNSW or IVFFlat index exists; migration `0005` is the head.
+- [FACT] **Chunk spans.** `Chunk.char_start/char_end` and `line_start/line_end` are the body
+  span. A table continuation chunk with a repeated header has `header_*` spans that end before
+  the body, and its `text` is the header slice immediately followed by the body slice
+  (`len(text) == header length + body length`), with no separator. At most 4,096 chunks per
+  revision, so 100 revisions can exceed 100,000 chunks.
+- [FACT] **Activation** (`activate_revision`) demotes the old active revision, promotes the target
+  and moves the pointer in one transaction. `create_index` requires `activated_at IS NOT NULL`,
+  and activation enqueues no indexing, so a newly activated revision has no ready index until an
+  explicit enqueue or backfill completes.
+- [FACT] **Read pattern.** `document_views.read_snapshot(session_factory)` creates a session,
+  executes `SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY`, then
+  `SELECT clock_timestamp()` once, yields `(session, time)`, and in `finally` rolls back and
+  closes (a rollback failure still closes, and propagates). `readiness.py` uses
+  `SET LOCAL statement_timeout`. The production engine sets `hide_parameters=True`.
+- [FACT] **Roles.** Document content reads in the API allow reviewer and approver only
+  (`DOCUMENT_ROLES`); admin is excluded. M4c's indexing seams allow reviewer, approver and admin.
+- [FACT] **Domain values.** `DomainModel` (pydantic) strips surrounding whitespace from strings;
+  the embedding and chunk contracts instead use frozen dataclasses with constructor validation,
+  fixed errors and content-free `repr`.
+- [FACT] **PostgreSQL integration tests** use the guarded disposable-database fixtures in
+  `tests/conftest.py`, the integration marker and `EG_REQUIRE_INTEGRATION=1` in CI, a server-side
+  `statement_timeout` per connection and deterministic `threading.Event` handshakes rather than
+  timing sleeps (`tests/test_indexing_postgres.py`).
+
+##### Package placement and public seams
+
+[SETTLED] R1 and R2. Every existing import direction is kept:
+
+| File (new) | Contents | May import |
+|---|---|---|
+| `packages/domain/evidenceguard_domain/retrieval.py` | Frozen values, canonical encodings, strict validation, the pure query-vector conversion, the pure `fuse` function and the fixed errors | domain and standard library |
+| `packages/persistence/evidenceguard_persistence/retrieval.py` | `capture_snapshot`, `retrieve_with_vectors`, statement builders, row conversion and the database failure boundary | domain, persistence, SQLAlchemy |
+| `apps/worker/evidenceguard_worker/retrieval.py` | Provider orchestration: `search_snapshot` and `search_current`, and the provider failure boundary | domain, persistence, retrieval |
+
+`evidenceguard_retrieval` is unchanged. Fusion sits in the domain so persistence can run channel
+queries, fusion and evidence loading in one read transaction without importing the retrieval
+package (R1). The orchestrator sits in the worker, the M5 consumer, because it alone may import
+both the provider boundary and persistence (R2).
+
+[REC] Public seams:
+
+```text
+capture_snapshot(session_factory, actor, *, vendor_id: UUID,
+                 identity: EmbeddingIdentity,
+                 config: RetrievalConfig = RETRIEVAL_CONFIG_V1) -> RetrievalSnapshot
+retrieve_with_vectors(session_factory, actor, snapshot: RetrievalSnapshot,
+                      request: RetrievalRequest, query_batch: EmbeddingBatch) -> RetrievalResult
+search_snapshot(session_factory, actor, snapshot, request, provider: EmbeddingProvider)
+    -> RetrievalResult
+search_current(session_factory, actor, *, vendor_id, request, provider)
+    -> tuple[RetrievalSnapshot, RetrievalResult]
+```
+
+All four are **trusted internal programming interfaces**. None is an endpoint, and none
+deserializes a snapshot from untrusted input. `search_current` implements decision 10: capture
+(its own transaction), then the provider call, then retrieval (a second transaction).
+
+##### Values and invariants
+
+[REC] All values are frozen dataclasses with `init=False` constructors that validate exact types
+(`type(x) is …`: no coercion, `bool` is not accepted as `int`, tuples only, no `str` where a
+`UUID` is expected), reject unknown keyword arguments, never strip or normalize text, and raise
+fixed errors after any `except` block. `dataclasses.replace` revalidates through the constructor.
+Derived digests are computed by the constructor, never accepted as arguments. `repr` and `str`
+show IDs and counts only, never query text, chunk text, section paths or
+vectors. A violation raises `InvalidRetrievalRequestError` for caller inputs and
+`InvalidSnapshotError` for snapshot values; inside persistence, a value that fails while being
+built from database rows raises `SnapshotInconsistentError`.
+
+- **`RetrievalConfig`.** Exactly one accepted value, `RETRIEVAL_CONFIG_V1` (fields in the
+  canonical encoding below). `config_sha256` is derived from its canonical bytes and pinned in
+  tests.
+- **`RetrievalRequest(queries, k=8)`.** `queries` is a tuple of 1–8 `str`, each 1–4,000 code
+  points, without NUL, not whitespace-only (`str.isspace()`), strictly UTF-8 encodable (lone
+  surrogates rejected) and at most 16,000 bytes. Queries are kept verbatim; distinctness is exact
+  code-point equality, and a duplicate is rejected, not merged. The total is therefore at most
+  128,000 bytes, so all queries go to the provider in **one** `embed_validated` call. `k` is an
+  `int` (not `bool`) in 1–20.
+- **`PendingExclusions(count, revision_ids, truncated)`.** `count` is an `int` ≥ 0;
+  `revision_ids` is a tuple of distinct `UUID`s in strictly ascending order with
+  `len(revision_ids) == min(count, 100)`; `truncated` is a `bool` equal to `count > 100`
+  ([SETTLED] R5).
+- **`RevisionBinding`.** `revision_id`, `document_id` and `index_id` (`UUID`); `chunker_version`
+  (`validate_chunker_version`); `chunk_count` (`int`, 1–4,096); `manifest_sha256` and
+  `vector_manifest_sha256` (64 lowercase hex characters).
+- **`RetrievalSnapshot`.** `tenant_id`, `vendor_id`, the pinned `EmbeddingIdentity`
+  (`require_storable_identity`: 1024 dims, `l2`), `config`, `bindings`, `exclusions` and
+  `captured_at`. The constructor derives `profile_id`, `total_chunks` and `sha256`. Invariants:
+  1–100 bindings in strictly ascending `revision_id` order (so no duplicate revision); distinct
+  `document_id`s (one binding per document, since a document has at most one active revision);
+  each `index_id == index_id(tenant, revision, chunker_version, profile_id)`; `total_chunks` (the
+  sum of `chunk_count`) at most 100,000; `captured_at` a timezone-aware `datetime`.
+- **`ChannelList(query_position, channel, entries)`.** `query_position` is an `int` in
+  `0 … query_count − 1`; `channel` is `"lexical"` or `"vector"`; `entries` holds 0–20
+  `(chunk_id, score)` pairs with distinct chunk IDs and finite `float` scores. Lexical scores are
+  positive and non-increasing; vector scores (cosine distances) are non-decreasing; equal scores
+  are in ascending chunk-ID order. No range narrower than finiteness is required for distances:
+  for unit vectors the cosine distance is mathematically in [0, 2], but floating rounding may
+  fall slightly outside it, and that assumption is documented rather than enforced. A list's rank
+  for an entry is its one-based position.
+- **`ChannelHit(query_position, channel, rank, score)`.** Bounds as above, with `rank` in 1–20.
+- **`RetrievedChunk`.** `chunk_id`, `revision_id`, `document_id`, `fused_rank`, `fused_score`
+  (a `Fraction`, with a `float` display property), `hits` and `evidence`. `hits` is non-empty,
+  in ascending (query position, channel) order with lexical before vector, at most one per
+  (query position, channel), and `fused_score` equals the exact sum of `1/(60 + rank)` over
+  `hits`. `revision_id` and `document_id` must belong to one snapshot binding.
+- **`ChunkEvidence`.** `chunk_id` equal to its item; exact `text` whose SHA-256 equals
+  `content_sha256`; `ordinal`; `section_path`; `is_table`; a body `SourceSpan(line_start,
+  line_end, char_start, char_end)` and an optional header `SourceSpan`, satisfying the existing
+  `Chunk` span rules; `header_text` and `body_text` split at the header length; and provenance
+  (`document_key`, `title`, `revision_no`, `version_label`, `effective_date`, `source_type`,
+  `authenticity`).
+- **`RetrievalResult`.** `tenant_id` and `vendor_id` equal to the snapshot's; `snapshot_sha256`;
+  `profile_fingerprint` and its label (the lexical-hash label for the offline profile);
+  `config_sha256`; `query_count` 1–8; `k` 1–20; `vector_skipped` (ascending query positions whose
+  canonical query vector was zero); and `items` with at most `k` entries, distinct chunk IDs,
+  `fused_rank` exactly `1 … len(items)`, in descending `fused_score` with ties by ascending chunk
+  ID, every hit's query position below `query_count`, and no vector hit for a position in
+  `vector_skipped`.
+
+##### Canonical encodings and digests
+
+[REC] Canonical encoding `eg-retrieval-canonical-v1`, used for `config_sha256` and
+`snapshot.sha256`:
+
+- **Bytes:** `json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True,
+  allow_nan=False).encode("ascii")`, the same rules as `EmbeddingIdentity.fingerprint`. The output
+  is ASCII and therefore valid UTF-8. The digest is the lowercase hex SHA-256 of those bytes.
+- **Scalars:** UUIDs as `str(uuid)` (lowercase, hyphenated); SHA-256 digests as 64 lowercase hex
+  characters; integers as JSON integers (never `bool`, never floats); booleans as `true`/`false`;
+  `captured_at` converted to UTC and written as `YYYY-MM-DDTHH:MM:SS.ffffffZ`, always with six
+  fractional digits (PostgreSQL `timestamptz` has microsecond precision). Snapshots contain no
+  floats.
+- **Forbidden:** Python `repr`, `hash()`, locale-dependent formatting and `default=str`; any
+  value not listed below is rejected rather than stringified.
+- **Order:** bindings in ascending `revision_id`; exclusion IDs in ascending order; object keys
+  sorted by the encoder.
+- **Self-exclusion:** neither digest is part of its own input.
+
+Config object:
+
+```json
+{"canonical":"eg-retrieval-canonical-v1","kind":"retrieval_config","version":"hybrid-rrf-v1",
+ "text_search_config":"simple","lexical_query":"websearch_to_tsquery",
+ "lexical_score":"ts_rank_cd","lexical_normalization":0,"vector_operator":"cosine_distance",
+ "channel_limit":20,"rrf_constant":60,"default_k":8,"max_k":20}
+```
+
+Snapshot object:
+
+```json
+{"canonical":"eg-retrieval-canonical-v1","kind":"retrieval_snapshot",
+ "tenant_id":"…","vendor_id":"…","captured_at":"…Z","config_sha256":"…",
+ "profile":{"provider_id":"…","model_id":"…","algorithm_version":"…","dims":1024,
+            "normalization":"l2","fingerprint":"…","profile_id":"…"},
+ "bindings":[{"revision_id":"…","document_id":"…","chunker_version":"…","chunk_count":1,
+              "manifest_sha256":"…","index_id":"…","vector_manifest_sha256":"…"}],
+ "total_chunks":1,
+ "exclusions":{"count":0,"revision_ids":[],"truncated":false}}
+```
+
+`captured_at` is informational provenance and is included in the canonical snapshot encoding.
+Captures whose encoded timestamps differ can therefore have different canonical bytes even when
+their other facts match, while captures with identical encoded fields produce the same digest.
+Timestamps have finite (microsecond) precision and are not unique identifiers. Neither the
+timestamp nor the digest proves authorization, past eligibility or uniqueness; a digest is
+recomputable by anyone. A persisted digest (M5) is verified only by recomputing it from the
+reloaded, revalidated fields and comparing the 64-character strings exactly. M4d adds no random
+ID, HMAC, secret or persistence.
+
+##### Trust model
+
+[SETTLED] R3, recorded explicitly:
+
+- The snapshot seams are a **trusted internal programming interface**. `capture_snapshot` is the
+  only producer of snapshots in M4d; it establishes eligibility from the database for a trusted
+  `ActorContext` (built from an authenticated API key at the API boundary, or by trusted worker
+  code). No public request may supply revision IDs, and no seam treats a caller's ID list as proof.
+- **No endpoint and no untrusted snapshot deserialization** is authorized.
+- A frozen value, a UUID list and a **recomputable digest are not authorization mechanisms**.
+- Before every retrieval, the database **binding recheck** below confirms tenant and vendor
+  ownership and the immutable bindings. It **does not prove past active-at-capture eligibility**,
+  and it cannot detect an omitted active revision.
+- **M5 must persist the captured facts** atomically with review creation **and reload them only
+  through trusted paths**.
+- Approval of this interim model **does not establish protection against malicious in-process
+  code**: such code could construct a structurally valid snapshot from same-vendor revisions that
+  were superseded before capture, violating decisions 6 and 8 without reaching other tenants,
+  vendors, or unsettled, failed or unindexed data.
+
+`activated_at`/`superseded_at` timestamps are not used as proof: commit order and
+`clock_timestamp()` can disagree near the capture instant, so a timestamp check could both accept
+a revision the capture never saw and reject one it legitimately captured. `captured_at` is
+informational and proves neither the snapshot's visibility nor past eligibility.
+
+*Binding recheck* (one statement in the retrieval transaction, before any channel query). For
+every binding, all of the following must hold, and the number of verified bindings must equal
+`len(bindings)`:
+
+- the vendor exists in the actor's tenant (the actor's tenant already equals the snapshot's);
+- the revision is in that tenant and belongs to the binding's `document_id`, and that document
+  belongs to the snapshot's vendor;
+- `activated_at IS NOT NULL` (so the revision is settled; never-activated and failed revisions
+  fail);
+- the chunk set equals the binding's `(chunker_version, chunk_count, manifest_sha256)`;
+- the index is the binding's `index_id`, in the tenant, `ready`, for that revision, chunk-set
+  binding and `profile_id`, with the binding's `vector_manifest_sha256`;
+- the profile row's identity fields and fingerprint equal the snapshot identity.
+
+No current `status` is consulted, which preserves snapshot-relative supersession (decision 7). Any
+failure, including a missing or foreign row, raises `SnapshotInconsistentError`.
+
+*Source-corruption assumptions.* The design assumes the database is changed only through the
+application's paths and migrations. Constraints and immutability by application convention (no
+update or delete statements for chunks, profiles, ready indexes and embeddings) are not a defence
+against arbitrary direct database modification. The evidence text-digest check detects one class
+of tampering only; no hash or convention in M4d is claimed to protect against a database writer
+outside the application.
+
+##### Transactions, settings and locking
+
+[REC] Capture and retrieval each use one short transaction through the existing
+`read_snapshot` helper, **unchanged**. The actual order is:
+
+1. the helper executes `SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY`, the
+   transaction's first statement;
+2. the helper executes its single `SELECT clock_timestamp()`. This is the transaction's first
+   snapshot-taking statement, so **the REPEATABLE READ snapshot is established here**, not at a
+   later data query; capture records the returned time as `captured_at`;
+3. after the helper yields, the seam executes `SET LOCAL statement_timeout = 30000`
+   ([SETTLED] R7); `SET` does not change the established snapshot;
+4. the capture or retrieval data statements, all reading that one snapshot.
+
+Both settings are transaction-local: PostgreSQL discards them when the helper rolls back, so a
+pooled connection returns with its defaults (READ COMMITTED, read-write, its previous
+`statement_timeout`). No session-level `SET`, `default_transaction_*` or connection
+`execution_options` isolation is used.
+
+*Timeout scope.* 30,000 ms applies to **each statement** separately. It is not a deadline for the
+whole capture or retrieval (capture runs fewer than ten statements; retrieval up to 18 data statements: the binding
+recheck, at most 16 channel statements and the evidence statement), and it does not apply to the
+provider call, which runs outside any transaction. No overall execution bound is promised, and
+nothing retries.
+
+*Locking.* `READ ONLY` makes any accidental write fail, and the seams issue no `INSERT`, `UPDATE`,
+`DELETE`, enqueue or `FOR UPDATE`/`FOR SHARE`, and never trigger indexing. They take **no explicit
+row locks**, so they have no row-lock conflict with ordinary activation or indexing DML. Ordinary
+`SELECT`s still take `ACCESS SHARE` relation locks, so they can wait for, or delay, DDL that needs
+stronger locks (for example a migration). The transactions attempt no row updates, so they cannot
+hit REPEATABLE READ's concurrent-update serialization failure.
+
+##### Capture (`capture_snapshot`)
+
+[REC] Sequence:
+
+1. **Validate before any database work:** `actor` is an `ActorContext` (else `TypeError`, as in
+   M4c); the role is reviewer or approver ([SETTLED] R4; else `PermissionDeniedError`);
+   `vendor_id` is a `UUID` (a string is rejected, not parsed); `require_storable_identity(identity)`
+   (its `InvalidEmbeddingError` becomes `InvalidRetrievalRequestError`); `config` is
+   `RETRIEVAL_CONFIG_V1`. Invalid input raises `InvalidRetrievalRequestError`.
+2. **One read transaction**, in the order above, then these phases. Each phase examines the
+   **whole** selected set before the next phase starts, so the error raised never depends on row
+   order:
+   1. *Scope:* the vendor in the actor's tenant. Missing or foreign → `RetrievalScopeError`.
+   2. *Selection:* the vendor's pointers (`documents.active_revision_id`, tenant- and
+      vendor-scoped) joined to the revision, its chunk set, the tenant's profile for the
+      fingerprint and that profile's index for the revision (left joins), ordered by revision ID
+      with **`LIMIT 101`**.
+   3. *Emptiness:* no rows → `EmptySnapshotError`.
+   4. *Revision bound:* 101 rows → `SnapshotBoundsError`. The limit only detects excess; a
+      truncated set is never used.
+   5. *Consistency:* any selected revision whose `status` is not `active`, or whose document does
+      not match → `SnapshotInconsistentError`.
+   6. *Readiness:* any selected revision without a chunk set, without the profile, or without a
+      `ready` index whose binding equals its chunk set → `SnapshotNotReadyError`, a fixed error
+      without revision IDs ([SETTLED] R6).
+   7. *Chunk bound:* the sum of the selected `chunk_count` values above 100,000 →
+      `SnapshotBoundsError`.
+   8. *Exclusions:* `count(*)` of the vendor's revisions in `pending` or `processing`, and their
+      IDs `ORDER BY id LIMIT 100`, form `PendingExclusions` ([SETTLED] R5).
+3. Build the snapshot inside the transaction (constructor failures become
+   `SnapshotInconsistentError`), leave the helper (rollback and close) and return.
+
+Error precedence is therefore: input, role, scope, emptiness, revision bound, consistency,
+readiness, chunk bound. A missing vendor and a foreign vendor are deliberately indistinguishable.
+
+*Exclusion semantics.* Pending and processing revisions are excluded and recorded; they never
+block capture and never enter this snapshot, even if they activate later. They include unsettled
+uploads for documents that also have an active revision. Failed and superseded revisions are
+excluded without a record, and a document without an active pointer contributes nothing. The
+record is provenance for M5 (`ReviewAccepted.excluded_pending`), not an eligibility input.
+
+*Races.* The snapshot is fixed by the helper's `clock_timestamp()` `SELECT`. Activation's
+demote → promote → pointer commits atomically, so capture sees each document entirely before or
+entirely after a concurrent activation:
+
+- an activation committed **before the helper's first `SELECT`** is visible: the new revision is
+  active with no ready index yet (indexing is explicit and asynchronous), so capture is refused
+  until indexing completes;
+- an activation committed **after that `SELECT`**, even before capture's first data query, is
+  invisible: the old revision is captured and stays eligible after its supersession;
+- index readiness, uploads and failures follow the same rule.
+
+##### Retrieval
+
+[REC] **Shared pure conversion** (domain): `query_vectors(batch, *, identity, query_count)`
+requires `type(batch) is EmbeddingBatch` and calls `validate_result(batch, identity=identity,
+input_type="query", count=query_count)`, which reconstructs the batch (dimensions, finiteness,
+norm and offline-only zero rules) and requires its identity to equal the snapshot identity. It
+then converts each vector with `canonical_vector(vector, allows_zero=allows_zero_vectors(identity))`,
+reusing the existing `NORM_TOLERANCE` and zero policy with no renormalization or widening. A zero
+canonical vector marks its query position as vector-skipped. Any failure raises
+`InvalidEmbeddingError`, which callers map to `RetrievalProviderError`. Conversion is pure and
+runs **outside** any database transaction.
+
+**`search_snapshot`** (worker; receives a real provider):
+
+1. Pure validation: request, snapshot structure, actor type and role, and actor tenant equal to
+   snapshot tenant (`RetrievalScopeError`). No provider access or SQL yet.
+2. **Provider identity before the call**, inside its own `try`: read `provider.identity`, run
+   `validate_identity` and compare it with the snapshot identity. An ordinary `Exception` from
+   the property getter or validation sets a flag; after the `except` block, the fixed
+   `RetrievalProviderError` is raised, retaining no cause or context. A mismatch raises the same
+   error. No embedding call is made in either case. `embed_validated` does **not** protect this
+   first read: it reads the property again itself.
+3. **Embedding**, with no session open: one `embed_validated(provider, request.queries, "query")`
+   call. Its fixed `InvalidEmbeddingError` (or any other ordinary `Exception`) sets a flag, and
+   `RetrievalProviderError` is raised after the `except` block.
+4. **Conversion**: `query_vectors(...)` against the **snapshot** identity, in its own `try` with
+   the same outside-`except` mapping. This also rejects a provider whose identity changed between
+   the first read (step 2) and the read inside `embed_validated`, because the returned batch's
+   identity must still equal the snapshot identity.
+5. `retrieve_with_vectors` with the validated batch.
+
+Scope of this boundary: only ordinary `Exception`s are caught, never `BaseException`. M4d adds no
+`JobContext` integration or worker cancellation protocol and changes no M4a or M4c control flow.
+`embed_validated` keeps its existing behaviour, including converting any `Exception` raised
+inside it into `InvalidEmbeddingError`. When M5 calls these seams from a job handler, M5 must
+specify how cancellation and lease loss take precedence, as M4c did for provider resolution.
+
+**`retrieve_with_vectors`** (persistence; receives a precomputed `EmbeddingBatch` and has **no
+provider object**). It validates independently, before opening any transaction:
+
+1. `actor` type, role (R4) and actor tenant equal to snapshot tenant;
+2. request and snapshot structure (both revalidated through their constructors);
+3. `query_vectors(query_batch, identity=snapshot.identity, query_count=len(request.queries))`:
+   batch identity, `input_type == "query"`, vector count, numeric and dimension rules and
+   canonical float32 conversion. Failure → `RetrievalProviderError`.
+
+Validation cannot prove that the vectors were computed from the claimed query strings: the
+precomputed-vector seam is **trusted internal input**. It then runs one read transaction:
+
+1. the binding recheck;
+2. for each query position in order: the lexical statement, and the vector statement unless the
+   position is vector-skipped (at most 16 channel statements);
+3. `fuse` in Python (at most 16 lists × 20 entries: bounded, cheap work);
+4. one evidence statement for the final ≤ k chunk IDs, constrained to the snapshot bindings,
+   tenant and vendor; each returned `text` must hash to its `content_sha256`, else
+   `SnapshotInconsistentError`;
+5. the immutable result, built inside the transaction before the helper rolls back and closes.
+
+Changes between stages: every binding is immutable once captured, so a supersession, activation,
+upload or indexing that commits between the provider call and the transaction cannot alter the
+verified facts, and status is never consulted. There is no atomic boundary across the provider
+call and the transaction, and no consistency claim across separate calls or requests; one result
+is internally consistent because steps 1–4 read one database snapshot.
+
+##### Database failure boundary
+
+[REC] `hide_parameters=True` only hides parameter values in SQLAlchemy's logging and in
+`StatementError` string formatting; it does not sanitize database or driver messages, exception
+attributes (such as the statement or `orig`) or exception chains
+([SQLAlchemy reference](https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.create_engine.params.hide_parameters)).
+The new seams therefore never let a raw database exception escape. A new fixed
+`RetrievalDatabaseError` (`retrieval_database_failed`) covers session acquisition, the helper's
+statements, `SET LOCAL`, every data statement, timeouts (`statement_timeout` cancellation),
+connection failures, row conversion and transaction cleanup:
+
+The seam's wrapper manages an explicit **pending outcome** around the unchanged
+`read_snapshot` helper (clarified at acceptance in Prompt 133):
+
+- **Body result, never inferred from exceptions.** The transaction body (`SET LOCAL`, the data
+  statements, row conversion and value construction) returns either the result or a
+  `SemanticOutcome` carrying one of the seam's fixed codes (`retrieval_scope`, `snapshot_empty`,
+  `snapshot_bounds_exceeded`, `snapshot_inconsistent`, `snapshot_not_ready`). The seam's own
+  checks produce semantic outcomes as values; they are not discovered by examining exceptions.
+- **Recording before leaving the body.** Inside the `with read_snapshot(...)` block, an inner
+  `try` around the body records the pending outcome: the result, the `SemanticOutcome`, or, for
+  any ordinary `Exception` raised by the body (SQLAlchemy, DBAPI, `OSError`, timeouts, or a
+  failure while converting backend values), the classification **operational**. Nothing else
+  from the exception is kept, and the block then exits normally.
+- **Cleanup.** Leaving the block runs the helper's rollback and close. An outer `try` around the
+  `with` statement catches an ordinary `Exception` from session creation, the helper's two
+  statements or that cleanup, and records only the fact that it happened.
+- **Precedence.** If the body recorded a semantic or operational outcome, that recorded outcome
+  stays primary even if cleanup also failed. If no body outcome was recorded (setup failed), the
+  failure is operational. If the body succeeded but cleanup failed, the seam returns no result and
+  raises `RetrievalDatabaseError`.
+- **Fresh fixed errors.** After both `try` statements, outside every exception handler, the seam
+  returns the result or raises a **new** fixed instance: the semantic error for a recorded
+  semantic code, otherwise `RetrievalDatabaseError`. It keeps no original exception object, so no
+  message, statement, parameter, vector, query text, cause or context is retained or logged.
+- **No chain inference.** A backend exception whose cause or context chain happens to contain a
+  semantic-looking error (even one of the seam's own error types) is still **operational**: only
+  an outcome recorded by the seam's own checks is semantic.
+- **Process control is not normalized.** Only `Exception` subclasses are caught. `KeyboardInterrupt`,
+  `SystemExit` and other `BaseException` subclasses propagate (the helper still cleans up) and are
+  never converted into `RetrievalDatabaseError` or a successful result.
+- No automatic retry. A database failure never becomes a successful empty result. This defines
+  failure precedence only; it is not a retry or cancellation protocol, and M5 job cancellation and
+  lease integration remain deferred.
+
+The engine's `hide_parameters=True` stays as defence in depth; no engine or workflow change is
+proposed.
+
+##### Lexical channel
+
+[REC] One statement per query. Each channel statement repeats the **complete eligibility joins**
+itself rather than relying only on the earlier recheck; the recheck additionally proves that
+**every** binding verified. All filters are in the `WHERE`/`JOIN` conditions before
+`ORDER BY … LIMIT 20`:
+
+```sql
+SELECT c.id, ts_rank_cd(c.search_vector, q.tsq) AS score
+FROM (SELECT websearch_to_tsquery('simple'::regconfig, :query) AS tsq) AS q
+CROSS JOIN (VALUES …snapshot bindings…) AS b(revision_id, document_id, index_id, chunker_version)
+JOIN documents AS d
+  ON d.tenant_id = :tenant AND d.id = b.document_id AND d.vendor_id = :vendor
+JOIN document_revisions AS r
+  ON r.tenant_id = :tenant AND r.id = b.revision_id AND r.document_id = d.id
+ AND r.activated_at IS NOT NULL
+JOIN embedding_indexes AS i
+  ON i.tenant_id = :tenant AND i.id = b.index_id AND i.revision_id = r.id
+ AND i.chunker_version = b.chunker_version AND i.status = 'ready' AND i.profile_id = :profile
+JOIN chunk_embeddings AS e
+  ON e.tenant_id = :tenant AND e.index_id = i.id
+ AND e.revision_id = i.revision_id AND e.chunker_version = i.chunker_version
+JOIN chunks AS c
+  ON c.tenant_id = :tenant AND c.id = e.chunk_id AND c.revision_id = e.revision_id
+ AND c.chunker_version = e.chunker_version AND c.content_sha256 = e.content_sha256
+WHERE c.search_vector @@ q.tsq
+  AND ts_rank_cd(c.search_vector, q.tsq) > 0
+ORDER BY score DESC, c.id ASC
+LIMIT 20
+```
+
+- **No current-status filter:** `activated_at IS NOT NULL` is immutable once true; `r.status` is
+  never tested, so a revision superseded after capture stays eligible (decision 7).
+- **Eligibility is never inferred from `search_vector`.** A chunk is a lexical candidate only
+  through its embedding row in its binding's ready index for the pinned profile. Because each
+  binding names exactly one index, a chunk that also has ready indexes under other profiles still
+  appears at most once.
+- **Query semantics** (`websearch_to_tsquery`, [SETTLED] R8): unquoted words are ANDed;
+  `"quoted text"` becomes a phrase (`<->`); the word `or` gives OR; a leading `-` negates. It
+  never raises a syntax error. The `simple` configuration lowercases and keeps every word (no
+  stop words or stemming). Text with no lexemes (for example only punctuation) gives an empty
+  query that matches nothing; PostgreSQL may emit a NOTICE, which is not an error.
+- **Scores:** `ts_rank_cd` (`real`) with normalization 0. Only positive scores are candidates, so a
+  negation-only query, which matches documents lacking the term with rank 0, contributes nothing.
+  Scores are comparable within one list only.
+
+##### Vector channel
+
+[REC] One statement per query position that is not vector-skipped, with the same eligibility
+joins (`b`, `d`, `r`, `i`, `e` as above; the chunk join is not needed for ordering) plus
+`NOT e.is_zero`:
+
+```sql
+SELECT e.chunk_id, e.embedding <=> CAST(:query_vector AS vector(1024)) AS distance
+FROM (VALUES …snapshot bindings…) AS b(revision_id, document_id, index_id, chunker_version)
+JOIN documents AS d ON …as above…
+JOIN document_revisions AS r ON …as above…
+JOIN embedding_indexes AS i ON …as above…
+JOIN chunk_embeddings AS e ON …as above…
+WHERE NOT e.is_zero
+ORDER BY distance ASC, e.chunk_id ASC
+LIMIT 20
+```
+
+- `:query_vector` is `StoredVector.literal()`, the exact float32 text binding that M4b writes
+  use, so the query is compared in the storage contract's float32 values.
+- Exact cosine distance; no approximate index exists or is added, so the scan is exact. A planned
+  catalog test asserts no HNSW or IVFFlat index on `chunk_embeddings`.
+- `NOT e.is_zero` excludes stored zero vectors, whose cosine distance is NaN. A zero query vector
+  issues no statement, so all-zero hash queries (for example non-ASCII text under the offline
+  hasher) still use the lexical channel and never divide by zero.
+- The reported score is the `double precision` distance (lower is closer), not a derived
+  similarity. A non-finite returned distance is a `SnapshotInconsistentError`.
+
+##### Fusion and results
+
+[REC] `fuse(lists, *, query_count, vector_skipped, k)` is pure and deterministic:
+
+- Its input is `ChannelList` values: at most one per (query position, channel), none for a
+  vector-skipped position, positions below `query_count`. It revalidates each list's invariants
+  (distinct entries, at most 20, finite scores, channel-specific order, ties by ascending UUID).
+  PostgreSQL `uuid` ordering, canonical-string ordering and Python `UUID` ordering agree.
+- A chunk's fused score is the exact sum, as `fractions.Fraction`, of `1/(60 + rank)` over every
+  list containing it. Exact rationals make the sum independent of list order and float rounding,
+  so equal scores really tie. `float` is used for display only; all comparisons use the
+  `Fraction`.
+- Sort by fused score descending, then chunk UUID ascending; return the first `min(k, n)` chunks,
+  each once, with `fused_rank` 1…. Fewer than k candidates gives fewer results; none gives an
+  empty result (not an error).
+- **Determinism boundary:** for the same snapshot, configuration, stored rows, PostgreSQL version
+  and query vectors, the lists and therefore the result are identical. No claim covers other
+  PostgreSQL versions' ranking functions, live providers' repeated outputs or other platforms.
+
+Success values carry authorized evidence text by design (see `ChunkEvidence`). The repeated
+table header is a separate span with its own `header_text`; it is **not** contiguous with the
+body, and later citation code must not quote across that boundary. `repr`/`str`, every error and
+every log never show query text, chunk text, section paths, vectors or provider data.
+
+##### Errors and privacy
+
+[REC] New fixed-message errors in `evidenceguard_domain.retrieval` (messages are the codes):
+
+| Error | Raised for |
+|---|---|
+| `InvalidRetrievalRequestError` (`invalid_retrieval_request`) | malformed request, k, vendor ID, identity or configuration |
+| `InvalidSnapshotError` (`invalid_snapshot`) | a structurally invalid snapshot value from a caller |
+| `PermissionDeniedError` (existing) | role not permitted |
+| `RetrievalScopeError` (`retrieval_scope`) | missing or foreign vendor at capture; actor tenant differs from the snapshot |
+| `EmptySnapshotError` (`snapshot_empty`) | no active revision |
+| `SnapshotBoundsError` (`snapshot_bounds_exceeded`) | more than 100 active revisions or more than 100,000 chunks |
+| `SnapshotNotReadyError` (`snapshot_not_ready`) | an active revision without a chunk set or ready index for the profile (no IDs) |
+| `SnapshotInconsistentError` (`snapshot_inconsistent`) | a failed binding recheck, a non-active pointer, an invalid value built from rows, a text digest mismatch or a non-finite score |
+| `RetrievalProviderError` (`retrieval_provider_failed`) | provider identity access, validation or mismatch; the embedding call; batch validation; canonical conversion |
+| `RetrievalDatabaseError` (`retrieval_database_failed`) | any operational database failure, including timeouts and cleanup failures |
+
+Precedence for `search_snapshot`: request and snapshot structure, role, scope, provider identity,
+embedding, conversion, then the database phase (binding recheck, consistency and operational
+failures as above). Missing and foreign objects are deliberately indistinguishable. No error
+carries or chains query text, content, vectors, credentials, statements, parameters, provider
+responses or exception text. Nothing in M4d logs.
+
+##### Planned verification (not run)
+
+All of the following are planned only.
+
+*Database-independent tests* (`tests/test_retrieval_contracts.py`,
+`tests/test_retrieval_orchestration.py`, `tests/test_retrieval_store.py`):
+
+- strict construction of every value at and beyond each bound: supplementary characters, lone
+  surrogates, NUL, whitespace-only text, duplicate queries, mutable collections, `bool` for
+  integers, strings for UUIDs, unknown fields, naive datetimes, unsorted or duplicate bindings,
+  two bindings for one document, wrong derived index IDs, inconsistent exclusion count/IDs/flag,
+  invalid channel lists (duplicates, wrong order, non-finite or non-positive lexical scores, more
+  than 20 entries, duplicate (position, channel) lists, a vector list for a skipped position),
+  inconsistent results (ranks, counts, scores, provenance), and `dataclasses.replace`
+  revalidation;
+- **independently pinned canonical bytes and digests** for `RETRIEVAL_CONFIG_V1` and for fixed
+  snapshot fixtures (computed by hand, not by the code under test), plus encoding rejections;
+- `repr`/`str` and every error message free of queries, text, section paths and vectors;
+- provider boundary: an identity getter raising an exception whose text holds a private marker
+  (fixed error, marker absent from message, cause and context, no embedding call); identity
+  mismatch before any call; an identity that changes between the first read and the read inside
+  `embed_validated`; malformed results (wrong count, type, dimensions, input type); numeric
+  conversion failure (a coordinate that overflows float32, a norm outside tolerance after
+  rounding); and a provider exception inside `embed`;
+- `retrieve_with_vectors` standalone: a batch with the wrong identity, `input_type="document"`,
+  a wrong count or invalid numbers, with no provider object involved;
+- **database failure boundary with fake sessions:** exceptions carrying a marker in their message,
+  their statement and parameters attributes and in chained causes; a statement timeout; a
+  connection failure during acquisition; a row-conversion failure; a cleanup failure after a
+  semantic outcome, after an operational failure and after success; and a backend exception whose
+  chain contains a semantic error that the seam did not record (it stays operational). Each yields
+  the expected fixed error with the marker absent from its message, `__cause__`, `__context__` and
+  traceback text, never an empty result, and no retry; a `BaseException` such as
+  `KeyboardInterrupt` raised in the body propagates unconverted;
+- pure fusion fixtures: ties within a list and across fused scores, duplicates fused across
+  queries and channels, a case where float addition order would change the result but `Fraction`
+  does not, fewer than k candidates and the empty result;
+- orchestration with fakes: no session is open while the provider runs, capture precedes the
+  provider call in `search_current`, and pure checks precede any provider or SQL call.
+
+Pure fusion fixtures do not establish that the PostgreSQL statements rank and filter correctly;
+the PostgreSQL tests below do.
+
+*PostgreSQL tests* (`tests/test_retrieval_postgres.py`, integration marker, real ingestion and
+indexing through the existing worker and M4c paths):
+
+- capture: success with exact bindings, counts and exclusion record (including more than 100
+  pending revisions, giving `truncated`); an active unindexed revision; a `building` index; a
+  ready index under another profile only; empty and 101-revision vendors; a chunk total above
+  100,000 (built efficiently under the existing constraints, or with an explicitly reviewed
+  lower-level fixture); foreign vendor and foreign tenant indistinguishable; precedence when
+  several phases would fail at once, in different row orders;
+- supersession: superseded at capture excluded; active at capture then superseded still
+  retrieved; a later revision absent from the older snapshot; pending and processing excluded
+  and recorded;
+- **lexical semantics against real PostgreSQL:** AND of unquoted words, a quoted phrase, `or`,
+  a negation-only query (no candidates), punctuation-only input (no candidates, no error),
+  positive-score filtering, and `simple` behaviour (case folding, no stemming or stop words);
+- **exact cosine ordering** with independently chosen stored and query vectors whose distances are
+  computed by hand; equal-distance and equal-lexical-score ties ordered by ascending UUID; stored
+  zero vectors never returned; a zero query vector falling back to lexical only;
+- **fusion end to end:** several queries and both channels, compared with ranks and RRF scores
+  calculated independently from the fixture;
+- **filters before limits:** an eligible candidate still returned when more than 20 higher-scoring
+  forbidden candidates exist in another tenant, another vendor, a superseded-before-capture
+  revision, a wrong-profile index and a `building` index, in both channels;
+- ready indexes for several profiles on the same revisions without duplicate lexical candidates;
+- binding recheck: forged snapshots with a foreign revision, another vendor's revision, a
+  never-activated revision, a changed manifest, count or index ID each raise
+  `SnapshotInconsistentError`;
+- **deterministic interleavings** positioned relative to the real snapshot establishment: a
+  test-owned SQLAlchemy `after_cursor_execute` listener on the test engine pauses the capture
+  connection right after the helper's `clock_timestamp()` statement, using `threading.Event`
+  handshakes, not sleeps. An activation committed while paused must be invisible; one committed
+  before the helper's first `SELECT` must be visible (refusing capture until indexed). The same
+  technique covers indexing completing during capture and a supersession between capture and
+  retrieval;
+- the statement timeout: a statement exceeding a test-lowered timeout yields
+  `RetrievalDatabaseError` (the production value is not changed by tests);
+- pooled settings restored: on the same pooled connection afterwards, `transaction_isolation`,
+  `transaction_read_only` and `statement_timeout` are back to their defaults;
+- no side effects: jobs, indexes, embeddings, revisions and documents unchanged after capture and
+  retrieval;
+- exactness: no HNSW/IVFFlat index exists;
+- result evidence: text, spans, repeated-header split and provenance match the stored rows.
+
+*Packaging and wheel.* `tests/test_packaging.py` keeps the existing boundaries unchanged.
+[SETTLED] R9: the CI installed-wheel step is extended to import the three new modules from
+`site-packages` and run `fuse` on a fixed fixture with a pinned expected result. This is a
+**required** future acceptance check; the workflow edit belongs to the implementation, not to
+this specification task.
+
+These tests make no retrieval-quality, injection-resistance or benchmark claim. Corpus and Recall
+work remain M4e; the mocked Voyage adapter remains M4f.
+
+##### M4d review decisions (settled in Prompt 132)
+
+[SETTLED] The reviewer approved the recommended option for each decision in Prompt 132. The
+complete specification, including these choices, was accepted in Prompt 133.
+
+- **R1.** Pure fusion in the domain package (`evidenceguard_domain.retrieval`).
+- **R2.** Provider and persistence orchestration in the worker package
+  (`evidenceguard_worker.retrieval`).
+- **R3.** Trusted in-process snapshots with database binding rechecks until M5, with the six
+  explicit conditions recorded under [Trust model](#trust-model): a trusted internal programming
+  interface; binding checks do not prove past active-at-capture eligibility; no endpoint or
+  untrusted snapshot deserialization; a recomputable digest is not authorization; M5 persists and
+  reloads the captured facts through trusted paths; no protection against malicious in-process
+  code is established.
+- **R4.** Reviewer and approver roles only, matching `DOCUMENT_ROLES`.
+- **R5.** Exact exclusion count, at most 100 ascending IDs and a `truncated` flag.
+- **R6.** A fixed not-ready error with no revision IDs.
+- **R7.** A transaction-local `statement_timeout` of 30,000 ms, per statement. The scan-volume
+  estimate behind it (about 400 MB of vectors per exact vector query at the 100,000-chunk bound,
+  up to 8 per request) is an engineering estimate, not a measured runtime or memory figure.
+- **R8.** `websearch_to_tsquery` with the explicit `simple` configuration.
+- **R9.** A narrow CI installed-wheel extension importing the new modules and executing fusion on
+  a fixed fixture: a required future acceptance check.
+
+No specification decision remains open. The details introduced by the Prompt 132 corrections
+(the `eg-retrieval-canonical-v1` encoding and field sets, `captured_at` as informational
+provenance in the digest, internally derived digests, `vector_skipped` in results, the fixed
+provider and database failure boundaries, standalone batch validation mapped to
+`RetrievalProviderError` and the fake-session tests in `tests/test_retrieval_store.py`) were
+accepted with the specification in Prompt 133, together with its two final clarifications.
+
+##### Intended changes, required checks and deferred work
+
+- **New files:** the three modules above and `tests/test_retrieval_contracts.py`,
+  `tests/test_retrieval_orchestration.py`, `tests/test_retrieval_store.py` and
+  `tests/test_retrieval_postgres.py`; ADR-0016 at implementation; README, plan and threat-model
+  updates.
+- **Changed files:** `.github/workflows/ci.yml` for the required R9 wheel extension only. No
+  other existing source changes.
+- **No migration** (existing columns, GIN index and exact operators suffice), **no dependency or
+  lockfile change**, no Dockerfile or Compose change, no engine setting change.
+- **Required acceptance checks (future):** lint, format, strict mypy, the database-independent
+  suite on Ubuntu and Windows, the PostgreSQL integration job including every case above, both
+  builds and the installed-wheel checks including the R9 extension, the unchanged container job
+  and Gitleaks.
+- **Deferred:** review persistence, endpoints and orchestration (M5), including cancellation and
+  lease precedence when called from a job; activation wiring and stalled-index recovery; the corpus
+  and Recall (M4e); Voyage (M4f); any approximate index (E5); live-provider evidence (M7).
 
 **M5 – Review workflow (fake model in CI)**
 - Provider interface; Anthropic and scripted fake providers; `prompts/verifier/v1.md` and `prompts/risk_analyst/v1.md`; planner; orchestration; review snapshot; provenance checks; status derivation; report renderer; provider-call records and spans.

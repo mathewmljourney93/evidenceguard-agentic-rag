@@ -195,18 +195,18 @@ Local Compose is unverified. It is a development stack only, with no production-
 
 **Limits** (ADR-0012): the database credentials are disposable and public. Stopping the worker has an external 60 s budget, not a guaranteed shutdown bound (ADR-0008). The smoke stops an idle worker only. Cleanup can be prevented by runner loss. The uv builder-tool image is used under a narrowly approved exception to the two-week age policy, for its exact digest only (no runtime uv; no change to the Python base or the general policy). The exception does not claim age compliance or general safety. There is no production deployment.
 
-## Revision indexing (M4c, verified in feature-branch CI; not merged)
+## Revision indexing (M4c, verified in CI and on `main`)
 
 Implemented by Claude Code in Prompt 125 and corrected in Prompt 126 under the accepted M4c
 specification ([ADR-0015](decisions/0015-revision-indexing.md)). The complete corrected implementation
-was accepted at external review in Prompt 127 and is **reviewed and verified in CI on
-`feat/revision-indexing` at `600a366`, not merged**; `main` remains at `872d0af`, and
-publication to `main` is pending. Historical local checks: Claude Code ran the new wheel script
+was accepted at external review in Prompt 127 and is **reviewed, verified in CI and on `main` at
+`76fa5a3`**. Earlier feature-branch verification at `600a366` is historical. Historical local checks: Claude Code ran the new wheel script
 locally on Windows in Prompts 125–126 and the corrected installed-wheel provider-resolution probe
 in Prompt 126; neither Codex nor the reviewer ran those checks.
 
-CI-verified paths at `600a366` (logs independently retrieved by the external reviewer; see the
-[feature-branch CI evidence](decisions/0015-revision-indexing.md#feature-branch-ci-evidence-at-600a366)):
+CI-verified paths, first at `600a366` and again in the main push at `76fa5a3` (logs independently
+retrieved by the external reviewer; see the
+[main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3)):
 - all 18 PostgreSQL indexing cases, covering tenant-scoped enqueue and backfill, concurrent
   enqueue, stalled and conflict reporting, atomic readiness with job success, committed-row reuse,
   a competing writer, and lease loss and cancellation while the provider blocks, passed with the
@@ -237,6 +237,19 @@ re-verified against provider output, and provider calls are not exactly-once. A 
 (terminal canonical job) has no recovery in M4c, and activation does not enqueue indexing
 automatically. The container smoke covers idle-worker shutdown only. The offline provider is a
 lexical-hash baseline with no semantic-quality claim, and no live provider was verified.
+
+## Snapshot retrieval (M4d, specification accepted; implementation pending)
+
+The [M4d specification](plan.md#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending)
+was accepted at external review in Prompt 133 (proposed in Prompt 131, corrected in Prompt 132).
+**Its implementation is pending: none of the proposed M4d mitigations operates yet, and no M4d
+test has run.** It specifies tenant/vendor-scoped snapshot capture in one read-only transaction,
+refusal of unready active revisions, re-verification of immutable snapshot bindings before every
+retrieval, filters before each channel limit, provider work outside transactions and fixed,
+content-free provider and database errors. Its accepted trust model keeps a limitation: until M5
+persists snapshots, a snapshot value forged in trusted in-process code could include same-vendor
+revisions that were superseded before capture, because retrieval cannot re-prove past
+eligibility; no protection against malicious in-process code is claimed.
 
 ## Not implemented yet
 

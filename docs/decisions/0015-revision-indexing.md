@@ -1,15 +1,17 @@
 # ADR-0015: Revision indexing, backfill and atomic readiness
 
-- **Status:** **M4c is accepted at review, reviewed and verified in CI on
-  `feat/revision-indexing` at `600a366`, not merged. Main remains at `872d0af`.** Implemented by
-  Claude Code in Prompt 125 and corrected in Prompt 126; accepted at external review in Prompt 127
-  for a local commit; the feature branch was published in Prompt 128. The
+- **Status:** **M4c is accepted at review, reviewed, verified in CI and on `main` at
+  `76fa5a3`.** Implemented by Claude Code in Prompt 125 and corrected in Prompt 126; accepted at
+  external review in Prompt 127 for a local commit; the feature branch was published in Prompt
+  128; `main` was fast-forwarded to `76fa5a3` in Prompt 130. The
   [specification](../plan.md#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending)
-  was accepted at review in Prompt 124. Both push workflows for exact commit `600a366` passed,
-  including the 18 PostgreSQL indexing cases, the installed-wheel embedding/indexing check on
-  Ubuntu and Windows and the container indexing smoke (see
-  [Feature-branch CI evidence](#feature-branch-ci-evidence-at-600a366)). Publication to `main` is
-  pending. M4d–M4f and overall M4 acceptance remain pending. Local Compose remains unverified.
+  was accepted at review in Prompt 124. Both main push workflows for exact commit `76fa5a3`
+  passed, including the 18 PostgreSQL indexing cases, the installed-wheel embedding/indexing check
+  on Ubuntu and Windows and the container indexing smoke (see
+  [Main CI evidence](#main-ci-evidence-at-76fa5a3)); the earlier
+  [feature-branch evidence at `600a366`](#feature-branch-ci-evidence-at-600a366) is historical.
+  The M4d specification is accepted at review (Prompt 133); its implementation is pending.
+  M4d–M4f implementation and overall M4 acceptance remain pending. Local Compose remains unverified.
 - **Date:** 2026-10-16
 - **Builds on:** [ADR-0014](0014-embedding-persistence.md) (M4b store), [ADR-0013](0013-embeddings.md)
   (M4a provider boundary), [ADR-0007](0007-durable-job-core.md) and [ADR-0008](0008-worker-runtime.md)
@@ -202,10 +204,10 @@ installed-wheel, PostgreSQL or Docker execution; the reviewer ran none of those 
 
 ## Feature-branch CI evidence at 600a366
 
-M4c was verified in CI on `feat/revision-indexing` at exact commit
+Historical record. M4c was verified in CI on `feat/revision-indexing` at exact commit
 `600a366453bd94811ab1d741dc0b28adeb427031`, which adds only prompt history after the
-implementation commit `cd5b99c`. It is **not merged**: `main` remains at
-`872d0af367be890cce25b2cce0d71a627c993479`. Both workflow records are successful **push** events
+implementation commit `cd5b99c`. At that point it was **not merged**, and `main` was at
+`872d0af367be890cce25b2cce0d71a627c993479`; it later reached `main` at `76fa5a3` (below). Both workflow records are successful **push** events
 on that branch and SHA, attempt 1. These results belong to `600a366`, not to any later
 documentation commit or `main` push.
 
@@ -265,6 +267,67 @@ not enqueue indexing automatically, and a stalled index has no recovery path. Pr
 not exactly-once, and reused vectors are not compared against fresh provider output. Cancellation
 and lease checks run at the accepted explicit boundaries and do not interrupt synchronous calls
 already running. Only the offline lexical-hash baseline ran; it makes no semantic-quality claim,
-and no live provider was verified. Local Compose remains unverified. M4c is not on `main`;
-publication to `main`, M4d–M4f and overall M4 acceptance remain pending. No retrieval, benchmark,
+and no live provider was verified. Local Compose remains unverified. At that point M4c was not
+on `main`; publication to `main` followed at `76fa5a3` (below). No retrieval, benchmark,
 production-readiness or general security claim follows.
+
+## Main CI evidence at 76fa5a3
+
+M4c is **reviewed, verified in CI and on `main`** at
+`76fa5a3800936d2bebdf13c5401609e09983b0d1`. Prompt 130 committed it on `feat/revision-indexing`
+(parent `600a366`) and fast-forwarded `main` from `872d0af` to it, without a merge commit.
+Relative to `600a366` it changes only the verification documentation (README, this ADR, the plan
+and the threat model) and prompt history; the implementation, test, workflow and container-helper
+files are unchanged. Both workflow records are successful **push** events on `main` for that
+exact SHA, attempt 1, and every job and step succeeded with no required step skipped.
+
+**Attribution.** The external reviewer independently retrieved both main run records, all five
+job logs and the job and step summaries; the counts and log output below come from that
+retrieval. The reviewer ran no suite, build, wheel check, PostgreSQL or Docker locally. In Prompt
+130 Claude Code observed only run, job and step conclusions (all `success`) for both the
+feature-branch and main pushes of `76fa5a3`; its anonymous log download returned HTTP 403, so it
+observed no counts or log output. The reviewer retrieved the **main** logs only: no counts are
+recorded for the feature-branch push of `76fa5a3` (CI run 38950031289, secret-scan run
+38950031321), whose conclusions alone were observed.
+
+[CI run 38950479536](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38950479536):
+
+- [Ubuntu job 117140297218](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38950479536/job/117140297218): `1716 passed, 251 skipped in 23.22s`. Formatting, lint, mypy, distribution build and installed-wheel checks passed. The installed-wheel log reports `offline embedding, canonical storage and indexing modules ran from the installed wheel`.
+- [Windows job 117140297108](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38950479536/job/117140297108): `1715 passed, 252 skipped in 37.66s`. Formatting, lint, mypy, distribution build and installed-wheel checks passed, and the log reports the same installed-wheel line. The one-test skip difference is the POSIX-only signal test.
+- [PostgreSQL integration job 117140297207](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38950479536/job/117140297207): `251 passed, 1716 deselected in 98.40s (0:01:38)`. The log shows all 18 cases in `tests/test_indexing_postgres.py` passing, none skipped or failed.
+- [Container job 117140297362](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38950479536/job/117140297362): all six required steps executed and succeeded (rendered Compose configuration, effective build context, application image build, image checks, Compose smoke, cleanup). Observed:
+  - `compose config: ok`;
+  - `context: ok (79 files; 19 planted fixtures excluded)`;
+  - image UID and GID 10001;
+  - all three entry-point help checks, installed imports, offline migration SQL and runtime contents checks passed;
+  - the database was healthy, migrations completed and the API was healthy, and migrate, API and worker ran the CI-built image;
+  - the generated API key was held privately in memory;
+  - upload returned 202, the ingestion job succeeded, the revision became active with two verified chunks, and a duplicate upload returned 200;
+  - the production backfill enqueued one offline indexing job;
+  - the index became ready with two embeddings and the indexing job succeeded;
+  - the idle worker exited 0 without an OOM kill;
+  - `smoke: ok` and `cleanup: ok`.
+
+[Secret-scan run 38950479604](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38950479604),
+[Gitleaks job 117140297515](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38950479604/job/117140297515): `56 commits scanned`, `no leaks found`.
+
+**What these checks establish.** For the paths exercised at `76fa5a3`, the same as at
+`600a366` (above): the 18 PostgreSQL indexing cases with the other 233 integration tests; the
+installed-wheel execution of the offline embedding and canonical storage path and the indexing
+imports from `site-packages` on Ubuntu and Windows, which contacts no database and does not by
+itself establish database indexing; and the production backfill command and worker indexing path
+in the CI-built image. The smoke's success gates the matching tenant, revision and offline
+profile, canonical-job success, readiness, matching embedding and chunk counts, and service-log
+key privacy. Raw database rows and generated credentials were not emitted or independently
+inspected; the successful assertions are not a raw-row observation. The embedding-specific
+installed-wheel CI gap recorded for M4a and M4b is closed for this version.
+
+**Limits.** Unchanged from the feature-branch record: local Compose remains unverified; the smoke
+covers idle-worker shutdown only; activation does not enqueue indexing automatically; a stalled
+index has no recovery path; provider calls are not exactly-once; reused vectors are not compared
+against fresh provider output; cancellation and lease checks run at the accepted explicit
+boundaries and do not interrupt synchronous calls already running; the offline lexical-hash
+baseline makes no semantic-quality claim; and no live provider was verified. The M4d specification
+is accepted at review, with implementation pending ([specification](../plan.md#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending));
+M4d–M4f and overall M4 acceptance remain pending. No retrieval, benchmark, production-readiness or
+general security claim follows.
