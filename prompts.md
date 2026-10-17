@@ -26970,3 +26970,249 @@ Claude Code authored the Prompt 149 test correction and performed its historical
 checks. The accepted test bytes are retained. No application tests, builds, installed-wheel
 checks, installs, Docker, database, provider or network checks are performed in this task.
 The local commit and post-commit verification are not yet performed at this pre-commit note.
+
+
+### Prompt 150 outcome (attributed to OpenAI Codex's supplied handoff)
+
+Codex reported local commit `cc924ede1ecf8d1488db88dcfa98f5b5f1a7f11c`, parent
+`c14821b72d82f3a174123011b4d2c002fdcadbf3`, tree
+`b51924d1fd5df96bbddd5ba25482792d065e5c64`, subject
+`test: fix Linux file-size mock recursion`. Six authorized paths were committed; the test
+remained identical to the accepted tree. Codex assisted with acceptance documentation and
+the local commit; Claude Code authored the Prompt 149 correction and performed its historical
+Windows checks. Codex reported passing scope/blob/prompt-prefix, 187 relative links/anchors,
+UTF-8/LF, whitespace, identity/attribution and unsuppressed staged/full-history Gitleaks checks
+(64 commits, no leaks). No application checks were repeated. The feature branch was clean,
+one commit ahead, with `main` and `origin/main` unchanged at
+`cf2b5743799e51c74e9f80638b0cc13be5827a71`; there was no remote contact, push, CI rerun or merge.
+This is an attributed summary of the handoff, not a reconstructed verbatim quotation.
+
+### External review acceptance of Prompt 150 documentation (Prompt 151)
+
+The reviewer inspected `.local/p150/m4e-linux-test-commit-incremental.diff`, independently
+matched its 62,326-byte size and SHA-256
+`d276583f05a3e72df6b1407fee3d5b146883e204ffb804f01ce040c05e862b8f`, and accepted its
+four-document update (70 insertions, 17 deletions; prompt history excluded), comparing accepted
+tree `4f931986c113da7e79c3d6c846a3f5ccca19febc` with
+`cc924ede1ecf8d1488db88dcfa98f5b5f1a7f11c`. The test correction was already accepted in
+Prompt 150 and its accepted bytes are preserved. Prompt 151 authorizes one history-only
+commit, normal feature-branch publication and read-only exact-commit CI observation; no main
+update is authorized.
+
+### Prompt 151 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+Prompt 151 — Publish the accepted M4e test correction to the feature branch and verify exact-commit CI. Do not update main.
+
+Read CLAUDE.md and any applicable AGENTS.md instructions first.
+
+Repository:
+D:\Claude\evidenceguard_agentic_rag
+
+Expected local starting state:
+- Branch: feat/retrieval-evaluation
+- HEAD: cc924ede1ecf8d1488db88dcfa98f5b5f1a7f11c
+- Parent: c14821b72d82f3a174123011b4d2c002fdcadbf3
+- Tree: b51924d1fd5df96bbddd5ba25482792d065e5c64
+- Subject: test: fix Linux file-size mock recursion
+- Clean index and working tree.
+- Tracking origin/feat/retrieval-evaluation, one local commit ahead.
+- Local main and origin/main:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Existing origin URL and noreply identity unchanged.
+
+Verify this state before making changes. Fetch fresh refs without tags and check remote refs read-only:
+- Remote feat/retrieval-evaluation must still be c14821b72d82f3a174123011b4d2c002fdcadbf3.
+- Remote main must still be cf2b5743799e51c74e9f80638b0cc13be5827a71.
+- Local main must equal origin/main with no independent commits.
+- Remote feature tip must be an ancestor of HEAD.
+
+If any expected state differs, stop and report. Do not reset or overwrite anything.
+
+Save a checkpoint under .local/p151/.
+
+Review acceptance:
+The external reviewer inspected the Prompt 150 incremental export and independently matched:
+- File: .local/p150/m4e-linux-test-commit-incremental.diff
+- Baseline: accepted tree 4f931986c113da7e79c3d6c846a3f5ccca19febc
+- Final: cc924ede1ecf8d1488db88dcfa98f5b5f1a7f11c
+- Size: 62,326 bytes
+- SHA-256: d276583f05a3e72df6b1407fee3d5b146883e204ffb804f01ce040c05e862b8f
+- Four documentation files only; prompts.md excluded.
+- 70 insertions, 17 deletions.
+
+The documentation changes are accepted. The corrected test was already accepted in Prompt 150 and remains byte-identical to its accepted staged-tree blob.
+
+This prompt authorizes:
+- One prompt-history-only commit.
+- A normal push of feat/retrieval-evaluation.
+- Read-only monitoring and retrieval of the resulting CI evidence.
+
+It does not authorize updating main.
+
+Pre-publication checks:
+1. Verify the export size/checksum and its comparison against Git.
+2. Inspect cc924ede against its parent:
+   - Exactly the six reviewed paths changed.
+   - The only test change is the accepted Linux mock correction.
+   - No production, corpus, PostgreSQL-test, workflow, packaging, dependency, lockfile, migration, Docker or Compose changes.
+3. Verify the corrected test matches tree 4f931986c113da7e79c3d6c846a3f5ccca19febc.
+4. Inspect identities and attribution:
+   - Expected noreply author/committer.
+   - Claude Code credited for the Prompt 149 correction.
+   - OpenAI Codex credited for Prompt 150 documentation/commit assistance.
+5. Check for private content, credentials, artifacts, backups, binaries and tracked .local files.
+6. Confirm .env.example is unchanged.
+7. Run the existing unsuppressed Gitleaks range scan.
+8. Read the workflows:
+   - Both still trigger on this branch push.
+   - All five required jobs remain enabled.
+   - Integration runs pytest -m integration with EG_REQUIRE_INTEGRATION=1.
+   - All existing wheel checks, including the M4e step, remain present.
+   - All six container steps remain present.
+   - No check was weakened or disabled.
+
+Do not repeat local application tests, builds or installed-wheel checks. No installs, local Docker, database or provider contact.
+
+Prompt history:
+Append to prompts.md:
+- The Prompt 150 outcome, attributed to Codex's handoff.
+- The reviewer's acceptance and matched checksum.
+- This Prompt 151 verbatim.
+- A preflight note recording only checks actually completed, without prospective commit, push or CI outcomes.
+
+Preserve every earlier prompts.md byte as an identical prefix.
+If the full earlier handoff is not stored locally, do not invent a verbatim reconstruction.
+Use inline backticks around commit identifiers in your own notes.
+
+Commit only prompts.md:
+- Subject: docs: record M4e correction publication authorization
+- Parent: cc924ede1ecf8d1488db88dcfa98f5b5f1a7f11c
+- Expected noreply author/committer.
+- Accurately identify OpenAI Codex's history/publication assistance and preserve Claude Code's earlier correction credit.
+- Follow applicable attribution instructions without misidentifying the assistant performing this task.
+
+Before committing:
+- Verify the history prefix and verbatim prompt.
+- Check privacy, UTF-8 without BOM, LF and staged whitespace.
+- Run the existing unsuppressed staged Gitleaks scan.
+- Confirm only prompts.md is staged.
+
+After committing:
+- Verify parent, tree, identity and attribution.
+- Verify every other blob is byte-identical to cc924ede.
+- Verify a clean working tree.
+- Run the existing unsuppressed full-history Gitleaks scan.
+
+Recheck remote feature and main refs immediately before pushing.
+If either changed unexpectedly, stop.
+
+Publish using this exact command:
+git push origin refs/heads/feat/retrieval-evaluation:refs/heads/feat/retrieval-evaluation
+
+Record its actual exit status without obscuring it through a pipeline.
+Do not force-push.
+If authentication requires user interaction, use the normal supported sign-in flow. Do not extract stored credentials or change authentication configuration.
+
+After a successful push:
+- Verify remote feature equals the full published SHA.
+- Verify remote main remains cf2b5743799e51c74e9f80638b0cc13be5827a71.
+- Verify local tracking and clean status.
+
+Exact-commit CI:
+Find the push-triggered ci and secret-scan runs for:
+- Branch feat/retrieval-evaluation
+- The exact new published SHA
+- The observed run attempt
+
+Monitor with a bounded loop, at most 25 minutes, checking approximately every 45–60 seconds.
+Stop any monitor when complete or when the bound is reached.
+
+Required jobs:
+- Ubuntu verify
+- Windows verify
+- PostgreSQL integration
+- Container
+- Gitleaks/full-history secret scan
+
+Inspect job and step conclusions, including:
+- Ubuntu Test now succeeding.
+- Ubuntu build and installed-wheel steps actually running and succeeding.
+- Windows tests, build and installed-wheel.
+- PostgreSQL integration execution.
+- All six container steps: configuration, context, build, image checks, smoke and cleanup.
+- Full-history secret scan.
+
+Retrieve logs through available connected GitHub tools or normal authorized access if possible. Do not bypass an access restriction or extract credentials.
+
+When logs are available, report:
+- Exact pytest summaries for Ubuntu, Windows and PostgreSQL.
+- The corrected Linux test and symlink test results if individually identifiable.
+- Whether all 16 M4e PostgreSQL cases passed.
+- Existing and new installed-wheel output, including the M4e pure Recall fixture.
+- Container summaries and their scope.
+- Gitleaks count and conclusion.
+
+The expected counts are historical context only. Report actual counts for the new SHA.
+The wheel's 2/3 Recall fixture is pure arithmetic, not database-derived corpus Recall.
+Do not invent numerical corpus Recall results or infer log lines from green job statuses.
+
+If logs are unavailable:
+- Record the access failure.
+- Report only observed run/job/step conclusions.
+- Keep counts and output explicitly unobserved.
+
+If any job fails, is cancelled, skips a required step, or remains incomplete at the monitoring bound:
+- Stop and report the exact state.
+- Do not repair, rerun, revert, amend or make another commit.
+
+Even if all five jobs pass:
+- Do not update main.
+- Do not edit documentation after CI.
+- Leave recording the new CI evidence to the next reviewed task.
+
+Final handoff:
+Report the history commit SHA, parent, tree, identity/attribution, changed path, checks, exact push command and exit status, published SHA, run/job links, conclusions, observed log evidence, unavailable evidence and final refs/status.
+Confirm no monitor remains running.
+
+Preserve the limitations:
+- M4e is not merged.
+- Offline hashing provides no semantic-quality claim.
+- No injection-resistance or production-readiness guarantee.
+- Trusted snapshots cannot prove past eligibility; M5 obligations remain.
+- Container smoke covers ingestion and indexing, not M4e evaluation, and idle-worker shutdown only.
+- Local Compose is unverified.
+- M4f and overall M4 acceptance remain pending.
+
+No main update, merge, force-push, amend, rebase, rerun, tag, branch deletion or M4f work.
+
+End with:
+Mathew: return this output only to the external reviewer; no diff attachment is required.
+
+### Prompt 151 preflight (OpenAI Codex; before commit and publication)
+
+Verified locally: clean `feat/retrieval-evaluation` at
+`cc924ede1ecf8d1488db88dcfa98f5b5f1a7f11c`, expected parent/tree/subject and noreply
+author/committer, tracking the expected remote feature tip one commit ahead. Fetched origin
+without tags and read remote refs: feature remains
+`c14821b72d82f3a174123011b4d2c002fdcadbf3`, main remains
+`cf2b5743799e51c74e9f80638b0cc13be5827a71`. The feature tip is an ancestor of HEAD;
+local main equals origin/main with no independent commits. Checkpoint and earlier prompt
+bytes saved under `.local/p151/`.
+
+Verified the accepted export's exact Git bytes, size, SHA-256, paths and statistics; inspected
+the correction diff and its six paths; confirmed the accepted test blob and unchanged
+`.env.example`, production, corpus, PostgreSQL tests, workflows, packaging, dependencies,
+lockfile, migrations, Docker and Compose. Reviewed the text-only changes for privacy,
+credentials and artifacts; no tracked `.local`, binaries or backups were introduced. Verified
+prior commit identity and Claude Code correction/OpenAI Codex assistance attribution. The
+unsuppressed Gitleaks range scan covered the one correction commit and found no leaks.
+
+Read both workflows: branch-push triggers and all five jobs remain enabled, integration uses
+`pytest -m integration` with `EG_REQUIRE_INTEGRATION=1`, all installed-wheel checks including
+the pure M4e 2/3 Recall fixture remain, and all six container steps remain. No check was
+weakened. No local application tests, builds, installed-wheel checks, installs, Docker,
+database or provider contact occurred. The history commit, push and exact-commit CI outcomes
+are not yet performed at this preflight note. OpenAI Codex assists with history/publication;
+Claude Code's earlier implementation, correction and historical checks retain their credit.
