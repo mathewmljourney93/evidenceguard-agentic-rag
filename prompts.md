@@ -26581,3 +26581,392 @@ longer at `cf2b5743`, a remote `feat/retrieval-evaluation` appearing, an ambiguo
 (inspect the remote ref; no automatic retry), or any CI job failing, being cancelled, skipping
 required work or exceeding the 25-minute monitoring bound (report diagnostics; no repair or rerun).
 No commit identifier, push result or CI outcome is recorded here.
+
+### Prompt 148 outcome (Claude Code; attributed to its handoff)
+
+Claude Code verified the starting state and the Prompt 147 export (which also regenerates
+byte-for-byte from Git), completed the publication preflight and committed the history-only
+`c14821b72d82f3a174123011b4d2c002fdcadbf3` (parent `f01af7eb`, tree
+`f4579bf36abec48c55040e4480425812a7b71b8c`, noreply author and committer, subject "docs: record
+M4e branch publication authorization"); only prompts.md changed, every other blob was identical
+to the parent, and full-history Gitleaks scanned 63 commits with no leaks. After rechecking the
+remote refs it ran `git push --set-upstream origin
+refs/heads/feat/retrieval-evaluation:refs/heads/feat/retrieval-evaluation` (exit status 0); the
+remote feature ref matched `c14821b7`, the upstream was set and remote `main` stayed at
+`cf2b5743`. A bounded monitor (45-second interval, 25-minute cap) observed the push-triggered
+runs for `c14821b7` (attempt 1): the
+[ci run](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39051603984)
+**failed** and the secret-scan run succeeded. From GitHub API conclusions only, Ubuntu verify
+failed at its `Test` step (build and installed-wheel steps skipped), and Windows verify,
+PostgreSQL integration, the container job (all six steps) and Gitleaks succeeded. Claude Code's
+anonymous log downloads returned HTTP 403 and the job page required sign-in, so it observed no
+log content, pytest summary or Recall output. As instructed, it stopped without repair, rerun or
+further commit, and recorded nothing in repository files.
+
+## Prompt 149 M4e Linux-specific test correction (Claude Code)
+
+External reviewer evidence (independently retrieved through the reviewer's connected GitHub log
+retrieval; not observed by Claude Code): for published commit `c14821b7`, the
+[Ubuntu job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39051603984/job/117451164827)
+reported `1 failed, 2245 passed, 306 skipped in 23.00s`; the failure is
+`tests/test_evaluation_worker.py::test_a_file_larger_than_its_reported_size_fails_within_its_bound`,
+asserting at line 598 (expected `corpus_file_changed`, received `corpus_read_failed`). Ubuntu
+formatting, lint and type checks passed; its build and installed-wheel steps were skipped. The
+[PostgreSQL job](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39051603984/job/117451164752)
+reported `306 passed, 2246 deselected in 212.64s`, and its log shows all 16 tests in
+`tests/test_evaluation_postgres.py` passing. No additional counts or output were supplied for the
+Windows, container or secret-scan jobs. Passing PostgreSQL tests supply no numerical Recall
+result.
+
+Diagnosis (external reviewer): the failing test replaced `os.lstat` with `understated()`, which
+called `Path(path).resolve()`; on Linux `Path.resolve()` itself calls `os.lstat`, recursively
+re-entering the replacement. The reviewer reproduced the recursion with a standalone
+standard-library probe on Linux. This diagnoses the test double; no production defect has been
+established.
+
+### Prompt 149 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+Prompt 149 — Correct the Linux-specific M4e test failure and stage for review. Do not commit or publish.
+
+Read CLAUDE.md and any applicable repository instructions first. Continue on feat/retrieval-evaluation.
+
+Expected starting state:
+- HEAD: c14821b72d82f3a174123011b4d2c002fdcadbf3
+- Parent: f01af7ebeeb1401db1709d4479c3e0afa1f003d2
+- Tree: f4579bf36abec48c55040e4480425812a7b71b8c
+- Branch tracks origin/feat/retrieval-evaluation.
+- Index and working tree are clean.
+- Local main and origin/main remain cf2b5743799e51c74e9f80638b0cc13be5827a71.
+- Origin and the existing noreply author/committer identity are unchanged.
+
+Verify these locally. No fetch or remote operation is needed. If they do not match, stop and report the discrepancy without changing anything.
+
+Save a checkpoint under .local/p149/: HEAD, tree, status, relevant blob hashes, and a byte-for-byte copy of the existing prompts.md.
+
+Independently retrieved evidence supplied by the external reviewer:
+- Published commit: c14821b72d82f3a174123011b4d2c002fdcadbf3.
+- CI run: https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39051603984
+- Ubuntu job: https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39051603984/job/117451164827
+- Ubuntu summary: 1 failed, 2245 passed, 306 skipped in 23.00s.
+- The failure is:
+  tests/test_evaluation_worker.py::test_a_file_larger_than_its_reported_size_fails_within_its_bound
+- Assertion at line 598:
+  expected corpus_file_changed; received corpus_read_failed.
+- Ubuntu formatting, lint and type checks passed. Its build and installed-wheel steps were skipped.
+- PostgreSQL job: https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39051603984/job/117451164752
+- PostgreSQL summary: 306 passed, 2246 deselected in 212.64s.
+- Its log shows all 16 tests in tests/test_evaluation_postgres.py passing.
+- Windows, container and secret-scan jobs succeeded, as recorded in Prompt 148. No additional counts or output for those jobs are supplied here.
+- These observations come from the external reviewer's connected GitHub log retrieval. Preserve Claude Code's Prompt 148 record that its own observations were API conclusions only and anonymous downloads returned HTTP 403.
+- Passing PostgreSQL tests do not supply a numerical Recall result here. Do not invent one.
+
+Finding:
+The failing test replaces os.lstat with understated(). Inside that replacement it calls Path(path).resolve(). On Linux, Path.resolve() itself calls os.lstat, recursively re-entering the replacement. The external reviewer reproduced this recursion with a standalone standard-library probe on Linux. This is a diagnosis of the test double; no production defect has been established.
+
+Authorized correction:
+1. Inspect the test and relevant reader code.
+2. Fix the test double so identifying its target does not call resolve(), stat(), lstat(), or another filesystem operation that re-enters the patched function.
+3. Compute any needed target normalization before installing the patch. Use a suitable non-recursive comparison inside it.
+4. Preserve meaningful stat metadata and the intended understated-size condition.
+5. Keep the expected corpus_file_changed assertion. Add a direct assertion that the target override was actually exercised, so the test cannot pass without testing the intended condition.
+6. Inspect nearby filesystem mocks for the same recursion pattern. Correct another occurrence only if it has the same demonstrated defect within this test file; otherwise report it for review.
+7. Do not weaken production validation, change error codes, skip the test on Linux, or modify the production reader to accommodate the mock.
+
+Authorized changed paths only:
+- tests/test_evaluation_worker.py
+- README.md
+- docs/decisions/0017-retrieval-evaluation.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+If a necessary correction requires another path, stop and explain before expanding scope.
+
+Documentation:
+- Record the failed exact-commit CI run, the independently retrieved Ubuntu and PostgreSQL evidence above, and the test-only correction.
+- Preserve historical Windows results and their attribution.
+- State that M4e was accepted for a local implementation commit in Prompt 147 and published in Prompt 148, but current-version CI is not fully green and M4e is not merged to main.
+- State that the correction is staged and awaits external review.
+- Do not continue saying the 16 M4e PostgreSQL tests have never run: they passed at c14821b7. Keep earlier statements explicitly historical.
+- Do not claim corrected Linux verification until it actually runs.
+- Keep the accepted specification heading and anchor unchanged.
+- Preserve report-only Recall, the determinism limits, the trusted-snapshot limitation and M5 obligations, the container-smoke scope, local Compose unverified, and M4f/overall M4 acceptance pending.
+- Make only the status and evidence edits needed for this correction.
+
+Prompt history:
+Append the Prompt 148 handoff/outcome with attribution, the external reviewer's evidence and diagnosis, this Prompt 149 verbatim, and the actual outcome.
+Keep every earlier prompts.md byte as an identical prefix.
+Use inline backticks around commit identifiers in your own notes.
+
+Verification:
+- Use the existing locked environment. Do not install or update dependencies.
+- Run the corrected test and tests/test_evaluation_worker.py.
+- Run Ruff format/lint and strict mypy as required by repository instructions.
+- Run the database-independent suite using the existing configuration; report actual passes/skips.
+- If an existing authorized Linux environment is already available, reproduce the original failure there and verify the correction there. Do not install or provision one, use Docker, or contact a database. If only Windows is available, say plainly that corrected Linux execution remains pending.
+- No local database, Docker, external-provider or network contact.
+- No build or installed-wheel check is required for a test/documentation-only change.
+- Verify that all production modules, corpus files, PostgreSQL tests, workflows, packaging, dependencies and lockfiles are byte-identical to HEAD.
+- Check relative links/anchors, status consistency, UTF-8 without BOM, LF line endings, private content, artifacts, and the append-only history prefix.
+- Run git diff --cached --check and the existing unsuppressed staged Gitleaks check.
+- Stage only the authorized paths. Leave no unintended unstaged or untracked files.
+
+Export:
+Write .local/p149/m4e-linux-test-correction.diff directly from Git, comparing c14821b72d82f3a174123011b4d2c002fdcadbf3 with the final staged tree, excluding prompts.md.
+Use UTF-8 without BOM and LF.
+Report the baseline, final staged tree, exact exported paths, statistics, byte size and SHA-256.
+
+Stop after staging and exporting.
+No commit, push, CI rerun, merge, main update, amend, rebase, revert, tag or M4f work.
+
+Return a concise handoff covering the correction, checks actually run, evidence attribution, remaining limitations and Git state.
+
+End with:
+Mathew: return this output plus .local/p149/m4e-linux-test-correction.diff to the external reviewer.
+
+### Prompt 149 outcome (Claude Code; correction staged, external review pending)
+
+Starting state matched locally (HEAD `c14821b7`, parent `f01af7eb`, tree `f4579bf3`, tracking
+`origin/feat/retrieval-evaluation`, clean, `main` and `origin/main` at `cf2b5743`, expected
+origin and identity); the checkpoint and prompt-history copy are under `.local/p149/`.
+
+Correction (test-only): in `tests/test_evaluation_worker.py`, the `os.lstat` double now
+identifies its target with a lexical key (`os.path.normcase(os.path.abspath(os.fspath(...)))`),
+computed for the target before the patch is installed, so it makes no file-system call that can
+re-enter the patched function. It keeps every `st_*` field of the real result with the target's
+size reported 10 bytes smaller, keeps the `corpus_file_changed` assertion and adds an assertion
+that the understated result was actually returned for the target. The production reader,
+validation and error codes are unchanged and the test is not skipped. The file's other
+file-system doubles (`os.open`, `Path.read_bytes`, `os.fdopen`) use only lexical path
+operations and were not changed; no other test file patches `os.lstat` or `os.stat`. README,
+docs/plan.md, docs/threat-model.md and ADR-0017 record the publication, the failed exact-commit
+CI run with the reviewer-retrieved evidence, the diagnosis and the staged correction, and mark
+the earlier "never run" statements as historical.
+
+Checks actually run by Claude Code, locally on Windows (locked environment, offline; no Docker,
+database, provider or network contact): the corrected test passed;
+`tests/test_evaluation_worker.py` 99 passed; `ruff format --check .` (171 files) and
+`ruff check .` clean; strict `mypy` (135 source files) no issues, after typing the new helper's
+parameter to satisfy `no-any-return`; full suite 2244 passed, 308 skipped (306 integration tests
+without a database, the symlink test and the POSIX-only signal test). A standalone
+standard-library probe on Windows calling `posixpath.realpath` reproduced the recursion with the
+old double's pattern and showed the new key making no `os.lstat` call; it is a stand-in, not
+Linux execution. No Linux environment was available (no WSL distribution installed), so the
+original failure was not reproduced locally and **corrected Linux execution remains pending**.
+No build or installed-wheel check was run. Staging checks, byte identity of the other paths and
+the export are reported in the Prompt 149 handoff. Nothing was committed or published.
+
+
+### Prompt 149 supplied handoff outcome (Claude Code; recorded in Prompt 150)
+
+The supplied handoff attributes the test correction and historical Windows checks to Claude
+Code: corrected individual test passed; worker test file 99 passed; full suite 2244 passed,
+308 skipped (306 database integration tests without a database, the symlink test and the
+POSIX-only signal test); Ruff format/lint and strict mypy passed. No Linux environment was
+available, and no build, installed-wheel, Docker, database, external-provider or network check
+ran. The accepted staged tree is `4f931986c113da7e79c3d6c846a3f5ccca19febc`, based on
+`c14821b72d82f3a174123011b4d2c002fdcadbf3`. These are attributed supplied facts, not a
+reconstructed verbatim handoff or checks performed by Codex.
+
+### External review acceptance (Prompt 150)
+
+The external reviewer accepted Claude Code's Prompt 149 test-only correction for a local
+commit after inspecting the export and independently matching its 69,891-byte size and SHA-256
+`96ae00845b634cd773c244d68e1125bd342ab4d6f2d1003e3d2ac48fb1c8a57d`.
+The reviewer's standalone standard-library Linux probe confirmed that `Path.resolve()`
+terminates without recursion, the target reports 10 fewer bytes while every other `st_*`
+field is preserved, a non-target stat result is unchanged, the real file size is unchanged
+and differs from the mocked size, and the target override is exercised. This isolated probe
+did not execute the project test, suite, reader, wheel or database. Corrected Linux project
+tests, Ubuntu build and installed-wheel steps, and a green current-version CI run remain
+pending. The published M4e feature branch is not merged to `main`; only a local correction
+commit is authorized.
+
+### Prompt 150 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+Prompt 150 — Codex recovery and local commit of the reviewed M4e Linux test correction. Do not publish.
+
+This is a fresh Codex session taking over from Claude Code. Work in the existing EvidenceGuard repository:
+D:\Claude\evidenceguard_agentic_rag
+
+Read CLAUDE.md and any applicable AGENTS.md instructions first. Then read the relevant current status in README.md, docs/plan.md and docs/decisions/0017-retrieval-evaluation.md. Read prompt history selectively rather than loading the entire file.
+
+Claude Code implemented M4e in Prompt 144, corrected it in Prompts 145–146, committed it in Prompt 147, published the feature branch in Prompt 148, and staged the reviewed Linux test correction in Prompt 149. Codex is now assisting with acceptance documentation and the local correction commit only.
+
+Expected starting state:
+- Branch: feat/retrieval-evaluation
+- HEAD: c14821b72d82f3a174123011b4d2c002fdcadbf3
+- Parent: f01af7ebeeb1401db1709d4479c3e0afa1f003d2
+- HEAD tree: f4579bf36abec48c55040e4480425812a7b71b8c
+- Accepted staged tree: 4f931986c113da7e79c3d6c846a3f5ccca19febc
+- Exactly these six paths staged:
+  README.md
+  docs/decisions/0017-retrieval-evaluation.md
+  docs/plan.md
+  docs/threat-model.md
+  tests/test_evaluation_worker.py
+  prompts.md
+- Nothing unstaged or untracked outside ignored .local/.
+- Branch tracks origin/feat/retrieval-evaluation.
+- The local upstream-tracking ref is at c14821b72d82f3a174123011b4d2c002fdcadbf3.
+- Local main and origin/main remain cf2b5743799e51c74e9f80638b0cc13be5827a71.
+- Origin is the existing mathewmljourney93/evidenceguard-agentic-rag repository.
+- Effective author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Check locally only. Do not fetch or contact the remote.
+If the expected state differs, stop and report without changing anything. Do not reset, clean or reconstruct the staged work.
+
+Save the accepted tree, staged paths, per-file blob hashes and existing prompts.md bytes under .local/p150/.
+
+Verify the reviewed export:
+.local/p149/m4e-linux-test-correction.diff
+- Size: 69,891 bytes
+- SHA-256: 96ae00845b634cd773c244d68e1125bd342ab4d6f2d1003e3d2ac48fb1c8a57d
+- Baseline: c14821b72d82f3a174123011b4d2c002fdcadbf3
+- Final tree: 4f931986c113da7e79c3d6c846a3f5ccca19febc
+- Excludes prompts.md.
+
+Background and evidence:
+The published commit c14821b7 failed Ubuntu CI because this test's os.lstat replacement called Path.resolve(), which re-entered os.lstat on Linux:
+tests/test_evaluation_worker.py::test_a_file_larger_than_its_reported_size_fails_within_its_bound
+
+The reviewed correction is test-only:
+- It identifies the target with os.path.normcase(os.path.abspath(os.fspath(path))).
+- The target key is computed before patching.
+- The replacement preserves every st_* field except the target's deliberately understated st_size.
+- The expected corpus_file_changed assertion remains.
+- An additional assertion requires that the target override was exercised.
+- No production reader, validation or error-code change.
+
+Exact-commit CI evidence independently retrieved by the external reviewer:
+- CI run:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39051603984
+- Ubuntu job:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39051603984/job/117451164827
+- Ubuntu: 1 failed, 2245 passed, 306 skipped in 23.00s.
+- The failing assertion expected corpus_file_changed and received corpus_read_failed.
+- Ubuntu formatting, lint and type checks passed; build and installed-wheel steps were skipped.
+- PostgreSQL job:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39051603984/job/117451164752
+- PostgreSQL: 306 passed, 2246 deselected in 212.64s, including all 16 M4e cases.
+- Windows, container and secret-scan jobs succeeded.
+- No numerical database-derived Recall value is supplied.
+- Claude Code's own Prompt 148 observations were API conclusions only; its anonymous log downloads returned HTTP 403. Preserve that distinction.
+
+Historical Prompt 149 verification, reported by Claude Code on Windows:
+- Corrected individual test passed.
+- tests/test_evaluation_worker.py: 99 passed.
+- Full suite: 2244 passed, 308 skipped, comprising 306 integration tests without a database, the symlink test and the POSIX-only signal test.
+- Ruff format/lint and strict mypy passed.
+- No Linux environment was available.
+- No build, installed-wheel, Docker, database, external-provider or network check ran.
+
+External review outcome:
+The reviewer inspected the Prompt 149 diff and independently matched its size and checksum. The correction is accepted for a local commit.
+
+The reviewer also ran a standalone standard-library probe on Linux using the corrected mock pattern. It confirmed:
+- Path.resolve terminates without recursion.
+- The target's reported size is 10 bytes smaller.
+- Every other st_* field is preserved.
+- A non-target file's stat result is unchanged.
+- The real file size remains unchanged and differs from the mocked size.
+- The target override is exercised.
+
+This was an isolated probe, not execution of the project test, suite, reader, wheel or database. Corrected project execution on Linux remains pending.
+
+Authorized work:
+1. Update only these four documentation files and prompts.md to record acceptance of the Prompt 149 correction for a local commit in Prompt 150:
+   README.md
+   docs/decisions/0017-retrieval-evaluation.md
+   docs/plan.md
+   docs/threat-model.md
+   prompts.md
+2. Keep tests/test_evaluation_worker.py byte-identical to the accepted staged tree.
+3. Preserve all other production, test, corpus, workflow, packaging and dependency files unchanged.
+4. Commit the six reviewed paths locally.
+
+Documentation requirements:
+- Record acceptance of the test-only correction at external review in Prompt 150.
+- Preserve the failed c14821b7 CI evidence and its attribution.
+- Preserve the passing PostgreSQL results for c14821b7, including all 16 M4e cases.
+- Keep Prompt 149 Windows results historical and attributed to Claude Code.
+- Describe the reviewer's isolated Linux probe accurately.
+- State that corrected Linux project tests, Ubuntu build and installed-wheel steps, and a green current-version CI run remain pending.
+- M4e is published on the feature branch but is not merged to main.
+- This task authorizes a local correction commit only.
+- Preserve the accepted specification heading and anchor.
+- Preserve report-only Recall, determinism limits, M5 obligations, container-smoke scope, local Compose unverified, and M4f/overall M4 acceptance pending.
+- Do not invent a database-derived Recall number.
+- Do not attribute Claude Code's implementation, correction or checks to Codex.
+
+Prompt history:
+Append:
+- The Prompt 149 outcome, attributed to Claude Code's supplied handoff.
+- The external review acceptance and its limited probe scope.
+- This Prompt 150 verbatim.
+- A pre-commit note identifying Codex's documentation/commit assistance, without a prospective commit SHA or unperformed outcome.
+
+Keep every earlier prompts.md byte as an identical prefix.
+If the complete Prompt 149 handoff is not saved locally, do not reconstruct it as a verbatim quotation. Record the supplied facts with attribution.
+Use inline backticks around commit identifiers in your own notes.
+
+Checks before committing:
+- Exactly the six expected paths remain staged.
+- Only the four documentation files and prompts.md differ from accepted tree 4f931986c113da7e79c3d6c846a3f5ccca19febc.
+- The corrected test file matches its accepted blob hash.
+- All other tracked files are unchanged.
+- Verify the prompt-history prefix.
+- Check relative links/anchors, status consistency, privacy, artifacts, UTF-8 without BOM and LF line endings.
+- Run git diff --cached --check.
+- Run the existing unsuppressed staged Gitleaks check.
+- Verify the effective noreply author and committer identity.
+
+Do not repeat application tests, builds or installed-wheel checks: implementation and test files are unchanged.
+No installs, Docker, database, provider or network contact.
+
+Commit:
+- Subject: test: fix Linux file-size mock recursion
+- Parent must be c14821b72d82f3a174123011b4d2c002fdcadbf3.
+- Include only the six reviewed paths.
+- The commit body must accurately identify Claude Code's Prompt 149 test correction and OpenAI Codex's Prompt 150 documentation/commit assistance.
+- Preserve existing attribution in prior history.
+- Do not imply Claude Code performed this Codex task or add a Claude co-author trailer solely because earlier commits used one. Follow applicable repository attribution instructions while accurately describing who assisted.
+- Do not amend or rewrite earlier commits.
+
+After committing:
+- Verify parent, tree, committed paths and attribution.
+- Verify the corrected test file remains byte-identical to the accepted tree.
+- Verify a clean working tree.
+- Verify main and origin/main are unchanged.
+- Run the existing unsuppressed full-history Gitleaks scan.
+- Report actual outcomes only.
+
+Export:
+Write .local/p150/m4e-linux-test-commit-incremental.diff directly from Git:
+- Baseline: accepted tree 4f931986c113da7e79c3d6c846a3f5ccca19febc
+- Final: the new local commit
+- Exclude prompts.md
+- UTF-8 without BOM, LF
+
+Report exact exported paths, statistics, byte size and SHA-256, plus the commit SHA, parent and tree.
+
+Stop after the local commit and export.
+No push, CI rerun, merge, main update, amend, rebase, revert, tag, branch deletion or M4f work.
+
+Return a concise, self-contained handoff stating what changed, checks actually run, historical attribution, remaining limitations and final Git state.
+
+End with:
+Mathew: return this output plus .local/p150/m4e-linux-test-commit-incremental.diff to the external reviewer.
+
+### Prompt 150 pre-commit note (OpenAI Codex)
+
+OpenAI Codex assists with acceptance documentation and the authorized local commit only.
+Claude Code authored the Prompt 149 test correction and performed its historical Windows
+checks. The accepted test bytes are retained. No application tests, builds, installed-wheel
+checks, installs, Docker, database, provider or network checks are performed in this task.
+The local commit and post-commit verification are not yet performed at this pre-commit note.

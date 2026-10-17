@@ -221,7 +221,8 @@ retrieved by the external reviewer; see the
 These results cover the exercised paths only; they are not a production-readiness or general
 security guarantee. M4d has since been verified in CI and on `main` at `cf2b5743` (below); M4e's
 specification is accepted and its implementation is accepted at external review (Prompt 147) for
-a local commit, not published or merged (PostgreSQL, Linux and current-version CI pending), and M4f and overall M4 acceptance remain
+a local commit and published in Prompt 148 at `c14821b7`, where exact-commit CI was not fully
+green (below); it is not merged to `main`, and M4f and overall M4 acceptance remain
 pending. Local Compose remains unverified.
 
 | Threat | Mitigation |
@@ -273,17 +274,24 @@ cannot prove that vectors came from the claimed queries. The evidence digest che
 class of tampering only; no hash protects against a database writer outside the application.
 Repeated table headers are a separate span that citations must not quote across.
 
-## Corpus and retrieval evaluation (M4e, implementation accepted for a local commit; PostgreSQL and CI pending)
+## Corpus and retrieval evaluation (M4e, published on a feature branch; CI not fully green)
 
 The [M4e specification](plan.md#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending)
 was proposed in Prompt 140, corrected in Prompts 141–142 and accepted at external review in
 Prompt 143. **Claude Code implemented it in Prompt 144 and corrected it in Prompts 145–146
 ([ADR-0017](decisions/0017-retrieval-evaluation.md)); the
-implementation was accepted at external review in Prompt 147 for a local implementation commit and
-is not published or merged. Only its database-independent checks ran, locally; none of its
-PostgreSQL mitigations (fresh loading, the read-only verifier, isolation checks against stored
-chunks) has been executed: all 16 M4e PostgreSQL tests have never run, Linux and current-version
-CI are pending, and no database-derived Recall or isolation result exists.** The Prompt 145 corrections locate and map every anchor offline before any
+implementation was accepted at external review in Prompt 147 for a local implementation commit,
+published on `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`, and is not merged to
+`main`. Exact-commit CI is not fully green: from job logs retrieved independently by the external
+reviewer, the PostgreSQL integration job passed (306 passed, including all 16 M4e tests, which
+exercise fresh loading, the read-only verifier and isolation checks against stored chunks), but
+one Ubuntu test failed because its `os.lstat` double re-entered itself on Linux (no production
+defect established; see
+[ADR-0017](decisions/0017-retrieval-evaluation.md#exact-commit-ci-at-c14821b7-and-test-correction-prompts-148149)).
+Claude Code's Prompt 149 test-only correction is accepted at external review in Prompt 150 for a local commit; corrected Linux
+verification has not run. Passing tests supply no numerical Recall result, and no
+database-derived Recall value has been observed. The earlier statement that the M4e PostgreSQL
+tests had never run is historical.** The Prompt 145 corrections locate and map every anchor offline before any
 database write, keep process-control exceptions (including, since Prompt 146, those raised by the setup
 clock result) and fixed refusals through read-cleanup failures,
 return a created vendor only after its transaction commits, and check per-file sizes (64 KiB for
@@ -296,6 +304,17 @@ databases, isolation checks that fail on foreign-tenant, cross-vendor or forbidd
 foreign canaries even when Recall is high, and fixed-code diagnostics without document text. It
 makes no injection-resistance or semantic-quality claim; end-to-end canary and output behaviour
 remain M5/M7.
+
+**Prompt 150 correction acceptance:** the external reviewer accepted Claude Code's Prompt 149
+test-only correction for a local commit after inspecting the export and independently matching
+its size and checksum. The reviewer's isolated standard-library Linux probe confirmed no
+`Path.resolve()` recursion, the target's 10-byte understatement with all other `st_*` fields
+preserved, unchanged non-target stat and real file size, and that the target override ran.
+It did not execute the project test, suite, reader, wheel or database. Corrected Linux project
+tests, Ubuntu build and installed-wheel steps, and a green current-version CI run remain
+pending. Claude Code's Prompt 149 Windows checks remain historical; OpenAI Codex assists only
+with acceptance documentation and the local commit. M4e is published on the feature branch
+and not merged to `main`; Prompt 150 authorizes a local correction commit only.
 
 ## Not implemented yet
 

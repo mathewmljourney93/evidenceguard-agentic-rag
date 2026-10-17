@@ -1,21 +1,24 @@
 # ADR-0017: Synthetic corpus, anchor-to-chunk ground truth and retrieval evaluation
 
-- **Status:** **Accepted at external review in Prompt 147 for a local implementation commit,
-  pending current-version CI** (see [External review](#external-review-prompt-147)); not
-  published or merged. Implemented by Claude Code in Prompt 144 on `feat/retrieval-evaluation`
-  and corrected in Prompts 145 and 146 (see [Prompt 145 corrections](#prompt-145-corrections)
-  and [Prompt 146 correction](#prompt-146-correction)). Implements the
+- **Status:** **Accepted at external review in Prompt 147 for a local implementation commit**
+  (see [External review](#external-review-prompt-147)) and **published on
+  `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`; exact-commit CI is not fully green
+  and M4e is not merged to `main`** (see
+  [Exact-commit CI and test correction](#exact-commit-ci-at-c14821b7-and-test-correction-prompts-148149)).
+  At `c14821b7`, the PostgreSQL integration job passed (306 passed, including all 16 M4e cases)
+  but Ubuntu verify failed one test because its `os.lstat` double re-entered itself on Linux; no
+  production defect has been established. Claude Code's **Prompt 149 test-only correction is accepted at external review in Prompt 150
+  for a local commit**; corrected Linux verification has not run. Implemented by Claude Code
+  in Prompt 144 and corrected in Prompts 145 and 146 (see
+  [Prompt 145 corrections](#prompt-145-corrections) and
+  [Prompt 146 correction](#prompt-146-correction)). Implements the
   [accepted M4e specification](../plan.md#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending)
   (proposed in Prompt 140, corrected in Prompts 141–142, accepted at external review in Prompt
-  143). Only database-independent checks ran, locally on Windows, as historical evidence
-  attributed to Claude Code (see [Verification (Prompt 146)](#verification-prompt-146); the
-  [Prompt 145](#verification-prompt-145) and [Prompt 144](#verification-prompt-144) checks
-  are separately scoped). **Pending:** every PostgreSQL test (all 16 M4e cases have never run,
-  and none of the 306 integration tests has run against this version), Linux and
-  current-version CI (including the installed-wheel step and Gitleaks in CI) and the symlink
-  refusal test; no claim depending on PostgreSQL has been executed and no database-derived
-  Recall or isolation result exists. M4d remains reviewed, verified in CI and on `main` at `cf2b5743`; M4f and overall M4
-  acceptance remain pending. Local Compose remains unverified.
+  143). **Pending:** a green current-version CI run (Ubuntu tests, then its build and
+  installed-wheel steps, which were skipped at `c14821b7`), publication of the correction
+  (only a local commit is authorized in Prompt 150), and merge. Passing PostgreSQL tests supply no numerical Recall result; no database-derived
+  Recall value has been observed. M4d remains reviewed, verified in CI and on `main` at
+  `cf2b5743`; M4f and overall M4 acceptance remain pending. Local Compose remains unverified.
 - **Date:** 2026-10-17
 - **Builds on:** [ADR-0016](0016-snapshot-retrieval.md) (M4d snapshot capture and retrieval),
   [ADR-0015](0015-revision-indexing.md) (M4c indexing), [ADR-0010](0010-document-ingestion.md)
@@ -287,12 +290,92 @@ the review:
   idempotency key and `succeeded` status but does not read job `payload`. No payload validation
   is claimed.
 
-**Outstanding:** no PostgreSQL test (none of the 16 M4e cases and none of the 306 integration tests against this version) has run, Linux and current-version CI are pending, the symlink refusal test has not run, and no database-derived Recall or isolation result exists. The implementation is not published or merged.
+**Outstanding at acceptance (historical, before the Prompt 148 CI run):** no PostgreSQL test (none of the 16 M4e cases and none of the 306 integration tests against this version) had run, Linux and current-version CI were pending, the symlink refusal test had not run, and no database-derived Recall or isolation result existed. The implementation was not yet published or merged.
+
+## Exact-commit CI at `c14821b7` and test correction (Prompts 148–149)
+
+**Publication (Prompt 148).** Claude Code published `feat/retrieval-evaluation` at
+`c14821b72d82f3a174123011b4d2c002fdcadbf3` (a history-only commit on top of the accepted
+implementation commit `f01af7eb`). The push-triggered
+[ci run](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39051603984)
+(attempt 1) **failed**; the secret-scan run succeeded. Claude Code observed only GitHub API
+conclusions (its anonymous log downloads returned HTTP 403): Ubuntu verify failed at its `Test`
+step, with the build and installed-wheel steps skipped; Windows verify, PostgreSQL integration,
+the container job (all six steps) and full-history Gitleaks succeeded.
+
+**Evidence retrieved independently by the external reviewer** (connected GitHub log retrieval;
+not observed by Claude Code):
+
+- [Ubuntu verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39051603984/job/117451164827):
+  `1 failed, 2245 passed, 306 skipped in 23.00s`. The failure is
+  `tests/test_evaluation_worker.py::test_a_file_larger_than_its_reported_size_fails_within_its_bound`,
+  asserting at line 598: expected `corpus_file_changed`, received `corpus_read_failed`.
+  Formatting, lint and type checks passed; the build and installed-wheel steps were skipped.
+- [PostgreSQL integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39051603984/job/117451164752):
+  `306 passed, 2246 deselected in 212.64s`; the log shows all 16 tests in
+  `tests/test_evaluation_postgres.py` passing. This is the first executed PostgreSQL evidence for
+  M4e. The logs supply no numerical Recall result, and none is claimed.
+- No additional counts or output were supplied for the Windows, container or secret-scan jobs.
+
+**Diagnosis (external reviewer).** The test replaced `os.lstat` with a double that called
+`Path(path).resolve()` to identify its target. On Linux, `Path.resolve()` itself calls
+`os.lstat`, so the double re-entered itself (by Claude Code's reading of the reader, the
+resulting ordinary `RecursionError` is what its guard converts to the private
+`corpus_read_failed`). The reviewer reproduced the recursion with a
+standalone standard-library probe on Linux. This is a defect in the test double; no production
+defect has been established. On Windows, `Path.resolve()` does not call `os.lstat`, which is why
+the test passed there.
+
+**Correction (Claude Code, Prompt 149, test-only; accepted at external review in Prompt 150 for a local commit).** The double now
+identifies its target with a purely lexical key (`os.path.normcase(os.path.abspath(...))`),
+computed for the target before the patch is installed, so it performs no file-system operation
+that could re-enter the patched function. It keeps every `st_*` field of the real result and
+reports the target's size 10 bytes smaller, so the reader's bounded read still observes
+`corpus_file_changed`. A new assertion requires that the understated result was actually
+returned for the target, so the test cannot pass without exercising the intended condition. The
+production reader, its validation and its error codes are unchanged, and the test is not skipped
+on any platform. The other file-system doubles in the file (`os.open`, `Path.read_bytes`,
+`os.fdopen`) use only lexical path operations and were left unchanged.
+
+**Historical verification (Prompt 149).** Run locally on Windows by Claude Code (locked environment, offline;
+no Docker, database or external provider contact):
+
+- the corrected test passed, and `tests/test_evaluation_worker.py`: 99 passed;
+- `ruff format --check .` (171 files) and `ruff check .`: clean; strict `mypy` (135 source
+  files): no issues;
+- full suite: 2244 passed, 308 skipped (306 integration tests without a database, the symlink
+  test and the POSIX-only signal test);
+- a standalone standard-library probe on Windows, calling `posixpath.realpath` (the function
+  `Path.resolve()` uses on POSIX), reproduced the recursion with the old double's pattern and
+  showed the new lexical key making no `os.lstat` call. This is a stand-in, not Linux execution.
+
+No Linux environment was available, so **corrected Linux execution remains pending**, as do the
+Ubuntu build and installed-wheel steps for the current tree.
+
+## External review acceptance of the test correction (Prompt 150)
+
+The external reviewer inspected Claude Code's Prompt 149 correction export, independently
+matched its size and SHA-256, and **accepted the test-only correction for a local commit**.
+OpenAI Codex assists with acceptance documentation and the local commit in Prompt 150;
+Claude Code's implementation, correction and historical checks remain attributed to Claude Code.
+
+The reviewer also ran a standalone standard-library probe on Linux using the corrected mock
+pattern. It confirmed that `Path.resolve()` terminates without recursion; the target reports
+10 fewer bytes while every other `st_*` field is preserved; a non-target file's stat result
+is unchanged; the real file size remains unchanged and differs from the mocked size; and
+the target override is exercised. This was an isolated probe, not execution of the project
+test, suite, reader, wheel or database. **Corrected Linux project tests, the Ubuntu build and
+installed-wheel steps, and a green current-version CI run remain pending.** No project checks
+were repeated by Codex for this documentation/commit task. The exact-commit failure and passing
+PostgreSQL evidence above remain evidence for `c14821b7`, not the corrected version; no
+database-derived Recall number is supplied. M4e is published on the feature branch and is
+not merged to `main`. Prompt 150 authorizes a local correction commit only, with no push,
+CI rerun or merge. M4f and overall M4 acceptance remain pending; local Compose is unverified.
 
 ## Verification (Prompt 146)
 
 Historical local evidence, attributed to Claude Code and not rerun for acceptance. Run locally on Windows by Claude Code (locked environment; no Docker, database or external
-provider contact; only the offline `HashingEmbedder` ran). **Pending:** all 16 PostgreSQL
+provider contact; only the offline `HashingEmbedder` ran). **Pending at the time:** all 16 PostgreSQL
 tests, the symlink refusal test, every CI job for the current tree and Gitleaks in CI.
 
 - `ruff format --check .` (171 files) and `ruff check .`: clean; strict `mypy` (135 source
@@ -311,7 +394,7 @@ tests, the symlink refusal test, every CI job for the current tree and Gitleaks 
 ## Verification (Prompt 145)
 
 Historical (before the Prompt 146 correction). Run locally on Windows by Claude Code (locked environment; no Docker, database or external
-provider contact; only the offline `HashingEmbedder` ran). **Pending:** all 16 PostgreSQL
+provider contact; only the offline `HashingEmbedder` ran). **Pending at the time:** all 16 PostgreSQL
 tests, the symlink refusal test (it needs a symlink-capable account or Linux CI), every CI job
 for the current tree and Gitleaks in CI.
 
@@ -333,7 +416,7 @@ for the current tree and Gitleaks in CI.
 ## Verification (Prompt 144)
 
 Historical (before the Prompt 145 corrections). Run locally on Windows by Claude Code (locked environment; no Docker, database or external
-provider contact; only the offline `HashingEmbedder` ran). **Pending:** every PostgreSQL test,
+provider contact; only the offline `HashingEmbedder` ran). **Pending at the time:** every PostgreSQL test,
 all CI jobs and Gitleaks in CI.
 
 - `ruff format --check .` (170 files: 134 Python and 36 Markdown) and `ruff check .`: clean; strict `mypy` (134 source

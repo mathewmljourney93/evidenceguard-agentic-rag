@@ -585,17 +585,27 @@ def test_a_file_larger_than_its_reported_size_fails_within_its_bound(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     root = _copy(tmp_path, _sample_files())
-    target = (root / "documents/halverson-freight/lumenvale-cloud/subprocessors@r1.md").resolve()
     real_lstat = os.lstat
+
+    # Normalized before patching, and compared purely lexically inside the double: on POSIX,
+    # Path.resolve() itself calls os.lstat and would re-enter the replacement.
+    def key(path: str | os.PathLike[str]) -> str:
+        return os.path.normcase(os.path.abspath(os.fspath(path)))
+
+    target = key(root / "documents/halverson-freight/lumenvale-cloud/subprocessors@r1.md")
+    understated_calls: list[str] = []
 
     def understated(path: Any, *args: Any, **kwargs: Any) -> Any:
         info = real_lstat(path, *args, **kwargs)
-        if Path(path).resolve() == target:
-            return SimpleNamespace(st_mode=info.st_mode, st_size=info.st_size - 10)
-        return info
+        if key(path) != target:
+            return info
+        understated_calls.append(target)
+        fields = {name: getattr(info, name) for name in dir(info) if name.startswith("st_")}
+        return SimpleNamespace(**{**fields, "st_size": info.st_size - 10})
 
     monkeypatch.setattr(os, "lstat", understated)
     assert _code(lambda: load_suite(root, CLEAN)) == "corpus_file_changed"
+    assert understated_calls  # the understated size was actually reported for the target
 
 
 def test_a_bounded_read_requests_at_most_one_byte_past_the_checked_size(
