@@ -238,21 +238,24 @@ re-verified against provider output, and provider calls are not exactly-once. A 
 automatically. The container smoke covers idle-worker shutdown only. The offline provider is a
 lexical-hash baseline with no semantic-quality claim, and no live provider was verified.
 
-## Snapshot retrieval (M4d, implementation accepted for a local commit; CI pending)
+## Snapshot retrieval (M4d, verified in feature-branch CI; not merged)
 
 The [M4d specification](plan.md#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending)
 was accepted at external review in Prompt 133 (proposed in Prompt 131, corrected in Prompt 132).
 Claude Code implemented it in Prompt 134 and corrected it in Prompt 135
 ([ADR-0016](decisions/0016-snapshot-retrieval.md)); the correction preserves process-control
 exceptions raised during the read helper's setup when cleanup also fails.
-**The implementation was accepted at external review in Prompt 136 for a local commit; it is not
-published, merged or verified in CI, and no endpoint or worker handler calls it.** Its
-database-independent tests ran locally on Windows (Claude Code, historical); its 39 PostgreSQL
-tests, which are the evidence for the database-side mitigations below (tenant/vendor scoping,
-filtering before limits, the binding recheck and snapshot-relative supersession), are written but
-have never run. Linux and current-version CI are pending.
+**The implementation was accepted at external review in Prompt 136 and is reviewed and verified
+in feature-branch CI at `3d6e8395`; it is not merged (`main` is unchanged at `76fa5a3`), and no
+endpoint or worker handler calls it.** Its 39 PostgreSQL tests, the evidence for the database-side
+mitigations below (tenant/vendor scoping, filtering before limits, the binding recheck and
+snapshot-relative supersession), all passed in that run (logs retrieved independently by the
+external reviewer; see the
+[ADR-0016 feature-branch CI evidence](decisions/0016-snapshot-retrieval.md#feature-branch-ci-evidence-at-3d6e8395)).
+This covers the tested paths in that run only; it is not a general security guarantee. Claude
+Code's earlier local Windows results are historical.
 
-| Threat | Mitigation (implemented and accepted; database-side evidence pending) |
+| Threat | Mitigation (implemented, accepted and verified in feature-branch CI) |
 |---|---|
 | Retrieving another tenant's or vendor's content | The tenant comes only from the trusted actor (reviewer or approver). Capture is tenant- and vendor-scoped; every channel and evidence statement repeats the tenant, vendor, binding, ready-index and profile joins before its `LIMIT 20`. |
 | Silently searching an incomplete or changed corpus | Capture runs in one REPEATABLE READ, READ ONLY transaction and refuses any active revision without a chunk set or ready index for the profile, an empty set and more than 100 revisions or 100,000 chunks. Before every retrieval, one statement rechecks every immutable binding; current `status` is never consulted, so supersession is snapshot-relative. |

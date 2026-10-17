@@ -23308,3 +23308,537 @@ embedding/indexing wheel checks remain. The private-content scan of range additi
 and range Gitleaks (`origin/main..HEAD`, no suppression) found no leaks. No local application
 checks, installs, Docker, database or provider contact were run. No commit identifier, push result
 or CI outcome is recorded here.
+
+### Prompt 137 outcome (Claude Code; attributed to its handoff)
+
+Claude Code committed the history-only change as `3d6e8395f09dbb6d9eb602fe24bcfed46a7f88f2`
+(parent `b1775009`, tree `2cebf9edf95f07a62da2db0ab2229e06e1d91cdc`, noreply author and committer,
+only prompts.md changed); full-history Gitleaks then scanned 59 commits with no leaks. After
+rechecking that remote `main` was `76fa5a3` and no remote feature ref existed, `git push
+--set-upstream origin refs/heads/feat/snapshot-retrieval:refs/heads/feat/snapshot-retrieval`
+exited 0 (`* [new branch]`) after waiting several minutes on a Git Credential Manager sign-in; no
+retry or authentication change was made. The remote feature ref equalled `3d6e8395`, upstream
+tracking was set and remote `main` stayed at `76fa5a3`. The push-triggered CI run 39018717538 and
+secret-scan run 39018717584 for that exact SHA (branch `feat/snapshot-retrieval`, attempt 1)
+concluded success, with all five jobs and every listed step `success`. These were Claude Code's
+observations of run, job and step conclusions through the public API only: its anonymous log
+downloads returned HTTP 403 ("Must have admin rights to Repository."), so it observed no pytest
+counts, wheel output, container details or Gitleaks commit count. Nothing was merged and no
+documentation changed after CI.
+
+## Prompt 138 M4d feature-branch CI evidence (Claude Code)
+
+External reviewer evidence note: the external reviewer subsequently and independently retrieved
+both run records, all five job records and all five job logs through connected GitHub tooling.
+Both runs: event `push`, branch `feat/snapshot-retrieval`, head commit
+`3d6e8395f09dbb6d9eb602fe24bcfed46a7f88f2`, attempt 1, conclusion success. Ubuntu verify
+(job 117356036652): `2002 passed, 290 skipped in 19.97s` (the 290 PostgreSQL tests skipped in this
+job); format, lint, type-check, distribution build and clean installed-wheel checks passed, with
+the output lines `offline embedding, canonical storage and indexing modules ran from the installed
+wheel`, `retrieval modules imported and fusion ran from the installed wheel` and `offline migration
+SQL rendered from the installed wheel`. Windows verify (job 117356036659): `2001 passed, 291
+skipped in 27.42s` (also the POSIX-only signal test), with the same checks and the same three
+lines. PostgreSQL integration (job 117356036581): `290 passed, 2002 deselected in 121.28s
+(0:02:01)`; the log shows all 39 cases in `tests/test_retrieval_postgres.py` passing, none failed
+or skipped, the first executed PostgreSQL evidence for the M4d implementation including the
+Prompt 135 corrections. Container (job 117356036757): all six steps executed and succeeded; the log
+shows effective context `82 files; 19 planted fixtures excluded`, UID/GID 10001 checks, `eg-api`,
+`eg-worker` and `eg-admin` help, installed imports, offline migration SQL and runtime-content
+checks, a healthy database, completed migration and healthy API on the CI-built image, an API key
+held in memory only, an upload accepted with 202, the ingestion job succeeding with the revision
+active and two verified chunks, a duplicate upload returning the existing revision with 200, the
+production backfill enqueuing one offline indexing job, the index ready with two embeddings and
+the job succeeding, the idle worker exiting 0 without an OOM kill, `smoke: ok` and `cleanup: ok`.
+These are printed summaries, not independently inspected raw rows; the unchanged smoke verifies
+ingestion and indexing, not M4d retrieval. Gitleaks (job 117356036744): 59 commits scanned, no
+leaks. No required job or step was skipped, failed or cancelled. The reviewer ran no local project
+suite, PostgreSQL, Docker or provider calls for this evidence review. Claude Code's earlier
+"unobserved" records in Prompt 137 remain historically accurate and are not rewritten.
+
+### Prompt 138 (verbatim; line endings normalized to LF)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 138: record verified M4d feature-branch CI evidence; stage documentation for review
+
+Work in `D:\Claude\evidenceguard_agentic_rag`. Read `CLAUDE.md` and any applicable repository instructions first.
+
+This is a documentation-only task. Record the independently retrieved CI evidence below, stage the permitted files and export a review diff. Do not commit, push, merge or implement anything.
+
+## 1. Verify the starting state
+
+Expected state:
+- Branch: `feat/snapshot-retrieval`.
+- HEAD, upstream and remote feature ref: `3d6e8395f09dbb6d9eb602fe24bcfed46a7f88f2`.
+- Parent: `b1775009f7a2af84266d7d9de12277ac88cd3577`.
+- Tree: `2cebf9edf95f07a62da2db0ab2229e06e1d91cdc`.
+- Subject: `docs: record M4d branch publication authorization`.
+- Clean index and working tree.
+- Local `main`, `origin/main` and remote `main`: `76fa5a3800936d2bebdf13c5401609e09983b0d1`.
+- Origin: `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`.
+- Expected author and committer: `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>`.
+
+Use read-only remote checks to confirm the refs. If a material mismatch exists, stop and report it without resetting or overwriting anything.
+
+Save the baseline commit/tree, status, permitted-file blob hashes and existing prompt-history bytes under ignored `.local/p138/`.
+
+## 2. Permitted files
+
+Change only:
+- `README.md`
+- `docs/decisions/0015-revision-indexing.md`
+- `docs/decisions/0016-snapshot-retrieval.md`
+- `docs/plan.md`
+- `docs/threat-model.md`
+- `prompts.md`
+
+ADR-0015 changes must be limited to current M4d status wording and relevant links. Preserve its M4c evidence.
+
+No source, test, workflow, migration, dependency, lockfile, configuration, Docker, Compose or `CLAUDE.md` changes.
+
+## 3. Independently verified evidence
+
+The external reviewer independently retrieved both run records, all five job records and all five job logs through connected GitHub tooling.
+
+Both runs:
+- Event: `push`.
+- Branch: `feat/snapshot-retrieval`.
+- Exact head commit: `3d6e8395f09dbb6d9eb602fe24bcfed46a7f88f2`.
+- Attempt: 1.
+- Conclusion: success.
+
+Runs:
+- CI: https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39018717538
+- Secret scan: https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39018717584
+
+### Ubuntu verify
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39018717538/job/117356036652
+
+Observed:
+- `2002 passed, 290 skipped in 19.97s`.
+- Format, lint, type-check, distribution build and clean installed-wheel checks passed.
+- Actual output confirms:
+  - `offline embedding, canonical storage and indexing modules ran from the installed wheel`
+  - `retrieval modules imported and fusion ran from the installed wheel`
+  - `offline migration SQL rendered from the installed wheel`
+
+### Windows verify
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39018717538/job/117356036659
+
+Observed:
+- `2001 passed, 291 skipped in 27.42s`.
+- Format, lint, type-check, distribution build and clean installed-wheel checks passed.
+- The same three installed-wheel output lines appeared.
+
+Keep the platform-specific skip explanation accurate: Ubuntu skips the 290 PostgreSQL tests in this job; Windows additionally skips the POSIX-only signal test.
+
+### PostgreSQL integration
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39018717538/job/117356036581
+
+Observed:
+- `290 passed, 2002 deselected in 121.28s (0:02:01)`.
+- The log explicitly shows all 39 cases in `tests/test_retrieval_postgres.py` passing, with none failed or skipped.
+- This is the first executed PostgreSQL evidence for the M4d implementation, including the corrections from Prompt 135.
+
+### Container
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39018717538/job/117356036757
+
+All six required steps executed and succeeded:
+1. Rendered Compose configuration.
+2. Effective build context.
+3. Application image build.
+4. Image checks.
+5. Compose smoke.
+6. Scoped cleanup.
+
+Observed log evidence:
+- Effective context: `82 files; 19 planted fixtures excluded`.
+- UID and GID 10001 checks passed.
+- `eg-api`, `eg-worker` and `eg-admin` help checks passed.
+- Installed imports, offline migration SQL and runtime-content checks passed.
+- Stack started with healthy database, completed migration and healthy API.
+- Migrate, API and worker used the CI-built image.
+- API key created and held in memory only.
+- Upload accepted with 202.
+- Ingestion job succeeded.
+- Revision active with two verified chunks.
+- Duplicate upload returned the existing revision with 200.
+- Production backfill enqueued one offline indexing job.
+- Index became ready with two embeddings and the indexing job succeeded.
+- Idle worker exited with code 0 and no OOM kill.
+- `smoke: ok`.
+- Ownership-scoped cleanup completed with `cleanup: ok`.
+
+This unchanged smoke verifies ingestion and indexing, not M4d retrieval. Keep printed summaries distinct from independently inspected raw database rows. Do not reproduce generated credentials or raw private output.
+
+### Gitleaks
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39018717584/job/117356036744
+
+Observed:
+- 59 commits scanned.
+- No leaks found.
+
+No required job or step was skipped, failed or cancelled.
+
+## 4. Documentation updates
+
+Record M4d as:
+- accepted at review in Prompt 136;
+- reviewed and verified in feature-branch CI at `3d6e8395`;
+- not merged;
+- `main` unchanged at `76fa5a3`.
+
+In ADR-0016:
+- Update the status.
+- Add a “Feature-branch CI evidence at 3d6e8395” section with the full commit, run/job links, exact summaries, all 39 M4d PostgreSQL cases, installed-wheel evidence, container scope and Gitleaks evidence.
+- Describe verification as establishing the covered paths in this run, without broad guarantees.
+- Relabel pre-CI “never run” and pending-verification statements as historical.
+
+Update README, plan and threat model consistently, using concise links to ADR-0016 rather than duplicating the entire evidence everywhere.
+
+Preserve:
+- Historical local Windows evidence and its Claude Code attribution.
+- The accepted specification heading and anchor.
+- The trusted-snapshot limitation: binding rechecks cannot prove past eligibility; M5 must persist and reload trusted captured facts.
+- No semantic-quality, retrieval-quality, benchmark, production-readiness or general security guarantee.
+- The container smoke’s ingestion/indexing scope and idle-worker-only shutdown coverage.
+- Local Compose unverified.
+- M4e–M4f and overall M4 acceptance pending.
+- Existing M4c limits and evidence.
+
+Do not say M4d is on `main` or that overall M4 is accepted.
+
+## 5. Prompt history and attribution
+
+Append without rewriting earlier bytes:
+1. The Prompt 137 publication outcome, attributed to its handoff.
+2. A separate reviewer-evidence note containing the independently retrieved results above.
+3. This Prompt 138 verbatim, including its “Written for” line.
+4. An outcome note marking the documentation staged and awaiting review.
+
+Keep the distinction clear:
+- Claude Code’s Prompt 137 observations were API conclusions only; anonymous logs returned HTTP 403.
+- The external reviewer subsequently retrieved the logs independently.
+- Earlier “unobserved” records remain historically accurate and must not be rewritten.
+- The reviewer did not run a local project suite, PostgreSQL, Docker or provider calls for this evidence review.
+
+Use inline backticked commit identifiers in your own notes.
+
+## 6. Verification
+
+Run documentation checks only:
+- Exactly the six permitted paths changed.
+- Earlier `prompts.md` bytes remain an identical prefix.
+- Relative links and anchors resolve.
+- Current-status wording is consistent; historical pending claims are clearly scoped.
+- No claim of main publication, overall M4 acceptance or container retrieval coverage.
+- Privacy/artifact scan clean.
+- UTF-8 without BOM and no CR characters.
+- `git diff --cached --check`.
+- Staged Gitleaks with existing defaults, no suppression or scanner changes.
+
+Do not run application tests, builds, installs, Docker, database or provider calls.
+
+Stage the six permitted files. Leave nothing unstaged and do not commit.
+
+## 7. Export and handoff
+
+Export directly from Git to:
+`.local/p138/m4d-verification-docs.diff`
+
+Requirements:
+- Baseline: `3d6e8395f09dbb6d9eb602fe24bcfed46a7f88f2`.
+- Final: the completed staged tree.
+- Exclude `prompts.md`.
+- UTF-8 without BOM, no CR characters.
+
+Report:
+- Starting-state checks.
+- Documentation changes and evidence attribution.
+- Checks actually run.
+- Final staged tree and paths.
+- Export baseline, final tree, statistics, byte size and SHA-256.
+- Final branch, HEAD, upstream, main refs and working-tree state.
+- Remaining limitations.
+
+Nothing is committed, pushed or merged in this task. No M4e work is authorized.
+
+End with:
+“Mathew: return this output plus .local/p138/m4d-verification-docs.diff to the external reviewer.”
+
+### Prompt 138 outcome (Claude Code; documentation staged, awaiting review)
+
+Starting state matched with read-only checks: branch `feat/snapshot-retrieval`, HEAD, upstream and
+remote feature ref `3d6e8395`, parent `b1775009`, tree `2cebf9ed`, clean index and working tree,
+local `main`, `origin/main` and remote `main` at `76fa5a3`, expected origin and identity. The
+baseline is saved under `.local/p138/`.
+
+Claude Code recorded the reviewer-retrieved feature-branch CI evidence: ADR-0016 has a new
+"Feature-branch CI evidence at 3d6e8395" section and an updated status (accepted in Prompt 136,
+reviewed and verified in feature-branch CI at `3d6e8395`, not merged), with pre-CI pending
+statements relabelled as historical; README, docs/plan.md, docs/threat-model.md and ADR-0015 (M4d
+status wording and link only) were updated consistently with links to ADR-0016. The accepted
+specification heading and anchor, historical local evidence and its attribution, the trusted
+snapshot limitation, the container smoke's scope and every stated limit are preserved. M4d is not
+on `main`; overall M4 acceptance and M4e–M4f remain pending. Only documentation checks were run;
+no application tests, builds, installs, Docker, database or provider calls. The documentation is
+staged, uncommitted and awaiting review; the staged tree and export metadata are reported in the
+Prompt 138 handoff.
+
+## Prompt 139 M4d evidence acceptance and main publication authorization (Claude Code)
+
+External review acceptance of Prompt 138: the reviewer inspected `.local/p138/m4d-verification-docs.diff`
+(baseline `3d6e8395f09dbb6d9eb602fe24bcfed46a7f88f2`, final tree
+`c82bde7d8494fa8aec6346cbbd6957398193e66f`, five documentation files with prompts.md excluded,
++110/−49) and independently matched its size (56,642 bytes) and SHA-256
+(`124a7fa72ce38a1d2acbb7585bc5363e06816040507009c80f8a486a249a6b92`). The recorded evidence was
+checked against the independently retrieved CI logs, and the limitations are preserved. The
+reviewer ran no local application suite or Docker for this review.
+
+### Prompt 139 (verbatim; line endings normalized to LF)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 139: commit the reviewed M4d evidence, publish the feature branch, then fast-forward main after green CI
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and any applicable repository instructions.
+
+The external reviewer accepts the Prompt 138 documentation diff. This prompt authorizes committing the reviewed documentation, pushing the feature branch, and—only after all five required jobs pass for the new exact commit—fast-forwarding main and pushing it.
+
+No implementation changes, repairs, CI reruns or M4e work are authorized.
+
+## 1. Verify starting state
+
+Fetch fresh refs without tags and check the remote refs.
+
+Expected:
+- Branch: feat/snapshot-retrieval.
+- HEAD, upstream and remote feature branch:
+  3d6e8395f09dbb6d9eb602fe24bcfed46a7f88f2
+- Parent:
+  b1775009f7a2af84266d7d9de12277ac88cd3577
+- Exactly six staged paths:
+  README.md
+  docs/decisions/0015-revision-indexing.md
+  docs/decisions/0016-snapshot-retrieval.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Accepted staged tree:
+  c82bde7d8494fa8aec6346cbbd6957398193e66f
+- Nothing unstaged or untracked outside ignored local artifacts.
+- Local main, origin/main and remote main:
+  76fa5a3800936d2bebdf13c5401609e09983b0d1
+- Local main equals origin/main, has no independent commits, and is an ancestor of HEAD.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Stop on a material mismatch without overwriting, resetting or repairing anything.
+
+Save the accepted tree, staged paths, per-file blob hashes and current prompt-history bytes under ignored .local/p139/.
+
+## 2. Preserve the accepted documents
+
+The reviewer inspected:
+.local/p138/m4d-verification-docs.diff
+
+Its verified properties:
+- Baseline:
+  3d6e8395f09dbb6d9eb602fe24bcfed46a7f88f2
+- Final tree:
+  c82bde7d8494fa8aec6346cbbd6957398193e66f
+- Five documentation files, excluding prompts.md.
+- 110 insertions, 49 deletions.
+- 56,642 bytes.
+- SHA-256:
+  124a7fa72ce38a1d2acbb7585bc5363e06816040507009c80f8a486a249a6b92
+
+Independently verify the export checksum locally.
+
+README, ADR-0015, ADR-0016, plan and threat model must remain byte-identical to the accepted tree throughout this task.
+
+Only append to prompts.md. Do not edit source, tests, workflows, migrations, dependencies, configuration, Docker, Compose or CLAUDE.md.
+
+## 3. Append prompt history
+
+Append:
+- The reviewer's acceptance of Prompt 138: diff inspected, checksum and size independently matched, evidence checked against the independently retrieved CI logs, limitations preserved, no local application suite or Docker run.
+- This Prompt 139 verbatim, including the Written for line.
+- A preflight note recording verified state, checks, publication order and stop conditions.
+
+Preserve all earlier bytes. Do not pre-record a commit SHA, push outcome, merge outcome or CI result.
+
+Use inline backticked commit identifiers in your own notes.
+
+## 4. Publication preflight and commit
+
+Inspect the entire unpublished range against fresh origin/main:
+- Accepted specification commit 51042a8.
+- Accepted implementation commit b1775009.
+- History commit 3d6e8395.
+- The new documentation/history commit prepared here.
+
+Confirm:
+- Only the 15 reviewed paths occur across the range.
+- The workflow change is only the reviewed M4d installed-wheel extension.
+- No migration, dependency, lockfile, Dockerfile, Compose, registry or container-smoke changes.
+- No tracked .local files, credentials, binaries, build outputs, backups or real environment files.
+- .env.example is unchanged and remains placeholder-only.
+- Commit identities and assistance attribution are accurate.
+- Both workflows trigger on push and all five required jobs remain enabled.
+- Integration still uses pytest -m integration with EG_REQUIRE_INTEGRATION=1.
+- The M4d PostgreSQL module remains integration-marked.
+- Existing wheel checks and all six container steps remain present.
+
+Run:
+- Earlier prompts.md prefix comparison.
+- Documentation links and anchors.
+- UTF-8, BOM and CR checks.
+- Private-content and artifact checks.
+- git diff --cached --check.
+- Staged Gitleaks and range Gitleaks without suppression or scanner changes.
+- Effective author and committer checks.
+
+Commit exactly the six staged documentation/history paths.
+
+Suggested subject:
+docs: record verified M4d results and main publication authorization
+
+Use the expected noreply author and committer. Credit Claude Code's actual work using the existing repository convention and preserve earlier OpenAI Codex attribution.
+
+After committing verify:
+- Parent is exactly 3d6e8395f09dbb6d9eb602fe24bcfed46a7f88f2.
+- Exactly six paths were committed.
+- The five reviewed document blobs equal accepted tree c82bde7d.
+- Only prompts.md differs from that accepted tree.
+- Working tree is clean.
+- Full-history Gitleaks passes without suppression.
+
+Do not rerun local application tests, builds, installs, Docker, database or provider calls.
+
+## 5. Feature-branch push and exact-commit CI
+
+Recheck remote feature and main refs immediately before pushing.
+
+Run explicitly:
+git push origin refs/heads/feat/snapshot-retrieval:refs/heads/feat/snapshot-retrieval
+
+Record its actual exit status without a pipeline hiding it. Do not retry automatically after an ambiguous result. Verify the remote feature ref equals the new full commit SHA.
+
+Monitor the push-triggered CI and secret-scan runs for:
+- Branch feat/snapshot-retrieval.
+- Exact new head SHA.
+- Correct run attempt.
+- All five required jobs:
+  Ubuntu verify
+  Windows verify
+  PostgreSQL integration
+  Container
+  Gitleaks
+
+Use a bounded monitor, at most 25 minutes, checking at intervals no longer than 60 seconds. Leave no polling running afterwards.
+
+Require all necessary steps to execute and succeed, including:
+- Tests, builds and installed-wheel checks on both platforms.
+- The M4d retrieval imports and fusion wheel check.
+- Integration tests.
+- All six container steps: config, context, build, image checks, smoke and cleanup.
+
+Retrieve job logs using normally available authorized tooling if possible. Do not extract stored credentials or change authentication configuration to obtain them.
+
+Report observed summaries and log evidence only. A green step does not establish a test count. The earlier 3d6e8395 results belong only to that commit.
+
+If any required job fails, is cancelled, is skipped, or exceeds the bound, stop and report the available diagnostics. Do not repair, rerun or update main.
+
+## 6. Fast-forward main only after feature CI passes
+
+After all five exact-commit feature jobs succeed, fetch fresh refs again.
+
+Require:
+- Remote main still equals 76fa5a3800936d2bebdf13c5401609e09983b0d1.
+- Local main equals origin/main with no independent commits.
+- Remote feature equals the newly verified full commit.
+- The old main is an ancestor of that commit.
+- Working tree is clean.
+- Reviewed document blobs remain unchanged.
+
+If any condition fails, stop.
+
+Then:
+git switch main
+git merge --ff-only <the newly verified full commit SHA>
+git push origin refs/heads/main:refs/heads/main
+
+Record each actual exit status. No merge commit, force-push, squash, amend or rebase.
+
+Verify local and remote main equal the exact published commit.
+
+## 7. Main-push CI
+
+Monitor both push-triggered main runs for the exact same commit, under the same 25-minute bound and requirements.
+
+Record run/job links, event, branch, exact SHA, attempt and conclusions. Retrieve logs if available, keeping main results separate from feature results.
+
+If main CI fails, stop and report; do not repair, revert or rerun automatically.
+
+Do not edit documentation after either publication. Recording main publication evidence is a later reviewed task.
+
+## 8. Final handoff
+
+Report:
+- Starting state and preflight.
+- New commit SHA, parent, tree, subject, paths, identity and attribution.
+- Byte identity against the accepted tree.
+- Scans and checks actually run.
+- Exact push and fast-forward commands and exit statuses.
+- Feature and main run/job links and exact-commit conclusions.
+- Actual log evidence, clearly separated from API-only observations.
+- Any unavailable logs or unobserved counts.
+- Before/after refs, final branch, tracking and clean-tree state.
+- Confirmation that no monitor remains running.
+
+Keep the limitations:
+- Container smoke covers ingestion and indexing, not M4d retrieval.
+- Idle-worker shutdown coverage only.
+- Trusted snapshots cannot prove past eligibility; M5 must persist and reload captured facts.
+- Local Compose remains unverified.
+- No semantic-quality, retrieval-quality, production-readiness or general security guarantee.
+- M4e–M4f and overall M4 acceptance remain pending.
+
+No diff attachment is required because the reviewed documents remain byte-identical.
+
+End:
+Mathew: return this output only to the external reviewer; no diff attachment is required.
+
+### Prompt 139 publication preflight (Claude Code; before the commit and publication)
+
+Verified state: `git fetch --no-tags origin` succeeded; branch `feat/snapshot-retrieval` with
+HEAD, upstream and remote feature ref at `3d6e8395` (parent `b1775009`); the index writes
+accepted tree `c82bde7d8494fa8aec6346cbbd6957398193e66f` with exactly the six expected staged
+paths and nothing else unstaged or untracked; local `main`, `origin/main` and remote `main` at
+`76fa5a3`, with no independent local commits and `main` an ancestor of HEAD; expected origin and
+noreply identity. The export `.local/p138/m4d-verification-docs.diff` matched locally (56,642
+bytes, SHA-256 `124a7fa7…6b92`). The accepted tree, paths, blob hashes and prompt-history prefix
+are saved under `.local/p139/`.
+
+Range checks against fresh `origin/main`: `51042a8`, `b1775009` and `3d6e8395` all carry the
+noreply author and committer and the Claude Code `Co-Authored-By` trailer; with the staged commit,
+the range touches only the 15 reviewed paths; the workflow diff only adds the M4d installed-wheel
+step; no migration, dependency, lockfile, Dockerfile, Compose, registry or container-smoke change;
+no tracked `.local` files, credentials, binaries, build outputs or backups; `.env.example`
+unchanged. Both workflows trigger on push; the five jobs are enabled (the only `if:` is cleanup's
+`always()`); integration runs `pytest -m integration` with `EG_REQUIRE_INTEGRATION=1`;
+`tests/test_retrieval_postgres.py` is integration-marked; the existing wheel checks and all six
+container steps remain. Range Gitleaks (`origin/main..HEAD`, no suppression) found no leaks.
+Staged-change checks are reported in the Prompt 139 handoff.
+
+Publication order and stop conditions: commit the six staged paths; recheck remote refs; push only
+`feat/snapshot-retrieval`; require all five jobs of its push-triggered CI and secret-scan runs for
+the exact new SHA to succeed within a 25-minute bounded monitor; only then fetch again, require
+remote `main` still at `76fa5a3`, local `main` equal to `origin/main`, the remote feature ref equal
+to the verified commit, a clean tree and unchanged reviewed blobs; fast-forward `main` with `git
+merge --ff-only` and push it; monitor the main runs under the same bound. Any failure, skip,
+cancellation, timeout or ref mismatch stops the sequence without repair, rerun or main update. No
+commit identifier, push, merge or CI result is recorded here.

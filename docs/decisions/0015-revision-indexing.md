@@ -11,8 +11,8 @@
   [Main CI evidence](#main-ci-evidence-at-76fa5a3)); the earlier
   [feature-branch evidence at `600a366`](#feature-branch-ci-evidence-at-600a366) is historical.
   The M4d specification is accepted at review (Prompt 133); its implementation (Prompts 134–135)
-  was accepted at external review for a local commit in Prompt 136, pending PostgreSQL and CI
-  verification ([ADR-0016](0016-snapshot-retrieval.md)).
+  was accepted at external review in Prompt 136 and is verified in feature-branch CI at
+  `3d6e8395`, not merged ([ADR-0016](0016-snapshot-retrieval.md#feature-branch-ci-evidence-at-3d6e8395)).
   M4d–M4f implementation and overall M4 acceptance remain pending. Local Compose remains unverified.
 - **Date:** 2026-10-16
 - **Builds on:** [ADR-0014](0014-embedding-persistence.md) (M4b store), [ADR-0013](0013-embeddings.md)
@@ -330,6 +330,6 @@ index has no recovery path; provider calls are not exactly-once; reused vectors 
 against fresh provider output; cancellation and lease checks run at the accepted explicit
 boundaries and do not interrupt synchronous calls already running; the offline lexical-hash
 baseline makes no semantic-quality claim; and no live provider was verified. The M4d specification
-is accepted at review, with its implementation accepted for a local commit in Prompt 136 and its PostgreSQL and CI verification pending ([specification](../plan.md#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending), [ADR-0016](0016-snapshot-retrieval.md));
+is accepted at review, with its implementation accepted in Prompt 136 and verified in feature-branch CI at `3d6e8395`, not merged ([specification](../plan.md#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending), [ADR-0016](0016-snapshot-retrieval.md));
 M4d–M4f and overall M4 acceptance remain pending. No retrieval, benchmark, production-readiness or
 general security claim follows.
