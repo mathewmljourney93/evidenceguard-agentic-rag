@@ -1,24 +1,20 @@
 # ADR-0017: Synthetic corpus, anchor-to-chunk ground truth and retrieval evaluation
 
-- **Status:** **Accepted at external review in Prompt 147 for a local implementation commit**
-  (see [External review](#external-review-prompt-147)) and **published on
-  `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`; exact-commit CI is not fully green
-  and M4e is not merged to `main`** (see
-  [Exact-commit CI and test correction](#exact-commit-ci-at-c14821b7-and-test-correction-prompts-148149)).
-  At `c14821b7`, the PostgreSQL integration job passed (306 passed, including all 16 M4e cases)
-  but Ubuntu verify failed one test because its `os.lstat` double re-entered itself on Linux; no
-  production defect has been established. Claude Code's **Prompt 149 test-only correction is accepted at external review in Prompt 150
-  for a local commit**; corrected Linux verification has not run. Implemented by Claude Code
-  in Prompt 144 and corrected in Prompts 145 and 146 (see
-  [Prompt 145 corrections](#prompt-145-corrections) and
-  [Prompt 146 correction](#prompt-146-correction)). Implements the
+- **Status:** **Accepted at external review in Prompt 147**, corrected by Claude Code in
+  Prompt 149, with that test-only correction accepted in Prompt 150; **reviewed and verified
+  in feature-branch CI at `d1dcdfce`**, not merged to `main` (see
+  [Feature-branch CI evidence](#feature-branch-ci-evidence-at-d1dcdfce)). Main remains
+  `cf2b5743799e51c74e9f80638b0cc13be5827a71`. Claude Code implemented M4e in Prompt 144 and
+  corrected it in Prompts 145–146; OpenAI Codex assisted with acceptance documentation and
+  the local correction commit in Prompt 150 and publication/CI observation in Prompt 151.
+  Implements the
   [accepted M4e specification](../plan.md#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending)
-  (proposed in Prompt 140, corrected in Prompts 141–142, accepted at external review in Prompt
-  143). **Pending:** a green current-version CI run (Ubuntu tests, then its build and
-  installed-wheel steps, which were skipped at `c14821b7`), publication of the correction
-  (only a local commit is authorized in Prompt 150), and merge. Passing PostgreSQL tests supply no numerical Recall result; no database-derived
-  Recall value has been observed. M4d remains reviewed, verified in CI and on `main` at
-  `cf2b5743`; M4f and overall M4 acceptance remain pending. Local Compose remains unverified.
+  (proposed in Prompt 140, corrected in Prompts 141–142, accepted in Prompt 143).
+  The failed Ubuntu run and passing PostgreSQL results at `c14821b7` remain
+  [historical evidence](#exact-commit-ci-at-c14821b7-and-test-correction-prompts-148149).
+  **Remaining:** reviewed publication to `main`; no merge is authorized by Prompt 152.
+  Recall is report-only with no threshold; no numerical database-derived corpus Recall
+  value is supplied. M4f and overall M4 acceptance remain pending; local Compose is unverified.
 - **Date:** 2026-10-17
 - **Builds on:** [ADR-0016](0016-snapshot-retrieval.md) (M4d snapshot capture and retrieval),
   [ADR-0015](0015-revision-indexing.md) (M4c indexing), [ADR-0010](0010-document-ingestion.md)
@@ -292,6 +288,69 @@ the review:
 
 **Outstanding at acceptance (historical, before the Prompt 148 CI run):** no PostgreSQL test (none of the 16 M4e cases and none of the 306 integration tests against this version) had run, Linux and current-version CI were pending, the symlink refusal test had not run, and no database-derived Recall or isolation result existed. The implementation was not yet published or merged.
 
+## Feature-branch CI evidence at `d1dcdfce`
+
+Claude Code's Prompt 149 test correction was accepted in Prompt 150, committed locally as
+`cc924ede1ecf8d1488db88dcfa98f5b5f1a7f11c`, and published with the Prompt 151 history-only
+commit **`d1dcdfcebdd084f654060bcdf1a468c847291ee0`** on `feat/retrieval-evaluation`.
+The [ci run](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39059247990)
+and [secret-scan run](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39059247979)
+both used event **push**, that branch and exact SHA, **attempt 1**, and concluded **success**.
+All five jobs and their required steps completed successfully; no required step was skipped.
+
+**Attribution:** OpenAI Codex's Prompt 151 handoff reports retrieval of both workflow records,
+job/step records and logs through connected GitHub tools. For Prompt 152 the external reviewer
+independently retrieved and confirmed both workflow records, all five job/step records and all
+five logs through connected GitHub tooling. The reviewer ran no local project suite, build,
+wheel, PostgreSQL, Docker or provider check. Claude Code's Prompt 148 API-only observations and
+HTTP 403 record belong to the earlier `c14821b7` run, not this log evidence.
+
+- [Ubuntu verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39059247990/job/117473630036):
+  `2246 passed, 306 skipped in 30.80s`. Formatting, lint, type-check, Test, distribution build
+  and installed-wheel steps all succeeded. The build and wheel checks actually ran.
+- [Windows verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39059247990/job/117473630066):
+  `2245 passed, 307 skipped in 33.63s`. All verification, distribution build and installed-wheel
+  steps succeeded.
+- [PostgreSQL integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39059247990/job/117473630038):
+  `306 passed, 2246 deselected in 204.77s`. `tests/test_evaluation_postgres.py` shows all
+  16 M4e cases passing, with no failed or skipped integration cases.
+- [Container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39059247990/job/117473629927):
+  all six steps executed and succeeded: configuration, effective context, image build, image
+  checks, smoke and cleanup. The context summary reports 87 files and 19 planted fixtures
+  excluded. Production backfill enqueued one offline indexing job; the index became ready for
+  the ingested revision with two embeddings and a succeeded indexing job. The idle worker
+  exited with code 0 without OOM. These printed summaries and passing gates are not independent
+  inspection of raw database rows. The smoke covers ingestion/indexing and idle-worker shutdown
+  only, not retrieval or M4e evaluation; local Compose remains unverified.
+- [Gitleaks](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39059247979/job/117473629950):
+  65 commits scanned, no leaks found. Pattern scanning is not a general security guarantee.
+
+Both successful installed-wheel logs contain these output lines:
+
+```text
+offline embedding, canonical storage and indexing modules ran from the installed wheel
+retrieval modules imported and fusion ran from the installed wheel
+evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+offline migration SQL rendered from the installed wheel
+```
+
+The wheel's 2/3 Recall fixture is pure arithmetic, not measured corpus Recall from PostgreSQL.
+No numerical database-derived corpus Recall value was supplied. Ubuntu's relevant corpus and
+worker modules showed passing dots; the corrected test and symlink test were not individually
+named. The green suite is evidence for the paths exercised under the unchanged collection
+configuration, not an individually named test-log observation or a guarantee beyond those paths.
+The PostgreSQL cases exercise fresh loading, the read-only verifier, evaluation and isolation
+against stored chunks; the tests establish their asserted behaviour on the exercised fixtures.
+
+Recall remains report-only with no threshold. Ranking/mapping determinism has the documented
+limits, including variation across fresh loads. Offline hashing supplies no semantic-quality
+claim; no live provider was verified. No injection-resistance, production-readiness or general
+security guarantee follows. Trusted in-process snapshots cannot prove past eligibility; M5
+obligations remain. M4e is reviewed and verified on the feature branch, **not merged**; main
+remains `cf2b5743`. Reviewed publication to main is still required. M4f and overall M4 acceptance
+remain pending. Prompt 152 stages documentation for review only; it authorizes no commit,
+publication or merge.
+
 ## Exact-commit CI at `c14821b7` and test correction (Prompts 148–149)
 
 **Publication (Prompt 148).** Claude Code published `feat/retrieval-evaluation` at
@@ -349,14 +408,15 @@ no Docker, database or external provider contact):
   `Path.resolve()` uses on POSIX), reproduced the recursion with the old double's pattern and
   showed the new lexical key making no `os.lstat` call. This is a stand-in, not Linux execution.
 
-No Linux environment was available, so **corrected Linux execution remains pending**, as do the
-Ubuntu build and installed-wheel steps for the current tree.
+At Prompt 149 no Linux environment was available, so corrected Linux execution and the Ubuntu
+build and installed-wheel steps were pending. These gaps were subsequently closed for
+`d1dcdfce` by the feature-branch CI evidence above; the Windows results here remain historical.
 
 ## External review acceptance of the test correction (Prompt 150)
 
 The external reviewer inspected Claude Code's Prompt 149 correction export, independently
 matched its size and SHA-256, and **accepted the test-only correction for a local commit**.
-OpenAI Codex assists with acceptance documentation and the local commit in Prompt 150;
+OpenAI Codex assisted with acceptance documentation and the local commit in Prompt 150;
 Claude Code's implementation, correction and historical checks remain attributed to Claude Code.
 
 The reviewer also ran a standalone standard-library probe on Linux using the corrected mock
@@ -364,12 +424,13 @@ pattern. It confirmed that `Path.resolve()` terminates without recursion; the ta
 10 fewer bytes while every other `st_*` field is preserved; a non-target file's stat result
 is unchanged; the real file size remains unchanged and differs from the mocked size; and
 the target override is exercised. This was an isolated probe, not execution of the project
-test, suite, reader, wheel or database. **Corrected Linux project tests, the Ubuntu build and
-installed-wheel steps, and a green current-version CI run remain pending.** No project checks
-were repeated by Codex for this documentation/commit task. The exact-commit failure and passing
-PostgreSQL evidence above remain evidence for `c14821b7`, not the corrected version; no
+test, suite, reader, wheel or database. **At Prompt 150**, corrected Linux project tests, the
+Ubuntu build and installed-wheel steps, and green current-version CI were pending; these
+subsequently passed at `d1dcdfce` (feature-branch evidence above). No project checks were
+repeated by Codex for that documentation/commit task. The failed-run and passing PostgreSQL
+evidence in the historical `c14821b7` section remain scoped to that commit; no
 database-derived Recall number is supplied. M4e is published on the feature branch and is
-not merged to `main`. Prompt 150 authorizes a local correction commit only, with no push,
+not merged to `main`. Prompt 150 authorized a local correction commit only, with no push,
 CI rerun or merge. M4f and overall M4 acceptance remain pending; local Compose is unverified.
 
 ## Verification (Prompt 146)
