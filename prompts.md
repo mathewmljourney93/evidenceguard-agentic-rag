@@ -25102,3 +25102,1184 @@ the accepted M4c and M4d anchors and every stated limit are unchanged. No applic
 builds, installs, Docker, database or provider calls were run. Pre-commit checks are reported in
 the Prompt 143 handoff; the local commit covers exactly these five documentation and history
 paths. No commit identifier, push or publication is recorded here.
+
+### Prompt 143 outcome (Claude Code; from the Prompt 143 handoff)
+
+Claude Code committed the five documentation and history paths locally as `faa11b74`
+(`faa11b749784859fcce760edbf0f604670ab00c8`, parent `cf2b5743`, tree `0168ff40`, subject "docs:
+record M4d main results and accepted M4e evaluation specification") with the expected noreply
+author and committer. The handoff reported the pre-commit documentation checks, a clean working
+tree, `main` and `origin/main` unchanged at `cf2b5743`, a full-history Gitleaks scan of 61 commits
+with no leaks, and the incremental export `.local/p143/m4e-spec-acceptance.diff` (baseline tree
+`464bdcc9`, final `faa11b74`; 55,699 bytes, SHA-256
+`07eae47c53944dc1dbbb4f36342cffa8ccd24fb71242dd5776c79d23c8b99bc0`). Nothing was pushed or
+merged, and no M4e implementation was started.
+
+## Prompt 144 M4e implementation and staging for external review (Claude Code)
+
+External review acceptance of Prompt 143: the reviewer inspected the incremental diff
+`.local/p143/m4e-spec-acceptance.diff`, independently matched its checksum and size (55,699 bytes,
+SHA-256 `07eae47c…c0`) and confirmed that both final clarifications (the fresh-run versus verifier
+starting states, and enumeration of every embedding profile) are recorded. The reviewer ran no
+project suite, build, PostgreSQL, Docker or provider calls for this review.
+
+Stale-status correction identified for this task: the current plan sentence "M4e–M4f still need
+accepted specifications" was stale after the Prompt 143 acceptance; it now refers to M4f only. The
+README's matching "M4e–M4f remain unimplemented" wording was corrected in the same way.
+
+### Prompt 144 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 144: implement the accepted M4e corpus and retrieval evaluation; stage for external review
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and any applicable repository instructions.
+
+Implement the complete M4e specification accepted in Prompt 143. Stage the implementation and export a review diff. Do not commit, push or merge.
+
+## 1. Verify the starting state
+
+Check locally only. No fetch or remote operation is required.
+
+Expected:
+- Branch docs/m4e-corpus-spec.
+- HEAD:
+  faa11b749784859fcce760edbf0f604670ab00c8
+- Parent:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Tree:
+  0168ff40fe6d8fb8c95946f40f5f01c225499355
+- Working tree and index clean.
+- Local main and origin/main:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Expected author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Verify the Prompt 143 export:
+.local/p143/m4e-spec-acceptance.diff
+- 55,699 bytes.
+- SHA-256:
+  07eae47c53944dc1dbbb4f36342cffa8ccd24fb71242dd5776c79d23c8b99bc0
+
+Stop on a material starting-state mismatch without resetting or overwriting anything.
+
+Save a checkpoint under ignored .local/p144/, including refs, tree, status and existing prompt-history bytes.
+
+Create feat/retrieval-evaluation from HEAD if it does not already exist. Do not silently reuse an existing branch.
+
+## 2. Load the accepted contract
+
+Read the full accepted section:
+
+M4e corpus and retrieval-evaluation specification
+(ACCEPTED at review, Prompt 143; implementation pending)
+
+Anchor:
+#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending
+
+Also read the relevant source, packaging/import-boundary tests, database fixtures, current CI wheel commands and applicable ADRs.
+
+Use the accepted specification as the implementation contract. Do not redesign earlier milestones.
+
+If a genuine contradiction prevents implementation, explain it and stop the dependent work for review. Routine implementation details may be resolved within the accepted contract and recorded in ADR-0017.
+
+Do not load the entire prompts.md into context.
+
+## 3. Implement M4e
+
+Implement the accepted scope, including:
+
+### Corpus and strict parsing
+- Fictional corpus and authored ground truth under sample_data/.
+- TOML formats, qualified references and per-epoch cases as specified.
+- Exact quote, occurrence, multiline and parts validation.
+- Clean/injected single-paragraph variant relationship.
+- Size, path, symlink, regular-file and unexpected-file checks.
+- Framed, versioned corpus digest.
+- No real client data, credentials or personal data.
+- No markers inserted into document text merely to support anchor mapping.
+- No new third-party dependency.
+
+### Pure evaluation modules
+Use the accepted evidenceguard_retrieval.evaluation placement for:
+- Corpus/ground-truth contracts and byte parsing.
+- Anchor and parts resolution with per-entry body/header provenance.
+- Manifest verification and authorized gold/forbidden mappings.
+- Exact Fraction Recall@5/@8 and macro arithmetic.
+- Contract and isolation checks.
+- Canonical report construction and serialization.
+- Fixed privacy-safe errors.
+
+Preserve import boundaries. Pure modules do not perform filesystem, database or network access.
+
+### Test-only worker orchestration
+Implement:
+- run_fresh_two_epoch
+- verify_loaded
+- evaluate
+
+Preserve the accepted global lifecycle phases:
+- Validate first.
+- Refuse existing corpus state before writes.
+- Seed and create vendors through production seams.
+- Fully ingest/index all r1 revisions.
+- Capture and retain genuine initial snapshots before later revisions exist.
+- Apply later revisions through production ingestion/indexing.
+- Capture final snapshots.
+- Evaluate both retained epochs after replacement.
+
+No direct status editing, fabricated ready indexes, terminal-job resets, durable snapshot storage or automatic recovery.
+
+Read actual job/revision/index outcomes. Worker exit status alone is insufficient.
+
+### Read-only verifier
+- Use one consistent READ ONLY transaction through the existing unchanged helper.
+- No seed/create/enqueue/worker/DML calls.
+- Enumerate all corpus-tenant profiles and compare exactly with HASH_IDENTITY.
+- Verify expected metadata, content, lifecycle states, manifests, indexes, counts and canonical jobs.
+- Reject missing, partial, conflicting or extra state without changing rows.
+- Never recreate initial snapshots.
+- Keep production-seam reuse tests separate from verification.
+
+### Reports and failures
+- Successful Recall remains report-only with no threshold.
+- Empty gold is valid N/A.
+- Contract or isolation failure makes the question invalid, with null Recall.
+- Invalid questions are separate from empty-gold exclusions.
+- Any invalid question fails its group and suppresses both group macro values.
+- require_passing fails regardless of perfect results elsewhere.
+- Preserve observed ranked output; do not repair duplicates or discard forbidden results.
+- Unknown logical references remain explicit nulls.
+- Operational failures produce fixed errors rather than misleading reports.
+- Preserve process-control exceptions and avoid retaining raw exception content.
+
+### Determinism
+Preserve production UUIDs, timestamps and tie-breaking.
+
+Do not assert equality of IDs, digests, tied ranks or Recall across fresh databases. Canonical serialization applies to identical validated report values; repeated retrieval uses the same retained snapshots.
+
+## 4. Tests
+
+Implement the accepted database-independent and PostgreSQL test matrices.
+
+Use meaningful independent fixtures for:
+- Exact schemas and bounds.
+- Qualified cross-tenant references.
+- Epoch-specific gold and forbidden cases.
+- Quote occurrences and invalid Unicode.
+- Cross-chunk parts and repeated table headers.
+- Corpus digest framing.
+- Recall examples, including 2/3, shared chunks, fewer than k results, empty gold and all-empty suites.
+- Failure reports and require_passing.
+- Error and report privacy.
+- Filesystem safety.
+- Initial/final lifecycle ordering.
+- Real ingestion/indexing and snapshot-relative retrieval.
+- Read-only verifier success and unchanged-state refusals.
+- Separate production-seam reuse.
+- Variant isolation.
+- Same-snapshot repeatability.
+- Fresh-load structural comparisons without false exact-ranking promises.
+
+Use existing disposable-database guards unchanged. Partial states must use the accepted test hooks or legitimate production seams.
+
+Do not weaken existing tests, replace production retrieval with a test ranking implementation, or manipulate terminal rows to make assertions pass.
+
+## 5. Packaging and CI
+
+Implement only the accepted changes:
+- sample_data included in the sdist, not the wheel.
+- Narrow installed-wheel extension importing the three pure evaluation modules from site-packages and checking the independent 2/3 Recall fixture.
+- Existing verify and integration jobs collect the new tests.
+- Necessary packaging/import-boundary tests.
+
+Keep all existing CI checks intact.
+
+No new job, dependency, lockfile, migration, Dockerfile, Compose, container-smoke or registry change.
+
+If a narrow strict-mypy file-list adjustment is necessary, record it explicitly as a tooling-only implementation detail.
+
+Do not install an eg-eval command in M4e.
+
+## 6. Documentation
+
+Create ADR-0017 describing:
+- Accepted decisions and implementation structure.
+- Material implementation choices.
+- Error/privacy boundaries.
+- Lifecycle and verifier contracts.
+- Report/Recall semantics and determinism limits.
+- Tests actually executed versus PostgreSQL/CI checks still pending.
+
+Update README, plan and threat model to say:
+- M4e implemented and staged for external review.
+- Not yet accepted as an implementation, committed, published or merged.
+- Local results are attributed and scoped accurately.
+- Unexecuted PostgreSQL and CI checks remain pending.
+
+Preserve the accepted specification heading and anchor.
+
+Correct the stale current plan phrase:
+“M4e–M4f still need accepted specifications”
+to refer only to M4f.
+
+Do not rewrite historical evidence or unrelated documentation.
+
+Preserve:
+- M4d main evidence at cf2b5743.
+- Trusted-snapshot past-eligibility limitation and M5 obligations.
+- Container smoke covers ingestion/indexing, not retrieval evaluation.
+- Local Compose unverified.
+- No semantic-quality, injection-resistance, production-readiness or general security guarantee.
+- M4f and overall M4 acceptance pending.
+
+## 7. Scope control
+
+Expected implementation files are those listed in the accepted specification:
+- Three pure evaluation modules and their __init__.py.
+- Worker evaluation module.
+- sample_data corpus and ground truth.
+- Accepted evaluation tests.
+- Packaging tests and narrow packaging/CI changes.
+- ADR-0017.
+- README, plan, threat model and prompts.md.
+
+No M4f adapter, live provider, M5 workflow, approval endpoints, GUI, deployment or earlier milestone redesign.
+
+Document any necessary file outside the anticipated list and why the accepted contract requires it. Do not silently broaden scope.
+
+## 8. Local verification
+
+Use the locked environment and existing repository tooling.
+
+Run:
+- Ruff formatting and lint.
+- Strict mypy.
+- Focused new/affected database-independent tests.
+- Full local suite.
+- Integration collection without database contact.
+- Distribution build.
+- Clean installed-wheel checks outside the checkout using locked dependencies and wheel installation without dependency changes.
+- The new CI wheel script, preferably extracted verbatim from ci.yml.
+
+Store build artifacts and scratch environments outside tracked paths.
+
+No local Docker, database or external-provider contact is authorized. The offline HashingEmbedder may run.
+
+Do not change dependencies or install missing tools automatically to overcome an unavailable environment. Report any blocker precisely.
+
+Clearly distinguish:
+- Tests that passed.
+- Tests collected but skipped.
+- Checks written but never executed.
+- Local Windows evidence versus future Linux, PostgreSQL and CI evidence.
+
+Do not manufacture Recall observations from unexecuted database tests.
+
+## 9. Prompt history and staging
+
+Append without changing earlier bytes:
+- Prompt 143 outcome, attributed to its handoff.
+- Reviewer acceptance of the incremental diff: inspected, checksum and size matched, both clarifications recorded; no project checks run by the reviewer.
+- The remaining stale-status correction identified for this task.
+- This Prompt 144 verbatim, including Written for.
+- Actual implementation outcome, choices, checks and pending verification.
+
+Use inline backticked commit identifiers in your own notes.
+
+Before staging completion verify:
+- Intended paths only.
+- No artifacts, credentials, unexpected binaries or tracked .local files.
+- Earlier prompts.md bytes remain an identical prefix.
+- Links and anchors resolve.
+- Status and scope remain accurate.
+- UTF-8 without BOM and no CR for authored text.
+- git diff --cached --check.
+- Staged Gitleaks without suppression or scanner changes.
+
+Stage the implementation. Leave no unstaged changes.
+
+Do not commit, push or merge.
+
+## 10. Review export and handoff
+
+Export directly from Git:
+.local/p144/m4e-implementation.diff
+
+- Baseline:
+  faa11b749784859fcce760edbf0f604670ab00c8
+- Final: completed staged tree.
+- Exclude prompts.md.
+- UTF-8 without BOM, no CR.
+
+Report:
+- Starting-state verification and branch.
+- Implemented behaviour.
+- Material choices or specification deviations.
+- Exact checks and results, including test counts and skips.
+- Build and isolated-wheel evidence.
+- PostgreSQL/CI tests written but unexecuted.
+- Scope and unchanged files.
+- Staged paths and final tree.
+- Export baseline/final tree, statistics, byte size and SHA-256.
+- Final Git state and remaining limitations.
+
+End:
+Mathew: return this output plus .local/p144/m4e-implementation.diff to the external reviewer.
+
+### Prompt 144 outcome (Claude Code; implementation staged, external review pending)
+
+Starting state matched locally: branch `docs/m4e-corpus-spec`, HEAD `faa11b74` (parent
+`cf2b5743`, tree `0168ff40`), clean index and working tree, `main` and `origin/main` at `cf2b5743`,
+the expected origin and noreply identity, and the Prompt 143 export (55,699 bytes, SHA-256
+`07eae47c…c0`). A checkpoint is saved under `.local/p144/`. Claude Code created
+`feat/retrieval-evaluation` from `faa11b74`.
+
+Implemented, uncommitted and staged for external review, not accepted, committed, published or
+merged (see ADR-0017):
+
+- `sample_data/`: the fictional corpus (two demo tenants, three vendors, 12 revisions), the clean
+  and injected variants (one inserted paragraph) and the authored ground truth (17 anchors, 10
+  questions, per-epoch cases, qualified cross-tenant forbidden references); in the sdist, not the
+  wheel.
+- `evidenceguard_retrieval.evaluation` (`corpus`, `anchors`, `recall`): pure strict parsing and
+  validation, exact anchor and `parts` resolution with body and header routes, manifest
+  verification, exact `Fraction` Recall@5 and Recall@8, the framed `eg-corpus-digest-v1`,
+  contract and isolation checks and the canonical `eg-retrieval-eval-v1` report.
+- `evidenceguard_worker.evaluation` (test-only, no command): the safe file reader,
+  `run_fresh_two_epoch`, the read-only `verify_loaded` and `evaluate`.
+- Tests: three database-independent files, `tests/test_evaluation_postgres.py` (16 integration
+  cases) and new packaging boundary tests; one narrow installed-wheel CI step; ADR-0017; README,
+  plan and threat-model status.
+
+Material choices recorded in ADR-0017: fixed-code failure conversion outside the handler; the
+verifier does not read job `payload` (the accepted checks compare kind, key and status only); two
+PostgreSQL tests reset the validated disposable database within a test exactly as the shared
+fixtures do. No file outside the anticipated list was needed; no mypy configuration change.
+
+Checks run locally on Windows (locked environment; no Docker, database or provider contact; only
+the offline `HashingEmbedder` ran): Ruff format (170 files: 134 Python and 36 Markdown) and lint clean; strict mypy (134 source
+files) clean; focused M4e and packaging tests 147 passed, 1 skipped (symlink creation unavailable
+to this Windows account); full suite 2135 passed, 308 skipped (306 integration without a database,
+the symlink test and the POSIX-only signal test); collection 2443 tests, 306 integration; `uv
+build` (sdist with the 16 `sample_data` files, wheel without them); an isolated installed-wheel
+environment outside the checkout (locked dependencies offline with `--require-hashes`, wheel with
+`--no-deps`) passed every CI wheel command extracted from `ci.yml`, including the new M4e step.
+
+Written but never executed: all 16 PostgreSQL tests, so no fresh load, verifier, isolation or
+Recall observation exists; the CI jobs and Gitleaks in CI are pending; the symlink refusal test
+has not run (it needs Linux CI or a symlink-capable account). Staging checks and the review export
+are reported in the Prompt 144 handoff. Nothing is committed, pushed or merged.
+
+### Prompt 144 handoff (Claude Code; from the Prompt 144 handoff)
+
+The handoff reported the implementation staged on `feat/retrieval-evaluation` (HEAD `faa11b74`,
+33 staged paths, staged tree `d513eaa2e7b341a944efce17f11f26c0077782c7`), nothing unstaged or
+untracked, `main` and `origin/main` unchanged at `cf2b5743`, staged Gitleaks with no leaks after a
+test variable named `secret` was renamed (no suppression), and the review export
+`.local/p144/m4e-implementation.diff` (baseline `faa11b74`, final staged tree `d513eaa2`,
+excluding prompts.md; 32 files, 4,638 insertions, 17 deletions; 242,353 bytes, SHA-256
+`6a0ce6a3b595b9f986d808d842e8aa5eac59dbe243b9a1ca5d50c57b7188d811`). Its local checks are
+historical; no PostgreSQL test had run. Nothing was committed, pushed or merged.
+
+## Prompt 145 M4e review findings and corrections (Claude Code)
+
+External review of Prompt 144: the reviewer inspected `.local/p144/m4e-implementation.diff` and
+matched its size and checksum. Isolated probes ran extracted actual code with infrastructure
+doubles: the corpus parser accepted the actual sample corpus after an anchor quote was changed to
+text absent from its source (the parser probe supplied minimal domain-enum and validator
+doubles); `ensure_vendor` returned the created UUID although the transaction context raised
+during commit; and the actual evaluation `_read`/`_guard` with the unchanged production
+`read_snapshot` helper converted setup `KeyboardInterrupt` and `SystemExit` into
+`EvaluationError` when rollback failed. The aggregate file-limit finding is from source
+inspection. These were isolated probes, not project tests or database execution; the reviewer ran
+no project suite, build, Docker, PostgreSQL or provider call. M4e implementation acceptance remains
+pending.
+
+### Prompt 145 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 145: correct M4e validation, transaction outcomes, read cleanup and aggregate file bounds
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and applicable repository instructions.
+
+Correct the four review findings below, add regression tests, verify locally, stage the corrections and export an incremental diff.
+
+M4e implementation acceptance remains pending. No commit, push, merge or database contact.
+
+## 1. Starting state
+
+Verify locally, without fetching.
+
+Expected:
+- Branch feat/retrieval-evaluation.
+- HEAD:
+  faa11b749784859fcce760edbf0f604670ab00c8
+- Parent:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Staged tree:
+  d513eaa2e7b341a944efce17f11f26c0077782c7
+- Same 33 staged paths from Prompt 144.
+- Nothing unstaged or untracked outside ignored local artifacts.
+- main and origin/main:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Origin and noreply identity unchanged.
+
+Verify:
+.local/p144/m4e-implementation.diff
+- 242,353 bytes.
+- SHA-256:
+  6a0ce6a3b595b9f986d808d842e8aa5eac59dbe243b9a1ca5d50c57b7188d811
+
+Save the baseline tree, paths, per-file blobs, current prompt-history bytes and affected Prompt 144 modules under ignored .local/p145/.
+
+Stop on a material mismatch without overwriting anything.
+
+## 2. Reviewer findings and scope
+
+The reviewer inspected the implementation diff and matched its size/checksum.
+
+Isolated probes used extracted actual code with infrastructure doubles:
+- The corpus parser accepted the actual sample corpus after an anchor quote was changed to text absent from its source.
+- ensure_vendor returned the created UUID despite the transaction context raising during commit.
+- Actual evaluation _read/_guard with the unchanged production read_snapshot helper converted setup KeyboardInterrupt and SystemExit into EvaluationError when rollback failed.
+
+These were isolated probes, not project tests or database execution. The parser probe supplied minimal domain-enum/validator doubles. The reviewer ran no project suite, build, Docker, PostgreSQL or provider call.
+
+The aggregate file-limit finding is from source inspection.
+
+## 3. Finding A: complete validation before database writes
+
+Current build_suite validates schemas and references but never locates or maps anchors. run_fresh_two_epoch then starts writing, while missing/ambiguous/unmappable anchors are discovered only during evaluate.
+
+Implement one complete pure validation path before fresh-run database work:
+- Locate every anchor against its selected variant's source text.
+- Check occurrences, parts, ordering/gaps and chunk containment using the pinned production chunker.
+- Validate every defined anchor, not just anchors used as gold.
+- Reject missing, ambiguous, out-of-range and unmappable annotations before freshness queries, seed_demo, vendor creation or any other write.
+- Validate both selected clean and injected content correctly.
+- Keep later stored-manifest verification; offline validation does not replace it.
+
+Keep module boundaries clean. Avoid a corpus/anchors circular import. A small pure orchestration helper in the appropriate evaluation module is allowed if necessary; record the placement.
+
+Ensure run_fresh_two_epoch cannot bypass this complete validation merely because its caller supplied a Suite object. Do not rely only on a function name or a frozen outer dataclass.
+
+Add regression tests:
+- Nonexistent parent quote.
+- Repeated quote without occurrence.
+- Out-of-range occurrence.
+- Invalid parts or a boundary-crossing quote without required parts.
+- An invalid anchor used only as forbidden evidence.
+- A valid committed corpus and both variants.
+- Invalid suite rejected before any database/creation seam is called, using a factory double that records or refuses access.
+
+Keep ground truth independent of retrieval output.
+
+## 4. Finding B: return vendor identity only after successful transaction completion
+
+Current ensure_vendor appends the new ID inside the transaction. If commit raises, the ordinary exception is swallowed and the nonempty list causes that ID to be returned.
+
+Correct it:
+- A created ID is returned only after the transaction context exits successfully.
+- Commit/flush/setup/cleanup failure must not become successful creation.
+- Ordinary failures produce a fresh fixed corpus_vendor_failed outside exception handlers, without original message, cause or context.
+- DuplicateVendorSlugError still rolls back before lookup in a new transaction.
+- Re-read and compare the concurrent vendor's name.
+- Process-control exceptions must not be classified as a duplicate or ordinary success.
+
+Add deterministic tests with transaction doubles:
+- Successful create and commit.
+- create_vendor failure.
+- Commit failure after create_vendor returned an ID.
+- Duplicate slug followed by matching re-read.
+- Duplicate slug followed by mismatched or missing re-read.
+- Private marker text absent from the normalized exception chain and formatted traceback.
+- Process-control propagation.
+
+Do not change the existing vendor store or transaction helper.
+
+## 5. Finding C: preserve read failures through cleanup
+
+The new evaluation read wrappers repeat the cleanup problem fixed in M4d:
+a process-control exception from setup can be replaced by rollback/close failure, which _guard then converts to EvaluationError.
+
+Correct all evaluation read paths:
+- Freshness reads.
+- Job/status reads.
+- verify_loaded.
+- Stored-span reads.
+- Any other read_snapshot use introduced here.
+
+Required behaviour:
+- Preserve the original process-control exception object when ordinary cleanup failure replaces it.
+- Preserve the first recorded semantic refusal if ordinary cleanup also fails.
+- Normalize ordinary operational failures to fresh fixed errors outside handlers.
+- If the body succeeded but cleanup failed, return no successful result.
+- Do not inspect arbitrary exception chains to infer semantic failures.
+- Do not log or retain raw SQL/backend exception text.
+- Do not change document_views.read_snapshot or earlier M4d source.
+
+Use a focused evaluation-owned boundary, taking account of the actual helper's setup and cleanup order. Reuse an appropriate existing public seam only if its contract fits; do not import private M4d machinery casually.
+
+Add a deterministic fake-session matrix covering:
+- KeyboardInterrupt and SystemExit.
+- SET TRANSACTION, clock_timestamp and body.
+- Ordinary rollback failure, close failure, both, and no cleanup failure.
+- Process control raised by cleanup itself.
+- Semantic refusal plus cleanup failure.
+- Ordinary setup/body failures remaining private.
+- Successful body plus cleanup failure returning no result.
+
+Test actual evaluation entry points or their shared boundary, not only an unrelated helper.
+
+## 6. Finding D: enforce aggregate bounds before payload reads
+
+Current load_suite reads the files, then build_suite checks MAX_FILE_SET_BYTES. Thus an over-budget file set is read before rejection.
+
+After reading the bounded manifest and deriving the file set:
+- Validate paths and file metadata.
+- Check per-file bounds and selected effective-set aggregate size before reading document/ground-truth payloads.
+- Account explicitly for clean files additionally needed to validate injected replacements.
+- Bound actual reads and recheck actual byte lengths and totals.
+- Do not use an unrestricted read_bytes followed only by a length check where the read can exceed its budget.
+- Preserve symlink, regular-file, containment and unexpected-file rejection.
+- Keep the digest's accepted effective-file-set definition unchanged.
+
+Add instrumented reader tests proving:
+- An aggregate-over-budget set is rejected before content payload reads.
+- Individual oversized files are rejected before reading.
+- A file whose actual data exceeds its reported size remains bounded and fails.
+- Normal clean/injected corpus loading still succeeds.
+
+No need to claim protection against every concurrent filesystem attack. State the implemented bounds precisely.
+
+## 7. Scope and documentation
+
+Limit changes to affected evaluation modules, their tests, ADR-0017, README, plan, threat model and prompts.md.
+
+Existing tests/test_evaluation_postgres.py may change only for coverage directly required by these corrections. Do not alter earlier milestone code, migrations, dependencies, lockfile, Docker, Compose, registry or container smoke.
+
+Keep the accepted M4e heading/anchor and semantics unchanged.
+
+Record:
+- Implemented in Prompt 144, corrected in Prompt 145.
+- Implementation still awaiting external acceptance.
+- Prompt 144 checks historical and separately attributed.
+- PostgreSQL tests still never run.
+- No database-derived Recall or isolation results.
+- Linux, symlink coverage and current-version CI pending where unexecuted.
+- Local Compose unverified; M4f and overall M4 acceptance pending.
+
+The job-payload omission remains explicitly disclosed for review; do not silently redefine the accepted read list.
+
+## 8. Regression comparison and local verification
+
+For the new regressions, compare against the saved Prompt 144 modules in ignored temporary copies:
+- Report which fail before and pass after.
+- Do not count already-passing cases as reproduced failures.
+- Restore corrected files and verify their hashes.
+
+Run in the locked environment:
+- Focused affected tests.
+- Ruff format and lint.
+- Strict mypy.
+- Full local suite.
+- Integration collection without database contact.
+- Build.
+- Clean installed-wheel checks outside the checkout, including the existing M4e CI wheel script.
+- A narrow installed-wheel probe of a corrected boundary if appropriate.
+
+No local Docker, PostgreSQL, external provider or dependency changes. Only offline hashing may run.
+
+Report tests executed versus collected/skipped accurately.
+
+## 9. History, staging and export
+
+Append:
+- Prompt 144 outcome, attributed to its handoff.
+- Reviewer findings and isolated-probe scope.
+- This Prompt 145 verbatim, including Written for.
+- Actual corrections, regression comparison, checks and remaining limitations.
+
+Preserve all earlier prompts.md bytes.
+
+Verify:
+- Intended scope and unchanged files by blob.
+- Earlier history prefix.
+- Links/anchors.
+- Privacy/artifacts.
+- UTF-8 without BOM, no CR.
+- git diff --cached --check.
+- Staged Gitleaks without suppression or scanner changes.
+
+Stage corrections; leave nothing unstaged. No commit, push or merge.
+
+Export directly from Git:
+.local/p145/m4e-corrections.diff
+
+- Baseline tree:
+  d513eaa2e7b341a944efce17f11f26c0077782c7
+- Final: completed staged tree.
+- Exclude prompts.md.
+- UTF-8 without BOM, no CR.
+
+Report corrections, exact regression evidence, checks/results, unexecuted PostgreSQL coverage, scope/byte identity, final staged tree/paths, export statistics/size/SHA-256 and Git state.
+
+End:
+Mathew: return this output plus .local/p145/m4e-corrections.diff to the external reviewer.
+
+### Prompt 145 outcome (Claude Code; corrections staged, external review pending)
+
+Starting state matched locally: branch `feat/retrieval-evaluation`, HEAD `faa11b74` (parent
+`cf2b5743`), staged tree `d513eaa2` with the same 33 paths, nothing unstaged or untracked, `main`
+and `origin/main` at `cf2b5743`, the expected origin and noreply identity, and the Prompt 144
+export (242,353 bytes, SHA-256 `6a0ce6a3…d811`). The baseline tree, paths, blobs, prompt-history
+bytes and the Prompt 144 modules are saved under `.local/p145/`.
+
+Corrections (details in ADR-0017, "Prompt 145 corrections"):
+
+- A: `anchors.validate_suite` locates and maps every defined anchor against the selected
+  variant's text chunked offline by the pinned chunker; `Suite.source_files` and
+  `anchors.revalidate` let `run_fresh_two_epoch`, `verify_loaded` and `evaluate` re-derive the
+  suite from its own bytes before any database access; `load_suite` returns only a completely
+  validated suite.
+- B: `ensure_vendor` returns a created ID only after the transaction context exits successfully.
+- C: every evaluation read uses `_read`, an evaluation-owned boundary over the unchanged
+  `read_snapshot` with a session proxy that records process control; process control survives
+  cleanup failure as the same object, fixed refusals survive it, and anything else is a fresh
+  `corpus_read_failed` with no result.
+- D: `load_suite` checks paths, file types, per-file bounds and the effective set's 4 MiB total
+  before any payload read beyond the 64 KiB-checked `corpus.toml`; each read is bounded by its
+  checked size (`corpus_file_changed` on mismatch).
+
+Files changed relative to the Prompt 144 tree: the corpus, anchors and worker evaluation modules,
+`tests/test_evaluation_anchors.py`, the new `tests/test_evaluation_worker.py`, ADR-0017, README,
+plan, threat model and prompts.md. `recall.py`, `tests/test_evaluation_postgres.py`, packaging,
+CI and every earlier-milestone file are unchanged. The job-payload omission remains disclosed.
+
+Regression comparison (new worker-boundary file, 80 cases) against temporary copies of the
+Prompt 144 modules: 26 passed and 54 failed before, 80 passed after; 37 failures reproduce the
+findings (A 4, B 1, C 29, D 3); 17 are not counted (15 where the Prompt 144 callers' `_guard`
+already normalized ordinary failures, 2 using seams that did not exist).
+
+Checks run locally on Windows (locked environment; no Docker, database or provider contact; only
+the offline `HashingEmbedder` ran): Ruff format (171 files: 135 Python and 36 Markdown) and lint
+clean; strict mypy (135 source files) clean; focused tests 237 passed, 1 skipped (symlink); full
+suite 2225 passed, 308 skipped (306 integration, the symlink test, the POSIX-only signal test);
+collection 2533 tests, 306 integration; `uv build`; the isolated installed-wheel environment
+passed every extracted CI wheel command and a narrow probe of the corrected validation and read
+boundary.
+
+Still pending: all 16 PostgreSQL tests (never run; no database-derived Recall or isolation
+result), the symlink refusal test, Linux and current-tree CI, Gitleaks in CI, local Compose, M4f
+and overall M4 acceptance. Staging checks and the export are reported in the Prompt 145 handoff.
+Nothing is committed, pushed or merged.
+
+### Prompt 145 handoff (Claude Code; from the Prompt 145 handoff)
+
+The handoff reported the four corrections staged on `feat/retrieval-evaluation` (HEAD
+`faa11b74`, 34 staged paths, staged tree `702d28eccaaa1e91b1758a73b79afe6badf61963`), 10 paths
+changed by blob from `d513eaa2`, a regression comparison in which 37 of 80 new worker-boundary
+cases reproduced the findings against the Prompt 144 modules, local checks (focused 237 passed and
+1 skipped; full suite 2225 passed and 308 skipped; build and installed-wheel checks), staged
+Gitleaks with no leaks, and the export `.local/p145/m4e-corrections.diff` (baseline tree
+`d513eaa2`, excluding prompts.md; 9 files, 1,139 insertions, 99 deletions; 117,524 bytes, SHA-256
+`f379f194b0d4a5b7a4c6f56ea3a5797cf4181d8d4fb9b7970e6eff3277a1b5fa`). Its checks are historical; no
+PostgreSQL test had run. Nothing was committed, pushed or merged.
+
+## Prompt 146 M4e clock-result read-boundary correction (Claude Code)
+
+External review of Prompt 145: the reviewer inspected `.local/p145/m4e-corrections.diff` and
+independently matched its size and checksum. The complete-validation, vendor-commit and
+bounded-file-reading corrections address their findings. An isolated probe of the actual
+corrected read boundary with the unchanged production `read_snapshot` helper confirmed 24 of 24
+combinations of `KeyboardInterrupt`/`SystemExit`, SET/clock execute/body and ordinary cleanup
+failures preserving the same exception object, and found one remaining case failing for both
+exception classes: the clock query's `result.scalar_one()` raising process control after
+`execute()` returned, followed by an ordinary rollback failure, gave `EvaluationError` instead of
+the original object. The probe's generic sessionmaker double needed a correction before it
+produced those results. These were isolated probes with infrastructure doubles, not project
+tests; the reviewer ran no project suite, build, PostgreSQL, Docker or provider call.
+Implementation acceptance remains pending.
+
+### Prompt 146 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 146: close the M4e clock-result process-control gap
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and applicable repository instructions.
+
+Make the narrow correction below, add regression coverage, verify locally, stage and export an incremental diff.
+
+Implementation acceptance remains pending. No commit, push, merge or database contact.
+
+## 1. Starting state
+
+Verify locally without fetching:
+
+- Branch feat/retrieval-evaluation.
+- HEAD:
+  faa11b749784859fcce760edbf0f604670ab00c8
+- Staged tree:
+  702d28eccaaa1e91b1758a73b79afe6badf61963
+- Same 34 staged paths from Prompt 145.
+- Nothing unstaged or untracked outside ignored local artifacts.
+- main and origin/main:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Origin and noreply identity unchanged.
+
+Verify:
+.local/p145/m4e-corrections.diff
+- 117,524 bytes.
+- SHA-256:
+  f379f194b0d4a5b7a4c6f56ea3a5797cf4181d8d4fb9b7970e6eff3277a1b5fa
+
+Save baseline tree, paths, blob hashes, history prefix and the current worker evaluation module under ignored .local/p146/.
+
+Stop on a material mismatch without overwriting anything.
+
+## 2. Review outcome
+
+The reviewer inspected the Prompt 145 correction diff and independently matched its size and checksum.
+
+The complete-validation, vendor-commit and bounded-file-reading corrections address their findings.
+
+An isolated probe of the actual corrected read boundary with the unchanged production read_snapshot helper confirmed:
+- 24/24 combinations of KeyboardInterrupt/SystemExit, SET/clock execute/body, and ordinary cleanup failures preserve the same exception object.
+- A further case still fails for both exception classes:
+  the clock query's result.scalar_one() raises process control after execute() returned successfully, then rollback raises an ordinary exception.
+- The observed result is EvaluationError instead of the original process-control object.
+
+The initial isolated probe required a correction to its generic sessionmaker double before producing those results. These are isolated probes with infrastructure doubles, not project tests.
+
+The reviewer ran no project suite, build, PostgreSQL, Docker or provider calls.
+
+## 3. Narrow correction
+
+The production helper performs:
+
+session.execute(select(func.clock_timestamp())).scalar_one()
+
+_RecordingSession records exceptions from session methods, but not exceptions raised by methods of the returned result. Thus the pending outcome misses process control from scalar_one.
+
+Extend the evaluation-owned boundary so:
+- KeyboardInterrupt and SystemExit from the setup clock result's scalar_one are recorded.
+- The same exception object escapes even if ordinary rollback, close or both fail.
+- No successful value is returned.
+- Ordinary scalar_one failures remain fresh private corpus_read_failed errors.
+- Existing semantic-refusal precedence remains intact.
+- Body result-consumption failures remain covered by the body boundary.
+- Existing successful SQLAlchemy result access and iteration continue working.
+
+Use the smallest appropriate adaptation around the setup result/session proxy. Do not build a general SQLAlchemy abstraction or alter:
+- document_views.read_snapshot;
+- earlier M4d code;
+- SQLAlchemy itself;
+- the accepted transaction order.
+
+Do not infer process-control or semantic outcomes by searching arbitrary exception chains.
+
+## 4. Regression tests
+
+Extend tests/test_evaluation_worker.py.
+
+Use a result double whose scalar_one raises; execute itself must return successfully.
+
+Cover:
+- KeyboardInterrupt and SystemExit.
+- No cleanup failure, rollback failure, close failure and both.
+- The same object escaping in every case.
+- Ordinary clock-result failure with the same cleanup combinations.
+- No raw marker text, cause or context on normalized ordinary failures.
+- At least one real evaluation entry-point path using this shared boundary.
+- A successful result path to guard against proxy incompatibility.
+
+Retain all Prompt 145 regression tests unchanged unless a necessary improvement is explained.
+
+Compare these new cases against the saved Prompt 145 worker module:
+- Report actual failed/passed cases.
+- Count only behavioural reproductions as regressions.
+- Restore corrected files and verify hashes.
+
+No PostgreSQL test changes are required.
+
+## 5. Scope and documentation
+
+Change only:
+- apps/worker/evidenceguard_worker/evaluation.py
+- tests/test_evaluation_worker.py
+- docs/decisions/0017-retrieval-evaluation.md
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Documentation changes are limited to the correction, actual verification results and accurate implementation status.
+
+Keep Prompt 144–145 results historical and attributed.
+Record corrected through Prompt 146, still staged and awaiting implementation acceptance.
+
+Preserve the accepted specification heading/anchor and all other accepted behaviour.
+
+Keep unchanged:
+- Corpus data and pure evaluation modules.
+- Recall/report semantics.
+- CI, packaging, dependencies and lockfile.
+- Earlier milestone code, migrations, Docker and Compose.
+- All PostgreSQL tests.
+- No database-derived Recall or isolation claim.
+- Local Compose unverified; M4f and overall M4 acceptance pending.
+
+## 6. Local verification
+
+In the locked environment run:
+- Focused affected evaluation tests.
+- Ruff format and lint.
+- Strict mypy.
+- Full local suite.
+- Build and clean installed-wheel commands.
+- A narrow installed-wheel probe exercising scalar_one process control followed by ordinary cleanup failure.
+
+No local database, Docker, external provider or dependency changes. Only offline hashing may run.
+
+Report actual executed results, skips and blockers. All 16 M4e PostgreSQL tests remain unexecuted unless later CI runs them.
+
+## 7. Prompt history and staging
+
+Append:
+- Prompt 145 outcome, attributed to its handoff.
+- This review finding and isolated-probe scope.
+- This Prompt 146 verbatim, including Written for.
+- Actual correction, regression comparison, checks and remaining limits.
+
+Preserve all earlier bytes.
+
+Check:
+- Authorized scope and unchanged blobs.
+- History prefix.
+- Links/anchors.
+- Privacy/artifacts.
+- UTF-8 without BOM, no CR.
+- git diff --cached --check.
+- Staged Gitleaks without suppression or scanner changes.
+
+Stage; leave nothing unstaged. Do not commit, push or merge.
+
+## 8. Incremental export
+
+Export directly from Git:
+.local/p146/m4e-read-result-correction.diff
+
+- Baseline:
+  702d28eccaaa1e91b1758a73b79afe6badf61963
+- Final: completed staged tree.
+- Exclude prompts.md.
+- UTF-8 without BOM, no CR.
+
+Report the correction, exact regression comparison, local checks, unexecuted PostgreSQL coverage, byte identity, staged paths/tree, export statistics/size/SHA-256 and Git state.
+
+End:
+Mathew: return this output plus .local/p146/m4e-read-result-correction.diff to the external reviewer.
+
+### Prompt 146 outcome (Claude Code; correction staged, external review pending)
+
+Starting state matched locally: branch `feat/retrieval-evaluation`, HEAD `faa11b74`, staged tree
+`702d28ec` with the same 34 paths, nothing unstaged or untracked, `main` and `origin/main` at
+`cf2b5743`, the expected origin and noreply identity, and the Prompt 145 export (117,524 bytes,
+SHA-256 `f379f194…b5fa`). The baseline tree's blob list, staged paths, history prefix and the
+Prompt 145 worker module are saved under `.local/p146/`.
+
+Correction: in `apps/worker/evidenceguard_worker/evaluation.py` the read boundary's session
+proxy now wraps each result `execute` returns in `_RecordingResult`, whose method calls record a
+process-control exception exactly as session calls do (iteration is passed through; the body
+boundary covers result consumption in the body). `KeyboardInterrupt` and `SystemExit` from the
+setup clock result's `scalar_one()` now escape as the same object through rollback, close or
+both failing; an ordinary `scalar_one()` failure is a fresh private `corpus_read_failed`; refusal
+precedence is unchanged. `read_snapshot`, M4d code, SQLAlchemy and the transaction order are
+unchanged.
+
+Regression comparison: 19 new cases in `tests/test_evaluation_worker.py` (the result double's
+`scalar_one` raises after `execute` returns). Against the saved Prompt 145 worker module 12
+failed and 7 passed; corrected, 19 passed. All 12 failures are behavioural reproductions (6
+boundary cases with cleanup failure, 6 entry-point cases through `verify_loaded`,
+`run_fresh_two_epoch` and `evaluate`); the 7 already passing are not counted. The 80 Prompt 145
+cases pass with both modules and are unchanged; the result double gained an optional
+`scalar_one` failure (default none).
+
+Checks run locally on Windows (locked environment; no Docker, database or provider contact; only
+the offline `HashingEmbedder` ran): Ruff format (171 files) and lint clean; strict mypy (135 source
+files) clean; focused tests 256 passed, 1 skipped (symlink); full suite 2244 passed, 308 skipped
+(306 integration, the symlink test, the POSIX-only signal test); collection 2552 tests, 306
+integration; `uv build`; the isolated installed-wheel environment passed every extracted CI wheel
+command, the Prompt 146 clock-result probe and the Prompt 145 probe.
+
+Changed relative to `702d28ec`: the worker evaluation module, `tests/test_evaluation_worker.py`,
+ADR-0017, README, plan, threat model and prompts.md. Still pending: all 16 PostgreSQL tests
+(never run; no database-derived Recall or isolation result), the symlink refusal test, Linux and
+current-tree CI, Gitleaks in CI, local Compose, M4f and overall M4 acceptance. Staging checks and
+the export are reported in the Prompt 146 handoff. Nothing is committed, pushed or merged.
+
+### Prompt 146 handoff (Claude Code; from the Prompt 146 handoff)
+
+The handoff reported the clock-result read-boundary correction staged on
+`feat/retrieval-evaluation` (HEAD `faa11b74`, 34 staged paths, staged tree
+`ade7bf826ab639e23fb71e4a9c947c5df1b0b289`), 7 paths changed by blob from `702d28ec`, a
+regression comparison of 19 new cases (Prompt 145 worker module: 12 failed, 7 passed; corrected:
+19 passed; all 12 failures behavioural), local Windows checks (focused 256 passed and 1 skipped;
+full suite 2244 passed and 308 skipped, being 306 integration tests, the symlink test and the
+POSIX-only signal test; Ruff and strict mypy clean; build and clean installed-wheel checks and a
+narrow `scalar_one()` probe passed), staged Gitleaks with no leaks, and the export
+`.local/p146/m4e-read-result-correction.diff` (baseline tree `702d28ec`, excluding prompts.md; 6
+files, 212 insertions, 38 deletions; 66,626 bytes, SHA-256
+`a1ab2dee69b572319d31e704cbbd08bb66562ca399c74ae788fe6f7619e6700f`). No PostgreSQL test had run.
+Nothing was committed, pushed or merged.
+
+## Prompt 147 M4e implementation acceptance and local commit authorization (Claude Code)
+
+External review acceptance: the reviewer accepted the complete M4e implementation from Prompt
+144 with the Prompt 145–146 corrections, scoped to a local implementation commit pending
+current-version CI. Review scope: the reviewer inspected the implementation and correction diffs
+and independently matched all three sizes and checksums (`.local/p144/m4e-implementation.diff`,
+242,353 bytes, `6a0ce6a3…d811`; `.local/p145/m4e-corrections.diff`, 117,524 bytes,
+`f379f194…b5fa`; `.local/p146/m4e-read-result-correction.diff`, 66,626 bytes, `a1ab2dee…700f`).
+The Prompt 145 review used isolated extracted-code probes with infrastructure doubles to
+reproduce the missing-anchor validation, vendor commit failure and read-cleanup process-control
+failures; the Prompt 146 review confirmed 24 of 24 existing control combinations but reproduced
+the additional clock-result `scalar_one()` gap for both exception classes; the final review
+inspected the result wrapper and new tests, and final isolated probes confirmed the 24 existing
+combinations plus both previously failing `scalar_one()` cases now preserving the same exception
+object. These probes are not the project suite, Claude Code's regression comparisons, the
+installed-wheel checks or PostgreSQL evidence; the reviewer ran no project suite, build,
+PostgreSQL, Docker or provider call. Acceptance also rests on the attributed local Windows results
+reported by Claude Code, not independent reruns. The disclosed verifier scope is accepted: it
+checks each canonical job's kind, idempotency key and `succeeded` status but does not read job
+`payload`; no payload validation is claimed.
+
+Acceptance is for a local implementation commit only, not publication or merge. Outstanding:
+all 16 M4e PostgreSQL tests have never run; none of the 306 integration tests has run against this
+version; Linux and current-version CI are pending; the symlink refusal test has not run; no
+database-derived Recall or isolation result exists; local Compose is unverified; M4f and overall
+M4 acceptance remain pending.
+
+### Prompt 147 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 147: record M4e implementation acceptance and commit locally
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and applicable repository instructions.
+
+The external reviewer accepts the complete M4e implementation from Prompt 144 with the Prompt 145–146 corrections, scoped to a local implementation commit pending current-version CI.
+
+Update acceptance wording and prompt history, verify byte identity, commit locally and export an incremental diff.
+
+No implementation changes, push or merge are authorized.
+
+## 1. Starting-state verification
+
+Check locally only. No fetch or remote operation.
+
+Expected:
+- Branch feat/retrieval-evaluation.
+- HEAD:
+  faa11b749784859fcce760edbf0f604670ab00c8
+- Parent:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Accepted staged tree:
+  ade7bf826ab639e23fb71e4a9c947c5df1b0b289
+- Exactly the 34 staged paths from Prompt 146.
+- Nothing unstaged or untracked outside ignored local artifacts.
+- main and origin/main:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Expected author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Stop on a material mismatch without resetting or overwriting anything.
+
+Save the accepted tree, staged paths, every staged file's blob hash and current prompt-history bytes under ignored .local/p147/.
+
+Verify all three reviewed exports:
+- .local/p144/m4e-implementation.diff
+  242,353 bytes
+  SHA-256:
+  6a0ce6a3b595b9f986d808d842e8aa5eac59dbe243b9a1ca5d50c57b7188d811
+
+- .local/p145/m4e-corrections.diff
+  117,524 bytes
+  SHA-256:
+  f379f194b0d4a5b7a4c6f56ea3a5797cf4181d8d4fb9b7970e6eff3277a1b5fa
+
+- .local/p146/m4e-read-result-correction.diff
+  66,626 bytes
+  SHA-256:
+  a1ab2dee69b572319d31e704cbbd08bb66562ca399c74ae788fe6f7619e6700f
+
+## 2. Acceptance scope and reviewer evidence
+
+Record accurately:
+- The reviewer inspected the implementation and correction diffs and independently matched all three checksums and sizes.
+- Prompt 145 review used isolated extracted-code probes with infrastructure doubles to reproduce missing-anchor validation, vendor commit failure and read-cleanup process-control failures.
+- Prompt 146 review confirmed 24/24 existing control combinations but reproduced the additional clock-result scalar_one gap for both exception classes.
+- Final review inspected the result wrapper and new tests.
+- Final isolated probes confirmed 24/24 existing combinations plus both previously failing scalar_one cases now preserve the same exception object.
+- These probes are not the project suite, Claude Code's regression comparisons, installed-wheel checks or PostgreSQL evidence.
+- The reviewer ran no project suite, build, PostgreSQL, Docker or provider calls.
+
+Acceptance also rests on the attributed local Windows results reported by Claude Code, not independent reruns by the reviewer.
+
+Keep the disclosed verifier deviation:
+- It checks canonical job kind, idempotency key and succeeded status but does not read job payload.
+- This is accepted as the disclosed verification scope for this slice; do not claim payload validation was performed or change implementation here.
+
+## 3. Permitted changes
+
+Only these five paths may differ from accepted tree ade7bf82:
+- README.md
+- docs/decisions/0017-retrieval-evaluation.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+All other 29 staged files must remain byte-identical, including:
+- Corpus and ground truth.
+- Pure and worker evaluation modules.
+- All tests.
+- Workflow and packaging changes.
+
+Do not alter source, tests, fixtures, CI, configuration, dependencies or implementation choices.
+
+## 4. Acceptance wording
+
+Update current status consistently:
+- M4e specification accepted in Prompt 143.
+- Implementation by Claude Code in Prompt 144.
+- Corrected in Prompts 145–146.
+- Accepted at external review in Prompt 147 for a local implementation commit.
+- Not published or merged.
+- PostgreSQL, Linux and current-version CI pending.
+- All 16 M4e PostgreSQL tests have never run.
+- All 306 integration tests remain unexecuted against this version.
+- No database-derived Recall or isolation result exists.
+- Symlink refusal coverage remains unexecuted locally.
+- Historical Windows evidence remains separately attributed.
+
+ADR-0017 becomes Accepted, scoped to the local implementation commit and pending CI. Add an external-review section containing the review scope above.
+
+Keep the Prompt 146 local results as historical evidence:
+- Focused: 256 passed, 1 skipped.
+- Full suite: 2244 passed, 308 skipped.
+- Skips: 306 integration, symlink test and POSIX-only signal test.
+- Ruff and strict mypy passed.
+- Build and clean installed-wheel checks passed.
+- New scalar_one regression comparison: old module 12 failed/7 passed; corrected module 19 passed.
+- Prompt 145 regression evidence remains separately scoped.
+
+Preserve:
+- Accepted specification heading and anchor.
+- M4d main evidence at cf2b5743.
+- Report-only Recall and no threshold.
+- Determinism limits across fresh databases.
+- Trusted-snapshot limit and M5 obligations.
+- Container smoke ingestion/indexing scope and idle-worker-only shutdown coverage.
+- Local Compose unverified.
+- No semantic-quality, injection-resistance, production-readiness or general security guarantee.
+- M4f and overall M4 acceptance pending.
+
+## 5. Prompt history
+
+Append without changing earlier bytes:
+- Prompt 146 outcome, attributed to its handoff.
+- Reviewer acceptance and precise review/probe scope.
+- Local-commit-only acceptance and outstanding verification.
+- This Prompt 147 verbatim, including Written for.
+- A pre-commit note that contains no future commit SHA or publication outcome.
+
+Use inline backticked commit references in your own notes.
+
+## 6. Checks before committing
+
+Verify:
+- Exactly the same 34 staged paths.
+- Only the five authorized documentation/history files differ from accepted tree.
+- All other 29 files match their accepted blob hashes.
+- Earlier prompts.md bytes are an identical prefix.
+- Links and anchors resolve.
+- Status and scope are consistent.
+- No claim of PostgreSQL execution, CI success, publication, merge or overall M4 acceptance.
+- Privacy/artifact scan clean.
+- UTF-8 without BOM and no CR in authored text.
+- git diff --cached --check clean.
+- Staged Gitleaks passes without suppression or scanner changes.
+- Effective author and committer match the noreply identity.
+
+Do not rerun application tests, builds or installed-wheel checks: the implementation must remain byte-identical.
+
+No installs, Docker, database or provider calls.
+
+## 7. Local commit
+
+Commit exactly the 34 expected paths.
+
+Suggested subject:
+feat: add synthetic retrieval corpus and snapshot evaluation
+
+Use the expected noreply author and committer. Credit Claude Code's actual implementation and correction work using the existing repository convention. Preserve earlier OpenAI Codex attribution.
+
+After committing verify:
+- Parent exactly:
+  faa11b749784859fcce760edbf0f604670ab00c8
+- Exactly the expected 34 paths.
+- All 29 non-documentation/history files remain byte-identical to the accepted tree.
+- Working tree clean.
+- main and origin/main unchanged.
+- Full-history Gitleaks passes without suppression.
+
+No push, merge, amend, rebase, tag or branch deletion.
+
+## 8. Incremental export and handoff
+
+Export directly from Git:
+.local/p147/m4e-commit-incremental.diff
+
+- Baseline:
+  ade7bf826ab639e23fb71e4a9c947c5df1b0b289
+- Final: new local commit.
+- Exclude prompts.md.
+- UTF-8 without BOM, no CR.
+
+Report:
+- Starting-state checks.
+- Acceptance wording.
+- Checks actually run.
+- Implementation byte identity.
+- Commit SHA, parent, tree, subject, paths, identity and attribution.
+- Export baseline/final commit, statistics, byte size and SHA-256.
+- Final branch, clean working tree and unchanged main refs.
+- PostgreSQL, Linux, symlink and current-version CI limitations.
+- Publication remains unauthorized.
+
+End:
+Mathew: return this output plus .local/p147/m4e-commit-incremental.diff to the external reviewer.
+
+### Prompt 147 pre-commit note (Claude Code; before the local commit)
+
+Starting state matched locally: branch `feat/retrieval-evaluation`, HEAD `faa11b74` (parent
+`cf2b5743`), staged tree `ade7bf82` with the 34 Prompt 146 paths, nothing unstaged or untracked,
+`main` and `origin/main` at `cf2b5743`, the expected origin and noreply identity, and all three
+reviewed exports matching their sizes and SHA-256 values. The accepted tree, staged paths, every
+staged blob hash and the prompt-history prefix are saved under `.local/p147/`.
+
+Claude Code updated only the acceptance wording in README, docs/plan.md, docs/threat-model.md and
+ADR-0017 (now Accepted for a local implementation commit, pending current-version CI, with an
+external-review section) and appended this history. The Prompt 144–146 local results remain
+historical and attributed; no application test, build, installed-wheel check, install, Docker,
+database or provider call was run for this prompt, because the implementation files are
+byte-identical to the accepted tree. Pre-commit checks are reported in the Prompt 147 handoff; the
+local commit covers exactly the 34 accepted paths. No commit identifier, push or publication is
+recorded here.

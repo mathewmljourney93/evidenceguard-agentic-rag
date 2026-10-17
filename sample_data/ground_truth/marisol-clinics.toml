@@ -1,0 +1,72 @@
+# Authored ground truth for the fictional tenant Marisol Clinics (ADR-0017). Its canaries must
+# never appear in Halverson Freight's results.
+format = "eg-ground-truth-v1"
+tenant = "marisol-clinics"
+
+[[anchors]]
+ref = "marisol-clinics/lumenvale-cloud/incident-response@r1#seventy-two-hours"
+quote = "Lumenvale will notify Marisol Clinics of a confirmed security incident within seventy-two (72) hours."
+
+[[anchors]]
+ref = "marisol-clinics/lumenvale-cloud/incident-response@r2#thirty-six-hours"
+quote = "Lumenvale will notify Marisol Clinics of a confirmed security incident within thirty-six (36) hours."
+
+[[anchors]]
+ref = "marisol-clinics/lumenvale-cloud/incident-response@r2#canary-36h"
+quote = "LV-TB-CANARY-36H"
+
+[[anchors]]
+ref = "marisol-clinics/lumenvale-cloud/security-overview@r1#aes-256"
+quote = "Customer data for Marisol Clinics is encrypted at rest with AES-256."
+
+[[anchors]]
+ref = "marisol-clinics/lumenvale-cloud/security-overview@r1#canary-aes"
+quote = "LV-TB-CANARY-AES"
+
+[[questions]]
+vendor = "lumenvale-cloud"
+id = "INC-01"
+text = "What is the breach-notification timeframe?"
+search_queries = ["breach notification timeframe", "notify security incident hours"]
+
+  [[questions.cases]]
+  epochs = ["initial"]
+  expected_status = "vendor_claim"
+  gold = ["marisol-clinics/lumenvale-cloud/incident-response@r1#seventy-two-hours"]
+  forbidden = ["marisol-clinics/lumenvale-cloud/incident-response@r2#thirty-six-hours"]
+  acceptable_claims = [
+    { text = "The vendor states it notifies within 72 hours.", refs = [
+      "marisol-clinics/lumenvale-cloud/incident-response@r1#seventy-two-hours",
+    ] },
+  ]
+  wrong_claims = []
+
+  [[questions.cases]]
+  epochs = ["final"]
+  expected_status = "vendor_claim"
+  gold = ["marisol-clinics/lumenvale-cloud/incident-response@r2#thirty-six-hours"]
+  forbidden = ["marisol-clinics/lumenvale-cloud/incident-response@r1#seventy-two-hours"]
+  acceptable_claims = [
+    { text = "The vendor states it notifies within 36 hours.", refs = [
+      "marisol-clinics/lumenvale-cloud/incident-response@r2#thirty-six-hours",
+    ] },
+  ]
+  wrong_claims = []
+
+[[questions]]
+vendor = "lumenvale-cloud"
+id = "ENC-01"
+text = "Is customer data encrypted at rest?"
+search_queries = ["encryption at rest"]
+
+  [[questions.cases]]
+  epochs = ["initial", "final"]
+  expected_status = "vendor_claim"
+  gold = ["marisol-clinics/lumenvale-cloud/security-overview@r1#aes-256"]
+  forbidden = ["halverson-freight/lumenvale-cloud/security-overview@r1#industry-standard-encryption"]
+  acceptable_claims = [
+    { text = "The vendor states that customer data is encrypted at rest with AES-256.", refs = [
+      "marisol-clinics/lumenvale-cloud/security-overview@r1#aes-256",
+    ] },
+  ]
+  wrong_claims = []

@@ -220,7 +220,8 @@ retrieved by the external reviewer; see the
 
 These results cover the exercised paths only; they are not a production-readiness or general
 security guarantee. M4d has since been verified in CI and on `main` at `cf2b5743` (below); M4e's
-specification is accepted with implementation pending, and M4f and overall M4 acceptance remain
+specification is accepted and its implementation is accepted at external review (Prompt 147) for
+a local commit, not published or merged (PostgreSQL, Linux and current-version CI pending), and M4f and overall M4 acceptance remain
 pending. Local Compose remains unverified.
 
 | Threat | Mitigation |
@@ -272,12 +273,23 @@ cannot prove that vectors came from the claimed queries. The evidence digest che
 class of tampering only; no hash protects against a database writer outside the application.
 Repeated table headers are a separate span that citations must not quote across.
 
-## Corpus and retrieval evaluation (M4e, specification accepted; implementation pending)
+## Corpus and retrieval evaluation (M4e, implementation accepted for a local commit; PostgreSQL and CI pending)
 
 The [M4e specification](plan.md#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending)
 was proposed in Prompt 140, corrected in Prompts 141–142 and accepted at external review in
-Prompt 143. **Its implementation is pending: none of its mitigations or checks has been executed,
-and no M4e corpus, module, test or command exists yet.** It specifies a fictional synthetic corpus
+Prompt 143. **Claude Code implemented it in Prompt 144 and corrected it in Prompts 145–146
+([ADR-0017](decisions/0017-retrieval-evaluation.md)); the
+implementation was accepted at external review in Prompt 147 for a local implementation commit and
+is not published or merged. Only its database-independent checks ran, locally; none of its
+PostgreSQL mitigations (fresh loading, the read-only verifier, isolation checks against stored
+chunks) has been executed: all 16 M4e PostgreSQL tests have never run, Linux and current-version
+CI are pending, and no database-derived Recall or isolation result exists.** The Prompt 145 corrections locate and map every anchor offline before any
+database write, keep process-control exceptions (including, since Prompt 146, those raised by the setup
+clock result) and fixed refusals through read-cleanup failures,
+return a created vendor only after its transaction commits, and check per-file sizes (64 KiB for
+the manifest, 256 KiB per document or ground-truth file) and the effective set's 4 MiB total before
+reading any payload, each read bounded by its checked size. A concurrent file-system change between
+check and read is detected only as an observed size or type mismatch, not prevented. It specifies a fictional synthetic corpus
 only (no real client data, credentials or personal
 data), loading solely through the existing production lifecycle into guarded disposable test
 databases, isolation checks that fail on foreign-tenant, cross-vendor or forbidden chunks and

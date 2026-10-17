@@ -1,0 +1,127 @@
+# Synthetic M4e evaluation corpus (ADR-0017). Every tenant, vendor, person, number and sentence
+# here is fictional; nothing comes from a real client, vendor or document.
+format = "eg-corpus-v1"
+
+[[tenants]]
+slug = "halverson-freight"
+
+  [[tenants.vendors]]
+  slug = "ferrowick-payroll"
+  name = "Ferrowick Payroll"
+
+    [[tenants.vendors.documents]]
+    key = "soc2-letter"
+    title = "SOC 2 Type II Report Letter"
+    source_type = "third_party_report"
+    media_type = "text/markdown"
+
+      [[tenants.vendors.documents.revisions]]
+      n = 1
+      version_label = "FY2025"
+      effective_date = 2026-02-01
+
+  [[tenants.vendors]]
+  slug = "lumenvale-cloud"
+  name = "Lumenvale Cloud"
+
+    [[tenants.vendors.documents]]
+    key = "company-newsletter"
+    title = "Lumenvale Quarterly Newsletter"
+    source_type = "vendor_statement"
+    media_type = "text/markdown"
+
+      [[tenants.vendors.documents.revisions]]
+      n = 1
+
+    [[tenants.vendors.documents]]
+    key = "data-retention-policy"
+    title = "Data Retention Policy"
+    source_type = "vendor_statement"
+    media_type = "text/markdown"
+
+      [[tenants.vendors.documents.revisions]]
+      n = 1
+      version_label = "2025.1"
+      effective_date = 2025-01-15
+
+      [[tenants.vendors.documents.revisions]]
+      n = 2
+      version_label = "2026.1"
+      effective_date = 2026-03-01
+
+    [[tenants.vendors.documents]]
+    key = "dpa-summary"
+    title = "Data Processing Agreement Summary"
+    source_type = "contract"
+    media_type = "text/markdown"
+
+      [[tenants.vendors.documents.revisions]]
+      n = 1
+      effective_date = 2025-06-30
+
+    [[tenants.vendors.documents]]
+    key = "incident-response"
+    title = "Incident Response"
+    source_type = "vendor_statement"
+    media_type = "text/markdown"
+
+      [[tenants.vendors.documents.revisions]]
+      n = 1
+
+    [[tenants.vendors.documents]]
+    key = "security-overview"
+    title = "Security Overview"
+    source_type = "vendor_statement"
+    media_type = "text/markdown"
+
+      [[tenants.vendors.documents.revisions]]
+      n = 1
+
+    [[tenants.vendors.documents]]
+    key = "subprocessors"
+    title = "Subprocessors"
+    source_type = "vendor_statement"
+    media_type = "text/markdown"
+
+      [[tenants.vendors.documents.revisions]]
+      n = 1
+
+    [[tenants.vendors.documents]]
+    key = "trust-center-page"
+    title = "Trust Center"
+    source_type = "vendor_statement"
+    media_type = "text/markdown"
+
+      [[tenants.vendors.documents.revisions]]
+      n = 1
+
+[[tenants]]
+slug = "marisol-clinics"
+
+  [[tenants.vendors]]
+  slug = "lumenvale-cloud"
+  name = "Lumenvale Cloud"
+
+    [[tenants.vendors.documents]]
+    key = "incident-response"
+    title = "Incident Response"
+    source_type = "vendor_statement"
+    media_type = "text/markdown"
+
+      [[tenants.vendors.documents.revisions]]
+      n = 1
+
+      [[tenants.vendors.documents.revisions]]
+      n = 2
+
+    [[tenants.vendors.documents]]
+    key = "security-overview"
+    title = "Security Overview"
+    source_type = "vendor_statement"
+    media_type = "text/markdown"
+
+      [[tenants.vendors.documents.revisions]]
+      n = 1
+
+[variants.injected]
+replaces = ["halverson-freight/lumenvale-cloud/trust-center-page@r1"]

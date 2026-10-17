@@ -60,6 +60,7 @@ include = [
     "/alembic.ini",
     "/tests",
     "/docs/decisions",
+    "/sample_data",
 ]
 
 [tool.ruff]

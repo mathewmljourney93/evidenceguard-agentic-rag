@@ -140,3 +140,42 @@ def test_m4d_retrieval_modules_keep_the_accepted_boundaries(
     module = Path(package.__file__).parent / "retrieval.py"
     third_party = _module_imports(module) - set(sys.stdlib_module_names)
     assert third_party <= allowed
+
+
+@pytest.mark.parametrize(
+    ("module", "allowed"),
+    [
+        ("evaluation/__init__.py", set()),
+        ("evaluation/corpus.py", {"evidenceguard_domain"}),
+        ("evaluation/anchors.py", {"evidenceguard_domain", "evidenceguard_retrieval"}),
+        ("evaluation/recall.py", {"evidenceguard_retrieval"}),
+    ],
+)
+def test_m4e_evaluation_modules_are_pure(module: str, allowed: set[str]) -> None:
+    """M4e (ADR-0017): corpus, anchor and Recall code use only the standard library, the domain
+    and the retrieval package: no file-system, database or network module, and no ``os``."""
+    assert evidenceguard_retrieval.__file__ is not None
+    imported = _module_imports(Path(evidenceguard_retrieval.__file__).parent / module)
+    assert imported - set(sys.stdlib_module_names) <= allowed
+    assert not imported & {"os", "pathlib", "shutil", "io", "socket", "urllib", "http", "sqlite3"}
+
+
+def test_m4e_worker_orchestration_keeps_the_accepted_boundaries() -> None:
+    """M4e (ADR-0017): the test-only orchestrator may use persistence, retrieval and SQLAlchemy,
+    never the API."""
+    assert evidenceguard_worker.__file__ is not None
+    module = Path(evidenceguard_worker.__file__).parent / "evaluation.py"
+    third_party = _module_imports(module) - set(sys.stdlib_module_names)
+    assert third_party <= {
+        "evidenceguard_domain",
+        "evidenceguard_persistence",
+        "evidenceguard_retrieval",
+        "evidenceguard_worker",
+        "sqlalchemy",
+    }
+
+
+def test_no_evaluation_command_is_installed() -> None:
+    """M4e has no installed command; the PostgreSQL tests are the only callers."""
+    names = {script.name for script in entry_points(group="console_scripts")}
+    assert "eg-eval" not in names

@@ -1,0 +1,223 @@
+# Authored ground truth for the fictional tenant Halverson Freight (ADR-0017). Labels are written
+# by hand; nothing here is derived from retrieval output or model judgments.
+format = "eg-ground-truth-v1"
+tenant = "halverson-freight"
+
+[[anchors]]
+ref = "halverson-freight/lumenvale-cloud/data-retention-policy@r1#one-eighty-days"
+quote = "Customer data is retained for one hundred and eighty (180) days after termination."
+
+[[anchors]]
+ref = "halverson-freight/lumenvale-cloud/data-retention-policy@r2#ninety-days"
+quote = "Customer data is retained for ninety (90) days after termination."
+
+[[anchors]]
+ref = "halverson-freight/lumenvale-cloud/dpa-summary@r1#thirty-days"
+quote = "The processor deletes customer personal data within thirty (30) days after the end of the services."
+
+[[anchors]]
+ref = "halverson-freight/lumenvale-cloud/security-overview@r1#tls-in-transit"
+quote = "All connections use TLS 1.2 in transit."
+
+[[anchors]]
+ref = "halverson-freight/lumenvale-cloud/security-overview@r1#industry-standard-encryption"
+quote = "Lumenvale applies industry-standard encryption to protect customer data."
+
+[[anchors]]
+ref = "halverson-freight/lumenvale-cloud/trust-center-page@r1#iso-27001"
+quote = "Lumenvale Cloud is ISO 27001 certified."
+
+[[anchors]]
+ref = "halverson-freight/lumenvale-cloud/trust-center-page@r1#hipaa"
+quote = "Lumenvale Cloud is HIPAA compliant."
+
+[[anchors]]
+ref = "halverson-freight/lumenvale-cloud/incident-response@r1#notify-promptly"
+quote = "Lumenvale will notify affected customers promptly after confirming a security incident."
+
+[[anchors]]
+ref = "halverson-freight/lumenvale-cloud/subprocessors@r1#northwind-row"
+quote = "| Northwind Hosting | Infrastructure hosting | EU (Frankfurt) |"
+
+[[anchors]]
+ref = "halverson-freight/lumenvale-cloud/subprocessors@r1#quillmail-row"
+quote = "| Quillmail | Transactional email | US (Oregon) |"
+
+[[anchors]]
+ref = "halverson-freight/ferrowick-payroll/soc2-letter@r1#unqualified-opinion"
+quote = "The independent auditor issued an unqualified SOC 2 Type II opinion for Ferrowick Payroll covering January to December 2025."
+
+[[anchors]]
+ref = "halverson-freight/ferrowick-payroll/soc2-letter@r1#ferrowick-aes"
+quote = "Ferrowick Payroll encrypts payroll records at rest with AES-256."
+
+[[questions]]
+vendor = "lumenvale-cloud"
+id = "RET-01"
+text = "How long is customer data retained after termination?"
+search_queries = ["data retention after termination", "retention period days"]
+
+  [[questions.cases]]
+  epochs = ["initial"]
+  expected_status = "conflicting"
+  gold = [
+    "halverson-freight/lumenvale-cloud/data-retention-policy@r1#one-eighty-days",
+    "halverson-freight/lumenvale-cloud/dpa-summary@r1#thirty-days",
+  ]
+  forbidden = ["halverson-freight/lumenvale-cloud/data-retention-policy@r2#ninety-days"]
+  acceptable_claims = [
+    { text = "The retention policy states 180 days after termination, while the DPA summary states 30 days.", refs = [
+      "halverson-freight/lumenvale-cloud/data-retention-policy@r1#one-eighty-days",
+      "halverson-freight/lumenvale-cloud/dpa-summary@r1#thirty-days",
+    ] },
+  ]
+  wrong_claims = []
+
+  [[questions.cases]]
+  epochs = ["final"]
+  expected_status = "conflicting"
+  gold = [
+    "halverson-freight/lumenvale-cloud/data-retention-policy@r2#ninety-days",
+    "halverson-freight/lumenvale-cloud/dpa-summary@r1#thirty-days",
+  ]
+  forbidden = ["halverson-freight/lumenvale-cloud/data-retention-policy@r1#one-eighty-days"]
+  acceptable_claims = [
+    { text = "The retention policy states 90 days after termination, while the DPA summary states 30 days.", refs = [
+      "halverson-freight/lumenvale-cloud/data-retention-policy@r2#ninety-days",
+      "halverson-freight/lumenvale-cloud/dpa-summary@r1#thirty-days",
+    ] },
+  ]
+  wrong_claims = [
+    { text = "Customer data is retained for 180 days after termination.", refs = [
+      "halverson-freight/lumenvale-cloud/dpa-summary@r1#thirty-days",
+    ] },
+  ]
+
+[[questions]]
+vendor = "lumenvale-cloud"
+id = "ENC-01"
+text = "Is customer data encrypted at rest?"
+search_queries = ["encryption at rest", "data encrypted at rest"]
+
+  [[questions.cases]]
+  epochs = ["initial", "final"]
+  expected_status = "missing"
+  gold = []
+  forbidden = [
+    "halverson-freight/ferrowick-payroll/soc2-letter@r1#ferrowick-aes",
+    "marisol-clinics/lumenvale-cloud/security-overview@r1#canary-aes",
+  ]
+  acceptable_claims = []
+  wrong_claims = [
+    { text = "Customer data is encrypted at rest.", refs = [
+      "halverson-freight/lumenvale-cloud/security-overview@r1#industry-standard-encryption",
+    ] },
+  ]
+
+[[questions]]
+vendor = "lumenvale-cloud"
+id = "CMP-01"
+text = "Does the vendor hold an ISO 27001 certification?"
+search_queries = ["ISO 27001 certification"]
+
+  [[questions.cases]]
+  epochs = ["initial", "final"]
+  expected_status = "vendor_claim"
+  gold = ["halverson-freight/lumenvale-cloud/trust-center-page@r1#iso-27001"]
+  forbidden = []
+  acceptable_claims = [
+    { text = "The vendor states that it is ISO 27001 certified.", refs = [
+      "halverson-freight/lumenvale-cloud/trust-center-page@r1#iso-27001",
+    ] },
+  ]
+  wrong_claims = []
+
+[[questions]]
+vendor = "lumenvale-cloud"
+id = "CMP-02"
+text = "Is the vendor HIPAA compliant?"
+search_queries = ["HIPAA compliance"]
+
+  [[questions.cases]]
+  epochs = ["initial", "final"]
+  expected_status = "vendor_claim"
+  gold = ["halverson-freight/lumenvale-cloud/trust-center-page@r1#hipaa"]
+  forbidden = []
+  acceptable_claims = [
+    { text = "The vendor states that it is HIPAA compliant.", refs = [
+      "halverson-freight/lumenvale-cloud/trust-center-page@r1#hipaa",
+    ] },
+  ]
+  wrong_claims = []
+
+[[questions]]
+vendor = "lumenvale-cloud"
+id = "INC-01"
+text = "What is the breach-notification timeframe?"
+search_queries = ["breach notification timeframe", "notify customers security incident hours"]
+
+  [[questions.cases]]
+  epochs = ["initial", "final"]
+  expected_status = "missing"
+  gold = []
+  forbidden = ["marisol-clinics/lumenvale-cloud/incident-response@r2#canary-36h"]
+  acceptable_claims = []
+  wrong_claims = [
+    { text = "The vendor notifies customers within 36 hours.", refs = [
+      "halverson-freight/lumenvale-cloud/incident-response@r1#notify-promptly",
+    ] },
+  ]
+
+[[questions]]
+vendor = "lumenvale-cloud"
+id = "BCP-01"
+text = "What is the recovery time objective for production?"
+search_queries = ["recovery time objective"]
+
+  [[questions.cases]]
+  epochs = ["initial", "final"]
+  expected_status = "missing"
+  gold = []
+  forbidden = []
+  acceptable_claims = []
+  wrong_claims = []
+
+[[questions]]
+vendor = "lumenvale-cloud"
+id = "SUB-01"
+text = "Which subprocessors are used, and in which regions?"
+search_queries = ["subprocessors and regions"]
+
+  [[questions.cases]]
+  epochs = ["initial", "final"]
+  expected_status = "vendor_claim"
+  gold = [
+    "halverson-freight/lumenvale-cloud/subprocessors@r1#northwind-row",
+    "halverson-freight/lumenvale-cloud/subprocessors@r1#quillmail-row",
+  ]
+  forbidden = []
+  acceptable_claims = [
+    { text = "The vendor lists Northwind Hosting (EU) and Quillmail (US) as subprocessors.", refs = [
+      "halverson-freight/lumenvale-cloud/subprocessors@r1#northwind-row",
+      "halverson-freight/lumenvale-cloud/subprocessors@r1#quillmail-row",
+    ] },
+  ]
+  wrong_claims = []
+
+[[questions]]
+vendor = "ferrowick-payroll"
+id = "SOC-01"
+text = "Is there an independent SOC 2 report?"
+search_queries = ["SOC 2 Type II opinion"]
+
+  [[questions.cases]]
+  epochs = ["initial", "final"]
+  expected_status = "documentary_support"
+  gold = ["halverson-freight/ferrowick-payroll/soc2-letter@r1#unqualified-opinion"]
+  forbidden = []
+  acceptable_claims = [
+    { text = "An independent auditor issued an unqualified SOC 2 Type II opinion.", refs = [
+      "halverson-freight/ferrowick-payroll/soc2-letter@r1#unqualified-opinion",
+    ] },
+  ]
+  wrong_claims = []

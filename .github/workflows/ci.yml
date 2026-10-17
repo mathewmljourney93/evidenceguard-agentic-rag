@@ -110,6 +110,22 @@ jobs:
           assert [(c.chunk_id, c.fused_rank, c.fused_score) for c in fused] == expected
           print("retrieval modules imported and fusion ran from the installed wheel")
           PY
+          # M4e (ADR-0017): import the pure evaluation modules from the installed wheel and
+          # compute the specified 2/3 Recall example. The corpus is not in the wheel and no
+          # database is contacted; this check does not establish evaluation (the PostgreSQL
+          # integration job does).
+          "${bin}/python" -I - <<'PY'
+          import uuid
+          from fractions import Fraction
+          import evidenceguard_retrieval.evaluation.anchors as anchors
+          import evidenceguard_retrieval.evaluation.corpus as corpus
+          import evidenceguard_retrieval.evaluation.recall as recall
+          for module in (corpus, anchors, recall):
+              assert "site-packages" in (module.__file__ or ""), module.__name__
+          a, b, c, x, y, z = (uuid.UUID(int=n) for n in range(1, 7))
+          assert recall.recall_at_k([a, x, b, y, z], frozenset({a, b, c}), 5) == Fraction(2, 3)
+          print("evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel")
+          PY
           "${bin}/python" -I -c "import io; from alembic import command; from evidenceguard_persistence.migration_config import alembic_config; buf = io.StringIO(); command.upgrade(alembic_config(output_buffer=buf), 'head', sql=True); assert 'CREATE TABLE api_keys' in buf.getvalue(); print('offline migration SQL rendered from the installed wheel')"
 
   integration:

@@ -1,6 +1,6 @@
 # EvidenceGuard implementation plan
 
-**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`. The M4c installed-wheel extension, which executes the offline embedding and canonical storage path and imports the indexing modules, ran locally on Windows in Prompts 125–126 (historical) and passed on Ubuntu and Windows CI runners at `600a366` and again on `main` at `76fa5a3`; the earlier M4a/M4b wheel limitations are historical. The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); M4c was implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 (ADR-0015); it is reviewed, verified in CI and on `main` at `76fa5a3` (PostgreSQL, Linux, Windows, installed-wheel and container indexing; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3); earlier feature-branch verification at `600a366` is historical). The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and accepted at external review in Prompt 133. Claude Code implemented it in Prompt 134 on `feat/snapshot-retrieval` and corrected it in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)); the implementation was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (Ubuntu, Windows, PostgreSQL with all 39 M4d cases passing, installed-wheel retrieval check, the unchanged container job and Gitleaks; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` and Claude Code's local Windows results in Prompts 134–135 are historical. The [M4e corpus and retrieval-evaluation specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was proposed in Prompt 140, corrected in Prompts 141–142 and **accepted at external review in Prompt 143**; its implementation and every M4e check are pending; M4f still requires a detailed specification; overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
+**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`. The M4c installed-wheel extension, which executes the offline embedding and canonical storage path and imports the indexing modules, ran locally on Windows in Prompts 125–126 (historical) and passed on Ubuntu and Windows CI runners at `600a366` and again on `main` at `76fa5a3`; the earlier M4a/M4b wheel limitations are historical. The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); M4c was implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 (ADR-0015); it is reviewed, verified in CI and on `main` at `76fa5a3` (PostgreSQL, Linux, Windows, installed-wheel and container indexing; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3); earlier feature-branch verification at `600a366` is historical). The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and accepted at external review in Prompt 133. Claude Code implemented it in Prompt 134 on `feat/snapshot-retrieval` and corrected it in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)); the implementation was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (Ubuntu, Windows, PostgreSQL with all 39 M4d cases passing, installed-wheel retrieval check, the unchanged container job and Gitleaks; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` and Claude Code's local Windows results in Prompts 134–135 are historical. The [M4e corpus and retrieval-evaluation specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was proposed in Prompt 140, corrected in Prompts 141–142 and **accepted at external review in Prompt 143**; Claude Code implemented it in Prompt 144 on `feat/retrieval-evaluation` and corrected it in Prompts 145–146 ([ADR-0017](decisions/0017-retrieval-evaluation.md)); the implementation was **accepted at external review in Prompt 147 for a local implementation commit** and is not published or merged; no PostgreSQL test (none of the 16 M4e cases and none of the 306 integration tests against this version) has run, Linux and current-version CI are pending, the symlink refusal test has not run, and no database-derived Recall or isolation result exists; M4f still requires a detailed specification; overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
 
 EvidenceGuard is a vendor-risk review copilot. It ingests synthetic vendor documents, retrieves evidence the tenant is authorized to see, classifies each review question against that evidence, and drafts a cited report. A human must approve the exact report revision before it can be finalized or exported. It is decision support, not legal advice or compliance certification.
 
@@ -2604,8 +2604,8 @@ container verification; see the [main CI evidence](decisions/0014-embedding-pers
 feature-branch verification at `90240e3` is historical. The
 [M4c indexing specification](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending)
 was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in
-Prompt 123). M4c was implemented on `feat/revision-indexing` by Claude Code in Prompt 125 ([ADR-0015](decisions/0015-revision-indexing.md)) and corrected in Prompt 126, with historical local Windows checks in Prompts 125–126; it was accepted at external review for a local commit in Prompt 127 and is **reviewed, verified in CI and on `main` at `76fa5a3`** (main push: PostgreSQL `251 passed`, including all 18 indexing cases, plus Linux, Windows, installed-wheel and container indexing verification; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3)). Earlier feature-branch verification at `600a366` is historical. The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and **accepted at external review in Prompt 133**. Its implementation by Claude Code in Prompt 134, corrected in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)), was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (main push: PostgreSQL `290 passed`, including all 39 M4d cases; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` is historical. The [M4e specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was accepted at external review in Prompt 143 (proposed in Prompt 140, corrected in Prompts 141–142); its implementation is pending. M4e–M4f still need accepted
-specifications, overall M4 acceptance remains pending, and local Compose remains unverified.** M1, M2 and M3 remain accepted.
+Prompt 123). M4c was implemented on `feat/revision-indexing` by Claude Code in Prompt 125 ([ADR-0015](decisions/0015-revision-indexing.md)) and corrected in Prompt 126, with historical local Windows checks in Prompts 125–126; it was accepted at external review for a local commit in Prompt 127 and is **reviewed, verified in CI and on `main` at `76fa5a3`** (main push: PostgreSQL `251 passed`, including all 18 indexing cases, plus Linux, Windows, installed-wheel and container indexing verification; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3)). Earlier feature-branch verification at `600a366` is historical. The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and **accepted at external review in Prompt 133**. Its implementation by Claude Code in Prompt 134, corrected in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)), was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (main push: PostgreSQL `290 passed`, including all 39 M4d cases; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` is historical. The [M4e specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was accepted at external review in Prompt 143 (proposed in Prompt 140, corrected in Prompts 141–142); its implementation (Prompt 144, corrected in Prompts 145–146, [ADR-0017](decisions/0017-retrieval-evaluation.md)) was accepted at external review in Prompt 147 for a local commit, is not published or merged, and awaits PostgreSQL, Linux and current-version CI. M4f still needs an accepted
+specification, overall M4 acceptance remains pending, and local Compose remains unverified.** M1, M2 and M3 remain accepted.
 
 The reviewer inspected the full Prompt 107 diff, independently matched its
 SHA-256 checksum and checked the existing chunk domain and chunker source
@@ -2644,7 +2644,7 @@ Accepted dependency-ordered sequence (Prompt 108; each later slice needs its own
 | M4b | Embedding profiles/index records, tenant-scoped storage and migration, full-text representation, exact vector operations and completeness/readiness. Real PostgreSQL constraints, migration round trips and filtering tests. Introduce pgvector here when vector storage/operators first require it; M4a needs no extension. Detailed specification [accepted at review in Prompt 116](#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending) (proposed in Prompt 114, corrected in Prompt 115); implemented in Prompt 117, accepted in Prompt 118, verified in CI and on `main` at `872d0af` ([ADR-0014](decisions/0014-embedding-persistence.md)). |
 | M4c | Separate durable `index_revision` jobs over completed immutable chunk sets, enqueue/backfill seam and registered handler. Test leases/fences, replay, partial batches, conflicting retries, cancellation and atomic readiness/job finish. No review workflow. Detailed specification [accepted at review in Prompt 124](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending) (proposed in Prompt 122, corrected in Prompt 123); implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 ([ADR-0015](decisions/0015-revision-indexing.md)); verified in CI and on `main` at `76fa5a3`, including PostgreSQL and container indexing. |
 | M4d | Explicit snapshot input/capture seam, eligibility validation, deterministic lexical/vector/RRF retrieval and bounded results. PostgreSQL isolation, snapshot-after-supersession, ranking and tie tests. No review endpoints or report generation. Detailed specification [accepted at review in Prompt 133](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) (proposed in Prompt 131, corrected in Prompt 132); implementation staged in Prompt 134 and corrected in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)), accepted at external review in Prompt 136; reviewed, verified in CI and on `main` at `cf2b5743` ([main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)). |
-| M4e | Synthetic clean/injected corpus, stable anchor-to-chunk ground truth, Recall@5/@8 and retrieval contracts. Include cross-tenant, cross-vendor and superseded traps and missing answers; no semantic-quality claim. Detailed specification [accepted at review in Prompt 143](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) (proposed in Prompt 140, corrected in Prompts 141–142); implementation pending. |
+| M4e | Synthetic clean/injected corpus, stable anchor-to-chunk ground truth, Recall@5/@8 and retrieval contracts. Include cross-tenant, cross-vendor and superseded traps and missing answers; no semantic-quality claim. Detailed specification [accepted at review in Prompt 143](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) (proposed in Prompt 140, corrected in Prompts 141–142); implementation (Prompt 144, corrected in Prompts 145–146, [ADR-0017](decisions/0017-retrieval-evaluation.md)) accepted at external review in Prompt 147 for a local commit; PostgreSQL, Linux and current-version CI pending. |
 | M4f | Voyage adapter behind the same contract, injected transport mocked in CI, fixed profile/configuration, bounded calls and safe error mapping. No live calls required for M4 acceptance; live quality evidence belongs to M7. |
 
 **[DECISION] Separate indexing readiness (Prompt 108); later persistence details remain proposals.** Retain M3's activation and immutable
@@ -3985,7 +3985,7 @@ container job and Gitleaks (60 commits, no leaks); see the
 [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743).
 Claude Code's Prompt 134–135 local Windows checks are historical, as is the earlier statement that
 the PostgreSQL tests had never run. The container smoke covers ingestion and indexing, not M4d
-retrieval. The M4e specification is accepted (Prompt 143) and its implementation is pending; M4f and overall M4 acceptance remain pending. The heading and the planned-verification list below keep their accepted
+retrieval. The M4e specification is accepted (Prompt 143) and its implementation (Prompt 144, corrected in Prompts 145–146) is accepted at external review (Prompt 147) for a local commit, with PostgreSQL, Linux and current-version CI pending; M4f and overall M4 acceptance remain pending. The heading and the planned-verification list below keep their accepted
 wording.
 
 **Scope.** A trusted snapshot capture seam, an immutable snapshot value, strict retrieval
@@ -4763,10 +4763,26 @@ and N1–N12 are settled within the complete accepted specification (see
 [M4e decisions settled at acceptance](#m4e-decisions-settled-at-acceptance-prompt-143)). The items
 labelled [REC] below were written as recommendations in Prompts 140–142; with this acceptance they
 **form the accepted implementation contract**, and **no specification decision remains open**.
-Acceptance is a design decision, not implementation or execution evidence: **the implementation
-and every M4e check are pending**; no corpus file, module, test, command, workflow extension or
-ADR-0017 exists, every test and command below is planned and not executed, and no M4e mitigation
-has run. ADR-0017 is deferred to implementation. Labels: **[DECISION]** accepted in Prompt 108 (see
+Acceptance is a design decision, not implementation or execution evidence.
+**Implementation (Prompt 144, corrected in Prompts 145–146):** Claude Code implemented this
+specification on `feat/retrieval-evaluation` ([ADR-0017](decisions/0017-retrieval-evaluation.md)) and in Prompt 145
+corrected four review findings (complete anchor validation before any database work, vendor
+IDs only after a successful commit, read failures preserved through cleanup, and aggregate
+bounds before payload reads) and in Prompt 146 closed a remaining read-boundary gap (process
+control raised by the setup clock result's `scalar_one()`). The implementation was **accepted
+at external review in Prompt 147 for a local implementation commit, pending current-version
+CI**; it is not published or merged. The disclosed verifier scope was accepted: it checks each
+canonical job's kind, idempotency key and `succeeded` status but does not read job `payload`
+(accepted read item 6; see ADR-0017), so no payload validation is claimed. Only
+database-independent checks ran, locally, as historical evidence attributed to Claude Code
+(see [M4e local verification (Prompt 146)](#m4e-local-verification-prompt-146); the
+[Prompt 145](#m4e-local-verification-prompt-145) and
+[Prompt 144](#m4e-local-verification-prompt-144) checks are historical); every
+PostgreSQL test (all 16 M4e cases; none of the 306 integration tests against this version),
+Linux and current-version CI (including the installed-wheel step and Gitleaks in CI) and the
+symlink refusal test are pending, so no M4e mitigation that needs PostgreSQL has run and no
+database-derived Recall or isolation result exists. The planned-verification wording
+below is kept as accepted. Labels: **[DECISION]** accepted in Prompt 108 (see
 [M4 direction and review decisions](#m4-direction-and-review-decisions)); **[SETTLED]** E1–E11
 (Prompt 141), N1–N9 (Prompt 142, as corrected) and N10–N12 (Prompt 143); **[FACT]** established
 from source on `main` at `cf2b5743`; **[REC]** an original recommendation, now part of the
@@ -5450,6 +5466,62 @@ row of each corpus tenant):
 **Planned verification (not run):** the tests above, Ruff, strict mypy, both builds, the existing
 installed-wheel checks plus E9, the integration job and Gitleaks. The container smoke is unchanged
 and continues to cover ingestion, indexing and idle-worker shutdown only.
+
+##### M4e local verification (Prompt 146)
+
+Historical local evidence, attributed to Claude Code and not rerun for the Prompt 147
+acceptance. Run locally on Windows by Claude Code after the Prompt 146 correction (locked environment; no
+Docker, database or external provider contact; only the offline `HashingEmbedder` ran). **Not
+run:** all 16 PostgreSQL tests, the symlink refusal test, every CI job for the current tree and
+Gitleaks in CI; no database-derived Recall or isolation result exists.
+
+- `ruff format --check .` (171 files) and `ruff check .`: clean; strict `mypy` (135 source
+  files): no issues;
+- focused tests (the four database-independent M4e files and `tests/test_packaging.py`): 256
+  passed, 1 skipped (the symlink test);
+- full suite: 2244 passed, 308 skipped (306 integration tests without a database, the symlink
+  test and the POSIX-only signal test); collection: 2552 tests, 306 integration;
+- regression comparison against the saved Prompt 145 worker module: 12 of the 19 new
+  clock-result cases failed before and all 19 pass after (see ADR-0017);
+- `uv build` and the isolated installed-wheel environment passed every CI wheel command
+  extracted from `ci.yml`, plus a narrow probe of clock-result process control followed by
+  ordinary cleanup failure.
+
+##### M4e local verification (Prompt 145)
+
+Historical (before the Prompt 146 correction). Run locally on Windows by Claude Code after the Prompt 145 corrections (locked environment; no
+Docker, database or external provider contact; only the offline `HashingEmbedder` ran). **Not
+run:** all 16 PostgreSQL tests, the symlink refusal test, every CI job for the current tree and
+Gitleaks in CI; no database-derived Recall or isolation result exists.
+
+- `ruff format --check .` (171 files: 135 Python and 36 Markdown) and `ruff check .`: clean;
+  strict `mypy` (135 source files): no issues;
+- focused tests (the four database-independent M4e files and `tests/test_packaging.py`): 237
+  passed, 1 skipped (the symlink test);
+- full suite: 2225 passed, 308 skipped (306 integration tests without a database, the symlink
+  test and the existing POSIX-only signal test); collection: 2533 tests, 306 integration;
+- regression comparison against the saved Prompt 144 modules: 37 of the new worker-boundary
+  cases failed before and pass after (see ADR-0017 for the classification of the rest);
+- `uv build` and the isolated installed-wheel environment passed every CI wheel command
+  extracted from `ci.yml`, plus a narrow probe of the corrected validation and read boundary.
+
+##### M4e local verification (Prompt 144)
+
+Historical (before the Prompt 145 corrections). Run locally on Windows by Claude Code on `feat/retrieval-evaluation` (locked environment; no
+Docker, database or external provider contact; only the offline `HashingEmbedder` ran). The
+implementation is staged for external review and uncommitted. **Not run:** every PostgreSQL
+test (16 cases in `tests/test_evaluation_postgres.py`), the CI jobs and Gitleaks in CI.
+
+- `ruff format --check .` (170 files: 134 Python and 36 Markdown) and `ruff check .`: clean; strict `mypy` (134 source
+  files): no issues;
+- focused tests (the three database-independent M4e files and `tests/test_packaging.py`): 147
+  passed, 1 skipped (the symlink test; this Windows account cannot create symbolic links);
+- full suite: 2135 passed, 308 skipped (306 integration tests without a database, the symlink
+  test and the existing POSIX-only signal test); collection: 2443 tests, 306 integration;
+- `uv build`: the sdist contains the 16 `sample_data` files, the wheel none; an isolated
+  installed-wheel environment outside the checkout (dependencies from `uv.lock`, offline with
+  `--require-hashes`, wheel with `--no-deps`) passed every CI wheel command extracted from
+  `ci.yml`, including the new M4e step.
 
 **M5 – Review workflow (fake model in CI)**
 - Provider interface; Anthropic and scripted fake providers; `prompts/verifier/v1.md` and `prompts/risk_analyst/v1.md`; planner; orchestration; review snapshot; provenance checks; status derivation; report renderer; provider-call records and spans.
