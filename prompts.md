@@ -26283,3 +26283,301 @@ database or provider call was run for this prompt, because the implementation fi
 byte-identical to the accepted tree. Pre-commit checks are reported in the Prompt 147 handoff; the
 local commit covers exactly the 34 accepted paths. No commit identifier, push or publication is
 recorded here.
+
+### Prompt 147 outcome (Claude Code; attributed to its handoff)
+
+Claude Code committed the accepted M4e implementation locally as
+`f01af7ebeeb1401db1709d4479c3e0afa1f003d2` (parent `faa11b74`, tree
+`9a36f0c0d7513a9e5b2c2371ad52ebdff2527204`, noreply author and committer, subject "feat: add
+synthetic retrieval corpus and snapshot evaluation") with exactly the 34 accepted paths. Against
+accepted tree `ade7bf82`, only README.md, docs/plan.md, docs/threat-model.md, ADR-0017 and
+prompts.md differ; the other 29 implementation, test, corpus, packaging and workflow files are
+byte-identical. The handoff reported its pre-commit documentation checks and post-commit
+full-history Gitleaks as passing and exported `.local/p147/m4e-commit-incremental.diff`. No
+application test, build, installed-wheel check, install, Docker, database or provider call was run
+for Prompt 147. Nothing was published or merged; `main` and `origin/main` stayed at `cf2b5743`.
+
+## Prompt 148 M4e branch publication authorization (Claude Code)
+
+External review acceptance of Prompt 147: the reviewer inspected the incremental documentation
+diff and independently matched `.local/p147/m4e-commit-incremental.diff` (baseline
+`ade7bf826ab639e23fb71e4a9c947c5df1b0b289`, final `f01af7ebeeb1401db1709d4479c3e0afa1f003d2`,
+prompts.md excluded, 58,885 bytes, SHA-256
+`16ef147b47127814fd90fbf85f8201b7520f7a154f0c7fd29e7a802d950a3129`) and accepted the
+local-commit documentation. The reviewer ran no project checks for this review. The earlier
+implementation review and the reviewer's isolated probes (Prompts 145–147) remain separately
+attributed.
+
+### Prompt 148 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 148: publish only the accepted M4e feature branch and observe exact-commit CI
+
+You are starting a fresh Claude Code session in:
+D:\Claude\evidenceguard_agentic_rag
+
+Read CLAUDE.md and any applicable repository instructions. Recover the current state from the repository, the accepted M4e specification and ADR-0017. Do not load the entire prompts.md into context.
+
+This prompt authorizes:
+- Publication preflight.
+- An append-only prompts.md history commit.
+- Publishing only feat/retrieval-evaluation.
+- Monitoring and reporting exact-commit CI.
+
+It does not authorize updating main, repairs, reruns, implementation changes or post-CI documentation edits.
+
+## 1. Verify starting state
+
+Fetch fresh origin refs without tags and check remote refs read-only.
+
+Expected:
+- Branch feat/retrieval-evaluation.
+- HEAD:
+  f01af7ebeeb1401db1709d4479c3e0afa1f003d2
+- Parent:
+  faa11b749784859fcce760edbf0f604670ab00c8
+- Tree:
+  9a36f0c0d7513a9e5b2c2371ad52ebdff2527204
+- Subject:
+  feat: add synthetic retrieval corpus and snapshot evaluation
+- Clean index and working tree.
+- No upstream and no remote feat/retrieval-evaluation branch.
+- Local main, origin/main and remote main:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- main is an ancestor of HEAD.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Stop on a material mismatch. Do not reset, overwrite or silently reuse a remote branch.
+
+Save the checkpoint under ignored .local/p148/, including refs, tree, status and existing prompt-history bytes.
+
+## 2. Verify the accepted incremental export
+
+.local/p147/m4e-commit-incremental.diff
+- Baseline:
+  ade7bf826ab639e23fb71e4a9c947c5df1b0b289
+- Final:
+  f01af7ebeeb1401db1709d4479c3e0afa1f003d2
+- Excludes prompts.md.
+- 58,885 bytes.
+- SHA-256:
+  16ef147b47127814fd90fbf85f8201b7520f7a154f0c7fd29e7a802d950a3129
+
+The external reviewer inspected this diff, independently matched its size and checksum and accepted the local-commit documentation. No project checks were run for that review.
+
+## 3. Publication preflight
+
+Inspect the complete unpublished range against fresh origin/main:
+- faa11b74: accepted M4e specification and M4d main evidence.
+- f01af7eb: accepted M4e implementation.
+- The new history commit prepared below.
+
+Confirm:
+- Only reviewed paths are included.
+- All commits use the expected noreply identity.
+- Assistance attribution accurately credits Claude Code and preserves earlier OpenAI Codex attribution.
+- No tracked .local files, build outputs, backups, credentials, private data or unexpected binaries.
+- .env.example remains unchanged and placeholder-only.
+- sample_data contains fictional corpus and ground truth only.
+- No migration, dependency, lockfile, Dockerfile, Compose, registry or container-smoke change.
+- pyproject.toml changes only the accepted sdist inclusion.
+- ci.yml changes only the accepted installed-wheel evaluation check.
+- Existing checks remain enabled.
+
+Verify both workflows trigger on feature-branch pushes and all five jobs are present:
+- Ubuntu verify.
+- Windows verify.
+- PostgreSQL integration.
+- Container.
+- Full-history Gitleaks.
+
+Confirm integration uses pytest -m integration with EG_REQUIRE_INTEGRATION=1 and tests/test_evaluation_postgres.py is integration-marked.
+
+Confirm the existing wheel checks remain, including:
+- Offline embeddings/storage/indexing.
+- M4d retrieval imports/fusion.
+- New M4e imports and the independent 2/3 Recall fixture.
+
+Confirm all six container steps remain enabled.
+
+Run private-content/artifact checks and Gitleaks over the unpublished range without suppression or scanner changes.
+
+Do not run local application tests, builds, installs, Docker, database or provider calls.
+
+## 4. Append prompt history
+
+Only prompts.md may change.
+
+Append:
+- Prompt 147 local-commit outcome, attributed to its handoff.
+- Reviewer acceptance of the Prompt 147 incremental diff, including matched checksum/size and no project reruns.
+- This Prompt 148 verbatim, including Written for.
+- A publication preflight note containing verified state, intended publication scope and stop conditions.
+
+Preserve every earlier byte.
+
+Do not pre-record the future commit SHA, push outcome, CI results or test counts.
+
+Use inline backticked commit identifiers in your own notes.
+
+Check:
+- Earlier history is an identical byte prefix.
+- Only prompts.md staged.
+- UTF-8 without BOM and no CR.
+- Privacy scan.
+- git diff --cached --check.
+- Staged Gitleaks without suppression.
+- Effective author and committer.
+
+## 5. History-only commit
+
+Commit only prompts.md.
+
+Suggested subject:
+docs: record M4e branch publication authorization
+
+Use the expected noreply author and committer, with accurate Claude Code assistance attribution following the repository convention.
+
+After committing verify:
+- Parent exactly:
+  f01af7ebeeb1401db1709d4479c3e0afa1f003d2
+- Only prompts.md changed.
+- Every other blob is byte-identical to the parent.
+- Working tree clean.
+- Full-history Gitleaks passes without suppression.
+
+Record the full new commit and tree.
+
+## 6. Publish only the feature branch
+
+Recheck remote refs immediately before pushing:
+- Remote main remains cf2b5743799e51c74e9f80638b0cc13be5827a71.
+- Remote feat/retrieval-evaluation is still absent.
+
+Run explicitly:
+git push --set-upstream origin refs/heads/feat/retrieval-evaluation:refs/heads/feat/retrieval-evaluation
+
+Record the actual exit status without a pipeline hiding it.
+
+If sign-in is required, allow the normal credential-manager interaction. Do not extract stored credentials or change authentication configuration.
+
+If the push result is ambiguous, inspect the remote ref before any further action. Do not retry automatically.
+
+After success verify:
+- Remote feature ref equals the new full SHA.
+- Upstream is origin/feat/retrieval-evaluation.
+- main remains unchanged.
+
+No other ref or tag may be pushed.
+
+## 7. Observe exact-commit CI
+
+Monitor the push-triggered CI and secret-scan runs for:
+- Branch feat/retrieval-evaluation.
+- Exact newly published SHA.
+- Correct event and run attempt.
+
+Use a bounded monitor, at most 25 minutes, with checks at intervals no longer than 60 seconds. Leave no polling running afterwards.
+
+Inspect all five required jobs and their necessary steps:
+- Formatting, lint, types, tests, builds and installed-wheel checks on Ubuntu and Windows.
+- PostgreSQL integration.
+- Container config, context, build, image checks, smoke and cleanup.
+- Full-history secret scan.
+
+Retrieve logs through normally available authorized tooling if possible. Do not extract stored credentials or change configuration to obtain them.
+
+Report:
+- Actual pytest summaries.
+- Whether all 16 M4e PostgreSQL cases ran, passed or skipped.
+- Actual total integration count.
+- Whether Linux exercised the locally skipped symlink test.
+- Actual new installed-wheel output:
+  evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+- Relevant container output.
+- Actual Gitleaks count and conclusion.
+
+The 306 integration tests and historical Windows counts are expectations from local collection, not results for the published commit.
+
+Do not infer database-derived Recall values from passing tests. If the logs do not print measured Recall, report those numerical results as unobserved. The installed-wheel 2/3 fixture is pure arithmetic, not a database evaluation result.
+
+A successful container smoke covers ingestion and indexing, not M4e evaluation.
+
+If any job fails, is cancelled, skips required work or exceeds the monitoring bound:
+- Stop.
+- Retrieve available failure diagnostics.
+- Report the first known failure and evidence.
+- Do not repair, rerun, amend, revert or publish another commit.
+
+## 8. Leave documents unchanged after CI
+
+Do not record publication or CI outcomes in repository files during this task.
+
+That is a later reviewed documentation task.
+
+Do not switch to or update main. No merge, force-push, tag, branch deletion or M4f work.
+
+## 9. Final handoff
+
+Report:
+- Starting state and preflight.
+- New history commit SHA, parent, tree, subject and identity.
+- Confirmation that only prompts.md changed and every other blob is unchanged.
+- Checks and scans actually run.
+- Push command and actual exit status.
+- Published SHA and matching remote feature ref.
+- CI run/job links, event, branch, SHA, attempt and conclusions.
+- Observed log evidence, separated from API-only conclusions.
+- Any unavailable logs, skips, failures or unobserved metrics.
+- Final branch, tracking and working-tree state.
+- Unchanged local/origin/remote main.
+- Confirmation that no monitor remains running.
+
+Keep limitations:
+- Offline hashing is a lexical baseline with no semantic-quality claim.
+- No injection-resistance or production-readiness guarantee.
+- Trusted-snapshot past-eligibility limit remains until M5.
+- Container smoke scope and idle-worker shutdown coverage unchanged.
+- Local Compose unverified.
+- M4f and overall M4 acceptance pending.
+
+End:
+Mathew: return this output only to the external reviewer; no diff attachment is required.
+
+### Prompt 148 publication preflight (Claude Code; before the history commit and publication)
+
+Starting state matched locally: branch `feat/retrieval-evaluation`, HEAD `f01af7eb` (parent
+`faa11b74`, tree `9a36f0c0`), clean working tree and index, no upstream, expected origin and
+noreply identity. `git fetch --no-tags origin` refreshed refs; `git ls-remote origin` showed `main`
+at `cf2b5743` and no remote `feat/retrieval-evaluation`; local `main` and `origin/main` are at
+`cf2b5743`, an ancestor of HEAD. The Prompt 147 export matched its recorded size and SHA-256 and
+regenerates byte-for-byte from `git diff --binary --full-index` between the recorded baseline and
+final. The checkpoint, ref listing and prompt-history prefix are saved under `.local/p148/`.
+
+The unpublished range against `origin/main` contains `faa11b74` (accepted M4e specification and
+M4d main evidence) and `f01af7eb` (accepted M4e implementation), both with the noreply author and
+committer, Claude Code assistance text and `Co-Authored-By` trailer, and the preserved OpenAI Codex
+attribution note; the history-only commit made in this task is added to it. The range changes 35
+paths: the five reviewed `faa11b74` documentation/history paths and the 34 accepted `f01af7eb`
+paths. No tracked `.local` files, build outputs, backups, credentials or binaries; `.env.example`
+unchanged; `sample_data` holds 13 fictional Markdown documents and three TOML corpus/ground-truth
+files; no migration, dependency, lockfile, Dockerfile, Compose, registry or container-smoke change.
+`pyproject.toml` only adds `/sample_data` to the sdist include, and `ci.yml` only adds the M4e
+installed-wheel evaluation step. Both workflows trigger on push; the five jobs (Ubuntu and Windows
+verify, PostgreSQL integration with `pytest -m integration` and `EG_REQUIRE_INTEGRATION=1`,
+container with all six steps, full-history Gitleaks) are present with no disabling conditions;
+`tests/test_evaluation_postgres.py` is integration-marked; the existing embedding/indexing and M4d
+retrieval wheel checks remain. The private-content scan of range additions found nothing, and range
+Gitleaks (`origin/main..HEAD`, no suppression) found no leaks. No local application checks,
+installs, Docker, database or provider contact were run.
+
+Intended publication scope: only `refs/heads/feat/retrieval-evaluation` to the same remote name,
+with upstream set; no `main` update, tag, merge or other ref. Stop conditions: remote `main` no
+longer at `cf2b5743`, a remote `feat/retrieval-evaluation` appearing, an ambiguous push result
+(inspect the remote ref; no automatic retry), or any CI job failing, being cancelled, skipping
+required work or exceeding the 25-minute monitoring bound (report diagnostics; no repair or rerun).
+No commit identifier, push result or CI outcome is recorded here.
