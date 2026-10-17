@@ -22981,3 +22981,330 @@ tests or builds were rerun. The 39 M4d PostgreSQL tests and all 290 integration 
 unexecuted against this version, and PostgreSQL, Linux and current-version CI are pending.
 Pre-commit checks are reported in the Prompt 136 handoff. No commit identifier, push, merge or
 publication is recorded here.
+
+### Prompt 136 outcome (Claude Code; attributed to its handoff)
+
+Claude Code committed the accepted M4d implementation locally as
+`b1775009f7a2af84266d7d9de12277ac88cd3577` (parent `51042a8`, tree
+`8f48ed2b48999b5ba19e0826df6547d36bed22d3`, noreply author and committer, subject "feat: add
+trusted snapshot capture and hybrid retrieval") with exactly the 15 intended paths. The nine
+implementation, test and workflow blobs are byte-identical to accepted tree `efa0633a`; only
+README.md, ADR-0015, ADR-0016, docs/plan.md, docs/threat-model.md and prompts.md differed. The
+documentation checks passed (staged paths, history prefix, 164 links, encoding, private-content
+scan, `git diff --cached --check`, staged Gitleaks), and after the commit the working tree was
+clean and full-history Gitleaks scanned 58 commits with no leaks. No application checks were
+repeated. Nothing was published or merged; `main` and `origin/main` stayed at `76fa5a3`.
+
+## Prompt 137 M4d branch publication authorization (Claude Code)
+
+External review acceptance of Prompt 136: the reviewer inspected the incremental documentation
+diff and independently matched `.local/p136/m4d-commit-incremental.diff` (baseline
+`efa0633a6bb3af205aab1893044a655b707318d9`, final `b1775009f7a2af84266d7d9de12277ac88cd3577`, five
+documentation files with prompts.md excluded, +63/−38, 47,638 bytes, SHA-256
+`9a9b0e58b5c1a5a15097dcbcfe888b5d9c983a3b3063b87299b3c9ab04890df4`). The acceptance wording
+accurately limits implementation acceptance to a local commit, with PostgreSQL and
+current-version CI pending. The reviewer ran no new project suite, regression suite, build,
+installed-wheel check, PostgreSQL or Docker for this incremental review. The earlier
+implementation review and the reviewer's isolated probes (Prompts 135–136) remain separately
+attributed.
+
+### Prompt 137 (verbatim; line endings normalized to LF)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 137: Publish the M4d feature branch and verify exact-commit CI
+
+Publish only feat/snapshot-retrieval and inspect CI for the exact published commit.
+
+Do not update main, repair failures or begin M4e.
+
+## Repository instructions
+
+Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+Read CLAUDE.md and any applicable AGENTS.md first. Inspect relevant current documentation and recent prompt history without loading all of prompts.md.
+
+## Expected starting state
+
+- Branch: feat/snapshot-retrieval.
+- HEAD:
+  b1775009f7a2af84266d7d9de12277ac88cd3577
+- Parent:
+  51042a863c688eb0352589dfe7d1c3aae73b22c6
+- Tree:
+  8f48ed2b48999b5ba19e0826df6547d36bed22d3
+- Subject:
+  feat: add trusted snapshot capture and hybrid retrieval
+- Working tree and index: clean.
+- No upstream or remote feat/snapshot-retrieval branch is expected.
+- Local main and origin/main:
+  76fa5a3800936d2bebdf13c5401609e09983b0d1
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Expected author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Fetch fresh refs and check remote refs read-only. Confirm remote main remains at the expected SHA and is an ancestor of HEAD.
+
+Save the starting checkpoint under .local/p137/.
+
+If branch, HEAD, working tree, remote refs or publication scope differs materially, stop and report. Do not reset, discard changes or overwrite another branch.
+
+## Review acceptance
+
+The external reviewer inspected the Prompt 136 incremental documentation diff and independently matched:
+
+- .local/p136/m4d-commit-incremental.diff
+- Baseline:
+  efa0633a6bb3af205aab1893044a655b707318d9
+- Final:
+  b1775009f7a2af84266d7d9de12277ac88cd3577
+- Scope: five documentation files; prompts.md excluded.
+- Statistics: +63/−38.
+- Size: 47,638 bytes.
+- SHA-256:
+  9a9b0e58b5c1a5a15097dcbcfe888b5d9c983a3b3063b87299b3c9ab04890df4
+
+The acceptance wording accurately limits implementation acceptance to a local commit, with PostgreSQL and current-version CI pending.
+
+The reviewer ran no new project suite, regression suite, build, installed-wheel check, PostgreSQL or Docker for this incremental review.
+
+Preserve the earlier implementation-review and isolated-probe evidence separately attributed.
+
+## Authorization
+
+You are authorized to:
+1. Perform publication preflight.
+2. Append prompt history.
+3. Commit that history-only change.
+4. Publish feat/snapshot-retrieval.
+5. Monitor and inspect its exact-commit CI and available logs.
+
+No further confirmation is needed for those actions.
+
+You are not authorized to:
+- update main;
+- change implementation, tests, workflows or documentation other than prompts.md;
+- repair failures;
+- rerun workflows;
+- change credentials or authentication configuration;
+- publish other branches or tags.
+
+No force-push, amend, rebase, merge, tag or branch deletion.
+
+## Publication preflight
+
+Inspect the full unpublished range against fresh origin/main. It should contain:
+- 51042a863c688eb0352589dfe7d1c3aae73b22c6:
+  accepted specification and M4c main evidence;
+- b1775009f7a2af84266d7d9de12277ac88cd3577:
+  accepted implementation;
+- the history-only commit created in this task.
+
+Verify:
+- expected noreply identities and accurate assistance attribution;
+- only reviewed changes;
+- no tracked .local files, build outputs, environments, backups, bundles, credentials or unexpected binaries;
+- unchanged placeholder-only .env.example;
+- no unexpected private content in publication additions;
+- range Gitleaks clean without suppression or allowlists.
+
+The M4d ci.yml change is intentional and reviewed: a narrow installed-wheel check imports the three retrieval modules and executes fusion on a pinned fixture.
+
+No migration, dependency, lockfile, Dockerfile, Compose, registry-kind or container-smoke change is expected.
+
+Confirm all five push-triggered jobs remain enabled:
+- Ubuntu verify;
+- Windows verify;
+- PostgreSQL integration;
+- container;
+- full-history Gitleaks.
+
+Confirm:
+- integration runs pytest -m integration with EG_REQUIRE_INTEGRATION=1;
+- tests/test_retrieval_postgres.py is integration-marked;
+- the M4d installed-wheel fixture is present;
+- existing embedding/indexing wheel checks remain;
+- all six container steps remain.
+
+The unchanged container smoke verifies ingestion and indexing, not M4d retrieval.
+
+## History-only commit
+
+Only prompts.md may change.
+
+Append:
+1. Prompt 136 outcome, attributed to its handoff:
+   - implementation commit, parent and clean state;
+   - nine implementation/test/workflow blobs unchanged from the accepted tree;
+   - successful documentation checks;
+   - full-history Gitleaks: 58 commits, no leaks;
+   - no application checks repeated;
+   - no publication or merge.
+2. The external acceptance above.
+3. Prompt 137 verbatim, including its opening “Written for” line.
+4. A factual publication-preflight note.
+
+Do not pre-record a commit SHA, push result or CI outcome.
+
+Preserve every earlier byte as an identical prefix. Do not rewrite historical records or formatting-exception notes. Use inline, backticked commit identifiers in your own entries.
+
+Before committing:
+- exactly prompts.md staged;
+- earlier history prefix identical;
+- no private content, BOM or unintended CR characters;
+- git diff --cached --check passes;
+- staged Gitleaks clean without suppression;
+- effective noreply author and committer verified.
+
+Commit subject:
+docs: record M4d branch publication authorization
+
+Use the expected identity and repository’s Claude Code assistance convention. Preserve earlier Codex attribution accurately.
+
+After committing:
+- report full SHA, parent and tree;
+- verify only prompts.md changed against its parent;
+- verify all other blobs are unchanged;
+- verify clean working tree;
+- run full-history Gitleaks.
+
+If a required preflight check fails, stop before pushing.
+
+## Publish only the feature branch
+
+Recheck remote main and the expected absent feature ref immediately before publication.
+
+Run:
+git push --set-upstream origin refs/heads/feat/snapshot-retrieval:refs/heads/feat/snapshot-retrieval
+
+Preserve and report the actual command exit status. Do not hide it behind a pipeline.
+
+After success:
+- verify remote feature ref equals the exact local HEAD;
+- verify upstream tracking;
+- verify remote main remains at:
+  76fa5a3800936d2bebdf13c5401609e09983b0d1
+
+If the push fails or refs contradict preconditions, stop and report. Do not retry blindly.
+
+## Exact-commit CI
+
+Find the push-triggered CI and secret-scan runs for:
+- feat/snapshot-retrieval;
+- the exact full SHA just published.
+
+Do not substitute earlier commits, another branch, a pull-request merge ref or a different event.
+
+Monitor for up to 25 minutes using bounded polling. Leave no background poller running after the task.
+
+All five jobs are required:
+1. Ubuntu verify.
+2. Windows verify.
+3. PostgreSQL integration.
+4. Container.
+5. Full-history Gitleaks.
+
+Check execution and conclusions for:
+- format, lint, mypy, tests and distribution builds;
+- installed-wheel checks on both platforms, including the new retrieval imports/fusion fixture;
+- integration tests;
+- all six container steps: configuration, context, build, image checks, smoke and cleanup;
+- full-history secret scanning.
+
+A skipped required step does not satisfy verification.
+
+If a job fails, is cancelled, times out or skips a required check:
+- report the exact run/job/step;
+- retrieve available diagnostic evidence safely;
+- preserve the published state;
+- do not repair code, rerun jobs or update main.
+
+## Logs and evidence
+
+Retrieve logs through normally available authorized tooling if possible.
+
+Do not extract credentials from credential stores, expose tokens, alter authentication or add credentials merely to obtain logs.
+
+Report observed:
+- Ubuntu and Windows pytest summaries;
+- PostgreSQL summary and confirmation that all 39 M4d cases ran;
+- distribution builds;
+- installed-wheel retrieval imports and fusion fixture;
+- existing wheel checks;
+- container context/image checks;
+- ingestion, duplicate upload and indexing smoke;
+- idle-worker exit and cleanup;
+- Gitleaks commit count and result.
+
+Keep generated keys and private output out of the handoff.
+
+If logs are unavailable, give the actual access error and distinguish job/step conclusions from unobserved log details. Do not claim exact counts or individual test execution solely from a green job.
+
+Historical Prompt 135 Windows results:
+- focused: 310 passed, 39 skipped;
+- full suite: 2001 passed, 291 skipped;
+- skips: 290 PostgreSQL tests without a database and one POSIX-only signal test;
+- collection: 2292 total, 290 integration;
+- process-control matrix: old module 14 failed/20 passed, corrected module 34 passed;
+- Ruff, strict mypy, build and isolated-wheel checks passed.
+
+These are historical local results, not observations for the published commit. The expected integration count is 290, including 39 M4d cases; report actual CI evidence.
+
+## Scope and limits
+
+No local application checks, installs, Docker, database or external-provider contact in this task.
+
+Do not change documentation after CI. Recording verification evidence is a later reviewed task.
+
+Preserve:
+- main unchanged;
+- trusted in-process snapshot/past-eligibility limitation;
+- M5 persistence/reload obligation;
+- no semantic-quality, retrieval-quality or production-readiness claim;
+- container smoke does not exercise M4d retrieval;
+- local Compose unverified;
+- M4e–M4f and overall M4 acceptance pending.
+
+## Final handoff
+
+Return:
+- starting-state and preflight results;
+- history commit SHA, parent, tree, identity and changed path;
+- push command and actual exit status;
+- exact published SHA and remote-ref verification;
+- run/job links, event, branch, head SHA, attempt and conclusions;
+- observed log evidence, clearly separated from unobserved details;
+- any failures or incomplete checks;
+- final branch, tracking and clean-tree state;
+- confirmation main is unchanged;
+- remaining limitations.
+
+No new diff attachment is required because only prompt history changed.
+
+End with:
+“Mathew: return this output only to the external reviewer; no diff attachment is required.”
+
+### Prompt 137 publication preflight (Claude Code; before the history commit and publication)
+
+Starting state matched locally: branch `feat/snapshot-retrieval`, HEAD `b1775009` (parent
+`51042a8`, tree `8f48ed2b`), clean working tree and index, no upstream, expected noreply
+identity. `git fetch origin --prune` refreshed refs; `git ls-remote` showed `main` at `76fa5a3`
+and no remote `feat/snapshot-retrieval`; `origin/main` is an ancestor of HEAD. The checkpoint is
+saved under `.local/p137/`.
+
+The unpublished range against `origin/main` contained `51042a8` (accepted specification and M4c
+main evidence) and `b1775009` (accepted implementation), both with the noreply author and
+committer and the Claude Code `Co-Authored-By` trailer; the history-only commit made in this task
+is added to it. The range changes the 15 reviewed paths only: no tracked `.local` files, build
+outputs, environments, backups, bundles, credentials or binaries; `.env.example` unchanged; no
+migration, dependency, lockfile, Dockerfile, Compose, registry or container-smoke change. The
+workflow diff only adds the reviewed M4d installed-wheel step. Both workflows trigger on push;
+the five jobs (Ubuntu and Windows verify, PostgreSQL integration with `pytest -m integration` and
+`EG_REQUIRE_INTEGRATION=1`, container with all six steps, full-history Gitleaks) are present with
+no disabling conditions; `tests/test_retrieval_postgres.py` is integration-marked; the existing
+embedding/indexing wheel checks remain. The private-content scan of range additions found nothing,
+and range Gitleaks (`origin/main..HEAD`, no suppression) found no leaks. No local application
+checks, installs, Docker, database or provider contact were run. No commit identifier, push result
+or CI outcome is recorded here.
