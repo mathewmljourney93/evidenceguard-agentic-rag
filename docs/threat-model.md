@@ -219,8 +219,9 @@ retrieved by the external reviewer; see the
   logs. Raw database rows and the generated key were not emitted or independently inspected.
 
 These results cover the exercised paths only; they are not a production-readiness or general
-security guarantee. M4d–M4f and overall M4 acceptance remain pending. Local Compose remains
-unverified.
+security guarantee. M4d has since been verified in CI and on `main` at `cf2b5743` (below); M4e's
+specification is accepted with implementation pending, and M4f and overall M4 acceptance remain
+pending. Local Compose remains unverified.
 
 | Threat | Mitigation |
 |---|---|
@@ -238,24 +239,25 @@ re-verified against provider output, and provider calls are not exactly-once. A 
 automatically. The container smoke covers idle-worker shutdown only. The offline provider is a
 lexical-hash baseline with no semantic-quality claim, and no live provider was verified.
 
-## Snapshot retrieval (M4d, verified in feature-branch CI; not merged)
+## Snapshot retrieval (M4d, verified in CI and on main)
 
 The [M4d specification](plan.md#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending)
 was accepted at external review in Prompt 133 (proposed in Prompt 131, corrected in Prompt 132).
 Claude Code implemented it in Prompt 134 and corrected it in Prompt 135
 ([ADR-0016](decisions/0016-snapshot-retrieval.md)); the correction preserves process-control
 exceptions raised during the read helper's setup when cleanup also fails.
-**The implementation was accepted at external review in Prompt 136 and is reviewed and verified
-in feature-branch CI at `3d6e8395`; it is not merged (`main` is unchanged at `76fa5a3`), and no
-endpoint or worker handler calls it.** Its 39 PostgreSQL tests, the evidence for the database-side
-mitigations below (tenant/vendor scoping, filtering before limits, the binding recheck and
-snapshot-relative supersession), all passed in that run (logs retrieved independently by the
-external reviewer; see the
-[ADR-0016 feature-branch CI evidence](decisions/0016-snapshot-retrieval.md#feature-branch-ci-evidence-at-3d6e8395)).
-This covers the tested paths in that run only; it is not a general security guarantee. Claude
+**The implementation was accepted at external review in Prompt 136 and is reviewed, verified in
+CI and on `main` at `cf2b5743`; no endpoint or worker handler calls it yet.** Its 39 PostgreSQL
+tests, the evidence for the database-side mitigations below (tenant/vendor scoping, filtering
+before limits, the binding recheck and snapshot-relative supersession), all passed in the main-push
+run (logs retrieved independently by the external reviewer; see the
+[ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)),
+as they did earlier in the historical
+[feature-branch run at `3d6e8395`](decisions/0016-snapshot-retrieval.md#feature-branch-ci-evidence-at-3d6e8395).
+This covers the tested paths in those runs only; it is not a general security guarantee. Claude
 Code's earlier local Windows results are historical.
 
-| Threat | Mitigation (implemented, accepted and verified in feature-branch CI) |
+| Threat | Mitigation (implemented, accepted and verified in CI on `main`) |
 |---|---|
 | Retrieving another tenant's or vendor's content | The tenant comes only from the trusted actor (reviewer or approver). Capture is tenant- and vendor-scoped; every channel and evidence statement repeats the tenant, vendor, binding, ready-index and profile joins before its `LIMIT 20`. |
 | Silently searching an incomplete or changed corpus | Capture runs in one REPEATABLE READ, READ ONLY transaction and refuses any active revision without a chunk set or ready index for the profile, an empty set and more than 100 revisions or 100,000 chunks. Before every retrieval, one statement rechecks every immutable binding; current `status` is never consulted, so supersession is snapshot-relative. |
@@ -269,6 +271,19 @@ this); no protection against malicious in-process code is claimed. The precomput
 cannot prove that vectors came from the claimed queries. The evidence digest check detects one
 class of tampering only; no hash protects against a database writer outside the application.
 Repeated table headers are a separate span that citations must not quote across.
+
+## Corpus and retrieval evaluation (M4e, specification accepted; implementation pending)
+
+The [M4e specification](plan.md#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending)
+was proposed in Prompt 140, corrected in Prompts 141–142 and accepted at external review in
+Prompt 143. **Its implementation is pending: none of its mitigations or checks has been executed,
+and no M4e corpus, module, test or command exists yet.** It specifies a fictional synthetic corpus
+only (no real client data, credentials or personal
+data), loading solely through the existing production lifecycle into guarded disposable test
+databases, isolation checks that fail on foreign-tenant, cross-vendor or forbidden chunks and
+foreign canaries even when Recall is high, and fixed-code diagnostics without document text. It
+makes no injection-resistance or semantic-quality claim; end-to-end canary and output behaviour
+remain M5/M7.
 
 ## Not implemented yet
 

@@ -23842,3 +23842,1263 @@ to the verified commit, a clean tree and unchanged reviewed blobs; fast-forward 
 merge --ff-only` and push it; monitor the main runs under the same bound. Any failure, skip,
 cancellation, timeout or ref mismatch stops the sequence without repair, rerun or main update. No
 commit identifier, push, merge or CI result is recorded here.
+
+### Prompt 139 outcome (Claude Code; attributed to its handoff)
+
+Claude Code committed the reviewed documentation and prompt history as
+`cf2b5743799e51c74e9f80638b0cc13be5827a71` (parent `3d6e8395`, tree
+`26e894acd7f3a0580342cc60b45a13dfd178bb6c`, noreply author and committer, subject "docs: record
+verified M4d results and main publication authorization"), with exactly six paths and only
+prompts.md differing from accepted tree `c82bde7d`; full-history Gitleaks scanned 60 commits with
+no leaks. `git push origin refs/heads/feat/snapshot-retrieval:refs/heads/feat/snapshot-retrieval`
+exited 0 (`3d6e839..cf2b574`). The push-triggered feature CI run 39022463200 and secret-scan run
+39022463222 for that exact SHA (attempt 1) concluded success with all five jobs and every step
+`success`. After rechecking preconditions, `git switch main` (0), `git merge --ff-only
+cf2b5743799e51c74e9f80638b0cc13be5827a71` (0, fast-forward from `76fa5a3`, no merge commit) and `git
+push origin refs/heads/main:refs/heads/main` (0, `76fa5a3..cf2b574`) ran; local and remote `main`
+equalled `cf2b5743`. The main CI run 39022741072 and secret-scan run 39022741039 (push, attempt 1)
+concluded success with all five jobs and every step `success`. These were Claude Code's
+observations of run, job and step conclusions through the public API only: its anonymous log
+downloads returned HTTP 403 for both pushes, so it observed no pytest counts, wheel output,
+container details or Gitleaks commit count. No documentation was changed after publication.
+
+## Prompt 140 M4d main evidence and M4e specification proposal (Claude Code)
+
+External reviewer main-evidence note: the external reviewer independently retrieved the main run
+records, job records and all five main job logs through connected GitHub tooling. Both main runs:
+event `push`, branch `main`, head `cf2b5743799e51c74e9f80638b0cc13be5827a71`, attempt 1,
+conclusion success; all five jobs and all required steps succeeded, none skipped. Ubuntu
+(job 117367630581): `2002 passed, 290 skipped in 29.50s`; formatting, lint, strict types,
+distribution build and clean installed-wheel checks passed. Windows (job 117367630553):
+`2001 passed, 291 skipped in 29.54s`; the same checks passed. Both installed-wheel jobs printed
+`offline embedding, canonical storage and indexing modules ran from the installed wheel`,
+`retrieval modules imported and fusion ran from the installed wheel` and `offline migration SQL
+rendered from the installed wheel`. PostgreSQL (job 117367630597): `290 passed, 2002 deselected in
+142.23s (0:02:22)`; all 39 cases in `tests/test_retrieval_postgres.py` passed, none failed or
+skipped. Container (job 117367630417): all six steps succeeded; printed summaries and passed gates
+showed effective context `82 files; 19 planted fixtures excluded`, UID/GID 10001 checks, the three
+help checks, installed imports, offline migration SQL and runtime-content checks, a healthy
+database, completed migration and healthy API on the CI-built image, an API key held in memory
+only, upload 202 with successful ingestion and an active revision with two verified chunks,
+duplicate upload 200, the production backfill enqueuing one offline indexing job, a ready index
+with two embeddings and a succeeded indexing job, the idle worker exiting 0 without OOM, `smoke:
+ok` and `cleanup: ok` (not independently inspected raw rows; ingestion and indexing only, not M4d
+retrieval). Gitleaks (job 117367630646): 60 commits scanned, no leaks. The reviewer confirmed both
+the feature and main workflow run records for this exact commit but did not retrieve the
+feature-push logs for `cf2b5743`, so no feature-push counts exist for it. The reviewer ran no local
+application suite, PostgreSQL, Docker or provider calls. Claude Code's earlier API-only records
+remain historically accurate and are not rewritten.
+
+### Prompt 140 (verbatim; line endings normalized to LF)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 140: record M4d main evidence and propose the M4e corpus and retrieval-evaluation specification
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and any applicable repository instructions.
+
+This task is documentation only:
+1. Record the independently retrieved M4d main-push evidence.
+2. Propose a detailed, implementable M4e specification for external review.
+3. Stage the permitted documentation and export a review diff.
+
+Do not implement, commit, push or merge anything.
+
+## 1. Starting-state verification
+
+Fetch fresh refs without tags and check remote refs read-only.
+
+Expected:
+- Current branch main, tracking origin/main.
+- HEAD, local main, origin/main and remote main:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Parent:
+  3d6e8395f09dbb6d9eb602fe24bcfed46a7f88f2
+- Tree:
+  26e894acd7f3a0580342cc60b45a13dfd178bb6c
+- Local and remote feat/snapshot-retrieval at the same commit.
+- Clean index and working tree.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+- Author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Stop on a material mismatch without resetting or overwriting anything.
+
+Create docs/m4e-corpus-spec from HEAD if it does not already exist. Do not reuse an existing branch silently.
+
+Save baseline refs, tree, status, permitted-file blob hashes and existing prompt-history bytes under ignored .local/p140/.
+
+## 2. Permitted changes
+
+Only:
+- README.md
+- docs/decisions/0016-snapshot-retrieval.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+No source, tests, fixtures, sample corpus files, dependencies, lockfile, migrations, workflows, Docker, Compose or CLAUDE.md changes.
+
+Do not create ADR-0017 yet. Defer it to implementation.
+
+## 3. Record exact-commit M4d main evidence
+
+The external reviewer independently retrieved the main run records, job records and all five main job logs through connected GitHub tooling.
+
+Both main runs:
+- Event push.
+- Branch main.
+- Exact head:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Attempt 1.
+- Conclusion success.
+- All five jobs and all required steps succeeded; none skipped.
+
+Runs:
+- CI:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39022741072
+- Secret scan:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39022741039
+
+Ubuntu:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39022741072/job/117367630581
+
+Observed:
+- 2002 passed, 290 skipped in 29.50s.
+- Formatting, lint, strict types, distribution build and clean installed-wheel checks passed.
+
+Windows:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39022741072/job/117367630553
+
+Observed:
+- 2001 passed, 291 skipped in 29.54s.
+- The same checks passed.
+
+Both installed-wheel jobs printed:
+- offline embedding, canonical storage and indexing modules ran from the installed wheel
+- retrieval modules imported and fusion ran from the installed wheel
+- offline migration SQL rendered from the installed wheel
+
+PostgreSQL:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39022741072/job/117367630597
+
+Observed:
+- 290 passed, 2002 deselected in 142.23s (0:02:22).
+- All 39 cases in tests/test_retrieval_postgres.py passed; none failed or skipped.
+
+Container:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39022741072/job/117367630417
+
+Observed:
+- All six required steps executed and succeeded: configuration, effective context, image build, image checks, smoke and cleanup.
+- Effective context: 82 files; 19 planted fixtures excluded.
+- UID/GID 10001 checks passed.
+- eg-api, eg-worker and eg-admin help checks passed.
+- Installed imports, offline migration SQL and runtime-content checks passed.
+- Healthy database, completed migration and healthy API.
+- Migrate, API and worker used the CI-built image.
+- API key created and held in memory only.
+- Upload 202; successful ingestion; active revision with two verified chunks.
+- Duplicate upload 200.
+- Production backfill enqueued one offline indexing job.
+- Ready index with two embeddings; indexing job succeeded.
+- Idle worker exited 0 without OOM.
+- smoke: ok.
+- Ownership-scoped cleanup completed with cleanup: ok.
+
+Describe these as observed printed summaries and passed gates, not independently inspected raw database rows. This smoke covers ingestion and indexing, not M4d retrieval.
+
+Gitleaks:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39022741039/job/117367630646
+
+Observed:
+- 60 commits scanned.
+- No leaks found.
+
+Attribution:
+- Claude Code's Prompt 139 observations were public API conclusions only; anonymous log downloads returned HTTP 403.
+- The reviewer subsequently retrieved main logs independently.
+- The reviewer confirmed both feature and main workflow run records for this exact commit, but did not retrieve the feature-push logs for cf2b5743. Do not invent feature-push counts.
+- The reviewer ran no local application suite, PostgreSQL, Docker or provider calls.
+
+In ADR-0016:
+- Update status to reviewed, verified in CI and on main at cf2b5743.
+- Add a Main CI evidence at cf2b5743 section with full commit, links, results, attribution and limits.
+- Explain that relative to 3d6e8395 this commit changes verification documentation and prompt history, not implementation.
+- Keep the 3d6e8395 feature evidence as historical and preserve its anchor.
+
+Update README, plan and threat model consistently. Preserve historical local evidence and accepted specification anchors.
+
+## 4. Read the current implementation before specifying M4e
+
+Inspect the accepted M4 direction and Recall decisions, plan sections 5 and 7, packaging/import boundaries, existing evaluation package and any sample-data infrastructure.
+
+Also inspect the actual:
+- Parsing and chunking implementation and source-span conventions.
+- Document/revision creation and activation seams.
+- Ingestion and indexing production paths.
+- Embedding identity, canonical storage and offline provider.
+- Snapshot capture, retrieval values, orchestration and result contracts.
+- Integration fixtures, disposable-database guards and relevant tests.
+- CLI entry points and CI commands.
+
+Read narrowly. Do not load the entire prompts.md into context.
+
+Ground the proposal in real signatures and source facts. Distinguish:
+- Previously accepted decisions.
+- Current implementation facts.
+- New recommendations.
+- Open reviewer decisions.
+
+If an existing implementation constraint contradicts a proposed approach, expose it rather than silently redesigning earlier slices.
+
+## 5. Propose M4e in docs/plan.md
+
+Add a detailed section after M4d and before M5:
+
+M4e corpus and retrieval-evaluation specification (PROPOSED, Prompt 140; not implemented)
+
+Link it from the M4e slice row and README. Add only a concise proposed-status reference in the threat model.
+
+The specification must remain unaccepted and unimplemented. Every future test and command is planned, not executed.
+
+Cover these areas concretely:
+
+### A. Corpus and ground truth
+
+Preserve section 7's fictional tenants and vendors, document roles and authenticity labels, conflicting retention evidence, superseded revision trap, missing answers, table content, wrong claims paired with valid but non-supporting quotations, foreign-tenant canaries and injected variant.
+
+Specify:
+- Intended file layout and schemas.
+- Stable human anchor syntax and exact quoted-span rules.
+- How document bytes, metadata, revision order and identities are represented.
+- Strict validation, bounds and deterministic loading.
+- Clean/injected variant isolation: only the injection paragraph differs in source content; revision hashes, IDs and derived chunk mappings may differ.
+- No real client documents, credentials or personal data.
+- What labels are authored ground truth, rather than model judgments.
+- No assumption that Markdown anchors can be inserted without affecting production chunking.
+
+### B. Loading and lifecycle
+
+Propose an explicit, bounded loading approach grounded in existing seams:
+- Tenant-scoped records and role handling.
+- Real revision creation, ingestion, activation and indexing.
+- Correct supersession order and ready-index checks.
+- Idempotency and repeat-invocation behaviour.
+- Transaction boundaries and partial-failure behaviour.
+- Disposable test databases and production-data protections.
+- No hidden terminal-row edits or fabricated ready indexes.
+
+Explain what runs database-independently and what requires PostgreSQL.
+
+### C. Anchor-to-chunk resolution
+
+Follow the accepted Prompt 108 rules:
+- Relevance unit is a distinct authorized chunk ID.
+- Resolve each gold passage to every eligible chunk containing its full required span.
+- Missing or ambiguous mappings fail unless an explicit multi-chunk annotation resolves them.
+- Deduplicate when multiple anchors map to one chunk.
+- Pin the chunker version and verify the relevant chunk manifest.
+- Account for repeated table headers as separate source spans.
+- Respect snapshot-relative supersession and distinguish forbidden historical revisions from revisions valid in an older captured snapshot.
+- Do not derive ground truth from whichever results retrieval happened to return.
+
+Specify exact mapping inputs, outputs and failure cases.
+
+### D. Retrieval evaluation and Recall
+
+Use existing production retrieval seams, not a replacement ranking implementation.
+
+For nonempty gold set G:
+Recall@k = |set(top_k_chunk_ids) intersect G| / |G|
+
+Required:
+- k=5 and k=8.
+- Per-question values and macro mean over nonempty gold sets.
+- Empty gold yields N/A and is excluded from the macro mean, with excluded count reported.
+- All-empty suites yield N/A, never 1.
+- Duplicate retrieval IDs are contract errors.
+- Fewer than k results are handled without changing the denominator.
+- Report variants and profiles separately.
+- Foreign or forbidden results fail isolation even when recall is high.
+- Distinguish retrieval contract correctness from measured Recall.
+- No fabricated minimum Recall threshold or semantic-quality claim for offline hashing.
+- Clearly identify any proposed threshold requiring reviewer approval.
+
+Cover deterministic examples including 2/3 recall, shared-chunk anchors, missing mappings, duplicated results, empty gold and all-empty suites.
+
+### E. Scope boundaries
+
+Keep M4e focused on corpus, mapping, retrieval contracts and Recall.
+
+Defer:
+- Model-generated report judgments and support precision.
+- End-to-end injection resistance and output-canary behaviour.
+- Live model/provider quality and cost evaluation.
+- Review workflow, approval endpoints and snapshot persistence.
+- Voyage adapter implementation.
+- GUI or deployment additions.
+
+Ground-truth fields needed later may be specified now without claiming their later metrics execute in M4e.
+
+Do not change the accepted M4d trust model or ranking rules.
+
+### F. Commands, outputs, tests and CI
+
+Propose:
+- Module placement consistent with current import boundaries.
+- A minimal operator/test entry point, explaining whether an existing evaluation CLI should be extended or introduced.
+- Output schema, deterministic ordering and reproducibility metadata.
+- Safe diagnostics and exit codes.
+- Database-independent tests and real PostgreSQL acceptance tests.
+- Which checks should run in existing CI jobs and whether any workflow/wheel changes are needed.
+- Packaging of corpus resources versus repository-only fixtures.
+- An intended-file list for the later implementation.
+
+No new dependency unless necessary. Identify any dependency proposal and its policy implications; do not install anything.
+
+Do not broaden the container smoke by default. If an additional check is proposed, explain its value and scope for review.
+
+### G. Decisions for review
+
+List each genuinely unsettled decision with:
+- A clear recommendation.
+- Alternatives and practical tradeoffs.
+- Whether it changes an accepted decision or only fills in implementation detail.
+
+Do not present recommendations as already approved.
+
+## 6. Preserve status and limits
+
+Throughout the five permitted files:
+- M4d is reviewed, verified in CI and on main at cf2b5743.
+- M4e is proposed only.
+- M4f still needs detailed review and implementation.
+- Overall M4 acceptance is pending.
+- The trusted-snapshot past-eligibility limit remains until M5.
+- Local Compose is unverified.
+- Container smoke remains ingestion/indexing and idle-worker shutdown only.
+- No semantic-quality, retrieval-quality, production-readiness or general security guarantee.
+
+Keep historical evidence accurately scoped rather than rewriting it.
+
+## 7. Prompt history
+
+Append:
+1. Prompt 139 publication outcome attributed to its handoff, with Claude Code's API-only observations separated from unavailable logs.
+2. The reviewer's independent main-log evidence above.
+3. This Prompt 140 verbatim, including its Written for line.
+4. An outcome note marking M4e proposed and the documentation staged for review.
+
+Preserve all earlier bytes. Use inline backticked commit references in your own notes.
+
+## 8. Checks and export
+
+Run documentation checks only:
+- Exactly the five permitted paths changed.
+- Earlier prompts.md bytes are an identical prefix.
+- Relative links and anchors resolve.
+- Current-status sweep: no current M4d not-merged claims, no M4e implementation or acceptance claims.
+- Accepted specification anchors preserved.
+- Privacy/artifact checks.
+- UTF-8 without BOM, no CR.
+- git diff --cached --check.
+- Staged Gitleaks without suppression or scanner changes.
+
+Do not run application tests, builds, installs, Docker, database or provider calls.
+
+Stage the permitted files and leave nothing unstaged.
+
+Export directly from Git:
+.local/p140/m4e-corpus-spec.diff
+
+Requirements:
+- Baseline:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Final: completed staged tree.
+- Exclude prompts.md.
+- UTF-8 without BOM, no CR.
+
+Report:
+- Starting state and branch.
+- M4d evidence recorded, with attribution.
+- Proposed M4e design and reviewer decisions.
+- Checks actually run.
+- Staged paths and final tree.
+- Export baseline/final tree, statistics, bytes and SHA-256.
+- Final refs and clean-versus-staged state.
+- Remaining limitations.
+
+Nothing is committed, pushed or merged.
+
+End:
+Mathew: return this output plus .local/p140/m4e-corpus-spec.diff to the external reviewer.
+
+### Prompt 140 outcome (Claude Code; M4e proposed, documentation staged and awaiting review)
+
+Starting state matched after `git fetch --no-tags origin` and read-only `git ls-remote`: branch
+`main` tracking `origin/main`; HEAD, local `main`, `origin/main` and remote `main` at `cf2b5743`
+(parent `3d6e8395`, tree `26e894ac`); local and remote `feat/snapshot-retrieval` at the same
+commit; clean index and working tree; expected origin and identity. `docs/m4e-corpus-spec` did
+not exist and was created from HEAD. The baseline is saved under `.local/p140/`.
+
+Claude Code recorded the reviewer-retrieved main evidence (ADR-0016 status "reviewed, verified in
+CI and on `main` at `cf2b5743`" and a new "Main CI evidence at cf2b5743" section; the
+`3d6e8395` feature evidence kept as historical with its anchor) and updated README, plan and threat
+model consistently. After reading the accepted M4 decisions, plan sections 5 and 7, packaging
+boundaries and the actual chunking, revision, ingestion, indexing, embedding, snapshot and
+retrieval seams, it added the "M4e corpus and retrieval-evaluation specification (PROPOSED,
+Prompt 140; not implemented)" section to docs/plan.md, linked from the M4e slice row, README and a
+concise threat-model note. It separates Prompt 108 decisions, source facts at `cf2b5743`, new
+recommendations and eleven open decisions (E1 to E11), and exposes two constraints: no YAML parser
+is a dependency (E1 recommends standard-library TOML) and visible anchors would change production
+chunking (E2 recommends quote-only anchors). M4e is proposed only, with no code, corpus, test,
+command, workflow change or ADR-0017. Only documentation checks were run; no application tests,
+builds, installs, Docker, database or provider calls. The documentation is staged, uncommitted and
+awaiting review; the staged tree and export metadata are reported in the Prompt 140 handoff.
+
+## Prompt 141 M4e review outcome and specification corrections (Claude Code)
+
+External review of Prompt 140: the reviewer inspected `.local/p140/m4e-corpus-spec.diff` and
+independently matched its size (81,513 bytes) and SHA-256
+(`ce4c22cac166fe46c32b3800e0c51260a0a5f5711187d331dc324fcab417309c`); accepted the M4d
+main-evidence documentation against the independently retrieved logs; and read relevant production
+source, including vendor creation, document/revision creation, chunk IDs and chunking. The
+reviewer ran no project suite, PostgreSQL, Docker, build or provider calls for this review.
+
+Settled decisions: E1–E11 are approved, subject to the corrections: TOML with standard-library
+parsing; ground-truth-only anchors; pure evaluation modules in retrieval and orchestration in the
+worker; tests as the only entry point in M4e; the corpus in the sdist, not the wheel; `initial`
+and `final` snapshot epochs; report-only Recall, any later regression pinning requiring separate
+review; no minimum Recall threshold; a narrow installed-wheel check; a synthetic long-table
+mapping fixture; a fresh disposable database per variant. These settle the choices, not the
+specification as a whole; no implementation or execution evidence follows.
+
+Requested corrections: (A) explicit global lifecycle phases, with the `initial` snapshot captured
+while every r1 is active and retained in memory, later revisions applied afterwards and both
+epochs evaluated after replacement; (B) separate contracts for a fresh two-epoch run and an
+idempotent repeat-load verifier that accepts a superseded r1, creates nothing, never reactivates or
+recaptures, with a valid vendor lookup/create/conflict strategy around `create_vendor`'s UUID4 and
+post-flush duplicate behaviour, and job outcomes read from rows rather than worker exit codes; (C)
+complete tenant-qualified reference and per-epoch case schemas, with forbidden mappings resolved
+against their own revisions and never filtered by the snapshot; (D) a corrected determinism scope
+given UUID4 IDs, inherited chunk IDs, `captured_at` in snapshot digests and UUID tie-breaking; (E)
+an exact `parts` and per-entry mapping-provenance contract; (F) concrete schema, report, failure,
+byte-bound, path-containment and framed corpus-digest contracts, with any new choice labelled as a
+recommendation awaiting review.
+
+### Prompt 141 (verbatim; line endings normalized to LF)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 141: correct the M4e specification and record settled review decisions
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and any applicable repository instructions.
+
+This is documentation only. Correct the proposed M4e specification, record the review decisions below, stage the changes and export an incremental diff.
+
+The complete specification remains proposed and awaiting review. Do not implement, commit, push or merge.
+
+## 1. Starting state
+
+Verify locally; no fetch or remote operation is needed.
+
+Expected:
+- Branch docs/m4e-corpus-spec.
+- HEAD:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Staged tree:
+  c89ce15525b9a1b58f9d8a1051aa23a5a7aaca32
+- Exactly five staged paths:
+  README.md
+  docs/decisions/0016-snapshot-retrieval.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked outside ignored local artifacts.
+- Local main and origin/main unchanged at HEAD.
+- Origin and noreply author/committer identity unchanged.
+
+Stop on a material mismatch without resetting or overwriting anything.
+
+Save the baseline tree, staged paths, per-file blobs and existing prompt-history bytes under ignored .local/p141/.
+
+Verify the earlier export:
+.local/p140/m4e-corpus-spec.diff
+- 81,513 bytes.
+- SHA-256:
+  ce4c22cac166fe46c32b3800e0c51260a0a5f5711187d331dc324fcab417309c
+
+## 2. Review outcome
+
+The external reviewer:
+- Inspected the Prompt 140 diff and independently matched its size and checksum.
+- Accepted the M4d main-evidence documentation against the independently retrieved logs.
+- Read relevant production source, including vendor creation, document/revision creation, chunk IDs and chunking.
+- Ran no project suite, PostgreSQL, Docker, build or provider calls for this review.
+
+E1–E11 recommendations are approved, subject to the corrections below:
+- TOML with standard-library parsing.
+- Ground-truth-only anchors.
+- Pure evaluation modules in retrieval; orchestration in worker.
+- Tests as the only entry point in M4e.
+- Corpus included in the sdist, not the wheel.
+- Initial and final snapshot epochs.
+- Report-only Recall; any later regression pinning requires separate review.
+- No minimum Recall threshold.
+- Narrow installed-wheel check.
+- Synthetic long-table mapping fixture.
+- Fresh disposable database per variant.
+
+These settle the choices, not the specification as a whole. No implementation or execution evidence follows.
+
+Preserve the M4e heading and anchor.
+
+## 3. Correction A: lifecycle phases and snapshot timing
+
+The proposed per-document loop creates all revisions before the described initial capture. Rewrite it as explicit global phases:
+
+1. Validate the entire corpus and ground truth before database writes.
+2. Seed tenants and create or verify vendors.
+3. Create and fully ingest/index revision 1 for every document.
+4. Capture initial snapshots for each required tenant/vendor while those r1 revisions are genuinely active and ready.
+5. Retain those trusted snapshot values in memory.
+6. Apply later revisions in manifest order through real ingestion and indexing.
+7. Capture final snapshots.
+8. Evaluate both the retained initial snapshots and final snapshots after later revisions have activated.
+
+Specify the exact responsibilities and outputs of loading versus evaluation orchestration. The implementation must not fabricate an initial snapshot after supersession.
+
+Keep real production activation and indexing paths unchanged. No direct status edits, synthetic ready indexes or durable snapshot persistence are added.
+
+Planned tests must prove:
+- Initial capture occurs before any r2 activation.
+- Final capture occurs after all intended replacements are ready.
+- Initial-snapshot retrieval after replacement uses the old revision.
+- Final retrieval uses the new revision and excludes the old one.
+
+## 4. Correction B: repeat invocation and failure behaviour
+
+The original repeat-run wording cannot require a superseded r1 to become active again.
+
+Define separate contracts for:
+- Fresh two-epoch evaluation.
+- Idempotent loading or verification of an already loaded corpus.
+
+Required rules:
+- A repeat load accepts an already-settled historical revision in its correct superseded state.
+- It verifies content, metadata, revision numbers, lifecycle states, manifests, ready indexes and canonical jobs.
+- It creates no duplicate rows or jobs and does not reset terminal jobs.
+- It does not reactivate old revisions.
+- It does not claim to recapture the historical initial epoch.
+- A fresh two-epoch run requires a fresh guarded disposable database, unless its original trusted initial snapshots are still explicitly available in memory.
+- Define what a partially loaded or conflicting database causes the test-only orchestrator to do. Do not silently resume in a way that invents a missing epoch.
+
+If the simplest contract is that fresh two-epoch evaluation refuses nonfresh state while a separate repeat-load verifier proves idempotency, specify that plainly.
+
+For vendor reuse, account for the real create_vendor behaviour:
+- create_vendor generates a UUID4.
+- A duplicate slug raises DuplicateVendorSlugError after flush.
+- A failed transaction must be rolled back before further queries.
+Describe a valid tenant-scoped lookup/create/conflict strategy; do not imply that create_vendor itself returns an existing vendor.
+
+Worker exit code is not job success. Read the actual expected job/revision/index outcome. Keep bounded claim counts and fixed failures explicit.
+
+Add planned tests for superseded-r1 repeat loading, metadata conflict, partial-state refusal and no additional rows/jobs.
+
+## 5. Correction C: complete reference and epoch schemas
+
+Provide explicit TOML examples and exact fields for:
+
+- Tenant-qualified anchor references, including foreign-tenant forbidden evidence.
+- Vendor-qualified questions or unambiguous question ownership.
+- Epoch applicability.
+- Epoch-specific gold, forbidden evidence and authored labels where they differ.
+
+Anchor IDs are currently unique only within a tenant, so bare IDs cannot identify another tenant's canaries safely. Choose one canonical qualified reference representation and validate every reference.
+
+A common question definition may contain per-epoch cases, but make the format precise.
+
+For example, retention labels and supporting claims must match the documents actually eligible in that epoch:
+- Initial r1 evidence is not automatically the final r2 evidence.
+- A later revision absent from an initial snapshot is forbidden for that snapshot.
+- A superseded r1 may remain valid for a retained initial snapshot.
+
+Clarify forbidden mapping:
+- Resolve it against the relevant corpus revisions, including revisions outside the snapshot.
+- Do not filter forbidden mappings down to the authorized snapshot, which would erase the traps.
+- Keep gold eligibility checks separate.
+- A future-revision forbidden reference can be resolved after the complete corpus has loaded, while the initial snapshot itself must have been captured earlier.
+
+Validate acceptable and wrong claims' quotation references without treating their later support judgments as M4e execution.
+
+Add planned tests for duplicate local anchor IDs across tenants, cross-tenant references, unknown references, contradictory gold/forbidden sets and epoch-specific labels.
+
+## 6. Correction D: reproducibility and canonical report claims
+
+Correct the determinism scope using the actual production identifiers:
+
+- Vendor, document and revision IDs use UUID4.
+- Chunk IDs are deterministic from tenant, revision, chunker version and ordinal, so they inherit fresh revision identities.
+- Snapshot digests include captured_at.
+- Ranking breaks ties by chunk UUID.
+
+Therefore:
+- Canonical serialization means identical validated report fields encode identically.
+- Repeated evaluation with the same stored corpus, snapshot values, profile, queries and database behaviour can be deterministic.
+- Fresh database loads need not produce identical IDs, manifests, snapshot digests, ranks or Recall values when UUID ties matter.
+- Removing a top-level timestamp does not remove the timestamp already represented by snapshot.sha256.
+- No cross-fresh-load byte or exact-metric equality is promised.
+
+Do not change production UUID generation, capture time, tie-breaking or snapshot contracts to obtain stronger determinism.
+
+Human-readable logical source references may accompany actual IDs for comparison, but do not claim that replacing IDs in a report makes tied rankings reproducible.
+
+E7 remains report-only. A future proposed regression baseline must define the stable inputs and permitted variability; CI observation alone does not justify exact Recall pins across fresh random-ID corpora.
+
+Add planned tests distinguishing:
+- Canonical encoding of the same report value.
+- Repeated retrieval from the same retained snapshots.
+- Two independent fresh loads, with no false equality requirement.
+
+## 7. Correction E: exact anchor/parts contract
+
+Make the multi-chunk annotation implementable:
+
+- Specify the exact type and fields of each part.
+- Resolve each part within the already selected parent quote occurrence.
+- Define occurrence disambiguation relative to that parent range.
+- Require nonempty, ordered, nonoverlapping parts.
+- Define permitted gaps using the production omission rules precisely.
+- Reject annotations that silently discard substantive text.
+- Each part must map to actual containing chunk body/header spans.
+- Preserve all required containing chunks and deduplicate IDs.
+
+The mapping output must represent provenance per mapping:
+- An anchor can map through a body in one chunk and repeated headers in other chunks.
+- A single anchor-level via flag cannot represent that.
+- Specify entries containing chunk ID, relevant source span and body/header route, or an equivalent unambiguous structure.
+
+Clarify the distinction between:
+- Missing text.
+- Ambiguous text occurrence.
+- A source quote spanning a chunk boundary.
+- An explicit valid multi-part annotation.
+- A quote that would falsely concatenate a repeated header and non-adjacent body.
+
+State any extra bounds for parts and mappings. Add planned tests covering each case.
+
+## 8. Correction F: concrete encoding and schema contracts
+
+Complete the proposed corpus/report contracts without implementing them:
+
+- Exact required/optional fields and unknown-key rejection.
+- Exact epoch field representation.
+- Validated profile/configuration identity and report grouping.
+- JSON representation of exact Recall fractions and N/A.
+- Defined four-decimal display rounding, separate from exact arithmetic.
+- What happens on contract/isolation failure: whether a fixed failure report is emitted, an error is raised, or both.
+- Ordinary error privacy and process-control propagation, without exposing raw database exceptions.
+- Input byte bounds before parsing or reading excessive corpus data.
+- Path containment rules for manifest-referenced files, including traversal and symlink escape.
+
+The corpus digest must use an unambiguous versioned encoding:
+- Sorted normalized relative paths.
+- Exact file bytes.
+- Explicit framing, such as length-prefixing.
+- Defined included/excluded file set and variant selection.
+- No hash over unframed path-and-content concatenation.
+- Do not hash the output report into its own corpus digest.
+
+The pure retrieval modules parse bytes/validated values only. File-system handling stays in worker/tests and preserves existing import boundaries.
+
+Any newly necessary design choice must be labelled as a recommendation awaiting review, rather than being silently treated as settled.
+
+## 9. Scope of edits
+
+Only docs/plan.md and prompts.md may differ from baseline tree:
+c89ce15525b9a1b58f9d8a1051aa23a5a7aaca32
+
+README.md, ADR-0016 and threat-model.md must remain byte-identical to that baseline. Their existing proposed status remains accurate.
+
+Correct the M4e section in place. Its complete specification remains proposed, corrected in Prompt 141 and awaiting external review.
+
+Do not create corpus files, code, tests, workflow changes, a CLI or ADR-0017.
+
+## 10. Prompt history
+
+Append:
+- The review outcome, including the matched Prompt 140 checksum.
+- The accepted M4d documentation and settled E1–E11 decisions.
+- The specification corrections and the reviewer's actual inspection scope.
+- This Prompt 141 verbatim, including its Written for line.
+- An outcome note saying corrections are staged and complete-specification review remains pending.
+
+Preserve all earlier bytes. Use inline backticked commit identifiers in your own notes.
+
+## 11. Checks and export
+
+Run documentation checks only:
+- Only plan and prompt history differ from the baseline.
+- README, ADR-0016 and threat-model blobs match the baseline.
+- Earlier prompts.md bytes are an identical prefix.
+- Links and anchors resolve.
+- No contradictory lifecycle, repeat-run, reference or determinism claims remain.
+- No M4e implementation or full-specification acceptance claim.
+- Privacy/artifact checks.
+- UTF-8 without BOM and no CR.
+- git diff --cached --check.
+- Staged Gitleaks without suppression or scanner changes.
+
+No application tests, builds, installs, Docker, database or provider calls.
+
+Stage the changes, retaining the same five staged paths overall.
+
+Export directly from Git:
+.local/p141/m4e-spec-corrections.diff
+
+- Baseline tree:
+  c89ce15525b9a1b58f9d8a1051aa23a5a7aaca32
+- Final: completed staged tree.
+- Exclude prompts.md.
+- UTF-8 without BOM, no CR.
+
+Report the corrections, settled decisions, any new recommendations, checks actually run, final staged tree and paths, byte identity, export statistics/size/SHA-256 and final Git state.
+
+Nothing is committed, pushed, merged or implemented.
+
+End:
+Mathew: return this output plus .local/p141/m4e-spec-corrections.diff to the external reviewer.
+
+### Prompt 141 outcome (Claude Code; corrections staged, complete-specification review pending)
+
+Starting state matched locally: branch `docs/m4e-corpus-spec`, HEAD, `main` and `origin/main` at
+`cf2b5743`, staged tree `c89ce155` with the same five paths, nothing unstaged or untracked,
+expected origin and identity. The Prompt 140 export matched (81,513 bytes, SHA-256
+`ce4c22ca…309c`). The baseline is saved under `.local/p141/`.
+
+Claude Code rewrote the M4e section of docs/plan.md in place, keeping its heading and anchor: the
+status now says proposed in Prompt 140, corrected in Prompt 141, E1–E11 settled and the complete
+specification awaiting review; corrections A–F are applied (global phases with a retained
+`initial` snapshot; `run_fresh_two_epoch`, `verify_loaded` and `evaluate` as separate contracts; a
+canonical `tenant/vendor/document@rN#anchor` reference with per-epoch question cases; the corrected
+determinism scope; exact `parts` rules and `MappingEntry` provenance; concrete corpus, ground-truth
+and report schemas, failure semantics, pre-read byte bounds, path containment and the framed
+`eg-corpus-digest-v1`). New details are listed as recommendations N1–N9 awaiting review. The M4e
+slice row and the plan status line note the Prompt 141 correction. README, ADR-0016 and the threat
+model are byte-identical to the baseline. Only documentation checks were run; no application
+tests, builds, installs, Docker, database or provider calls. Nothing is implemented, committed,
+pushed or merged; the staged tree and export metadata are reported in the Prompt 141 handoff.
+
+## Prompt 142 M4e review outcome and final specification corrections (Claude Code)
+
+External review of Prompt 141: the reviewer inspected `.local/p141/m4e-spec-corrections.diff` and
+independently matched its size (69,889 bytes) and SHA-256
+(`76a8099e6ec2c55f2bb151ba33b74f1d385d468d14b94d2ebda4608c4ef1c6eb`). No project tests, builds,
+PostgreSQL, Docker or provider calls were run. The lifecycle phases, qualified references, epoch
+cases, determinism limits, mapping provenance and framed corpus digest are acceptable directions.
+N1–N9 are approved subject to the Prompt 142 corrections; E1–E11 remain settled. The complete
+specification is not accepted yet.
+
+Remaining findings: (1) `verify_loaded` called `seed_demo`, `create_upload` and
+`enqueue_index_revision`, which can write on missing or partial state, so comparing counts afterwards
+could not prevent committed changes; it must become a genuinely read-only verifier with production-
+seam reuse covered separately; (2) the Prompt 141 rewrite removed the quote-validation rules that
+section C still referred to; exact quote and occurrence rules for parent and part quotes are needed;
+(3) contract and isolation failures still required ordinary Recall fields; question validity,
+null-Recall semantics, failed-group macro suppression, malformed-output reporting and a nullable
+schema need defining, distinct from operational errors.
+
+### Prompt 142 (verbatim; line endings normalized to LF)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 142: resolve the remaining M4e verification, quote-validation and failure-report contracts
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and any applicable repository instructions.
+
+Documentation only. Correct the remaining specification issues, stage the changes and export an incremental diff.
+
+The complete M4e specification remains proposed and awaiting review. No implementation, commit, push or merge.
+
+## 1. Verify starting state locally
+
+No fetch or remote operation.
+
+Expected:
+- Branch docs/m4e-corpus-spec.
+- HEAD, main and origin/main:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Staged tree:
+  a8176482b912002d2b10d01e55bfb348a7c2bc2a
+- Same five staged paths:
+  README.md
+  docs/decisions/0016-snapshot-retrieval.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked outside ignored local artifacts.
+- Origin and noreply identity unchanged.
+
+Stop on a material mismatch without overwriting anything.
+
+Save baseline tree, paths, per-file blobs and existing prompt-history bytes under ignored .local/p142/.
+
+Verify:
+.local/p141/m4e-spec-corrections.diff
+- 69,889 bytes.
+- SHA-256:
+  76a8099e6ec2c55f2bb151ba33b74f1d385d468d14b94d2ebda4608c4ef1c6eb
+
+## 2. Review outcome
+
+The external reviewer inspected the Prompt 141 correction diff and independently matched its checksum and size. No project tests, builds, PostgreSQL, Docker or provider calls were run.
+
+The lifecycle phases, qualified references, epoch cases, determinism limits, mapping provenance and framed corpus digest are acceptable directions.
+
+N1–N9 are approved subject to the corrections and clarifications in this prompt. E1–E11 remain settled.
+
+The complete specification is not accepted yet. Record that distinction.
+
+## 3. Make verify_loaded genuinely read-only
+
+The current proposal calls seed_demo, create_upload and enqueue_index_revision, then promises no new rows or jobs.
+
+That promise fails on missing or partial state:
+- seed_demo can create missing records.
+- create_upload can create a missing revision or enqueue work.
+- enqueue_index_revision can create missing profile/index/job state.
+- Comparing counts after those calls does not prevent committed changes.
+
+Replace verify_loaded with a genuinely read-only verifier:
+- No seed_demo.
+- No create_upload or create_revision.
+- No ensure_profile, create_index or enqueue calls.
+- No worker.
+- No new snapshot capture.
+- No DML or repair.
+- Read existing tenants/users, vendors, documents, revisions, profiles, chunk sets, indexes, embeddings and canonical jobs as needed.
+- Verify exact expected metadata, content, revision numbers, lifecycle states, manifests, ready indexes and succeeded canonical jobs.
+- Accept historical r1 as superseded where a later revision exists.
+- Refuse missing, extra, unsettled, failed or conflicting corpus state with a fixed error.
+- Define whether extra-state rejection is corpus-tenant-wide or limited to named corpus vendors, consistently with the freshness check.
+- Use an explicitly read-only transaction with a consistent view for the verification. Ground the transaction handling in existing helpers rather than changing them.
+
+Identify the required read statements and module placement. Evaluation-only SQL may live in the worker orchestrator if compatible with existing import boundaries; otherwise propose the narrowest necessary read seam and list its intended file explicitly. Do not implement it now.
+
+Preserve production-seam idempotency coverage separately:
+- After a complete fresh load, planned tests may call the existing upload and indexing seams on known complete records to demonstrate reuse and unchanged rows/jobs.
+- Those tests are distinct from verify_loaded.
+- Specify transaction handling and what is asserted.
+- Do not use mutating probes to determine whether a partial database is complete.
+
+Add planned tests:
+- The verifier on a complete database performs no writes.
+- Each relevant missing-state case refuses without changing database state.
+- Metadata conflicts refuse without changes.
+- Superseded-r1 verification succeeds.
+- Production-seam reuse on a complete corpus creates no additional rows/jobs.
+- No initial epoch is fabricated or recaptured.
+
+Update N3 and all repeat-run descriptions consistently.
+
+## 4. Restore complete quote and occurrence validation
+
+The Prompt 141 rewrite removed the earlier quote-validation paragraph. Section C still refers to “anchor quote rules (A)”, but those rules no longer exist.
+
+Define the exact rules in section A for both parent and part quotes:
+- Exact string type.
+- Nonempty and bounded code-point length.
+- Strict UTF-8 encodability, with no NUL or unpaired surrogate.
+- Exact source matching: no case folding, whitespace normalization or Unicode normalization.
+- Explicit leading/trailing whitespace rules.
+- Explicit multiline rules compatible with source-contiguous multi-part quotes and table spans.
+- Optional occurrence is an exact positive integer, never bool, counted over non-overlapping matches.
+- Missing occurrence for repeated matches and out-of-range occurrence have fixed outcomes.
+- Parent occurrence is resolved in the revision text.
+- Part occurrence is resolved only within the selected parent range.
+- Unknown fields are rejected.
+
+Keep the existing full-coverage, ordering, gap and provenance rules for parts.
+
+Do not restore a restriction that makes the accepted cross-chunk annotation unusable. If multiline body quotes are permitted, state that explicitly and retain exact source offsets.
+
+Add planned tests for empty quotes, invalid types, zero/negative/bool occurrences, invalid Unicode, bounds, multiline quotes and exact matching without normalization.
+
+## 5. Define failure-report metrics precisely
+
+The current proposal records contract and isolation failures in a complete report, but still requires ordinary Recall fields.
+
+Specify:
+- A question with any contract or isolation failure is invalid for Recall.
+- Its recall_at_5 and recall_at_8 are null.
+- This null is distinguishable from valid empty-gold N/A through an explicit question outcome/status or reason.
+- Invalid questions are counted separately from excluded_empty_gold.
+- Group output must clearly indicate failure.
+- Do not present a failed group’s macro as an ordinary successful evaluation.
+
+Recommended simple rule:
+- If any question in a group has a contract or isolation failure, both group macro Recall fields are null.
+- Retain explicit counts for total questions, valid nonempty-gold questions, valid empty-gold questions and invalid questions.
+- require_passing fails the run regardless of other groups’ values.
+
+Define reporting for malformed output:
+- Duplicate IDs, bad ranks and out-of-snapshot results can be represented as failures without silently repairing or deduplicating the ranked output.
+- If a returned chunk has no known logical source reference, its report entry can use an explicit null/unknown mapping rather than causing report construction to lose the original violation.
+- Do not emit document/query text or arbitrary object representations.
+- Only validated safe identifiers may appear in diagnostics.
+- Operational retrieval/database failures may remain fixed EvaluationError with no complete report; distinguish these from inspectable contract/isolation violations.
+- Define which report fields can be absent/null in a failure case, so the schema is implementable.
+
+Add planned tests:
+- Duplicate result IDs.
+- A forbidden result.
+- A foreign or unknown chunk.
+- A snapshot/profile/configuration mismatch.
+- Valid empty gold versus invalid-question null.
+- Failed-group macro suppression.
+- require_passing fails even when unaffected questions have perfect Recall.
+
+Keep successful Recall arithmetic unchanged and report-only. No minimum threshold.
+
+## 6. Preserve accepted scope and document identity
+
+Only docs/plan.md and prompts.md may differ from baseline tree:
+a8176482b912002d2b10d01e55bfb348a7c2bc2a
+
+README.md, ADR-0016 and docs/threat-model.md must stay byte-identical to that baseline.
+
+Keep:
+- M4e heading and anchor unchanged.
+- M4d main evidence unchanged.
+- Fresh two-epoch captures before/after replacements.
+- Qualified references and per-epoch cases.
+- No deterministic IDs or cross-fresh-load equality promise.
+- Corpus digest framing.
+- No change to production ranking, snapshot trust or lifecycle semantics.
+- Tests-only entry point.
+- No corpus files, code, tests, CLI, workflow changes or ADR-0017.
+
+Mark the complete specification proposed, corrected through Prompt 142 and awaiting review.
+
+## 7. Append prompt history
+
+Append:
+- The Prompt 141 review outcome with the matched checksum.
+- N1–N9 approval subject to these corrections.
+- The three remaining findings and the reviewer’s actual scope.
+- This Prompt 142 verbatim, including Written for.
+- An outcome note that the corrections are staged and complete-specification acceptance remains pending.
+
+Preserve all earlier bytes. Use inline backticked commit identifiers in your own notes.
+
+## 8. Checks and incremental export
+
+Documentation checks only:
+- Only plan and prompt history differ from the baseline.
+- README, ADR-0016 and threat-model blob identity.
+- Earlier prompts.md bytes remain an identical prefix.
+- Links and anchors resolve.
+- No contradictory verifier-write, quote-rule or failure-metric wording.
+- No implementation or full-acceptance claim.
+- Privacy/artifact scan.
+- UTF-8 without BOM, no CR.
+- git diff --cached --check.
+- Staged Gitleaks without suppression or scanner changes.
+
+No application tests, builds, installs, Docker, database or provider calls.
+
+Stage the changes, retaining the same five staged paths overall.
+
+Export directly from Git:
+.local/p142/m4e-final-spec-corrections.diff
+
+- Baseline:
+  a8176482b912002d2b10d01e55bfb348a7c2bc2a
+- Final: completed staged tree.
+- Exclude prompts.md.
+- UTF-8 without BOM, no CR.
+
+Report corrections, any genuinely unresolved detail, checks actually run, byte identity, staged paths/tree, export statistics/bytes/SHA-256 and final Git state.
+
+Nothing is implemented, committed, pushed or merged.
+
+End:
+Mathew: return this output plus .local/p142/m4e-final-spec-corrections.diff to the external reviewer.
+
+### Prompt 142 outcome (Claude Code; corrections staged, complete-specification acceptance pending)
+
+Starting state matched locally: branch `docs/m4e-corpus-spec`, HEAD, `main` and `origin/main` at
+`cf2b5743`, staged tree `a8176482` with the same five paths, nothing unstaged or untracked,
+expected origin and identity. The Prompt 141 export matched (69,889 bytes, SHA-256
+`76a8099e…c6eb`). The baseline is saved under `.local/p142/`.
+
+Claude Code corrected the M4e section of docs/plan.md in place, keeping its heading and anchor:
+`verify_loaded` is now genuinely read-only (no seeding, uploads, profile/index creation, enqueue,
+worker, capture or DML; one `read_snapshot` transaction; listed read statements in the worker
+module; corpus-tenant-wide extra-state rejection matching the widened freshness check), with
+production-seam reuse demonstrated by a separate test on a complete corpus; the quote and
+occurrence rules are restored in section A for parent and part quotes; and contract and isolation
+failures now make questions `invalid` with `null` Recall, distinguished from valid empty-gold N/A by
+an `outcome` field, mark groups and the report `failed` with `null` macro, and keep the observed
+ranked output with nullable logical references, while operational retrieval errors raise without a
+report. N1–N9 are recorded as settled as corrected; new details are N10–N12 awaiting review. The
+plan status line and the M4e slice row say "corrected through Prompt 142". README, ADR-0016 and the
+threat model are byte-identical to the baseline. Only documentation checks were run; nothing is
+implemented, committed, pushed or merged. The staged tree and export metadata are reported in the
+Prompt 142 handoff.
+
+## Prompt 143 M4e specification acceptance and local commit authorization (Claude Code)
+
+External review acceptance of Prompt 142: the reviewer accepted the complete M4e specification,
+including N10–N12, with two precise final clarifications. Review scope across the M4e
+specification reviews: the reviewer inspected the Prompt 140 proposal diff
+(`.local/p140/m4e-corpus-spec.diff`, 81,513 bytes, SHA-256
+`ce4c22cac166fe46c32b3800e0c51260a0a5f5711187d331dc324fcab417309c`) and the Prompt 141 and 142
+correction diffs (`.local/p141/m4e-spec-corrections.diff`, 69,889 bytes, SHA-256
+`76a8099e6ec2c55f2bb151ba33b74f1d385d468d14b94d2ebda4608c4ef1c6eb`;
+`.local/p142/m4e-final-spec-corrections.diff`, 43,799 bytes, SHA-256
+`1608f4ec57e9defacf7dd5bdbe5cd51ca1d1d1d9eb00e425dc4c6394bb9eaa60`), independently matched their
+checksums and sizes, and read selected relevant production source. The reviewer ran no project
+suite, build, PostgreSQL, Docker or provider calls for these specification reviews.
+
+Final clarifications: (A) the planned tests now state that `verify_loaded` refuses an empty
+database and a seeded-only database because the corpus is incomplete, while
+`run_fresh_two_epoch` accepts both as valid starting states and refuses, writing nothing, any
+partially loaded or conflicting corpus state (existing corpus-tenant vendors, documents, revisions,
+embedding profiles, embedding indexes or corpus job kinds); the freshness policy is unchanged and
+the verifier stays read-only; (B) the read-only verifier reads every `embedding_profiles` row of
+each corpus tenant and compares the set with the exact `HASH_IDENTITY` profile (full stored
+identity, fingerprint and derived ID), refusing missing, conflicting or additional profiles, with
+a planned extra-profile test whose setup uses the legitimate `ensure_profile` seam. E1–E11 and
+N1–N12 are settled within the complete accepted specification. Specification acceptance is a design
+decision, not implementation or execution evidence: no M4e corpus, module, test, command, workflow
+extension or ADR-0017 exists, and every M4e check is pending.
+
+### Prompt 143 (verbatim; line endings normalized to LF)
+
+Written for: Mathew and the external reviewer.
+
+# Prompt 143: record accepted M4e specification and commit documentation locally
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and any applicable repository instructions.
+
+The external reviewer accepts the complete M4e specification, including N10–N12, with the two precise clarifications below.
+
+Apply those clarifications, record specification acceptance, run documentation checks, commit locally and export an incremental review diff.
+
+No implementation, push or merge is authorized.
+
+## 1. Starting-state verification
+
+Check locally only. No fetch or remote operation.
+
+Expected:
+- Branch docs/m4e-corpus-spec.
+- HEAD:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Accepted staged tree:
+  464bdcc977f9ddd952876842ff65909373797f80
+- Exactly five staged paths:
+  README.md
+  docs/decisions/0016-snapshot-retrieval.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked outside ignored local artifacts.
+- Local main and origin/main unchanged at HEAD.
+- Origin and expected noreply identity unchanged:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Stop on a material mismatch without resetting or overwriting anything.
+
+Save the accepted tree, staged paths, per-file blob hashes and existing prompt-history bytes under ignored .local/p143/.
+
+Verify the Prompt 142 export:
+.local/p142/m4e-final-spec-corrections.diff
+- 43,799 bytes.
+- SHA-256:
+  1608f4ec57e9defacf7dd5bdbe5cd51ca1d1d1d9eb00e425dc4c6394bb9eaa60
+
+## 2. Apply two final clarifications
+
+### A. Fresh-run test expectations
+
+The current planned-test sentence says the fresh run refuses every state from the verifier-refusal list. That list includes:
+- An empty database.
+- Seeded tenants and users only.
+
+Those are valid fresh-run starting states under the specification.
+
+Correct the test matrix explicitly:
+- verify_loaded refuses an empty database and seeded-only state because the corpus is incomplete.
+- run_fresh_two_epoch accepts either of those valid starting states.
+- run_fresh_two_epoch refuses partially loaded or conflicting corpus state, including existing corpus-tenant vendors, documents, revisions, embedding profiles, embedding indexes or corpus job kinds.
+- Refusal writes nothing.
+- The verifier remains genuinely read-only.
+
+Do not change the accepted freshness policy.
+
+### B. Enumerate all embedding profiles
+
+The verifier rejects unexpected embedding profiles tenant-wide, but its read list currently names only the HASH_IDENTITY fingerprint lookup.
+
+Clarify:
+- Read every embedding_profiles row in each corpus tenant.
+- Compare that set against the exact expected HASH_IDENTITY profile.
+- Verify its full stored identity and fingerprint, not just that some lookup returned a row.
+- Reject missing, conflicting or additional profiles with the appropriate fixed refusal.
+- Keep the existing index, manifest, row-count and canonical-job checks.
+- No profile creation, repair, DML or fenced helper is used.
+
+Add a planned read-only verifier test for an extra profile. Test setup must use existing legitimate profile-creation seams, not direct corruption of terminal rows.
+
+These are specification clarifications only. Do not write tests or code now.
+
+## 3. Record acceptance
+
+Permitted files:
+- README.md
+- docs/decisions/0016-snapshot-retrieval.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Only the two clarifications, acceptance wording, necessary links and append-only history may differ from accepted tree 464bdcc9.
+
+In docs/plan.md:
+- Change the heading to:
+  M4e corpus and retrieval-evaluation specification (ACCEPTED at review, Prompt 143; implementation pending)
+- Update all references to the resulting anchor.
+- Record:
+  proposed in Prompt 140;
+  corrected in Prompts 141–142;
+  accepted at external review in Prompt 143 with the two final clarifications.
+- Record E1–E11 and N1–N12 as settled within the complete accepted specification.
+- State that the section's recommendations now form the accepted implementation contract.
+- State that no specification decision remains open.
+- Update current status and slice-table wording.
+- Keep implementation and every M4e execution check pending.
+
+Update README, ADR-0016 and threat model consistently:
+- M4d remains reviewed, verified in CI and on main at cf2b5743.
+- M4e specification accepted; implementation pending.
+- No M4e corpus, module, test, command, workflow extension or ADR-0017 exists yet.
+- No proposed M4e mitigation has been executed.
+- M4f still needs detailed review and implementation.
+- Overall M4 acceptance remains pending.
+
+Keep unchanged:
+- M4d evidence, counts, links and attribution.
+- Accepted M4c and M4d specification anchors.
+- The M4e design apart from the two clarifications.
+- Report-only Recall and no minimum threshold.
+- Fresh-load determinism limitations.
+- Trusted-snapshot past-eligibility limitation and M5 obligations.
+- Local Compose unverified.
+- Container smoke ingestion/indexing scope and idle-worker shutdown limit.
+- No semantic-quality, retrieval-quality, production-readiness or general security guarantee.
+
+Do not create ADR-0017.
+
+## 4. Append prompt history
+
+Preserve every earlier byte.
+
+Append:
+- The reviewer acceptance under Prompt 142.
+- Review scope: inspected the Prompt 140 proposal and Prompt 141–142 correction diffs, independently matched their checksums and sizes, and read selected relevant production source.
+- The reviewer ran no project suite, build, PostgreSQL, Docker or provider calls for these specification reviews.
+- The two final clarifications and N10–N12 acceptance.
+- The distinction between specification acceptance and implementation/execution evidence.
+- This Prompt 143 verbatim, including Written for.
+- A pre-commit note recording checks and local-commit scope without recording the future commit SHA or publication.
+
+Use inline backticked commit identifiers in your own notes.
+
+## 5. Documentation checks
+
+Before committing verify:
+- Exactly the five permitted paths staged.
+- Changes from accepted tree limited to the authorized clarifications, acceptance wording, links and history.
+- Earlier prompts.md bytes remain an identical prefix.
+- Relative links and anchors resolve.
+- No stale current “awaiting specification acceptance” wording.
+- No claim that M4e is implemented, tested, published or merged.
+- No remaining contradiction between fresh-run and verifier starting states.
+- All-profile enumeration supports the extra-profile refusal.
+- Privacy/artifact checks clean.
+- UTF-8 without BOM and no CR.
+- git diff --cached --check clean.
+- Staged Gitleaks passes without suppression or scanner changes.
+- Effective author and committer match the expected noreply identity.
+
+Do not run application tests, builds, installs, Docker, database or provider calls.
+
+## 6. Local commit
+
+Commit exactly the five documentation/history paths.
+
+Suggested subject:
+docs: record M4d main results and accepted M4e evaluation specification
+
+Use the expected noreply author and committer. Credit Claude Code's actual assistance following the existing repository convention. Preserve earlier OpenAI Codex attribution in history.
+
+After committing verify:
+- Parent is exactly:
+  cf2b5743799e51c74e9f80638b0cc13be5827a71
+- Exactly the five expected paths committed.
+- Only authorized documentation/history changes relative to accepted tree.
+- Working tree clean.
+- main and origin/main unchanged.
+- Full-history Gitleaks passes without suppression.
+
+No push, merge, amend, rebase, tag or branch deletion.
+
+## 7. Incremental export and handoff
+
+Export directly from Git:
+.local/p143/m4e-spec-acceptance.diff
+
+- Baseline:
+  464bdcc977f9ddd952876842ff65909373797f80
+- Final: the new local commit.
+- Exclude prompts.md.
+- UTF-8 without BOM, no CR.
+
+Report:
+- Starting-state checks.
+- The two final clarifications.
+- Acceptance wording and anchor changes.
+- Checks actually run.
+- Commit SHA, parent, tree, subject, paths, identity and attribution.
+- Final branch and clean-tree state.
+- main and origin/main unchanged.
+- Export baseline/final commit, statistics, byte size and SHA-256.
+- Implementation and verification still pending.
+
+Nothing is pushed or merged, and no M4e implementation is started.
+
+End:
+Mathew: return this output plus .local/p143/m4e-spec-acceptance.diff to the external reviewer.
+
+### Prompt 143 pre-commit note (Claude Code; before the local commit)
+
+Starting state matched locally: branch `docs/m4e-corpus-spec`, HEAD, `main` and `origin/main` at
+`cf2b5743`, index writing accepted tree `464bdcc977f9ddd952876842ff65909373797f80` with the five
+staged paths, nothing unstaged or untracked, expected origin and noreply identity. The Prompt 142
+export matched (43,799 bytes, SHA-256 `1608f4ec…aa60`). The accepted tree, paths, blob hashes and
+prompt-history prefix are saved under `.local/p143/`.
+
+Claude Code applied the two clarifications to the M4e section of docs/plan.md, renamed its heading
+to "M4e corpus and retrieval-evaluation specification (ACCEPTED at review, Prompt 143;
+implementation pending)" and updated every link to the new anchor (plan, README and threat
+model); recorded the acceptance (proposed in Prompt 140, corrected in Prompts 141–142, accepted in
+Prompt 143; E1–E11 and N1–N12 settled; the [REC] items now the accepted implementation contract;
+no decision open; implementation and every M4e check pending); and updated the plan status line,
+the M4e slice row, README, ADR-0016 (M4e status wording only) and the threat model. M4d evidence,
+the accepted M4c and M4d anchors and every stated limit are unchanged. No application tests,
+builds, installs, Docker, database or provider calls were run. Pre-commit checks are reported in
+the Prompt 143 handoff; the local commit covers exactly these five documentation and history
+paths. No commit identifier, push or publication is recorded here.

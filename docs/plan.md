@@ -1,6 +1,6 @@
 # EvidenceGuard implementation plan
 
-**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`. The M4c installed-wheel extension, which executes the offline embedding and canonical storage path and imports the indexing modules, ran locally on Windows in Prompts 125–126 (historical) and passed on Ubuntu and Windows CI runners at `600a366` and again on `main` at `76fa5a3`; the earlier M4a/M4b wheel limitations are historical. The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); M4c was implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 (ADR-0015); it is reviewed, verified in CI and on `main` at `76fa5a3` (PostgreSQL, Linux, Windows, installed-wheel and container indexing; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3); earlier feature-branch verification at `600a366` is historical). The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and accepted at external review in Prompt 133. Claude Code implemented it in Prompt 134 on `feat/snapshot-retrieval` and corrected it in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)); the implementation was **accepted at external review in Prompt 136** and is **reviewed and verified in feature-branch CI at `3d6e8395`** (Ubuntu, Windows, PostgreSQL with all 39 M4d cases passing, installed-wheel retrieval check, the unchanged container job and Gitleaks; see the [ADR-0016 feature-branch CI evidence](decisions/0016-snapshot-retrieval.md#feature-branch-ci-evidence-at-3d6e8395)). It is not merged; `main` is unchanged at `76fa5a3`. Claude Code's local Windows results in Prompts 134–135 are historical. M4e–M4f remain unimplemented and still require accepted specifications; overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
+**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`. The M4c installed-wheel extension, which executes the offline embedding and canonical storage path and imports the indexing modules, ran locally on Windows in Prompts 125–126 (historical) and passed on Ubuntu and Windows CI runners at `600a366` and again on `main` at `76fa5a3`; the earlier M4a/M4b wheel limitations are historical. The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); M4c was implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 (ADR-0015); it is reviewed, verified in CI and on `main` at `76fa5a3` (PostgreSQL, Linux, Windows, installed-wheel and container indexing; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3); earlier feature-branch verification at `600a366` is historical). The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and accepted at external review in Prompt 133. Claude Code implemented it in Prompt 134 on `feat/snapshot-retrieval` and corrected it in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)); the implementation was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (Ubuntu, Windows, PostgreSQL with all 39 M4d cases passing, installed-wheel retrieval check, the unchanged container job and Gitleaks; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` and Claude Code's local Windows results in Prompts 134–135 are historical. The [M4e corpus and retrieval-evaluation specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was proposed in Prompt 140, corrected in Prompts 141–142 and **accepted at external review in Prompt 143**; its implementation and every M4e check are pending; M4f still requires a detailed specification; overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
 
 EvidenceGuard is a vendor-risk review copilot. It ingests synthetic vendor documents, retrieves evidence the tenant is authorized to see, classifies each review question against that evidence, and drafts a cited report. A human must approve the exact report revision before it can be finalized or exported. It is decision support, not legal advice or compliance certification.
 
@@ -2604,7 +2604,7 @@ container verification; see the [main CI evidence](decisions/0014-embedding-pers
 feature-branch verification at `90240e3` is historical. The
 [M4c indexing specification](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending)
 was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in
-Prompt 123). M4c was implemented on `feat/revision-indexing` by Claude Code in Prompt 125 ([ADR-0015](decisions/0015-revision-indexing.md)) and corrected in Prompt 126, with historical local Windows checks in Prompts 125–126; it was accepted at external review for a local commit in Prompt 127 and is **reviewed, verified in CI and on `main` at `76fa5a3`** (main push: PostgreSQL `251 passed`, including all 18 indexing cases, plus Linux, Windows, installed-wheel and container indexing verification; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3)). Earlier feature-branch verification at `600a366` is historical. The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and **accepted at external review in Prompt 133**. Its implementation by Claude Code in Prompt 134, corrected in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)), was **accepted at external review in Prompt 136** and is **reviewed and verified in feature-branch CI at `3d6e8395`** on `feat/snapshot-retrieval` (PostgreSQL `290 passed`, including all 39 M4d cases; see the [ADR-0016 evidence](decisions/0016-snapshot-retrieval.md#feature-branch-ci-evidence-at-3d6e8395)); it is not merged. M4e–M4f still need accepted
+Prompt 123). M4c was implemented on `feat/revision-indexing` by Claude Code in Prompt 125 ([ADR-0015](decisions/0015-revision-indexing.md)) and corrected in Prompt 126, with historical local Windows checks in Prompts 125–126; it was accepted at external review for a local commit in Prompt 127 and is **reviewed, verified in CI and on `main` at `76fa5a3`** (main push: PostgreSQL `251 passed`, including all 18 indexing cases, plus Linux, Windows, installed-wheel and container indexing verification; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3)). Earlier feature-branch verification at `600a366` is historical. The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and **accepted at external review in Prompt 133**. Its implementation by Claude Code in Prompt 134, corrected in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)), was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (main push: PostgreSQL `290 passed`, including all 39 M4d cases; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` is historical. The [M4e specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was accepted at external review in Prompt 143 (proposed in Prompt 140, corrected in Prompts 141–142); its implementation is pending. M4e–M4f still need accepted
 specifications, overall M4 acceptance remains pending, and local Compose remains unverified.** M1, M2 and M3 remain accepted.
 
 The reviewer inspected the full Prompt 107 diff, independently matched its
@@ -2643,8 +2643,8 @@ Accepted dependency-ordered sequence (Prompt 108; each later slice needs its own
 | M4a | Immutable embedding identity/batch contracts, provider protocol, deterministic offline hashing and validation. Detailed below; no persistence or provider access. |
 | M4b | Embedding profiles/index records, tenant-scoped storage and migration, full-text representation, exact vector operations and completeness/readiness. Real PostgreSQL constraints, migration round trips and filtering tests. Introduce pgvector here when vector storage/operators first require it; M4a needs no extension. Detailed specification [accepted at review in Prompt 116](#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending) (proposed in Prompt 114, corrected in Prompt 115); implemented in Prompt 117, accepted in Prompt 118, verified in CI and on `main` at `872d0af` ([ADR-0014](decisions/0014-embedding-persistence.md)). |
 | M4c | Separate durable `index_revision` jobs over completed immutable chunk sets, enqueue/backfill seam and registered handler. Test leases/fences, replay, partial batches, conflicting retries, cancellation and atomic readiness/job finish. No review workflow. Detailed specification [accepted at review in Prompt 124](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending) (proposed in Prompt 122, corrected in Prompt 123); implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 ([ADR-0015](decisions/0015-revision-indexing.md)); verified in CI and on `main` at `76fa5a3`, including PostgreSQL and container indexing. |
-| M4d | Explicit snapshot input/capture seam, eligibility validation, deterministic lexical/vector/RRF retrieval and bounded results. PostgreSQL isolation, snapshot-after-supersession, ranking and tie tests. No review endpoints or report generation. Detailed specification [accepted at review in Prompt 133](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) (proposed in Prompt 131, corrected in Prompt 132); implementation staged in Prompt 134 and corrected in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)), accepted at external review in Prompt 136; verified in feature-branch CI at `3d6e8395`, not merged. |
-| M4e | Synthetic clean/injected corpus, stable anchor-to-chunk ground truth, Recall@5/@8 and retrieval contracts. Include cross-tenant, cross-vendor and superseded traps and missing answers; no semantic-quality claim. |
+| M4d | Explicit snapshot input/capture seam, eligibility validation, deterministic lexical/vector/RRF retrieval and bounded results. PostgreSQL isolation, snapshot-after-supersession, ranking and tie tests. No review endpoints or report generation. Detailed specification [accepted at review in Prompt 133](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) (proposed in Prompt 131, corrected in Prompt 132); implementation staged in Prompt 134 and corrected in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)), accepted at external review in Prompt 136; reviewed, verified in CI and on `main` at `cf2b5743` ([main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)). |
+| M4e | Synthetic clean/injected corpus, stable anchor-to-chunk ground truth, Recall@5/@8 and retrieval contracts. Include cross-tenant, cross-vendor and superseded traps and missing answers; no semantic-quality claim. Detailed specification [accepted at review in Prompt 143](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) (proposed in Prompt 140, corrected in Prompts 141–142); implementation pending. |
 | M4f | Voyage adapter behind the same contract, injected transport mocked in CI, fixed profile/configuration, bounded calls and safe error mapping. No live calls required for M4 acceptance; live quality evidence belongs to M7. |
 
 **[DECISION] Separate indexing readiness (Prompt 108); later persistence details remain proposals.** Retain M3's activation and immutable
@@ -3960,7 +3960,7 @@ No specification decision remains open. Labels: **[DECISION]** accepted in Promp
 source at `76fa5a3`; **[REC]** written as a proposal in Prompts 131–132 and, with acceptance of
 the complete specification in Prompt 133, now part of the **accepted implementation contract**.
 
-**Implementation status (Prompts 134–138).** Claude Code implemented this specification on
+**Implementation status (Prompts 134–140).** Claude Code implemented this specification on
 `feat/snapshot-retrieval` in Prompt 134 and corrected it in Prompt 135
 ([ADR-0016](decisions/0016-snapshot-retrieval.md), which records the material implementation
 choices, the corrections and the lower-level chunk-bound fixture approved at review in Prompt 135
@@ -3975,10 +3975,17 @@ skipped`, PostgreSQL `290 passed, 2002 deselected` with all 39 cases in
 `tests/test_retrieval_postgres.py` passing, both installed-wheel jobs running the R9 retrieval
 check, the unchanged container job and Gitleaks (59 commits, no leaks); see the
 [ADR-0016 feature-branch CI evidence](decisions/0016-snapshot-retrieval.md#feature-branch-ci-evidence-at-3d6e8395).
-It is not merged; `main` is unchanged at `76fa5a3`. Claude Code's Prompt 134–135 local Windows
-checks are historical, as is the earlier statement that the PostgreSQL tests had never run. The
-container smoke covers ingestion and indexing, not M4d retrieval. Overall M4 acceptance and
-M4e–M4f remain pending. The heading and the planned-verification list below keep their accepted
+That feature-branch evidence is now historical: in Prompt 139 Claude Code fast-forwarded `main` to
+`cf2b5743` (verification documentation and prompt history only beyond `3d6e8395`) after green
+exact-commit feature CI, and the implementation is **reviewed, verified in CI and on `main` at
+`cf2b5743`**: from main-push job logs independently retrieved by the external reviewer (Prompt
+140), Ubuntu `2002 passed, 290 skipped`, Windows `2001 passed, 291 skipped`, PostgreSQL `290
+passed, 2002 deselected` with all 39 M4d cases passing, both installed-wheel retrieval checks, the
+container job and Gitleaks (60 commits, no leaks); see the
+[ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743).
+Claude Code's Prompt 134–135 local Windows checks are historical, as is the earlier statement that
+the PostgreSQL tests had never run. The container smoke covers ingestion and indexing, not M4d
+retrieval. The M4e specification is accepted (Prompt 143) and its implementation is pending; M4f and overall M4 acceptance remain pending. The heading and the planned-verification list below keep their accepted
 wording.
 
 **Scope.** A trusted snapshot capture seam, an immutable snapshot value, strict retrieval
@@ -4745,6 +4752,704 @@ accepted with the specification in Prompt 133, together with its two final clari
 - **Deferred:** review persistence, endpoints and orchestration (M5), including cancellation and
   lease precedence when called from a job; activation wiring and stalled-index recovery; the corpus
   and Recall (M4e); Voyage (M4f); any approximate index (E5); live-provider evidence (M7).
+
+#### M4e corpus and retrieval-evaluation specification (ACCEPTED at review, Prompt 143; implementation pending)
+
+**Status.** **Proposed by Claude Code in Prompt 140, corrected in Prompts 141–142 and accepted
+at external review in Prompt 143 with two final clarifications** (the fresh-run versus verifier
+starting states, and enumeration of every embedding profile by the read-only verifier). E1–E11
+and N1–N12 are settled within the complete accepted specification (see
+[M4e settled review decisions](#m4e-settled-review-decisions-prompts-141-and-142) and
+[M4e decisions settled at acceptance](#m4e-decisions-settled-at-acceptance-prompt-143)). The items
+labelled [REC] below were written as recommendations in Prompts 140–142; with this acceptance they
+**form the accepted implementation contract**, and **no specification decision remains open**.
+Acceptance is a design decision, not implementation or execution evidence: **the implementation
+and every M4e check are pending**; no corpus file, module, test, command, workflow extension or
+ADR-0017 exists, every test and command below is planned and not executed, and no M4e mitigation
+has run. ADR-0017 is deferred to implementation. Labels: **[DECISION]** accepted in Prompt 108 (see
+[M4 direction and review decisions](#m4-direction-and-review-decisions)); **[SETTLED]** E1–E11
+(Prompt 141), N1–N9 (Prompt 142, as corrected) and N10–N12 (Prompt 143); **[FACT]** established
+from source on `main` at `cf2b5743`; **[REC]** an original recommendation, now part of the
+accepted contract. M4d
+is reviewed, verified in CI and on `main` at `cf2b5743`; nothing here changes the M4d trust model,
+ranking rules, bounds, UUID generation, capture time, tie-breaking or snapshot contracts.
+
+**Scope.** A synthetic corpus and authored ground truth, a bounded test-only orchestrator over
+the existing production lifecycle, deterministic anchor-to-chunk resolution, Recall@5/@8 over the
+existing M4d retrieval seams, retrieval contract and isolation checks, and their tests. **Out of
+scope** (deferred): model-generated report judgments, claim-support precision, support-judgment
+accuracy and status accuracy (M5/M7); end-to-end injection resistance and output-canary behaviour
+(M5/M7); live model/provider quality and cost (M7); the review workflow, approval endpoints and
+snapshot persistence (M5–M6); the Voyage adapter (M4f); any GUI, deployment or container-smoke
+change. Ground-truth fields that later metrics need are specified and validated now, but **no
+later metric executes in M4e**.
+
+##### Accepted decisions preserved (Prompt 108)
+
+[DECISION] Preserve §7's fictional tenants and vendors, conflicting retention evidence, missing
+evidence, table content, wrong claims paired with valid quotations and the injection case. Load
+clean and injected variants separately; only the injection paragraph differs, while revision
+hashes and derived IDs may differ. Human anchors plus exact quoted spans resolve deterministically
+against the pinned chunker and manifest. The relevance unit is a distinct authorized chunk ID;
+each gold passage resolves to every chunk containing its full required span; missing or ambiguous
+mappings fail unless an explicit multi-chunk annotation resolves them; shared chunks are
+deduplicated. For a nonempty gold set G, `Recall@k = |set(top_k_chunk_ids) ∩ G| / |G|`, reported
+per question and as a macro mean over nonempty sets at k = 5 and 8, separately by variant and
+profile; empty G is N/A (excluded and counted); an all-empty suite is N/A, never 1; duplicate
+retrieval IDs are contract errors; foreign or forbidden results fail isolation even when recall is
+high. Hashing proves reproducibility and retrieval contracts only; no semantic-quality or
+injection-resistance claim.
+
+##### Facts from current source (`cf2b5743`)
+
+- [FACT] **No corpus or evaluation code exists.** There is no `sample_data/` directory, no
+  evaluation module and no `eg-eval` script; the console scripts are `eg-api`, `eg-admin` and
+  `eg-worker`. §7's commands are plans.
+- [FACT] **No YAML parser is a dependency.** `tomllib` (read-only TOML) and `json` are in the
+  standard library.
+- [FACT] **Tenants.** `DatabaseAdminStore.seed_demo()` (`eg-admin seed-demo`) idempotently creates
+  exactly the synthetic tenants `halverson-freight` and `marisol-clinics`, with deterministic UUID5
+  tenant and user IDs (`demo_tenant_id`, `demo_user_id`) and one user per role.
+- [FACT] **Vendors.** `vendors.create_vendor(session, actor, *, slug, name)` always inserts a new
+  row with a **UUID4** ID and flushes; a duplicate slug in the tenant raises
+  `DuplicateVendorSlugError` after the flush, which leaves the session's transaction needing a
+  rollback before further queries. It never returns an existing vendor. There is no
+  get-by-slug helper; `list_vendors(session, actor, *, limit, offset)` pages the tenant's vendors
+  ordered by `(slug, id)`.
+- [FACT] **Documents and revisions.** `document_views.create_upload(session, actor, *, vendor_id,
+  document_key, title, source_type, content, version_label=None, effective_date=None)` runs in the
+  caller's transaction: `create_revision` inserts a new document or revision with **UUID4** IDs, or
+  returns the existing revision with identical content for that document (any status; a metadata
+  difference raises `DocumentConflictError` or `RevisionConflictError`); a new or still-unsettled
+  revision gets its canonical `ingest_revision` job (idempotently); **a settled duplicate is never
+  re-enqueued**. Document keys match `^[a-z0-9]+(?:-[a-z0-9]+)*$` (≤ 64), titles ≤ 200, version
+  labels ≤ 64; media types are `text/markdown` and `text/plain`; content is strict UTF-8 without
+  NUL. `source_type` is `vendor_statement`, `contract` or `third_party_report`; `authenticity`
+  has one value, `not_established`. Editor roles are reviewer and approver.
+- [FACT] **Activation happens in ingestion.** The `ingest_revision` handler chunks a revision and
+  activates it (superseding the document's current active revision) when its job succeeds.
+  `run_worker(..., once=True)` performs one claim; its exit code reports the worker loop, not the
+  job's outcome, which must be read from the job, revision and index rows.
+- [FACT] **Indexing.** `indexing.enqueue_index_revision(session, actor, *, revision_id, identity)`
+  creates the index and canonical `index_revision` job, or reports `ready` or `stalled` (a terminal
+  canonical job is never reset); it accepts any revision that was ever activated. The production
+  registry indexes with `HASH_IDENTITY` only.
+- [FACT] **Chunker.** `chunking.chunk_revision(content, *, tenant_id, revision_id)` with
+  `CHUNKER_VERSION = "text-md-v1"`. Chunk IDs are UUID5 of `(tenant, revision, chunker_version,
+  ordinal)`, so they inherit the revision's fresh UUID4. Body spans are code-point ranges into the
+  stored text; between consecutive chunks a split may omit only line terminators (LF, or CR
+  immediately before LF), a leading BOM and spaces/tabs (U+0020, U+0009). A long table's
+  continuation chunks repeat its header as a separate `header_*` span ending before the body;
+  chunk `text` is header slice + body slice. Any visible text inserted into a document becomes
+  chunk text and lexemes and can move boundaries.
+- [FACT] **Retrieval and determinism inputs.** `capture_snapshot(session_factory, actor, *,
+  vendor_id, identity)` and `search_snapshot(session_factory, actor, snapshot, request, provider)`
+  are trusted internal seams. `RetrievalSnapshot.sha256` covers `captured_at` (from the database
+  `clock_timestamp()`), and the bindings' UUID4 revision and document IDs. Lists and fusion break
+  ties by ascending chunk UUID, and fusion truncates one order, so for one snapshot and query set
+  the top 5 of a k = 8 request equal a k = 5 request. `EvidenceQuestion.search_queries` allows
+  1–5 queries.
+- [FACT] **Boundaries and guards.** `evidenceguard_retrieval` may import only the domain and the
+  standard library (never `os`, `sqlalchemy` or network modules); the worker may import domain,
+  persistence and retrieval. Destructive PostgreSQL tests require `EG_TEST_DATABASE_URL` naming a
+  `_test` database distinct from `EG_DATABASE_URL`.
+
+##### A. Corpus, references and ground truth
+
+[SETTLED] E1, E2, E5: TOML parsed with `tomllib`; anchors exist only in ground truth, never in
+documents; `sample_data/` is repository-only and included in the sdist, not the wheel.
+
+**Layout** (§7's document set and tenant/vendor structure; TOML replaces the YAML names):
+
+```text
+sample_data/
+  corpus.toml
+  documents/<tenant>/<vendor>/<document_key>@r<n>.md
+  variants/injected/<tenant>/<vendor>/trust-center-page@r1.md
+  ground_truth/<tenant>.toml
+```
+
+**Canonical reference** [REC]. Every reference to evidence anywhere in ground truth is one string:
+
+```text
+<tenant>/<vendor>/<document_key>@r<n>#<anchor>
+```
+
+Each segment matches `^[a-z0-9]+(-[a-z0-9]+)*$` (anchor ≤ 64 characters) and `n` is a positive
+decimal integer without leading zeros. An anchor is defined once, in the ground-truth file of its
+own tenant; its local name is unique within its revision. Bare names are never accepted. Every
+reference must name a defined anchor; foreign-tenant references are allowed only in `forbidden`.
+
+**`corpus.toml`** [REC] (all keys required unless marked optional; unknown keys rejected at every
+level; values must have the exact TOML types shown):
+
+```toml
+format = "eg-corpus-v1"
+
+[[tenants]]
+slug = "halverson-freight"                # one of the two seeded demo tenants
+
+  [[tenants.vendors]]
+  slug = "lumenvale-cloud"
+  name = "Lumenvale Cloud"
+
+    [[tenants.vendors.documents]]
+    key = "data-retention-policy"
+    title = "Data Retention Policy"
+    source_type = "vendor_statement"        # vendor_statement | contract | third_party_report
+    media_type = "text/markdown"            # text/markdown | text/plain
+
+      [[tenants.vendors.documents.revisions]]
+      n = 1                                  # 1, 2, … in order, no gaps
+      version_label = "2025.1"               # optional string
+      effective_date = 2025-01-15            # optional TOML local date
+
+[variants.injected]
+replaces = ["halverson-freight/lumenvale-cloud/trust-center-page@r1"]
+```
+
+The file for revision `n` is `documents/<tenant>/<vendor>/<key>@r<n>.md`, derived from validated
+segments, never read from a free-form path. Document bytes are the file bytes exactly; their
+SHA-256 is computed, never stored in the manifest. The newsletter distractor is
+`vendor_statement`, the DPA summary `contract`, Ferrowick's SOC 2 letter `third_party_report`;
+every document is `not_established` (the only stored value).
+
+**`ground_truth/<tenant>.toml`** [REC]:
+
+```toml
+format = "eg-ground-truth-v1"
+tenant = "halverson-freight"               # must equal the file name stem
+
+[[anchors]]
+ref = "halverson-freight/lumenvale-cloud/data-retention-policy@r2#ninety-days"
+quote = "Customer data is retained for ninety (90) days after termination."
+occurrence = 1                             # optional; required only if the quote repeats
+# parts = [{ quote = "…", occurrence = 1 }, { quote = "…" }]   # optional, see C
+
+[[questions]]
+vendor = "lumenvale-cloud"                 # the question belongs to this tenant × vendor
+id = "RET-01"                              # QuestionId, unique per tenant × vendor
+text = "How long is customer data retained after termination?"
+search_queries = ["data retention after termination", "retention period days"]
+
+  [[questions.cases]]
+  epochs = ["initial"]
+  expected_status = "conflicting"
+  gold = [
+    "halverson-freight/lumenvale-cloud/data-retention-policy@r1#one-eighty-days",
+    "halverson-freight/lumenvale-cloud/dpa-summary@r1#thirty-days",
+  ]
+  forbidden = ["halverson-freight/lumenvale-cloud/data-retention-policy@r2#ninety-days"]
+  acceptable_claims = [{ text = "…", refs = ["…@r1#one-eighty-days"] }]
+  wrong_claims = []
+
+  [[questions.cases]]
+  epochs = ["final"]
+  expected_status = "conflicting"
+  gold = [
+    "halverson-freight/lumenvale-cloud/data-retention-policy@r2#ninety-days",
+    "halverson-freight/lumenvale-cloud/dpa-summary@r1#thirty-days",
+  ]
+  forbidden = ["halverson-freight/lumenvale-cloud/data-retention-policy@r1#one-eighty-days"]
+  acceptable_claims = [{ text = "…", refs = ["…@r2#ninety-days"] }]
+  wrong_claims = []
+```
+
+(`…` in `refs` abbreviates the full canonical reference; the real file always uses full strings.)
+A question has 1–2 cases; each case's `epochs` is a nonempty subset of `["initial", "final"]`;
+across a question's cases the epochs are disjoint, and every epoch in which the question is
+evaluated has exactly one case (a question with no case for an epoch is not evaluated there).
+Questions whose evidence does not change list one case with `epochs = ["initial", "final"]`.
+Case fields: `expected_status`, `gold`, `forbidden`, `acceptable_claims`, `wrong_claims` (all
+required; lists may be empty). Each claim has `text` (1–500 characters) and `refs` (1–8 canonical
+references). **Authored labels** are exactly these fields; nothing is derived from retrieval
+output or model judgments. M4e validates claims' references; their support judgments are M5/M7.
+
+**Quote and occurrence rules** [REC] (apply to every anchor `quote` and every `parts` entry;
+checked before any database work; failures use the fixed code `anchor_invalid` unless noted):
+
+- **Type:** `quote` is a TOML string (exact `str`); `occurrence`, when present, is a TOML integer
+  (exact `int`, never `bool`) with value ≥ 1. An anchor table has exactly the keys `ref`, `quote`
+  and optionally `occurrence` and `parts`; a part table has exactly `quote` and optionally
+  `occurrence`. Any other key is rejected.
+- **Length and encoding:** 1–4,000 code points; strictly UTF-8 encodable (no unpaired surrogate);
+  no U+0000 and no other C0 control character except TAB (U+0009) and LF (U+000A); no CR
+  (U+000D). Corpus documents are likewise required to use LF line endings only, so every quote is
+  matched against LF-only text.
+- **Whitespace:** the first and the last code point must not be U+0020, TAB or LF. Interior spaces,
+  tabs and LFs are allowed and matched exactly.
+- **Multiline:** a quote may span lines (interior LF), for body prose and table rows alike. It is
+  still one source-contiguous range with exact offsets; whether a single chunk contains it is
+  decided only by the containment rule in C, and a quote that crosses a chunk boundary needs
+  `parts`.
+- **Matching:** code-point equality against the stored revision text: no case folding, whitespace
+  collapsing or Unicode normalization.
+- **Occurrence:** matches are counted left to right without overlap (after a match at `[i, j)`,
+  the search resumes at `j`). The parent quote is matched in the whole revision text; a part is
+  matched only inside the selected parent range `[s, e)` (a match must lie entirely within it).
+  No match: `anchor_not_found` (`anchor_part_not_found` for a part). More than one match and no
+  `occurrence`: `anchor_ambiguous` (`anchor_part_ambiguous`). An `occurrence` greater than the
+  number of matches: `anchor_occurrence_out_of_range` (`anchor_part_occurrence_out_of_range`).
+  `occurrence` may also be given when there is exactly one match (it must then be 1).
+
+**Reference validation** [REC] (before any database work, fixed codes): every reference parses,
+names a defined anchor (`unknown_reference`); `gold` and claim references name the question's
+own tenant and vendor (`foreign_gold_reference`); a gold reference names, for every epoch of its
+case, the revision eligible in that epoch, which is `r1` for `initial` and the document's highest
+`n` for `final` (`gold_not_eligible_in_epoch`); no reference appears in both `gold` and
+`forbidden` of one case (`gold_forbidden_conflict`); `forbidden` may name any revision of any
+document, including later revisions, other vendors and the other tenant; local anchor names may
+repeat across tenants or revisions, because only full references identify anchors.
+
+**Content** (from §7): RET-01 conflict with the superseded r1 180-day trap (per-epoch cases as
+above); ENC-01, INC-01 and BCP-01 with empty gold; CMP-01/CMP-02 vendor claims; SUB-01 a short
+table kept as one chunk; Ferrowick's SOC 2 letter in the same tenant (cross-vendor trap); Tenant B
+mirrors with canaries `LV-TB-CANARY-36H` and `LV-TB-CANARY-AES` (cross-tenant trap, referenced in
+Tenant A's `forbidden`); the injected variant adds exactly one paragraph to
+`trust-center-page@r1.md`. All names, numbers and text are fictional; no real client documents,
+credentials or personal data.
+
+**Bounds, paths and validation** [REC] (fixed codes, no content in messages): at most 2 tenants,
+8 vendors, 64 documents, 4 revisions per document, 256 anchors, 64 questions and 2 cases per
+question per tenant. Byte limits are checked from file metadata **before reading** and again on
+the bytes: `corpus.toml` ≤ 64 KiB, each ground-truth file ≤ 256 KiB, each document ≤ 256 KiB
+(below the 2 MiB upload cap), the whole selected file set ≤ 4 MiB. **Path containment:** every
+file path is built from validated segments under the corpus root; each path component is checked
+to be a non-symlink, the final file to be a regular file, and the resolved path to remain under
+the resolved root; files present under `documents/`, `variants/` or `ground_truth/` but not
+named by the manifest are rejected (`corpus_unexpected_file`). Clean and injected file sets
+differ in exactly the files listed in `replaces`, and each injected text equals its clean text
+with one inserted paragraph (one contiguous insertion bounded by blank lines). Loading order is
+deterministic: tenants, vendors, documents and revisions sorted by slug, key and `n`.
+
+##### B. Orchestration, lifecycle and repeat runs
+
+[SETTLED] E4, E6, E11: tests are the only entry point; two epochs, `initial` and `final`; each
+variant is loaded into a freshly reset disposable database.
+
+[SETTLED] N3 and N4, as corrected in Prompt 142. Three separate test-only contracts in
+`evidenceguard_worker.evaluation`; only the first writes:
+
+**1. Fresh two-epoch run** — `run_fresh_two_epoch(session_factory, corpus) -> TwoEpochState`,
+global phases in this order:
+
+1. **Validate** the entire corpus and ground truth (A) before any database write.
+2. **Freshness check** (read only, in one `read_snapshot` transaction): if any vendor, document,
+   revision, embedding profile, embedding index or job of kind `ingest_revision` or
+   `index_revision` already exists for a corpus tenant, refuse with `corpus_state_not_fresh` and
+   write nothing. Seeded tenants and users alone are allowed. This corpus-tenant-wide scope is the
+   same as the verifier's extra-state scope.
+3. **Tenants and vendors:** `seed_demo()`; act as each tenant's seeded reviewer. Vendors: one
+   transaction lists the tenant's vendors (`list_vendors`); an existing slug with an equal name is
+   reused, a different name is `corpus_conflict`; a missing slug is created with `create_vendor`
+   in **its own** transaction. If that raises `DuplicateVendorSlugError` (a concurrent insert), the
+   transaction is rolled back by the existing `transaction` helper, the vendor is re-read in a new
+   transaction and compared as above. `create_vendor` is never assumed to return an existing row.
+4. **Revision 1 of every document:** in deterministic order, one transaction runs `create_upload`
+   (which must report `created = True`); then the worker runs once and the orchestrator reads the
+   job, revision and chunk set until the job is `succeeded` and the revision `active` with a
+   verified chunk set. Then for every r1, `enqueue_index_revision(identity=HASH_IDENTITY)` and the
+   worker until the canonical index job is `succeeded` and the index `ready`.
+5. **Capture `initial`:** for each tenant × vendor with questions, `capture_snapshot`; require
+   every binding to be the vendor's r1 revision and no binding to be a later revision. The
+   snapshot values are **retained in memory** in the returned state. No later revision exists yet,
+   so the initial snapshot is genuinely captured before any r2 activation.
+6. **Later revisions** in manifest order (n = 2, 3, … per document): create, ingest (activation
+   supersedes r(n−1)), verify the previous revision is `superseded` and the new one `active`, then
+   index to `ready`.
+7. **Capture `final`:** for each tenant × vendor; require every binding to be the document's
+   highest revision and every index ready.
+8. **Return** `TwoEpochState`: the loaded logical-to-actual map (logical revision → revision,
+   document and vendor IDs), the retained `initial` and `final` snapshots, and nothing else.
+   Snapshots are never persisted and never re-created for an earlier epoch.
+
+**Bounded claims and outcomes:** the orchestrator enqueues one job at a time; each expected job
+allows at most two `run_worker(once=True)` invocations, after which a job still queued or running
+is `corpus_job_not_settled`; a `failed` or `dead` job is `corpus_job_failed`; a failed revision is
+`corpus_revision_failed`; a `stalled` or non-ready index is `corpus_index_not_ready`. Worker exit
+codes are never treated as job success. Each step commits independently; any failure stops the run
+with a fixed code, leaves rows as they are and returns no state. A partially loaded database is
+never resumed by the fresh run (its freshness check refuses it); the test resets the disposable
+database instead.
+
+**2. Read-only verifier** [REC] — `verify_loaded(session_factory, corpus) -> LoadedCorpus`, for an
+already loaded database. It is **genuinely read-only**: it calls no `seed_demo`, `create_vendor`,
+`create_upload`, `create_revision`, `ensure_profile`, `create_index` or `enqueue`/
+`enqueue_index_revision`, runs no worker, captures no snapshot, executes no DML and repairs
+nothing. After validating the corpus (A), it reads everything inside **one** transaction opened
+with the existing, unchanged `document_views.read_snapshot` helper (`SET TRANSACTION ISOLATION
+LEVEL REPEATABLE READ, READ ONLY`, then `clock_timestamp()`, rollback and close), so every
+statement sees one consistent view and any accidental write fails.
+
+Read statements (planned; SQLAlchemy Core over the existing table objects, in
+`evidenceguard_worker/evaluation.py`, which may already import `sqlalchemy` and
+`evidenceguard_persistence`; existing builders reused where they fit):
+
+1. tenants by `demo_tenant_id(slug)` and the seeded reviewer by `demo_user_id(slug, REVIEWER)`;
+2. every vendor of each corpus tenant (`vendors` by `tenant_id`);
+3. every document of each corpus tenant, and every revision of those documents ordered by
+   `revision_no` (all columns except `content_text`), then each expected revision's
+   `content_text`, `sha256` and `byte_size`;
+4. per revision: `chunks.chunk_set_statement` and `chunks.manifest_rows_statement` (manifest
+   rebuilt from stored fields);
+5. **every** `embedding_indexes` row of the tenant, with `embeddings.embedding_count_statement`
+   per expected index; and **every** `embedding_profiles` row of the tenant (all columns, by
+   `tenant_id`), not only a lookup by fingerprint;
+6. every `ingest_revision` and `index_revision` job of the tenant (`kind`, `idempotency_key`,
+   `status`, `payload`).
+
+Checks: tenants and reviewer exist (else `corpus_state_incomplete`); vendors, documents and
+revisions equal the manifest's exactly in slug, name, key, title, source type, media type,
+revision numbers, version label, effective date and content hash (a difference is
+`corpus_conflict`, a missing record `corpus_state_incomplete`); **the highest revision is
+`active` and every earlier revision `superseded`** (a superseded r1 is the correct historical
+state and is accepted, never reactivated), anything else (`pending`, `processing`, `failed`) is
+`corpus_state_unsettled`; each stored manifest equals the rebuilt manifest and the manifest of
+`chunk_revision` over the stored text (`mapping_manifest_mismatch`); the tenant's profile set is
+exactly one row whose stored identity (`provider_id`, `model_id`, `algorithm_version`, `dims`,
+`normalization`, `allows_zero_vectors`), `fingerprint` and `id` equal those derived from
+`HASH_IDENTITY` (`profile_id(tenant, fingerprint)`): no row is `corpus_state_incomplete`, a row with
+that fingerprint but different fields or ID is `corpus_conflict`, and any additional profile is
+`corpus_state_unexpected`; each revision has a `ready` index for the profile whose embedding count equals its chunk count (`corpus_index_not_ready`);
+each revision's canonical ingestion job (key `str(revision_id)`) and each index's canonical
+indexing job (key `str(index_id)`) is `succeeded` (`corpus_job_not_settled` or
+`corpus_job_failed`).
+
+**Extra-state scope** matches the freshness check: it is **corpus-tenant-wide**. Any vendor,
+document, revision, embedding profile, embedding index or job of kind `ingest_revision` or
+`index_revision` in a corpus tenant that the manifest does not describe is `corpus_state_unexpected`
+(users and API keys are not corpus state and are not checked beyond the seeded reviewer). The
+verifier returns only the logical-to-actual ID map; it **never captures or reports an `initial`
+epoch** (a two-epoch evaluation needs a fresh run's retained `TwoEpochState` or a new fresh
+database). Every refusal is a fixed `EvaluationError` after the read transaction has ended; nothing
+is written, so refusal leaves the database unchanged.
+
+**Production-seam reuse (separate from the verifier)** [REC]: a planned PostgreSQL test, after a
+complete fresh load, records every corpus-table row and job, then calls the existing write seams on
+the known complete records, each in its own `transaction` block: `seed_demo()` (every user
+reported existing), `create_upload` for every revision (each `created = False`, the stored status,
+and no job enqueued for a settled revision) and `enqueue_index_revision` for every revision
+(outcome `ready`, no job). It then asserts that every recorded row and job is unchanged and that no
+row or job was added. These calls only demonstrate reuse on a complete corpus; they are never used
+to probe whether a partial database is complete.
+
+**3. Evaluation** — `evaluate(session_factory, corpus, state, provider) -> EvaluationReport`
+(reads only; stored chunks are read in `read_snapshot` transactions and retrieval uses the M4d
+seams, which are themselves read-only): after both captures, read the stored chunk rows and chunk-set manifests of **every
+loaded revision** (including superseded r1 and later revisions), resolve every reference (C), then
+run retrieval for the retained `initial` snapshots and the `final` snapshots (D). Evaluating the
+initial snapshots after r2 has activated is the point of the second epoch.
+
+**No hidden edits:** nothing here updates or deletes terminal rows, edits statuses, marks an index
+ready, fabricates chunk sets, embeddings or snapshots, or alters activation order outside the
+production handler; the M4d metadata-only bound fixture stays confined to its one M4d test.
+**Database independence:** validation, reference checks, the variant diff, offline chunking,
+anchor resolution against `chunk_revision` and all Recall and report code run without a database;
+loading, capture, retrieval and mapping against stored chunks need PostgreSQL. **Production
+protection:** the only planned callers are PostgreSQL tests using the existing guarded
+disposable-database fixtures; there is no installed command.
+
+##### C. Anchor-to-chunk resolution
+
+[REC] **Inputs:** a validated anchor; the revision's stored text; its chunks (`id`, `ordinal`,
+body span, optional header span, `chunker_version`) and chunk-set `manifest_sha256`. **Checks
+first:** `chunker_version == "text-md-v1"`, and the stored manifest equals the manifest rebuilt
+from the stored rows and the manifest of `chunk_revision` over the stored text
+(`mapping_manifest_mismatch`).
+
+**Single-quote anchors.** Locate the quote in the revision source text by the quote and
+occurrence rules in A (`anchor_not_found`, `anchor_ambiguous` or
+`anchor_occurrence_out_of_range` on failure). With the range
+`[s, e)`, the anchor maps to **every** chunk whose body span contains `[s, e)` (route `body`) and
+every chunk whose repeated header span contains it (route `header`). If none contains it, the
+anchor is `anchor_crosses_chunk_boundary` (the text exists but spans a boundary) unless it has
+`parts`.
+
+**Multi-part anchors** (`parts`, the explicit multi-chunk annotation) [REC]:
+
+- `parts` is an array of 2–8 inline tables `{ quote = <string>, occurrence = <integer, optional> }`
+  with no other keys; each part obeys the quote and occurrence rules in A.
+- The parent quote is located first (as above, with its own `occurrence`). Each part is located
+  **within the parent range** `[s, e)` only; its `occurrence` counts non-overlapping matches inside
+  that range and is required if the part occurs there more than once.
+- Parts must be nonempty, in order and nonoverlapping (`part[i].end ≤ part[i+1].start`), the first
+  must start at `s` and the last must end at `e`, and every code point between consecutive parts
+  must be a permitted split omission: U+0020, U+0009, LF, or CR immediately followed by LF
+  (`anchor_parts_gap`). So no substantive text is ever discarded.
+- Each part must map to at least one containing chunk by the single-quote rule
+  (`anchor_part_unmapped`); the anchor maps to the union of all parts' containing chunks.
+- `parts` on a quote that some single chunk already contains is rejected
+  (`anchor_parts_unnecessary`), so annotations are used only where required.
+
+**What fails and what does not:** missing text → `anchor_not_found`; repeated text without an
+occurrence → `anchor_ambiguous`; an occurrence beyond the matches →
+`anchor_occurrence_out_of_range`; source-contiguous text spanning a chunk boundary without parts →
+`anchor_crosses_chunk_boundary`; the same text with a valid `parts` annotation → mapped. A quote
+that would join a repeated header to a non-adjacent body exists only in chunk `text`, never
+contiguously in the source, so matching against the source rejects it as `anchor_not_found`.
+
+**Mapping output** [REC], per anchor, sorted by chunk UUID, part index and route:
+
+```text
+MappingEntry(chunk_id, part_index | None, route ∈ {"body", "header"}, char_start, char_end)
+```
+
+`char_start`/`char_end` are the source range matched (the parent range, or the part's range).
+One anchor may therefore map through a body in one chunk and through repeated headers in others.
+The anchor's chunk set is the deduplicated set of entry chunk IDs. At most 64 entries per anchor
+(`anchor_mapping_too_large`).
+
+**Gold, forbidden and epochs** [REC]: for each evaluated (question, epoch), G is the deduplicated
+union of the case's `gold` anchors' chunk sets, and must be contained in the chunks of the epoch
+snapshot's bindings (`gold_not_in_snapshot`); empty G is allowed. `forbidden` anchors are resolved
+against **their own revisions, wherever they are** (superseded r1, a later r2, another vendor or
+tenant), after the complete corpus has loaded, and are **never** filtered by the snapshot, so the
+traps remain. A chunk in both a case's G and its forbidden set is `gold_forbidden_conflict`.
+Resolving a future revision's forbidden reference after loading does not move the `initial`
+capture, which was already taken in phase 5. Mapping never consults retrieval results.
+
+##### D. Retrieval evaluation and Recall
+
+[SETTLED] E7, E8: Recall is report-only; no minimum threshold.
+
+[REC] For each variant, tenant × vendor, epoch and evaluated question: `search_snapshot` with the
+retained snapshot of that epoch, `RetrievalRequest(question.search_queries, k=8)` and
+`HashingEmbedder` (profile `HASH_IDENTITY`, labelled "lexical-hash baseline — not semantic").
+`top_8` is the result's chunk IDs in fused-rank order and `top_5` its first five; a test also
+checks that a k = 5 request returns the same five. The production ranking is used unchanged.
+
+- **Contract checks** (contract errors, not metrics): duplicate IDs; fused ranks not `1…n`;
+  `n > k`; an item outside the snapshot bindings; a result whose snapshot digest, profile or
+  configuration differs from the evaluated snapshot. The production `RetrievalResult` constructor
+  already rejects duplicates, bad ranks and foreign bindings, so these checks are defensive: they
+  run on the raw extracted ranked IDs and metadata, and their pure tests feed synthetic sequences.
+- **Isolation checks:** no returned chunk is in the case's forbidden chunk set, belongs to another
+  vendor or tenant, or has evidence text containing another tenant's canary string.
+- **Question validity** [REC]: a question with **any** contract or isolation failure is
+  `invalid`; its Recall is not computed (both values `null`) and its ranked output is reported as
+  observed, never deduplicated or repaired. A valid question is `ok` (nonempty G) or
+  `ok_empty_gold` (G = ∅, Recall N/A, `null`).
+- **Recall** (valid questions only): `None` (N/A) for empty G, else
+  `Fraction(|set(ranked[:k]) ∩ G|, |G|)`; fewer than k results never change the denominator.
+  Macro mean is the `Fraction` mean over `ok` questions, `None` when there are none; the
+  accepted excluded (empty-gold) count is reported as `valid_empty_gold`. **If any question of a
+  group is `invalid`, the group is `failed` and both macro values are `null`.**
+- **No threshold:** contracts and isolation are asserted; measured Recall is reported only.
+  Offline hashing gives no semantic-quality claim.
+
+Unit examples (pure): G = {a, b, c}, top-5 [a, x, b, y, z] → 2/3; two anchors on chunk a → G =
+{a}, [a] → 1; an unresolvable anchor → `anchor_not_found` before retrieval; [a, a] →
+`duplicate_retrieval_id`; G = ∅ → N/A; all-empty suite → macro N/A with excluded = n (never 1);
+G = {a, b}, k = 5, [a] → 1/2; macro of {1, 1/2, N/A} → 3/4 with one valid empty-gold
+question; a group with {1, invalid} → status `failed`, macro `null`, counts (2 questions, 1 valid
+nonempty-gold, 0 valid empty-gold, 1 invalid).
+
+##### E. Reproducibility and determinism
+
+[REC] What is and is not deterministic, given the production identifiers:
+
+- Vendor, document and revision IDs are UUID4; chunk IDs derive from those revision IDs; snapshot
+  digests include `captured_at`; ranking breaks ties by chunk UUID. Therefore **two fresh database
+  loads need not produce identical IDs, snapshot digests, tie-broken ranks or Recall values**,
+  and no cross-load byte or exact-metric equality is promised. Chunk manifests also embed chunk
+  IDs, so they differ across loads too.
+- **Repeated evaluation** with the same stored corpus, retained snapshot values, profile, queries
+  and database behaviour is expected to be deterministic.
+- **Canonical serialization** means only that identical validated report values encode to
+  identical bytes. The report has no top-level timestamp, but `snapshot_sha256` already encodes
+  each capture time.
+- Logical references (tenant/vendor/document@rn, anchor references) accompany actual IDs in the
+  report for human comparison; this does not make tied rankings reproducible across loads.
+- Nothing here changes production UUID generation, capture time, tie-breaking or snapshot
+  contracts. Any future regression baseline (E7) must define its stable inputs and permitted
+  variability; CI observation alone does not justify exact Recall pins across fresh random-ID
+  loads.
+
+##### F. Report, corpus digest, failures and placement
+
+[SETTLED] E3, E9, E10: pure modules in `evidenceguard_retrieval.evaluation`, orchestration in
+`evidenceguard_worker.evaluation`; a narrow installed-wheel check; a synthetic long-table mapping
+fixture.
+
+| File (planned) | Contents | Imports |
+|---|---|---|
+| `packages/retrieval/evidenceguard_retrieval/evaluation/corpus.py` | `eg-corpus-v1` and `eg-ground-truth-v1` values parsed from bytes with `tomllib`, references, validation, variant diff | domain, stdlib |
+| `packages/retrieval/evidenceguard_retrieval/evaluation/anchors.py` | Quote location, parts, containment, `MappingEntry`, manifest checks | domain, retrieval, stdlib |
+| `packages/retrieval/evidenceguard_retrieval/evaluation/recall.py` | Recall, macro mean, contract and isolation checks, report values, canonical JSON, corpus digest over supplied `(path, bytes)` pairs | domain, stdlib |
+| `apps/worker/evidenceguard_worker/evaluation.py` | File reading with size, symlink and containment checks; `run_fresh_two_epoch`, `verify_loaded`, `evaluate` | domain, persistence, retrieval, stdlib |
+
+The pure modules receive bytes or validated values only; all file-system access stays in the
+worker module and tests, preserving the retrieval package's no-`os` boundary.
+
+**Corpus digest** [REC] `eg-corpus-digest-v1`: SHA-256 over the ASCII line
+`eg-corpus-digest-v1\n`, then the framed variant name, then, for each file of the **selected
+variant's effective file set** sorted by normalized relative POSIX path (UTF-8 bytes, bytewise
+order), the framed path followed by the framed exact file bytes. A frame is an 8-byte unsigned
+big-endian length followed by the bytes. The effective set is `corpus.toml`, every
+`ground_truth/*.toml` and the variant's documents (for `injected`, the replaced files are the
+`variants/injected/…` files, recorded under their actual paths). Nothing else, including any
+report, is hashed.
+
+**Report** [SETTLED N7 as corrected; failure fields REC] `eg-retrieval-eval-v1`: JSON with
+`sort_keys=True`, `separators=(",", ":")`, `ensure_ascii=True`, `allow_nan=False`; no other
+fields are emitted. Exactly these fields (✓ always present and non-null; **N** may be `null`):
+
+| Level | Field | Value |
+|---|---|---|
+| top | `schema` ✓, `variant` ✓, `corpus_digest` ✓, `chunker_version` ✓, `stamp` ✓ | strings; `stamp` = "NOT a quality measurement of semantic retrieval" |
+| top | `config_sha256` ✓, `profile` ✓ | the evaluated snapshots' configuration digest (must equal `RETRIEVAL_CONFIG_V1`'s) and identity (`provider_id`, `model_id`, `algorithm_version`, `dims`, `fingerprint`, `label`); evaluated snapshots that disagree are an `EvaluationError` (`profile_mismatch`) before any report |
+| top | `status` ✓ | `ok`, or `failed` if any group failed |
+| top | `contract_failures` ✓, `isolation_failures` ✓ | lists (possibly empty) of failure entries |
+| group | `tenant` ✓, `vendor` ✓, `epoch` ✓, `snapshot_sha256` ✓, `status` ✓ | `status` is `ok` or `failed` |
+| group | `counts` ✓ | `questions`, `valid_nonempty_gold`, `valid_empty_gold`, `invalid` (integers) |
+| group | `macro` ✓ | `recall_at_5` **N**, `recall_at_8` **N**: `null` when the group failed or has no valid nonempty-gold question |
+| question | `id` ✓, `outcome` ✓, `failure_codes` ✓, `gold_count` ✓ | `outcome` ∈ `ok`, `ok_empty_gold`, `invalid`; `failure_codes` sorted, empty unless invalid |
+| question | `ranked` ✓ | the observed result order, not repaired: entries `{position, chunk_id, ref}` with `ref` **N** (`null` when the chunk is not in the loaded corpus map) |
+| question | `recall_at_5` **N**, `recall_at_8` **N** | `null` for `ok_empty_gold` (N/A) and for `invalid` (not computed); `outcome` distinguishes them |
+
+Groups are sorted by tenant, vendor and epoch; questions by id. A failure entry is `{code, tenant,
+vendor, epoch, question, chunk_id, position}` with `chunk_id` and `position` **N** (`null` when the
+violation concerns the whole result, such as a configuration mismatch). An exact value is
+`{"numerator": 2, "denominator": 3, "display": "0.6667"}` in lowest terms; N/A and not-computed are
+`null`. `display` is the exact fraction rounded to four decimal places with round-half-to-even,
+formatted with exactly four decimals; it is never used in arithmetic. **Only validated safe
+identifiers** appear anywhere in the report and its diagnostics: corpus slugs and keys, epochs,
+question IDs, fixed codes, canonical UUID strings and integers; never document, quote or query
+text, evidence text or object representations.
+
+**Failure semantics** [SETTLED N8 as corrected; details REC]:
+
+- **Inspectable violations** (contract and isolation failures) never raise during evaluation: the
+  complete report is built with the affected questions `invalid`, their groups `failed` and the
+  top-level `status` `failed`. `require_passing(report)` then raises `EvaluationError`
+  (`evaluation_failed`, with the failure counts) whenever the top-level status is `failed`,
+  **regardless of other groups' or questions' Recall**. Tests call both, so a failing run still
+  yields its report.
+- **Operational failures** raise a fixed `EvaluationError` and produce **no** report: validation,
+  freshness, loading and mapping errors, and any error raised by the retrieval seams themselves
+  (the fixed M4d errors, including `RetrievalDatabaseError`, `RetrievalProviderError` and
+  `SnapshotInconsistentError`, are mapped to `retrieval_failed` plus their fixed code).
+- Ordinary exceptions from production seams are converted to fixed codes outside the handler,
+  retaining no message, cause, context, statement or content; no raw database exception is exposed.
+  `BaseException` process control propagates unconverted. Nothing logs document or query text.
+  Measured Recall values never fail a run.
+
+##### G. Tests and CI (planned, not run)
+
+**Database-independent** (`tests/test_evaluation_corpus.py`, `tests/test_evaluation_anchors.py`,
+`tests/test_evaluation_recall.py`): exact schemas and unknown-key rejection; bounds checked before
+reading; path traversal, symlink components, non-regular files and unexpected files; the committed
+corpus validates; duplicate local anchor names across tenants accepted only through full
+references; cross-tenant references allowed only in `forbidden`; unknown references; gold in a
+non-eligible epoch; contradictory gold/forbidden sets; epoch-specific cases and labels; every
+committed anchor resolving against `chunk_revision`; the synthetic long table mapping one header
+quote through `header` routes and the original chunk's `body` route; missing, ambiguous,
+boundary-crossing and header-concatenation quotes; valid parts, gaps containing substantive text,
+overlapping or out-of-order parts, part occurrence inside the parent, unnecessary parts; quote and
+occurrence rules: empty quotes, non-string quotes, zero, negative, `bool` and non-integer
+occurrences, unknown anchor or part keys, unpaired surrogates, NUL and other control characters,
+CR, leading or trailing whitespace, 4,000 and 4,001 code points, multiline body and table quotes
+with exact offsets, case and Unicode-normalization differences that must not match, repeated text
+without an occurrence, an out-of-range occurrence, and a part occurrence counted only inside its
+parent; the clean/injected single-paragraph diff; the corpus digest framing (changing a path, a
+byte or the variant changes it; equal inputs give equal bytes); all Recall examples; canonical
+encoding of one report value and the four-decimal display; failure reports: duplicate result IDs,
+a forbidden result, a foreign chunk and an unknown chunk (`ref` `null`), a snapshot, profile or
+configuration mismatch, each making its question `invalid` with `null` Recall and its group
+`failed` with `null` macro; a valid empty-gold question (`ok_empty_gold`, `null`) distinguished
+from an invalid one; the four group counts; `require_passing` failing even when every other
+question has Recall 1; message and report privacy.
+
+**PostgreSQL** (`tests/test_evaluation_postgres.py`, integration-marked, guarded fixtures, a fresh
+database per variant):
+
+- the fresh run on the clean corpus: statuses, supersession order, ready indexes and manifests;
+  the `initial` capture happens while every r1 is active and before any r2 exists (asserted from
+  the retained bindings and revision rows), and `final` after every replacement is ready;
+- evaluation: the retained `initial` snapshots, after r2 activation, still return only r1
+  revisions; `final` retrieval returns r2 and never r1; contract and isolation checks pass; k = 5
+  prefix equality; the report is well formed (Recall values are not asserted);
+- repeated retrieval from the same retained snapshots gives identical ranked IDs;
+- `verify_loaded` on the complete database: succeeds with every superseded r1 accepted;
+  performs no writes (every corpus-table row and job compared before and after, and the read runs
+  in the `READ ONLY` transaction); captures and reports no `initial` epoch;
+- `verify_loaded` refusals, each leaving every row unchanged: an empty database (no tenants); seeded
+  tenants only (no vendors); a run stopped after phase 4 (r2 revisions missing); a run stopped
+  after an r1 ingestion job was enqueued but before the worker ran (unsettled revision, pending
+  job); a run stopped before indexing (no ready index); a manifest with a changed document title or
+  revision content (`corpus_conflict`); an extra document in a corpus tenant
+  (`corpus_state_unexpected`); an **extra embedding profile** in a corpus tenant
+  (`corpus_state_unexpected`), created only through the existing legitimate
+  `embeddings.ensure_profile` seam for a second test identity. The empty and seeded-only states
+  are refused because the corpus is incomplete. Partial states are produced only by stopping the
+  orchestrator through a test-owned phase hook, or by the legitimate seams named here, never by
+  direct DML on terminal rows;
+- the fresh run **accepting** an empty database and a seeded-only database (tenants and users only,
+  the valid fresh starting states), and **refusing** (`corpus_state_not_fresh`, writing nothing)
+  every partially loaded or conflicting state: existing corpus-tenant vendors, documents,
+  revisions, embedding profiles, embedding indexes or `ingest_revision`/`index_revision` jobs,
+  including the stopped-phase states above and the extra-profile state;
+- production-seam reuse on the complete corpus (`seed_demo`, `create_upload`,
+  `enqueue_index_revision`): no added or changed rows or jobs;
+- the injected variant in a freshly reset database, evaluated separately;
+- two independent fresh loads of the same variant, asserting only structural equality (logical
+  references, gold counts, group shapes), **not** equality of IDs, digests, ranks or Recall.
+
+**CI:** the new tests run in the existing verify and integration jobs. E9 adds one narrow
+installed-wheel step importing the three pure modules from `site-packages` and computing the 2/3
+example. No new dependency, lockfile, Docker, Compose or container-smoke change.
+
+**Intended files (later implementation):** the modules above (with `evaluation/__init__.py`);
+`sample_data/` as laid out; the four test files; `tests/test_packaging.py` for the new boundaries;
+`pyproject.toml` (sdist include only); `.github/workflows/ci.yml` (E9 only); ADR-0017; README,
+plan, threat model and prompts.md.
+
+##### M4e settled review decisions (Prompts 141 and 142)
+
+[SETTLED] In Prompt 141 the reviewer approved each Prompt 140 recommendation, subject to the
+Prompt 141 corrections above: **E1** TOML parsed with the standard library; **E2** ground-truth-only anchors;
+**E3** pure evaluation modules in retrieval, orchestration in the worker; **E4** tests as the only
+entry point in M4e; **E5** corpus in the sdist, not the wheel; **E6** `initial` and `final`
+snapshot epochs; **E7** report-only Recall, any later regression pinning needing separate review;
+**E8** no minimum Recall threshold; **E9** a narrow installed-wheel check; **E10** a synthetic
+long-table mapping fixture; **E11** a fresh disposable database per variant.
+
+In Prompt 142 the reviewer approved N1–N9, subject to the Prompt 142 corrections above: **N1** the
+canonical tenant-qualified reference `tenant/vendor/document@rN#anchor`, foreign-tenant references
+only in `forbidden`; **N2** per-question `cases` with disjoint `epochs` and `r1`/highest-`n` gold
+eligibility; **N3** separate contracts, now a writing fresh run, a **genuinely read-only**
+verifier and a read-only evaluation; **N4** the vendor list/create/re-read strategy (used only by
+the fresh run); **N5** the `parts` rules and per-entry `MappingEntry` provenance; **N6** the
+`eg-corpus-digest-v1` framing and effective file set; **N7** the report fields, fraction encoding
+and round-half-to-even display, as extended for failures; **N8** failure semantics, as refined into
+inspectable violations and operational errors; **N9** bounds, pre-read size checks and symlink and
+unexpected-file rejection. These settle the choices, not the complete specification.
+
+##### M4e decisions settled at acceptance (Prompt 143)
+
+[SETTLED] Introduced by the Prompt 142 corrections and accepted in Prompt 143 with the two final
+clarifications (the starting-state test matrix, and the verifier reading every `embedding_profiles`
+row of each corpus tenant):
+
+- **N10** the read-only verifier: one `read_snapshot` transaction, the listed read statements in
+  the worker module, corpus-tenant-wide extra-state rejection (vendors, documents, revisions,
+  profiles, indexes and corpus job kinds; not users or API keys), and fixed refusals that leave the
+  database unchanged; every embedding profile of a corpus tenant enumerated and compared with the
+  exact `HASH_IDENTITY` profile; production-seam reuse demonstrated only by a separate test on a
+  complete corpus;
+- **N11** the quote and occurrence rules: exact types, 1–4,000 code points, no NUL, CR or other
+  control characters except TAB and LF, LF-only corpus documents, no leading or trailing
+  whitespace, multiline quotes allowed with exact offsets, non-overlapping left-to-right counting,
+  parent-relative part occurrences and distinct `not_found`, `ambiguous` and
+  `occurrence_out_of_range` outcomes;
+- **N12** the failure-report contract: question outcomes `ok`, `ok_empty_gold` and `invalid`;
+  `null` Recall for both N/A and not-computed, told apart by `outcome`; the four group counts; group
+  and top-level `failed` status with `null` macro; observed ranked output with nullable `ref`;
+  nullable failure-entry fields; and operational retrieval errors raising without a report.
+
+**Planned verification (not run):** the tests above, Ruff, strict mypy, both builds, the existing
+installed-wheel checks plus E9, the integration job and Gitleaks. The container smoke is unchanged
+and continues to cover ingestion, indexing and idle-worker shutdown only.
 
 **M5 – Review workflow (fake model in CI)**
 - Provider interface; Anthropic and scripted fake providers; `prompts/verifier/v1.md` and `prompts/risk_analyst/v1.md`; planner; orchestration; review snapshot; provenance checks; status derivation; report renderer; provider-call records and spans.

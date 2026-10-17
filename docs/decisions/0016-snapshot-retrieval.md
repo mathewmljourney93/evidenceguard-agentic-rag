@@ -1,8 +1,9 @@
 # ADR-0016: Trusted snapshot capture and snapshot-relative hybrid retrieval
 
-- **Status:** **Accepted at external review in Prompt 136; reviewed and verified in
-  feature-branch CI at `3d6e8395`; not merged.** `main` is unchanged at `76fa5a3`. Implemented by
-  Claude Code in Prompt 134 and corrected in Prompt 135 (see
+- **Status:** **Accepted at external review in Prompt 136; reviewed, verified in CI and on
+  `main` at `cf2b5743`** (fast-forwarded in Prompt 139; see
+  [Main CI evidence](#main-ci-evidence-at-cf2b5743)). The earlier feature-branch verification at
+  `3d6e8395` is historical. Implemented by Claude Code in Prompt 134 and corrected in Prompt 135 (see
   [Prompt 135 corrections](#prompt-135-corrections) and
   [External review](#external-review-prompt-136)) from the
   [accepted specification](../plan.md#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending)
@@ -11,8 +12,9 @@
   PostgreSQL (all 39 M4d cases), the container job and Gitleaks (see
   [Feature-branch CI evidence](#feature-branch-ci-evidence-at-3d6e8395)); this is the first
   executed PostgreSQL evidence for M4d. Claude Code's local Windows checks under
-  [Verification](#verification) are historical. M4c remains verified and on `main` at `76fa5a3`. M4e–M4f and overall M4 acceptance remain
-  pending. Local Compose remains unverified.
+  [Verification](#verification) are historical. M4c's own evidence remains at `76fa5a3`. The M4e
+  specification is accepted (Prompt 143) with its implementation pending; M4f and overall M4
+  acceptance remain pending. Local Compose remains unverified.
 - **Date:** 2026-10-17
 - **Builds on:** [ADR-0015](0015-revision-indexing.md) (M4c indexing), [ADR-0014](0014-embedding-persistence.md)
   (M4b storage), [ADR-0013](0013-embeddings.md) (M4a provider boundary), [ADR-0011](0011-document-api.md)
@@ -292,8 +294,57 @@ No required job or step was skipped, failed or cancelled.
 
 This evidence establishes the covered paths in this run for this commit. It is not a
 semantic-quality, retrieval-quality, benchmark, production-readiness or general security guarantee,
-and it says nothing about other PostgreSQL versions, platforms or live providers. M4d is not
-merged; `main` is unchanged at `76fa5a3`.
+and it says nothing about other PostgreSQL versions, platforms or live providers. At the time,
+M4d was not merged and `main` was at `76fa5a3` (historical; see the main evidence below).
+
+## Main CI evidence at cf2b5743
+
+In Prompt 139, after all five push-triggered feature-branch jobs for
+`cf2b5743799e51c74e9f80638b0cc13be5827a71` concluded success, Claude Code fast-forwarded `main`
+from `76fa5a3` to that commit (no merge commit) and pushed it. Relative to `3d6e8395`, this
+commit changes only verification documentation and prompt history (README, ADR-0015, ADR-0016,
+plan, threat model and prompts.md); the implementation, tests and workflow are unchanged.
+
+The push-triggered `main` runs for exact commit `cf2b5743` (event `push`, branch `main`,
+attempt 1) both concluded **success**, with all five jobs and every required step succeeding and
+none skipped:
+[CI run 39022741072](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39022741072)
+and
+[secret-scan run 39022741039](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39022741039).
+In Prompt 139 Claude Code observed run, job and step conclusions through the public API only; its
+anonymous log downloads returned HTTP 403. The external reviewer then independently retrieved the
+main run records, job records and all five main job logs through connected GitHub tooling
+(Prompt 140); the log details below come from that retrieval. The reviewer confirmed the
+feature-branch and main run records for this exact commit but did not retrieve the feature-push
+logs for `cf2b5743`, so no feature-push counts are recorded for it. The reviewer ran no local
+project suite, PostgreSQL, Docker or provider calls.
+
+| Job | Observed |
+|---|---|
+| [Ubuntu verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39022741072/job/117367630581) | `2002 passed, 290 skipped in 29.50s`; formatting, lint, strict types, distribution build and clean installed-wheel checks passed |
+| [Windows verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39022741072/job/117367630553) | `2001 passed, 291 skipped in 29.54s`; the same checks passed |
+| [PostgreSQL integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39022741072/job/117367630597) | `290 passed, 2002 deselected in 142.23s (0:02:22)`; all 39 cases in `tests/test_retrieval_postgres.py` passed, none failed or skipped |
+| [Container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39022741072/job/117367630417) | all six steps executed and succeeded (configuration, effective context, image build, image checks, smoke, cleanup) |
+| [Gitleaks (full history)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39022741039/job/117367630646) | 60 commits scanned, no leaks found |
+
+- **Installed wheel (Ubuntu and Windows):** both printed `offline embedding, canonical storage and
+  indexing modules ran from the installed wheel`, `retrieval modules imported and fusion ran from
+  the installed wheel` and `offline migration SQL rendered from the installed wheel`.
+- **Container (printed summaries and passed gates, not independently inspected raw rows):**
+  effective context `82 files; 19 planted fixtures excluded`; UID/GID 10001 checks; `eg-api`,
+  `eg-worker` and `eg-admin` help; installed imports, offline migration SQL and runtime-content
+  checks; healthy database, completed migration and healthy API, with migrate, API and worker on the
+  CI-built image; an API key created and held in memory only; upload 202, successful ingestion and an
+  active revision with two verified chunks; duplicate upload 200; the production backfill enqueuing
+  one offline indexing job; a ready index with two embeddings and a succeeded indexing job; the idle
+  worker exiting 0 without OOM; `smoke: ok`; ownership-scoped cleanup with `cleanup: ok`. The smoke
+  covers ingestion and indexing and idle-worker shutdown only, **not M4d retrieval**.
+
+This evidence establishes the covered paths in this run for this commit only. It is not a
+semantic-quality, retrieval-quality, benchmark, production-readiness or general security
+guarantee. M4d is reviewed, verified in CI and on `main` at `cf2b5743`; the M4e specification is
+accepted (Prompt 143) with its implementation pending, and M4f and overall M4 acceptance remain
+pending.
 
 ## Limits
 
