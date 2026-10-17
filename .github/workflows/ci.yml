@@ -89,6 +89,27 @@ jobs:
           assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
           print("offline embedding, canonical storage and indexing modules ran from the installed wheel")
           PY
+          # M4d (ADR-0016): import the retrieval modules from the installed wheel and run fusion
+          # on a fixed fixture with a pinned result. No database or provider is contacted; this
+          # check does not establish database retrieval (the PostgreSQL integration job does).
+          "${bin}/python" -I - <<'PY'
+          import uuid
+          from fractions import Fraction
+          import evidenceguard_domain.retrieval as contracts
+          import evidenceguard_persistence.retrieval as store
+          import evidenceguard_worker.retrieval as orchestration
+          for module in (contracts, store, orchestration):
+              assert "site-packages" in (module.__file__ or ""), module.__name__
+          one, two, three = (uuid.UUID(int=n) for n in (1, 2, 3))
+          lists = (
+              contracts.ChannelList(0, "lexical", ((one, 2.0), (two, 1.0))),
+              contracts.ChannelList(0, "vector", ((two, 0.1), (three, 0.2))),
+          )
+          fused = contracts.fuse(lists, query_count=1, vector_skipped=(), k=8)
+          expected = [(two, 1, Fraction(123, 3782)), (one, 2, Fraction(1, 61)), (three, 3, Fraction(1, 62))]
+          assert [(c.chunk_id, c.fused_rank, c.fused_score) for c in fused] == expected
+          print("retrieval modules imported and fusion ran from the installed wheel")
+          PY
           "${bin}/python" -I -c "import io; from alembic import command; from evidenceguard_persistence.migration_config import alembic_config; buf = io.StringIO(); command.upgrade(alembic_config(output_buffer=buf), 'head', sql=True); assert 'CREATE TABLE api_keys' in buf.getvalue(); print('offline migration SQL rendered from the installed wheel')"
 
   integration:

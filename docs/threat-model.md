@@ -238,18 +238,34 @@ re-verified against provider output, and provider calls are not exactly-once. A 
 automatically. The container smoke covers idle-worker shutdown only. The offline provider is a
 lexical-hash baseline with no semantic-quality claim, and no live provider was verified.
 
-## Snapshot retrieval (M4d, specification accepted; implementation pending)
+## Snapshot retrieval (M4d, implementation accepted for a local commit; CI pending)
 
 The [M4d specification](plan.md#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending)
 was accepted at external review in Prompt 133 (proposed in Prompt 131, corrected in Prompt 132).
-**Its implementation is pending: none of the proposed M4d mitigations operates yet, and no M4d
-test has run.** It specifies tenant/vendor-scoped snapshot capture in one read-only transaction,
-refusal of unready active revisions, re-verification of immutable snapshot bindings before every
-retrieval, filters before each channel limit, provider work outside transactions and fixed,
-content-free provider and database errors. Its accepted trust model keeps a limitation: until M5
-persists snapshots, a snapshot value forged in trusted in-process code could include same-vendor
-revisions that were superseded before capture, because retrieval cannot re-prove past
-eligibility; no protection against malicious in-process code is claimed.
+Claude Code implemented it in Prompt 134 and corrected it in Prompt 135
+([ADR-0016](decisions/0016-snapshot-retrieval.md)); the correction preserves process-control
+exceptions raised during the read helper's setup when cleanup also fails.
+**The implementation was accepted at external review in Prompt 136 for a local commit; it is not
+published, merged or verified in CI, and no endpoint or worker handler calls it.** Its
+database-independent tests ran locally on Windows (Claude Code, historical); its 39 PostgreSQL
+tests, which are the evidence for the database-side mitigations below (tenant/vendor scoping,
+filtering before limits, the binding recheck and snapshot-relative supersession), are written but
+have never run. Linux and current-version CI are pending.
+
+| Threat | Mitigation (implemented and accepted; database-side evidence pending) |
+|---|---|
+| Retrieving another tenant's or vendor's content | The tenant comes only from the trusted actor (reviewer or approver). Capture is tenant- and vendor-scoped; every channel and evidence statement repeats the tenant, vendor, binding, ready-index and profile joins before its `LIMIT 20`. |
+| Silently searching an incomplete or changed corpus | Capture runs in one REPEATABLE READ, READ ONLY transaction and refuses any active revision without a chunk set or ready index for the profile, an empty set and more than 100 revisions or 100,000 chunks. Before every retrieval, one statement rechecks every immutable binding; current `status` is never consulted, so supersession is snapshot-relative. |
+| Leaking queries, text, vectors or backend detail | Values show IDs and counts only. Provider and database failures become fresh fixed errors raised outside handlers, with no message, statement, parameter, cause or context; nothing logs. Process-control exceptions propagate unconverted. |
+| Unbounded work | 1–8 queries, at most 16 channel statements of 20 rows, k at most 20, a transaction-local 30-second timeout per statement; provider calls run with no session open. |
+
+**Limits:** its accepted trust model keeps a limitation: until M5 persists snapshots, a snapshot
+value forged in trusted in-process code could include same-vendor revisions that were superseded
+before capture, because retrieval cannot re-prove past eligibility (a PostgreSQL test documents
+this); no protection against malicious in-process code is claimed. The precomputed-vector seam
+cannot prove that vectors came from the claimed queries. The evidence digest check detects one
+class of tampering only; no hash protects against a database writer outside the application.
+Repeated table headers are a separate span that citations must not quote across.
 
 ## Not implemented yet
 

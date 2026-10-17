@@ -1,4 +1,5 @@
 import ast
+import sys
 from importlib.metadata import distribution, entry_points
 from pathlib import Path
 from types import ModuleType
@@ -99,3 +100,43 @@ def test_retrieval_imports_only_the_domain_and_the_standard_library() -> None:
         "evidenceguard_retrieval",
     }
     assert not imported & {"sqlalchemy", "psycopg", "httpx", "socket", "urllib", "requests", "os"}
+
+
+def _module_imports(path: Path) -> set[str]:
+    imported: set[str] = set()
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        if isinstance(node, ast.Import):
+            imported.update(alias.name.split(".")[0] for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imported.add(node.module.split(".")[0])
+    return imported
+
+
+@pytest.mark.parametrize(
+    ("package", "allowed"),
+    [
+        (evidenceguard_domain, {"evidenceguard_domain"}),
+        (
+            evidenceguard_persistence,
+            {"evidenceguard_domain", "evidenceguard_persistence", "sqlalchemy"},
+        ),
+        (
+            evidenceguard_worker,
+            {
+                "evidenceguard_domain",
+                "evidenceguard_persistence",
+                "evidenceguard_retrieval",
+                "sqlalchemy",
+            },
+        ),
+    ],
+)
+def test_m4d_retrieval_modules_keep_the_accepted_boundaries(
+    package: ModuleType, allowed: set[str]
+) -> None:
+    """M4d (ADR-0016): pure values and fusion in the domain, capture and retrieval in
+    persistence, provider orchestration in the worker; standard library otherwise."""
+    assert package.__file__ is not None
+    module = Path(package.__file__).parent / "retrieval.py"
+    third_party = _module_imports(module) - set(sys.stdlib_module_names)
+    assert third_party <= allowed
