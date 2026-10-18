@@ -6693,7 +6693,7 @@ current code. Per-slice main evidence remains in each ADR.
     and contract and isolation evaluation, which the arithmetic tests and the PostgreSQL
     evaluation tests support. A numerical report remains optional follow-up evidence, with no
     threshold and no quality claim (any README figure would still need a committed run, per §7).
-    No measured corpus Recall result exists.
+    No database-derived corpus Recall value has been observed or published.
   - **G3, documentation lag.** `main` at `5acb75e5` still describes M4f as unmerged.
     **Resolution:** the reviewed documentation corrects the M4f main-publication status; Prompt
     165 records the acceptance in a local commit only, and its publication remains pending and is

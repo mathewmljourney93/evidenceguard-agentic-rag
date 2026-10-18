@@ -30947,3 +30947,243 @@ pending and M5 not started. The reviewer's evidence and Claude Code's documentat
 separately attributed. No application test, build, wheel check, install, Docker, database,
 network or provider call was made. The staged checks, the local commit and its post-commit
 verification are not recorded in this note; their outcomes are reported in the handoff.
+
+### Prompt 165 outcome (Claude Code handoff results)
+
+Claude Code's Prompt 165 handoff reported: the pre-commit checks passed (exactly five staged
+paths; all other blobs identical to tree `816cf9fb` and HEAD; earlier prompt bytes preserved;
+276 relative links resolving, including the renamed assessment anchor; consistent status;
+UTF-8 without BOM or replacement characters and LF; a clean `git diff --cached --check`; Ruff
+format clean; a clean privacy scan; an unsuppressed staged Gitleaks scan with no leaks; the
+noreply author and committer). The local commit `a3d8991e6ea4007804ff7cef2ded3594e471c45f`
+(parent `5acb75e5`, tree `efd2f0db31180f245bfe288f6fe4bbcd0f4da157`, subject "docs: record
+overall M4 acceptance and main verification evidence") contains exactly the five paths, with no
+other file differing from `5acb75e5`; afterwards the working tree was clean, `main` and
+`origin/main` remained `5acb75e5`, and the unsuppressed full-history Gitleaks scan covered 71
+commits with no leaks. The export `.local/p165/m4-acceptance-commit-incremental.diff` (baseline
+tree `816cf9fb`, final `a3d8991e`, prompts.md excluded; 4 files, 68 insertions, 47 deletions) is
+80,044 bytes with SHA-256 `f408e5fefa664a2f372ca6261606df027f434b6214463a35e7d8b0031b2d9331`.
+Nothing was pushed.
+
+### External review acceptance of the M4 acceptance record (Prompt 166)
+
+The external reviewer matched `.local/p165/m4-acceptance-commit-incremental.diff` (baseline
+`816cf9fb4263295ba6a35848d1b299821fd992ac`, final `a3d8991e6ea4007804ff7cef2ded3594e471c45f`,
+prompts.md excluded; 80,044 bytes; SHA-256
+`f408e5fefa664a2f372ca6261606df027f434b6214463a35e7d8b0031b2d9331`) and accepted it, subject to
+one exact wording clarification in `docs/plan.md`: "No measured corpus Recall result exists."
+becomes "No database-derived corpus Recall value has been observed or published." (the
+PostgreSQL tests compute reports; the absence concerns independently observed or published
+numerical values, not whether computation occurred). No other change to the four reviewed
+documents is authorized. Prompt 166 authorizes one history commit, publication of
+`docs/m4-acceptance-assessment`, an exact-SHA five-job feature CI gate and, only after it passes
+and fresh preconditions hold, a fast-forward of `main` and a normal main push with main CI
+monitoring. No implementation change or M5 work is authorized.
+
+### Prompt 166 (verbatim)
+
+Prompt 166 — Publish the M4 acceptance record through feature CI and fast-forward main
+
+Written for: Mathew and the external reviewer.
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and applicable repository instructions.
+
+The external reviewer accepts the Prompt 165 incremental export, subject to the exact wording clarification below. Publication is now authorized through the gated sequence in this prompt.
+
+Do not start M5 or change implementation, tests, workflows, dependencies, configuration or corpus.
+
+1. Verify the starting state
+
+Expected:
+- Branch docs/m4-acceptance-assessment.
+- HEAD:
+  a3d8991e6ea4007804ff7cef2ded3594e471c45f
+- Parent:
+  5acb75e59edbb42035d468c2c40bb0ab81a8725a
+- Tree:
+  efd2f0db31180f245bfe288f6fe4bbcd0f4da157
+- Subject:
+  docs: record overall M4 acceptance and main verification evidence
+- Clean index and working tree.
+- Local main and origin/main at:
+  5acb75e59edbb42035d468c2c40bb0ab81a8725a
+- Expected origin and author/committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Fetch normally with --no-tags and inspect remote refs read-only.
+Expected remote main remains 5acb75e5 and the remote docs/m4-acceptance-assessment branch is absent. Confirm main is an ancestor of HEAD and local main has no independent commits.
+
+If material state differs, stop without repairing it.
+
+Verify:
+.local/p165/m4-acceptance-commit-incremental.diff
+Baseline:
+816cf9fb4263295ba6a35848d1b299821fd992ac
+Final:
+a3d8991e6ea4007804ff7cef2ded3594e471c45f
+Excluding prompts.md:
+80,044 bytes
+SHA-256:
+f408e5fefa664a2f372ca6261606df027f434b6214463a35e7d8b0031b2d9331
+
+Save a checkpoint under .local/p166/: refs, status, tree, reviewed document blobs and prompt-history prefix.
+
+2. Exact approved clarification
+
+In docs/plan.md, change only this sentence:
+
+“No measured corpus Recall result exists.”
+
+to:
+
+“No database-derived corpus Recall value has been observed or published.”
+
+The PostgreSQL tests compute reports. The absence concerns independently observed or published numerical values, not whether computation occurred.
+
+No other change to the four reviewed documents is authorized.
+
+3. Publication history commit
+
+Preserve every earlier prompts.md byte as an identical prefix.
+
+Append:
+- The Prompt 165 handoff, attributed to its supplied output.
+- The reviewer’s matched export size/checksum and acceptance, including the exact clarification above.
+- Prompt 166 verbatim, including the Written for line.
+- A preflight note recording completed checks and publication authorization, without predicting a commit SHA, push result or CI outcome.
+
+Only docs/plan.md and prompts.md may change in this task.
+README, ADR-0018 and threat model must remain byte-identical to a3d8991e. The plan must differ only by the approved sentence.
+
+Create one local commit:
+docs: record M4 acceptance publication authorization
+
+Use a message file, the expected noreply author/committer and the repository’s assistance/trailer convention. Credit Claude Code’s actual documentation/history/publication assistance, preserving prior implementation and Codex attribution.
+
+4. Preflight checks
+
+Check the complete range from origin/main through the new commit:
+- Exactly the five previously reviewed documentation/history paths.
+- No application, test, workflow, corpus, migration, dependency, lockfile, settings, Docker, Compose or container-smoke changes.
+- No tracked .local files, artifacts, backups, binaries, credentials or environment changes.
+- .env.example unchanged.
+- Identities and attribution correct.
+- Both workflows still trigger on push and all five required jobs remain enabled.
+- Existing tests, integration requirement, wheel checks and container steps unchanged.
+
+Check:
+- Reviewed document blob identity, with only the exact plan sentence changed.
+- Prompt prefix and verbatim prompt.
+- Relative links/anchors and status consistency.
+- UTF-8 without BOM, LF only, staged whitespace and existing Markdown formatting.
+- Privacy/artifact scope.
+- Unsuppressed Gitleaks over the unpublished range and staged changes.
+
+After committing, verify parent/tree/paths, clean working tree and unsuppressed full-history Gitleaks.
+
+Do not rerun local application tests, builds, wheel checks, installs, Docker, database or provider calls.
+
+5. Publish the documentation branch
+
+Recheck remote refs immediately before pushing.
+
+Push only:
+git push --set-upstream origin refs/heads/docs/m4-acceptance-assessment:refs/heads/docs/m4-acceptance-assessment
+
+Record its exit status and verify the remote branch equals the exact local SHA.
+
+Wait for both push-triggered workflows for that exact SHA:
+- CI: Ubuntu verify, Windows verify, PostgreSQL integration and container.
+- Secret scan: full-history Gitleaks.
+
+Verify event, branch, SHA, run attempt, run conclusions, all five jobs and required steps. Poll at reasonable intervals with a 25-minute bound. Stop monitoring when complete and leave no background monitor.
+
+If any required job fails, is skipped/cancelled, remains incomplete, or its exact-SHA identity cannot be established:
+- Stop.
+- Do not update main.
+- Do not repair, rerun, amend or revert.
+- Report observed evidence and the blocker.
+
+Retrieve logs through available authorized tooling if possible. If unavailable, preserve the distinction between API conclusions and unobserved log details. Do not inspect or extract stored credentials to obtain access.
+
+Do not assume previous test counts for this SHA.
+
+6. Main gate and fast-forward
+
+Only after all five feature jobs and their required steps pass:
+
+Refresh remote refs and verify:
+- Remote main is still 5acb75e59edbb42035d468c2c40bb0ab81a8725a.
+- Local main equals origin/main.
+- Remote documentation branch equals the exact verified SHA.
+- Main is its ancestor.
+- Working tree is clean.
+- Only the expected documentation commits are in the range.
+- Reviewed document blobs still match, allowing only the approved sentence clarification.
+
+Then:
+git switch main
+git merge --ff-only <exact verified SHA>
+
+Recheck remote main immediately before pushing. If it moved, stop without force-pushing or integrating unexpected work.
+
+Push only:
+git push origin refs/heads/main:refs/heads/main
+
+Record each command’s exit status. No merge commit, squash, force-push or history rewrite.
+
+7. Main CI
+
+Wait for both main-push workflows at that exact SHA using the same checks and bounds.
+
+If main CI fails, report it and stop without automatic repair, rerun or revert.
+
+If logs are available, report exact observed:
+- Ubuntu/Windows/PostgreSQL summaries.
+- M4 PostgreSQL module results where identifiable.
+- Build and installed-wheel execution/output.
+- Container steps and bounded log summaries.
+- Gitleaks count/result.
+
+Keep the limitations:
+- Voyage coverage is mocked, not live.
+- The wheel’s 2/3 Recall fixture is arithmetic.
+- No numerical database-derived corpus Recall is supplied unless actually observed.
+- Container smoke covers offline ingestion/indexing and idle-worker shutdown.
+- Overall M4 acceptance is scoped; M5 has not started.
+- Existing timing, privacy, snapshot, retryability, live-provider and local-Compose limits remain.
+
+Do not edit documentation after either push in this task. Existing publication-pending wording can be updated in a later reviewed task.
+
+8. Final handoff
+
+Report:
+- Starting state and checks actually performed.
+- The exact approved sentence clarification.
+- New commit SHA, parent, tree, subject, identity, attribution and paths.
+- Publication commands and exit statuses.
+- Feature and main CI links, exact-SHA identities and conclusions.
+- Observed logs separately from unavailable details.
+- Before/after local and remote refs.
+- Clean final working tree and stopped monitors.
+- No implementation changes or M5 work.
+- Remaining limitations.
+
+Do not create an additional review diff.
+
+End:
+“Mathew: return this output only to the external reviewer; no diff attachment is required.”
+
+### Prompt 166 preflight (Claude Code; before the history commit and publication)
+
+Completed checks only. Verified locally and against freshly fetched refs (no tags, read-only):
+branch `docs/m4-acceptance-assessment`, HEAD `a3d8991e` (parent `5acb75e5`, tree `efd2f0db`),
+clean; remote `main` `5acb75e5` and no remote `docs/m4-acceptance-assessment`; local `main`
+equals `origin/main` with no independent commits and is an ancestor of HEAD; unchanged origin
+and noreply identity. The Prompt 165 export matched its size, SHA-256 and an exact Git
+comparison. Saved a checkpoint under `.local/p166/`. Applied only the approved sentence
+clarification in `docs/plan.md` (one line); README, ADR-0018 and threat model are unchanged
+from `a3d8991e`. Publication is authorized by Prompt 166 through the gated sequence: feature
+push, exact-SHA five-job feature CI, fresh main preconditions, fast-forward and main push, then
+main CI monitoring. The range, workflow, privacy and Gitleaks checks, the history commit, the
+pushes and the CI outcomes are reported in the handoff, not predicted here.
