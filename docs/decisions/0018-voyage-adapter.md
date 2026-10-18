@@ -1,18 +1,19 @@
 # ADR-0018: Voyage embedding adapter over an injected standard-library transport
 
-- **Status:** **Accepted at external review in Prompt 160 for a local implementation commit
-  only, pending current-version CI** (see [External review (Prompt 160)](#external-review-prompt-160)).
-  Implemented by Claude Code in Prompt 158 and corrected in Prompt 159 (two error-privacy
-  boundaries and the lease-loss integration case; see
-  [Prompt 159 corrections](#prompt-159-corrections)). No publication or merge is authorized or
-  performed. Implements the
+- **Status:** **Accepted at external review (Prompt 160); reviewed and verified in
+  feature-branch CI on `feat/voyage-adapter` at `84eec023`**
+  (`84eec02318c359579c5becbb408e113eee18ceaa`; see
+  [Feature-branch CI evidence at `84eec023`](#feature-branch-ci-evidence-at-84eec023)),
+  **not merged**; `main` remains `0ae4c6ca339232e40cc007d7b78334af08a8b25b`. Implemented by
+  Claude Code in Prompt 158 and corrected in Prompt 159 (two error-privacy boundaries and the
+  lease-loss integration case; see [Prompt 159 corrections](#prompt-159-corrections)); accepted
+  for a local commit in Prompt 160 ([External review (Prompt 160)](#external-review-prompt-160));
+  published on the feature branch in Prompt 161. Implements the
   [accepted M4f specification](../plan.md#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending)
   (proposed in Prompt 154, corrected in Prompts 155–156, accepted at external review in Prompt
-  157), including V1–V15, N1–N13 and the Prompt 157 cleanup clarification. Only Claude Code's
-  local Windows checks have run (below, historical); Linux and current-version CI are pending,
-  the two new PostgreSQL cases are written and collected but have never executed, and none of the
-  308 integration tests has run against this implementation. Overall M4 acceptance remains
-  pending; local Compose is unverified.
+  157), including V1–V15, N1–N13 and the Prompt 157 cleanup clarification. **Remaining:**
+  reviewed publication to `main` (not authorized) and overall M4 acceptance; local Compose is
+  unverified.
 - **Date:** 2026-10-18
 - **Builds on:** [ADR-0013](0013-embeddings.md) (M4a contracts), [ADR-0014](0014-embedding-persistence.md)
   (canonical float32 storage), [ADR-0015](0015-revision-indexing.md) (the `index_revision`
@@ -197,9 +198,69 @@ context and no canary in the default formatted tracebacks. **The reviewer ran no
 suite, regression suite, build, installed-wheel check, PostgreSQL, Docker, network or provider
 call**; these isolated checks are separate from Claude Code's checks below.
 
-**Outstanding:** Linux and current-version CI; the two new PostgreSQL cases (written and
-collected, never executed); every integration test against this implementation; and
-publication, which is not authorized.
+**Outstanding at Prompt 160 (historical):** Linux and current-version CI; the two new
+PostgreSQL cases (then written and collected, never executed); every integration test against
+this implementation; and publication, which was not then authorized. The CI items were closed by
+the [feature-branch CI evidence at `84eec023`](#feature-branch-ci-evidence-at-84eec023);
+publication to `main` remains.
+
+## Feature-branch CI evidence at `84eec023`
+
+In Prompt 161 Claude Code committed the history-only commit
+**`84eec02318c359579c5becbb408e113eee18ceaa`** (parent `54bab581`, the accepted implementation
+commit) and published `feat/voyage-adapter`. The push-triggered
+[ci run](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39135139059)
+and [secret-scan run](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39135138841)
+both used event **push**, that branch and exact SHA, **attempt 1**, and concluded **success**.
+All five jobs and every step concluded success; no required step was skipped.
+
+**Attribution:** in Prompt 161 Claude Code observed only the run, job and step conclusions
+through the anonymous public API; its anonymous log downloads returned HTTP 403, so it observed
+no counts or log output. For Prompt 162 the external reviewer independently retrieved both
+workflow records, all five job and step records and all five logs through connected GitHub
+tooling; the counts and output below come from that retrieval. The reviewer ran no local
+project test, build, wheel check, PostgreSQL, Docker or provider call.
+
+| Job | Observed |
+|---|---|
+| [Ubuntu verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39135139059/job/117698018663) | `2675 passed, 308 skipped in 35.21s`; formatting, lint, types, tests, distribution build and installed-wheel steps succeeded; the adapter and transport modules show passing progress output (case names not printed) |
+| [Windows verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39135139059/job/117698018506) | `2674 passed, 309 skipped in 77.85s`; all verification, build and installed-wheel steps succeeded; the adapter and transport modules show passing progress output |
+| [PostgreSQL integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39135139059/job/117698018301) | `308 passed, 2675 deselected in 155.87s`; `tests/test_voyage_postgres.py` shows two passing cases; no failed or skipped integration case. This is the first executed PostgreSQL evidence for the two M4f cases |
+| [Container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39135139059/job/117698018583) | all six steps executed and succeeded (configuration, context, build, image checks, smoke, cleanup) |
+| [Gitleaks (full history)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39135138841/job/117698017626) | 69 commits scanned, no leaks found |
+
+Both installed-wheel logs printed:
+
+```text
+offline embedding, canonical storage and indexing modules ran from the installed wheel
+retrieval modules imported and fusion ran from the installed wheel
+evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+Voyage adapter validated a mocked response from the installed wheel
+offline migration SQL rendered from the installed wheel
+```
+
+**Container (printed summaries and passing gates, not independent inspection of raw database
+rows or generated credentials):** context 89 files with 19 planted fixtures excluded; CI-built
+service images confirmed; upload accepted with 202; ingestion succeeded with an active revision
+and two verified chunks; a duplicate upload returned the existing revision with 200; the backfill
+enqueued one offline indexing job; a ready index with two embeddings and a succeeded indexing
+job; the idle worker exited 0 without OOM; the smoke succeeded. The smoke exercises offline
+ingestion, indexing and idle-worker shutdown only, not the Voyage transport or M4e evaluation.
+
+**What this establishes, on the exercised paths only.** The database-independent adapter and
+transport tests passed on Ubuntu and Windows for this version: request formation, response
+validation, status-before-body, framing, short-body detection, cooperative-budget checks,
+configuration validation, cleanup precedence, privacy and the mocked M4c and M4d integrations,
+all against fake transports, connections and clocks. The two PostgreSQL cases show that a
+mocked Voyage provider (an in-memory transport returning offline-hash vectors) indexes a revision
+through the real handler into pgvector with `allows_zero_vectors = false`, and that capture and
+`search_snapshot` run with it. The installed-wheel line shows the packaged adapter validating
+one canned response through a fake transport. None of this contacts Voyage or establishes live
+model-echo, strict-framing or normalization compatibility, semantic quality, latency, cost,
+injection resistance, production readiness or a general security guarantee. The 2/3 Recall
+line is pure arithmetic; no live provider or numerical database-derived corpus Recall result
+was observed. Earlier statements that CI was pending and that the two PostgreSQL cases had never
+executed are historical.
 
 ## Tests
 
@@ -229,7 +290,8 @@ publication, which is not authorized.
   TLS-context setup failures (patched setup function; ordinary, timeout and process-control
   failures, validation first, no connection). A fake returning
   late shows only the cooperative checks, not interruption of a real socket operation.
-- `tests/test_voyage_postgres.py` (2 integration cases, **written and collected, not run**):
+- `tests/test_voyage_postgres.py` (2 integration cases; not run locally; both passed in
+  [feature-branch CI at `84eec023`](#feature-branch-ci-evidence-at-84eec023)):
   indexing a revision through the real handler with a mocked Voyage provider into pgvector
   (`allows_zero_vectors = false`, canonical vectors), and capture plus `search_snapshot` with
   it.
@@ -262,7 +324,8 @@ contact; no `EG_TEST_DATABASE_URL` set.
   is preserved fresh, and TLS-setup `OSError` and `TimeoutError` become private
   `voyage_transport_failed` and `voyage_timeout`.
 
-**Not run:** the two PostgreSQL cases, any Linux execution, current-version CI and Gitleaks in
+**Not run at that point (historical; since covered by the feature-branch CI evidence):** the
+two PostgreSQL cases, any Linux execution, current-version CI and Gitleaks in
 CI. At that point implementation acceptance was pending (historical; accepted for a local
 commit in Prompt 160).
 
@@ -286,7 +349,8 @@ update; no Docker, database, network or provider contact; no `EG_TEST_DATABASE_U
   commands extracted from the CI wheel step passed, including the new Voyage command, with
   modules resolved from `site-packages`.
 
-**Not run:** the two PostgreSQL cases, any Linux execution, current-version CI and Gitleaks in
+**Not run at that point (historical; since covered by the feature-branch CI evidence):** the
+two PostgreSQL cases, any Linux execution, current-version CI and Gitleaks in
 CI. Mocked tests establish request formation, validation, bounds, cooperative timing checks,
 error mapping and the stated privacy scope only; they do **not** verify live API
 compatibility, semantic quality, latency, cost or production readiness. Live evaluation remains

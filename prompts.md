@@ -29850,3 +29850,535 @@ production `SUPPORTED_PROVIDERS` remains offline-only, and no workflow reference
 Voyage key. No local application test, build, wheel check, install, Docker, database or
 provider call was made. The history commit, push and CI outcomes have not occurred at this
 note.
+
+### Prompt 161 outcome (attributed to Claude Code's handoff; API-only observations)
+
+Claude Code's Prompt 161 handoff reported: the history-only commit
+`84eec02318c359579c5becbb408e113eee18ceaa` (parent `54bab581`, tree
+`1fbe3b5700dbb6f4ba6d404e58480edc10e32799`, subject "docs: record M4f branch publication
+authorization", path prompts.md only, noreply author and committer; every other blob identical
+to `54bab581`; full-history Gitleaks clean); a remote recheck before pushing (`main`
+`0ae4c6ca`, feature branch absent); `git push --set-upstream origin
+refs/heads/feat/voyage-adapter:refs/heads/feat/voyage-adapter` with exit status 0, the remote
+feature branch at the full SHA, tracking set and remote `main` unchanged. Through the anonymous
+public GitHub API, Claude Code observed push-triggered runs for that exact SHA on
+`feat/voyage-adapter`, attempt 1: ci 39135139059 and secret-scan 39135138841, both concluding
+success, with all five jobs and every required step concluding success and none skipped. Its
+anonymous log downloads returned HTTP 403 for all five jobs, so it observed no counts or log
+output. The bounded monitor stopped when CI completed. No main update, merge, rerun or
+documentation edit after CI occurred.
+
+### External review log evidence (Prompt 162)
+
+The external reviewer independently retrieved both workflow records, all five job and step
+records and all five logs through connected GitHub tooling (the reviewer ran no local project
+test, build, wheel check, PostgreSQL, Docker or provider call). Both runs: event push, branch
+`feat/voyage-adapter`, SHA `84eec02318c359579c5becbb408e113eee18ceaa`, attempt 1, conclusion
+success. Ubuntu verify: `2675 passed, 308 skipped in 35.21s`; Windows verify: `2674 passed,
+309 skipped in 77.85s`; both with formatting, lint, types, tests, distribution build and
+installed-wheel steps succeeding and the adapter and transport modules showing passing progress
+output (individual case names not printed). PostgreSQL integration: `308 passed, 2675
+deselected in 155.87s`, with `tests/test_voyage_postgres.py` showing two passing cases and no
+failed or skipped integration case (the first executed PostgreSQL evidence for the two M4f
+cases). Container: all six steps succeeded; context 89 files with 19 planted fixtures excluded;
+CI-built service images confirmed; upload 202; ingestion succeeded with an active revision and
+two verified chunks; duplicate upload 200; backfill enqueued one offline indexing job; a ready
+index with two embeddings and a succeeded indexing job; the idle worker exited 0 without OOM;
+smoke succeeded (printed summaries and passing gates, not raw-row or credential inspection;
+offline ingestion and indexing and idle-worker shutdown only). Gitleaks: 69 commits scanned, no
+leaks. Both installed-wheel logs printed the offline embedding/indexing, retrieval/fusion,
+evaluation Recall@5 = 2/3 (pure arithmetic), "Voyage adapter validated a mocked response from
+the installed wheel" (fake transport) and offline migration lines. No live provider or numerical
+database-derived corpus Recall result was observed.
+
+### Prompt 162 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+Prompt 162 — Record verified M4f feature-branch CI evidence and stage documentation for review. Do not commit or publish.
+
+Read CLAUDE.md and applicable repository instructions first.
+
+Repository:
+D:\Claude\evidenceguard_agentic_rag
+
+Expected state:
+- Branch: feat/voyage-adapter
+- HEAD, upstream and remote feature branch:
+  84eec02318c359579c5becbb408e113eee18ceaa
+- Parent: 54bab581ba010e457d0546a01f24ce2e770e98a3
+- Tree: 1fbe3b5700dbb6f4ba6d404e58480edc10e32799
+- Subject: docs: record M4f branch publication authorization
+- Clean index and working tree.
+- Local main, origin/main and remote main:
+  0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Existing origin and noreply identity unchanged.
+
+Verify locally and check remote refs read-only.
+If state differs, stop without resetting or overwriting anything.
+
+Save a checkpoint under .local/p162/, including refs, status, tree, permitted-file blob hashes and existing prompts.md bytes.
+
+Authorized changed paths only:
+- README.md
+- docs/decisions/0018-voyage-adapter.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+No implementation, tests, workflows, corpus, dependencies, lockfile, configuration, migrations, Docker or Compose changes.
+
+Independently verified evidence:
+The external reviewer retrieved both workflow records, all five job/step records and all five logs through connected GitHub tooling.
+
+Both runs:
+- Event: push
+- Branch: feat/voyage-adapter
+- Exact SHA: 84eec02318c359579c5becbb408e113eee18ceaa
+- Attempt: 1
+- Conclusion: success
+
+CI:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39135139059
+
+Secret scan:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39135138841
+
+Ubuntu:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39135139059/job/117698018663
+- 2675 passed, 308 skipped in 35.21s.
+- Formatting, lint, types, tests, distribution build and installed-wheel steps all succeeded.
+- The adapter and transport modules show passing progress output; individual case names are not printed.
+
+Windows:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39135139059/job/117698018506
+- 2674 passed, 309 skipped in 77.85s.
+- All verification, build and installed-wheel steps succeeded.
+- The adapter and transport modules show passing progress output.
+
+PostgreSQL:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39135139059/job/117698018301
+- 308 passed, 2675 deselected in 155.87s.
+- tests/test_voyage_postgres.py shows two passing cases.
+- No failed or skipped integration cases.
+- This is the first executed PostgreSQL evidence for the two M4f cases.
+
+Container:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39135139059/job/117698018583
+- All six steps executed and succeeded: configuration, context, build, image checks, smoke and cleanup.
+- Context: 89 files; 19 planted fixtures excluded.
+- CI-built service images confirmed.
+- Upload accepted with 202.
+- Ingestion succeeded; active revision with two verified chunks.
+- Duplicate upload returned existing revision with 200.
+- Backfill enqueued one offline indexing job.
+- Ready index with two embeddings and succeeded indexing job.
+- Idle worker exited 0 without OOM.
+- Smoke succeeded.
+- These are printed summaries and passing gates, not independent inspection of raw database rows or generated credentials.
+- The smoke exercises offline ingestion/indexing and idle-worker shutdown, not Voyage transport or M4e evaluation.
+
+Gitleaks:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39135138841/job/117698017626
+- 69 commits scanned.
+- No leaks found.
+
+Every job and step concluded success; no required step was skipped.
+
+Both installed-wheel logs printed:
+offline embedding, canonical storage and indexing modules ran from the installed wheel
+retrieval modules imported and fusion ran from the installed wheel
+evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+Voyage adapter validated a mocked response from the installed wheel
+offline migration SQL rendered from the installed wheel
+
+The Voyage check uses a fake transport and verifies installed-artifact behaviour only.
+The 2/3 Recall fixture is pure arithmetic, not measured corpus Recall.
+No live provider or numerical database-derived corpus Recall result was observed.
+
+Evidence attribution:
+- Claude Code's Prompt 161 observations were API conclusions only; anonymous log downloads returned HTTP 403.
+- The external reviewer independently retrieved the records and logs above.
+- Do not claim Claude Code retrieved those logs.
+- Preserve the earlier HTTP 403/history records.
+- The reviewer ran no local project tests, builds, wheel checks, PostgreSQL, Docker or provider calls for this review.
+
+Documentation:
+1. ADR-0018:
+   - Current status: accepted at review, reviewed and verified in feature-branch CI at 84eec023, not merged.
+   - Main remains 0ae4c6ca.
+   - Add “Feature-branch CI evidence at 84eec023”.
+   - Include full SHA, both run links, all five job links, exact counts, observed wheel output, container evidence, attribution and limits.
+   - Explain what the mocked tests and PostgreSQL cases establish on the exercised paths.
+   - Relabel earlier “never run” and “CI pending” statements as historical.
+   - Keep Prompt 158–159 Windows results and the reviewer's isolated probes separately attributed.
+
+2. README, plan and threat model:
+   - Consistently state M4f verified on feat/voyage-adapter at 84eec023, not merged.
+   - Link to ADR-0018's evidence.
+   - Update remaining work from M4f CI verification to reviewed publication to main and overall M4 acceptance.
+   - Keep the accepted specification heading and anchor unchanged.
+   - Preserve all M4e main evidence.
+   - Do not record overall M4 acceptance or begin M5.
+
+Preserve limitations:
+- Production provider defaults remain offline; no live wiring or settings.
+- Live Voyage model-echo, strict-framing and normalization compatibility unverified.
+- Mocked tests establish no live semantic quality, latency or cost.
+- Timing is cooperative, with no hard deadline.
+- Process control preserved only where observable in adapter-owned code.
+- Raw-byte cap is not a peak-memory guarantee.
+- Privacy scope excludes frame locals and held values.
+- Retryability gap remains before live indexing.
+- M5 snapshot obligations remain.
+- Container smoke scope unchanged.
+- Local Compose unverified.
+- No injection-resistance, production-readiness or general security guarantee.
+- Overall M4 acceptance pending.
+
+Prompt history:
+Append:
+- Prompt 161 outcome, attributed to its Claude Code handoff and API-only observations.
+- A separate note containing the reviewer's independent log evidence.
+- This Prompt 162 verbatim.
+- Actual outcome note: documentation staged and awaiting review.
+
+Preserve every earlier prompts.md byte as an identical prefix.
+Do not reconstruct unavailable handoffs as verbatim quotations.
+Use inline backticks around commit identifiers in your notes.
+
+Checks:
+- Exactly the five authorized paths changed.
+- All other tracked blobs unchanged.
+- Prompt-history prefix and verbatim prompt correct.
+- Relative links/anchors resolve.
+- No stale current claims that M4f PostgreSQL cases never ran, CI remains pending, or feature publication has not occurred.
+- No claim M4f is on main or overall M4 is accepted.
+- Historical claims remain clearly scoped.
+- UTF-8 without BOM, LF.
+- Privacy/artifact scan.
+- git diff --cached --check.
+- Existing unsuppressed staged Gitleaks scan.
+
+No application tests, builds, installs, wheel checks, Docker, database or provider calls.
+
+Stage only the five authorized paths.
+
+Export:
+.local/p162/m4f-verification-docs.diff
+- Baseline:
+  84eec02318c359579c5becbb408e113eee18ceaa
+- Final: final staged tree
+- Exclude prompts.md
+- Direct Git export, UTF-8 without BOM, LF.
+
+Report paths, statistics, byte size, SHA-256, staged tree, checks actually run, attribution, limitations and final Git state.
+
+Stop after staging and exporting.
+No commit, push, merge, CI rerun, amend, rebase, tag, branch deletion, live wiring or M5 work.
+
+End with:
+Mathew: return this output plus .local/p162/m4f-verification-docs.diff to the external reviewer.
+
+### Prompt 162 outcome (Claude Code; documentation staged, external review pending)
+
+On `feat/voyage-adapter` (HEAD, upstream and remote feature at `84eec023`; `main` and remote
+`main` at `0ae4c6ca`), Claude Code staged README, ADR-0018, plan, threat model and append-only
+prompt history. ADR-0018's status now reads accepted at review, reviewed and verified in
+feature-branch CI at `84eec023`, not merged, with a new "Feature-branch CI evidence at
+`84eec023`" section built from the external reviewer's independent log retrieval (full SHA,
+both runs, all five jobs, exact counts, the five wheel lines, container evidence, attribution
+and limits, and what the mocked tests and the two PostgreSQL cases establish on the exercised
+paths). Earlier "never executed" and "CI pending" statements are relabelled historical; Claude
+Code's Prompt 158-159 Windows results, its Prompt 161 API-only observations with HTTP 403, and
+the reviewer's isolated probes stay separately attributed. README, plan and threat model state
+M4f verified on `feat/voyage-adapter` at `84eec023`, not merged, with reviewed publication to
+`main` and overall M4 acceptance remaining. Claude Code retrieved no logs. No application test,
+build, install, wheel check, Docker, database or provider call was made; nothing was committed
+or pushed. Staging, scope, link, encoding, whitespace, privacy and Gitleaks checks and the
+export are reported in the handoff.
+
+### Prompt 162 outcome (Claude Code handoff results)
+
+Claude Code's Prompt 162 handoff reported: exactly the five authorized paths staged on
+`feat/voyage-adapter` (HEAD and upstream `84eec023`; `main` and remote `main` `0ae4c6ca`),
+staged tree `3402b5c371327ac54645a6539ec6fa2a2b76da6b`, all other tracked blobs unchanged, the
+earlier prompt-history prefix preserved, 250 relative links resolving, no stale current claims,
+UTF-8 without BOM and LF, a clean `git diff --cached --check`, a clean privacy scan and an
+unsuppressed staged Gitleaks scan with no leaks. The export
+`.local/p162/m4f-verification-docs.diff` (baseline `84eec023`, prompts.md excluded; 4 files,
+108 insertions, 40 deletions) is 78,094 bytes with SHA-256
+`44a1482c0d9fce1b3d5fa93f55045fbb7d92a4f3eb22ae417a246c9c21fe48e8`. Claude Code retrieved no
+logs; nothing was committed or pushed.
+
+### External review acceptance (Prompt 163)
+
+The external reviewer inspected `.local/p162/m4f-verification-docs.diff` (baseline
+`84eec02318c359579c5becbb408e113eee18ceaa`, final staged tree
+`3402b5c371327ac54645a6539ec6fa2a2b76da6b`; 78,094 bytes; SHA-256
+`44a1482c0d9fce1b3d5fa93f55045fbb7d92a4f3eb22ae417a246c9c21fe48e8`; four documentation paths,
+prompts.md excluded; 108 insertions, 40 deletions), independently matched it and accepted the
+verification documentation. The reviewer ran no additional project checks. Prompt 163
+authorizes committing the five reviewed paths, pushing `feat/voyage-adapter`, an exact-SHA
+five-job feature CI gate, and only after that gate and fresh preconditions pass, a fast-forward
+of `main` and a normal main push with main CI monitoring. No implementation change or overall
+M4 acceptance is authorized.
+
+### Prompt 163 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+Prompt 163 — Commit accepted M4f verification documentation, publish the feature branch, and fast-forward main only after all five feature jobs pass.
+
+Read CLAUDE.md and applicable repository instructions first.
+
+Repository:
+D:\Claude\evidenceguard_agentic_rag
+
+Expected starting state:
+- Branch: feat/voyage-adapter
+- HEAD and upstream:
+  84eec02318c359579c5becbb408e113eee18ceaa
+- Parent: 54bab581ba010e457d0546a01f24ce2e770e98a3
+- HEAD tree: 1fbe3b5700dbb6f4ba6d404e58480edc10e32799
+- Accepted staged tree:
+  3402b5c371327ac54645a6539ec6fa2a2b76da6b
+- Exactly five staged paths:
+  README.md
+  docs/decisions/0018-voyage-adapter.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or unexpectedly untracked.
+- Local main and origin/main:
+  0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Existing origin and noreply identity unchanged.
+
+Fetch fresh refs without tags and check remote refs read-only.
+Require:
+- Remote feature equals 84eec02318c359579c5becbb408e113eee18ceaa.
+- Remote main equals 0ae4c6ca339232e40cc007d7b78334af08a8b25b.
+- Local main equals origin/main without independent commits.
+- Main is an ancestor of HEAD.
+
+If any expected state differs, stop without resetting, cleaning or overwriting anything.
+
+Save a checkpoint under .local/p163/, including refs, status, accepted tree, staged paths, reviewed document hashes and existing prompts.md bytes.
+
+External review acceptance:
+The reviewer inspected the Prompt 162 export and independently matched:
+- .local/p162/m4f-verification-docs.diff
+- Baseline: 84eec02318c359579c5becbb408e113eee18ceaa
+- Final staged tree: 3402b5c371327ac54645a6539ec6fa2a2b76da6b
+- Size: 78,094 bytes
+- SHA-256:
+  44a1482c0d9fce1b3d5fa93f55045fbb7d92a4f3eb22ae417a246c9c21fe48e8
+- Four documentation paths, excluding prompts.md.
+- 108 insertions, 40 deletions.
+
+The verification documentation is accepted.
+The reviewer ran no additional project checks for this review.
+
+Authorization:
+- Append history and commit the five reviewed paths.
+- Push feat/voyage-adapter.
+- Wait for all five required jobs to pass for the exact new SHA.
+- Only then, after fresh precondition checks, fast-forward local main and push main normally.
+- Monitor all five main-push jobs.
+
+No implementation changes or overall M4 acceptance are authorized.
+
+Preflight:
+1. Verify the export checksum and exact Git comparison.
+2. Verify README, ADR-0018, plan and threat model match their accepted staged-tree blobs.
+3. Inspect the publication range against fresh origin/main:
+   - Specification eeef0227.
+   - Implementation 54bab581.
+   - History 84eec023.
+   - The documentation commit created below.
+   - Only reviewed paths and changes.
+4. Confirm:
+   - Workflow change only adds the accepted mocked Voyage wheel command.
+   - No dependency, lockfile, settings, registry, migration, Docker, Compose or container-smoke change.
+   - .env.example unchanged.
+   - No binaries, artifacts, backups, credentials or tracked .local files.
+   - Production provider defaults remain offline.
+5. Verify identities and attribution.
+6. Run privacy checks and the existing unsuppressed Gitleaks range scan.
+7. Confirm both push workflows and all five jobs remain enabled.
+8. Confirm integration uses pytest -m integration with EG_REQUIRE_INTEGRATION=1.
+9. Confirm all wheel checks and six container steps remain present.
+
+No local application tests, builds, installs or wheel checks.
+No local Docker, database or provider contact.
+
+Prompt history:
+Append:
+- Prompt 162 outcome, attributed to its Claude Code handoff.
+- The reviewer's acceptance and matched checksum.
+- This Prompt 163 verbatim.
+- A preflight note recording completed checks only, without prospective commit, push or CI outcomes.
+
+Preserve every earlier prompts.md byte as an identical prefix.
+Do not reconstruct unavailable handoffs as verbatim quotations.
+Use inline backticks around commit identifiers in your notes.
+
+Before committing:
+- Exactly the five intended paths staged.
+- Four reviewed documents unchanged from the accepted tree.
+- Prefix and verbatim prompt verified.
+- Relative links/anchors, status, privacy and artifacts checked.
+- UTF-8 without BOM, LF.
+- git diff --cached --check.
+- Existing unsuppressed staged Gitleaks scan.
+- Effective author/committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Commit:
+- Subject:
+  docs: record verified M4f results and main publication authorization
+- Parent:
+  84eec02318c359579c5becbb408e113eee18ceaa
+- Exactly the five authorized paths.
+- Accurate Claude Code assistance attribution, preserving earlier Codex credit and repository conventions.
+- No amend or history rewrite.
+
+After committing:
+- Verify SHA, parent, tree, paths, identity and attribution.
+- Verify the four reviewed document blobs still match the accepted tree.
+- Verify clean working tree.
+- Run the existing unsuppressed full-history Gitleaks scan.
+
+Feature publication:
+Recheck remote feature and main refs immediately before pushing.
+If either changed unexpectedly, stop.
+
+Run exactly:
+git push origin refs/heads/feat/voyage-adapter:refs/heads/feat/voyage-adapter
+
+Record the actual exit status without obscuring it through a pipeline.
+No force-push.
+Use normal supported authentication if needed; do not extract stored credentials or change authentication configuration.
+
+Verify remote feature equals the full new SHA.
+
+Feature CI gate:
+Find push-triggered ci and secret-scan runs for that exact SHA and branch.
+Record attempt numbers.
+Monitor with a bounded loop, at most 25 minutes, checking approximately every 45–60 seconds.
+
+Require:
+- Ubuntu verify.
+- Windows verify.
+- PostgreSQL integration.
+- Container.
+- Gitleaks/full-history scan.
+
+All required steps must execute successfully, including both builds/wheel checks, integration execution, and all six container steps.
+
+If any job fails, is cancelled, skips a required step or remains incomplete at the bound:
+Stop. Do not update main, repair, rerun, revert or make another commit.
+
+Main fast-forward gate:
+Only after all five feature jobs pass for the exact new SHA, fetch fresh refs without tags and recheck:
+- Remote main remains 0ae4c6ca339232e40cc007d7b78334af08a8b25b.
+- Local main equals origin/main without independent commits.
+- Remote feature equals the exact verified new SHA.
+- The old main SHA is an ancestor of it.
+- Clean working tree.
+- Reviewed document blobs unchanged.
+- No unexpected commits entered the range.
+
+If any precondition fails, stop without changing main.
+
+Run separately, using the actual full verified SHA:
+git switch main
+git merge --ff-only <full verified new SHA>
+git push origin refs/heads/main:refs/heads/main
+
+Record each exit status.
+No merge commit, squash or force-push.
+
+Verify remote main equals the published SHA.
+
+Main CI:
+Find push-triggered ci and secret-scan runs for main at that exact SHA.
+Monitor all five jobs and required steps with the same bounded approach.
+If anything fails or remains incomplete, report without repair, rerun, revert or further commit.
+
+Evidence for each push:
+Retrieve logs through available connected GitHub tooling or normal authorized access when possible.
+Do not bypass access restrictions or extract credentials.
+
+Report:
+- Run links, event, branch, full SHA, attempt and conclusions.
+- Five job links and required-step conclusions.
+- Actual Ubuntu, Windows and PostgreSQL summaries.
+- Whether both Voyage PostgreSQL cases passed.
+- Installed-wheel output, including:
+  Voyage adapter validated a mocked response from the installed wheel
+- Existing wheel output.
+- Container summaries and scope.
+- Gitleaks count and conclusion.
+
+If logs are unavailable, state the access failure and report only observed API conclusions.
+Do not infer counts or output from green statuses.
+Do not relabel the historical 84eec023 results as observations for the new SHA.
+Keep feature and main evidence separate.
+
+The Voyage wheel command uses a fake transport, not live HTTPS.
+The 2/3 Recall fixture is arithmetic, not measured corpus Recall.
+Do not invent live compatibility or numerical corpus Recall evidence.
+
+Do not edit documentation after either push.
+The documents' pre-merge wording will be updated in a later reviewed task.
+
+Final handoff:
+- Commit SHA, parent, tree, paths, identity and attribution.
+- Checks actually performed.
+- Commands and actual exit statuses.
+- Feature and main CI evidence separately.
+- Observed versus unavailable logs.
+- Before/after refs and final clean status.
+- Confirmation all monitors stopped.
+
+Preserve limitations:
+- Overall M4 acceptance remains pending.
+- Production defaults remain offline; no live wiring.
+- Live Voyage compatibility unverified.
+- Cooperative timing, no hard deadline.
+- Process-control preservation limited to observable adapter-owned boundaries.
+- Raw-byte cap is not a peak-memory guarantee.
+- Privacy excludes frame locals and held values.
+- Retryability gap remains before live indexing.
+- M5 snapshot obligations remain.
+- Container smoke covers offline ingestion/indexing and idle-worker shutdown, not Voyage evaluation.
+- Local Compose remains unverified.
+- No semantic-quality, latency, cost, injection-resistance, production-readiness or general security guarantee.
+
+No force-push, amend, rebase, squash, rerun, tag, branch deletion, implementation change, live wiring or M5 work.
+
+End with:
+Mathew: return this output only to the external reviewer; no diff attachment is required.
+
+### Prompt 163 preflight (Claude Code; before the documentation commit and publication)
+
+Completed checks only. Verified locally and against freshly fetched refs (no tags, read-only):
+branch `feat/voyage-adapter`, HEAD and upstream `84eec023` (parent `54bab581`, tree
+`1fbe3b57`), accepted staged tree `3402b5c3` with exactly the five reviewed paths, nothing
+unstaged or untracked; remote feature `84eec023` and remote `main` `0ae4c6ca`; local `main`
+equals `origin/main` with no independent commits and is an ancestor of HEAD; unchanged origin
+and noreply identity. Saved a checkpoint under `.local/p163/`. The Prompt 162 export matched its
+size, SHA-256 and an exact Git comparison, and README, ADR-0018, plan and threat model match
+their accepted staged-tree blobs. The publication range against `origin/main` holds `eeef0227`
+(documentation and history), `54bab581` (the 12 reviewed implementation paths) and `84eec023`
+(prompts.md only), all with the noreply author and committer; the workflow change only adds the
+mocked Voyage wheel command (no removed lines); dependencies, lockfile, `.env.example`,
+settings, registry, migrations, Docker, Compose and the container smoke are unchanged; there are
+no binaries, artifacts or tracked `.local` files; production `SUPPORTED_PROVIDERS` remains
+offline-only. The privacy scan found no credentials and the unsuppressed Gitleaks range scan
+found no leaks. Both workflows trigger on every push; the five jobs are present with no
+job-level condition; integration runs `pytest -m integration` with `EG_REQUIRE_INTEGRATION=1`;
+all wheel checks and the six container steps are present; no workflow references a secret. No
+local application test, build, install, wheel check, Docker, database or provider call was made.
+The documentation commit, pushes, CI gates and main update have not occurred at this note.
