@@ -1,19 +1,22 @@
 # ADR-0018: Voyage embedding adapter over an injected standard-library transport
 
-- **Status:** **Accepted at external review (Prompt 160); reviewed and verified in
-  feature-branch CI on `feat/voyage-adapter` at `84eec023`**
-  (`84eec02318c359579c5becbb408e113eee18ceaa`; see
-  [Feature-branch CI evidence at `84eec023`](#feature-branch-ci-evidence-at-84eec023)),
-  **not merged**; `main` remains `0ae4c6ca339232e40cc007d7b78334af08a8b25b`. Implemented by
-  Claude Code in Prompt 158 and corrected in Prompt 159 (two error-privacy boundaries and the
-  lease-loss integration case; see [Prompt 159 corrections](#prompt-159-corrections)); accepted
-  for a local commit in Prompt 160 ([External review (Prompt 160)](#external-review-prompt-160));
-  published on the feature branch in Prompt 161. Implements the
+- **Status:** **Accepted at external review (Prompt 160); reviewed, verified in CI and on `main`
+  at `5acb75e5`** (`5acb75e59edbb42035d468c2c40bb0ab81a8725a`; see
+  [Main CI evidence at `5acb75e5`](#main-ci-evidence-at-5acb75e5)). All five required jobs passed
+  for that exact commit on the feature push before the fast-forward and again on the main push.
+  Implemented by Claude Code in Prompt 158 and corrected in Prompt 159 (two error-privacy
+  boundaries and the lease-loss integration case; see [Prompt 159 corrections](#prompt-159-corrections));
+  accepted for a local commit in Prompt 160 ([External review (Prompt 160)](#external-review-prompt-160));
+  published on the feature branch in Prompt 161 with evidence recorded in Prompt 162
+  ([feature-branch CI evidence at `84eec023`](#feature-branch-ci-evidence-at-84eec023), historical);
+  published to `main` in Prompt 163. Implements the
   [accepted M4f specification](../plan.md#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending)
   (proposed in Prompt 154, corrected in Prompts 155–156, accepted at external review in Prompt
-  157), including V1–V15, N1–N13 and the Prompt 157 cleanup clarification. **Remaining:**
-  reviewed publication to `main` (not authorized) and overall M4 acceptance; local Compose is
-  unverified.
+  157), including V1–V15, N1–N13 and the Prompt 157 cleanup clarification. **Overall M4 was
+  accepted at external review in Prompt 165** within the reviewed scope implemented at `5acb75e5`
+  (see the [acceptance assessment](../plan.md#overall-m4-acceptance-assessment-accepted-at-review-prompt-165); the acceptance record is committed
+  locally, its publication pending);
+  local Compose is unverified.
 - **Date:** 2026-10-18
 - **Builds on:** [ADR-0013](0013-embeddings.md) (M4a contracts), [ADR-0014](0014-embedding-persistence.md)
   (canonical float32 storage), [ADR-0015](0015-revision-indexing.md) (the `index_revision`
@@ -201,10 +204,82 @@ call**; these isolated checks are separate from Claude Code's checks below.
 **Outstanding at Prompt 160 (historical):** Linux and current-version CI; the two new
 PostgreSQL cases (then written and collected, never executed); every integration test against
 this implementation; and publication, which was not then authorized. The CI items were closed by
-the [feature-branch CI evidence at `84eec023`](#feature-branch-ci-evidence-at-84eec023);
-publication to `main` remains.
+the [feature-branch CI evidence at `84eec023`](#feature-branch-ci-evidence-at-84eec023), and
+publication by the [main CI evidence at `5acb75e5`](#main-ci-evidence-at-5acb75e5).
+
+## Main CI evidence at `5acb75e5`
+
+In Prompt 163 Claude Code committed the reviewed verification documentation as
+**`5acb75e59edbb42035d468c2c40bb0ab81a8725a`** (parent `84eec023`), published it on
+`feat/voyage-adapter`, and only after the push-triggered feature runs for that exact SHA had
+passed all five jobs, fast-forwarded `main` to it and pushed. The push-triggered main runs then
+passed. Relative to `84eec023`, `5acb75e5` changes verification documentation and prompt history
+only (README, ADR-0018, plan, threat model and prompts.md); the adapter, transport, tests and
+workflow are unchanged.
+
+**Attribution:** in Prompt 163 Claude Code observed only run, job and step conclusions through
+the anonymous public API; its anonymous log downloads returned HTTP 403 for all ten jobs. For
+Prompt 164 the external reviewer independently retrieved all four run records, all ten job
+records and all ten job logs; the counts and output below come from that retrieval. The
+reviewer ran no local project test, build, wheel check, database, Docker or provider call.
+
+All four runs used event **push**, SHA `5acb75e59edbb42035d468c2c40bb0ab81a8725a`, **attempt 1**,
+and concluded **success**; all ten jobs and their required steps succeeded, none skipped.
+
+**Feature push** (`feat/voyage-adapter`, before the fast-forward):
+[ci run](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39139552620)
+and [secret-scan run](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39139552592).
+
+| Job | Observed |
+|---|---|
+| [Ubuntu verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39139552620/job/117710964721) | `2675 passed, 308 skipped in 36.47s` |
+| [Windows verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39139552620/job/117710964455) | `2674 passed, 309 skipped in 78.22s (0:01:18)` |
+| [PostgreSQL integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39139552620/job/117710964654) | `308 passed, 2675 deselected in 195.36s (0:03:15)`; both tests in `tests/test_voyage_postgres.py` passed |
+| [Container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39139552620/job/117710964697) | all six required steps succeeded |
+| [Gitleaks (full history)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39139552592/job/117710964179) | 70 commits scanned, no leaks found |
+
+**Main push** (`main`, after the fast-forward):
+[CI run 39140072984](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39140072984)
+and [secret-scan run 39140072964](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39140072964).
+
+| Job | Observed |
+|---|---|
+| [Ubuntu verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39140072984/job/117712498197) | `2675 passed, 308 skipped in 30.23s` |
+| [Windows verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39140072984/job/117712498176) | `2674 passed, 309 skipped in 79.26s (0:01:19)` |
+| [PostgreSQL integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39140072984/job/117712498063) | `308 passed, 2675 deselected in 188.45s (0:03:08)`; both tests in `tests/test_voyage_postgres.py` passed |
+| [Container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39140072984/job/117712498228) | all six required steps succeeded |
+| [Gitleaks (full history)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39140072964/job/117712498113) | 70 commits scanned, no leaks found |
+
+On both pushes both platforms ran tests, distribution builds and installed-wheel checks
+successfully. All four installed-wheel logs printed:
+
+```text
+offline embedding, canonical storage and indexing modules ran from the installed wheel
+retrieval modules imported and fusion ran from the installed wheel
+evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+Voyage adapter validated a mocked response from the installed wheel
+offline migration SQL rendered from the installed wheel
+```
+
+Both container logs reported (observed log summaries and successful gates, not independent
+inspection of raw database rows or credentials): 89 context files with 19 planted fixtures
+excluded; a healthy stack and successful migrations; upload 202, successful ingestion with two
+verified chunks and a duplicate upload 200; one offline backfill indexing job, a ready index
+with two embeddings and a succeeded indexing job; idle-worker exit 0 without OOM; successful
+smoke and cleanup. The smoke covers offline ingestion, indexing and idle-worker shutdown only;
+it does not exercise the live Voyage transport or M4e evaluation.
+
+**Limits.** The Voyage wheel check and the two PostgreSQL cases use a mocked, in-memory
+transport, not the live service; the 2/3 Recall line is pure arithmetic, not database-derived
+corpus Recall. This evidence covers the exercised paths for this commit only and makes no live
+compatibility, semantic-quality, latency, cost, injection-resistance, production-readiness or
+general security claim. At that point overall M4 acceptance was pending (historical); it was
+accepted at review in Prompt 165 ([assessment](../plan.md#overall-m4-acceptance-assessment-accepted-at-review-prompt-165)).
 
 ## Feature-branch CI evidence at `84eec023`
+
+*Historical (Prompt 162): at that point M4f was verified on the feature branch and not merged,
+with `main` at `0ae4c6ca`; it has since been published to `main` at `5acb75e5` (above).*
 
 In Prompt 161 Claude Code committed the history-only commit
 **`84eec02318c359579c5becbb408e113eee18ceaa`** (parent `54bab581`, the accepted implementation

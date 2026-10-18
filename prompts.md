@@ -30382,3 +30382,568 @@ job-level condition; integration runs `pytest -m integration` with `EG_REQUIRE_I
 all wheel checks and the six container steps are present; no workflow references a secret. No
 local application test, build, install, wheel check, Docker, database or provider call was made.
 The documentation commit, pushes, CI gates and main update have not occurred at this note.
+
+### Prompt 163 outcome (attributed to Claude Code's handoff; API-only observations)
+
+Claude Code's Prompt 163 handoff reported: the documentation commit
+`5acb75e59edbb42035d468c2c40bb0ab81a8725a` (parent `84eec023`, tree
+`84b7abb3d73d64a526e2c08556426dc6c6cb8952`, subject "docs: record verified M4f results and main
+publication authorization", exactly the five reviewed paths, the four reviewed documents
+identical to tree `3402b5c3`, noreply author and committer; full-history Gitleaks clean over 70
+commits). `git push origin refs/heads/feat/voyage-adapter:refs/heads/feat/voyage-adapter`
+exited 0. Through the anonymous public API, Claude Code observed the feature ci run
+39139552620 and secret-scan run 39139552592 (event push, attempt 1, success) with all five jobs
+and every step succeeding. After fresh precondition checks (remote `main` `0ae4c6ca`, local
+`main` equal to `origin/main`, the old main an ancestor, a clean tree, unchanged reviewed blobs,
+only the four expected commits), `git switch main`, `git merge --ff-only
+5acb75e59edbb42035d468c2c40bb0ab81a8725a` and `git push origin refs/heads/main:refs/heads/main`
+each exited 0, and remote `main` became `5acb75e5`. Claude Code then observed the main ci run
+39140072984 and secret-scan run 39140072964 (event push, attempt 1, success) with all five jobs
+and every step succeeding. Anonymous log downloads returned HTTP 403 for all ten jobs, so it
+observed no counts or log output. Both bounded monitors stopped when their runs completed.
+
+### External review log evidence for `5acb75e5` (Prompt 164)
+
+The external reviewer independently retrieved all four run records, all ten job records and all
+ten job logs (no local project test, build, wheel check, database, Docker or provider call). All
+four runs used event push, exact SHA `5acb75e59edbb42035d468c2c40bb0ab81a8725a`, attempt 1, and
+concluded success; all ten jobs and their required steps succeeded, none skipped. Feature
+(ci 39139552620, secret-scan 39139552592): Ubuntu job 117710964721 `2675 passed, 308 skipped in
+36.47s`; Windows job 117710964455 `2674 passed, 309 skipped in 78.22s (0:01:18)`; PostgreSQL job
+117710964654 `308 passed, 2675 deselected in 195.36s (0:03:15)` with both tests in
+`tests/test_voyage_postgres.py` passing; container job 117710964697 with all six required steps
+succeeding; Gitleaks job 117710964179 with 70 commits scanned and no leaks. Main (ci
+39140072984, secret-scan 39140072964): Ubuntu job 117712498197 `2675 passed, 308 skipped in
+30.23s`; Windows job 117712498176 `2674 passed, 309 skipped in 79.26s (0:01:19)`; PostgreSQL job
+117712498063 `308 passed, 2675 deselected in 188.45s (0:03:08)` with both Voyage PostgreSQL tests
+passing; container job 117712498228 with all six required steps succeeding; Gitleaks job
+117712498113 with 70 commits scanned and no leaks. On both pushes both platforms ran tests,
+distribution builds and installed-wheel checks; all four wheel logs printed the offline
+embedding/indexing, retrieval/fusion, evaluation Recall@5 = 2/3 (pure arithmetic), "Voyage
+adapter validated a mocked response from the installed wheel" (fake transport) and offline
+migration lines. Both container logs reported 89 context files with 19 planted fixtures
+excluded, a healthy stack and successful migrations, upload 202, successful ingestion with two
+verified chunks, duplicate upload 200, one offline backfill indexing job, a ready index with two
+embeddings and a succeeded indexing job, idle-worker exit 0 without OOM, and successful smoke and
+cleanup (observed log summaries and gates, not raw-row or credential inspection; offline
+ingestion, indexing and idle-worker shutdown only).
+
+### Prompt 164 (verbatim)
+
+Prompt 164 — Record M4f main evidence and prepare the overall M4 acceptance assessment
+
+Written for: Mathew and the external reviewer.
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and any applicable repository instructions first.
+
+This is documentation-only work. Record the independently verified M4f main publication evidence, then prepare an overall M4 acceptance assessment for external review. Do not record overall M4 as accepted yet.
+
+Do not implement anything, start M5, change application code/tests/workflows, run application tests/builds/wheel checks, install anything, contact a provider, use Docker or a database, commit, push, merge, amend, rebase, tag or delete branches.
+
+1. Verify the starting state
+
+Expected:
+- Current branch: main, tracking origin/main.
+- HEAD, local main, origin/main and remote main:
+  5acb75e59edbb42035d468c2c40bb0ab81a8725a
+- Local and remote feat/voyage-adapter at that same SHA.
+- Parent:
+  84eec02318c359579c5becbb408e113eee18ceaa
+- Tree:
+  84b7abb3d73d64a526e2c08556426dc6c6cb8952
+- Subject:
+  docs: record verified M4f results and main publication authorization
+- Clean index and working tree.
+- Expected origin URL and author/committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+A normal fetch --no-tags and read-only remote-ref checks are authorized. If the material starting state differs, stop and report the difference without repairing it.
+
+Save a checkpoint under .local/p164/, including refs, status, tree, permitted-file blob hashes and the existing prompts.md byte count/hash.
+
+Create docs/m4-acceptance-assessment from HEAD if it does not already exist. Do not overwrite an existing branch with that name.
+
+2. Authorized files
+
+Only:
+- README.md
+- docs/decisions/0018-voyage-adapter.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Do not create a new ADR. Read other source, tests and documentation as needed, but do not edit them.
+
+3. Record M4f on main
+
+Update current status consistently:
+- Specification accepted in Prompt 157.
+- Implemented in Prompt 158 and corrected in Prompt 159.
+- Implementation accepted in Prompt 160.
+- Feature publication/evidence in Prompts 161–162.
+- Published to main in Prompt 163 at full SHA:
+  5acb75e59edbb42035d468c2c40bb0ab81a8725a
+- All five required jobs passed for this exact commit on the feature push before the fast-forward, and again on the main push.
+- Overall M4 acceptance remains pending.
+
+In ADR-0018 add a main-evidence section. Preserve the existing historical feature-evidence heading and anchor for 84eec023. Scope its former “not merged” wording historically rather than deleting the history.
+
+Relative to 84eec023, 5acb75e5 changes verification documentation and prompt history only. Do not describe it as another adapter implementation change.
+
+Evidence supplied by the external reviewer:
+
+All four runs used event push, exact SHA 5acb75e59edbb42035d468c2c40bb0ab81a8725a, attempt 1, and concluded success. All ten jobs and their required steps succeeded; none of the required steps was skipped.
+
+Feature branch:
+CI:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39139552620
+Secret scan:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39139552592
+
+Ubuntu job 117710964721:
+2675 passed, 308 skipped in 36.47s
+
+Windows job 117710964455:
+2674 passed, 309 skipped in 78.22s (0:01:18)
+
+PostgreSQL job 117710964654:
+308 passed, 2675 deselected in 195.36s (0:03:15)
+Both tests in tests/test_voyage_postgres.py passed.
+
+Container job 117710964697:
+All six required steps succeeded.
+
+Gitleaks job 117710964179:
+70 commits scanned; no leaks found.
+
+Main:
+CI:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39140072984
+Secret scan:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39140072964
+
+Ubuntu job 117712498197:
+2675 passed, 308 skipped in 30.23s
+
+Windows job 117712498176:
+2674 passed, 309 skipped in 79.26s (0:01:19)
+
+PostgreSQL job 117712498063:
+308 passed, 2675 deselected in 188.45s (0:03:08)
+Both tests in tests/test_voyage_postgres.py passed.
+
+Container job 117712498228:
+All six required steps succeeded.
+
+Gitleaks job 117712498113:
+70 commits scanned; no leaks found.
+
+Use full job links built from the corresponding run and job IDs.
+
+On both pushes, both platforms successfully executed tests, distribution builds and installed-wheel checks. All four wheel logs printed:
+
+offline embedding, canonical storage and indexing modules ran from the installed wheel
+retrieval modules imported and fusion ran from the installed wheel
+evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+Voyage adapter validated a mocked response from the installed wheel
+offline migration SQL rendered from the installed wheel
+
+Both container logs reported:
+- 89 context files and 19 planted fixtures excluded.
+- Healthy stack and successful migrations.
+- Upload 202, successful ingestion, two verified chunks and duplicate upload 200.
+- One offline backfill indexing job, a ready index with two embeddings and a succeeded indexing job.
+- Idle-worker exit 0 without OOM.
+- Successful smoke and cleanup.
+
+Describe these as observed log summaries and successful gates, not independently inspected raw database rows or credentials. The smoke covers offline ingestion, indexing and idle-worker shutdown; it does not exercise the live Voyage transport or M4e evaluation.
+
+Attribution:
+- Claude Code’s Prompt 163 observations were API run/job/step conclusions only; anonymous log downloads returned HTTP 403.
+- The external reviewer independently retrieved all four run records, all ten job records and all ten job logs.
+- The reviewer ran no local project tests, builds, wheel checks, database, Docker or provider calls.
+- Do not rewrite the earlier HTTP 403 record.
+- Do not present the reviewer’s retrieval as a new Claude Code log retrieval.
+
+The wheel’s 2/3 fixture is pure Recall arithmetic, not database-derived corpus Recall. Voyage wheel and PostgreSQL coverage use mocked transport, not the live service.
+
+4. Prepare an overall M4 acceptance assessment
+
+Read the accepted M4 sequence, its acceptance requirements, the detailed M4a–M4f specifications, relevant ADRs and existing evidence.
+
+Add a clearly labelled assessment in docs/plan.md:
+“Overall M4 acceptance assessment (PROPOSED for review, Prompt 164)”.
+
+Make it a traceable assessment, not an automatic acceptance declaration.
+
+Include a compact matrix mapping each M4a–M4f scope and the cross-cutting accepted M4 requirements to:
+- what is implemented;
+- the relevant source/test or ADR evidence;
+- its reviewed/main baseline;
+- the scope of verification;
+- remaining limitations or missing evidence.
+
+Distinguish:
+- requirements supported by observed evidence;
+- accepted scope limitations and later-milestone work;
+- any actual unmet requirement or evidence gap.
+
+Check the original corpus/trap and Recall requirements against the accepted M4e contract and implementation. A passing evaluation test is not an observed numerical corpus Recall report. No database-derived corpus Recall value has been supplied. Do not invent values, silently waive a requirement or add a new threshold. Explain whether the accepted requirement is supported by the existing test evidence or whether a further evidence task is needed, citing the controlling text.
+
+Likewise, do not turn deferred live-provider work into an M4 requirement: the accepted M4f contract explicitly requires mocked CI coverage and does not require live calls for M4 acceptance.
+
+If an original statement was superseded by an explicitly accepted later decision, cite that decision and explain the resulting scope. Do not silently rewrite historical specifications.
+
+Conclude with a proposed disposition and any concrete blockers or follow-up evidence needed for the external reviewer to decide. Overall M4 remains pending regardless of your recommendation. M5 must not start in this task.
+
+Keep README and threat-model updates concise, linking to the assessment where useful. Do not duplicate the full matrix across documents.
+
+5. Preserve limitations
+
+Keep the applicable limits visible:
+- Production providers remain offline-only; Voyage has no production registration/settings/live wiring.
+- Live model-name echo, strict framing and normalization compatibility remain unverified.
+- Timing is cooperative, with no hard deadline.
+- Process control is preserved only where it reaches adapter-owned code.
+- The 4 MiB response cap bounds accepted bytes, not peak memory.
+- Privacy guarantees exclude trusted inspection of frame locals and held values.
+- Retryability mapping must be resolved before live indexing.
+- Trusted snapshots cannot prove past eligibility; M5 must persist and reload captured facts.
+- Container smoke scope remains offline ingestion/indexing and idle-worker shutdown.
+- Local Compose remains unverified.
+- No semantic-quality, latency, cost, injection-resistance, production-readiness or general security guarantee.
+
+Preserve accepted specification headings/anchors and historical attribution. Update stale current M4f “not merged” and old-main wording, but retain historical baselines with clear scope.
+
+6. Prompt history
+
+Preserve every existing prompts.md byte as an identical prefix.
+
+Append:
+- A Prompt 163 outcome note attributed to its supplied handoff, with its API-only observations.
+- A separate note containing the external reviewer’s exact-commit log evidence supplied above.
+- This Prompt 164 verbatim, including its Written for line.
+- An outcome note accurately recording staged documentation and a proposed assessment awaiting review.
+
+Do not manufacture a prospective commit, publication or acceptance outcome.
+
+7. Documentation checks and export
+
+Check:
+- Only the five authorized files changed; all other tracked blobs match HEAD.
+- Prompt-history prefix and verbatim prompt preservation.
+- Relative links and anchors.
+- Current/historical status consistency.
+- No overall M4 acceptance or M5 implementation claim.
+- UTF-8 without BOM, LF only, clean staged whitespace.
+- Privacy/artifact scope and unsuppressed staged Gitleaks.
+- Markdown formatting using the repository’s existing tooling, without editing unrelated files.
+
+Do not repeat application checks.
+
+Stage the five files and export directly from Git:
+.local/p164/m4-main-evidence-and-acceptance-assessment.diff
+
+Baseline:
+5acb75e59edbb42035d468c2c40bb0ab81a8725a
+
+Final:
+the final staged tree
+
+Exclude prompts.md from the export. Report exact paths, statistics, byte size, SHA-256 and encoding, and verify the export matches the staged comparison.
+
+Stop with staged, uncommitted changes. No commit, push, merge, rerun or implementation.
+
+Return a handoff for Mathew and the external reviewer stating:
+- starting-state verification;
+- M4f main-evidence updates and attribution;
+- the proposed overall M4 disposition and any actual evidence gaps;
+- checks actually run;
+- final staged tree, export details and Git state;
+- remaining limits.
+
+End:
+“Mathew: return this output plus .local/p164/m4-main-evidence-and-acceptance-assessment.diff to the external reviewer.”
+
+### Prompt 164 outcome (Claude Code; documentation and proposed assessment staged, review pending)
+
+On the new branch `docs/m4-acceptance-assessment` from `5acb75e5` (HEAD, `main`, `origin/main`,
+remote `main` and both feature refs at that SHA), Claude Code staged README, ADR-0018, plan,
+threat model and append-only prompt history. ADR-0018's status now reads reviewed, verified in CI
+and on `main` at `5acb75e5`, with a new "Main CI evidence at `5acb75e5`" section built from the
+external reviewer's independent retrieval of all four runs, ten jobs and ten logs (Claude Code's
+Prompt 163 observations remain API-only, with HTTP 403 for logs); the `84eec023` feature evidence
+keeps its heading and anchor and its "not merged" state is scoped as historical. README, plan and
+threat model now state M4f on `main` at `5acb75e5`. The plan adds "Overall M4 acceptance
+assessment (PROPOSED for review, Prompt 164)": the controlling text (the original M4 acceptance
+lines from `6c095738`, removed by `ac39503` when the Prompt 108 sequence was recorded, the Prompt
+108 supersession and Recall-semantics decisions, M4e E7/E8 and the M4f row), a matrix of M4a-M4f
+and the cross-cutting requirements against evidence on `main` at `5acb75e5`, the accepted scope
+limits and later work, three evidence gaps (G1 traceability of the removed original acceptance
+lines; G2 no observed numerical database-derived corpus Recall value, not required by the
+controlling text and not proposed as a blocker; G3 the documentation lag this update corrects),
+no unmet requirement found, and a proposed disposition for the reviewer. Overall M4 acceptance
+remains pending and M5 has not started. No application test, build, install, wheel check,
+Docker, database or provider call was made; nothing was committed or pushed. Staging, scope,
+link, encoding, whitespace, privacy and Gitleaks checks and the export are reported in the
+handoff.
+
+### Prompt 164 outcome (Claude Code handoff results)
+
+Claude Code's Prompt 164 handoff reported: the starting state matched (`main`, `origin/main`,
+remote `main` and both feature refs at `5acb75e5`, parent `84eec023`, tree `84b7abb3`, clean,
+unchanged origin and noreply identity); the new branch `docs/m4-acceptance-assessment` from
+HEAD; exactly the five authorized paths staged with all other tracked blobs matching HEAD;
+staged tree `816cf9fb4263295ba6a35848d1b299821fd992ac`; the earlier prompt-history prefix
+preserved; 273 relative links and anchors resolving; no stale M4f "not merged", M4-accepted or
+M5 claims; UTF-8 without BOM or replacement characters and LF; a clean `git diff --cached
+--check`; Ruff format clean; a clean privacy scan; and an unsuppressed staged Gitleaks scan with
+no leaks. The export `.local/p164/m4-main-evidence-and-acceptance-assessment.diff` (baseline
+`5acb75e5`, prompts.md excluded; 4 files, 202 insertions, 35 deletions) is 91,041 bytes with
+SHA-256 `4bf9c31d4679d8f559ff0107d60d14a02929884d5c95b1df866f25d9ad23bb38` and matched the
+staged comparison. The assessment proposed accepting overall M4 for its accepted scope, found no
+unmet requirement and listed gaps G1-G3. No application check ran; nothing was committed or
+pushed.
+
+### External review decision on overall M4 (Prompt 165)
+
+The external reviewer inspected the supplied four-document diff, verified its size (91,041
+bytes) and SHA-256 (`4bf9c31d4679d8f559ff0107d60d14a02929884d5c95b1df866f25d9ad23bb38`), and
+checked its assessment against the original M4 milestone, the accepted later decisions and the
+current M4e PostgreSQL test source. The reviewer ran no project suite, regression suite, build,
+installed-wheel check, database, Docker or provider call in this review; the exact-commit CI
+evidence remains the independent retrieval recorded for Prompt 164, not new execution. The
+reviewer accepts the M4f main-evidence documentation, the overall M4 assessment and **overall
+M4 within the accepted implementation scope at `5acb75e59edbb42035d468c2c40bb0ab81a8725a`**:
+all six M4 slices are implemented, individually accepted, published and verified on `main`.
+This is not acceptance of M5 or of the whole project.
+
+Resolutions: **G1** the original isolation and Recall-correctness criteria remain applicable,
+and their removal from the milestone summary did not waive them; "no superseded chunks" has the
+accepted Prompt 108 snapshot-relative meaning with the documented trusted-in-process snapshot
+limitation, not a universal isolation proof. **G2** no database-derived numerical corpus Recall
+value has been observed or published; the reviewer does not require an additional published
+numerical report for M4 acceptance, because the accepted scope requires correct computation and
+contract and isolation evaluation, supported by the arithmetic tests and the PostgreSQL
+evaluation tests; a numerical report remains optional follow-up evidence with no threshold and
+no quality claim, and the absence of pinned values concerns corpus-derived Recall across fresh
+loads, while the pure arithmetic tests do assert specified expected values. **G3** the reviewed
+staged documentation corrects the M4f main-publication status; Prompt 165 records the acceptance
+in a local commit only, and its publication remains pending and unauthorized.
+
+### Prompt 165 (verbatim)
+
+Prompt 165 — Record overall M4 acceptance and commit the reviewed documentation locally
+
+Written for: Mathew and the external reviewer.
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and any applicable repository instructions.
+
+The external reviewer has reviewed the Prompt 164 export and accepts:
+1. The M4f main-evidence documentation.
+2. The overall M4 assessment.
+3. Overall M4 within the accepted implementation scope at:
+   5acb75e59edbb42035d468c2c40bb0ab81a8725a
+
+Record this acceptance and make one local documentation commit. Do not push, merge, start M5 or change implementation.
+
+1. Starting-state verification
+
+Expected:
+- Branch docs/m4-acceptance-assessment.
+- HEAD:
+  5acb75e59edbb42035d468c2c40bb0ab81a8725a
+- Parent:
+  84eec02318c359579c5becbb408e113eee18ceaa
+- HEAD tree:
+  84b7abb3d73d64a526e2c08556426dc6c6cb8952
+- Accepted staged tree:
+  816cf9fb4263295ba6a35848d1b299821fd992ac
+- Exactly these five paths staged:
+  README.md
+  docs/decisions/0018-voyage-adapter.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Local main and origin/main remain at 5acb75e5.
+- Origin and the noreply identity are unchanged.
+
+Verify locally only. No fetch or remote operation is needed.
+
+Verify:
+.local/p164/m4-main-evidence-and-acceptance-assessment.diff
+Size: 91,041 bytes
+SHA-256:
+4bf9c31d4679d8f559ff0107d60d14a02929884d5c95b1df866f25d9ad23bb38
+
+Check that it matches its recorded Git comparison, excluding prompts.md.
+
+If the material starting state differs, stop and report without repairing it.
+
+Save the accepted tree, staged paths, blob hashes and prompt-history prefix under .local/p165/.
+
+2. External review decision
+
+Record the following accurately:
+
+- The reviewer inspected the supplied four-document diff, verified its size and checksum, and checked its assessment against the original M4 milestone, the accepted later decisions and the current M4e PostgreSQL test source.
+- The reviewer ran no project suite, regression suite, build, installed-wheel check, database, Docker or provider call in this review.
+- The exact-commit CI evidence remains the independent retrieval already recorded for Prompt 164. Do not describe it as new execution in Prompt 165.
+- All six M4 slices are implemented, individually accepted, published and verified on main.
+- Overall M4 is accepted at external review in Prompt 165 for the reviewed scope implemented at 5acb75e5.
+- This is not acceptance of M5 or of the whole project.
+
+Resolve the assessment’s three gaps:
+
+G1:
+The reviewer confirms that the original isolation and Recall-correctness criteria remain applicable. Their removal from the milestone summary did not waive them.
+“No superseded chunks” has the accepted Prompt 108 snapshot-relative meaning and the documented trusted-in-process snapshot limitation. This is not a universal isolation proof.
+
+G2:
+No database-derived numerical corpus Recall value has been observed or published.
+The reviewer does not require an additional published numerical report for M4 acceptance: the accepted scope requires correct computation and contract/isolation evaluation, supported by the arithmetic tests and PostgreSQL evaluation tests.
+A numerical report remains optional follow-up evidence, with no threshold and no quality claim.
+Do not describe this as a measured corpus Recall result or as a requirement that has been executed.
+Clarify any broad “values are never asserted” wording: the absence of pinned values concerns corpus-derived Recall across fresh loads; pure arithmetic tests do assert specified expected values.
+
+G3:
+The reviewed staged documentation corrects the M4f main-publication status. This task records acceptance locally. Publication of this documentation commit remains pending and is not authorized here.
+
+3. Documentation changes
+
+Only the same five files are authorized.
+
+docs/plan.md:
+- Change the assessment heading/status from proposed to accepted at external review in Prompt 165.
+- Update every link to that heading.
+- Preserve the matrix, controlling requirements, evidence and limitations.
+- Rewrite the proposed disposition as the actual scoped acceptance decision.
+- Preserve Prompt 164 as the assessment’s preparation history.
+- Record that the acceptance documentation is committed locally by this task, with publication pending.
+- Update the top status and M4 summary consistently.
+- M5 remains planned and has not started. This prompt authorizes no M5 work.
+
+README.md:
+- State that overall M4 was accepted at external review in Prompt 165 within the reviewed scope at 5acb75e5.
+- Link to the acceptance assessment.
+- Distinguish published implementation from the locally committed acceptance record.
+- Preserve the project’s pre-alpha status and later-milestone work.
+
+ADR-0018:
+- Preserve its accepted M4f design and exact-commit evidence.
+- Replace the current overall-M4-pending wording with the scoped Prompt 165 acceptance and link.
+- Do not alter historical pending statements unless needed to label their historical scope.
+
+docs/threat-model.md:
+- Update overall M4 status and the assessment link.
+- Acceptance adds no new mitigation or security guarantee.
+
+Preserve:
+- All accepted M4a–M4f specification headings and anchors.
+- Historical evidence, failures, probe scope and attribution.
+- Exact SHA attribution for CI.
+- Existing M4e evidence and the absence of an observed numerical corpus Recall.
+- No live Voyage verification or wiring.
+- Cooperative timing and process-control limits.
+- Accepted-byte cap versus peak memory.
+- Privacy limits concerning frame locals and held values.
+- Retryability work before live indexing.
+- M5’s obligation to persist and reload trusted captured facts.
+- Container smoke scope: offline ingestion/indexing and idle-worker shutdown.
+- Local Compose unverified.
+- No semantic-quality, latency, cost, injection-resistance, production-readiness or general security guarantee.
+
+Do not create a new ADR or edit application code, tests, workflows, corpus, dependencies, lockfiles or configuration.
+
+4. Prompt history
+
+Keep every existing prompts.md byte as an identical prefix.
+
+Append:
+- The Prompt 164 handoff, attributed to its supplied output.
+- The reviewer’s matched checksum, inspection scope and acceptance decision above.
+- The G1/G2/G3 resolutions.
+- Prompt 165 verbatim, including its Written for line.
+- A pre-commit note recording completed checks only, without a prospective commit SHA or publication claim.
+
+Keep Claude Code’s implementation/documentation attribution and the reviewer’s evidence attribution distinct.
+
+5. Verification and local commit
+
+Do not rerun application tests, builds or wheel checks: implementation is unchanged.
+
+Check:
+- Exactly the five authorized paths.
+- Every other tracked blob remains identical to the accepted staged tree and HEAD.
+- Append-only history and verbatim prompt preservation.
+- Relative links and anchors, including the renamed assessment.
+- Status consistency: overall M4 accepted within scope, acceptance-record publication pending, M5 not started.
+- UTF-8 without BOM, LF only and clean staged whitespace.
+- Privacy/artifact scope.
+- Existing Markdown formatting checks without modifying unrelated files.
+- Unsuppressed staged Gitleaks.
+
+Verify author and committer:
+mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Create one local commit:
+docs: record overall M4 acceptance and main verification evidence
+
+Use a commit-message file. Credit Claude Code’s actual Prompt 164–165 documentation assistance, preserve earlier Codex attribution, and follow the repository’s established assistance/trailer convention. Do not attribute the implementation to this documentation task.
+
+After committing:
+- Verify parent, tree, subject, identity and exactly five committed paths.
+- Verify all files outside those five are unchanged.
+- Run unsuppressed full-history Gitleaks.
+- Confirm the working tree is clean.
+- Confirm local main and origin/main remain at 5acb75e5.
+
+No push, fetch, merge, amend, rebase, tag, branch deletion, CI rerun or M5 work.
+
+6. Incremental export and handoff
+
+Export directly from Git:
+.local/p165/m4-acceptance-commit-incremental.diff
+
+Baseline:
+816cf9fb4263295ba6a35848d1b299821fd992ac
+
+Final:
+the new local commit
+
+Exclude prompts.md. Verify exact Git comparison, paths, statistics, bytes, SHA-256 and UTF-8/LF encoding.
+
+Return:
+- Starting-state verification.
+- Scoped overall M4 acceptance and G1/G2/G3 resolutions.
+- Documentation changes and checks actually performed.
+- Commit SHA, parent, tree, subject, identity and attribution.
+- Byte-identity verification.
+- Export details.
+- Final branch/ref state.
+- Publication pending and M5 not started.
+- Remaining limitations.
+
+End:
+“Mathew: return this output plus .local/p165/m4-acceptance-commit-incremental.diff to the external reviewer.”
+
+### Prompt 165 pre-commit note (Claude Code; before the local commit)
+
+Completed checks only. Verified locally (no fetch or remote operation): branch
+`docs/m4-acceptance-assessment`, HEAD `5acb75e5` (parent `84eec023`, tree `84b7abb3`), accepted
+staged tree `816cf9fb4263295ba6a35848d1b299821fd992ac` with exactly the five reviewed paths,
+nothing unstaged or untracked, `main` and `origin/main` at `5acb75e5`, unchanged origin and
+noreply identity, and the Prompt 164 export's size, SHA-256 and exact Git comparison. Saved the
+accepted tree, staged paths, blob hashes and prompt prefix under `.local/p165/`. Recorded the
+Prompt 165 decision: the plan's assessment heading is now "Overall M4 acceptance assessment
+(ACCEPTED at review, Prompt 165)" with every link updated, its status, gap resolutions G1-G3 and
+acceptance decision written as the scoped acceptance (Prompt 164 kept as its preparation
+history), the Recall wording clarified (the pure arithmetic tests assert specified values;
+corpus-derived Recall is reported but not pinned; no such value observed or published), and the
+top status, M4 summary, README, ADR-0018 and threat model updated to overall M4 accepted within
+the reviewed scope at `5acb75e5`, with the acceptance record committed locally, its publication
+pending and M5 not started. The reviewer's evidence and Claude Code's documentation remain
+separately attributed. No application test, build, wheel check, install, Docker, database,
+network or provider call was made. The staged checks, the local commit and its post-commit
+verification are not recorded in this note; their outcomes are reported in the handoff.

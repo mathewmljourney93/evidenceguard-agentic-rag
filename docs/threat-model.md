@@ -226,7 +226,7 @@ green (historical; below); the corrected version, verified in feature-branch CI 
 (historical), is reviewed, verified in CI and on `main` at `0ae4c6ca` (see
 [evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)); the
 [M4f specification](plan.md#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending)
-is accepted (Prompt 157) and its implementation (Prompt 158, corrected in Prompt 159) was accepted at external review in Prompt 160 and is reviewed and verified in feature-branch CI on `feat/voyage-adapter` at `84eec023` (see [evidence](decisions/0018-voyage-adapter.md#feature-branch-ci-evidence-at-84eec023)), not merged; overall M4 acceptance remains pending.
+is accepted (Prompt 157) and its implementation (Prompt 158, corrected in Prompt 159) was accepted at external review in Prompt 160 and is reviewed, verified in CI and on `main` at `5acb75e5` (see [evidence](decisions/0018-voyage-adapter.md#main-ci-evidence-at-5acb75e5)); overall M4 was accepted at external review in Prompt 165 within the reviewed scope (see the [acceptance assessment](plan.md#overall-m4-acceptance-assessment-accepted-at-review-prompt-165)); the acceptance adds no new mitigation or security guarantee.
 Local Compose remains unverified.
 
 | Threat | Mitigation |
@@ -327,22 +327,22 @@ independently confirmed the new logs without running local project checks. At th
 not yet merged (historical); it is now on `main` at `0ae4c6ca` (above). Prompt 150 authorized only a local
 correction commit. M4f and overall M4 acceptance remain pending; local Compose is unverified.
 
-## Voyage embedding adapter (M4f, verified on a feature branch; not merged)
+## Voyage embedding adapter (M4f, verified in CI and on `main`)
 
 The [M4f specification](plan.md#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending)
 was proposed by Claude Code in Prompt 154, corrected in Prompts 155–156 and **accepted at
 external review in Prompt 157**. Claude Code **implemented it in Prompt 158, corrected it in Prompt 159 and
 staged it for external review**; the external reviewer **accepted it in Prompt 160 for a local
-implementation commit** and it is now **reviewed and verified in feature-branch CI on
-`feat/voyage-adapter` at `84eec023`** ([evidence](decisions/0018-voyage-adapter.md#feature-branch-ci-evidence-at-84eec023)), not merged to `main`. The
-controls below exist only in that unmerged code and are exercised by mocked tests (which passed
-on Ubuntu and Windows in that run) and by the two PostgreSQL cases with an in-memory transport
-(which passed in its integration job). Nothing constructs the adapter in production, so **none of these controls
+implementation commit**; after feature-branch verification at `84eec023` (historical) it is
+**reviewed, verified in CI and on `main` at `5acb75e5`** ([evidence](decisions/0018-voyage-adapter.md#main-ci-evidence-at-5acb75e5)). The
+controls below are exercised by mocked tests (which passed on Ubuntu and Windows on both
+pushes) and by the two PostgreSQL cases with an in-memory transport (which passed in both
+integration jobs). Nothing constructs the adapter in production, so **none of these controls
 operates in the shipped system**, and mocked tests do not verify live API behaviour. In
 Prompt 159 two privacy-boundary gaps found by the external reviewer's isolated probes were
 closed: a transport `VoyageError` with a missing or raising `code`, and a failing TLS-context
 setup, no longer let a raw exception or its text escape; both now give fresh fixed errors.
-Publication to `main` remains. The implemented controls:
+Overall M4 was accepted at review in Prompt 165; that adds no mitigation. The implemented controls:
 
 - the provider key is supplied only to an explicitly constructed transport as a `SecretStr`,
   and is never placed in the fingerprint, default representations, public errors, logs,
