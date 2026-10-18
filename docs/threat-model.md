@@ -226,7 +226,7 @@ green (historical; below); the corrected version, verified in feature-branch CI 
 (historical), is reviewed, verified in CI and on `main` at `0ae4c6ca` (see
 [evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)); the
 [M4f specification](plan.md#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending)
-is accepted (Prompt 157) with its implementation pending; overall M4 acceptance remains pending.
+is accepted (Prompt 157) and its implementation (Prompt 158, corrected in Prompt 159) was accepted at external review in Prompt 160 for a local commit only, pending CI, not published or merged; overall M4 acceptance remains pending.
 Local Compose remains unverified.
 
 | Threat | Mitigation |
@@ -327,13 +327,22 @@ independently confirmed the new logs without running local project checks. At th
 not yet merged (historical); it is now on `main` at `0ae4c6ca` (above). Prompt 150 authorized only a local
 correction commit. M4f and overall M4 acceptance remain pending; local Compose is unverified.
 
-## Voyage embedding adapter (M4f, specification accepted; not implemented)
+## Voyage embedding adapter (M4f, implementation accepted for a local commit; not merged)
 
 The [M4f specification](plan.md#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending)
 was proposed by Claude Code in Prompt 154, corrected in Prompts 155–156 and **accepted at
-external review in Prompt 157**. Its **implementation is pending**: it is not implemented or
-tested, and **none of the controls below operates yet**; nothing here is an existing
-mitigation. The accepted specification's intended controls:
+external review in Prompt 157**. Claude Code **implemented it in Prompt 158, corrected it in Prompt 159 and
+staged it for external review**; the external reviewer **accepted it in Prompt 160 for a local
+implementation commit only, pending current-version CI**
+([ADR-0018](decisions/0018-voyage-adapter.md)); it is not published or merged. The controls below exist only in that unpublished code and are exercised only by
+mocked, database-independent tests run locally on Windows (its two PostgreSQL cases and all CI
+jobs have not run). Nothing constructs the adapter in production, so **none of these controls
+operates in the shipped system**, and mocked tests do not verify live API behaviour. In
+Prompt 159 two privacy-boundary gaps found by the external reviewer's isolated probes were
+closed: a transport `VoyageError` with a missing or raising `code`, and a failing TLS-context
+setup, no longer let a raw exception or its text escape; both now give fresh fixed errors.
+Linux, current-version CI and every integration test against it remain pending. The
+implemented controls:
 
 - the provider key is supplied only to an explicitly constructed transport as a `SecretStr`,
   and is never placed in the fingerprint, default representations, public errors, logs,

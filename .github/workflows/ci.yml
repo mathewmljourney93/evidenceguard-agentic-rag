@@ -126,6 +126,34 @@ jobs:
           assert recall.recall_at_k([a, x, b, y, z], frozenset({a, b, c}), 5) == Fraction(2, 3)
           print("evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel")
           PY
+          # M4f (ADR-0018): import the Voyage adapter and HTTPS transport from the installed wheel
+          # and run the adapter with an in-memory fake transport and one canned response. No
+          # network, key or database is used; this check does not establish live Voyage
+          # compatibility, and production providers stay offline-only.
+          "${bin}/python" -I - <<'PY'
+          import json
+          import evidenceguard_retrieval.voyage as voyage
+          import evidenceguard_worker.voyage_http as transport
+          from evidenceguard_retrieval.embeddings import HASH_IDENTITY
+          from evidenceguard_worker.indexing import SUPPORTED_PROVIDERS
+          for module in (voyage, transport):
+              assert "site-packages" in (module.__file__ or ""), module.__name__
+          fingerprint = "827fb43a08091171e8eea7b14f6943506646aff6e4dafe7e6fd47cca643cc109"
+          assert voyage.VOYAGE_IDENTITY.fingerprint == fingerprint
+          vector = [0.0] * 1024
+          vector[0] = 1.0
+          row = {"object": "embedding", "embedding": vector, "index": 0}
+          document = {"object": "list", "data": [row], "model": "voyage-4-lite", "usage": {"total_tokens": 2}}
+          class FakeTransport:
+              def post(self, request):
+                  assert json.loads(request)["model"] == "voyage-4-lite"
+                  return voyage.VoyageResponse(200, json.dumps(document).encode())
+          batch = voyage.VoyageEmbedder(FakeTransport()).embed(("wheel check",), "document")
+          assert batch.identity == voyage.VOYAGE_IDENTITY and batch.vectors[0][0] == 1.0
+          assert batch.usage.input_tokens == 2
+          assert tuple(SUPPORTED_PROVIDERS) == (HASH_IDENTITY.fingerprint,)
+          print("Voyage adapter validated a mocked response from the installed wheel")
+          PY
           "${bin}/python" -I -c "import io; from alembic import command; from evidenceguard_persistence.migration_config import alembic_config; buf = io.StringIO(); command.upgrade(alembic_config(output_buffer=buf), 'head', sql=True); assert 'CREATE TABLE api_keys' in buf.getvalue(); print('offline migration SQL rendered from the installed wheel')"
 
   integration:

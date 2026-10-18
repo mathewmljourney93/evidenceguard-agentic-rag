@@ -1,6 +1,6 @@
 # EvidenceGuard implementation plan
 
-**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`. The M4c installed-wheel extension, which executes the offline embedding and canonical storage path and imports the indexing modules, ran locally on Windows in Prompts 125–126 (historical) and passed on Ubuntu and Windows CI runners at `600a366` and again on `main` at `76fa5a3`; the earlier M4a/M4b wheel limitations are historical. The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); M4c was implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 (ADR-0015); it is reviewed, verified in CI and on `main` at `76fa5a3` (PostgreSQL, Linux, Windows, installed-wheel and container indexing; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3); earlier feature-branch verification at `600a366` is historical). The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and accepted at external review in Prompt 133. Claude Code implemented it in Prompt 134 on `feat/snapshot-retrieval` and corrected it in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)); the implementation was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (Ubuntu, Windows, PostgreSQL with all 39 M4d cases passing, installed-wheel retrieval check, the unchanged container job and Gitleaks; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` and Claude Code's local Windows results in Prompts 134–135 are historical. The [M4e corpus and retrieval-evaluation specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was proposed in Prompt 140, corrected in Prompts 141–142 and **accepted at external review in Prompt 143**; Claude Code implemented it in Prompt 144 on `feat/retrieval-evaluation` and corrected it in Prompts 145–146 ([ADR-0017](decisions/0017-retrieval-evaluation.md)); the implementation was **accepted at external review in Prompt 147 for a local implementation commit** and **published on `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`**, where exact-commit CI was not fully green: PostgreSQL integration passed (306 passed, including all 16 M4e cases), but one Ubuntu test failed because its `os.lstat` double re-entered itself on Linux (no production defect established; see [ADR-0017](decisions/0017-retrieval-evaluation.md#exact-commit-ci-at-c14821b7-and-test-correction-prompts-148149)); the Prompt 149 test-only correction was accepted in Prompt 150 and published in Prompt 151; after feature-branch verification at `d1dcdfce` (historical), M4e is **reviewed, verified in CI and on `main` at `0ae4c6ca`** (`0ae4c6ca339232e40cc007d7b78334af08a8b25b`, committed and fast-forwarded by OpenAI Codex in Prompt 153 after green feature CI; main CI then passed; see the [ADR-0017 main CI evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)), and no database-derived Recall value has been observed; the [M4f Voyage adapter specification](#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending) was proposed in Prompt 154, corrected in Prompts 155–156 and **accepted at external review in Prompt 157** (implementation and all checks pending; not implemented, tested, published or merged); overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
+**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`. The M4c installed-wheel extension, which executes the offline embedding and canonical storage path and imports the indexing modules, ran locally on Windows in Prompts 125–126 (historical) and passed on Ubuntu and Windows CI runners at `600a366` and again on `main` at `76fa5a3`; the earlier M4a/M4b wheel limitations are historical. The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); M4c was implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 (ADR-0015); it is reviewed, verified in CI and on `main` at `76fa5a3` (PostgreSQL, Linux, Windows, installed-wheel and container indexing; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3); earlier feature-branch verification at `600a366` is historical). The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and accepted at external review in Prompt 133. Claude Code implemented it in Prompt 134 on `feat/snapshot-retrieval` and corrected it in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)); the implementation was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (Ubuntu, Windows, PostgreSQL with all 39 M4d cases passing, installed-wheel retrieval check, the unchanged container job and Gitleaks; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` and Claude Code's local Windows results in Prompts 134–135 are historical. The [M4e corpus and retrieval-evaluation specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was proposed in Prompt 140, corrected in Prompts 141–142 and **accepted at external review in Prompt 143**; Claude Code implemented it in Prompt 144 on `feat/retrieval-evaluation` and corrected it in Prompts 145–146 ([ADR-0017](decisions/0017-retrieval-evaluation.md)); the implementation was **accepted at external review in Prompt 147 for a local implementation commit** and **published on `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`**, where exact-commit CI was not fully green: PostgreSQL integration passed (306 passed, including all 16 M4e cases), but one Ubuntu test failed because its `os.lstat` double re-entered itself on Linux (no production defect established; see [ADR-0017](decisions/0017-retrieval-evaluation.md#exact-commit-ci-at-c14821b7-and-test-correction-prompts-148149)); the Prompt 149 test-only correction was accepted in Prompt 150 and published in Prompt 151; after feature-branch verification at `d1dcdfce` (historical), M4e is **reviewed, verified in CI and on `main` at `0ae4c6ca`** (`0ae4c6ca339232e40cc007d7b78334af08a8b25b`, committed and fast-forwarded by OpenAI Codex in Prompt 153 after green feature CI; main CI then passed; see the [ADR-0017 main CI evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)), and no database-derived Recall value has been observed; the [M4f Voyage adapter specification](#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending) was proposed in Prompt 154, corrected in Prompts 155–156 and **accepted at external review in Prompt 157**; its implementation (Prompt 158, corrected in Prompt 159, [ADR-0018](decisions/0018-voyage-adapter.md)) was accepted at external review in Prompt 160 for a local implementation commit only, pending current-version CI; no publication or merge is authorized; Linux and current-version CI are pending, the two new PostgreSQL cases have never executed and none of the 308 integration tests has run against it; not published or merged; overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
 
 EvidenceGuard is a vendor-risk review copilot. It ingests synthetic vendor documents, retrieves evidence the tenant is authorized to see, classifies each review question against that evidence, and drafts a cited report. A human must approve the exact report revision before it can be finalized or exported. It is decision support, not legal advice or compliance certification.
 
@@ -2604,7 +2604,7 @@ container verification; see the [main CI evidence](decisions/0014-embedding-pers
 feature-branch verification at `90240e3` is historical. The
 [M4c indexing specification](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending)
 was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in
-Prompt 123). M4c was implemented on `feat/revision-indexing` by Claude Code in Prompt 125 ([ADR-0015](decisions/0015-revision-indexing.md)) and corrected in Prompt 126, with historical local Windows checks in Prompts 125–126; it was accepted at external review for a local commit in Prompt 127 and is **reviewed, verified in CI and on `main` at `76fa5a3`** (main push: PostgreSQL `251 passed`, including all 18 indexing cases, plus Linux, Windows, installed-wheel and container indexing verification; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3)). Earlier feature-branch verification at `600a366` is historical. The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and **accepted at external review in Prompt 133**. Its implementation by Claude Code in Prompt 134, corrected in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)), was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (main push: PostgreSQL `290 passed`, including all 39 M4d cases; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` is historical. The [M4e specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was accepted at external review in Prompt 143 (proposed in Prompt 140, corrected in Prompts 141–142); its implementation (Prompt 144, corrected in Prompts 145–146, [ADR-0017](decisions/0017-retrieval-evaluation.md)) was accepted at external review in Prompt 147 for a local commit and published on `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`, where PostgreSQL passed with all 16 M4e cases but one Ubuntu test failed (a Linux-specific test-double recursion); the Prompt 149 test-only correction was accepted in Prompt 150 and published in Prompt 151; after feature-branch verification at `d1dcdfce` (historical), M4e is reviewed, verified in CI and on `main` at `0ae4c6ca` (see the [ADR-0017 main CI evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)). The [M4f specification](#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending) was proposed in Prompt 154, corrected in Prompts 155–156 and accepted at external review in Prompt 157; its implementation is pending,
+Prompt 123). M4c was implemented on `feat/revision-indexing` by Claude Code in Prompt 125 ([ADR-0015](decisions/0015-revision-indexing.md)) and corrected in Prompt 126, with historical local Windows checks in Prompts 125–126; it was accepted at external review for a local commit in Prompt 127 and is **reviewed, verified in CI and on `main` at `76fa5a3`** (main push: PostgreSQL `251 passed`, including all 18 indexing cases, plus Linux, Windows, installed-wheel and container indexing verification; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3)). Earlier feature-branch verification at `600a366` is historical. The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and **accepted at external review in Prompt 133**. Its implementation by Claude Code in Prompt 134, corrected in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)), was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (main push: PostgreSQL `290 passed`, including all 39 M4d cases; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` is historical. The [M4e specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was accepted at external review in Prompt 143 (proposed in Prompt 140, corrected in Prompts 141–142); its implementation (Prompt 144, corrected in Prompts 145–146, [ADR-0017](decisions/0017-retrieval-evaluation.md)) was accepted at external review in Prompt 147 for a local commit and published on `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`, where PostgreSQL passed with all 16 M4e cases but one Ubuntu test failed (a Linux-specific test-double recursion); the Prompt 149 test-only correction was accepted in Prompt 150 and published in Prompt 151; after feature-branch verification at `d1dcdfce` (historical), M4e is reviewed, verified in CI and on `main` at `0ae4c6ca` (see the [ADR-0017 main CI evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)). The [M4f specification](#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending) was proposed in Prompt 154, corrected in Prompts 155–156 and accepted at external review in Prompt 157; its implementation (Prompt 158, corrected in Prompt 159, [ADR-0018](decisions/0018-voyage-adapter.md)) was accepted at external review in Prompt 160 for a local commit only, pending current-version CI (no publication or merge authorized),
 overall M4 acceptance remains pending, and local Compose remains unverified.** M1, M2 and M3 remain accepted.
 
 The reviewer inspected the full Prompt 107 diff, independently matched its
@@ -2645,7 +2645,7 @@ Accepted dependency-ordered sequence (Prompt 108; each later slice needs its own
 | M4c | Separate durable `index_revision` jobs over completed immutable chunk sets, enqueue/backfill seam and registered handler. Test leases/fences, replay, partial batches, conflicting retries, cancellation and atomic readiness/job finish. No review workflow. Detailed specification [accepted at review in Prompt 124](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending) (proposed in Prompt 122, corrected in Prompt 123); implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 ([ADR-0015](decisions/0015-revision-indexing.md)); verified in CI and on `main` at `76fa5a3`, including PostgreSQL and container indexing. |
 | M4d | Explicit snapshot input/capture seam, eligibility validation, deterministic lexical/vector/RRF retrieval and bounded results. PostgreSQL isolation, snapshot-after-supersession, ranking and tie tests. No review endpoints or report generation. Detailed specification [accepted at review in Prompt 133](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) (proposed in Prompt 131, corrected in Prompt 132); implementation staged in Prompt 134 and corrected in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)), accepted at external review in Prompt 136; reviewed, verified in CI and on `main` at `cf2b5743` ([main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)). |
 | M4e | Synthetic clean/injected corpus, stable anchor-to-chunk ground truth, Recall@5/@8 and retrieval contracts. Include cross-tenant, cross-vendor and superseded traps and missing answers; no semantic-quality claim. Detailed specification [accepted at review in Prompt 143](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) (proposed in Prompt 140, corrected in Prompts 141–142); implementation (Prompt 144, corrected in Prompts 145–146, [ADR-0017](decisions/0017-retrieval-evaluation.md)) accepted at external review in Prompt 147 for a local commit and published in Prompt 148 at `c14821b7` (PostgreSQL passed with all 16 M4e cases; one Ubuntu test failed from a test-double recursion); Prompt 149 test-only correction accepted in Prompt 150; verified in feature-branch CI at `d1dcdfce` (historical); reviewed, verified in CI and on `main` at `0ae4c6ca` ([main CI evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)). |
-| M4f | Voyage adapter behind the same contract, injected transport mocked in CI, fixed profile/configuration, bounded calls and safe error mapping. No live calls required for M4 acceptance; live quality evidence belongs to M7. Detailed specification [accepted at review in Prompt 157](#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending) (proposed in Prompt 154, corrected in Prompts 155–156); implementation pending; not implemented or tested. |
+| M4f | Voyage adapter behind the same contract, injected transport mocked in CI, fixed profile/configuration, bounded calls and safe error mapping. No live calls required for M4 acceptance; live quality evidence belongs to M7. Detailed specification [accepted at review in Prompt 157](#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending) (proposed in Prompt 154, corrected in Prompts 155–156); implemented by Claude Code in Prompt 158 and corrected in Prompt 159 ([ADR-0018](decisions/0018-voyage-adapter.md)) and accepted at external review in Prompt 160 for a local commit only, pending current-version CI; PostgreSQL cases never executed; not published or merged. |
 
 **[DECISION] Separate indexing readiness (Prompt 108); later persistence details remain proposals.** Retain M3's activation and immutable
 chunk rules. Treat indexing readiness as separate from revision status: an active
@@ -5555,9 +5555,29 @@ an ordinary exception escaping an operation such as `getresponse()` or `read()` 
 by its own type; see D1). **V1–V15 and N1–N13 are settled within the complete specification;
 the section's recommendations ([REC]) now form the accepted implementation contract, and no
 specification decision remains open.** The external reviewer matched all three review exports'
-sizes and checksums. Acceptance is a design decision only: **no M4f implementation exists**, and
-no M4f project test, build, wheel check, PostgreSQL test or live provider call has run; source
-reading and the reviewer's isolated Python 3.12.14 probes are not implementation evidence.
+sizes and checksums. Acceptance is a design decision only; at acceptance (Prompt 157,
+historical) no M4f implementation existed and no M4f project check had run; source reading and
+the reviewer's isolated Python 3.12.14 probes are not implementation evidence.
+
+**Implementation (Prompt 158, corrected in Prompt 159; accepted at external review in Prompt 160 for a
+local implementation commit only, pending current-version CI; not published or merged).** See
+[ADR-0018](decisions/0018-voyage-adapter.md) for the final implementation, the implementation
+details requiring review and the checks actually run. In Prompt 159, after the external
+reviewer's isolated probes, Claude Code corrected two error-privacy boundaries (transport
+`VoyageError` metadata read inside a handler, and TLS-context setup outside any boundary) and
+added the lease-loss integration case; the external reviewer accepted the corrected
+implementation in Prompt 160 for a local commit only (see ADR-0018 for the reviewer's eight
+isolated checks, which are not project-suite execution). Linux and current-version CI are
+pending, and none of the 308 integration tests has run against it. Local Windows
+checks passed in both prompts (Ruff, strict mypy, the full database-independent suite, the
+build and the isolated installed-wheel commands including the new mocked Voyage command; the
+Prompt 158 results are historical). The two PostgreSQL cases in
+`tests/test_voyage_postgres.py` are **written and collected but not run** (no test database),
+and no Linux or CI run exists for this version. The accepted M4f code blocks below were
+reformatted by Ruff (whitespace and one trailing comma only) because `ruff format --check .`
+failed on them; no wording changed. Mocked tests do not verify live API compatibility,
+semantic quality, latency, cost or production readiness; live evaluation remains M7.
+
 **Unresolved external API facts are distinct from design decisions:** the [OPEN] items below,
 the live compatibility of the strict 200 framing rules (N2), whether Voyage echoes the model
 name exactly (V6) and any upstream model-immutability guarantee remain explicitly unverified
@@ -5743,34 +5763,46 @@ environment access, so the existing retrieval import test holds unchanged):
 
 ```python
 VOYAGE_IDENTITY = EmbeddingIdentity("voyage", "voyage-4-lite", "voyage-http-v1", 1024, "l2")
-VOYAGE_HOST = "api.voyageai.com"            # used only by the transport
+VOYAGE_HOST = "api.voyageai.com"  # used only by the transport
 VOYAGE_PATH = "/v1/embeddings"
-MAX_REQUEST_BYTES = 1_048_576               # choice
-MAX_RESPONSE_BYTES = 4_194_304              # choice
+MAX_REQUEST_BYTES = 1_048_576  # choice
+MAX_RESPONSE_BYTES = 4_194_304  # choice
 
-class VoyageErrorCode(StrEnum): ...         # fixed codes, see D
-class VoyageError(Exception):               # message is the code; never values or causes
+
+class VoyageErrorCode(StrEnum): ...  # fixed codes, see D
+
+
+class VoyageError(Exception):  # message is the code; never values or causes
     code: VoyageErrorCode
+
     @property
     def retryable(self) -> bool: ...
 
+
 @dataclass(frozen=True, init=False, repr=False)
-class VoyageResponse:                       # validated in __init__; repr shows the status only
-    status: int                             # exact int (not bool), 100-599
-    body: bytes                             # exact bytes; always b"" unless status == 200
+class VoyageResponse:  # validated in __init__; repr shows the status only
+    status: int  # exact int (not bool), 100-599
+    body: bytes  # exact bytes; always b"" unless status == 200
+
 
 class VoyageTransport(Protocol):
     def post(self, body: bytes) -> VoyageResponse: ...  # status-only value for non-200
 
+
 def build_request_body(texts: tuple[str, ...], input_type: InputType) -> bytes: ...
-def parse_response(response: VoyageResponse, *, input_type: InputType, count: int) -> EmbeddingBatch: ...
+def parse_response(
+    response: VoyageResponse, *, input_type: InputType, count: int
+) -> EmbeddingBatch: ...
+
 
 @dataclass(frozen=True, repr=False)
-class VoyageEmbedder:                       # satisfies EmbeddingProvider
+class VoyageEmbedder:  # satisfies EmbeddingProvider
     transport: VoyageTransport
+
     @property
-    def identity(self) -> EmbeddingIdentity: ...      # always VOYAGE_IDENTITY
+    def identity(self) -> EmbeddingIdentity: ...  # always VOYAGE_IDENTITY
     def embed(self, texts: tuple[str, ...], input_type: InputType) -> EmbeddingBatch: ...
+
     # __repr__ -> "VoyageEmbedder()"
 ```
 
@@ -5790,12 +5822,19 @@ and the retrieval module; no `os` or environment read):
 ConnectionFactory = Callable[[str, float, ssl.SSLContext], http.client.HTTPSConnection]
 # called as factory(VOYAGE_HOST, timeout, context); must not connect by itself
 
-class HttpsVoyageTransport:                 # satisfies VoyageTransport; repr masks the key
-    def __init__(self, api_key: SecretStr, *, connect_timeout: float = 10.0,
-                 io_timeout: float = 30.0, elapsed_budget: float = 60.0,
-                 max_response_bytes: int = MAX_RESPONSE_BYTES,
-                 connection_factory: ConnectionFactory = _https_connection,
-                 clock: Callable[[], float] = time.monotonic) -> None: ...
+
+class HttpsVoyageTransport:  # satisfies VoyageTransport; repr masks the key
+    def __init__(
+        self,
+        api_key: SecretStr,
+        *,
+        connect_timeout: float = 10.0,
+        io_timeout: float = 30.0,
+        elapsed_budget: float = 60.0,
+        max_response_bytes: int = MAX_RESPONSE_BYTES,
+        connection_factory: ConnectionFactory = _https_connection,
+        clock: Callable[[], float] = time.monotonic,
+    ) -> None: ...
     def post(self, body: bytes) -> VoyageResponse: ...
 ```
 
@@ -5901,27 +5940,27 @@ No chunk parser and no private socket access; `http.client` decodes chunked fram
 total = 0
 pieces = []
 while True:
-    if declared is not None:            # Content-Length framing (validated, <= cap)
+    if declared is not None:  # Content-Length framing (validated, <= cap)
         wanted = min(PIECE, declared - total)
         if wanted == 0:
-            break                       # declared length reached: no further read
-    else:                               # chunked framing, decoded by http.client
+            break  # declared length reached: no further read
+    else:  # chunked framing, decoded by http.client
         wanted = min(PIECE, cap + 1 - total)
-    check_budget_before()               # C1 step 1; voyage_timeout if exhausted
-    sock = connection.sock              # public attribute; may be None after getresponse()
+    check_budget_before()  # C1 step 1; voyage_timeout if exhausted
+    sock = connection.sock  # public attribute; may be None after getresponse()
     if sock is not None:
         sock.settimeout(min(io_timeout, remaining()))
-    piece = response.read(wanted)       # one bounded read
-    check_budget_after()                # C1 step 3
+    piece = response.read(wanted)  # one bounded read
+    check_budget_after()  # C1 step 3
     if type(piece) is not bytes or len(piece) > wanted:
-        fail(voyage_transport_failed)   # N11
+        fail(voyage_transport_failed)  # N11
     if piece == b"":
         if declared is not None:
-            fail(voyage_transport_failed)   # early EOF before the declared length
-        break                           # end of the decoded chunked body
+            fail(voyage_transport_failed)  # early EOF before the declared length
+        break  # end of the decoded chunked body
     total += len(piece)
     if total > cap:
-        fail(voyage_response_too_large) # only reachable for chunked framing
+        fail(voyage_response_too_large)  # only reachable for chunked framing
     pieces.append(piece)
 body = b"".join(pieces)
 ```
@@ -6210,27 +6249,27 @@ every internal standard-library operation.
 The first-outcome rule:
 
 ```python
-control = None          # first non-Exception BaseException, kept as the same object
-failure = None          # fixed VoyageErrorCode of the first ordinary operation failure
+control = None  # first non-Exception BaseException, kept as the same object
+failure = None  # fixed VoyageErrorCode of the first ordinary operation failure
 result = None
 try:
-    result = run_phases()               # connection, send, headers, status, 200 body (B, C1)
-except Exception as error:              # classified by type only; never by chain
-    failure = classify(error)           # error is not stored beyond this assignment
-except BaseException as error:          # process control
+    result = run_phases()  # connection, send, headers, status, 200 body (B, C1)
+except Exception as error:  # classified by type only; never by chain
+    failure = classify(error)  # error is not stored beyond this assignment
+except BaseException as error:  # process control
     control = error
 for close in (close_response, close_connection):
     try:
         close()
     except Exception:
-        pass                            # ordinary cleanup failure: never changes the outcome
+        pass  # ordinary cleanup failure: never changes the outcome
     except BaseException as error:
         if control is None:
-            control = error             # cleanup process control beats an ordinary failure
+            control = error  # cleanup process control beats an ordinary failure
 if control is not None:
-    raise control                       # the same object, outside every handler
+    raise control  # the same object, outside every handler
 if failure is not None:
-    raise VoyageError(failure)          # fresh, outside every handler
+    raise VoyageError(failure)  # fresh, outside every handler
 return result
 ```
 
@@ -6271,6 +6310,10 @@ return result
   `test-only-not-a-real-key`).
 
 ##### M4f F. Tests and acceptance (planned, not written or run)
+
+*Prompts 158-159:* these tests are now written ([ADR-0018](decisions/0018-voyage-adapter.md)); the
+database-independent ones ran locally on Windows, while the two PostgreSQL cases and every
+CI job have not run. The planned list below is kept as accepted.
 
 All new tests are database-independent unless marked PostgreSQL, and none uses the network.
 

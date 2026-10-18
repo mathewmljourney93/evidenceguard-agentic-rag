@@ -28795,3 +28795,795 @@ implemented, tested, published or merged, and overall M4 acceptance remains pend
 project test, build, install, Docker, database, provider or network call was made. The
 pre-commit checks, the local commit and its post-commit verification have not been recorded
 in this note; their outcomes are reported in the handoff.
+
+### Prompt 157 outcome (Claude Code handoff results)
+
+Claude Code's Prompt 157 handoff reported: the pre-commit checks passed (exactly five staged
+paths, ADR-0017 and all other tracked blobs unchanged from tree `e858ee3a`, earlier prompt
+bytes preserved, 225 relative links and anchors resolving, no stale acceptance or
+implementation claims, UTF-8 without BOM and LF, a clean `git diff --cached --check`, an
+unsuppressed staged Gitleaks scan with no leaks and the noreply author and committer). The
+local commit `eeef0227498e1a8052b559585bd92097fe0d0d60` (parent `0ae4c6ca`, tree
+`d13872e9871b2c537affed0b664827fc9ead2bef`, subject "docs: record M4e main results and
+accepted M4f Voyage specification") contains exactly the five documentation and history paths;
+afterwards the working tree was clean, `main` and `origin/main` remained `0ae4c6ca`, and the
+unsuppressed full-history Gitleaks scan covered 67 commits with no leaks. The export
+`.local/p157/m4f-spec-acceptance.diff` (baseline tree `e858ee3a`, prompts.md excluded; 119
+insertions, 65 deletions) is 75,818 bytes with SHA-256
+`ae9ca91e76d3e1439ee70ec25c2c0d9943b0a0e47f3519e5532017b0f29bdc23`. Nothing was pushed.
+
+### External review of Prompt 157 (recorded in Prompt 158)
+
+The external reviewer inspected `.local/p157/m4f-spec-acceptance.diff`, independently matched
+its size and SHA-256, and accepted the acceptance-documentation changes. No additional project
+checks were run by the reviewer.
+
+### Prompt 158 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+Prompt 158 — Implement the accepted M4f Voyage adapter specification and stage it for external review. Do not commit or publish.
+
+Read CLAUDE.md and any applicable repository instructions first.
+
+Repository:
+D:\Claude\evidenceguard_agentic_rag
+
+Expected starting state:
+- Branch: docs/m4f-voyage-spec
+- HEAD: eeef0227498e1a8052b559585bd92097fe0d0d60
+- Parent: 0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Tree: d13872e9871b2c537affed0b664827fc9ead2bef
+- Subject:
+  docs: record M4e main results and accepted M4f Voyage specification
+- Clean index and working tree.
+- Local main and origin/main:
+  0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Existing origin and noreply identity unchanged.
+
+Check locally only. No fetch or remote operation.
+If state differs, stop and report without resetting or reconstructing anything.
+
+Verify:
+.local/p157/m4f-spec-acceptance.diff
+- Size: 75,818 bytes
+- SHA-256:
+  ae9ca91e76d3e1439ee70ec25c2c0d9943b0a0e47f3519e5532017b0f29bdc23
+- Baseline:
+  e858ee3ab897c4ab731ddd1c850989409fa8d783
+- Final:
+  eeef0227498e1a8052b559585bd92097fe0d0d60
+- Excludes prompts.md.
+
+The external reviewer inspected this export, independently matched its size/checksum, and accepted the acceptance-documentation changes. No additional project checks were run by the reviewer.
+
+Save a checkpoint under .local/p158/, including HEAD, tree, status and existing prompts.md bytes.
+
+Create feat/voyage-adapter from HEAD if it does not exist.
+If it already exists, stop and report rather than replacing or reusing it.
+
+Read the complete accepted M4f specification:
+docs/plan.md
+#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending
+
+Read relevant source and tests before editing:
+- Domain embedding contracts and canonical storage.
+- Retrieval provider protocol and embed_validated.
+- Worker indexing and retrieval orchestration.
+- Existing packaging/import-boundary tests.
+- Existing PostgreSQL fixtures and production-seam helpers.
+- Current installed-wheel workflow commands.
+
+Implement the accepted specification, including V1–V15, N1–N13 and the Prompt 157 cleanup clarification.
+Do not substitute the earlier proposed versions.
+
+Intended implementation paths:
+New:
+- packages/retrieval/evidenceguard_retrieval/voyage.py
+- apps/worker/evidenceguard_worker/voyage_http.py
+- tests/test_voyage_adapter.py
+- tests/test_voyage_http.py
+- tests/test_voyage_postgres.py
+- docs/decisions/0018-voyage-adapter.md
+
+Changed:
+- tests/test_packaging.py
+- .github/workflows/ci.yml
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+If implementation requires another path or a specification change, stop and explain the concrete conflict before expanding scope. Do not redesign accepted contracts silently.
+
+Core implementation requirements:
+
+1. Pure adapter
+- Keep voyage.py within the existing retrieval import boundary.
+- No network, filesystem, environment access or new dependency.
+- Fixed accepted VOYAGE_IDENTITY and fingerprint.
+- Strict request formation and response validation.
+- Preserve input order through validated response indexes.
+- Reject invalid vectors and zero vectors without renormalization.
+- Invalid request: zero transport calls.
+- Otherwise at most one injected transport call.
+- Validate direct helper/constructor calls, not just annotated types.
+- Fixed private errors with the accepted classification and precedence.
+
+2. HTTPS transport
+- Standard-library implementation in the worker only.
+- Fixed host/path, verified TLS, no redirects, proxies, cookies, decompression or internal retries.
+- Explicit SecretStr credential; no settings or environment lookup.
+- Accepted request/response caps and configuration validation.
+- Status before body: non-200 bodies are never read.
+- Strict accepted framing policy for 200 responses.
+- Bounded reads with explicit premature-EOF detection.
+- No extra read after Content-Length is satisfied.
+- Chunk decoding delegated to http.client.
+- No private socket traversal or reconnect after getresponse releases the public socket.
+- Cooperative elapsed checks and timeout adjustment exactly as specified.
+- No hard-deadline or peak-memory guarantee.
+
+3. Cleanup and privacy
+- Preserve the first process-control object escaping into adapter-owned code through subsequent cleanup.
+- Attempt response and connection cleanup independently.
+- Ordinary adapter-owned cleanup failures are ignored, even if their chains contain process control.
+- Ordinary operation failures are classified by their own type, never their exception chains.
+- Process control already masked inside the standard library is not reconstructed.
+- Raise fresh fixed ordinary public errors outside handlers.
+- No document/query text, key, headers, body or raw exception text in public errors, default representations, default formatted tracebacks or logs.
+- Preserve the accepted limitation concerning frame-local inspection and explicitly held values.
+- Keep HTTP debugging disabled.
+
+4. Existing boundaries unchanged
+- Do not change embed_validated or existing M4c/M4d error mappings.
+- Preserve the disclosed retryability gap.
+- Production SUPPORTED_PROVIDERS remains offline-only.
+- No settings, .env.example, registry, CLI, API, automatic indexing or live wiring.
+- No dependency, lockfile, migration, Dockerfile, Compose or container-smoke change.
+
+Tests:
+Implement the complete accepted planned coverage, including:
+- Exact request bytes and identity fingerprint.
+- Valid and reordered responses.
+- Malformed values, huge integers, duplicate JSON keys, numeric edge cases and limits.
+- Direct helper/configuration validation.
+- Zero-call and one-call bounds.
+- Non-200 status precedence with read() forbidden.
+- Framing and response-size cases.
+- Explicit short-body detection without relying on IncompleteRead.
+- Connection: close cases with connection.sock becoming None.
+- Cooperative-budget checks using deterministic clocks.
+- Operation-versus-cleanup precedence and process-control identity.
+- Privacy with canaries, stdout/stderr capture and logs.
+- Mocked integration with existing indexing/retrieval boundaries.
+- Two real PostgreSQL test cases using a mocked provider, as specified.
+- Packaging boundaries and unchanged production defaults.
+
+All ordinary tests must prevent real network access.
+Use fake connections/transports. No live provider calls or real credentials.
+
+Prefer deterministic fakes and bounded synchronization. Do not use timing sleeps to manufacture ordering. Do not weaken existing assertions or skip Linux-specific behaviour.
+
+CI:
+Make only the accepted narrow installed-wheel addition:
+- Import both new modules from the isolated installed wheel.
+- Run the adapter with an in-memory fake response.
+- Check the batch/fingerprint and unchanged production provider mapping.
+- Print the accepted mocked-adapter verification line.
+- No network, key or database.
+Preserve every existing CI job, check and condition.
+
+Documentation:
+- Add ADR-0018 describing the final implementation, accepted choices, any implementation details requiring review, checks actually run and remaining limitations.
+- README, plan and threat model should say implemented and staged for review, not implementation-accepted, committed, published or merged.
+- Preserve the accepted specification heading and anchor.
+- Preserve all M4e main evidence and historical attribution.
+- Distinguish written/collected PostgreSQL tests from executed tests.
+- State clearly that mocked transport tests do not verify live API compatibility, semantic quality, latency, cost or production readiness.
+- Preserve model-echo/framing uncertainties, the retryability gap, timing/process-control limits and deferred live wiring.
+- Overall M4 acceptance remains pending.
+
+Prompt history:
+Append:
+- Prompt 157 outcome with Claude Code attribution.
+- The reviewer's matched checksum and acceptance scope.
+- This Prompt 158 verbatim.
+- Actual implementation outcome and verification results.
+
+Preserve every earlier prompts.md byte as an identical prefix.
+Do not reconstruct unavailable handoffs as verbatim quotations.
+Use inline backticks around commit identifiers in your notes.
+
+Verification:
+Use the existing locked environment.
+Do not install or update dependencies.
+
+Run:
+- Focused new and affected database-independent tests.
+- Full suite under the existing configuration.
+- Integration collection, reporting the new cases and total accurately.
+- Ruff format/lint.
+- Strict mypy.
+- Distribution build.
+- Isolated installed-wheel checks outside the checkout, using existing locked dependencies and the wheel installed with --no-deps.
+- Every existing CI wheel command plus the new mocked Voyage command.
+- Confirm imports resolve from site-packages.
+- Verify corpus packaging remains unchanged.
+
+Do not contact Docker, a database or a provider.
+If no test database is configured, PostgreSQL tests must remain skipped and explicitly unverified.
+Do not set a database URL or provision services.
+If an offline build/wheel check is blocked by unavailable dependencies, report the blocker without installing anything.
+
+Do not represent local Windows execution as Linux/current-version CI.
+Do not claim live transport validation from fake connections.
+
+Staging checks:
+- Only intended paths changed.
+- No unexpected artifacts or tracked .local files.
+- All forbidden source/configuration/dependency paths unchanged.
+- Prompt-history prefix preserved and prompt recorded verbatim.
+- Relative links/anchors resolve.
+- Status and scope consistent.
+- UTF-8 without BOM, LF.
+- Privacy/artifact scan.
+- git diff --cached --check.
+- Existing unsuppressed staged Gitleaks scan.
+
+Stage the completed implementation for external review.
+Leave no unintended unstaged or untracked files.
+
+Export:
+.local/p158/m4f-implementation.diff
+- Baseline:
+  eeef0227498e1a8052b559585bd92097fe0d0d60
+- Final: final staged tree
+- Exclude prompts.md
+- Direct Git export, UTF-8 without BOM, LF.
+
+Report:
+- What was implemented.
+- Any deviations or implementation choices requiring review.
+- Checks actually run and their results.
+- Tests written but not run.
+- Remaining limitations.
+- Exact staged paths and final staged tree.
+- Export statistics, byte size and SHA-256.
+- Final branch/HEAD and unchanged main refs.
+
+Stop after staging and exporting.
+No commit, push, merge, CI rerun, amend, rebase, tag, branch deletion, live provider call or M5 work.
+
+End with:
+Mathew: return this output plus .local/p158/m4f-implementation.diff to the external reviewer.
+
+### Prompt 158 outcome (Claude Code; implementation staged, external review pending)
+
+On the new branch `feat/voyage-adapter` from `eeef0227`, Claude Code implemented the accepted
+M4f specification (V1–V15, N1–N13 and the Prompt 157 cleanup clarification): the pure adapter
+`evidenceguard_retrieval/voyage.py` and the standard-library HTTPS transport
+`evidenceguard_worker/voyage_http.py`, both constructed explicitly only, with no production
+registration, settings, CLI, API, dependency, lockfile, migration, Docker or Compose change, and
+`embed_validated` and the M4c and M4d mappings unchanged. Tests: `tests/test_voyage_adapter.py`
+(145), `tests/test_voyage_http.py` (244), `tests/test_voyage_postgres.py` (2 integration cases)
+and 3 new cases in `tests/test_packaging.py`; one mocked Voyage command was added to the
+existing CI installed-wheel step; ADR-0018 was added and README, plan and threat model updated.
+The accepted M4f code blocks in `docs/plan.md` were reformatted by Ruff because
+`ruff format --check .` failed on them at `eeef0227` (whitespace and one trailing comma only).
+
+Local Windows verification (locked environment, offline, nothing installed or updated; no
+Docker, database, network or provider contact): Ruff format (177 files) and lint clean; strict
+mypy clean (140 source files); focused and affected tests 653 passed, 2 skipped; full suite
+2636 passed, 310 skipped (308 integration tests without a database, the symlink test and the
+POSIX-only signal test); collection 2946 tests, 308 integration (2 new); `uv build --offline`
+succeeded with corpus packaging unchanged; an isolated installed-wheel environment outside the
+checkout (locked dependencies with `--require-hashes`, wheel with `--no-deps`) passed all nine
+CI wheel commands, including the new Voyage command, from `site-packages`. Not run: the two
+PostgreSQL cases, any Linux execution and every CI job. Mocked tests do not verify live Voyage
+compatibility, semantic quality, latency, cost or production readiness. The implementation is
+staged for external review and uncommitted; overall M4 acceptance remains pending. Staging,
+scope, link, encoding, whitespace, privacy and Gitleaks checks and the export are reported in
+the handoff.
+
+### Prompt 158 outcome (Claude Code handoff results)
+
+Claude Code's Prompt 158 handoff reported: exactly 12 intended paths staged on
+`feat/voyage-adapter` (HEAD `eeef0227`), staged tree
+`0eff6069b844febae8cf0552888c402d86179d76`, forbidden paths unchanged, no tracked `.local`
+files, the earlier prompt-history prefix preserved, 237 relative links resolving, UTF-8 without
+BOM and LF, a clean `git diff --cached --check`, a clean privacy scan and an unsuppressed staged
+Gitleaks scan with no leaks. The export `.local/p158/m4f-implementation.diff` (baseline
+`eeef0227`, prompts.md excluded; 11 files, 3,057 insertions, 53 deletions) is 197,721 bytes
+with SHA-256 `aa1c4e729de63c414b5fbdede91de047604a265fa18ed07271c07a390110e888`. The local
+Windows verification results are recorded in the Prompt 158 outcome above and in ADR-0018;
+the two PostgreSQL cases, Linux and CI did not run. Nothing was committed or pushed.
+
+### External review of Prompt 158 (recorded in Prompt 159)
+
+The external reviewer inspected the Prompt 158 export and independently matched its size and
+SHA-256; implementation acceptance remains pending. The reviewer imported the submitted adapter
+and transport with the existing domain embedding contract and Pydantic in an isolated scratch
+environment (no project suite, build, wheel, database, Docker, network or provider call) and
+reproduced three findings with isolated probes: (1) an injected transport raising a
+`VoyageError` whose `code` attribute was deleted made `VoyageEmbedder.embed` raise a raw
+`AttributeError` with the original error as context; (2) a `VoyageError` subclass whose `code`
+property raised a `RuntimeError` containing a synthetic private marker let that raw error
+escape, its formatted traceback containing the marker; (3) TLS-context creation raising an
+`OSError` containing the marker made `HttpsVoyageTransport` construction raise the raw
+`OSError`, its formatted traceback containing the marker. Prompt 159 requires correcting both
+boundaries and adding the accepted lease-loss integration case; the Prompt 158 implementation
+details (the formatting-only plan correction, the pre-send socket requirement, direct
+post-body validation, header whitespace handling, the explicit TLS minimum and fake-only
+retrieval wiring) are accepted within scope, and the PostgreSQL tests may remain without a
+blanket socket guard while keeping the transport strictly in memory.
+
+### Prompt 159 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+Prompt 159 — Correct M4f error privacy boundaries and complete lease-loss coverage. Stage for review; do not commit or publish.
+
+Read CLAUDE.md and applicable repository instructions first.
+
+Expected state:
+- Branch: feat/voyage-adapter
+- HEAD: eeef0227498e1a8052b559585bd92097fe0d0d60
+- Parent: 0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Staged tree:
+  0eff6069b844febae8cf0552888c402d86179d76
+- Exactly the 12 Prompt 158 paths staged.
+- Nothing unstaged or unexpectedly untracked.
+- main and origin/main:
+  0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Origin and noreply identity unchanged.
+
+Check locally only. No fetch or remote operation.
+If state differs, stop without resetting or reconstructing anything.
+
+Verify:
+.local/p158/m4f-implementation.diff
+- Size: 197,721 bytes
+- SHA-256:
+  aa1c4e729de63c414b5fbdede91de047604a265fa18ed07271c07a390110e888
+- Baseline:
+  eeef0227498e1a8052b559585bd92097fe0d0d60
+- Final:
+  0eff6069b844febae8cf0552888c402d86179d76
+- Excludes prompts.md.
+
+Save the baseline tree, paths, blob hashes, existing prompts.md bytes and copies of both submitted implementation modules under .local/p159/.
+
+External review:
+The reviewer inspected the export and independently matched its size/checksum.
+Implementation acceptance remains pending.
+
+The reviewer imported the submitted adapter and transport with the existing domain embedding contract and installed Pydantic in an isolated scratch environment. No project suite, build, wheel, database, Docker, network or provider call ran.
+
+Three isolated probes reproduced:
+1. An injected transport raising VoyageError with its code attribute deleted:
+   VoyageEmbedder.embed raised raw AttributeError, with the original VoyageError as context.
+2. A VoyageError subclass whose code property raises RuntimeError containing a synthetic private marker:
+   raw RuntimeError escaped, and its formatted traceback contained the marker.
+3. TLS-context creation raising OSError containing the marker:
+   HttpsVoyageTransport construction raised raw OSError, and its formatted traceback contained the marker.
+
+Correct these two boundaries:
+
+A. Defensive handling of transport VoyageError metadata
+
+VoyageEmbedder._post currently reads error.code inside an except clause without protecting that read.
+
+Required behaviour:
+- A normal VoyageError with a valid VoyageErrorCode is re-raised fresh with the same code.
+- Missing, invalid or ordinarily raising code metadata becomes a fresh voyage_transport_failed.
+- Do not retain the original error, its text, attributes, cause or context on the public error.
+- Raise the public error outside exception handlers.
+- Do not inspect exception chains.
+- A non-Exception BaseException raised while obtaining metadata propagates as the same object.
+- Keep at most one transport call.
+- No M4a, M4c or M4d change.
+
+Add regression cases for:
+- Deleted/missing code.
+- Invalid code, retaining existing coverage.
+- A code property raising an ordinary exception containing a canary.
+- KeyboardInterrupt and SystemExit from that property, checked by object identity.
+- Normal valid codes still being preserved in fresh errors.
+- Fixed errors having no cause/context and no canary in default formatted tracebacks or logs.
+
+B. TLS-context construction belongs inside the private error boundary
+
+HttpsVoyageTransport.__init__ currently calls _tls_context() outside a sanitizing boundary.
+
+Required behaviour:
+- Argument/configuration validation stays first and keeps voyage_configuration.
+- Ordinary failures creating/configuring the TLS context become fresh fixed VoyageError instances.
+- Use the existing operational classification: TimeoutError maps to voyage_timeout; other ordinary TLS/setup failures map to voyage_transport_failed.
+- Do not add a new error code.
+- Raise outside the exception handler, with no raw cause/context.
+- KeyboardInterrupt, SystemExit and other non-Exception BaseExceptions propagate unchanged.
+- Do not disable certificate verification, fall back to an insecure context, retry, connect, or change the credential seam.
+
+Add tests with a patched TLS-context setup function:
+- OSError and ssl.SSLError containing canaries.
+- TimeoutError.
+- KeyboardInterrupt and SystemExit, same-object propagation.
+- Ordinary errors with process control in their chain remain ordinary sanitized failures.
+- No connection factory or network call occurs.
+- Existing successful TLS-context properties remain tested.
+
+C. Complete the accepted lease-loss integration case
+
+The new adapter integration tests cover a cancellation latched during the call. Add the corresponding lease-loss case using the existing handler/context doubles:
+- Lease loss becomes observable during the mocked Voyage call.
+- The provider then raises an ordinary/Voyage failure.
+- ctx.check() makes LeaseLostError win over permanent classification.
+- No embedding write or success completion follows.
+- Use deterministic state, not sleeps.
+- Do not alter the production handler or runtime.
+
+Implementation details from Prompt 158:
+The disclosed formatting-only plan correction, pre-send socket requirement, direct post-body validation, header whitespace handling, explicit TLS minimum and fake-only retrieval wiring are acceptable within the existing scope.
+The PostgreSQL tests may remain without a blanket socket guard because they need database connectivity; they must keep the Voyage transport strictly in-memory and perform no provider calls.
+Do not expand scope or change the accepted design.
+
+Authorized paths that may differ from the Prompt 158 staged tree:
+- packages/retrieval/evidenceguard_retrieval/voyage.py
+- apps/worker/evidenceguard_worker/voyage_http.py
+- tests/test_voyage_adapter.py
+- tests/test_voyage_http.py
+- docs/decisions/0018-voyage-adapter.md
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Keep CI, PostgreSQL tests and packaging tests byte-identical to the baseline.
+All earlier-milestone source, corpus, dependencies, lockfile, settings, registry, migrations, Docker and Compose remain unchanged.
+The same 12 paths should remain staged.
+
+Documentation:
+- Record implemented in Prompt 158, corrected in Prompt 159, staged for review.
+- Describe the two findings and added lease-loss coverage.
+- Keep Prompt 158 Windows results historical and attributed.
+- Record actual Prompt 159 verification separately.
+- Preserve the accepted specification heading/anchor and M4e evidence.
+- Keep implementation acceptance, Linux and current-version CI pending.
+- The two PostgreSQL cases remain unexecuted unless actually run under separate authorization; none is authorized here.
+- Preserve all accepted live-compatibility, timing, privacy, process-control, memory and retryability limitations.
+- Overall M4 acceptance remains pending.
+
+Regression comparison:
+Use ignored local copies to run the new targeted regression cases against the saved Prompt 158 modules, then against the corrected modules.
+Report which failures reproduce the findings, separately from cases that already passed or depend on new seams.
+Verify the final corrected files are restored.
+Do not modify earlier history or committed files for the comparison.
+
+Verification:
+Use the existing locked environment; do not install or update dependencies.
+Run:
+- Both new database-independent test modules.
+- Relevant existing indexing/retrieval tests.
+- Full suite and integration collection.
+- Ruff format/lint.
+- Strict mypy.
+- Offline distribution build.
+- Fresh isolated installed-wheel checks outside the checkout, with locked dependencies and --no-deps wheel installation.
+- All existing CI wheel commands.
+- Direct installed-wheel probes of the corrected error boundaries.
+
+No Docker, database, real network or provider contact.
+Do not provision services or set a database URL.
+Report unavailable checks honestly.
+
+Prompt history:
+Append the Prompt 158 outcome with attribution, the reviewer's matched checksum and exact isolated probe scope, these findings, Prompt 159 verbatim, and actual results.
+Preserve every earlier byte as an identical prefix.
+Do not reconstruct unavailable handoffs as verbatim quotations.
+Use inline backticks around commit identifiers in your notes.
+
+Staging checks:
+- Authorized scope and all unchanged blob identities.
+- Prompt-history prefix and verbatim prompt.
+- Relative links/anchors.
+- Accurate status and evidence attribution.
+- UTF-8 without BOM, LF.
+- Privacy/artifact scan.
+- git diff --cached --check.
+- Existing unsuppressed staged Gitleaks scan.
+
+Stage and export:
+.local/p159/m4f-error-boundary-corrections.diff
+- Baseline:
+  0eff6069b844febae8cf0552888c402d86179d76
+- Final: final staged tree
+- Exclude prompts.md
+- Direct Git export, UTF-8 without BOM, LF.
+
+Report exact paths, statistics, byte size, SHA-256, staged tree, checks, unexecuted tests, remaining limitations and final Git state.
+
+Stop after staging and exporting.
+No commit, push, merge, CI rerun, amend, rebase, tag, branch deletion, live wiring or M5 work.
+
+End with:
+Mathew: return this output plus .local/p159/m4f-error-boundary-corrections.diff to the external reviewer.
+
+### Prompt 159 outcome (Claude Code; corrections staged, external review pending)
+
+On `feat/voyage-adapter` (HEAD `eeef0227`), Claude Code corrected both reported boundaries:
+`VoyageEmbedder._post` now keeps a transport's ordinary exception only as transient state and
+reads its `code` after the handler inside a `suppress(Exception)` block, so a missing, invalid
+or raising `code` becomes a fresh private `voyage_transport_failed` (valid codes are preserved
+fresh, process control from the read propagates as the same object); and
+`HttpsVoyageTransport` now builds its unchanged verifying TLS context, after argument
+validation, inside a private boundary (`TimeoutError` → `voyage_timeout`, other ordinary
+failures → `voyage_transport_failed`, process control unchanged). The lease-loss integration
+case was added. Only the adapter, transport, both new test modules, ADR-0018, README, plan,
+threat model and prompts.md changed; CI, the PostgreSQL tests and the packaging tests are
+byte-identical to tree `0eff6069`.
+
+Regression comparison (temporary copies of the saved Prompt 158 modules first on
+`PYTHONPATH`, import locations confirmed): of 37 new targeted cases, 11 failed and 26 passed
+against the Prompt 158 modules; all 37 passed against the corrected modules. All 11 failures
+reproduce the findings (6 for A, 5 for B), each a raw exception carrying the canary; the 26
+earlier passes are not counted. Local Windows verification (locked environment, offline,
+nothing installed; no Docker, database, network or provider contact): Ruff format (177 files)
+and lint clean; strict mypy clean (140 files); both new modules 426 passed; with relevant
+existing tests 893 passed, 2 skipped; full suite 2673 passed, 310 skipped; collection 2983
+tests, 308 integration; offline build; a fresh isolated installed-wheel environment passed all
+nine CI wheel commands and a direct probe of both corrected boundaries. Not run: the two
+PostgreSQL cases, Linux and current-version CI. The Prompt 158 results remain historical.
+Implementation acceptance and overall M4 acceptance remain pending. Staging, scope, link,
+encoding, whitespace, privacy and Gitleaks checks and the export are reported in the handoff.
+
+### Prompt 159 outcome (Claude Code handoff results)
+
+Claude Code's Prompt 159 handoff reported: the same 12 paths staged on `feat/voyage-adapter`
+(HEAD `eeef0227`), staged tree `66b2657730b23e2810af69e8cb6083334ff7a3fe`, CI, the PostgreSQL
+tests and the packaging tests byte-identical to tree `0eff6069`, no tracked `.local` files,
+the earlier prompt-history prefix preserved, 238 relative links resolving, UTF-8 without BOM
+and LF, a clean `git diff --cached --check`, a clean privacy scan and an unsuppressed staged
+Gitleaks scan with no leaks. The export `.local/p159/m4f-error-boundary-corrections.diff`
+(baseline tree `0eff6069`, prompts.md excluded; 8 files, 395 insertions, 43 deletions) is 90,300
+bytes with SHA-256 `4c126b188bf9d83852b91a0351c9f9c0c011850a609aa3535589672a101db8a5`. The local
+Windows results are recorded in the Prompt 159 outcome above and in ADR-0018. A leftover
+whole-file comparison started in Prompt 158 later confirmed that the plan reformat changed only
+one trailing comma besides whitespace. Nothing was committed or pushed.
+
+### External review acceptance of the M4f implementation (Prompt 160)
+
+The external reviewer inspected `.local/p158/m4f-implementation.diff` (197,721 bytes, SHA-256
+`aa1c4e729de63c414b5fbdede91de047604a265fa18ed07271c07a390110e888`) and
+`.local/p159/m4f-error-boundary-corrections.diff` (90,300 bytes, SHA-256
+`4c126b188bf9d83852b91a0351c9f9c0c011850a609aa3535589672a101db8a5`), independently matched both
+sizes and checksums, and accepted the corrected M4f implementation for a local implementation
+commit only, pending current-version CI. The accepted scope covers the pure adapter and the
+explicitly constructed standard-library transport, the Prompt 159 metadata and TLS-setup
+privacy corrections, the lease-loss integration coverage, the disclosed Prompt 158
+implementation choices, the formatting-only correction to the plan's Python code blocks, the
+narrow mocked installed-wheel workflow addition, and the two PostgreSQL cases with an
+in-memory transport (no blanket socket guard required). The reviewer reconstructed the corrected
+modules from the two exports and ran eight isolated checks: a missing transport error code and a
+`code` property raising an ordinary canary-bearing error each became a private
+`voyage_transport_failed`; TLS-setup `OSError` and `TimeoutError` became private
+`voyage_transport_failed` and `voyage_timeout`; and `KeyboardInterrupt` and `SystemExit` from
+the code metadata and from TLS setup preserved object identity. The four ordinary-error checks
+also verified no cause or context and no canary in the default formatted tracebacks. These
+isolated checks were not project-suite, regression-suite, installed-wheel, PostgreSQL, Docker,
+network or provider execution. Outstanding: Linux and current-version CI, the two PostgreSQL
+cases (never executed) and every integration test against this implementation; no publication
+or merge is authorized.
+
+### Prompt 160 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+Prompt 160 — Record M4f implementation acceptance and commit locally. Do not publish.
+
+Read CLAUDE.md and applicable repository instructions first.
+
+Expected starting state:
+- Branch: feat/voyage-adapter
+- HEAD: eeef0227498e1a8052b559585bd92097fe0d0d60
+- Parent: 0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Accepted staged tree:
+  66b2657730b23e2810af69e8cb6083334ff7a3fe
+- Exactly these 12 paths staged:
+  .github/workflows/ci.yml
+  README.md
+  apps/worker/evidenceguard_worker/voyage_http.py
+  docs/decisions/0018-voyage-adapter.md
+  docs/plan.md
+  docs/threat-model.md
+  packages/retrieval/evidenceguard_retrieval/voyage.py
+  prompts.md
+  tests/test_packaging.py
+  tests/test_voyage_adapter.py
+  tests/test_voyage_http.py
+  tests/test_voyage_postgres.py
+- Nothing unstaged or unexpectedly untracked.
+- Local main and origin/main:
+  0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Existing origin and noreply identity unchanged.
+
+Verify locally only. No fetch or remote operation.
+If state differs, stop without resetting or reconstructing anything.
+
+Save the accepted tree, staged paths, per-file blob hashes and existing prompts.md bytes under .local/p160/.
+
+Verify both reviewed exports:
+1. .local/p158/m4f-implementation.diff
+   197,721 bytes
+   SHA-256:
+   aa1c4e729de63c414b5fbdede91de047604a265fa18ed07271c07a390110e888
+
+2. .local/p159/m4f-error-boundary-corrections.diff
+   90,300 bytes
+   SHA-256:
+   4c126b188bf9d83852b91a0351c9f9c0c011850a609aa3535589672a101db8a5
+
+External review acceptance:
+The reviewer inspected both exports and independently matched their sizes/checksums.
+
+The corrected M4f implementation is accepted at external review in Prompt 160 for a local implementation commit only, pending current-version CI.
+
+Accepted scope includes:
+- The pure Voyage adapter and explicitly constructed standard-library transport.
+- The Prompt 159 metadata and TLS-setup privacy corrections.
+- The added lease-loss integration coverage.
+- The disclosed Prompt 158 implementation choices.
+- The formatting-only correction to the accepted plan's Python code blocks.
+- The narrow mocked installed-wheel workflow addition.
+- Two PostgreSQL cases using an in-memory Voyage transport; no blanket socket guard is required for their database connectivity.
+
+The reviewer reconstructed the corrected modules from the two exports and ran eight isolated checks:
+- Missing transport error code becomes private voyage_transport_failed.
+- A code property raising an ordinary canary-bearing error becomes private voyage_transport_failed.
+- TLS setup OSError becomes private voyage_transport_failed.
+- TLS setup TimeoutError becomes private voyage_timeout.
+- KeyboardInterrupt and SystemExit from code metadata preserve object identity.
+- KeyboardInterrupt and SystemExit from TLS setup preserve object identity.
+
+The four ordinary-error checks also verified no cause/context and no canary in default formatted tracebacks.
+
+These isolated checks were not project-suite, regression-suite, installed-wheel, PostgreSQL, Docker, network or provider execution. Do not conflate them with Claude Code's checks.
+
+Authorized changes from the accepted staged tree:
+- README.md
+- docs/decisions/0018-voyage-adapter.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Keep the other seven staged files byte-identical to the accepted tree:
+- Both implementation modules.
+- All three Voyage test files.
+- tests/test_packaging.py.
+- .github/workflows/ci.yml.
+
+No other tracked file may change.
+
+Documentation:
+1. Record:
+   - Specification accepted in Prompt 157.
+   - Implementation in Prompt 158.
+   - Corrections in Prompt 159.
+   - Implementation accepted at external review in Prompt 160 for a local commit.
+   - No publication or merge authorized or performed.
+   - Linux and current-version CI pending.
+   - The two new PostgreSQL cases remain written/collected but never executed.
+   - None of the 308 integration tests has run against this implementation.
+   - Overall M4 acceptance remains pending.
+
+2. ADR-0018:
+   - Status: Accepted, scoped to a local implementation commit and pending CI.
+   - Add an “External review (Prompt 160)” section recording matched checksums, accepted scope and the reviewer's eight isolated checks.
+   - State clearly that the reviewer ran no project suite, build, wheel check or database.
+   - Keep the Prompt 158 and 159 local results historical and attributed to Claude Code.
+
+3. Preserve:
+   - Accepted specification heading and anchor.
+   - M4e main evidence.
+   - Fixed identity and fingerprint.
+   - Offline-only production provider mapping.
+   - No settings, environment key, registration, CLI or API wiring.
+   - No live provider verification.
+   - Exact model-echo and strict-framing compatibility uncertainties.
+   - Cooperative timing without a hard deadline.
+   - Process-control preservation only at observable adapter-owned boundaries.
+   - Raw-byte cap without a peak-memory claim.
+   - Privacy scope excluding frame locals and explicitly held values.
+   - Existing retryability gap before live indexing.
+   - M5 snapshot obligations.
+   - Container-smoke scope and unverified local Compose.
+   - No semantic-quality, latency, cost, injection-resistance, production-readiness or general security guarantee.
+
+4. Minor evidence wording correction:
+   ADR-0018 currently describes every old-module regression failure as carrying a canary.
+   The deleted-code case instead escaped as AttributeError because code was missing; its message need not contain a canary.
+   Describe the 11 old-module failures as raw exceptions, with canary exposure in the cases where a canary was supplied in the escaping error.
+   Preserve the reported 11 failed/26 passed before and 37 passed after.
+   Do not rewrite earlier prompt history.
+
+Prompt history:
+Append:
+- Prompt 159 outcome with Claude Code attribution.
+- The reviewer's acceptance, checksums, exact isolated probe scope and outstanding verification.
+- This Prompt 160 verbatim.
+- A pre-commit note without a prospective commit SHA or unperformed outcome.
+
+Preserve every earlier prompts.md byte as an identical prefix.
+Do not reconstruct unavailable handoffs as verbatim quotations.
+Use inline backticks around commit identifiers in your notes.
+
+Checks before committing:
+- Exactly the 12 accepted paths staged.
+- Only the five authorized documentation/history files differ from tree 66b2657730b23e2810af69e8cb6083334ff7a3fe.
+- All seven implementation/test/workflow blobs match their accepted hashes.
+- All other tracked files unchanged.
+- Earlier prompt-history bytes unchanged.
+- Relative links and anchors resolve.
+- Status and scope consistent.
+- UTF-8 without BOM, LF.
+- Privacy/artifact scan.
+- git diff --cached --check.
+- Existing unsuppressed staged Gitleaks scan.
+- Effective author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Do not repeat application tests, builds or installed-wheel checks because implementation/test/workflow files are unchanged.
+No installs, network, Docker, database or provider contact.
+
+Commit locally:
+- Subject:
+  feat: add explicit Voyage embedding adapter and mocked transport coverage
+- Parent:
+  eeef0227498e1a8052b559585bd92097fe0d0d60
+- Exactly the 12 reviewed paths.
+- Accurately credit Claude Code's implementation/corrections and this documentation/commit task.
+- Preserve earlier Codex attribution and follow repository attribution conventions.
+- Do not amend or rewrite earlier commits.
+
+After committing:
+- Verify SHA, parent, tree, paths, identity and attribution.
+- Recheck the seven implementation/test/workflow blobs against the accepted tree.
+- Verify clean working tree.
+- Verify main and origin/main unchanged.
+- Run the existing unsuppressed full-history Gitleaks scan.
+- Report actual outcomes only.
+
+Export:
+.local/p160/m4f-commit-incremental.diff
+- Baseline:
+  66b2657730b23e2810af69e8cb6083334ff7a3fe
+- Final: new local commit
+- Exclude prompts.md
+- Direct Git export, UTF-8 without BOM, LF.
+
+Report exact exported paths, statistics, byte size and SHA-256.
+Report commit SHA, parent, tree, attribution, checks actually run, historical evidence, pending verification and final Git state.
+
+Stop after the local commit and export.
+No push, merge, CI rerun, amend, rebase, tag, branch deletion, live wiring or M5 work.
+
+End with:
+Mathew: return this output plus .local/p160/m4f-commit-incremental.diff to the external reviewer.
+
+### Prompt 160 pre-commit note (Claude Code; before the local commit)
+
+Verified locally (no fetch or remote operation): branch `feat/voyage-adapter`, HEAD `eeef0227`
+(parent `0ae4c6ca`), accepted staged tree `66b2657730b23e2810af69e8cb6083334ff7a3fe`, exactly the
+12 accepted paths staged, nothing unstaged or untracked, `main` and `origin/main` at `0ae4c6ca`,
+unchanged origin and noreply identity, and both reviewed exports' sizes and SHA-256 values.
+Saved the accepted tree, staged paths, blob hashes and prior prompt bytes under `.local/p160/`.
+Recorded the Prompt 160 implementation acceptance (local commit only, pending current-version
+CI) in ADR-0018 (status and a new "External review (Prompt 160)" section, with the reviewer's
+eight isolated checks kept separate from Claude Code's historical local checks), README, plan and
+threat model, and corrected the ADR's regression-comparison wording: all 11 old-module failures
+were raw exceptions, with canary exposure only where a canary was supplied (the deleted-`code`
+case escaped as a raw `AttributeError`). The seven implementation, test and workflow files are
+unchanged. No application test, build, installed-wheel check, install, Docker, database,
+network or provider call was made in this prompt. The pre-commit checks, the local commit and
+its post-commit verification are not recorded in this note; their outcomes are reported in the
+handoff.

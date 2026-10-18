@@ -179,3 +179,46 @@ def test_no_evaluation_command_is_installed() -> None:
     """M4e has no installed command; the PostgreSQL tests are the only callers."""
     names = {script.name for script in entry_points(group="console_scripts")}
     assert "eg-eval" not in names
+
+
+def test_m4f_voyage_adapter_is_pure_and_network_free() -> None:
+    """M4f (ADR-0018): the adapter uses only the standard library and the domain, with no
+    network, file-system or environment module."""
+    assert evidenceguard_retrieval.__file__ is not None
+    imported = _module_imports(Path(evidenceguard_retrieval.__file__).parent / "voyage.py")
+    assert imported - set(sys.stdlib_module_names) <= {"evidenceguard_domain"}
+    assert not imported & {"os", "socket", "ssl", "http", "urllib", "pathlib", "io", "requests"}
+
+
+def test_m4f_voyage_transport_uses_only_the_standard_library_and_pydantic() -> None:
+    """M4f (ADR-0018): the HTTPS transport is ``http.client``-based, with no SDK, third-party
+    HTTP client or environment access."""
+    assert evidenceguard_worker.__file__ is not None
+    module = Path(evidenceguard_worker.__file__).parent / "voyage_http.py"
+    imported = _module_imports(module)
+    assert imported - set(sys.stdlib_module_names) <= {"evidenceguard_retrieval", "pydantic"}
+    assert not imported & {"os", "requests", "httpx", "aiohttp", "urllib3", "voyageai"}
+
+
+def test_m4f_leaves_the_production_providers_registry_and_commands_unchanged() -> None:
+    """M4f is constructed explicitly only: production indexing stays offline-only, the registry
+    kinds and installed commands are unchanged, and no module reads a Voyage setting."""
+    from evidenceguard_retrieval.embeddings import HASH_IDENTITY
+    from evidenceguard_worker.handlers import production_registry
+    from evidenceguard_worker.indexing import SUPPORTED_PROVIDERS
+
+    assert tuple(SUPPORTED_PROVIDERS) == (HASH_IDENTITY.fingerprint,)
+    assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
+    names = {
+        script.name
+        for script in entry_points(group="console_scripts")
+        if script.dist is not None and script.dist.name == "evidenceguard"
+    }
+    assert names == {"eg-api", "eg-admin", "eg-worker"}
+    mentions = set()
+    for package in (evidenceguard_api, evidenceguard_persistence, evidenceguard_worker):
+        assert package.__file__ is not None
+        for source in Path(package.__file__).parent.rglob("*.py"):
+            if "voyage" in source.read_text(encoding="utf-8").lower():
+                mentions.add(source.name)
+    assert mentions == {"voyage_http.py"}  # no registration, setting, CLI or API wiring
