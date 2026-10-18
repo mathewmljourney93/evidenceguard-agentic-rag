@@ -27716,3 +27716,1082 @@ database or provider checks were repeated. The new commit, feature push, feature
 main fast-forward/push and main CI outcomes have not occurred at this note. OpenAI Codex
 assists with documentation/history and publication; Claude Code's implementation/correction
 and historical checks retain their credit. No documentation edits are authorized after a push.
+
+### Prompt 153 outcome (attributed to OpenAI Codex's handoff)
+
+As summarized in Prompt 154 (an attributed summary, not a reconstructed verbatim handoff):
+Codex committed the five reviewed paths as `0ae4c6ca339232e40cc007d7b78334af08a8b25b`
+(parent `d1dcdfcebdd084f654060bcdf1a468c847291ee0`), published it on
+`feat/retrieval-evaluation`, observed the push-triggered feature CI and secret-scan runs for
+that exact SHA succeed, then fast-forwarded `main` to the same SHA and pushed it, after which
+the push-triggered main CI and secret-scan runs also succeeded. Relative to `d1dcdfce`, this
+commit changes verification documentation and prompt history only, not implementation. Codex's
+log observations are attributed to its Prompt 153 handoff. No documentation was edited after
+either push.
+
+### External review confirmation (Prompt 154)
+
+The external reviewer independently retrieved all four workflow records (feature CI
+39061146590, feature secret scan 39061146559, main CI 39061528249, main secret scan
+39061528188), all ten job/step records, all ten job logs and the remote `main` ref. Both
+pushes used SHA `0ae4c6ca339232e40cc007d7b78334af08a8b25b`, event push, attempt 1, conclusion
+success, with every job and step succeeding. Feature: Ubuntu `2246 passed, 306 skipped in
+31.31s`, Windows `2245 passed, 307 skipped in 28.18s`, PostgreSQL `306 passed, 2246
+deselected in 174.69s` (all 16 M4e cases passed), Gitleaks 66 commits with no leaks. Main:
+Ubuntu `2246 passed, 306 skipped in 24.55s`, Windows `2245 passed, 307 skipped in 40.96s`,
+PostgreSQL `306 passed, 2246 deselected in 187.68s` (all 16 M4e cases passed), Gitleaks 66
+commits with no leaks. All four installed-wheel logs printed the four expected lines; both
+container jobs passed all six steps with the expected smoke summaries. These are observed log
+summaries and passing gates, not independent inspection of raw rows or generated credentials;
+the smoke does not exercise M4e evaluation, and the wheel's 2/3 Recall fixture is pure
+arithmetic. No numerical corpus Recall result was supplied. The reviewer ran no local project
+tests, builds, wheel checks, PostgreSQL, Docker or provider calls.
+
+### Prompt 154 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+Prompt 154 — Fresh Claude Code session: record M4e main evidence and propose the M4f Voyage adapter specification. Documentation only; stage for review.
+
+Repository:
+D:\Claude\evidenceguard_agentic_rag
+
+This is a fresh Claude Code session taking over from Codex.
+Do not assume earlier session context.
+
+Read CLAUDE.md and any applicable AGENTS.md instructions first. Then read the relevant current README, plan, ADR-0017 and source files. Read prompts.md selectively rather than loading its entire history.
+
+Attribution:
+- Claude Code implemented M4e in Prompt 144, corrected it in Prompts 145–146 and corrected the Linux test in Prompt 149.
+- Codex handled the subsequent documentation, commits and publication in Prompts 150–153.
+- Claude Code is handling this documentation/specification task in Prompt 154.
+Preserve those distinctions.
+
+Expected starting state:
+- Current branch: main, tracking origin/main.
+- HEAD, local main, origin/main and remote main:
+  0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Parent: d1dcdfcebdd084f654060bcdf1a468c847291ee0
+- Tree: 36a1a68f4354925741eb18117c909430db4507d9
+- Local and remote feat/retrieval-evaluation at the same SHA.
+- Clean index and working tree.
+- Origin:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag
+  or its existing equivalent Git URL.
+- Effective author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Fetch fresh refs without tags and check remote refs read-only.
+If the expected state differs, stop and report without resetting or overwriting anything.
+
+Save a checkpoint under .local/p154/, including refs, status, tree, permitted-file blob hashes and existing prompts.md bytes.
+
+Create docs/m4f-voyage-spec from HEAD if that branch does not already exist. If it exists, stop and report rather than reusing or replacing it.
+
+Authorized changed paths only:
+- README.md
+- docs/decisions/0017-retrieval-evaluation.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+No implementation, tests, corpus, dependency, lockfile, workflow, configuration, migration, Docker or Compose changes.
+Do not create ADR-0018 yet.
+
+Part 1 — Record M4e main publication and CI evidence
+
+The external reviewer independently retrieved:
+- All four workflow records.
+- All ten job/step records.
+- All ten job logs.
+- The remote main ref.
+
+Both pushes used:
+- SHA: 0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Event: push
+- Attempt: 1
+- Conclusion: success
+
+Feature runs:
+- CI:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39061146590
+- Secret scan:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39061146559
+
+Feature jobs:
+- Ubuntu:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39061146590/job/117479200417
+  2246 passed, 306 skipped in 31.31s.
+- Windows:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39061146590/job/117479200373
+  2245 passed, 307 skipped in 28.18s.
+- PostgreSQL:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39061146590/job/117479200429
+  306 passed, 2246 deselected in 174.69s.
+  All 16 M4e cases passed.
+- Container:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39061146590/job/117479200247
+- Gitleaks:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39061146559/job/117479200081
+  66 commits scanned, no leaks.
+
+Main runs:
+- CI:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39061528249
+- Secret scan:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39061528188
+
+Main jobs:
+- Ubuntu:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39061528249/job/117480324329
+  2246 passed, 306 skipped in 24.55s.
+- Windows:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39061528249/job/117480324350
+  2245 passed, 307 skipped in 40.96s.
+- PostgreSQL:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39061528249/job/117480324114
+  306 passed, 2246 deselected in 187.68s.
+  All 16 M4e cases passed.
+- Container:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39061528249/job/117480324342
+- Gitleaks:
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39061528188/job/117480323798
+  66 commits scanned, no leaks.
+
+Every job and step succeeded on both pushes.
+Both platforms' tests, distribution builds and installed-wheel checks executed successfully on each push.
+
+All four wheel logs printed:
+offline embedding, canonical storage and indexing modules ran from the installed wheel
+retrieval modules imported and fusion ran from the installed wheel
+evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+offline migration SQL rendered from the installed wheel
+
+Both container jobs:
+- All six steps succeeded: configuration, context, build, image checks, smoke and cleanup.
+- 87 context files; 19 planted fixtures excluded.
+- Upload accepted with 202.
+- Successful ingestion and two verified chunks.
+- Duplicate upload returned the existing revision with 200.
+- One offline backfill indexing job enqueued.
+- Ready index with two embeddings and succeeded indexing job.
+- Idle worker exited 0 without OOM.
+- Smoke succeeded.
+
+These are observed log summaries and passing gates, not independent inspection of raw database rows or generated credentials.
+The smoke does not exercise M4e evaluation.
+The wheel's 2/3 Recall fixture is pure arithmetic, not database-derived corpus Recall. No numerical corpus Recall result was supplied.
+
+The reviewer ran no local project tests, builds, wheel checks, PostgreSQL, Docker or provider calls.
+
+Documentation:
+- ADR-0017 status: reviewed, verified in CI and on main at 0ae4c6ca.
+- Add “Main CI evidence at 0ae4c6ca”, with full SHA, main run/job links, counts, wheel and container evidence, attribution and limits.
+- Record that feature CI passed before the main fast-forward, and main CI then passed.
+- Attribute Codex's observations to its Prompt 153 handoff and the reviewer's confirmation to independent retrieval.
+- Do not claim this fresh Claude session retrieved logs unless it actually does.
+- Relative to d1dcdfce, 0ae4c6ca changes verification documentation and prompt history, not implementation.
+- Keep the d1dcdfce feature evidence and c14821b7 failure as historical, preserving their anchors.
+- Update current README, plan and threat-model status consistently.
+- Do not rewrite historical prompt records or claim overall M4 acceptance.
+
+Part 2 — Propose the M4f specification
+
+Read the accepted M4 direction and decisions, M4a embedding contracts, canonical storage, M4c provider mapping/error handling, M4d orchestration, current settings/dependency boundaries and relevant tests before designing.
+
+The existing M4f direction is:
+“Voyage adapter behind the same contract, injected transport mocked in CI, fixed profile/configuration, bounded calls and safe error mapping. No live calls required for M4 acceptance; live quality evidence belongs to M7.”
+
+Write a detailed, implementable proposal in docs/plan.md:
+“M4f Voyage adapter specification (PROPOSED, Prompt 154; not implemented)”.
+
+Link it from the M4f slice row and README.
+Add a short proposed-only threat-model note.
+Keep all accepted earlier specification headings and anchors unchanged.
+
+Clearly distinguish:
+- Already accepted decisions.
+- Facts verified from current source.
+- Current external API facts, with official sources and retrieval date.
+- New recommendations.
+- Decisions requiring external review.
+
+Public read-only research of official Voyage documentation and relevant official package metadata is authorized.
+Do not contact the embedding API, use keys, install anything or run provider calls.
+If documentation cannot be accessed, identify unverified API details and leave them explicitly unresolved.
+
+Do not rely on remembered model names, response fields, limits, prices or SDK versions as current facts. Distinguish a requested model identifier from any immutability or version guarantees the provider actually documents.
+
+The proposal must cover:
+
+A. Placement and public contract
+- Exact proposed module paths, signatures, value types and import boundaries.
+- Reuse existing embedding validation and identity contracts.
+- Identify configuration fields and which ones affect the fingerprint.
+- State whether a standard-library/injected transport or SDK is recommended, with dependency-policy implications.
+- Prefer the smallest design satisfying the accepted direction; do not add a framework.
+
+B. Transport and protocol
+- Explicit request/response shapes and document versus query input type.
+- Requested model, dimensions and any output-format options.
+- Complete response validation: cardinality, dimensions, finite numbers, indexes/order, missing/duplicate/extra rows, identity and malformed payloads.
+- Explicit handling of normalization and zero vectors, consistent with M4a and canonical storage.
+- No silent correction, truncation or renormalization unless already authorized by the existing contract.
+- Define what untrusted provider metadata may be retained, ignored or validated.
+
+C. Bounds and resource use
+- Batch count, text and byte limits and interaction with existing M4a/M4c/M4d limits.
+- Connection/request timeouts, response-size bounds and explicit call bounds.
+- Retry policy with a finite total-attempt bound, or a clear recommendation for no internal retries.
+- Avoid unbounded memory, pagination or retry behaviour.
+- Distinguish provider documentation limits from chosen application defaults.
+
+D. Errors and privacy
+- Fixed public error types/codes and retryability classifications.
+- Authentication/configuration failures, rate limits, server errors, timeouts, transport errors, malformed responses and invalid vectors.
+- Exception-chain and traceback privacy consistent with existing boundaries.
+- Do not expose keys, headers, document/query text, response bodies or raw backend errors.
+- Preserve process-control exceptions.
+- Explain how proposed error types meet existing M4c and M4d classification boundaries; identify incompatibilities rather than silently changing them.
+- State that M5 still owns job cancellation/lease precedence for retrieval orchestration.
+
+E. Configuration and activation
+- Credentials supplied through an explicit supported configuration seam, excluded from fingerprints/repr/logs.
+- No keys required in ordinary tests or CI.
+- Decide whether M4f is an explicitly constructed adapter only, or changes production provider registration/settings.
+- Explain the implications of either option.
+- Do not silently enable live calls, change offline defaults, add automatic indexing, or add a new CLI/API.
+- Any proposed live wiring must be a separate review decision.
+
+F. Tests and acceptance
+- Mocked transport tests for exact request formation, valid responses and every error/boundary case.
+- Privacy and process-control regression coverage.
+- Prove no real network access is needed for ordinary tests.
+- Integration with existing contracts/storage and relevant orchestration using mocks.
+- Proposed isolated installed-wheel coverage and any necessary CI change, narrowly scoped.
+- Which checks are required for M4f acceptance.
+- No live semantic-quality or production-readiness claim from mocked tests.
+- Live evaluation remains M7.
+
+G. Scope and decisions
+- Intended implementation-file list and anticipated changes outside new modules.
+- State explicitly whether dependencies, settings, workflows or existing error mappings would change.
+- Number the review decisions, each with a recommendation and tradeoff.
+- Keep engineering defaults identifiable as choices, not measurements.
+- Defer ADR-0018 until implementation.
+- Keep M4f proposed, unaccepted, unimplemented and untested.
+- Overall M4 acceptance remains pending.
+
+Do not redesign earlier accepted slices or implement the proposal.
+
+Prompt history:
+Append:
+- Prompt 153 outcome, attributed to Codex's handoff.
+- The external reviewer's independent workflow/job/log confirmation.
+- This Prompt 154 verbatim.
+- An outcome note stating the documentation and proposal are staged for review.
+
+Preserve every earlier prompts.md byte as an identical prefix.
+Do not reconstruct unavailable handoffs as verbatim quotations.
+Use inline backticks around commit identifiers in your own notes.
+
+Checks:
+- Exactly the five authorized files changed.
+- All other tracked files byte-identical to HEAD.
+- Prompt-history prefix and verbatim prompt.
+- Relative links/anchors, including new main-evidence and M4f anchors.
+- No stale current claim that M4e is unmerged or main remains cf2b5743.
+- Historical evidence remains correctly scoped.
+- No claim M4f or overall M4 is accepted, implemented or tested.
+- Privacy/artifact scan.
+- UTF-8 without BOM and LF.
+- git diff --cached --check.
+- Existing unsuppressed staged Gitleaks scan.
+
+No application tests, builds, installs, Docker, database or provider calls.
+Only authorized read-only Git checks and public documentation research may use the network.
+
+Stage only the five authorized paths.
+
+Export:
+.local/p154/m4f-voyage-spec.diff
+- Baseline: 0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Final: final staged tree
+- Exclude prompts.md
+- Written directly from Git, UTF-8 without BOM, LF.
+
+Report exact paths, statistics, byte size and SHA-256, plus final staged tree and Git state.
+List the decisions needed and any external API facts that could not be verified.
+
+Stop after staging and exporting.
+No commit, push, merge, CI rerun, amend, rebase, tag, branch deletion or implementation.
+
+End with:
+Mathew: return this output plus .local/p154/m4f-voyage-spec.diff to the external reviewer.
+
+### Prompt 154 outcome (Claude Code; documentation and proposal staged, external review pending)
+
+On the new branch `docs/m4f-voyage-spec` from `0ae4c6ca`, Claude Code staged README, ADR-0017,
+plan, threat model and append-only prompt history. Part 1 records M4e as reviewed, verified in
+CI and on `main` at `0ae4c6ca`, with a new ADR-0017 “Main CI evidence at `0ae4c6ca`” section
+built from the evidence the external reviewer retrieved; the `d1dcdfce` feature evidence and
+the `c14821b7` failure keep their anchors as historical. Claude Code retrieved no workflow logs.
+Part 2 adds the “M4f Voyage adapter specification (PROPOSED, Prompt 154; not implemented)” to
+the plan, linked from the M4f slice row, README and a proposed-only threat-model note, with 15
+review decisions (V1–V15). Official Voyage documentation and `voyageai` PyPI metadata were read
+publicly on 2026-10-18; no embedding API call, key, install, application test, build, Docker or
+database check was made. M4f is proposed only, unaccepted, unimplemented and untested; overall
+M4 acceptance remains pending. Nothing was committed or pushed. The staging, scope, link,
+encoding, whitespace, privacy and Gitleaks checks and the export are reported in the handoff.
+
+### Prompt 154 outcome (Claude Code handoff results)
+
+Claude Code's Prompt 154 handoff reported: exactly the five authorized paths staged on
+`docs/m4f-voyage-spec` (HEAD, `main` and `origin/main` at `0ae4c6ca`), staged tree
+`95a5dd57d0187498e4227332917b7b24cd1db315`, the other 189 tracked files identical to HEAD, the
+earlier prompt-history bytes preserved as a prefix, 215 relative links and anchors resolving, no
+stale "not merged" current claim, UTF-8 without BOM and LF, a clean `git diff --cached --check`,
+and an unsuppressed staged Gitleaks 8.30.1 scan with no leaks. The export
+`.local/p154/m4f-voyage-spec.diff` (baseline `0ae4c6ca`, prompts.md excluded; 646 insertions,
+44 deletions) is 112,542 bytes with SHA-256
+`2a9b07f4f86bf3c5f135cef0319eae8e9d694d947f4fcce968c1689a234af504`. No application test,
+build, install, Docker, database or provider call was made, and nothing was committed or pushed.
+
+### External review of Prompt 154 (recorded in Prompt 155)
+
+The external reviewer inspected the Prompt 154 export and independently matched its size and
+SHA-256. The reviewer read the current embedding contracts, `embed_validated` and the indexing
+handler, consulted official Voyage and Python documentation and inspected local standard-library
+HTTP client source; no project suite, build, wheel, PostgreSQL, Docker or live provider call was
+run. The M4e main-evidence documentation is accepted and stays unchanged. V1–V9 and V11–V15 are
+approved, subject to four corrections; V10's numerical defaults are approved as engineering
+choices, with its timing guarantees corrected. This settles design choices, not the complete
+specification or implementation. The corrections are: (A) a cooperative elapsed-time budget,
+not a hard deadline; (B) status before body, with no body read for non-200 responses; (C) exact
+direct-call validation, configuration bounds and call-count and memory wording; (D) a concrete
+cleanup-precedence algorithm and qualified privacy scope.
+
+### Prompt 155 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+Prompt 155 — Correct the M4f specification and record settled design choices. Documentation only; stage for review.
+
+Read CLAUDE.md and any applicable repository instructions first.
+
+Expected starting state:
+- Branch: docs/m4f-voyage-spec
+- HEAD, local main and origin/main:
+  0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Staged tree:
+  95a5dd57d0187498e4227332917b7b24cd1db315
+- Exactly these five paths staged:
+  README.md
+  docs/decisions/0017-retrieval-evaluation.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or unexpectedly untracked.
+- Existing origin and noreply identity unchanged.
+
+Check locally only. No fetch or remote operation is needed.
+If state differs, stop and report without resetting or reconstructing anything.
+
+Save the baseline tree, staged paths, per-file blob hashes and existing prompts.md bytes under .local/p155/.
+
+Verify the Prompt 154 export:
+.local/p154/m4f-voyage-spec.diff
+- Size: 112,542 bytes
+- SHA-256: 2a9b07f4f86bf3c5f135cef0319eae8e9d694d947f4fcce968c1689a234af504
+- Baseline: 0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Final tree: 95a5dd57d0187498e4227332917b7b24cd1db315
+- Excludes prompts.md.
+
+External review:
+The reviewer inspected the export and independently matched its size/checksum.
+The M4e main-evidence documentation is accepted and must remain unchanged in this task.
+The complete M4f specification remains proposed and awaiting review.
+
+The reviewer read the current embedding contracts, embed_validated and indexing handler, consulted official Voyage/Python documentation, and inspected local standard-library HTTP client source. No project suite, build, wheel, PostgreSQL, Docker or live provider call was run.
+
+Settled choices:
+Record V1–V9 and V11–V15 as approved, subject to the precise corrections below.
+V10's numerical defaults are approved as engineering choices, but its timing guarantees must be corrected as specified below.
+This settles design choices, not the complete specification or implementation.
+
+Preserve:
+- Explicit construction only; no production registration or settings.
+- Standard-library transport in the worker.
+- Requested model identity and strict model-echo check, with documented live compatibility uncertainty.
+- Placement by response index.
+- Ignoring unknown response fields without retaining them in returned application values.
+- No internal retry.
+- Existing M4a/M4c/M4d error mappings unchanged.
+- The known retryability gap must be resolved before live indexing.
+- Explicit credential construction.
+- Required mocked wheel and PostgreSQL coverage.
+- No dependency, lockfile, migration, registry, Docker or Compose change.
+- Live evaluation remains M7.
+
+Authorized changed paths for this correction:
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+README.md and ADR-0017 must remain byte-identical to the Prompt 154 staged tree.
+The total staged path list remains the same five paths.
+
+Apply these four corrections in place:
+
+A. Timing contract: cooperative budget, not a hard deadline
+
+The proposal checks the clock between operations, but http.client.getresponse(), buffered reads and chunked reads may execute multiple socket operations internally. A peer sending data slowly can keep those calls running beyond the nominal total budget. DNS is not the only exception.
+
+Specify:
+- 10-second connect timeout.
+- 30-second socket I/O timeout.
+- 60-second cooperative elapsed-time budget.
+- Before each controllable blocking phase, calculate remaining budget and refuse to start it if exhausted.
+- Set the relevant connection/socket timeout to the smaller of its configured phase timeout and remaining budget where the API permits.
+- Recheck elapsed time after each phase returns and before returning a successful response.
+- Cover connection/TLS, request sending, response headers and body reads in the phase sequence.
+- Do not return success once the cooperative budget has expired.
+- No watchdog thread, background worker, custom HTTP parser or new dependency.
+
+Disclose precisely:
+- This cannot interrupt an in-progress standard-library operation.
+- DNS, multiple connection attempts, header parsing and internal buffered/chunked read loops can exceed the budget.
+- Socket timeouts bound individual blocking waits, not the complete call.
+- Cleanup is not given a hard deadline.
+- No hard wall-clock maximum is established.
+- A hard deadline would require a separately reviewed transport design before a deployment that depends on one.
+
+Replace “per-read timeout” where it incorrectly means one complete HTTPResponse.read() call. Remove unqualified “60-second total” and “bounded HTTPS request” timing claims from both plan and threat model.
+
+Add planned fake-clock tests:
+- Budget exhausted before a phase: that phase is not started.
+- Phase returns after expiry: no success is returned.
+- Remaining budget reduces the applied timeout.
+- Request sending and response-header phases are included.
+- Tests do not pretend that a fake returning late proves interruption of a real socket operation.
+
+B. HTTP status and body handling must agree
+
+The proposal says non-200 bodies are never retained, but the transport currently promises to read a body before returning VoyageResponse. Define the actual order:
+
+- Obtain and validate the status after headers.
+- For a non-200 status, do not call response.read() or drain the body.
+- Return a status-only VoyageResponse with an empty body, then close the response/connection under the defined cleanup rules.
+- The adapter maps that status to the existing fixed code.
+- A non-200 body, oversized Content-Length or body-read failure must not replace the HTTP status classification, because the body is not read.
+- For status 200 only, validate framing/size metadata and perform the bounded body read.
+- Define the handling of malformed Content-Length, conflicting lengths, unsupported Content-Encoding and contradictory framing without implementing a new HTTP parser.
+- Clearly separate HTTP headers that the standard library necessarily parses temporarily from metadata retained in application results.
+- Unknown JSON fields can be parsed temporarily but must not be retained in the returned batch or errors.
+
+Add planned tests:
+- A 429/401/503 response whose read() raises if called: read() is never called and status mapping wins.
+- A non-200 response advertising an oversized body still maps by status without reading.
+- A 200 response with invalid framing or oversized content is refused privately.
+- No redirects or decompression are introduced.
+
+C. Make direct-call validation and configuration exact
+
+The adapter is explicitly constructible, and its helpers are public in the proposal. Type annotations alone do not enforce their contracts.
+
+Specify validation and error mapping for:
+- VoyageResponse exact status/body types, including bool statuses and non-bytes bodies.
+- parse_response input_type and count, including bool/out-of-range counts.
+- Invalid request arguments to build_request_body and embed.
+- Unexpected return types from an injected transport.
+- Huge JSON integer coordinates that can raise OverflowError when checked for finiteness.
+- Invalid usage values and JSON decoder failures.
+- Timeout values: finite positive numbers, excluding bool, NaN and infinity.
+- Response caps: exact positive integers, excluding bool, with a finite hard upper bound consistent with MAX_RESPONSE_BYTES.
+- Explicit SecretStr credential type and the existing visible-ASCII length policy.
+- Callable factory/clock requirements where validated.
+
+Keep the error taxonomy small. State the fixed code for each category and precedence; do not add raw exception text.
+Preserve M4a InvalidEmbeddingError for invalid embedding requests where appropriate, and define the adapter's own helper validation consistently.
+
+Correct call-count wording:
+- Invalid input makes zero transport calls.
+- Once validation succeeds and transport is reached, at most one post call occurs.
+- Never claim exactly one call for every outcome.
+
+Correct the memory claim:
+- The byte cap bounds accepted raw response bytes.
+- JSON parsing, temporary objects, decoded strings and tuple construction consume additional memory.
+- Do not claim peak memory equals the raw-body cap plus final vectors unless actually established.
+
+Add planned tests for the above malformed direct calls and numeric/configuration edge cases.
+
+D. Cleanup precedence and privacy need a concrete algorithm
+
+The promise that process control survives cleanup is valuable, but it needs an implementable first-outcome rule.
+
+Specify:
+- Separate response and connection cleanup, attempted independently where available, so an ordinary response-close failure does not prevent connection close.
+- Record the first non-Exception BaseException and re-raise the same object after cleanup, even if later cleanup raises another error.
+- If the operation failed ordinarily, preserve its sanitized fixed code when ordinary cleanup also fails.
+- A process-control exception from cleanup takes precedence over an ordinary operation failure.
+- If the operation succeeded, ordinary cleanup failures are ignored as the current recommendation states; process control from cleanup still propagates.
+- Never inspect exception chains to infer classifications.
+- Keep ordinary exception objects only as transient control-flow state where necessary; do not attach them to the fresh public VoyageError.
+- Raise fresh fixed VoyageError instances outside exception handlers.
+- Preserve control-flow objects without claiming their original messages or tracebacks are sanitized.
+- The privacy guarantee covers ordinary public errors, default representations, default formatted tracebacks and logs; it does not promise secrecy against trusted code inspecting frame locals or the explicitly held response body.
+- Safe code/retryable attributes are permitted. Remove the contradictory sentence saying VoyageError has no other attributes while also defining .code and .retryable.
+- Keep default http.client debugging disabled and include a no-output/no-log test with canaries.
+
+Add a planned matrix covering:
+- Ordinary operation failure plus each ordinary cleanup failure.
+- Process control from connection, headers, body, clock and cleanup.
+- Process control followed by ordinary cleanup failure.
+- Two cleanup failures.
+- Successful operation plus ordinary cleanup failure.
+- First process-control object retained when cleanup raises another one.
+- Sanitized ordinary exception chains and formatted tracebacks.
+
+Do not modify read_snapshot, M4d, M4c or implementation code.
+
+Specification/status:
+- Keep the M4f heading and anchor unchanged.
+- State “proposed in Prompt 154, corrected in Prompt 155; design choices settled, complete specification awaiting review”.
+- Record the approved choices and the modified interpretation of V10.
+- Preserve documentation gaps as external uncertainties rather than treating review approval as proof of live API behaviour.
+- Any new detailed choices introduced by these corrections should be listed clearly for review.
+- No claim M4f or overall M4 is accepted, implemented or tested.
+- Update the proposed threat-model note to match the qualified timing/privacy guarantees.
+
+Public read-only research of official Python/Voyage documentation is permitted if needed. No provider API calls, keys, installs, Docker or database contact.
+
+Prompt history:
+Append:
+- Prompt 154 outcome with Claude Code attribution.
+- The reviewer's checksum, inspection scope, settled decisions and corrections.
+- This Prompt 155 verbatim.
+- An actual outcome note marking the corrections staged and awaiting review.
+
+Keep every earlier prompts.md byte as an identical prefix.
+Do not reconstruct unavailable handoffs as verbatim quotations.
+Use inline backticks around commit identifiers in your own notes.
+
+Checks:
+- Only plan, threat model and prompts.md differ from tree 95a5dd57d0187498e4227332917b7b24cd1db315.
+- README and ADR-0017 blob hashes unchanged.
+- All source, tests, corpus, workflows, dependencies and configuration unchanged.
+- Earlier prompt-history bytes unchanged.
+- Relative links/anchors resolve.
+- No contradictory hard-deadline, non-200 body-reading, exactly-one-call-on-invalid-input or blanket memory/privacy claims remain.
+- No implementation or acceptance claims.
+- Privacy/artifact scan.
+- UTF-8 without BOM, LF.
+- git diff --cached --check.
+- Existing unsuppressed staged Gitleaks check.
+
+No application tests, builds, installs, Docker, database or provider calls.
+Any standalone standard-library probe must be reported separately from project verification.
+
+Stage only the authorized changes.
+
+Export:
+.local/p155/m4f-spec-corrections.diff
+- Baseline: tree 95a5dd57d0187498e4227332917b7b24cd1db315
+- Final: final staged tree
+- Exclude prompts.md
+- Direct Git export, UTF-8 without BOM, LF.
+
+Report exact paths, statistics, byte size, SHA-256, final staged tree and Git state.
+List new details needing review and any remaining unresolved API facts.
+
+Stop after staging and exporting.
+No commit, push, merge, CI rerun, amend, rebase, tag or implementation.
+
+End with:
+Mathew: return this output plus .local/p155/m4f-spec-corrections.diff to the external reviewer.
+
+### Prompt 155 outcome (Claude Code; corrections staged, external review pending)
+
+On `docs/m4f-voyage-spec` (HEAD `0ae4c6ca`), Claude Code corrected the M4f specification in
+place in the plan and threat model; README and ADR-0017 are unchanged from the Prompt 154
+staged tree. The M4f heading and anchor are unchanged; the status now reads proposed in Prompt
+154, corrected in Prompt 155, design choices settled, complete specification awaiting review.
+V1–V9 and V11–V15 are recorded as approved and V10's numbers as approved engineering choices
+with the corrected timing interpretation. New subsections specify (A) a cooperative 60 s
+elapsed-time budget with a 10 s connect timeout and a 30 s socket I/O timeout, explicitly not
+a hard deadline; (B) status before body, with no read of any non-200 body and strict 200
+framing checks; (C) exact direct-call and configuration validation, zero transport calls for
+invalid input and at most one otherwise, and memory wording limited to raw accepted bytes; and
+(D) a first-outcome cleanup algorithm with a qualified privacy scope. Planned tests were added
+for each. Nine new details (N1–N9) are listed for review. The local Python 3.13.7
+standard-library `http.client` source was read (not executed) to confirm framing behaviour; no
+probe, application test, build, install, Docker, database or provider call was run. M4f is
+proposed only, not accepted, implemented or tested; overall M4 acceptance remains pending.
+Nothing was committed or pushed. Staging, scope, link, encoding, whitespace, privacy and
+Gitleaks checks and the export are reported in the handoff.
+
+### Prompt 155 outcome (Claude Code handoff results)
+
+Claude Code's Prompt 155 handoff reported: only the plan, threat model and prompts.md changed
+from tree `95a5dd57d0187498e4227332917b7b24cd1db315`; README and ADR-0017 blobs unchanged; the
+same five paths staged on `docs/m4f-voyage-spec` (HEAD `0ae4c6ca`); staged tree
+`ea83f9ca1df781dd4dea50eb2c0f25c7db459264`; both earlier prompt-history prefixes preserved;
+222 relative links and anchors resolving; UTF-8 without BOM and LF; a clean
+`git diff --cached --check`; and an unsuppressed staged Gitleaks 8.30.1 scan with no leaks. The
+export `.local/p155/m4f-spec-corrections.diff` (baseline tree `95a5dd57`, prompts.md excluded;
+408 insertions, 97 deletions) is 62,645 bytes with SHA-256
+`4d9041b32afc18ec2bccb05f5bd047f00fcd451a97eda4546c78b30eb21c6393`. Claude Code read the local
+Python 3.13.7 `http.client` source without executing it; no probe, application test, build,
+install, Docker, database or provider call was made, and nothing was committed or pushed.
+
+### External review of Prompt 155 (recorded in Prompt 156)
+
+The external reviewer inspected the Prompt 155 export and matched its size and SHA-256. N1–N9
+are approved subject to four clarifications; V1–V15 remain settled as previously qualified; the
+complete specification remains proposed and awaiting review. The reviewer inspected Python
+3.12.14 standard-library source and ran two isolated in-memory standard-library probes (not
+project tests, network calls, builds, wheel checks or database verification): a response
+declaring `Content-Length: 5` but containing three bytes returned `b"abc"` and then `b""` from
+bounded reads without raising `IncompleteRead`; and a response whose `begin()` raised
+`KeyboardInterrupt` and whose `close()` raised `RuntimeError` made
+`HTTPConnection.getresponse()` raise the `RuntimeError` instead of the original process-control
+object. The clarifications are: (A) explicit short-body detection; (B) not assuming the
+connection socket remains after `getresponse()`; (C) process-control preservation scoped to
+observable adapter-owned boundaries; (D) a non-200 `VoyageResponse` with a nonempty body is
+malformed, consistently with C2/N5.
+
+### Prompt 156 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+Prompt 156 — Clarify the remaining Python 3.12 transport semantics in the M4f specification. Documentation only; stage for review.
+
+Read CLAUDE.md and applicable repository instructions first.
+
+Expected state:
+- Branch: docs/m4f-voyage-spec
+- HEAD, main and origin/main:
+  0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Staged tree:
+  ea83f9ca1df781dd4dea50eb2c0f25c7db459264
+- Same five paths staged:
+  README.md
+  docs/decisions/0017-retrieval-evaluation.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or unexpectedly untracked.
+- Origin and noreply identity unchanged.
+
+Check locally only. No fetch or remote operation.
+If state differs, stop without resetting or reconstructing work.
+
+Save the baseline tree, paths, blob hashes and prompt-history prefix under .local/p156/.
+
+Verify:
+.local/p155/m4f-spec-corrections.diff
+- 62,645 bytes
+- SHA-256:
+  4d9041b32afc18ec2bccb05f5bd047f00fcd451a97eda4546c78b30eb21c6393
+- Baseline:
+  95a5dd57d0187498e4227332917b7b24cd1db315
+- Final:
+  ea83f9ca1df781dd4dea50eb2c0f25c7db459264
+- Excludes prompts.md.
+
+Review outcome:
+The reviewer inspected the export and matched its size/checksum.
+N1–N9 are approved, subject to the clarifications below.
+V1–V15 remain settled as previously qualified.
+The complete specification remains proposed and awaiting review.
+
+The reviewer inspected Python 3.12.14 standard-library source and ran two isolated standard-library probes:
+1. A response declaring Content-Length: 5 but containing three bytes returned b"abc", then b"", from bounded reads, without raising IncompleteRead.
+2. A response whose begin() raised KeyboardInterrupt and whose close() raised RuntimeError caused HTTPConnection.getresponse() to raise RuntimeError instead of the original process-control object.
+
+These were isolated in-memory probes, not project tests, network calls, builds, wheel checks or database verification.
+
+Authorized changed paths:
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+README and ADR-0017 must remain byte-identical to the baseline tree. M4e main evidence is already accepted and must not change.
+
+Apply these clarifications:
+
+A. Explicit short-body detection
+
+The specification currently relies on IncompleteRead for a body shorter than Content-Length. With bounded HTTPResponse.read(n), Python can instead return fewer bytes and eventually b"".
+
+Specify:
+- Track the expected Content-Length and cumulative bytes received explicitly.
+- Use bounded reads, requesting no more than the remaining declared length and the chosen chunk size.
+- If EOF arrives before the expected length, raise the fixed voyage_transport_failed.
+- Any IncompleteRead still maps to the same code.
+- Never loop indefinitely on an empty read.
+- For chunked responses, let http.client decode framing and enforce the cap on decoded body bytes; do not implement a chunk parser.
+- Preserve cooperative timing checks around each read.
+
+Add planned tests for:
+- A declared length of five with only three bytes followed by EOF, without IncompleteRead.
+- Early EOF on the first read.
+- Multiple short nonempty reads that eventually supply the exact length.
+- No extra read once the declared length is satisfied.
+
+B. Socket ownership after response headers
+
+Python's HTTPConnection.getresponse() can close/reset the connection when response.will_close is true. The response can remain readable while connection.sock is None.
+
+Specify:
+- Do not assume connection.sock remains available after getresponse().
+- Apply the I/O timeout before the header phase.
+- Before a body read, reduce the timeout through the public connected socket only when it is still available.
+- If connection.sock is None, do not access response.fp or other private socket internals, reconnect, or fail merely because the public connection socket is absent.
+- The response then uses its previously applied socket timeout, while cooperative elapsed checks still run before and after reads.
+- Document that this further limits how closely a body read can follow the remaining elapsed budget.
+- Do not claim every body read always receives a newly reduced socket timeout.
+
+Add planned tests for:
+- A readable, correctly framed Connection: close response with connection.sock becoming None.
+- Both Content-Length and chunked success under that condition.
+- Late completion still refused by the cooperative post-read check.
+- No reconnect and no private socket traversal.
+
+C. Scope process-control preservation to observable boundaries
+
+The adapter cannot recover an original exception that http.client replaced before returning control. Do not inspect exception chains to reconstruct it.
+
+Keep the proposed simple standard-library transport. Do not add a custom HTTP parser, HTTPResponse subclass, watchdog or dependency.
+
+Specify:
+- D1 preserves the first process-control exception that actually escapes into adapter-owned code from a factory, connection method, response method, clock or explicit cleanup call.
+- It preserves that same object through subsequent adapter-owned cleanup.
+- It does not guarantee recovery of an exception already masked inside http.client or another dependency.
+- An ordinary exception escaping such an internal failure is sanitized as voyage_transport_failed, regardless of any process-control exception in its chain.
+- No exception-chain inspection.
+- State this residual limitation in the plan and threat model.
+- Before live use requiring stronger process-control guarantees, a separately reviewed transport design is needed.
+- Fake-method tests prove preservation at observable call boundaries, not every internal standard-library operation.
+
+Add planned tests:
+- An ordinary exception with KeyboardInterrupt/SystemExit in its cause or context remains an ordinary sanitized transport failure.
+- A process-control exception escaping a method still survives both adapter-owned cleanup failures as the same object.
+- The existing first-process-control cleanup matrix remains required.
+
+D. Remove one residual validation contradiction
+
+Response-validation step 1 says a body on a non-200 value is ignored, but C2/N5 correctly require non-200 VoyageResponse bodies to be empty.
+
+Make these consistent:
+- Revalidate the complete VoyageResponse first.
+- A non-200 value with nonempty body is voyage_malformed_response.
+- Only a valid status-only value proceeds to HTTP status classification.
+- The real transport never reads the non-200 body.
+
+Status and scope:
+- Keep the M4f heading and anchor unchanged.
+- Record proposed in Prompt 154, corrected in Prompts 155–156; choices settled, complete specification awaiting review.
+- Record N1–N9 approved with these clarifications.
+- List any newly introduced detailed choices for review.
+- Preserve external API uncertainties, strict framing compatibility uncertainty, model-echo uncertainty and the existing retryability gap.
+- M4f is not accepted, implemented or tested.
+- Overall M4 acceptance remains pending.
+- No ADR-0018 yet.
+
+Official Python 3.12 documentation/source may be read publicly if needed. Do not rely solely on locally installed Python 3.13 source for these facts.
+
+Prompt history:
+Append the Prompt 155 outcome with attribution, the reviewer's checksum and exact isolated probe scope, approvals and clarifications, this Prompt 156 verbatim, and the actual outcome.
+Preserve every earlier byte as an identical prefix.
+Do not reconstruct unavailable handoffs as verbatim quotations.
+Use inline backticks around commit identifiers in your notes.
+
+Checks:
+- Only plan, threat model and prompts.md differ from the baseline staged tree.
+- README and ADR-0017 blobs unchanged.
+- All implementation, tests, corpus, workflow, dependencies and configuration unchanged.
+- Prompt-history prefix and verbatim prompt correct.
+- Relative links and anchors resolve.
+- No contradictory short-read, socket-availability, non-200 body or unconditional process-control guarantees remain.
+- UTF-8 without BOM, LF.
+- Privacy/artifact scan.
+- git diff --cached --check.
+- Existing unsuppressed staged Gitleaks scan.
+
+No project tests, builds, installs, Docker, database or provider calls.
+Any standalone standard-library probe must be identified separately from project verification.
+
+Stage the authorized changes and export:
+.local/p156/m4f-transport-semantics.diff
+- Baseline:
+  ea83f9ca1df781dd4dea50eb2c0f25c7db459264
+- Final: final staged tree
+- Exclude prompts.md
+- Direct Git export, UTF-8 without BOM, LF.
+
+Report paths, statistics, byte size, SHA-256, staged tree and final Git state.
+
+Stop after staging and exporting.
+No commit, push, merge, CI rerun, amend, rebase, tag or implementation.
+
+End with:
+Mathew: return this output plus .local/p156/m4f-transport-semantics.diff to the external reviewer.
+
+### Prompt 156 outcome (Claude Code; clarifications staged, external review pending)
+
+On `docs/m4f-voyage-spec` (HEAD `0ae4c6ca`), Claude Code applied the four Python 3.12 transport
+clarifications in place in the plan and threat model; README and ADR-0017 are unchanged from
+staged tree `ea83f9ca`. The M4f heading and anchor are unchanged; the status now reads proposed
+in Prompt 154, corrected in Prompts 155–156, design choices settled, complete specification
+awaiting review, with N1–N9 recorded as approved subject to the clarifications. The plan adds
+the Python 3.12 `http.client` facts relied on, an explicit bounded body-read loop that detects
+a short `Content-Length` body itself and never reads past the declared length, timeout
+reduction only through an available public `connection.sock`, process-control preservation
+scoped to exceptions that escape into adapter-owned code (with the masked-exception limitation
+disclosed in both documents), and revalidation that refuses a non-200 `VoyageResponse` with a
+body. Planned tests were added for each, and four new details (N10–N13) are listed for review.
+Claude Code read the official CPython `3.12` branch `Lib/http/client.py` publicly; no probe,
+application test, build, install, Docker, database or provider call was run. M4f is not
+accepted, implemented or tested; overall M4 acceptance remains pending; no ADR-0018 exists.
+Nothing was committed or pushed. Staging, scope, link, encoding, whitespace, privacy and
+Gitleaks checks and the export are reported in the handoff.
+
+### Prompt 156 outcome (Claude Code handoff results)
+
+Claude Code's Prompt 156 handoff reported: only the plan, threat model and prompts.md changed
+from tree `ea83f9ca1df781dd4dea50eb2c0f25c7db459264`; README and ADR-0017 blobs unchanged; the
+same five paths staged on `docs/m4f-voyage-spec` (HEAD `0ae4c6ca`); staged tree
+`e858ee3ab897c4ab731ddd1c850989409fa8d783`; all three earlier prompt-history prefixes
+preserved; 225 relative links and anchors resolving; UTF-8 without BOM and LF; a clean
+`git diff --cached --check`; and an unsuppressed staged Gitleaks scan with no leaks. The export
+`.local/p156/m4f-transport-semantics.diff` (baseline tree `ea83f9ca`, prompts.md excluded; 219
+insertions, 46 deletions) is 41,918 bytes with SHA-256
+`dbccf53a3c9c281f1813e68ed039041e4e69f52a4fef92579ee01576c353c9ce`. Claude Code read the
+official CPython `3.12` branch `Lib/http/client.py` publicly; no probe, application test, build,
+install, Docker, database or provider call was made, and nothing was committed or pushed.
+
+### External review acceptance of the M4f specification (Prompt 157)
+
+The external reviewer inspected all three exports and independently matched their sizes and
+SHA-256 values across the reviews: `.local/p154/m4f-voyage-spec.diff` (112,542 bytes,
+`2a9b07f4f86bf3c5f135cef0319eae8e9d694d947f4fcce968c1689a234af504`),
+`.local/p155/m4f-spec-corrections.diff` (62,645 bytes,
+`4d9041b32afc18ec2bccb05f5bd047f00fcd451a97eda4546c78b30eb21c6393`) and
+`.local/p156/m4f-transport-semantics.diff` (41,918 bytes,
+`dbccf53a3c9c281f1813e68ed039041e4e69f52a4fef92579ee01576c353c9ce`). The complete M4f
+specification is accepted at external review in Prompt 157, including V1–V15 and N1–N13 as
+qualified by Prompts 155–156, with one final consistency clarification: an ordinary exception
+escaping an operation such as `getresponse()` or `read()` is classified by its own type and
+sanitized, while an ordinary adapter-owned response-close or connection-close failure is
+ignored under D1 even if its cause or context contains process control; a failure from cleanup
+internal to `getresponse()` is that operation's escaping failure, distinct from adapter-owned
+cleanup. This accepts the specification only: no M4f implementation exists, and no M4f project
+test, build, wheel check, PostgreSQL test or live provider call has run. Source reading and the
+reviewer's isolated Python 3.12.14 probes (Prompt 156) are not implementation evidence.
+Overall M4 acceptance remains pending.
+
+### Prompt 157 (verbatim)
+
+Written for: Mathew and the external reviewer.
+
+Prompt 157 — Record M4f specification acceptance and commit the documentation locally. No implementation or publication.
+
+Read CLAUDE.md and applicable repository instructions first.
+
+Expected starting state:
+- Branch: docs/m4f-voyage-spec
+- HEAD, local main and origin/main:
+  0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Accepted staged tree:
+  e858ee3ab897c4ab731ddd1c850989409fa8d783
+- Exactly five staged paths:
+  README.md
+  docs/decisions/0017-retrieval-evaluation.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or unexpectedly untracked.
+- Existing origin and noreply identity unchanged.
+
+Check locally only. No fetch or remote operation.
+If state differs, stop and report without resetting or reconstructing anything.
+
+Save the accepted tree, staged paths, per-file blob hashes and existing prompts.md bytes under .local/p157/.
+
+Verify the three reviewed exports:
+1. .local/p154/m4f-voyage-spec.diff
+   112,542 bytes
+   SHA-256:
+   2a9b07f4f86bf3c5f135cef0319eae8e9d694d947f4fcce968c1689a234af504
+
+2. .local/p155/m4f-spec-corrections.diff
+   62,645 bytes
+   SHA-256:
+   4d9041b32afc18ec2bccb05f5bd047f00fcd451a97eda4546c78b30eb21c6393
+
+3. .local/p156/m4f-transport-semantics.diff
+   41,918 bytes
+   SHA-256:
+   dbccf53a3c9c281f1813e68ed039041e4e69f52a4fef92579ee01576c353c9ce
+
+External review outcome:
+The reviewer inspected all three exports and independently matched their sizes and checksums across the reviews.
+
+The complete M4f specification is accepted at external review in Prompt 157, including V1–V15 and N1–N13 as qualified by Prompts 155–156, with the single consistency clarification below.
+
+This accepts the specification only:
+- No M4f implementation exists.
+- No M4f project tests, builds, wheel checks, PostgreSQL tests or live provider calls have run.
+- Reading source and the reviewer's isolated Python 3.12.14 probes are not implementation evidence.
+- Overall M4 acceptance remains pending.
+
+Final consistency clarification:
+The planned “Process-control scope” tests currently group ordinary exceptions raised by getresponse(), read() and close() as voyage_transport_failed. That conflicts with D1 when close() is adapter-owned cleanup.
+
+Correct that wording:
+- An ordinary exception escaping an operation such as getresponse() or read() is classified by its own type and sanitized, without inspecting its cause/context.
+- An ordinary adapter-owned response-close or connection-close failure is ignored under D1, even if its cause/context contains KeyboardInterrupt or SystemExit.
+- If the operation succeeded, such ordinary cleanup failure does not change success.
+- If the operation failed, its existing fixed outcome is preserved.
+- An actual non-Exception BaseException escaping cleanup still takes precedence as specified.
+- A failure from cleanup internal to getresponse() is observed as that operation's escaping failure; it is distinct from adapter-owned cleanup.
+- Adjust N13 and related test descriptions only as needed to preserve this distinction.
+
+Do not change the approved transport design or add another mechanism.
+
+Acceptance wording:
+1. Plan:
+   Change the heading to:
+   M4f Voyage adapter specification (ACCEPTED at review, Prompt 157; implementation pending)
+
+   Update every reference to its new anchor.
+   Record:
+   - Proposed in Prompt 154.
+   - Corrected in Prompts 155–156.
+   - Accepted at review in Prompt 157 with the consistency clarification.
+   - V1–V15 and N1–N13 settled within the complete specification.
+   - The section's recommendations now form the accepted implementation contract.
+   - No specification decision remains open.
+
+   Distinguish unresolved external API facts from unresolved design decisions. The former remain explicitly unverified and are not settled by acceptance.
+
+   Update the top status, M4 summary and M4f slice row consistently.
+   Preserve the historical review chronology.
+
+2. README:
+   State M4e is verified and on main at 0ae4c6ca.
+   State the M4f specification is accepted in Prompt 157, with implementation and all checks pending.
+   Update links to the accepted M4f anchor.
+   Do not claim overall M4 acceptance.
+
+3. Threat model:
+   State the M4f specification is accepted, implementation is pending, and none of its proposed controls operates yet.
+   Preserve all qualified timing, privacy and process-control limitations.
+   Update links to the accepted anchor.
+
+4. ADR-0017:
+   Change only M4f status wording or links if needed.
+   Preserve all M4e evidence, counts, links, attribution and historical sections.
+
+Preserve:
+- Explicit construction only; no production provider registration or settings.
+- Offline defaults.
+- No internal retries.
+- Existing M4a/M4c/M4d mappings and the retryability gap before live indexing.
+- Strict model echo and framing compatibility uncertainties.
+- No upstream model-immutability guarantee.
+- Cooperative timing only, with no hard wall-clock maximum.
+- Process-control preservation only at observable adapter-owned boundaries.
+- Accepted raw-byte cap without a peak-memory claim.
+- Required mocked tests, two PostgreSQL cases and installed-wheel coverage, all planned only.
+- No live quality evidence required for M4f acceptance; live evaluation remains M7.
+- M5 snapshot obligations.
+- Container-smoke scope and unverified local Compose.
+- Overall M4 acceptance pending.
+- ADR-0018 deferred until implementation.
+
+Authorized paths:
+Only the existing five documentation/history paths may change.
+No source, tests, corpus, dependency, lockfile, workflow, settings, configuration, migration, Docker or Compose change.
+Do not create ADR-0018.
+
+Prompt history:
+Append:
+- Prompt 156 outcome, attributed to Claude Code's handoff.
+- The reviewer's acceptance, three matched checksums, review/probe scope and the final consistency clarification.
+- This Prompt 157 verbatim.
+- A pre-commit note with no prospective commit SHA or unperformed outcome.
+
+Keep every earlier prompts.md byte as an identical prefix.
+Do not reconstruct unavailable handoffs as verbatim quotations.
+Use inline backticks around commit identifiers in your notes.
+
+Pre-commit checks:
+- Exactly five expected paths staged.
+- Changes from accepted tree e858ee3ab897c4ab731ddd1c850989409fa8d783 limited to acceptance wording, links, the consistency clarification and prompt history.
+- All other tracked blobs unchanged.
+- Earlier prompts.md bytes unchanged.
+- Relative links and anchors resolve.
+- No stale claim that the complete M4f specification awaits acceptance.
+- No claim M4f is implemented, tested, published or merged.
+- No claim overall M4 is accepted.
+- External API uncertainties remain.
+- UTF-8 without BOM, LF.
+- Privacy/artifact scan.
+- git diff --cached --check.
+- Existing unsuppressed staged Gitleaks scan.
+- Effective author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+No project tests, builds, installs, Docker, database, provider or network calls.
+
+Commit locally:
+- Subject:
+  docs: record M4e main results and accepted M4f Voyage specification
+- Parent:
+  0ae4c6ca339232e40cc007d7b78334af08a8b25b
+- Exactly the five intended paths.
+- Accurately credit Claude Code's specification/documentation work in Prompts 154–157.
+- Preserve earlier Codex attribution and follow repository attribution conventions.
+- Do not amend or rewrite earlier commits.
+
+After committing:
+- Verify SHA, parent, tree, paths, identity and attribution.
+- Verify a clean working tree.
+- Verify main and origin/main remain unchanged.
+- Run the existing unsuppressed full-history Gitleaks scan.
+- Report actual outcomes only.
+
+Export:
+.local/p157/m4f-spec-acceptance.diff
+- Baseline:
+  e858ee3ab897c4ab731ddd1c850989409fa8d783
+- Final: new local commit
+- Exclude prompts.md
+- Direct Git export, UTF-8 without BOM, LF.
+
+Report exact paths, statistics, byte size and SHA-256, plus commit SHA, parent, tree and final Git state.
+
+Stop after the local commit and export.
+No implementation, push, merge, CI rerun, amend, rebase, tag or branch deletion.
+
+End with:
+Mathew: return this output plus .local/p157/m4f-spec-acceptance.diff to the external reviewer.
+
+### Prompt 157 pre-commit note (Claude Code; before the local commit)
+
+Verified locally (no fetch or remote operation): branch `docs/m4f-voyage-spec`, HEAD, `main`
+and `origin/main` at `0ae4c6ca`, accepted staged tree `e858ee3a`, exactly the five expected
+staged paths, nothing unstaged or untracked, unchanged origin and noreply identity, and the
+three reviewed exports' sizes and SHA-256 values. Saved the accepted tree, staged paths,
+blob hashes and prior prompt bytes under `.local/p157/`. Recorded the M4f specification as
+accepted at external review in Prompt 157 in the plan (renamed heading and anchors, status,
+M4 summary, slice row, settled decisions and the final clarification on operation failures
+versus adapter-owned cleanup in D1, the planned tests and N13), README and threat model;
+ADR-0017 needed no change. External API facts stay explicitly unverified. M4f is not
+implemented, tested, published or merged, and overall M4 acceptance remains pending. No
+project test, build, install, Docker, database, provider or network call was made. The
+pre-commit checks, the local commit and its post-commit verification have not been recorded
+in this note; their outcomes are reported in the handoff.

@@ -1,6 +1,6 @@
 # EvidenceGuard implementation plan
 
-**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`. The M4c installed-wheel extension, which executes the offline embedding and canonical storage path and imports the indexing modules, ran locally on Windows in Prompts 125–126 (historical) and passed on Ubuntu and Windows CI runners at `600a366` and again on `main` at `76fa5a3`; the earlier M4a/M4b wheel limitations are historical. The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); M4c was implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 (ADR-0015); it is reviewed, verified in CI and on `main` at `76fa5a3` (PostgreSQL, Linux, Windows, installed-wheel and container indexing; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3); earlier feature-branch verification at `600a366` is historical). The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and accepted at external review in Prompt 133. Claude Code implemented it in Prompt 134 on `feat/snapshot-retrieval` and corrected it in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)); the implementation was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (Ubuntu, Windows, PostgreSQL with all 39 M4d cases passing, installed-wheel retrieval check, the unchanged container job and Gitleaks; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` and Claude Code's local Windows results in Prompts 134–135 are historical. The [M4e corpus and retrieval-evaluation specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was proposed in Prompt 140, corrected in Prompts 141–142 and **accepted at external review in Prompt 143**; Claude Code implemented it in Prompt 144 on `feat/retrieval-evaluation` and corrected it in Prompts 145–146 ([ADR-0017](decisions/0017-retrieval-evaluation.md)); the implementation was **accepted at external review in Prompt 147 for a local implementation commit** and **published on `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`**, where exact-commit CI was not fully green: PostgreSQL integration passed (306 passed, including all 16 M4e cases), but one Ubuntu test failed because its `os.lstat` double re-entered itself on Linux (no production defect established; see [ADR-0017](decisions/0017-retrieval-evaluation.md#exact-commit-ci-at-c14821b7-and-test-correction-prompts-148149)); the Prompt 149 test-only correction was accepted in Prompt 150 and published in Prompt 151; M4e is reviewed and verified in feature-branch CI on `feat/retrieval-evaluation` at `d1dcdfce`, M4e is not merged to `main`, and no database-derived Recall value has been observed; M4f still requires a detailed specification; overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
+**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`. The M4c installed-wheel extension, which executes the offline embedding and canonical storage path and imports the indexing modules, ran locally on Windows in Prompts 125–126 (historical) and passed on Ubuntu and Windows CI runners at `600a366` and again on `main` at `76fa5a3`; the earlier M4a/M4b wheel limitations are historical. The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); M4c was implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 (ADR-0015); it is reviewed, verified in CI and on `main` at `76fa5a3` (PostgreSQL, Linux, Windows, installed-wheel and container indexing; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3); earlier feature-branch verification at `600a366` is historical). The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and accepted at external review in Prompt 133. Claude Code implemented it in Prompt 134 on `feat/snapshot-retrieval` and corrected it in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)); the implementation was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (Ubuntu, Windows, PostgreSQL with all 39 M4d cases passing, installed-wheel retrieval check, the unchanged container job and Gitleaks; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` and Claude Code's local Windows results in Prompts 134–135 are historical. The [M4e corpus and retrieval-evaluation specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was proposed in Prompt 140, corrected in Prompts 141–142 and **accepted at external review in Prompt 143**; Claude Code implemented it in Prompt 144 on `feat/retrieval-evaluation` and corrected it in Prompts 145–146 ([ADR-0017](decisions/0017-retrieval-evaluation.md)); the implementation was **accepted at external review in Prompt 147 for a local implementation commit** and **published on `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`**, where exact-commit CI was not fully green: PostgreSQL integration passed (306 passed, including all 16 M4e cases), but one Ubuntu test failed because its `os.lstat` double re-entered itself on Linux (no production defect established; see [ADR-0017](decisions/0017-retrieval-evaluation.md#exact-commit-ci-at-c14821b7-and-test-correction-prompts-148149)); the Prompt 149 test-only correction was accepted in Prompt 150 and published in Prompt 151; after feature-branch verification at `d1dcdfce` (historical), M4e is **reviewed, verified in CI and on `main` at `0ae4c6ca`** (`0ae4c6ca339232e40cc007d7b78334af08a8b25b`, committed and fast-forwarded by OpenAI Codex in Prompt 153 after green feature CI; main CI then passed; see the [ADR-0017 main CI evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)), and no database-derived Recall value has been observed; the [M4f Voyage adapter specification](#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending) was proposed in Prompt 154, corrected in Prompts 155–156 and **accepted at external review in Prompt 157** (implementation and all checks pending; not implemented, tested, published or merged); overall M4 acceptance is pending. Later milestones remain plans. Historical evidence below retains its original baseline.
 
 EvidenceGuard is a vendor-risk review copilot. It ingests synthetic vendor documents, retrieves evidence the tenant is authorized to see, classifies each review question against that evidence, and drafts a cited report. A human must approve the exact report revision before it can be finalized or exported. It is decision support, not legal advice or compliance certification.
 
@@ -2604,8 +2604,8 @@ container verification; see the [main CI evidence](decisions/0014-embedding-pers
 feature-branch verification at `90240e3` is historical. The
 [M4c indexing specification](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending)
 was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in
-Prompt 123). M4c was implemented on `feat/revision-indexing` by Claude Code in Prompt 125 ([ADR-0015](decisions/0015-revision-indexing.md)) and corrected in Prompt 126, with historical local Windows checks in Prompts 125–126; it was accepted at external review for a local commit in Prompt 127 and is **reviewed, verified in CI and on `main` at `76fa5a3`** (main push: PostgreSQL `251 passed`, including all 18 indexing cases, plus Linux, Windows, installed-wheel and container indexing verification; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3)). Earlier feature-branch verification at `600a366` is historical. The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and **accepted at external review in Prompt 133**. Its implementation by Claude Code in Prompt 134, corrected in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)), was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (main push: PostgreSQL `290 passed`, including all 39 M4d cases; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` is historical. The [M4e specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was accepted at external review in Prompt 143 (proposed in Prompt 140, corrected in Prompts 141–142); its implementation (Prompt 144, corrected in Prompts 145–146, [ADR-0017](decisions/0017-retrieval-evaluation.md)) was accepted at external review in Prompt 147 for a local commit and published on `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`, where PostgreSQL passed with all 16 M4e cases but one Ubuntu test failed (a Linux-specific test-double recursion); the Prompt 149 test-only correction was accepted in Prompt 150 and published in Prompt 151; M4e is reviewed and verified in feature-branch CI on `feat/retrieval-evaluation` at `d1dcdfce`, and M4e is not merged to `main`. M4f still needs an accepted
-specification, overall M4 acceptance remains pending, and local Compose remains unverified.** M1, M2 and M3 remain accepted.
+Prompt 123). M4c was implemented on `feat/revision-indexing` by Claude Code in Prompt 125 ([ADR-0015](decisions/0015-revision-indexing.md)) and corrected in Prompt 126, with historical local Windows checks in Prompts 125–126; it was accepted at external review for a local commit in Prompt 127 and is **reviewed, verified in CI and on `main` at `76fa5a3`** (main push: PostgreSQL `251 passed`, including all 18 indexing cases, plus Linux, Windows, installed-wheel and container indexing verification; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3)). Earlier feature-branch verification at `600a366` is historical. The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and **accepted at external review in Prompt 133**. Its implementation by Claude Code in Prompt 134, corrected in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)), was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (main push: PostgreSQL `290 passed`, including all 39 M4d cases; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` is historical. The [M4e specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was accepted at external review in Prompt 143 (proposed in Prompt 140, corrected in Prompts 141–142); its implementation (Prompt 144, corrected in Prompts 145–146, [ADR-0017](decisions/0017-retrieval-evaluation.md)) was accepted at external review in Prompt 147 for a local commit and published on `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`, where PostgreSQL passed with all 16 M4e cases but one Ubuntu test failed (a Linux-specific test-double recursion); the Prompt 149 test-only correction was accepted in Prompt 150 and published in Prompt 151; after feature-branch verification at `d1dcdfce` (historical), M4e is reviewed, verified in CI and on `main` at `0ae4c6ca` (see the [ADR-0017 main CI evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)). The [M4f specification](#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending) was proposed in Prompt 154, corrected in Prompts 155–156 and accepted at external review in Prompt 157; its implementation is pending,
+overall M4 acceptance remains pending, and local Compose remains unverified.** M1, M2 and M3 remain accepted.
 
 The reviewer inspected the full Prompt 107 diff, independently matched its
 SHA-256 checksum and checked the existing chunk domain and chunker source
@@ -2644,8 +2644,8 @@ Accepted dependency-ordered sequence (Prompt 108; each later slice needs its own
 | M4b | Embedding profiles/index records, tenant-scoped storage and migration, full-text representation, exact vector operations and completeness/readiness. Real PostgreSQL constraints, migration round trips and filtering tests. Introduce pgvector here when vector storage/operators first require it; M4a needs no extension. Detailed specification [accepted at review in Prompt 116](#m4b-persistence-specification-accepted-at-review-prompt-116-implementation-pending) (proposed in Prompt 114, corrected in Prompt 115); implemented in Prompt 117, accepted in Prompt 118, verified in CI and on `main` at `872d0af` ([ADR-0014](decisions/0014-embedding-persistence.md)). |
 | M4c | Separate durable `index_revision` jobs over completed immutable chunk sets, enqueue/backfill seam and registered handler. Test leases/fences, replay, partial batches, conflicting retries, cancellation and atomic readiness/job finish. No review workflow. Detailed specification [accepted at review in Prompt 124](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending) (proposed in Prompt 122, corrected in Prompt 123); implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 ([ADR-0015](decisions/0015-revision-indexing.md)); verified in CI and on `main` at `76fa5a3`, including PostgreSQL and container indexing. |
 | M4d | Explicit snapshot input/capture seam, eligibility validation, deterministic lexical/vector/RRF retrieval and bounded results. PostgreSQL isolation, snapshot-after-supersession, ranking and tie tests. No review endpoints or report generation. Detailed specification [accepted at review in Prompt 133](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) (proposed in Prompt 131, corrected in Prompt 132); implementation staged in Prompt 134 and corrected in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)), accepted at external review in Prompt 136; reviewed, verified in CI and on `main` at `cf2b5743` ([main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)). |
-| M4e | Synthetic clean/injected corpus, stable anchor-to-chunk ground truth, Recall@5/@8 and retrieval contracts. Include cross-tenant, cross-vendor and superseded traps and missing answers; no semantic-quality claim. Detailed specification [accepted at review in Prompt 143](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) (proposed in Prompt 140, corrected in Prompts 141–142); implementation (Prompt 144, corrected in Prompts 145–146, [ADR-0017](decisions/0017-retrieval-evaluation.md)) accepted at external review in Prompt 147 for a local commit and published in Prompt 148 at `c14821b7` (PostgreSQL passed with all 16 M4e cases; one Ubuntu test failed from a test-double recursion); Prompt 149 test-only correction accepted in Prompt 150; reviewed and verified in feature-branch CI on `feat/retrieval-evaluation` at `d1dcdfce`; not merged. |
-| M4f | Voyage adapter behind the same contract, injected transport mocked in CI, fixed profile/configuration, bounded calls and safe error mapping. No live calls required for M4 acceptance; live quality evidence belongs to M7. |
+| M4e | Synthetic clean/injected corpus, stable anchor-to-chunk ground truth, Recall@5/@8 and retrieval contracts. Include cross-tenant, cross-vendor and superseded traps and missing answers; no semantic-quality claim. Detailed specification [accepted at review in Prompt 143](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) (proposed in Prompt 140, corrected in Prompts 141–142); implementation (Prompt 144, corrected in Prompts 145–146, [ADR-0017](decisions/0017-retrieval-evaluation.md)) accepted at external review in Prompt 147 for a local commit and published in Prompt 148 at `c14821b7` (PostgreSQL passed with all 16 M4e cases; one Ubuntu test failed from a test-double recursion); Prompt 149 test-only correction accepted in Prompt 150; verified in feature-branch CI at `d1dcdfce` (historical); reviewed, verified in CI and on `main` at `0ae4c6ca` ([main CI evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)). |
+| M4f | Voyage adapter behind the same contract, injected transport mocked in CI, fixed profile/configuration, bounded calls and safe error mapping. No live calls required for M4 acceptance; live quality evidence belongs to M7. Detailed specification [accepted at review in Prompt 157](#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending) (proposed in Prompt 154, corrected in Prompts 155–156); implementation pending; not implemented or tested. |
 
 **[DECISION] Separate indexing readiness (Prompt 108); later persistence details remain proposals.** Retain M3's activation and immutable
 chunk rules. Treat indexing readiness as separate from revision status: an active
@@ -3985,7 +3985,7 @@ container job and Gitleaks (60 commits, no leaks); see the
 [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743).
 Claude Code's Prompt 134–135 local Windows checks are historical, as is the earlier statement that
 the PostgreSQL tests had never run. The container smoke covers ingestion and indexing, not M4d
-retrieval. The M4e specification is accepted (Prompt 143) and its implementation (Prompt 144, corrected in Prompts 145–146) is accepted at external review (Prompt 147) for a local commit and published in Prompt 148 at `c14821b7`, where exact-commit CI was not fully green (PostgreSQL passed with all 16 M4e cases; one Ubuntu test failed from a test-double recursion); the Prompt 149 test-only correction was accepted in Prompt 150 and published in Prompt 151; M4e is reviewed and verified in feature-branch CI on `feat/retrieval-evaluation` at `d1dcdfce`; M4f and overall M4 acceptance remain pending. The heading and the planned-verification list below keep their accepted
+retrieval. The M4e specification is accepted (Prompt 143) and its implementation (Prompt 144, corrected in Prompts 145–146) is accepted at external review (Prompt 147) for a local commit and published in Prompt 148 at `c14821b7`, where exact-commit CI was not fully green (PostgreSQL passed with all 16 M4e cases; one Ubuntu test failed from a test-double recursion); the Prompt 149 test-only correction was accepted in Prompt 150 and published in Prompt 151; after feature-branch verification at `d1dcdfce` (historical), M4e is reviewed, verified in CI and on `main` at `0ae4c6ca`; M4f and overall M4 acceptance remain pending. The heading and the planned-verification list below keep their accepted
 wording.
 
 **Scope.** A trusted snapshot capture seam, an immutable snapshot value, strict retrieval
@@ -4772,9 +4772,10 @@ bounds before payload reads) and in Prompt 146 closed a remaining read-boundary 
 control raised by the setup clock result's `scalar_one()`). The implementation was **accepted
 at external review in Prompt 147 for a local implementation commit** and **published on
 `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`**. The Prompt 149 correction, accepted
-in Prompt 150, is now **reviewed and verified in feature-branch CI at `d1dcdfce`**, not merged
-to `main`; reviewed publication to main remains (see
-[feature-branch CI evidence](decisions/0017-retrieval-evaluation.md#feature-branch-ci-evidence-at-d1dcdfce)). The disclosed verifier scope was accepted: it checks each
+in Prompt 150, was verified in feature-branch CI at `d1dcdfce` (historical; see
+[feature-branch CI evidence](decisions/0017-retrieval-evaluation.md#feature-branch-ci-evidence-at-d1dcdfce))
+and is now **reviewed, verified in CI and on `main` at `0ae4c6ca`** (see
+[main CI evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)). The disclosed verifier scope was accepted: it checks each
 canonical job's kind, idempotency key and `succeeded` status but does not read job `payload`
 (accepted read item 6; see ADR-0017), so no payload validation is claimed. From job logs
 retrieved independently by the external reviewer, PostgreSQL integration at `c14821b7` passed
@@ -5485,8 +5486,8 @@ Linux project tests, Ubuntu build/wheel and green current-version CI were pendin
 subsequently passed at `d1dcdfce` (see [feature-branch CI evidence](decisions/0017-retrieval-evaluation.md#feature-branch-ci-evidence-at-d1dcdfce)).
 Claude Code's Prompt 149 Windows checks remain historical; OpenAI Codex assisted with Prompt
 150 documentation/commit work and Prompt 151 publication/log retrieval. The external reviewer
-independently confirmed the new logs without running local project checks. M4e is reviewed and verified in feature-branch CI on `feat/retrieval-evaluation` at `d1dcdfce`,
-not merged to `main`; reviewed publication to main remains. Prompt 150 authorized only a local
+independently confirmed the new logs without running local project checks. At that point M4e was verified in feature-branch CI on `feat/retrieval-evaluation` at `d1dcdfce`
+and not yet merged (historical); it is now reviewed, verified in CI and on `main` at `0ae4c6ca` ([main CI evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)). Prompt 150 authorized only a local
 correction commit. M4f and overall M4 acceptance remain pending; local Compose is unverified.
 
 ##### M4e local verification (Prompt 146)
@@ -5544,6 +5545,1008 @@ test (16 cases in `tests/test_evaluation_postgres.py`), the CI jobs and Gitleaks
   installed-wheel environment outside the checkout (dependencies from `uv.lock`, offline with
   `--require-hashes`, wheel with `--no-deps`) passed every CI wheel command extracted from
   `ci.yml`, including the new M4e step.
+
+#### M4f Voyage adapter specification (ACCEPTED at review, Prompt 157; implementation pending)
+
+**Status.** **Proposed in Prompt 154, corrected in Prompts 155–156 and accepted at external
+review in Prompt 157** with one final consistency clarification (an ordinary adapter-owned
+cleanup failure is ignored under D1 even when its cause or context holds process control, while
+an ordinary exception escaping an operation such as `getresponse()` or `read()` is classified
+by its own type; see D1). **V1–V15 and N1–N13 are settled within the complete specification;
+the section's recommendations ([REC]) now form the accepted implementation contract, and no
+specification decision remains open.** The external reviewer matched all three review exports'
+sizes and checksums. Acceptance is a design decision only: **no M4f implementation exists**, and
+no M4f project test, build, wheel check, PostgreSQL test or live provider call has run; source
+reading and the reviewer's isolated Python 3.12.14 probes are not implementation evidence.
+**Unresolved external API facts are distinct from design decisions:** the [OPEN] items below,
+the live compatibility of the strict 200 framing rules (N2), whether Voyage echoes the model
+name exactly (V6) and any upstream model-immutability guarantee remain explicitly unverified
+and are **not** settled by acceptance; the known retryability gap (V11) must still be resolved
+by a separately reviewed change before live indexing.
+
+**Review chronology (historical).** Claude Code wrote it in Prompt 154 and applied the
+reviewer's four corrections in Prompt 155 (A: a cooperative elapsed-time budget, not a hard
+deadline; B: status before body, with no body read for non-200 responses; C: exact direct-call
+validation, configuration bounds and call-count and memory wording; D: a concrete
+cleanup-precedence algorithm and qualified privacy scope) and four Python 3.12 transport
+clarifications in Prompt 156 (explicit short-body detection; no reliance on the connection
+socket after `getresponse()`; process-control preservation scoped to observable adapter-owned
+boundaries; a non-200 `VoyageResponse` with a body is malformed). The external review of Prompt
+154 approved V1–V9 and V11–V15 subject to the Prompt 155 corrections, and approved V10's
+numerical defaults as engineering choices with its timing guarantees corrected; the review of
+Prompt 155 approved N1–N9 subject to the Prompt 156 clarifications, with V1–V15 remaining
+settled as qualified (see [M4f review decisions](#m4f-review-decisions-settled-at-acceptance-prompt-157)).
+At those points (historical) the complete specification still awaited review. The details
+introduced by the corrections are listed in
+[M4f details introduced by the Prompt 155 corrections](#m4f-details-introduced-by-the-prompt-155-corrections-settled-at-acceptance)
+(N1–N9, approved in Prompt 156 with clarifications) and
+[M4f details introduced by the Prompt 156 clarifications](#m4f-details-introduced-by-the-prompt-156-clarifications-settled-at-acceptance)
+(N10–N13, settled at acceptance in Prompt 157).
+
+The M4f **specification is accepted; the implementation is pending and untested**; no code,
+test, dependency, setting or workflow has changed. ADR-0018 is deferred until implementation.
+Overall M4 acceptance remains pending. Nothing here redesigns M4a–M4e. Labels in this section:
+
+- **[DECISION]** already accepted (cited);
+- **[FACT]** verified from source on `main` at `0ae4c6ca` in Prompt 154;
+- **[EXT]** a current external fact from official Voyage documentation or package metadata,
+  retrieved read-only on **2026-10-18** (sources below); no API call was made and no key used;
+- **[OPEN]** an external detail the documentation does not settle; it remains unverified and
+  is not settled by acceptance;
+- **[REC]** a recommendation written in Prompts 154–156, now part of the accepted
+  implementation contract; numbers marked as choices are engineering defaults, not
+  measurements;
+- **[V*n*]** a design choice proposed in Prompt 154; V1–V9 and V11–V15 approved and V10's
+  numbers approved in the Prompt 155 review, all settled at acceptance in Prompt 157 (see
+  [M4f review decisions](#m4f-review-decisions-settled-at-acceptance-prompt-157));
+- **[N*n*]** a detail introduced by the corrections: N1–N9 (Prompt 155) approved in the
+  Prompt 156 review subject to its clarifications; N10–N13 (Prompt 156); all settled at
+  acceptance in Prompt 157;
+- **[PY]** a Python 3.12 standard-library fact, read in Prompt 156 from `Lib/http/client.py` on
+  the `3.12` branch of the official CPython repository
+  (<https://github.com/python/cpython/blob/3.12/Lib/http/client.py>, retrieved 2026-10-18),
+  and consistent with the reviewer's Python 3.12.14 source inspection and two isolated
+  in-memory standard-library probes (not project tests).
+
+**Python 3.12 `http.client` facts relied on** [PY]:
+
+- `HTTPResponse.read(amt)` with a declared `Content-Length` returns whatever the socket file
+  supplies, decrementing the remaining length; a short body yields fewer bytes and then `b""`,
+  **without** raising `IncompleteRead` (the source comments that raising would break
+  compatibility). Only the unbounded `read()` path raises `IncompleteRead` for a short body.
+  The reviewer's probe observed `b"abc"` and then `b""` for a declared length of five.
+- For chunked responses, `read(amt)` decodes the framing and raises `IncompleteRead` on a
+  premature end or an unparseable chunk size.
+- `HTTPConnection.getresponse()` calls `self.close()` when `response.will_close` is true, and
+  `HTTPConnection.close()` sets `self.sock = None`; the response stays readable through its own
+  file object.
+- If `response.begin()` fails, `getresponse()` closes the connection or the response in its own
+  handler and re-raises; an exception raised by that internal close replaces the original
+  (the reviewer's probe: `KeyboardInterrupt` from `begin()` was replaced by a `RuntimeError`
+  from `close()`).
+- `_MAXLINE = 65536` and `_MAXHEADERS = 100`.
+
+**Scope.** A Voyage embedding adapter behind the existing `EmbeddingProvider` contract, a
+standard-library HTTPS transport injected into it, fixed profile and request configuration,
+bounded calls, fixed private errors and mocked tests. **Out of scope:** any live call, key,
+production registration, setting, environment variable, CLI, endpoint, automatic indexing,
+reranker (E7), retry orchestration, cancellation integration for retrieval (M5), live quality
+or cost evidence (M7).
+
+##### M4f accepted decisions and source facts
+
+- [DECISION] D11: the real embedding provider is an API (Voyage); no local model download
+  ([§1](#1-review-decisions)). §5 names Voyage `voyage-4-lite` at 1024 dimensions; Prompt 108
+  preserved D7/D11 and §§4–7 and fixed the M4f row: “Voyage adapter behind the same contract,
+  injected transport mocked in CI, fixed profile/configuration, bounded calls and safe error
+  mapping. No live calls required for M4 acceptance; live quality evidence belongs to M7”
+  ([M4 direction](#m4-direction-and-review-decisions)).
+- [DECISION] M4a (Prompt 108): a future Voyage identity must pin requested model, dimensions
+  and adapter contract version; model aliases cannot establish an upstream immutable model
+  revision; record any provider-returned model identity and fail on unexpected mismatch. A live
+  adapter rejects zero vectors. Fixed error codes carry no input text, vectors, provider
+  response or exception body. No implicit truncation or splitting.
+- [FACT] `evidenceguard_domain.embeddings`: `EmbeddingIdentity(provider_id, model_id,
+  algorithm_version, dims, normalization)`; identifiers match `[a-z][a-z0-9._-]{0,63}`; the
+  fingerprint is SHA-256 of canonical JSON of exactly those five fields. `validate_request`
+  allows 1–32 texts, each 1–4,000 code points, at most 16,000 UTF-8 bytes, no NUL, not
+  whitespace-only, at most 128,000 bytes in total. `EmbeddingBatch` requires a tuple of
+  `dims`-length tuples of strict `int`/`float` coordinates, finite `math.hypot` norm, and norm
+  within absolute 1e-6 of 1, with zero vectors only when `provider_id == "offline"`.
+  `EmbeddingUsage(input_tokens)` is a nonnegative strict int or `None`. Errors are the single
+  fixed `InvalidEmbeddingError("invalid_embedding")`.
+- [FACT] `evidenceguard_retrieval.embeddings.embed_validated` validates the request, reads the
+  provider identity, calls `embed`, validates the result and converts **every** `Exception` to
+  a fresh `InvalidEmbeddingError` raised outside the handler; non-`Exception` process control
+  propagates.
+- [FACT] `evidenceguard_domain.embedding_storage`: `STORED_DIMS = 1024`; `canonical_vector`
+  rounds to float32, rejects a nonzero vector that rounds to zero and rechecks the norm without
+  renormalizing; `allows_zero_vectors` is true only for `offline`. Migration `0005` checks
+  `dims = 1024` and `allows_zero_vectors = (provider_id = 'offline')` in the database.
+- [FACT] M4c (`evidenceguard_worker.indexing`): providers come from an immutable
+  fingerprint → factory mapping fixed when the handler is built; production
+  `SUPPORTED_PROVIDERS` holds only `HASH_IDENTITY`. A page is at most 32 chunks and 128,000
+  UTF-8 bytes. `_embed` runs `ctx.check()` before the call and before classifying a failure,
+  then maps `InvalidEmbeddingError` to `PermanentJobError(permanent_failure)`; only
+  `JobLockTimeoutError` is retryable. An unsupported stored profile is a permanent failure.
+  `eg-admin backfill-indexes` is fixed to `HASH_IDENTITY`.
+- [FACT] M4d (`evidenceguard_worker.retrieval`): `search_snapshot` reads the provider identity,
+  makes at most one `embed_validated(..., "query")` call (none if its earlier validation or
+  identity check fails) for 1–8 queries with no session open,
+  and maps any ordinary failure to the fixed `RetrievalProviderError`
+  (`retrieval_provider_failed`), with no retry or `JobContext` integration; M5 must define
+  cancellation and lease precedence.
+- [FACT] `tests/test_packaging.py` requires `evidenceguard_retrieval` to import only the domain,
+  itself and the standard library, and none of `sqlalchemy`, `psycopg`, `httpx`, `socket`,
+  `urllib`, `requests` or `os`. `pyproject.toml` has no HTTP client or Voyage dependency; new
+  dependencies fall under the two-week age policy (ADR-0004). Settings exist only for the
+  database (`EG_DATABASE_URL`, held as `SecretStr`).
+- [FACT] Test fixtures already use `EmbeddingIdentity("voyage", "voyage-4-lite", "adapter-v1",
+  1024, "l2")` as a non-offline example; that string is a fixture, not an accepted contract.
+- [FACT] Plan §8 says “60 s timeout, 2 SDK retries” for provider calls, written for model
+  calls before M4; see V15.
+
+##### M4f current Voyage API facts (retrieved 2026-10-18)
+
+Sources (official, read-only): [Embeddings API reference](https://docs.voyageai.com/reference/embeddings-api)
+(page `updatedAt` 2025-12-10), [Text embeddings](https://docs.voyageai.com/docs/embeddings)
+(2026-08-10), [Error codes](https://docs.voyageai.com/docs/error-codes) (2025-09-12),
+[Rate limits](https://docs.voyageai.com/docs/rate-limits) (2026-08-26),
+[FAQ](https://docs.voyageai.com/docs/faq) (2026-08-03),
+[Tokenization](https://docs.voyageai.com/docs/tokenization) (2026-01-05) and the
+[`voyageai` PyPI metadata](https://pypi.org/pypi/voyageai/json).
+
+- [EXT] `POST https://api.voyageai.com/v1/embeddings`, `Authorization: Bearer <key>`,
+  `Content-Type: application/json`.
+- [EXT] Request: `input` (string or list, at most 1,000 items; per-request token limit 1M for
+  `voyage-4-lite`), `model` (required), `input_type` (`null`, `query` or `document`; `query`
+  and `document` prepend a documented retrieval prompt), `truncation` (default `true`; `false`
+  makes an over-length input an error), `output_dimension` (`voyage-4-lite`: 256, 512, 1024
+  default, 2048), `output_dtype` (default `float`, 32-bit floats), `encoding_format` (`null`
+  for number arrays, or `base64`).
+- [EXT] Response 200: `{"object": "list", "data": [{"object": "embedding", "embedding": [...],
+  "index": n}], "model": "...", "usage": {"total_tokens": n}}`; `index` is the position in the
+  input list. 4XX bodies carry a `detail` string.
+- [EXT] `voyage-4-lite` is listed as a current model with a 32,000-token context length and a
+  1024 default dimension. The pages state no alias, version-pinning or immutability guarantee
+  for model names; `voyage-4-lite` is therefore only a **requested model identifier**.
+- [EXT] The FAQ states that Voyage embeddings are normalized to length 1; no numeric tolerance
+  is stated.
+- [EXT] Errors: 400 invalid request (malformed body, bad parameter, batch or token limit,
+  context length), 401 invalid authentication, 403 possibly blocked IP, 429 rate limit (pace
+  requests), 500 server error (retry after a brief wait), 502/503/504 heavy traffic (retry after
+  a brief wait). No backoff schedule or retry count is specified there; the rate-limit page
+  suggests exponential backoff with jitter. No rate-limit response header is documented.
+- [EXT] Tier 1 limits for `voyage-4-lite`: 16M tokens and 2,000 requests per minute.
+- [EXT] Tokenization happens server-side; the docs estimate about 5 characters per token and
+  offer counting through the SDK or a Hugging Face tokenizer.
+- [EXT] `voyageai` 0.5.0 (uploaded 2026-07-10, MIT, Python >=3.9,<3.15) requires `requests`,
+  `aiohttp`, `tenacity`, `numpy`, `aiolimiter`, `pillow`, `pydantic`, `tokenizers` and
+  `langchain-text-splitters`.
+- [OPEN] Not settled by the documentation: whether the response `model` echoes the requested
+  name exactly; whether `data` is always in input order (only `index` is documented); whether
+  a zero vector can ever be returned; whether float32 values serialized to JSON keep every
+  normalized vector within 1e-6 of unit norm after the storage contract's float32 rounding;
+  determinism across calls; the error body beyond `detail`; `Retry-After` or rate-limit
+  headers; status codes other than those listed (for example 404 or 413); the per-text context
+  length on the API reference page (only the models page states it); and the inconsistency
+  between the two pages' model lists (`voyage-code-3` versus `voyage-code-4`), which does not
+  affect `voyage-4-lite`. Prices were not re-verified and are not needed for M4f.
+
+##### M4f A. Placement and public contract
+
+[REC] Two new modules and no framework.
+
+**`packages/retrieval/evidenceguard_retrieval/voyage.py`** (pure; standard library and
+`evidenceguard_domain.embeddings` only; no `os`, `socket`, `ssl`, `http`, `urllib`, file or
+environment access, so the existing retrieval import test holds unchanged):
+
+```python
+VOYAGE_IDENTITY = EmbeddingIdentity("voyage", "voyage-4-lite", "voyage-http-v1", 1024, "l2")
+VOYAGE_HOST = "api.voyageai.com"            # used only by the transport
+VOYAGE_PATH = "/v1/embeddings"
+MAX_REQUEST_BYTES = 1_048_576               # choice
+MAX_RESPONSE_BYTES = 4_194_304              # choice
+
+class VoyageErrorCode(StrEnum): ...         # fixed codes, see D
+class VoyageError(Exception):               # message is the code; never values or causes
+    code: VoyageErrorCode
+    @property
+    def retryable(self) -> bool: ...
+
+@dataclass(frozen=True, init=False, repr=False)
+class VoyageResponse:                       # validated in __init__; repr shows the status only
+    status: int                             # exact int (not bool), 100-599
+    body: bytes                             # exact bytes; always b"" unless status == 200
+
+class VoyageTransport(Protocol):
+    def post(self, body: bytes) -> VoyageResponse: ...  # status-only value for non-200
+
+def build_request_body(texts: tuple[str, ...], input_type: InputType) -> bytes: ...
+def parse_response(response: VoyageResponse, *, input_type: InputType, count: int) -> EmbeddingBatch: ...
+
+@dataclass(frozen=True, repr=False)
+class VoyageEmbedder:                       # satisfies EmbeddingProvider
+    transport: VoyageTransport
+    @property
+    def identity(self) -> EmbeddingIdentity: ...      # always VOYAGE_IDENTITY
+    def embed(self, texts: tuple[str, ...], input_type: InputType) -> EmbeddingBatch: ...
+    # __repr__ -> "VoyageEmbedder()"
+```
+
+`embed` runs `validate_request` first and builds and checks the body; an invalid request makes
+**zero** transport calls. Once validation succeeds and the transport is reached, **at most one**
+`transport.post` call occurs, whatever its outcome; the response is then validated and parsed.
+The adapter never sees the key, headers, host or timeouts. Direct calls to the public helpers
+and constructors are validated exactly as specified in
+[M4f C2](#m4f-c2-direct-call-and-configuration-validation-prompt-155-correction-c); type
+annotations are not relied on.
+
+**`apps/worker/evidenceguard_worker/voyage_http.py`** (the only module that touches the
+network; standard library `http.client`, `ssl`, `socket`, `time`, plus `pydantic.SecretStr`
+and the retrieval module; no `os` or environment read):
+
+```python
+ConnectionFactory = Callable[[str, float, ssl.SSLContext], http.client.HTTPSConnection]
+# called as factory(VOYAGE_HOST, timeout, context); must not connect by itself
+
+class HttpsVoyageTransport:                 # satisfies VoyageTransport; repr masks the key
+    def __init__(self, api_key: SecretStr, *, connect_timeout: float = 10.0,
+                 io_timeout: float = 30.0, elapsed_budget: float = 60.0,
+                 max_response_bytes: int = MAX_RESPONSE_BYTES,
+                 connection_factory: ConnectionFactory = _https_connection,
+                 clock: Callable[[], float] = time.monotonic) -> None: ...
+    def post(self, body: bytes) -> VoyageResponse: ...
+```
+
+`connect_timeout` is the socket timeout for connection and TLS setup, `io_timeout` the socket
+timeout applied to each individual blocking send or receive wait (not to a complete
+`HTTPResponse.read()` call), and `elapsed_budget` the cooperative elapsed-time budget of
+[M4f C1](#m4f-c1-cooperative-timing-budget-prompt-155-correction-a); none of them is a hard
+deadline.
+
+Placing the transport in the worker keeps `evidenceguard_retrieval` network-free and puts it
+beside its consumers (M4c indexing, M4d retrieval and later M5); see V3.
+
+**Configuration and fingerprint.** The fingerprint is unchanged M4a code over the five
+identity fields:
+
+| Field | Value | In fingerprint |
+|---|---|---|
+| `provider_id` | `voyage` | yes |
+| `model_id` | `voyage-4-lite` (requested identifier; no immutability claimed) | yes |
+| `algorithm_version` | `voyage-http-v1` | yes |
+| `dims` | `1024` (also `output_dimension`; the stored column is fixed at 1024) | yes |
+| `normalization` | `l2` | yes |
+| endpoint path, `input_type` mapping, `truncation=false`, `output_dimension=1024`, `output_dtype="float"`, omitted `encoding_format`, request encoding and response validation rules | fixed constants | covered by `algorithm_version`: any change requires a new version and therefore a new profile |
+| key, timeouts, elapsed budget, response cap, connection factory, clock (the host and path are fixed constants) | transport arguments | **no**; operational, never stored in profiles, logged or shown |
+
+**SDK versus standard library.** [REC] Standard library (V2). The official SDK would add nine
+runtime dependencies [EXT], an internal retry library and its own HTTP stacks, all under the
+dependency-age policy, and would make transport injection and error privacy depend on SDK
+internals. The standard-library transport needs **no dependency or lockfile change**.
+
+##### M4f B. Transport and protocol
+
+**Request** (none for invalid input; at most one per `embed` otherwise): [REC]
+
+```json
+{"input": ["…", "…"], "input_type": "document", "model": "voyage-4-lite",
+ "output_dimension": 1024, "output_dtype": "float", "truncation": false}
+```
+
+- `input` is always a list (even for one text), in the caller's order, duplicates kept;
+  `input_type` is always the caller's `query` or `document`, never `null`.
+- Encoded with `json.dumps(sort_keys=True, separators=(",", ":"), ensure_ascii=True,
+  allow_nan=False)`, so the bytes are deterministic and pure ASCII; lone surrogates were
+  already rejected by `validate_request`. Worst-case escaping (`\u00XX` for control characters)
+  is 6 bytes per input byte, so 128,000 input bytes give under 800,000 bytes; the body is
+  checked against `MAX_REQUEST_BYTES` anyway (`voyage_configuration` if exceeded, which the
+  bounds make unreachable).
+- `truncation=false` means an over-length text is a provider 400, never a silently truncated
+  embedding. `encoding_format` is omitted (number arrays); base64 is not used.
+
+**HTTP** (transport): `POST /v1/embeddings` on `api.voyageai.com:443` over
+`ssl.create_default_context()` (certificate and hostname verification, TLS 1.2 minimum);
+headers exactly `Host`, `Authorization: Bearer <key>`, `Content-Type: application/json`,
+`Accept: application/json`, `Accept-Encoding: identity` (N1), `Content-Length` and a fixed
+`User-Agent: evidenceguard-voyage-http-v1`. No redirect is followed (`http.client` does not),
+no decompression is performed, no proxy or environment is consulted, no cookie or connection is
+reused across calls, and `http.client` debugging stays at its default level 0 (never
+`set_debuglevel`). The connection and response are closed after each call under
+[M4f D1](#m4f-d1-cleanup-precedence-prompt-155-correction-d).
+
+**Exchange order (Prompt 155 correction B).** Each step is a timed phase of
+[M4f C1](#m4f-c1-cooperative-timing-budget-prompt-155-correction-a):
+
+1. Connection and TLS: `factory(VOYAGE_HOST, timeout, context)` then an explicit `connect()`.
+2. Request sending: `request("POST", VOYAGE_PATH, body, headers)`.
+3. Response headers: `getresponse()`, which reads the status line and headers.
+4. Status: the status is taken from the response object after the headers. **For any status
+   other than 200 the transport never calls `response.read()` and never drains the body**; it
+   returns `VoyageResponse(status, b"")` (status only), and then closes the response and the
+   connection. A non-200 body, an oversized or malformed `Content-Length`, or a failure that a
+   body read would have produced therefore cannot replace the status classification, because
+   the body is never read. The adapter maps the status to the fixed code in D.
+5. 200 only: framing and size metadata are validated (below), then the body is read with the
+   bounded loop of [the 200 body read](#200-body-read-prompt-156-clarifications-a-and-b), each
+   read a separate timed phase.
+6. A final elapsed-time check; only then is `VoyageResponse(200, body)` returned.
+
+**200 framing and size metadata** (N2; checked on the parsed header object that `http.client`
+already provides, with no custom HTTP parser). The standard library parses `Content-Length`
+leniently (an invalid value becomes "unknown" and only the first header is used), so the
+transport reads the raw values with `headers.get_all(...)` itself:
+
+- `Transfer-Encoding`: absent, or exactly one value equal to `chunked` (ASCII
+  case-insensitive). Any other value, or `chunked` together with any `Content-Length`, is
+  contradictory framing: `voyage_malformed_response`.
+- Without `Transfer-Encoding`: exactly one `Content-Length` value of 1–20 ASCII digits.
+  Missing (close-delimited body), repeated (even if equal), empty, signed, non-digit or
+  otherwise malformed values are `voyage_malformed_response`; a value above
+  `max_response_bytes` is `voyage_response_too_large`, refused before reading.
+- `Content-Encoding`: absent or exactly `identity`; anything else (for example `gzip`) is
+  `voyage_malformed_response`. No decompression is ever attempted.
+- A body shorter than its declared length is detected **explicitly** by the read loop below
+  (an empty read before the declared length is reached), not by relying on `IncompleteRead`;
+  it is `voyage_transport_failed`, and any `IncompleteRead` that is raised maps to the same
+  code. More accepted bytes than the cap is `voyage_response_too_large`.
+- `Content-Type` is not required or interpreted; the JSON validation below decides.
+
+###### 200 body read (Prompt 156 clarifications A and B)
+
+No chunk parser and no private socket access; `http.client` decodes chunked framing.
+
+```python
+total = 0
+pieces = []
+while True:
+    if declared is not None:            # Content-Length framing (validated, <= cap)
+        wanted = min(PIECE, declared - total)
+        if wanted == 0:
+            break                       # declared length reached: no further read
+    else:                               # chunked framing, decoded by http.client
+        wanted = min(PIECE, cap + 1 - total)
+    check_budget_before()               # C1 step 1; voyage_timeout if exhausted
+    sock = connection.sock              # public attribute; may be None after getresponse()
+    if sock is not None:
+        sock.settimeout(min(io_timeout, remaining()))
+    piece = response.read(wanted)       # one bounded read
+    check_budget_after()                # C1 step 3
+    if type(piece) is not bytes or len(piece) > wanted:
+        fail(voyage_transport_failed)   # N11
+    if piece == b"":
+        if declared is not None:
+            fail(voyage_transport_failed)   # early EOF before the declared length
+        break                           # end of the decoded chunked body
+    total += len(piece)
+    if total > cap:
+        fail(voyage_response_too_large) # only reachable for chunked framing
+    pieces.append(piece)
+body = b"".join(pieces)
+```
+
+- `PIECE` is 64 KiB (N10). With `Content-Length`, each read requests at most the remaining
+  declared length, so no read is issued once the declared length is satisfied; with chunked
+  framing, each read requests at most one byte more than the cap allows, so an oversized body
+  is detected after at most `cap + 1` decoded bytes.
+- The loop cannot spin on empty reads: every iteration either adds at least one byte (bounded
+  by the declared length or the cap) or ends at the first `b""`.
+- Multiple short nonempty reads are accepted until the exact declared length is supplied.
+- An `IncompleteRead` or other ordinary exception from `read()` is `voyage_transport_failed`,
+  and a socket timeout `voyage_timeout`, under D1.
+- **Socket ownership (B).** `getresponse()` may close the connection and set
+  `connection.sock` to `None` when the response will close (for example `Connection: close`),
+  while the response remains readable [PY]. The transport therefore never assumes
+  `connection.sock` exists after the header phase: it reduces the timeout through the public
+  `connection.sock` only when that attribute is not `None` (N12). When it is `None`, the
+  transport does not access `response.fp` or any other private socket internal, does not
+  reconnect, and does not fail merely because the public socket is absent; the response keeps
+  the socket timeout applied before the header phase, while the cooperative elapsed checks
+  still run before and after each read.
+
+**Headers versus retained metadata.** `http.client` necessarily parses the status line and
+every response header into temporary objects (bounded by its own 65,536-byte line and 100-header
+limits). The transport reads only the status, `Transfer-Encoding`, `Content-Length` and
+`Content-Encoding` values for the decisions above; it copies no header into `VoyageResponse`,
+an error or a log, and the response object is discarded at cleanup.
+
+**Response validation** (`parse_response`, in this order; the first failure wins):
+
+1. Value and status: the complete `VoyageResponse` is revalidated first (exact type,
+   reconstructed from its fields; see C2). A non-200 value with a nonempty body is
+   `voyage_malformed_response` (N5). Only a valid status-only non-200 value proceeds to the
+   status classification in D; only a valid 200 value proceeds to step 2. The real transport
+   never reads a non-200 body, so it always supplies `b""` for one.
+2. Size: `len(body) <= MAX_RESPONSE_BYTES` (rechecked even though the transport bounds it).
+3. JSON: strict UTF-8 decode; `json.loads` with a `parse_constant` that rejects `NaN`,
+   `Infinity` and `-Infinity` and an `object_pairs_hook` that rejects duplicate keys; any
+   decoder failure, including recursion depth, is `voyage_malformed_response`.
+4. Top level: an object with `object == "list"`, `data` a list, `model` a string and `usage` an
+   object.
+5. Identity: `model` must equal `"voyage-4-lite"` exactly (V6), else
+   `voyage_malformed_response`. It is then discarded.
+6. Cardinality and order: `len(data)` equals the request count (no missing or extra rows);
+   every item is an object with `object == "embedding"`, a strict-int `index` (not `bool`) and
+   a list `embedding`; the indexes are exactly `{0, …, count-1}` with no duplicate; vectors are
+   placed by `index` (V7). Placing by the documented `index` is not a correction.
+7. Coordinates: each `embedding` has exactly 1024 elements, each a strict `int` or `float` (not
+   `bool`, string or `None`) and finite (`json` turns `1e400` into infinity, so finiteness is
+   checked explicitly). An integer too large to convert to `float` (where `OverflowError`
+   would be raised by the finiteness check) is caught as an ordinary failure and is
+   `voyage_malformed_response`; a JSON integer longer than Python's integer-string digit limit
+   already fails in the decoder (step 3). Vectors become tuples without conversion or rounding.
+8. Usage: `usage.total_tokens` must be a strict `int` (not `bool`), 0 ≤ value ≤ 2^63 − 1 (N3),
+   and becomes `EmbeddingUsage(input_tokens=total_tokens)`; any other value is
+   `voyage_malformed_response`.
+9. Construction: `EmbeddingBatch(VOYAGE_IDENTITY, input_type, vectors, usage)` applies the M4a
+   rules; an `InvalidEmbeddingError` here (dimension, non-finite norm, norm outside 1e-6 of 1,
+   or any zero vector, since `provider_id != "offline"`) becomes `voyage_invalid_vector`.
+
+**Normalization and zero vectors.** [REC] Consistent with M4a and storage: no
+renormalization, scaling, rounding or zero substitution anywhere in the adapter. [EXT] Voyage
+documents unit-length output; M4a checks it in float64 and `canonical_vector` re-checks it
+after float32 rounding. A vector that fails either check is rejected, never corrected
+([OPEN]: whether live output always passes is M7 evidence). Zero vectors are always rejected,
+by M4a, by storage (`allows_zero=false`) and by the database check.
+
+**Untrusted metadata.** Retained in the returned batch: only `usage.total_tokens` (as
+`EmbeddingUsage`) and the validated vectors. Validated then discarded: `object` markers,
+`model`, `index`. Unknown keys at the top level and in items (V8) are parsed temporarily by
+`json.loads` but are not retained in the returned batch or in any error. Response headers are
+parsed temporarily by `http.client` and only the framing values above are inspected; none is
+retained. A non-200 body is never read. Nothing from a response appears in a public error,
+default representation or log.
+
+##### M4f C. Bounds and resource use
+
+| Bound | Provider documentation [EXT] | Application value |
+|---|---|---|
+| Texts per call | at most 1,000 | 1–32 ([DECISION] M4a); M4c pages ≤32, M4d 1–8 queries |
+| Text size | 32,000-token context for `voyage-4-lite`; tokens counted server-side | ≤4,000 code points and ≤16,000 UTF-8 bytes each ([DECISION] M4a); over-context inputs fail with 400 because `truncation=false` |
+| Batch size | 1M tokens per request for `voyage-4-lite` | ≤128,000 UTF-8 bytes ([DECISION] M4a; M4c page prefix the same) |
+| Request body | not documented | ≤1 MiB, checked (choice) |
+| Response body | not documented | ≤4 MiB (choice): 32 × 1024 JSON floats is roughly 0.8 MB |
+| Connect timeout / socket I/O timeout / cooperative elapsed budget | not documented | 10 s / 30 s / 60 s (choices approved in V10; the budget is cooperative, not a hard deadline; see C1) |
+| Calls per `embed` | — | 0 for an invalid request; at most 1 once validation succeeds and the transport is reached; no pagination, no splitting, no internal retry (V9) |
+| Rate | Tier 1: 16M TPM, 2,000 RPM | no client-side limiter; the worker runs one handler and one call at a time |
+
+- For a 200 response the transport reads the body in pieces of at most 64 KiB and refuses as
+  soon as more than `max_response_bytes` would be accepted; a declared `Content-Length` above
+  the cap is refused before reading. Non-200 bodies are not read at all (B).
+- **Memory.** The cap bounds the **accepted raw response bytes** only. UTF-8 decoding, JSON
+  parsing, temporary Python objects (including unknown fields and decoded strings), the
+  standard library's own buffers and header objects, and tuple construction all consume
+  additional memory. No peak-memory figure is claimed or established; in particular, peak
+  memory is not claimed to equal the raw cap plus the final vectors.
+- **Timing** is the cooperative budget of C1, not a hard deadline.
+- No token counting is done locally (it would need a tokenizer dependency). [REC] The
+  application byte bounds make an over-limit request unlikely but are not a documented
+  guarantee; any provider limit error is a fixed non-retryable failure, never truncation.
+- Indexing calls per attempt are bounded by the existing M4c paging (at most 4,096 chunks per
+  revision and at least eight chunks per full page under the 128,000-byte prefix); job attempts
+  are bounded by the existing M3a attempt limit. Retrieval makes one call per
+  `search_snapshot`.
+
+**Retries.** [REC] **No internal retries** (V9): at most one transport attempt per `embed`.
+Durable retry belongs to the M3 job lifecycle, and the cancellation and lease checks run only at
+the handler's explicit boundaries, so an adapter that slept and retried inside one call would
+delay those checks and multiply provider calls. The error's `retryable` flag records the
+classification for callers; it causes no retry by itself.
+
+##### M4f C1. Cooperative timing budget (Prompt 155 correction A)
+
+V10's numbers are approved as engineering choices with this interpretation:
+
+- **Connect timeout 10 s:** the socket timeout during connection and TLS setup.
+- **Socket I/O timeout 30 s:** the socket timeout for each individual blocking send or
+  receive wait after connection. It is **not** a limit on a complete `getresponse()` or
+  `HTTPResponse.read()` call, which may perform many waits internally.
+- **Cooperative elapsed-time budget 60 s:** measured with the injected monotonic clock from the
+  start of `post`.
+
+Algorithm (no watchdog thread, background worker, custom HTTP parser or new dependency):
+
+1. Record `start = clock()`. Before each controllable blocking phase (connection and TLS,
+   request sending, response headers, and each body read), compute
+   `remaining = elapsed_budget - (clock() - start)`. If `remaining <= 0`, **do not start the
+   phase**; the outcome is `voyage_timeout`.
+2. Apply `min(phase timeout, remaining)` as the timeout where the API permits: the factory's
+   `timeout` argument for connection and TLS (the connect timeout), then
+   `connection.sock.settimeout(...)` on the connected socket before sending and before
+   `getresponse()` (the I/O timeout). Before each body read the timeout is reduced again
+   **only if the public `connection.sock` is still available**; after `getresponse()` it may be
+   `None`, and the read then uses the timeout applied before the header phase (see
+   [the 200 body read](#200-body-read-prompt-156-clarifications-a-and-b)). Not every body read
+   is guaranteed a newly reduced socket timeout.
+3. After each phase returns, recheck elapsed time; if the budget has expired, stop with
+   `voyage_timeout` even though the phase itself succeeded (except as in step 4 for a status
+   already known to be non-200).
+4. Recheck once more immediately before returning a 200 response. **No success is returned
+   once the budget has expired.** A status-only non-200 value, once its status is known, is
+   still returned after expiry, because it is not a success and needs no further I/O; its
+   status classification is kept (N4).
+5. A socket timeout (`TimeoutError`, including `socket.timeout`) in any phase is
+   `voyage_timeout`. A clock value that is not a finite real number is `voyage_configuration`
+   (C2).
+
+**Disclosed limits.** This is a cooperative budget, not a hard wall-clock maximum:
+
+- it cannot interrupt an in-progress standard-library operation;
+- DNS resolution, multiple connection attempts (one per resolved address, each with its own
+  timeout), TLS handshakes, header parsing and the internal buffered or chunked read loops of
+  `getresponse()` and `read()` can run past the budget, for example while a peer sends data
+  slowly;
+- socket timeouts bound individual blocking waits, not the complete call;
+- when `getresponse()` has released the public connection socket, body reads keep the socket
+  timeout applied before the header phase, which further limits how closely a body read can
+  follow the remaining elapsed budget;
+- cleanup (D1) is not given any deadline;
+- **no hard wall-clock maximum is established** for a call. A hard deadline would need a
+  separately reviewed transport design before any deployment that depends on one.
+
+##### M4f C2. Direct-call and configuration validation (Prompt 155 correction C)
+
+The adapter, its helpers and the transport are public and explicitly constructible, so each
+validates its own arguments with exact type checks (`type(x) is ...`, so `bool` never passes as
+`int`). The taxonomy stays small: M4a's `InvalidEmbeddingError` for invalid embedding
+requests, and the existing `VoyageError` codes for everything else.
+
+| Category | Rule | Outcome |
+|---|---|---|
+| `embed` and `build_request_body` texts and `input_type` | M4a `validate_request` | `InvalidEmbeddingError`; zero transport calls |
+| Encoded body larger than `MAX_REQUEST_BYTES` | checked after encoding | `voyage_configuration`; zero transport calls (unreachable within the M4a bounds) |
+| `parse_response` `input_type` | exactly `"query"` or `"document"` | `InvalidEmbeddingError` |
+| `parse_response` `count` | exact `int`, 1–32 (`True` and out-of-range values rejected) | `InvalidEmbeddingError` |
+| `VoyageResponse(status, body)` construction, and re-validation of any value received | `status`: exact `int`, 100–599; `body`: exact `bytes`; a non-200 status must have `b""` | `voyage_malformed_response` (N5) |
+| `parse_response` response argument, or the injected transport's return value | must be exactly a `VoyageResponse`; it is reconstructed from its fields to reject bypassed values | `voyage_malformed_response` |
+| JSON decoder failures (`UnicodeDecodeError`, `ValueError`, `RecursionError`, rejected constants or duplicate keys) | step 3 | `voyage_malformed_response` |
+| Huge integer coordinates (`OverflowError` in the finiteness check) | step 7 | `voyage_malformed_response` |
+| Invalid usage | step 8 | `voyage_malformed_response` |
+| `VoyageEmbedder(transport)` | an object with a callable `post` attribute | `voyage_configuration` |
+| `api_key` | exactly `pydantic.SecretStr`; its value an exact `str` of 1–256 characters, each visible ASCII (0x21–0x7E) | `voyage_configuration` |
+| `connect_timeout`, `io_timeout`, `elapsed_budget` | exact `int` or `float` (not `bool`), finite (no NaN or infinity), 0 < value ≤ 600 (N6) | `voyage_configuration` |
+| `max_response_bytes` | exact `int` (not `bool`), 1 ≤ value ≤ `MAX_RESPONSE_BYTES` | `voyage_configuration` |
+| `connection_factory`, `clock` | callable | `voyage_configuration` |
+| A clock result | exact `int` or `float`, finite | `voyage_configuration` at call time (N7) |
+| A connection-factory result or method failing with an ordinary `Exception` | — | `voyage_transport_failed` |
+
+**Precedence inside `embed`:** M4a request validation, then body encoding and its size check,
+then at most one `post`, then validation of the returned value, then the status mapping, then
+`parse_response` steps 2–9. Transport construction errors arise when the transport is built,
+before any call. The first failing step determines the outcome; no later step runs.
+
+##### M4f D. Errors and privacy
+
+[REC] One exception type, `VoyageError(Exception)`. Its message and only argument are the fixed
+code string; its only public attributes are the safe `code` (a `VoyageErrorCode`) and
+`retryable` (a `bool` derived from the code). It carries no submitted value, header, body,
+note, cause or context.
+
+| Code | Raised for | Retryable |
+|---|---|---|
+| `voyage_configuration` | the configuration and argument rules in C2 (key, timeouts, budget, cap, factory, clock, transport object), an invalid clock result, an oversized request body | no |
+| `voyage_authentication` | 401, 403 | no |
+| `voyage_request_rejected` | 400 and any other 4XX except 401, 403 and 429 | no |
+| `voyage_rate_limited` | 429 | yes |
+| `voyage_server_error` | 500, 502, 503, 504 and any other 5XX | yes |
+| `voyage_unexpected_status` | any status other than 200, 4XX or 5XX (for example 1XX, 204 or 3XX) | no |
+| `voyage_timeout` | a socket timeout in any phase, or the cooperative budget exhausted before a phase or found expired after one (C1) | yes |
+| `voyage_transport_failed` | DNS, connection, TLS, reset or protocol failure; a short 200 body detected by the read loop (early `b""`) or an `IncompleteRead`; a read returning a non-`bytes` value or more than requested; another body-read failure; or any other ordinary `Exception` raised by an injected transport, connection or `http.client`, whatever its chain contains | yes |
+| `voyage_response_too_large` | a 200 response's declared `Content-Length` or accepted body bytes above the cap, and step 2 of the response validation | no |
+| `voyage_malformed_response` | an invalid `VoyageResponse` or transport return value (C2), contradictory or malformed 200 framing or an unsupported `Content-Encoding` (B), and steps 3–8 of the response validation | no |
+| `voyage_invalid_vector` | step 9 | no |
+
+- **Privacy.** Public errors are fresh `VoyageError` instances created from a recorded fixed
+  code and raised outside every `except` block, so their `__cause__` and `__context__` are
+  `None`. A `VoyageError` raised by an injected transport is re-raised **fresh** with the same
+  code. Ordinary exception objects are classified by their own type only (never by inspecting
+  `__cause__`, `__context__` or chains), kept at most as transient local control-flow state, and
+  never attached to a public error. The key, headers, texts, bodies, `detail`, socket or SSL
+  messages and exception text are never put into a public error, default representation or
+  log; `SecretStr` masks the key in `repr`, and the transport's and adapter's representations
+  are fixed strings. Nothing logs, and `http.client` debugging stays disabled.
+- **Scope of the privacy guarantee.** It covers ordinary public errors, default
+  representations, default formatted tracebacks of those public errors, and logs. It does
+  **not** promise secrecy against trusted code that inspects frame locals, the transport's
+  held key, or the explicitly held response body of a `VoyageResponse`.
+- **Process control.** Only `Exception` is caught for classification. A `KeyboardInterrupt`,
+  `SystemExit` or other non-`Exception` `BaseException` **that escapes into adapter-owned code**
+  propagates as the **same object** under the first-outcome rule of D1; its original message
+  and traceback are preserved as they are and are **not** claimed to be sanitized. This is
+  scoped to observable boundaries; see the residual limitation in D1.
+- **M4a and M4c boundary (unchanged; incompatibility disclosed, V11).** Through
+  `embed_validated`, every `VoyageError` becomes `InvalidEmbeddingError`, so the M4c handler
+  records `permanent_failure` for every provider failure, **including rate limits, timeouts and
+  server errors**, and the index stalls with no M4c recovery. The retryability classification is
+  therefore lost at today's boundary. M4f does not silently change `embed_validated`, M4c's
+  `_embed` or the M3 job codes; because nothing registers Voyage in production, the effect is
+  confined to explicitly constructed handlers in tests. Mapping retryable provider failures to
+  `RetryableJobError` needs a separately reviewed change to the M4a/M4c contract, and must be
+  decided before any live indexing. Cancellation and lease loss keep precedence through the
+  existing `ctx.check()` before classification.
+- **M4d boundary (unchanged).** Every `VoyageError` becomes `retrieval_provider_failed`, which is
+  compatible with M4d's fixed-error contract but carries no retryability. **M5 still owns job
+  cancellation and lease precedence, and any retry policy, for retrieval orchestration.**
+
+##### M4f D1. Cleanup precedence (Prompt 155 correction D)
+
+`post` runs its phases, then cleans up the response and the connection **separately**, each in
+its own `try` where the object exists, so an ordinary response-close failure never prevents the
+connection close. (`getresponse()` may already have closed the connection itself [PY]; closing
+again is harmless.)
+
+**Scope (Prompt 156 clarification C).** D1 preserves the first process-control exception that
+**actually escapes into adapter-owned code** from a call the adapter makes: the connection
+factory, a connection method (`connect`, `request`, `getresponse`, `close`), a response method
+(`read`, `close`), the clock or an explicit cleanup call. It preserves that same object through
+all subsequent adapter-owned cleanup. It does **not** guarantee recovery of a process-control
+exception that `http.client` or another dependency has already masked before returning control:
+for example, `getresponse()` closes internally when `begin()` fails, and an exception from that
+internal close replaces the original [PY]. An ordinary exception that escapes in that way is
+classified by its own type only and becomes `voyage_transport_failed`, **regardless of any
+process-control exception in its cause or context**; no exception chain is ever inspected to
+reconstruct one.
+
+**Operation failures versus adapter-owned cleanup (Prompt 157 clarification).**
+
+- An ordinary exception escaping an **operation** (the factory, `connect`, `request`,
+  `getresponse()`, `read()` or the clock) is classified by its own type and sanitized to its
+  fixed code, without inspecting its cause or context.
+- A failure from cleanup **internal to** `getresponse()` (or another `http.client` operation) is
+  observed only as that operation's escaping failure and is classified as such; it is not
+  adapter-owned cleanup.
+- An ordinary failure of the **adapter-owned** response close or connection close in D1 is
+  ignored, even if its cause or context contains a `KeyboardInterrupt` or `SystemExit`: if the
+  operation succeeded, success is unchanged; if the operation failed, its existing fixed
+  outcome is preserved.
+- An actual non-`Exception` `BaseException` escaping adapter-owned cleanup still takes
+  precedence as specified below. This residual limitation stays with the simple standard-library transport
+(no custom HTTP parser, `HTTPResponse` subclass, watchdog or dependency is added). Live use that
+needs a stronger process-control guarantee requires a separately reviewed transport design
+first. Fake-method tests prove preservation at these observable call boundaries only, not inside
+every internal standard-library operation.
+
+The first-outcome rule:
+
+```python
+control = None          # first non-Exception BaseException, kept as the same object
+failure = None          # fixed VoyageErrorCode of the first ordinary operation failure
+result = None
+try:
+    result = run_phases()               # connection, send, headers, status, 200 body (B, C1)
+except Exception as error:              # classified by type only; never by chain
+    failure = classify(error)           # error is not stored beyond this assignment
+except BaseException as error:          # process control
+    control = error
+for close in (close_response, close_connection):
+    try:
+        close()
+    except Exception:
+        pass                            # ordinary cleanup failure: never changes the outcome
+    except BaseException as error:
+        if control is None:
+            control = error             # cleanup process control beats an ordinary failure
+if control is not None:
+    raise control                       # the same object, outside every handler
+if failure is not None:
+    raise VoyageError(failure)          # fresh, outside every handler
+return result
+```
+
+- The first recorded process-control object (one that escaped into adapter-owned code) is
+  re-raised after cleanup, even if a later
+  cleanup step raises another process-control or ordinary exception.
+- Process control from cleanup takes precedence over an ordinary operation failure.
+- If the operation failed ordinarily, its fixed code is preserved when ordinary cleanup also
+  fails (one or both closes).
+- If the operation succeeded, ordinary cleanup failures are ignored and the result is
+  returned; process control from cleanup still propagates.
+- Cleanup has no deadline (C1). The adapter applies the same pattern around its single `post`
+  call: a `VoyageError` from the transport becomes a fresh `VoyageError` with the same code,
+  any other `Exception` becomes `voyage_transport_failed`, and process control propagates as
+  the same object.
+
+##### M4f E. Configuration and activation
+
+- [REC] **Explicitly constructed adapter only** (V1): `VoyageEmbedder(HttpsVoyageTransport(key))`
+  built by trusted code. No change to `SUPPORTED_PROVIDERS`, `production_registry`,
+  `eg-admin`, `eg-worker`, `eg-api`, settings, `.env.example`, Compose, the container smoke or
+  any default. The production worker therefore cannot index or search with Voyage; a Voyage
+  profile created through the trusted `enqueue_index_revision` seam still ends as M4c's
+  existing unsupported-profile permanent failure. Offline hashing stays the only production
+  provider; no automatic indexing, CLI or API is added.
+- **Alternative (not recommended for M4f):** register Voyage in the production mapping with a
+  key from new settings. That would make live calls possible from a stored profile, require a
+  key in deployments, read new environment state at worker start, change `eg-worker`
+  behaviour, require the M4c retryability change above, and require a data-handling decision
+  for sending vendor text to a third party ([EXT] the FAQ describes an opt-out for training use
+  and retention). It must be a separate review decision (expected with M7 live evaluation).
+- **Credential seam** (V12): the key is an explicit `SecretStr` constructor argument of the
+  transport, validated as above and used only to build the `Authorization` header inside
+  `post`. It is never part of the identity or fingerprint, never stored on the adapter, never
+  in a representation, error, log, test or CI. M4f reads no environment variable; how an
+  operator supplies the key for live use is part of the later live-wiring decision.
+- No key is needed for ordinary tests or CI; test placeholders are obviously fake (for example
+  `test-only-not-a-real-key`).
+
+##### M4f F. Tests and acceptance (planned, not written or run)
+
+All new tests are database-independent unless marked PostgreSQL, and none uses the network.
+
+- **Network guard.** An autouse fixture in each new test module replaces `socket.socket.connect`,
+  `socket.create_connection` and `socket.getaddrinfo` with functions that fail the test; the
+  transport tests use an injected fake `connection_factory`, so no socket is created.
+- **Adapter (`tests/test_voyage_adapter.py`, fake `VoyageTransport`):** a literal pinned
+  `VOYAGE_IDENTITY` fingerprint computed independently of the implementation; exact request
+  bytes for `document` and `query`, one and 32 texts, non-ASCII, supplementary and control
+  characters and duplicates; invalid requests never reach the transport; valid responses in
+  order and permuted, integer coordinates and usage mapping; every malformed case (non-JSON,
+  invalid UTF-8, `NaN`/`Infinity` literals, `1e400`, duplicate keys, wrong `object` markers,
+  missing/extra/duplicate/out-of-range/`bool` indexes, too few or too many rows, wrong or
+  missing `model`, wrong dimension, string/`None`/`bool` coordinates, missing or negative or
+  `bool` usage, deep nesting); vectors with norm outside 1e-6, a zero vector, and an
+  M4a-valid vector that fails float32 storage (`0.999999001`) through `stored_embeddings`;
+  every status in the table, including unlisted 4XX/5XX and 1XX/204/3XX; an oversized body;
+  **zero** transport calls for every invalid request and **at most one** call once the
+  transport is reached (a counting fake); `embed_validated` turning each `VoyageError` into
+  `InvalidEmbeddingError` (the current boundary).
+- **Direct calls and configuration (C2):** `VoyageResponse` with `True`/`False`, float,
+  out-of-range and non-int statuses, `bytearray`/`str`/`memoryview` bodies and a non-200 status
+  with a non-empty body; a bypassed `VoyageResponse` built with `object.__setattr__`;
+  `parse_response` with a non-`VoyageResponse`, invalid `input_type`, and `count` of `True`, 0,
+  33, a float or a string; `build_request_body` and `embed` with every M4a request violation; a
+  transport returning `None`, a dict, a subclass instance or a tuple; huge integer coordinates
+  (`OverflowError`) and over-long integer literals; usage of `True`, −1, 2^63, a float or a
+  string; `VoyageEmbedder` with an object lacking a callable `post`; the transport with a plain
+  `str` key, non-`str` secret, empty, 257-character, space, CR, LF, tab and non-ASCII keys;
+  timeouts and budget of `True`, 0, negative, NaN, ±infinity, 601 and strings; caps of `True`,
+  0, `MAX_RESPONSE_BYTES + 1` and floats; non-callable factory and clock; and clock results of
+  NaN, infinity, `None` and strings. Each maps to its C2 outcome with the fixed code only.
+- **Transport (`tests/test_voyage_http.py`, fake connections and clock):** method, path, host,
+  exact headers (including `Accept-Encoding: identity`) and body; TLS context with
+  `CERT_REQUIRED` and hostname checking; `TimeoutError` in each phase as `voyage_timeout`;
+  `OSError`, `ssl.SSLError` and `http.client.HTTPException` (including `IncompleteRead`) as
+  `voyage_transport_failed`; 3XX not followed; no decompression; `set_debuglevel` never
+  called; response and connection both closed after every call.
+- **Status before body (B):** 429, 401 and 503 fakes whose `read()` raises if called: `read()`
+  is never called and the status mapping wins; a non-200 response advertising a huge or
+  malformed `Content-Length`, or `chunked` with a broken body, still maps by status without any
+  read; 200 responses with a missing, repeated, empty, signed or non-digit `Content-Length`,
+  `chunked` plus `Content-Length`, an unsupported `Transfer-Encoding`, a `gzip`
+  `Content-Encoding`, a declared length above the cap, a chunked body exceeding the cap and a
+  short body are each refused with their fixed code and no body content in the error.
+- **Cooperative budget (C1, fake clock):** a budget exhausted before each phase (connection,
+  request sending, response headers, each body read) means that phase's fake is never called;
+  a phase returning after expiry yields `voyage_timeout`, never success, for 200 responses; a
+  late non-200 status keeps its status code (N4); the applied timeout is `min(phase timeout,
+  remaining)`, observed through the factory argument and each `settimeout` call; request
+  sending and response headers are included as phases. These tests only show the cooperative
+  checks; a fake that returns late does **not** show that a real blocked socket operation is
+  interrupted, and no such claim is made.
+- **Short bodies (Prompt 156 A):** a declared length of five with only three bytes followed by
+  `b""`, from a fake whose bounded `read` never raises `IncompleteRead`, is
+  `voyage_transport_failed`; early `b""` on the first read; multiple short nonempty reads that
+  eventually supply the exact declared length succeed; no further `read` call once the declared
+  length is satisfied (a counting fake); every requested size is at most
+  `min(64 KiB, remaining declared length)`; a read returning more than requested or a
+  non-`bytes` value; a raised `IncompleteRead` mapping to the same code; budget checks before
+  and after every read.
+- **Socket ownership (Prompt 156 B):** a correctly framed `Connection: close` response whose
+  fake `getresponse()` sets `connection.sock` to `None` succeeds with both `Content-Length` and
+  chunked framing; no `settimeout` is attempted on the absent socket and the timeout applied
+  before the header phase is the last one recorded; a late completion is still refused by the
+  post-read elapsed check; no reconnect (the factory and `connect` are called once) and no
+  access to `response.fp` or other private attributes (a fake that fails on any such access).
+- **Process-control scope (Prompt 156 C, as clarified in Prompt 157):** an ordinary exception
+  whose `__cause__` or `__context__` is a `KeyboardInterrupt` or `SystemExit`, raised by the
+  `getresponse()` or `read()` **operation** (including a `getresponse()` fake that simulates a
+  failure from its own internal cleanup), remains an ordinary sanitized
+  `voyage_transport_failed`; the same kind of ordinary exception raised by the
+  **adapter-owned** response close or connection close is ignored under D1, leaving a
+  successful result unchanged and preserving a failed operation's existing fixed code; a real
+  process-control exception escaping adapter-owned cleanup still takes precedence; and a
+  process-control exception escaping a fake method survives both adapter-owned cleanup
+  failures as the same object. These are observable-boundary tests only.
+- **Status-only values (Prompt 156 D):** a non-200 `VoyageResponse` with a nonempty body, built
+  directly, bypassed or returned by a fake transport, is `voyage_malformed_response` before any
+  status classification.
+- **Cleanup matrix (D1, still required):** an ordinary operation failure combined with an ordinary response-close
+  failure, connection-close failure and both (the operation's code wins each time); process
+  control (`KeyboardInterrupt` and `SystemExit`) from the connection, request sending,
+  headers, body reads, the clock, response close and connection close; process control
+  followed by an ordinary cleanup failure; two cleanup failures; a successful operation with an
+  ordinary cleanup failure (success returned); a first process-control object retained when a
+  later cleanup raises another process-control exception (the first is re-raised, by
+  identity); a response-close failure not preventing the connection close.
+- **Privacy (both files):** canary text, key, `detail`, body, header and exception-message
+  values never appear in a public error's `str`, `repr`, `args`, `__cause__`, `__context__` or
+  `traceback.format_exception` output, in default representations, in captured stdout and
+  stderr (`capsys`) or in captured log records (`caplog`); public errors have `None` cause and
+  context. Process-control objects are checked for identity only, not for sanitized content.
+- **Integration with existing contracts (database-independent):** `make_index_revision_handler`
+  built with `{VOYAGE_IDENTITY.fingerprint: lambda: VoyageEmbedder(fake)}` and the existing
+  handler doubles: success writes canonical rows; each `VoyageError` ends as
+  `permanent_failure`; a cancellation or lease loss latched during the call wins over
+  classification. `search_snapshot` with a fake-transport `VoyageEmbedder`: success, each failure
+  as `retrieval_provider_failed`, process control propagating.
+- **PostgreSQL (two cases, `tests/test_voyage_postgres.py`):** a fake transport that answers
+  with deterministic nonzero unit vectors (for example derived from the offline hash of each
+  input, rejecting all-zero cases) indexes a revision through the real handler to a ready index
+  with `allows_zero_vectors = false`; then capture and `search_snapshot` with the same mocked
+  provider return bounded results. These prove storage and retrieval wiring only.
+- **Packaging (`tests/test_packaging.py`):** `voyage.py` imports only the standard library and
+  the domain, and none of `os`, `socket`, `ssl`, `http`, `urllib`; `voyage_http.py` imports no
+  `os`, `requests`, `httpx`, `aiohttp` or `voyageai`; production `SUPPORTED_PROVIDERS` still
+  contains only `HASH_IDENTITY`; the registry kinds and entry points are unchanged.
+- **Installed wheel (V13, one narrowly scoped workflow change):** one added `python -I -c` line
+  in the existing installed-wheel step that imports both modules, runs `VoyageEmbedder` with an
+  in-memory fake transport returning one canned 1024-dimensional unit vector, checks the batch
+  and fingerprint and that `SUPPORTED_PROVIDERS` is unchanged, and prints `Voyage adapter
+  validated a mocked response from the installed wheel`. No network, key or database.
+
+**Required for M4f acceptance:** Ruff format and lint, strict mypy, the full suite on Ubuntu and
+Windows, the PostgreSQL job including the new cases, both builds with the extended
+installed-wheel step, the unchanged container job, full-history Gitleaks, and a diff review
+confirming no dependency, lockfile, settings, registry, migration, Docker or Compose change.
+**Mocked tests establish the adapter's request formation, validation, bounds, cooperative
+timing checks, error mapping and the stated privacy scope only; they establish no hard deadline
+and make no live semantic-quality, latency, cost or production-readiness claim. Live evaluation
+remains M7.**
+
+##### M4f G. Scope and intended files
+
+- New: `packages/retrieval/evidenceguard_retrieval/voyage.py`,
+  `apps/worker/evidenceguard_worker/voyage_http.py`, `tests/test_voyage_adapter.py`,
+  `tests/test_voyage_http.py`, `tests/test_voyage_postgres.py`, and with the implementation
+  `docs/decisions/0018-voyage-adapter.md`.
+- Changed: `tests/test_packaging.py`; `.github/workflows/ci.yml` (one wheel line, only if V13
+  is accepted); README, plan, threat model and prompt history.
+- **Unchanged:** `pyproject.toml` and `uv.lock` (no dependency), settings and `.env.example`,
+  `evidenceguard_domain.embeddings`, `embedding_storage`, `evidenceguard_retrieval.embeddings`
+  (`embed_validated`), `evidenceguard_worker.indexing`, `handlers.py`, `retrieval.py`,
+  persistence, migrations, `eg-admin`, Dockerfile, Compose and the container smoke. **No
+  existing error mapping changes** (V11).
+
+##### M4f review decisions (settled at acceptance, Prompt 157)
+
+**Review outcome (Prompt 155).** The external review of Prompt 154 **approved V1–V9 and
+V11–V15**, subject to the Prompt 155 corrections A–D, and **approved V10's numerical defaults
+as engineering choices** with its timing guarantees reinterpreted as the cooperative budget of
+[M4f C1](#m4f-c1-cooperative-timing-budget-prompt-155-correction-a). The text of each choice
+below is kept as originally proposed in Prompt 154, with V9 and V10 annotated. These approvals
+settled design choices only; at that point (historical) the complete specification, including
+the new details N1–N9, still awaited review. None of them is evidence of live Voyage behaviour.
+
+**Review outcome (Prompt 156).** The external review of Prompt 155 **approved N1–N9** subject to
+the Prompt 156 clarifications (short-body detection, socket ownership, process-control scope and
+status-only values); V1–V15 remain settled as previously qualified. At that point
+(historical) the complete specification, including N10–N13, still awaited review.
+
+**Acceptance (Prompt 157).** The external reviewer **accepted the complete M4f specification**,
+including V1–V15 and N1–N13 as qualified by Prompts 155–156, with the final consistency
+clarification on operation failures versus adapter-owned cleanup (D1, N13). All choices below
+are settled within the accepted specification; no specification decision remains open. The
+[OPEN] external API facts are not settled by acceptance.
+
+1. **V1 Activation.** [REC] Explicitly constructed adapter only; no production registration,
+   settings or defaults. *Tradeoff:* no production path can use Voyage until a later reviewed
+   wiring slice; in exchange no live call or key is possible from shipped defaults.
+2. **V2 Standard library, not the SDK.** [REC] `http.client`/`ssl`; no dependency. *Tradeoff:*
+   we own a small HTTPS client and its tests, instead of nine transitive runtime dependencies,
+   SDK retries and SDK-dependent error privacy.
+3. **V3 Ship the real transport in M4f.** [REC] Include `HttpsVoyageTransport` in the worker,
+   tested only through fake connections. *Alternative:* adapter and protocol only, real
+   transport deferred to M7. *Tradeoff:* untested-live code now versus a smaller slice and a
+   later transport review.
+4. **V4 Identity.** [REC] `("voyage", "voyage-4-lite", "voyage-http-v1", 1024, "l2")`, naming a
+   requested model with no immutability claim. *Tradeoff:* if Voyage changes the model behind
+   the name, stored vectors and new queries could silently diverge; only M7 live checks can
+   detect it.
+5. **V5 Request options.** [REC] `truncation=false`, `output_dimension=1024`,
+   `output_dtype="float"`, no `encoding_format`, explicit `input_type`. *Tradeoff:* over-length
+   text fails instead of being embedded partially; JSON floats are larger than base64.
+6. **V6 Model echo.** [REC] Require `model == "voyage-4-lite"` exactly. *Tradeoff:* fails closed
+   if Voyage echoes a resolved or versioned name ([OPEN]), which would block every live call
+   until reviewed; ignoring it would lose M4a's required mismatch check. Because only an exact
+   match is accepted, the returned name equals the identity's `model_id`, so M4a's “record any
+   provider-returned model identity” is met by the stored profile without a new field; a review
+   preferring a separately stored echo would need a contract change.
+7. **V7 Row order.** [REC] Accept an exact permutation of `index` values and place by index.
+   *Alternative:* require `data[i].index == i`. *Tradeoff:* tolerates an undocumented ordering
+   change versus a stricter shape.
+8. **V8 Unknown response keys.** [REC] Ignore without retaining. *Alternative:* reject.
+   *Tradeoff:* forward compatibility with additive API changes versus failing closed on any
+   change.
+9. **V9 No internal retries.** [REC] One attempt per `embed`; durable retry stays with jobs.
+   *Tradeoff:* transient errors surface immediately (and, under V11, fail the M4c job
+   permanently) instead of being absorbed. *(Prompt 155 wording: zero transport calls for an
+   invalid request, at most one once the transport is reached.)*
+10. **V10 Bounds.** [REC] 10 s connect, 30 s socket I/O, 60 s elapsed, 4 MiB response, 1 MiB
+    request; choices, not measurements. *Tradeoff:* tighter values risk false timeouts on slow
+    networks; looser values hold a worker longer. *(Prompt 155: the numbers are approved; the
+    30 s value is a socket I/O timeout per blocking wait, not per `read()` call, and the 60 s
+    value is a cooperative elapsed-time budget, not a hard deadline; see C1.)*
+11. **V11 Keep existing error mappings.** [REC] Fixed `VoyageError` codes with `retryable`, and
+    no change to `embed_validated`, M4c or M4d; record the incompatibility (retryable provider
+    failures become M4c `permanent_failure`) and resolve it in a separate reviewed change before
+    live indexing. *Alternative:* change the M4a/M4c boundary in M4f. *Tradeoff:* a known gap
+    with no production effect now versus redesigning accepted slices inside M4f.
+12. **V12 Credential seam.** [REC] An explicit `SecretStr` transport argument, no environment
+    or settings in M4f. *Tradeoff:* the operator key path is deferred to the live-wiring
+    decision.
+13. **V13 Installed-wheel CI line.** [REC] Add the one mocked line to the existing wheel step.
+    *Alternative:* no workflow change. *Tradeoff:* a small reviewed workflow edit versus no
+    installed-artifact evidence for the new modules.
+14. **V14 PostgreSQL cases.** [REC] Add the two mocked-provider cases. *Tradeoff:* longer
+    integration job versus storage and retrieval wiring evidence for a non-offline profile
+    (`allows_zero_vectors = false`) against real pgvector.
+15. **V15 Plan §8 retries.** [REC] For embedding calls, V9 and V10 supersede §8's “60 s timeout,
+    2 SDK retries”; §8 still applies to model calls until M5 decides otherwise. *Tradeoff:*
+    different retry behaviour for embeddings and model calls.
+
+##### M4f details introduced by the Prompt 155 corrections (settled at acceptance)
+
+Each is a detailed choice made while applying corrections A–D (historically awaiting review);
+all were approved in the Prompt 156 review subject to its clarifications and are settled at
+acceptance in Prompt 157.
+
+1. **N1 `Accept-Encoding: identity`** added to the request headers, so no compressed body is
+   requested; any other `Content-Encoding` is refused. *Tradeoff:* larger responses than gzip.
+2. **N2 Strict 200 framing:** exactly one digit-only `Content-Length` or a sole `chunked`
+   `Transfer-Encoding`; close-delimited bodies, repeated lengths (even if equal) and mixed
+   framing are refused. *Tradeoff:* a legitimate but unusual framing would fail closed.
+3. **N3 Usage upper bound** 2^63 − 1 for `total_tokens`. *Tradeoff:* arbitrary but finite;
+   M4a itself has no upper bound.
+4. **N4 Late non-200 statuses keep their classification** after the budget expires, since they
+   are not a success and need no further I/O; only a 200 becomes `voyage_timeout`.
+   *Alternative:* map every post-expiry outcome to `voyage_timeout`. *Tradeoff:* more accurate
+   classification versus one uniform rule.
+5. **N5 Invalid `VoyageResponse` values are `voyage_malformed_response`**, whether built
+   directly, bypassed or returned by an injected transport, including a non-200 value with a
+   non-empty body. *Tradeoff:* a caller's construction error and a broken transport share one
+   code.
+6. **N6 Timeout and budget range** 0 < value ≤ 600 seconds (the same ceiling as the database
+   `connect_timeout` policy). *Tradeoff:* an arbitrary but finite ceiling.
+7. **N7 Clock results** that are not finite real numbers are `voyage_configuration`.
+8. **N8 Caller-argument errors** in `parse_response` (`input_type`, `count`) raise M4a's
+   `InvalidEmbeddingError`, matching `validate_result`; provider-derived problems use
+   `VoyageError`. *Tradeoff:* two error types at one public helper.
+9. **N9 Cleanup precedence** exactly as D1: first process-control object wins; ordinary
+   cleanup failures never change the outcome; process control from cleanup beats an ordinary
+   operation failure; no cleanup deadline.
+
+N1–N9 were approved in the Prompt 156 review subject to its clarifications: N2's
+"short body" handling is now the explicit read loop of B, and N9's precedence is scoped to
+exceptions that escape into adapter-owned code (D1). N2's strict framing remains a live
+compatibility uncertainty until M7.
+
+##### M4f details introduced by the Prompt 156 clarifications (settled at acceptance)
+
+Each is a detailed choice made while applying the Prompt 156 clarifications (historically
+awaiting review); all are settled at acceptance in Prompt 157, N13 as clarified there.
+
+1. **N10 Read size** of at most 64 KiB per bounded `read`, and no more than the remaining
+   declared length (or `cap + 1` minus the bytes accepted, for chunked framing). *Tradeoff:*
+   more read calls than one large read, in exchange for a cooperative check between reads.
+2. **N11 Read results** that are not `bytes`, or are longer than requested, are
+   `voyage_transport_failed`. *Tradeoff:* defends against a misbehaving injected connection at
+   the cost of one more rule.
+3. **N12 Released socket:** when `connection.sock` is `None` after `getresponse()`, reads
+   continue with the previously applied timeout; the transport neither fails nor reaches into
+   private attributes. *Alternative:* refuse such responses. *Tradeoff:* compatibility with
+   `Connection: close` responses versus less precise timeout reduction.
+4. **N13 Masked process control:** an ordinary exception escaping an `http.client`
+   **operation** (including one produced by cleanup internal to that operation) is
+   `voyage_transport_failed` even when its chain holds process control; an ordinary
+   **adapter-owned** close failure with such a chain is instead ignored under D1 (Prompt 157
+   clarification). *Tradeoff:* an interrupt masked inside the standard library is reported as a
+   retryable transport failure, not re-raised; only a separately reviewed transport design
+   could do better.
+
+The M4f **specification is accepted (Prompt 157); its implementation is pending, and none of
+its planned tests, builds, wheel checks or PostgreSQL cases has run**. ADR-0018 is deferred
+until implementation, and overall M4 acceptance remains pending.
 
 **M5 – Review workflow (fake model in CI)**
 - Provider interface; Anthropic and scripted fake providers; `prompts/verifier/v1.md` and `prompts/risk_analyst/v1.md`; planner; orchestration; review snapshot; provenance checks; status derivation; report renderer; provider-call records and spans.

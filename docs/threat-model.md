@@ -222,9 +222,12 @@ These results cover the exercised paths only; they are not a production-readines
 security guarantee. M4d has since been verified in CI and on `main` at `cf2b5743` (below); M4e's
 specification is accepted and its implementation is accepted at external review (Prompt 147) for
 a local commit and published in Prompt 148 at `c14821b7`, where exact-commit CI was not fully
-green (historical; below); the corrected version is reviewed and verified in feature-branch
-CI at `d1dcdfce` (see [evidence](decisions/0017-retrieval-evaluation.md#feature-branch-ci-evidence-at-d1dcdfce)), not merged to `main`; M4f and overall M4 acceptance remain
-pending. Local Compose remains unverified.
+green (historical; below); the corrected version, verified in feature-branch CI at `d1dcdfce`
+(historical), is reviewed, verified in CI and on `main` at `0ae4c6ca` (see
+[evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)); the
+[M4f specification](plan.md#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending)
+is accepted (Prompt 157) with its implementation pending; overall M4 acceptance remains pending.
+Local Compose remains unverified.
 
 | Threat | Mitigation |
 |---|---|
@@ -275,16 +278,19 @@ cannot prove that vectors came from the claimed queries. The evidence digest che
 class of tampering only; no hash protects against a database writer outside the application.
 Repeated table headers are a separate span that citations must not quote across.
 
-## Corpus and retrieval evaluation (M4e, verified on a feature branch; not merged)
+## Corpus and retrieval evaluation (M4e, verified in CI and on `main`)
 
 The [M4e specification](plan.md#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending)
 was proposed in Prompt 140, corrected in Prompts 141–142 and accepted at external review in
 Prompt 143. **Claude Code implemented it in Prompt 144 and corrected it in Prompts 145–146
 ([ADR-0017](decisions/0017-retrieval-evaluation.md)); the
-implementation was accepted at external review in Prompt 147 for a local implementation commit,
-published on `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`, and is not merged to
-`main`. M4e is now **reviewed and verified on `feat/retrieval-evaluation` at `d1dcdfce`**
-(see [feature-branch CI evidence](decisions/0017-retrieval-evaluation.md#feature-branch-ci-evidence-at-d1dcdfce)); reviewed publication to main remains.
+implementation was accepted at external review in Prompt 147 for a local implementation commit
+and published on `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`. After feature-branch
+verification at `d1dcdfce` (historical; see [feature-branch CI evidence](decisions/0017-retrieval-evaluation.md#feature-branch-ci-evidence-at-d1dcdfce)),
+M4e is now **reviewed, verified in CI and on `main` at `0ae4c6ca`**: feature CI passed for that
+exact commit before OpenAI Codex fast-forwarded `main` in Prompt 153, and main CI then passed,
+from job logs independently retrieved by the external reviewer (see
+[main CI evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)).
 Historically, at `c14821b7`, from job logs retrieved independently by the external reviewer, the PostgreSQL integration job passed (306 passed, including all 16 M4e tests, which
 exercise fresh loading, the read-only verifier and isolation checks against stored chunks), but
 one Ubuntu test failed because its `os.lstat` double re-entered itself on Linux (no production
@@ -317,9 +323,64 @@ Linux project tests, Ubuntu build/wheel and green current-version CI were pendin
 subsequently passed at `d1dcdfce` (see [feature-branch CI evidence](decisions/0017-retrieval-evaluation.md#feature-branch-ci-evidence-at-d1dcdfce)).
 Claude Code's Prompt 149 Windows checks remain historical; OpenAI Codex assisted with Prompt
 150 documentation/commit work and Prompt 151 publication/log retrieval. The external reviewer
-independently confirmed the new logs without running local project checks. M4e is reviewed and verified in feature-branch CI on `feat/retrieval-evaluation` at `d1dcdfce`,
-not merged to `main`; reviewed publication to main remains. Prompt 150 authorized only a local
+independently confirmed the new logs without running local project checks. At that point M4e was verified in feature-branch CI at `d1dcdfce` and
+not yet merged (historical); it is now on `main` at `0ae4c6ca` (above). Prompt 150 authorized only a local
 correction commit. M4f and overall M4 acceptance remain pending; local Compose is unverified.
+
+## Voyage embedding adapter (M4f, specification accepted; not implemented)
+
+The [M4f specification](plan.md#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending)
+was proposed by Claude Code in Prompt 154, corrected in Prompts 155–156 and **accepted at
+external review in Prompt 157**. Its **implementation is pending**: it is not implemented or
+tested, and **none of the controls below operates yet**; nothing here is an existing
+mitigation. The accepted specification's intended controls:
+
+- the provider key is supplied only to an explicitly constructed transport as a `SecretStr`,
+  and is never placed in the fingerprint, default representations, public errors, logs,
+  tests or CI;
+- public errors are fresh fixed codes with no cause or context, so document/query text,
+  headers, response bodies and raw transport errors do not reach their messages, default
+  representations, default formatted tracebacks or logs. This does not extend to trusted code
+  inspecting frame locals, the transport's held key or an explicitly held response body;
+- a process-control exception that escapes into adapter-owned code propagates as the same
+  object under a first-outcome cleanup rule, with its own message and traceback unsanitized.
+  **Residual limitation:** one already masked inside `http.client` (for example replaced by an
+  exception from its internal close) cannot be recovered; the escaping ordinary exception is
+  reported as a sanitized transport failure, and no exception chain is inspected. An ordinary
+  failure of the adapter's own response or connection close is ignored, even if its chain holds
+  process control. Live use needing a stronger guarantee requires a separately reviewed
+  transport design;
+- each `embed` makes zero transport calls for invalid input and at most one HTTPS request
+  otherwise, to a fixed host with verified TLS, no redirects, no decompression, no internal
+  retries and no provider truncation;
+- a non-200 response body is never read, and a status-only value carrying a body is refused as
+  malformed; a 200 body is read only after strict framing checks, in bounded reads up to a
+  raw-byte cap, with a body shorter than its declared length detected explicitly (not left to
+  the standard library). The cap bounds accepted raw bytes, not peak memory;
+- every response is fully validated before the existing M4a and storage checks, with no
+  renormalization or zero-vector acceptance.
+
+**Timing is cooperative, not a hard deadline:** a 10 s connect timeout, a 30 s socket I/O
+timeout per blocking wait and a 60 s elapsed-time budget checked before and after each phase.
+The budget cannot interrupt an in-progress standard-library operation. DNS, repeated connection
+attempts, TLS, header parsing and internal buffered or chunked reads can exceed it; when the
+standard library releases the connection socket after the headers, body reads keep the earlier
+socket timeout; and cleanup has no deadline, so **no hard wall-clock maximum is established**;
+a hard deadline would need a separately reviewed transport design.
+
+No production registration, setting, CLI, endpoint or automatic indexing is specified, so no
+live call is possible from the shipped defaults, which stay offline. Unverified Voyage API
+behaviour (model echo, framing, normalization tolerance, model immutability) is not settled by
+acceptance. Residual risks once implemented:
+
+- sending vendor text to a third-party service (a data-handling decision for any live use in
+  M7);
+- repeated provider calls, since calls are at least once;
+- calls running past the nominal budget;
+- live vectors that might not meet the 1e-6 norm tolerance after float32 rounding (rejected,
+  not corrected).
+
+The settled decisions, details and the unresolved external API facts are listed in the plan.
 
 ## Not implemented yet
 
