@@ -33675,3 +33675,838 @@ tracked `.local` file, build artifact, binary or backup; clean privacy scan; uns
 over `origin/main..HEAD` found no leaks. Publication of `feat/model-call-contracts` is authorized
 by Prompt 174 with exact-commit CI monitoring; `main` is not to be updated. The history commit, the
 push and the CI outcomes are reported afterwards, not predicted here.
+
+### Prompt 174 interruption (Claude Code)
+
+After the history-only commit `9ba6a488` (`prompts.md` only), the publication push (background task
+`bo8o0m4mf`) waited at an interactive Git Credential Manager account picker and was stopped at
+Mathew's request while he was away from the PC; it ended with exit status 128 and published nothing.
+Read-only `ls-remote` afterwards showed remote `main` at `46c02257` and no remote
+`feat/model-call-contracts`. No retry was made, no credential was read and no authentication setting
+was changed. Mathew then returned to the PC and supplied the resumption instruction below.
+
+### Prompt 174 resumption (verbatim)
+
+Resume Prompt 174 — Publish M5a, verify CI and prepare the M5b specification
+
+Written for: Mathew and the external reviewer.
+
+Work in D:\Claude\evidenceguard_agentic_rag. Mathew is back at the Windows PC and can complete Git Credential Manager sign-in if prompted.
+
+Read CLAUDE.md and applicable repository instructions. Resume the interrupted Prompt 174; do not restart its completed work or create another authorization commit.
+
+1. Recover and verify the saved state
+
+Read:
+- .local/p174/resume-checkpoint.md
+- .local/p174/m5b-prep-notes.md
+- The existing Prompt 174 instructions recorded in prompts.md.
+
+Expected local state:
+- Branch feat/model-call-contracts.
+- HEAD:
+  9ba6a48888ff39a06b336a22429d5b3dcfa0bad6
+- Parent:
+  79e32532ff045dd49f1f84bdcf10dd43bf27f5d4
+- Subject:
+  docs: record M5a branch publication authorization
+- Clean index and working tree.
+- No upstream.
+- main and origin/main:
+  46c0225787ba09f27508dafaa218c1bf33af1e8e
+- Expected origin and noreply author/committer.
+
+The previous push task bo8o0m4mf was cancelled with exit 128. Its credential prompt ended. Read-only remote checks then showed no remote feature branch and main unchanged. Do not assume those remote observations are still current.
+
+Fetch normally with --no-tags and inspect remote refs read-only.
+
+Expected:
+- Remote main remains 46c0225787ba09f27508dafaa218c1bf33af1e8e.
+- Remote feat/model-call-contracts is absent.
+
+If the feature branch already exists at exactly 9ba6a488, do not push again: inspect whether exact-commit CI already exists and resume from there.
+If material state differs otherwise, stop and report without repairing it.
+
+Confirm:
+- Local main equals origin/main and is an ancestor of HEAD.
+- The unpublished range contains only d34aaaac, 79e32532 and 9ba6a488.
+- The range contains the 18 reviewed paths.
+- 9ba6a488 changes prompts.md only.
+- The 12 implementation/test/packaging/workflow blobs remain identical to accepted tree:
+  5d4febb69ab73b003c4c053ff0a7f5f8849d48fb
+
+Reuse the completed preflight evidence. Do not repeat application tests, builds or wheel checks. Repeat only checks needed because of elapsed time, changed refs or changed files.
+
+Save the resumed-state observations under .local/p174/.
+
+2. Complete the existing publication
+
+If the remote feature branch is absent, run once:
+git push --set-upstream origin refs/heads/feat/model-call-contracts:refs/heads/feat/model-call-contracts
+
+Mathew will select the correct GitHub account and complete sign-in on the Windows desktop if needed.
+
+Do not extract credentials or change authentication configuration. If authentication blocks, identify the visible action needed and wait for Mathew; do not launch repeated pushes.
+
+Record the command’s exit status. Verify remote feat/model-call-contracts equals:
+9ba6a48888ff39a06b336a22429d5b3dcfa0bad6
+
+Confirm remote main is unchanged.
+
+Do not create a new commit, amend the existing one or push main.
+
+3. Monitor exact-commit feature CI
+
+Monitor both push-triggered workflows for the published SHA:
+- CI: Ubuntu verify, Windows verify, PostgreSQL integration and container.
+- Secret scan: full-history Gitleaks.
+
+Verify event, branch, SHA, attempt, run/job conclusions and every required step.
+
+Poll at reasonable intervals within the original 25-minute bound, measured from this resumed monitoring session. Stop monitors after completion or timeout.
+
+If a required job fails, is skipped/cancelled, remains incomplete or cannot be matched to this SHA:
+- Stop.
+- Do not repair, rerun, amend, revert or update main.
+- Do not proceed to post-CI tracked documentation.
+- Return observed evidence and the blocker.
+
+Use available authorized tools to retrieve logs. If unavailable, distinguish API conclusions from unobserved log details. Do not infer counts from earlier versions or change authentication solely to obtain logs.
+
+While CI runs, read-only M5b preparation under .local/p174/ may continue.
+
+4. After all five jobs pass, record feature evidence
+
+Only these tracked files may change:
+- README.md
+- docs/decisions/0019-model-call-contracts.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Record:
+- Implementation accepted in Prompt 173.
+- Published and verified in feature-branch CI at the exact SHA in the resumed Prompt 174.
+- Not merged; main remains 46c02257.
+- Run/job links and observed conclusions.
+- Exact test summaries, module results, build/wheel output, container summaries and Gitleaks count only when actually retrieved.
+- Any unavailable details explicitly unobserved.
+- Historical Windows results and reviewer isolated checks remain separately attributed.
+
+Add feature evidence to ADR-0019 and concise linked status updates elsewhere.
+
+Keep accepted specification headings/anchors unchanged. Preserve the distinction between:
+- scripted-fake contract evidence and live model quality;
+- the wheel’s arithmetic Recall fixture and database-derived corpus Recall;
+- unchanged offline ingestion/indexing container smoke and M5a coverage.
+
+Do not commit these updates.
+
+5. Complete the detailed M5b proposal
+
+Resume the saved preparation notes and fulfill the M5b specification requirements from the original Prompt 174.
+
+Add:
+“M5b provenance and status-derivation specification (PROPOSED, Prompt 174; not implemented)”
+
+M5b remains pure and database-independent. No implementation, tests, ADR-0020, persistence, prompts, orchestration, endpoints or provider calls.
+
+Separate accepted decisions, current-source facts, recommendations and open reviewer decisions.
+
+Specify:
+- Public values/functions and domain placement.
+- Binding of Verifier output to the exact trusted evidence retrieved for that review and question.
+- Trusted source of tenant/revision/source-type/authenticity metadata.
+- Per-claim citation relationships and question-level aggregation.
+- Deterministic Verdict-to-EvidenceStatus rules compatible with existing Verification/Citation/Finding contracts.
+- Analyst findings restricted to previously validated citations, including multi-question ownership.
+- Documentary-support-required behavior.
+- Fixed errors/outcomes, precedence, privacy, nested revalidation and process-control behavior.
+- Resource bounds, intended files, exclusions and concrete planned tests.
+- Narrow installed-wheel acceptance if recommended.
+- Numbered reviewer decisions with recommendations and tradeoffs.
+
+Settle W12 in the proposal:
+- Exact Unicode normalization and whitespace rules.
+- Independent matching within body and repeated-header spans.
+- No joining unrelated spans or crossing a body/header boundary.
+- Deterministic normalized-match-to-original-text offset mapping.
+- Repeated/ambiguous-match policy.
+- Exact original stored/displayed quotation.
+- Compatibility with Citation’s quote-length limit.
+
+Address the saved source finding that Citation’s DomainModel uses str_strip_whitespace=True. Do not claim a leading/trailing-whitespace quotation remains exact if construction strips it. Propose a precise compatible policy, or flag the required contract change for review. Do not silently modify M1.
+
+Keep provenance distinct from semantic entailment and document authenticity.
+
+Preserve later boundaries:
+- M5c: safe prompt encoding/request assembly.
+- M5d: persisted snapshot trust.
+- M5f: hash-covered report representation.
+- M5g: orchestration and job precedence.
+- M5h: model adapter.
+- Production wiring remains separate.
+
+Nothing proposed is accepted or implemented.
+
+6. History, checks and export
+
+Preserve the published prompts.md bytes as an identical prefix.
+
+Append an accurate interruption/resumption note:
+- Previous push cancelled, exit 128, no publication at that checkpoint.
+- Mathew returned to the PC.
+- This resumption instruction verbatim.
+- Actual push/CI outcome and evidence attribution.
+- M5b proposal staged and awaiting review.
+
+Do not duplicate the original Prompt 174 verbatim entry or rewrite earlier history.
+
+Check:
+- Only the five authorized post-CI files changed.
+- All implementation/test/workflow/packaging blobs unchanged.
+- Links/anchors, tables and current/historical status consistency.
+- UTF-8 without BOM, LF, staged whitespace and repository formatting.
+- Privacy/artifact scope and unsuppressed staged Gitleaks.
+- No M5b acceptance, implementation or execution claim.
+
+No application tests, builds, wheel checks, installs, Docker, database or provider calls.
+
+Stage the five files.
+
+Export directly from Git:
+.local/p174/m5a-feature-evidence-and-m5b-spec.diff
+
+Baseline:
+9ba6a48888ff39a06b336a22429d5b3dcfa0bad6
+
+Final:
+the final staged tree
+
+Exclude prompts.md. Verify the exact comparison. Report paths, statistics, byte size, SHA-256 and encoding.
+
+Stop staged and uncommitted. No main update, further commit, M5b implementation or CI rerun.
+
+Return the publication/CI handoff, observed versus unavailable evidence, proposed M5b design and reviewer decisions, checks, staged tree, export and unchanged main refs.
+
+Mathew is back at the PC, so provide the export path and handoff; the complete diff does not need printing in chat.
+
+End:
+“Mathew: return this output plus .local/p174/m5a-feature-evidence-and-m5b-spec.diff to the external reviewer.”
+
+### Prompt 174 resumed outcome (Claude Code; staged, awaiting review)
+
+*Observed by Claude Code in the resumed session; nothing below has been reviewed.*
+
+- **State re-verified.** `git fetch --no-tags origin` and read-only `ls-remote` (exit 0): remote
+  `main` `46c02257`, no remote `feat/model-call-contracts`. Local branch at `9ba6a488` (parent
+  `79e32532`), clean, no upstream, noreply identity and origin unchanged; local `main` equal to
+  `origin/main` and an ancestor of HEAD; `origin/main..HEAD` is exactly `d34aaaac`, `79e32532` and
+  `9ba6a488` with the 18 reviewed paths; `9ba6a488` changes `prompts.md` only; the 12
+  implementation, test, packaging and workflow blobs equal the accepted tree `5d4febb6`. The earlier
+  preflight evidence was reused; no application test, build or wheel check was repeated.
+- **Publication.** `git push --set-upstream origin
+  refs/heads/feat/model-call-contracts:refs/heads/feat/model-call-contracts` ran once and completed with
+  exit 0 within seconds. Remote `feat/model-call-contracts` = `9ba6a488`; remote `main` unchanged
+  at `46c02257`. No commit was created or amended and `main` was not pushed.
+- **Feature CI** (anonymous GitHub REST API): exactly two runs for SHA `9ba6a488`, both event `push`,
+  branch `feat/model-call-contracts`, attempt 1, conclusion `success`: CI run `39303677105` (Ubuntu
+  verify `118235104286`, Windows verify `118235103507`, PostgreSQL integration `118235104321`,
+  container `118235103996`) and secret-scan run `39303677129` (Gitleaks full history
+  `118235103782`). Every listed step of all five jobs succeeded; none was skipped or cancelled.
+  Links are recorded in ADR-0019.
+- **Unavailable.** Every job-log download returned HTTP 403 ("Must have admin rights to
+  Repository."); authentication was not changed. Test counts, PostgreSQL module results,
+  installed-wheel output, container summaries and the Gitleaks commit count are unobserved and were
+  not inferred.
+- **Monitoring.** The first polling loop used a path the Windows Python could not open; it was
+  stopped (its orphaned shell process killed) and replaced by a corrected loop within the same
+  25-minute bound, which exited after both runs completed. No monitor remains.
+- **Documentation (staged, uncommitted).** Feature evidence in ADR-0019 and linked status updates in
+  `README.md`, `docs/plan.md` and `docs/threat-model.md`; the
+  "M5b provenance and status-derivation specification (PROPOSED, Prompt 174; not implemented)" was
+  added to `docs/plan.md`. **It is proposed only: not reviewed, accepted, implemented or tested.**
+  No implementation, test, packaging or workflow file changed.
+
+### Prompt 174 outcome (attributed to Claude Code's supplied handoff output)
+
+Claude Code's resumed Prompt 174 handoff reported: the saved state matched after `fetch --no-tags`
+and read-only `ls-remote` (remote `main` `46c02257`, no remote feature branch, HEAD `9ba6a488`, the
+three-commit range with its 18 reviewed paths, `9ba6a488` changing `prompts.md` only and the 12
+implementation, test, packaging and workflow blobs equal to `5d4febb6`). The single push of
+`feat/model-call-contracts` exited 0; remote feature `9ba6a488`, remote `main` unchanged. Both
+push-triggered runs for that SHA (CI `39303677105`, secret scan `39303677129`; event `push`, attempt
+1) and all five jobs succeeded with every required step; Claude Code observed API conclusions only,
+and every job-log download returned HTTP 403, so counts, wheel output, container summaries and the
+Gitleaks count were reported as unobserved. A first polling loop with an unusable path was stopped
+and its orphaned process killed; the corrected loop exited after completion. Staged documentation:
+ADR-0019 feature evidence, linked README, plan and threat-model updates, and the proposed M5b
+specification. Checks: five-path scope with unchanged implementation blobs, 0 link or anchor
+problems, UTF-8 without BOM, LF, `git diff --cached --check` clean, privacy scan clean and staged
+Gitleaks 8.30.1 with no leaks. Staged tree `9c54cec5737f1ce06104c552a504d74f846ebbfa`; export
+`.local/p174/m5a-feature-evidence-and-m5b-spec.diff` (baseline `9ba6a488`, prompts.md excluded; 4
+files, 555 insertions, 17 deletions): 66,097 bytes, SHA-256
+`ed38d9a77bf7ea0a000f866bacc50266de1e0bd3d30337283cbe9a2fe4d6a6eb`. Nothing was committed or
+merged.
+
+### External review of the Prompt 174 output (Prompt 175)
+
+- **Export.** The review of the Prompt 174 output matched the export checksum (66,097 bytes, SHA-256
+  `ed38d9a77bf7ea0a000f866bacc50266de1e0bd3d30337283cbe9a2fe4d6a6eb`); Claude Code re-verified the
+  file's bytes and its Git comparison locally at the start of Prompt 175.
+- **Independently retrieved CI evidence.** The external reviewer retrieved both workflow-run
+  records, all five job records and all five job logs for `9ba6a488` (both runs event `push`, branch
+  `feat/model-call-contracts`, attempt 1, success; all five jobs and their required steps succeeded,
+  none skipped): Ubuntu `118235104286` `2938 passed, 308 skipped in 26.62s`; Windows `118235103507`
+  `2937 passed, 309 skipped in 59.65s`; PostgreSQL `118235104321` `308 passed, 2938 deselected in
+  189.30s` with the 104 M4 PostgreSQL cases passing, including both Voyage cases; container
+  `118235103996` with an effective context of 95 files (19 planted fixtures excluded), image checks
+  passed, and a smoke reporting a healthy stack, upload 202, successful ingestion, an active revision
+  with 2 verified chunks, duplicate upload 200 returning the existing revision, one offline indexing
+  job, a ready index with 2 embeddings and a successful indexing job, and idle-worker exit 0 without
+  an OOM kill, with smoke and cleanup succeeding; Gitleaks `118235103782` 75 commits scanned, no
+  leaks. Both installed-wheel logs printed the six expected lines, including "model-call contracts
+  classified a scripted fake response from the installed wheel". The reviewer ran no project suite,
+  build, installed-wheel check, database, Docker or provider locally; the container observations are
+  the smoke's reported checks.
+- **Isolated Unicode probe.** The reviewer ran a small isolated standard-library probe with Unicode
+  15.0.0 implementing the proposed segmentation and per-segment NFD keys (not a project or
+  implementation test). It showed that the segment-wise keys of the canonically equivalent
+  `ཀཱིུ` and `ཀཱིུ` differ, and that the quote `가` is rejected
+  in span `각` but accepted in the equivalent `각`.
+- **Design directions** (supported subject to review of the corrected specification; not acceptance
+  of M5b): P1 as a deliberately limited segment-wise NFD rule; P2–P6 as recommended; P7 the stronger
+  alternative (every claim of a `supported` or `contradicted` output cited); P8–P10 as recommended
+  within the accepted budgets; P11 the deterministic documentary-gap finding (`medium`, `missing`),
+  replacing §4's literal Analyst requirement and mandatory in the hash-covered report even if
+  analysis fails; P12–P15 as recommended; P16 an explicit M5f review obligation with no silent
+  truncation or unbounded report.
+
+### Prompt 175 (verbatim)
+
+Prompt 175 — Correct the M5b specification and record independently verified M5a CI evidence
+
+Written for: Mathew and the external reviewer.
+
+Work in the existing EvidenceGuard repository. This is a documentation-only task. Correct the staged M5b proposal, record the reviewer’s independently retrieved CI evidence, and stage the result for review.
+
+Do not implement M5b, create ADR-0020, commit, push, merge, rerun CI or change authentication. M5b remains proposed pending review of the corrected complete specification.
+
+1. Verify and checkpoint the starting state
+
+Expected:
+- Branch feat/model-call-contracts.
+- HEAD and upstream at 9ba6a48888ff39a06b336a22429d5b3dcfa0bad6.
+- Local main and origin/main at 46c0225787ba09f27508dafaa218c1bf33af1e8e.
+- Staged tree 9c54cec5737f1ce06104c552a504d74f846ebbfa.
+- Exactly README.md, docs/decisions/0019-model-call-contracts.md, docs/plan.md, docs/threat-model.md and prompts.md staged.
+- Nothing unstaged or untracked.
+- Origin and noreply identity unchanged.
+
+Verify .local/p174/m5a-feature-evidence-and-m5b-spec.diff:
+- 66,097 bytes.
+- SHA-256 ed38d9a77bf7ea0a000f866bacc50266de1e0bd3d30337283cbe9a2fe4d6a6eb.
+- Byte-identical to the baseline-to-staged-tree Git comparison excluding prompts.md.
+
+Save the baseline tree, staged paths, blob hashes and prompts.md prefix under .local/p175/. If the expected state differs materially, stop and report it without resetting anything.
+
+No remote operation is necessary for this task.
+
+2. Record the reviewer’s independent M5a CI evidence
+
+The external reviewer independently retrieved both workflow records, all five job records and all five job logs for:
+9ba6a48888ff39a06b336a22429d5b3dcfa0bad6.
+
+Both runs used event push, branch feat/model-call-contracts, attempt 1, and concluded success:
+- CI: https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39303677105
+- Secret scan: https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39303677129
+
+All five jobs and their required steps succeeded; none was skipped.
+
+Observed logs:
+- Ubuntu job 118235104286:
+  2938 passed, 308 skipped in 26.62s.
+- Windows job 118235103507:
+  2937 passed, 309 skipped in 59.65s.
+- PostgreSQL job 118235104321:
+  308 passed, 2938 deselected in 189.30s.
+  The 104 M4 PostgreSQL cases passed, including both Voyage cases.
+- Container job 118235103996:
+  Effective context: 95 files; 19 planted fixtures excluded.
+  Image checks passed.
+  Smoke reported a healthy stack, accepted upload (202), successful ingestion, active revision with 2 verified chunks, duplicate upload returning the existing revision (200), one offline indexing job, a ready index with 2 embeddings and successful indexing job, and idle-worker exit 0 without an OOM kill.
+  Smoke and cleanup succeeded.
+- Gitleaks job 118235103782:
+  75 commits scanned; no leaks found.
+
+The following actual output lines appeared in both installed-wheel logs:
+- offline embedding, canonical storage and indexing modules ran from the installed wheel
+- retrieval modules imported and fusion ran from the installed wheel
+- evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+- Voyage adapter validated a mocked response from the installed wheel
+- model-call contracts classified a scripted fake response from the installed wheel
+- offline migration SQL rendered from the installed wheel
+
+Update ADR-0019’s feature evidence with the job links, counts, wheel observations and appropriately scoped container evidence. Update the linked short summaries in README, plan and threat model.
+
+Preserve attribution:
+- Claude Code observed API conclusions and received HTTP 403 for logs in Prompt 174.
+- The external reviewer independently retrieved the logs afterwards.
+- The reviewer did not run a project suite, build, installed-wheel check, database, Docker or provider locally.
+- The container observations are the smoke’s reported checks, not independent inspection of underlying database rows.
+- M5a evidence concerns contracts and a scripted fake, not live-model quality.
+- The wheel Recall line is arithmetic, not database-derived corpus Recall.
+- M5a remains unmerged; main remains 46c02257.
+
+Do not repeat these checks.
+
+3. Correct the Unicode contract
+
+The proposed segment-wise algorithm is not general canonical equivalence.
+
+The reviewer ran a small isolated standard-library probe with Unicode 15.0.0, implementing the proposed segmentation and per-segment NFD keys. It was not a project test or an implementation test.
+
+Counterexample:
+- Original: "ཀཱིུ"
+- Its full NFD: "ཀཱིུ"
+- These strings are canonically equivalent.
+- Proposed segment-wise key for the original:
+  "ཀཱིུ"
+- Proposed segment-wise key for the full-NFD spelling:
+  "ཀཱིུ"
+- Therefore the proposed keys differ.
+
+The reviewer also checked the proposed unit-boundary rule:
+- Span "각", quote "가": rejected.
+- Canonically equivalent decomposed span "각", same quote: accepted.
+The individual Jamo have combining class zero, so this is not a grapheme-boundary rule.
+
+For v1, retain the bounded segment-wise algorithm as a deliberately limited matching rule rather than introducing a new normalization implementation in this task.
+
+Correct every broad claim accordingly:
+- Call it segment-wise NFD matching.
+- Do not claim full Unicode canonical-equivalence matching.
+- Describe boundaries as the specified units, not general “whole characters” or grapheme clusters.
+- Explicitly disclose that canonically equivalent spellings can produce different matching results.
+- Explain the Tibetan counterexample and the Hangul partial-match asymmetry.
+- Preserve the guarantee that every accepted quote is an exact, contiguous original substring with exact original offsets.
+- Clarify how an initial run of non-starters is segmented; remove ambiguity between one initial segment and one segment per non-starter.
+- Add planned tests pinning these limitations, alongside the existing common Latin normalization and complete Hangul examples.
+
+This is the reviewer-supported direction for revised P1, subject to review of the final wording. It is not acceptance of the whole M5b specification.
+
+4. Complete the value and rejection contracts
+
+The proposal must specify enough that implementation does not invent public invariants.
+
+Add a compact table defining exact types, bounds and cross-field invariants for every new public value, including:
+- QuoteMatch: exact integer offsets (reject bool), nonnegative starts, increasing ends, lengths consistent with the original quote, valid span kind, occurrence count 1–64.
+- ValidatedClaim: text constraints, citation-index bounds, distinctness and ordering.
+- VerifiedQuestion: claim and citation/provenance bounds, supported match-rules identifier, exact digest format, aligned provenance, and all identity/status/coverage checks.
+- AnalyzedQuestion: finding and follow-up bounds, parallel tuple alignment, tenant/question consistency and deterministic finding-ID checks that can be performed without retrieval evidence.
+- QuestionEvidence and AcceptedCitation: complete identity and nested-value invariants.
+- Shared questions: a finite bound, unique IDs, owner exclusion and common tenant/review/snapshot.
+- finding_id: accepted kind values and index ranges, including the rule finding’s fixed index.
+
+Separate constructor-checkable invariants from checks requiring trusted evidence or owner/shared values. Do not claim a constructor proves authorization or semantic entailment.
+
+Specify ProvenanceRejection completely:
+- Exact field types and permitted optional fields.
+- Meaning and bounds of rejected_count.
+- How counts behave for citation failures, uncited claims and aggregate status/rationale failures.
+- How item_index and citation_index are represented when no claim/reference/finding position applies.
+- Whether analysis checks all findings to count failures or stops at the first.
+- Deterministic precedence, including simultaneous failures.
+- A consistent rule for the standalone match_quote result.
+
+Retain all-or-nothing stage conversion and fixed, text-free failures.
+
+Every public operation must cover the whole supported-input operation with ordinary-error normalization, including traversal, copying and nested revalidation. Preserve process-control identity and never inspect exception chains.
+
+5. Strengthen reload validation
+
+Make recheck_verified rebuild and validate all relevant values and require:
+- Matching tenant, review, snapshot and question.
+- Supported match-rules identifier.
+- Retrieved membership and matching document/revision/source/authenticity metadata.
+- Valid header/body selection.
+- Consistent chunk-text and source offsets.
+- Exact original quotation.
+- The specified unit-boundary, first-occurrence and capped occurrence-count rules.
+
+A suitable normative rule is to recompute match_quote from the trusted ChunkEvidence and stored original citation.quote and require equality with the stored QuoteMatch, in addition to identity and membership checks.
+
+Add planned tests that independently alter:
+- source offsets while leaving chunk-text offsets unchanged;
+- chunk-text offsets;
+- span kind;
+- occurrence count;
+- match-rules identifier;
+- document/revision/source metadata;
+- claim indexes and provenance alignment.
+
+State explicitly that this detects inconsistent values against trusted evidence; it does not prove what retrieval request originally ran or protect against a malicious trusted process.
+
+6. Record the reviewer’s design decisions
+
+These choices are supported, subject to the corrected specification’s review; do not label the whole specification accepted.
+
+- P1: the limited segment-wise rule described in section 3 above.
+- P2–P6: recommended choices supported.
+- P7: select the stronger alternative. Every claim in a supported or contradicted Verifier output must retain at least one accepted citation after deduplication. Insufficient-evidence claims may have none. Add a fixed uncited-claim rejection reason and planned tests, including one cited and one uncited claim. This is structural provenance, not proof that a quote supports a claim.
+- P8–P10: recommended choices supported, within the already accepted repair/call budgets.
+- P11: deterministic documentary-gap finding supported, with medium severity and missing status. Record explicitly that this replaces §4’s literal requirement that the Risk Analyst itself raise the finding. It is a domain-rule obligation, independent of model compliance. Once a valid vendor-claim Verification exists for a question requiring documents, the rule finding must be included in the later hash-covered report even if analysis fails; do not leave inclusion optional for M5f/M5g. Preserve the valid Verification.
+- P12–P15: recommended choices supported.
+- P16: global report bounds remain an explicit M5f review obligation. No silent truncation or unbounded report is authorized.
+
+Carry these choices consistently through algorithms, tables, planned tests, threat-model notes and the decision list.
+
+Do not silently rewrite historical accepted requirements. Add the explicit scoped supersession/clarification and its attribution.
+
+7. Scope, history and checks
+
+Modify only:
+- README.md
+- docs/decisions/0019-model-call-contracts.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Preserve accepted specification headings and existing anchors. Add subsections where helpful. Keep M4 evidence unchanged.
+
+Append to prompts.md:
+- Prompt 174’s handoff;
+- this review, including the matched checksum, independently retrieved CI evidence, isolated Unicode-probe scope and design directions;
+- Prompt 175 verbatim;
+- an outcome note recording only work actually completed.
+
+Preserve the entire previous prompts.md version as an identical byte prefix.
+
+Run documentation checks:
+- exact path scope and unchanged implementation/test/workflow/packaging blobs;
+- relative links and anchors;
+- tables, UTF-8 without BOM, LF-only, no replacement characters;
+- git diff --cached --check;
+- privacy/credential scan;
+- unsuppressed staged Gitleaks.
+
+Run no application tests, builds, installs, wheel checks, PostgreSQL, Docker or provider calls. No additional research is required; if a small isolated probe is needed to clarify the written algorithm, label it separately and report exactly what ran.
+
+8. Export and handoff
+
+Stage the five authorized files, leaving the result uncommitted.
+
+Export directly from Git:
+.local/p175/m5b-spec-corrections-and-m5a-ci-evidence.diff
+
+Baseline: staged tree 9c54cec5737f1ce06104c552a504d74f846ebbfa.
+Final: the new staged tree.
+Exclude prompts.md.
+
+Report:
+- starting and final refs/tree;
+- changes and remaining decisions;
+- exact checks actually performed;
+- unchanged implementation blobs;
+- export paths, file counts, insertion/deletion counts, byte size and SHA-256;
+- that M5b remains proposed, unimplemented and unaccepted;
+- that M5a remains feature-published and CI-verified, unmerged.
+
+Return the handoff plus the diff attachment to Mathew for external review. Do not print the complete diff into the handoff.
+
+### Prompt 175 outcome (Claude Code; staged, awaiting review)
+
+*Work actually completed in Prompt 175; nothing below has been reviewed.*
+
+- **Starting state verified** (local only, no remote operation): branch `feat/model-call-contracts`,
+  HEAD and upstream `9ba6a488`, `main` and `origin/main` `46c02257`, staged tree `9c54cec5` with
+  exactly the five files, nothing unstaged or untracked, origin and noreply identity unchanged; the
+  Prompt 174 export matched 66,097 bytes, its SHA-256 and the byte-identical Git comparison.
+  Checkpoint (baseline tree with blob hashes, staged paths, prompts.md prefix) saved under
+  `.local/p175/`.
+- **CI evidence recorded** in ADR-0019 (per-job log results, the six installed-wheel lines, the
+  scoped container summary and the split attribution) with linked summaries in README, plan and
+  threat model. The CI checks were not repeated.
+- **M5b proposal corrected** (still proposed; not accepted, implemented or tested): segment-wise NFD
+  matching with the initial non-starter run as one segment and its disclosed limitations (new
+  M5b-C1, with the reviewer's probe attributed); a value-invariant table (new M5b-B1) separating
+  constructor checks from trusted-value checks; the complete `ProvenanceRejection` contract and
+  whole-operation error normalization (M5b-F); reload validation that recomputes `match_quote`, plus
+  `recheck_analyzed` (M5b-D, M5b-E); the `claim_uncited` rule (P7); the mandatory documentary-gap
+  finding (P11) with a proposed scoped clarification of §4 noted beside §4 without changing its
+  text; P16 as an explicit M5f obligation; the planned tests and decision list updated. Claude Code
+  ran no probe or application check.
+- **Documentation checks run before this note** (on the four documents): 0 relative-link or anchor
+  problems, 0 table column mismatches, UTF-8 without BOM, LF only, no replacement characters, and
+  `git diff --check` clean. The final staged scope, prefix, whitespace, privacy and Gitleaks checks
+  and the export follow this note and are reported in the Prompt 175 handoff.
+
+### Prompt 175 outcome (attributed to Claude Code's supplied handoff output)
+
+Claude Code's Prompt 175 handoff reported: the starting state matched (HEAD and upstream `9ba6a488`,
+`main` and `origin/main` `46c02257`, staged tree `9c54cec5` with the five files, nothing unstaged or
+untracked) and the Prompt 174 export matched its size, SHA-256 and Git comparison; no remote
+operation ran. It recorded the reviewer's independently retrieved CI evidence in ADR-0019 (per-job
+log results, the six installed-wheel lines, the scoped container summary and split attribution)
+with linked summaries, and corrected the M5b proposal: segment-wise NFD matching with the initial
+non-starter run as one segment and the disclosed Tibetan and Hangul limitations (M5b-C1), the value
+invariant table (M5b-B1), the complete `ProvenanceRejection` contract and whole-operation error
+normalization (M5b-F), reload validation recomputing `match_quote` plus `recheck_analyzed`,
+`claim_uncited` (P7), the mandatory documentary-gap finding (P11) with a proposed scoped §4
+clarification beside the unchanged §4 text, and P16 as an M5f obligation. Checks: five-path scope,
+all other blobs unchanged and the 12 implementation blobs equal to `5d4febb6`, 0 link or anchor
+problems, 0 table mismatches, UTF-8 without BOM, LF, no U+FFFD, `git diff --check` and
+`git diff --cached --check` clean, prompts.md prefix identical, privacy scan clean, staged Gitleaks
+8.30.1 with no leaks; no probe or application check ran. Staged tree
+`2e75e3da7b05a85593c27a91dbec66ff585cbad6`; export
+`.local/p175/m5b-spec-corrections-and-m5a-ci-evidence.diff` (baseline `9c54cec5`, prompts.md
+excluded; 4 files, 489 insertions, 285 deletions; 1,024 lines): 102,007 bytes, SHA-256
+`6100b72c6f52f0c876dea9d4884a06231f289d01edb5daf38c64b70e0d4e44c7`.
+
+### External review acceptance of the M5a CI evidence and the M5b specification (Prompt 176)
+
+The external reviewer accepted the M5a feature-branch CI evidence recorded in Prompts 174–175 and
+the complete M5b specification proposed in Prompt 174 and corrected in Prompt 175, including
+P1–P16, with a binding clarification. The reviewer independently verified both attached exports'
+byte sizes and checksums (`.local/p174/m5a-feature-evidence-and-m5b-spec.diff`, 66,097 bytes,
+SHA-256 `ed38d9a77bf7ea0a000f866bacc50266de1e0bd3d30337283cbe9a2fe4d6a6eb`;
+`.local/p175/m5b-spec-corrections-and-m5a-ci-evidence.diff`, 102,007 bytes, SHA-256
+`6100b72c6f52f0c876dea9d4884a06231f289d01edb5daf38c64b70e0d4e44c7`) and inspected their
+documentation changes. The reviewer's Unicode probes and independently retrieved CI evidence keep
+their previously recorded scope; no M5b implementation or project test was run during this review.
+
+*Binding clarification:* `recheck_analyzed` rebuilds and validates `analyzed`, `owner`, `question`
+and `shared` and requires matching tenant, review and question identities before iterating findings,
+even when there are none; `documentary_gap_finding` rebuilds and validates its inputs and requires
+matching question IDs before evaluating its condition or returning `None`; `analyze_question` keeps
+its identity checks before iterating, including for empty outputs; owner and shared verifications
+come from the trusted path that ran `recheck_verified`, and analysis does not re-prove retrieval
+membership; Analyst and Verifier `request_sha256` values are never compared; identity violations
+are fresh `InvalidProvenanceInputError` values with no cause or context, and process control
+propagates unchanged.
+
+Prompt 176 authorizes recording the acceptance, one local documentation commit, publication of
+`feat/model-call-contracts` and, only after all five required jobs pass for that exact new commit, a
+fast-forward of `main`, followed by main-push CI monitoring. It does not authorize M5b
+implementation, any live provider, production wiring or overall M5 acceptance.
+
+### Prompt 176 (verbatim)
+
+Prompt 176 — Record M5b specification acceptance and publish the reviewed M5a work
+
+Written for: Mathew and the external reviewer.
+
+The external reviewer accepts:
+- The M5a feature-branch CI evidence recorded in Prompts 174–175.
+- The complete M5b specification proposed in Prompt 174 and corrected in Prompt 175, including P1–P16, with the binding clarification below.
+
+Record that acceptance, commit the documentation locally, publish the feature branch, and fast-forward main only after all five required jobs pass for the exact new commit. Then monitor the main-push CI.
+
+This prompt authorizes those publication steps subject to the gates below. It does not authorize M5b implementation, any live provider, production wiring or overall M5 acceptance.
+
+1. Verify and checkpoint
+
+Expected local state:
+- Branch feat/model-call-contracts.
+- HEAD and upstream at 9ba6a48888ff39a06b336a22429d5b3dcfa0bad6.
+- Local main and origin/main at 46c0225787ba09f27508dafaa218c1bf33af1e8e.
+- Staged tree 2e75e3da7b05a85593c27a91dbec66ff585cbad6.
+- Exactly README.md, docs/decisions/0019-model-call-contracts.md, docs/plan.md, docs/threat-model.md and prompts.md staged.
+- Nothing unstaged or untracked.
+- Origin and noreply identity unchanged.
+
+Verify both exports against their Git comparisons:
+- Prompt 174: 66,097 bytes, SHA-256
+  ed38d9a77bf7ea0a000f866bacc50266de1e0bd3d30337283cbe9a2fe4d6a6eb.
+- Prompt 175: 102,007 bytes, SHA-256
+  6100b72c6f52f0c876dea9d4884a06231f289d01edb5daf38c64b70e0d4e44c7.
+
+The reviewer independently verified both attached exports’ byte sizes and checksums and inspected their documentation changes. The reviewer’s Unicode probes and independently retrieved CI evidence retain their previously recorded scope; no M5b implementation or project test was run during this review.
+
+Save refs, status, accepted staged tree, five blob hashes and the prompts.md prefix under .local/p176/.
+
+Fetch origin with --no-tags. Verify remote main is 46c02257 and the remote feature branch is 9ba6a488. Stop on any unexpected divergence without resetting, rebasing or overwriting anything.
+
+2. Record the accepted binding clarification
+
+Add explicit rules to the M5b specification and planned tests:
+
+- recheck_analyzed must rebuild and validate analyzed, owner, question and shared, then require analyzed.tenant_id == owner.tenant_id, analyzed.review_id == owner.review_id, and analyzed.question_id == owner.question_id == question.question_id before iterating findings. These checks apply even when findings is empty.
+- documentary_gap_finding must rebuild and validate verified and question and require their question IDs to match before evaluating requires_documentary_support or returning None.
+- analyze_question retains its corresponding owner/question/result identity checks before iterating, including empty Analyst outputs.
+- Owner/shared verifications supplied to analysis or its reload check must come from the trusted path that has performed recheck_verified against the appropriate trusted evidence. Analysis checks do not independently re-prove retrieval membership.
+- Do not compare an Analyst request_sha256 with the Verifier’s request_sha256: these identify different calls. Each remains an audit field for its own stage.
+- Identity violations are fresh InvalidProvenanceInputError values with no cause or context; process control propagates unchanged.
+
+Add planned cases for mismatched outer tenant/review/question on an empty AnalyzedQuestion, mismatched question inputs to documentary_gap_finding whether its condition would be true or false, and valid empty analysis.
+
+This clarifies the intended input binding; it introduces no new module, persistence mechanism or production capability.
+
+3. Record specification acceptance
+
+Modify only the five currently staged documentation/history files.
+
+In docs/plan.md:
+- Rename the M5b heading to:
+  “M5b provenance and status-derivation specification (ACCEPTED at review, Prompt 176; implementation pending)”.
+- Update every link to its new anchor.
+- Record proposed in Prompt 174, corrected in Prompt 175, accepted in Prompt 176 with the binding clarification.
+- Record P1–P16 and the specified value, matching, rejection and reload rules as the implementation contract.
+- State that no M5b specification decision remains open.
+- Make the scoped §4 documentary-rule clarification accepted and effective for M5, while preserving the original wording as historical.
+- Preserve the disclosed Unicode limitations, structural-only provenance guarantee, mandatory hash-covered documentary-gap finding and later-slice obligations.
+- Preserve the M5f report-bound obligation: no silent truncation or unbounded report.
+- State that M5b implementation and every M5b check remain pending.
+
+Update README and threat model consistently. No M5b mitigation operates yet.
+
+Keep ADR-0019’s exact-commit evidence and attribution intact. Record main publication as authorized but still pending execution at the time of this documentation commit. Scope existing “not merged” statements to their observation time; do not claim a future merge or CI result.
+
+Do not alter accepted M5a specification anchors or earlier M4 evidence.
+
+Append to prompts.md:
+- Prompt 175’s handoff.
+- This reviewer acceptance, checksums, review scope and binding clarification.
+- Prompt 176 verbatim.
+- A pre-commit note containing completed checks only, without a prospective commit SHA or success claim.
+
+Preserve the previous prompts.md bytes as an identical prefix.
+
+4. Preflight and local commit
+
+Verify:
+- Only the five permitted files differ from accepted tree 2e75e3da.
+- The 12 implementation, test, packaging and workflow blobs remain identical to accepted tree 5d4febb69ab73b003c4c053ff0a7f5f8849d48fb.
+- No implementation, dependency, lockfile, settings, registry, migration, corpus, Docker, Compose or container-smoke change.
+- No tracked .local files, binaries or build artifacts.
+- All relative links and anchors resolve; tables are consistent.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --cached --check is clean.
+- Privacy scan and unsuppressed staged/range Gitleaks are clean.
+- Both workflows still trigger on push; all five jobs and their required steps remain present.
+- Integration still uses EG_REQUIRE_INTEGRATION=1 and pytest -m integration.
+- Existing wheel and container checks remain intact.
+
+Do not repeat local application tests, builds, installs, wheel checks, PostgreSQL or Docker checks. The implementation is unchanged.
+
+Commit using the established noreply author and committer:
+mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Suggested subject:
+docs: record verified M5a results and accepted M5b specification
+
+Write the message from a file. Credit Claude Code’s actual documentation work, preserve earlier attribution and the reviewer’s evidence, and retain the repository’s Co-Authored-By convention.
+
+Verify the commit, parent, tree, five changed paths, unchanged implementation blobs and clean working tree. Run unsuppressed full-history Gitleaks.
+
+Export the acceptance increment directly from Git:
+.local/p176/m5b-spec-acceptance.diff
+Baseline: accepted staged tree 2e75e3da7b05a85593c27a91dbec66ff585cbad6.
+Final: the new commit.
+Exclude prompts.md.
+Record byte size, SHA-256 and change statistics.
+
+5. Publish the feature branch once
+
+Immediately before pushing, recheck remote refs:
+- Feature must still equal 9ba6a488.
+- Main must still equal 46c02257.
+
+Push only:
+git push origin refs/heads/feat/model-call-contracts:refs/heads/feat/model-call-contracts
+
+No force push, amend, squash or automatic retry.
+
+If authentication requires interaction, notify Mathew promptly so he can complete the desktop prompt. Do not choose an account, inspect credentials or change authentication. Do not leave an unexplained credential-blocked push running indefinitely.
+
+Confirm the push exit status and that the remote feature branch equals the new full SHA. Main must remain unchanged.
+
+6. Feature CI gate
+
+Monitor both push-triggered workflows for the exact new SHA, feature branch and attempt 1, within a 25-minute bound.
+
+Require all five jobs:
+- Ubuntu verify.
+- Windows verify.
+- PostgreSQL integration.
+- Container.
+- Full-history Gitleaks.
+
+Require successful completion of every required step, with none skipped or cancelled. Earlier 9ba6a488 evidence cannot substitute for this gate.
+
+Use available permitted read access for workflow records and logs. If logs are unavailable, report API conclusions separately; do not infer counts or output. Do not change authentication to obtain logs.
+
+No reruns or corrective commits in this prompt. If any required job fails, is skipped, cannot be verified or exceeds the bound, stop before updating main and report the exact state. Stop any monitor when done.
+
+7. Main publication gate
+
+Only after the exact-commit feature gate passes:
+
+Fetch --no-tags and recheck:
+- Remote main remains 46c0225787ba09f27508dafaa218c1bf33af1e8e.
+- Local main equals origin/main.
+- The remote feature branch equals the newly verified SHA.
+- Main is an ancestor of that SHA.
+- The working tree is clean.
+- The publication range contains only d34aaaac, 79e32532, 9ba6a488 and the new documentation commit.
+- The reviewed implementation blobs are unchanged and the range contains only the reviewed paths.
+
+Then:
+git switch main
+git merge --ff-only <the full verified SHA>
+
+Recheck remote main immediately before pushing. If it changed, stop without pushing.
+
+Push only:
+git push origin refs/heads/main:refs/heads/main
+
+Verify exit status and remote main equals the verified SHA. No force push, merge commit, squash, rebase or deletion of either branch.
+
+8. Main CI and final handoff
+
+Monitor both main-push workflows for that exact SHA, event push, branch main and attempt 1, within a separate 25-minute bound.
+
+Report all five job conclusions and required steps. Retrieve logs if available through permitted existing access; otherwise keep API observations and unobserved log details separate. Never reuse earlier counts as observations for the new SHA.
+
+Do not edit documentation after either push, rerun CI or begin M5b implementation.
+
+Return:
+- Commit SHA, parent, tree, subject, identity and attribution.
+- Export size, SHA-256 and statistics.
+- Publication commands and exit statuses.
+- Feature and main run/job links with exact-SHA observations.
+- Any observed log counts and output, with attribution.
+- Before/after refs and final working-tree state.
+- Confirmation that monitors have stopped.
+- Any failure or remaining limitation.
+
+If publication succeeds, state that M5a and the accepted M5b specification are on main at the new SHA. M5b implementation and overall M5 acceptance remain pending.
+
+The documentation commit’s publication-status wording reflects its pre-publication observation time; updating it with final main evidence is a later task.
+
+Return the handoff and .local/p176/m5b-spec-acceptance.diff to Mathew for external review. Do not print the complete diff.
+
+### Prompt 176 pre-commit note (Claude Code; before the local documentation commit)
+
+Completed checks only. The starting state matched: branch `feat/model-call-contracts`, HEAD and
+upstream `9ba6a488`, `main` and `origin/main` `46c02257`, staged tree `2e75e3da` with exactly the
+five files, nothing unstaged or untracked, origin and noreply identity unchanged. Both exports
+matched their sizes, SHA-256 values and byte-identical Git comparisons. `fetch --no-tags` and
+read-only `ls-remote` (exit 0) showed remote `main` `46c02257` and remote feature `9ba6a488`. A
+checkpoint (refs, status, accepted staged tree, five blob hashes, prompts.md prefix) is saved under
+`.local/p176/`. Documentation: the M5b heading renamed to "ACCEPTED at review, Prompt 176;
+implementation pending" with every link updated; the status, the §4 clarification (accepted and
+effective for M5, original wording kept) and M5b-J updated; the binding clarification added as
+M5b-E1 with matching rules in M5b-E and planned identity tests in M5b-H; README, ADR-0019 and the
+threat model updated, with "not merged" statements scoped to their observation time and `main`
+publication recorded as authorized but not yet run. Checks on the four documents: 0 relative-link
+or anchor problems, no remaining link to the old M5b anchor, 0 table column mismatches, UTF-8
+without BOM, LF only, no replacement characters, and `git diff --check` clean. Workflow preflight
+(read-only, unchanged files): both workflows trigger on push; the `verify` matrix (Ubuntu and
+Windows), `integration`, `container` and `gitleaks` jobs and their steps are present; integration
+sets `EG_REQUIRE_INTEGRATION: "1"` and runs `uv run --locked pytest -m integration`; the
+installed-wheel checks and the six container steps remain; no workflow uses a secret. No
+implementation, dependency, lockfile, migration, corpus, Docker, Compose or container-smoke path
+differs from HEAD, and no `.local` file or build artifact is tracked. No application test, build,
+install, wheel check, PostgreSQL or Docker check was run. The commit, its CI and any publication are
+reported afterwards, not predicted here.

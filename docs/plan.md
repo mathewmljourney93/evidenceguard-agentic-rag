@@ -219,6 +219,8 @@ These checks prove **provenance only**: the quoted text exists in an authorized 
 
 **Questions that need documentary support.** If `requires_documentary_support` is set and the status is `vendor_claim`, the Risk Analyst must raise a finding asking for documentary evidence.
 
+*Scoped clarification (proposed in Prompt 175, accepted at external review in Prompt 176; effective for M5):* under the accepted [M5b specification](#m5b-a-accepted-requirements-and-current-source-facts) this obligation is met by a deterministic domain-rule finding, independent of model compliance, instead of by the Risk Analyst itself (P11). The sentence above is kept as the historical requirement.
+
 ### Lifecycles
 
 Each lifecycle is a pure function in `evidenceguard_domain.state`, tested exhaustively.
@@ -6807,7 +6809,13 @@ sequence acceptance covers the slice order and the settled design choices; it is
 acceptance of the M5b–M5h schemas, SQL, prompts, transport or orchestration, each of which needs
 its own reviewed specification (see [acceptance scope](#m5-sequence-and-m5a-acceptance-prompt-170)).
 **M5a was implemented in Prompt 171, corrected in Prompt 172 and accepted for a local commit in
-Prompt 173 (publication and CI are pending); M5b–M5h have not started; no review path, provenance check, persisted snapshot or
+Prompt 173 (publication and CI were then pending); in Prompt 174 it was published on
+`feat/model-call-contracts` and verified in feature-branch CI at `9ba6a488` ([feature
+evidence](#m5a-feature-branch-ci-evidence-prompt-174)); when this record was written (Prompt 176,
+before the authorized `main` publication ran) it was not merged and `main` was `46c02257`. The
+[M5b specification](#m5b-provenance-and-status-derivation-specification-accepted-at-review-prompt-176-implementation-pending)
+was proposed in Prompt 174, corrected in Prompt 175 and **accepted at external review in Prompt
+176**; its implementation is pending. M5b–M5h are not implemented; no review path, provenance check, persisted snapshot or
 orchestration exists, and overall M5 acceptance is pending.** The M5 milestone text above is the controlling requirement and is unchanged; this
 sequence only orders it into slices. Labels: **[DECISION]** already accepted; **[FACT]** current
 code at `46c02257`; **[REC]** recommendation (for M5a and the sequence-level choices, accepted in
@@ -7341,9 +7349,11 @@ accepted in Prompt 170 with a clarification of the planned clock-test wording (G
 recommendations and W-A1 to W-A11 (section I) form the implementation contract; no M5a
 specification decision remains open. At acceptance no M5a module, test, workflow extension or
 ADR-0019 existed (historical). **Implemented by Claude Code in Prompt 171, corrected in Prompt 172
-and accepted at external review in Prompt 173 for a local commit**; publication, Linux and current-version CI are pending (see the
+and accepted at external review in Prompt 173 for a local commit**; publication, Linux and current-version CI were then pending (see the
 [implementation status](#m5a-implementation-status-accepted-for-a-local-commit-prompt-173-ci-pending) below and
-[ADR-0019](decisions/0019-model-call-contracts.md)). M5a is
+[ADR-0019](decisions/0019-model-call-contracts.md)). **Published and verified in feature-branch CI at
+`9ba6a488` in Prompt 174; not merged when this record was written (Prompt 176, before the
+authorized `main` publication ran)** ([feature evidence](#m5a-feature-branch-ci-evidence-prompt-174)). M5a is
 pure: no database, migration, network, credentials, settings, handler registration, prompts or
 orchestration.
 
@@ -7769,9 +7779,10 @@ reading supplied mappings at the public output and fake-configuration entry poin
 fixed errors), and the corrected implementation was **accepted at external review in Prompt 173
 for a local commit only**; see [ADR-0019](decisions/0019-model-call-contracts.md) for the
 contracts, the implementation choices, the review attribution and the local verification actually
-run. **Publication and merge are not authorized; Linux verification and current-version CI are
-pending, and none of the 308 integration tests has run against this version** (M5a adds no
-PostgreSQL tests). Nothing registers, configures or networks the new code: there
+run. **At acceptance, publication and merge were not authorized; Linux verification and
+current-version CI were pending, and none of the 308 integration tests had run against this
+version** (M5a adds no PostgreSQL tests; historical, see the
+[feature evidence](#m5a-feature-branch-ci-evidence-prompt-174) below for Prompt 174). Nothing registers, configures or networks the new code: there
 is no production wiring, live provider, provenance check, prompt, persisted snapshot or review
 orchestration, and M5b–M5h and overall M5 acceptance remain pending.
 
@@ -7795,6 +7806,706 @@ orchestration, and M5b–M5h and overall M5 acceptance remain pending.
   suite `2910 passed, 310 skipped` (308 PostgreSQL tests without a database, one POSIX-only signal
   test and one symbolic-link test this Windows user cannot run); offline build; installed-wheel
   checks in an isolated offline environment. Details and limits are in ADR-0019.
+
+##### M5a feature-branch CI evidence (Prompt 174)
+
+[FACT] Accepted in Prompt 173 for a local commit; in Prompt 174 (resumed after an interrupted push)
+`feat/model-call-contracts` was published at `9ba6a48888ff39a06b336a22429d5b3dcfa0bad6` (history-only
+commit on top of the accepted implementation `79e32532`; the 12 implementation, test, packaging and
+workflow blobs are identical to the accepted tree `5d4febb6`). **Not merged when observed
+(Prompts 174–176): `main` was `46c02257`.** Publication to `main` was authorized in Prompt 176,
+gated on exact-commit CI for the documentation commit; it had not run when this record was
+written. Both push-triggered runs for that exact SHA (event `push`, attempt 1) and all five
+required jobs succeeded, with every required step successful and none skipped:
+[CI run 39303677105](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39303677105)
+(Ubuntu verify, Windows verify, PostgreSQL integration, container) and
+[secret-scan run 39303677129](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39303677129)
+(full-history Gitleaks).
+
+From the job logs **independently retrieved by the external reviewer** after Prompt 174 (recorded in
+Prompt 175): Ubuntu `2938 passed, 308 skipped`, Windows `2937 passed, 309 skipped`, PostgreSQL
+`308 passed, 2938 deselected` with the 104 M4 PostgreSQL cases passing (including both Voyage
+cases), both installed-wheel logs printing the six expected lines including "model-call contracts
+classified a scripted fake response from the installed wheel", the container job with all six
+required steps and its smoke's reported checks, and Gitleaks (75 commits, no leaks). In Prompt 174
+Claude Code observed only the API conclusions (its log downloads returned HTTP 403). Job links,
+durations, the wheel lines, the container summary and the attribution are in
+[ADR-0019](decisions/0019-model-call-contracts.md#feature-branch-ci-evidence-prompt-174). This is
+contract evidence with the scripted fake, not live-model quality; the wheel's Recall@5 line is
+arithmetic, not a database-derived corpus Recall; the container smoke is unchanged and does not
+exercise M5a.
+
+#### M5b provenance and status-derivation specification (ACCEPTED at review, Prompt 176; implementation pending)
+
+**Status.** **Proposed by Claude Code in Prompt 174, corrected in Prompt 175 after external review
+and accepted at external review in Prompt 176**, together with the binding input-identity
+clarification in [M5b-E1](#m5b-e1-input-identity-binding-accepted-clarification-prompt-176). P1–P16
+([M5b-J](#m5b-j-reviewer-decisions)) and the value, matching, rejection and reload rules specified
+below (M5b-B1, M5b-C, M5b-C1, M5b-D, M5b-E, M5b-E1, M5b-F) form the **implementation contract**;
+**no M5b specification decision remains open.** **The M5b implementation and every M5b check are
+pending:** no M5b module, test, ADR-0020 or workflow change exists, and no M5b control operates.
+*Review scope (Prompt 176):* the reviewer independently verified the byte sizes and checksums of
+the Prompt 174 and Prompt 175 exports and inspected their documentation changes; the reviewer's
+Unicode probes and independently retrieved CI evidence keep their previously recorded scope, and no
+M5b implementation or project test was run for this review. Labels: **[DECISION]** already accepted
+before Prompt 174 (§4, the M5 sequence and its W11/W12 directions); **[FACT]** current source at the
+published M5a SHA `9ba6a488`; **[REC]** Claude Code's recommendation, **accepted in Prompt 176 as
+part of the implementation contract**. M5b is pure and database-independent: no
+persistence, migration, prompt, request assembly, orchestration, endpoint, provider call, setting or
+production wiring. Provenance (a quote exists in an authorized retrieved chunk) is distinct from
+semantic entailment (model judgment, measured in M7) and from document authenticity (always
+`not_established` in v1).
+
+*Prompt 175 corrections (summary):* the matching rule is renamed and scoped as **segment-wise NFD
+matching**, with its departures from Unicode canonical equivalence disclosed
+([M5b-C1](#m5b-c1-limitations-of-segment-wise-nfd-matching)); exact value invariants
+([M5b-B1](#m5b-b1-value-types-bounds-and-invariants)) and the complete rejection contract
+([M5b-F](#m5b-f-outcomes-errors-privacy-and-process-control)) are specified; reload validation
+recomputes the match ([M5b-D](#m5b-d-verifier-conversion-and-status-derivation)); every claim of a
+`supported` or `contradicted` output must be cited (P7); and the documentary-gap finding is a
+mandatory domain rule (P11).
+
+##### M5b-A. Accepted requirements and current-source facts
+
+[DECISION]
+
+- §4: provenance checks prove only that each quote exists in an authorized chunk retrieved for that
+  review and question; `evidence_status` is derived deterministically from the verdict and the
+  cited documents' `source_type`; authenticity is always `not_established`; a `vendor_claim` on a
+  question with `requires_documentary_support` raises a finding; the Risk Analyst may cite only
+  citations the Verifier already validated.
+- W11: `Verification`, `Citation` and `Finding` stay unchanged; surrounding values are added; the
+  derived status must satisfy the existing validator.
+- W12 direction: a normalized-substring match of body and repeated-header text **independently**,
+  never joining spans, storing and displaying the exact original substring; evidence text is never
+  modified.
+- Sequence: M5b lives in `evidenceguard_domain.provenance`; a forged or unretrieved chunk gives
+  `citation_rejected`; M5c owns safe prompt encoding and request assembly, M5d persisted snapshot
+  trust, M5f the hash-covered report representation, M5g orchestration and job precedence, M5h the
+  model adapter; production wiring is a separate reviewed decision (W8).
+
+*Scoped clarification of §4 (P11; proposed in Prompt 175, **accepted at external review in Prompt
+176 and effective for M5**).* §4 says "the Risk Analyst must raise a finding asking for documentary
+evidence". For M5 this obligation is met by a **deterministic domain-rule finding** (M5b-E),
+independent of model compliance, instead of by the Risk Analyst itself. The §4 text is left
+unchanged as the historical wording.
+
+[FACT]
+
+- `Citation(tenant_id, document_revision_id, chunk_id, source_type, quote, authenticity)` is a
+  `DomainModel`, whose configuration has `str_strip_whitespace=True`: `quote` (the `Quote` type,
+  1–1000 code points) is **stripped at construction**, as are `Verification.rationale` and
+  `Finding.title` and `.statement`. A quotation with leading or trailing whitespace therefore cannot
+  be stored unchanged in a `Citation`.
+- `_check_citations` enforces one tenant, no duplicate `(chunk_id, quote)`, `vendor_claim` → every
+  citation a `vendor_statement`, `documentary_support` → at least one `contract` or
+  `third_party_report`, `conflicting` → at least two distinct quote texts, `missing` → any number.
+  `ALLOWED_STATUSES` maps `supported` → {`vendor_claim`, `documentary_support`}, `contradicted` →
+  {`conflicting`}, `insufficient_evidence` → {`missing`}. `Verification` has no claims or provenance
+  field; `Finding` has no follow-up field; `ReportContent` holds at most 200 findings and 100
+  questions.
+- M5a: `VerifierOutput(verdict, claims ≤ 10, rationale)`, `ClaimOutput(text 1–1000, citations ≤ 8)`,
+  `QuoteRef(chunk_id canonical string, quote 1–1000)`, `AnalystOutput(findings ≤ 20)`,
+  `FindingOutput(question_ids 1–20, title, severity, statement, citations ≤ 8, follow_up_questions
+  ≤ 5 of 1–500)`; output strings reject NUL and lone surrogates and are never stripped; only exact
+  duplicate `QuoteRef`s within one claim or finding are rejected. `StructuredResult` carries
+  `purpose`, `question_id`, `request_sha256`, `outcome` and, for `completed`, `output`.
+- M4d: `RetrievalResult` derives `tenant_id` and `snapshot_sha256` from its snapshot and holds at
+  most `k` ≤ 20 items with distinct chunk IDs, each item's revision and document belonging to a
+  snapshot binding. `RetrievedChunk(chunk_id, revision_id, document_id, …, evidence)`.
+  `ChunkEvidence` has `text` (1–4,000 code points, digest-verified at construction, so UTF-8
+  encodable), a `body` `SourceSpan`, an optional `header` span (tables only) ending before the body,
+  `text` equal to the header slice followed by the body slice, `header_text`/`body_text` split at the
+  header length, `source_type` and `authenticity`. **`ChunkEvidence` carries no tenant or revision
+  ID**; those come from the result and item.
+- No module uses `unicodedata`. Chunk IDs already use `uuid5` with a fixed namespace
+  (`chunks.CHUNK_ID_NAMESPACE`).
+
+##### M5b-B. Placement and public values
+
+[REC] One new module, `packages/domain/evidenceguard_domain/provenance.py`, importing only the
+standard library (`unicodedata`, `uuid`, `dataclasses`, `enum`, `contextlib`) and the domain modules
+`evidence`, `retrieval`, `model_calls` and `agent_outputs`. It imports no persistence, retrieval
+package, agents, apps, SQLAlchemy or network module; `tests/test_packaging.py` gains its allowlist.
+Values are frozen dataclasses in the M4d/M5a style: exact types (`type(x) is …`, `bool` is not an
+`int`), no coercion, tuples only, unknown keywords rejected, nested values **rebuilt through their
+constructors** (`Citation`, `Verification`, `Finding` and `EvidenceQuestion` through `model_copy()`,
+which revalidates; M4d and M5a values through their constructors), revalidation on
+`dataclasses.replace`, count-only `repr`.
+
+| Name | Kind | Contents and rule |
+|---|---|---|
+| `MATCH_RULES` | constant | `"eg-quote-match-v1"`, the only supported match-rules identifier, recorded with every verified question |
+| `QuoteSpanKind` | `StrEnum` | `header`, `body` |
+| `QuoteMatch` | value | the matched exact original quote and its offsets (M5b-B1) |
+| `match_quote(evidence, quote)` | function | `QuoteMatch` or one of four `RejectionReason` members (M5b-C) |
+| `QuestionEvidence` | value | the trusted inputs for one question (M5b-B1, M5b-D) |
+| `AcceptedCitation` | value | a `Citation`, its document ID and its `QuoteMatch` |
+| `ValidatedClaim` | value | model claim text and indexes into the verification's citations |
+| `VerifiedQuestion` | value | one question's derived `Verification`, claims and aligned provenance |
+| `FindingKind` | `StrEnum` | `analyst`, `documentary_support_required` |
+| `AnalyzedQuestion` | value | one question's Analyst findings and their follow-up questions |
+| `RejectionStage` | `StrEnum` | `verification`, `analysis` |
+| `RejectionReason` | `StrEnum` | the fixed reasons in M5b-F |
+| `ProvenanceRejection` | value | a text-free stage rejection (M5b-F) |
+| `derive_status(verdict, citations)` | function | `EvidenceStatus` or `None` (M5b-D table) |
+| `verify_question(evidence, result)` | function | `VerifiedQuestion` or `ProvenanceRejection` |
+| `recheck_verified(verified, evidence)` | function | the rebuilt value, or `InvalidProvenanceInputError` (reload path) |
+| `analyze_question(owner, question, result, *, shared=())` | function | `AnalyzedQuestion` or `ProvenanceRejection` (M5b-E) |
+| `recheck_analyzed(analyzed, owner, question, *, shared=())` | function | the rebuilt value, or `InvalidProvenanceInputError` (reload path) |
+| `documentary_gap_finding(verified, question)` | function | the deterministic rule finding or `None` (M5b-E) |
+| `finding_id(tenant_id, review_id, question_id, kind, index)` | function | deterministic `UUID` (M5b-E) |
+| `InvalidProvenanceInputError`, `InvalidProvenanceValueError` | errors | `invalid_provenance_input`, `invalid_provenance_value` (M5b-F) |
+
+##### M5b-B1. Value types, bounds and invariants
+
+[REC] "Constructor" invariants are checked on every direct construction and `dataclasses.replace`
+(failure: `InvalidProvenanceValueError`). "Needs trusted values" invariants cannot be checked from
+the value alone; they are checked only by `verify_question`/`analyze_question` when deriving and by
+`recheck_verified`/`recheck_analyzed` on reload (failure: `InvalidProvenanceInputError`). **No
+constructor proves authorization, retrieval for a particular question, or semantic entailment.**
+Text fields "plain" means exactly `str`, no NUL, no lone surrogate (UTF-8 encodable), never
+stripped or normalized. IDs are exactly `UUID`; digests exactly `str` of 64 lowercase hex; question
+IDs exactly `str` matching the existing `QuestionId` pattern.
+
+| Value | Fields (exact types and bounds) | Constructor invariants | Needs trusted values |
+|---|---|---|---|
+| `QuoteMatch` | `kind: QuoteSpanKind`; `text_start`, `text_end`, `source_char_start`, `source_char_end`: `int` (not `bool`); `quote`: plain `str`; `occurrences`: `int` | `0 <= text_start < text_end <= 4000`; `source_char_start >= 0`; `text_end - text_start == source_char_end - source_char_start == len(quote)`; `1 <= len(quote) <= 1000`; `quote == quote.strip()`; `1 <= occurrences <= 64` | offsets lie inside the named span of that chunk, select exactly `quote` in `text` and in the source, and equal a fresh `match_quote` result (M5b-D) |
+| `QuestionEvidence` | `tenant_id`, `review_id`: `UUID`; `snapshot_sha256`: digest; `question: EvidenceQuestion`; `result: RetrievalResult` | `question` and `result` rebuilt; `result.tenant_id == tenant_id`; `result.snapshot_sha256 == snapshot_sha256`; items ≤ 20 with distinct chunk IDs (from `RetrievalResult`) | that `result` came from this review's trusted snapshot and was retrieved for this question (M5d/M5g responsibility) |
+| `AcceptedCitation` | `citation: Citation`; `document_id: UUID`; `match: QuoteMatch` | both rebuilt; `match.quote == citation.quote`; `citation.authenticity` is `not_established` | chunk among the retrieved items; revision, document, source type, authenticity and tenant equal the item's; match recomputes equal |
+| `ValidatedClaim` | `text`: plain `str`, 1–1000 code points; `citation_indexes`: tuple of `int`, length 0–8 | each index `0 <= i < 80`; indexes distinct within the claim | that the order within the claim is the model's first-appearance order (needs the original output; not rechecked on reload) |
+| `VerifiedQuestion` | `tenant_id`, `review_id`: `UUID`; `question_id`; `snapshot_sha256`, `request_sha256`: digests; `match_rules: str`; `verification: Verification`; `claims`: tuple of `ValidatedClaim`, 0–10; `provenance`: tuple of `AcceptedCitation`, 0–80 | `match_rules == MATCH_RULES`; `verification` and every nested value rebuilt; `verification.tenant_id == tenant_id` and `.question_id == question_id`; `len(provenance) == len(verification.citations)` and `provenance[i].citation == verification.citations[i]`; every claim index `< len(provenance)`; reading claims in order, the first appearances of indexes are exactly `0, 1, …, n−1` (canonical order, so every citation is referenced); `verification.evidence_status == derive_status(verdict, citations)` (never `None`); for `supported` and `contradicted`, every claim has at least one index (P7) | all `AcceptedCitation` checks; question, tenant, review and snapshot equal the trusted `QuestionEvidence` |
+| `AnalyzedQuestion` | `tenant_id`, `review_id`: `UUID`; `question_id`; `request_sha256`: digest; `findings`: tuple of `Finding`, 0–20; `follow_up_questions`: tuple of tuples of plain `str` (1–500 code points), inner length 0–5 | findings rebuilt; `len(follow_up_questions) == len(findings)`; every finding has `tenant_id == tenant_id`, contains `question_id` in `question_ids`, at most 8 citations, and `finding_id == finding_id(tenant_id, review_id, question_id, analyst, k)` for its position `k` | citations are validated owner (and shared) citations; listed questions are the owner and supplied shared questions; status equals the derivation in M5b-E |
+| `ProvenanceRejection` | see M5b-F | see M5b-F | — |
+
+**Shared questions** (`shared` in `analyze_question`/`recheck_analyzed`): a tuple of at most 19
+`VerifiedQuestion`s (a finding lists at most 20 questions, one being the owner), each rebuilt, with
+distinct question IDs, none equal to the owner's, and the same `tenant_id`, `review_id` and
+`snapshot_sha256` as the owner; otherwise `InvalidProvenanceInputError`.
+
+**`finding_id` arguments:** `tenant_id`, `review_id` exactly `UUID`; `question_id` matching
+`QuestionId`; `kind` exactly a `FindingKind` member; `index` an `int` (not `bool`) with `0 <= index
+<= 19` for `analyst` and **exactly 0** for `documentary_support_required`; otherwise
+`InvalidProvenanceInputError`.
+
+##### M5b-C. Exact quote matching (settles W12)
+
+[REC] `match_quote(evidence, quote)` revalidates `evidence` as a `ChunkEvidence` and requires
+`quote` to be a plain `str` of 1–1000 code points (as validated by M5a); otherwise
+`InvalidProvenanceInputError`. It never raises for model content: it returns a `QuoteMatch` or one
+of `quote_blank`, `quote_not_found`, `quote_too_long`, `quote_not_exact`, checked in that order.
+The rule is **segment-wise NFD matching**, a deliberately limited, bounded matching rule; it is
+**not** full Unicode canonical-equivalence matching (see M5b-C1).
+
+1. **Spans.** `header_text` (when present) and `body_text` are matched **separately**. Each is one
+   contiguous slice of the revision text. Matching never uses `text` as a whole, never joins header
+   and body, never joins two chunks and never joins non-adjacent passages; a quote that exists only
+   across the header/body boundary is not found, even though `text` contains it contiguously.
+2. **Segments.** A code point is a *starter* when its canonical combining class is 0
+   (`unicodedata.combining(c) == 0`), otherwise a *non-starter*. A new segment begins at every
+   starter; a segment is one starter followed by all non-starters up to the next starter. If the
+   text **begins** with non-starters, the whole maximal initial run of non-starters forms **one**
+   segment (not one segment per non-starter). The same rule applies to the span and to the quote.
+3. **Units and keys.** A segment that is exactly one code point `c` with `c.isspace()` is a
+   whitespace segment; each **maximal run** of whitespace segments is one unit with key `" "`
+   (U+0020). Every other segment is one unit with key `unicodedata.normalize("NFD", segment)`. Each
+   unit records its `[start, end)` code-point offsets in the span. Matching boundaries are these
+   **specified units**, not grapheme clusters or user-perceived characters.
+4. **Quote form.** The quote's units and keys are formed the same way; leading and trailing
+   whitespace units are dropped; nothing left → `quote_blank`. `Q` is the concatenation of the
+   remaining keys.
+5. **Occurrence.** `N` is the concatenation of the span's unit keys with a table of unit boundaries.
+   An occurrence is an index `i` with `N[i:i+len(Q)] == Q` where `i` is the start of a unit and
+   `i + len(Q)` the end of a unit. The search repeats `str.find` from `i + 1` (overlapping
+   occurrences count). A match therefore never starts or ends inside a unit (in particular, never
+   inside a whitespace run). No occurrence in either span → `quote_not_found`.
+6. **Offset mapping.** An occurrence covers units `u_a … u_b`; the original slice is
+   `span[u_a.start:u_b.end]`. Chunk-text offsets add 0 (header) or `header.length` (body); source
+   offsets add that span's `char_start`. This is exact because M4d guarantees `text` is the header
+   slice followed by the body slice and each slice is a contiguous source range of the same length.
+7. **Selection.** All occurrences in both spans are ordered by chunk-text start (header before body);
+   the **first** is selected; `occurrences` counts them and scanning stops at 64. Only the selected
+   occurrence is checked in step 8; there is **no fallback** to a later occurrence. With repeated
+   text whose originals differ (for example different line breaks), the first occurrence's original
+   is stored (P4).
+8. **Exact stored quotation.** `original = span[start:end]`. `len(original) > 1000` (an original can
+   be longer than the model's quote, for example a decomposed spelling) → `quote_too_long`, never
+   truncated; `original != original.strip()` (Python whitespace; only possible for a degenerate edge
+   unit such as a space carrying a combining mark) → `quote_not_exact`. `verify_question` then builds
+   the `Citation` with `quote=original` and requires `citation.quote == original` after construction
+   (else `quote_not_exact`). Because the selected original has no Python-whitespace edges, the M1
+   stripping leaves it unchanged; the post-construction equality pins this whatever whitespace
+   definition Pydantic applies (design intent to be confirmed by the tests). **No M1 contract change
+   is made;** a non-stripping citation quote was the alternative in P5.
+9. **Not folded.** No case folding, no compatibility (NFKC) folding (ligatures, full-width forms,
+   superscripts), no punctuation, quotation-mark, dash or ellipsis folding, no removal of zero-width,
+   soft-hyphen or other format characters, and no matching across elided text: a quote containing
+   `…` or `...` matches only those literal characters.
+10. **Original preserved.** The model's string is never stored or displayed; only `original` is.
+    Every accepted quote is an **exact, contiguous substring of one span of the original evidence,
+    with exact original offsets**, whatever the limitations in M5b-C1. Evidence text is never
+    modified; normalized forms are transient and never returned, stored or logged.
+11. **Unicode version.** Results depend on the interpreter's `unicodedata` tables (expected Unicode
+    15.0.0 for the CI's Python 3.12; a test pins the observed version so an interpreter upgrade is a
+    deliberate change). Stored citations are original substrings, so a later Unicode version cannot
+    change a stored quote, only future matches.
+12. **Bounds.** Spans hold at most 4,000 code points and NFD expands each code point by a small
+    constant (the maximum pinned by a test over the code space); quotes hold at most 1,000 code
+    points; a verification checks at most 80 quote references (10 claims × 8), each against one
+    chunk; span forms are computed at most once per span per call (at most 40); the occurrence loop
+    makes at most one `find` per position of `N` and stops after 64 occurrences. These are
+    engineering bounds, not measured limits.
+
+Examples (all planned tests):
+
+| Span text (original) | Model quote | Result |
+|---|---|---|
+| `Data is encrypted⏎  at rest.` | `Data is encrypted at rest.` | match; stored quote is the original with its line break and spaces |
+| `café` with `e` + U+0301 | `café` precomposed | match; stored quote is the decomposed original |
+| `café` | `cafe` | `quote_not_found` (the mark belongs to the unit) |
+| `ﬁle` (ligature) | `file` | `quote_not_found` (no NFKC) |
+| `MFA enabled` | `mfa enabled` | `quote_not_found` (no case folding) |
+| precomposed `각` (U+AC01) | conjoining U+1100 U+1161 U+11A8 | match (complete syllable); stored quote is the precomposed original |
+| conjoining U+1100 U+1161 U+11A8 | precomposed `각` (U+AC01) | match (complete syllable); stored quote is the conjoining original |
+| header `\| Control \| Status \|`, body `\| MFA \| On \|` | `Status \| \| MFA` | `quote_not_found` (crosses the header/body boundary) |
+| body with `rotated yearly` twice, once across a line break | `rotated yearly` | first occurrence's original, `occurrences` 2 |
+| `   ` | `   ` | `quote_blank` |
+
+##### M5b-C1. Limitations of segment-wise NFD matching
+
+[REC] Segment-wise NFD handles the common cases (precomposed versus combining Latin accents,
+canonical reordering of marks **within one segment**, complete Hangul syllables in either spelling)
+but is **not** Unicode canonical equivalence: **canonically equivalent spellings can produce
+different matching results**. Two disclosed cases (from the reviewer's isolated Prompt 175 probe,
+see below):
+
+- **Reordering across segments (Tibetan).** U+0F73 has combining class 0 and decomposes to U+0F71
+  U+0F72 (non-starters). The original `ཀཱིུ` and its full NFD
+  `ཀཱིུ` are canonically equivalent, but because U+0F73 starts a new segment,
+  the segment-wise key of the original is `ཀཱིུ`, while the key of the full-NFD
+  spelling is `ཀཱིུ`. A quote in one spelling does not match evidence in the
+  other.
+- **Hangul partial-match asymmetry.** Conjoining Jamo each have combining class 0, so each is its own
+  unit, while a precomposed syllable is one unit. For the span `각` (precomposed), the quote
+  `가` has key `가`, which ends inside the span's single unit (`각`):
+  `quote_not_found`. For the canonically equivalent span `각` (three units), the same
+  quote matches the first two units and the stored quote is `가`. Complete-syllable quotes
+  match both spellings (examples above).
+
+These limitations can cause **false rejections** (and, for partial Hangul syllables, an acceptance
+that depends on the evidence spelling); they never weaken the guarantee in rule 10: an accepted
+quote is always an exact contiguous original substring with exact offsets. Full canonical
+equivalence would need a different, reviewed normalization design; none is proposed for v1 (P1).
+
+*Probe attribution.* The reviewer ran a small isolated standard-library probe with Unicode 15.0.0,
+implementing the proposed segmentation and per-segment NFD keys, which produced the keys and
+results above. It was not a project test or an implementation test; no M5b code exists. Claude Code
+ran no probe in Prompt 175.
+
+##### M5b-D. Verifier conversion and status derivation
+
+[REC] **Trusted input binding.** `QuestionEvidence` (M5b-B1) carries the tenant, review, snapshot
+digest, question and retrieval result from M5d/M5g trusted paths (the review record, the planner
+and M5g's own `search_snapshot` call for that question), never from the model. M5b cannot prove
+that `result` was retrieved for this question; M5g supplies it only from that call (an M5g
+structure test).
+
+**Call binding.** `verify_question(evidence, result)` requires `type(result) is StructuredResult`,
+revalidated by rebuilding, with `outcome` `completed`, `purpose` `verifier` and
+`result.question_id == evidence.question.question_id`; otherwise `InvalidProvenanceInputError`
+(caller misuse: only completed Verifier results reach M5b). `request_sha256` is recorded for audit.
+
+**Algorithm** (phases run in order; a later phase runs only if no earlier phase failed; M5b-F
+defines the reported rejection):
+
+1. Index the retrieved items by chunk UUID. The model's `chunk_id` is only a lookup key; it
+   authorizes nothing.
+2. **Phase 1 – references.** For every claim `i` and quote reference `j`, in order: chunk not among
+   the items → `chunk_not_retrieved`; otherwise `match_quote` (`quote_blank`, `quote_not_found`,
+   `quote_too_long`, `quote_not_exact`) and the `Citation` equality check (`quote_not_exact`). On
+   success build `Citation(tenant_id=evidence.tenant_id, document_revision_id=item.revision_id,
+   chunk_id=item.chunk_id, source_type=item.evidence.source_type, quote=original,
+   authenticity=item.evidence.authenticity)`: **all metadata comes from trusted evidence**, and
+   authenticity is `not_established`, the only value. Every reference is checked (at most 80).
+3. **Deduplication.** Accepted citations are keyed by `(chunk_id, original quote)`. The question's
+   citations are the distinct keys in first-appearance order across claims; each claim keeps
+   distinct `citation_indexes` in first-appearance order, so two references that resolve to the
+   same original collapse. Every question-level citation is referenced by at least one claim, so no
+   claim–citation relationship is lost.
+4. **Phase 2 – claim coverage (P7).** For verdict `supported` or `contradicted`, every claim must
+   retain at least one accepted citation after deduplication; a claim with no quote reference →
+   `claim_uncited`. (A claim whose references failed was already rejected in phase 1.) For
+   `insufficient_evidence`, claims may be uncited. This is structural provenance only; it does not
+   show that a quote supports its claim.
+5. **Phase 3 – aggregate.** Status by `derive_status` (table below; `None` → `verdict_unsupported`)
+   and the rationale (`output.rationale.strip() == ""` → `rationale_blank`); both are evaluated.
+   Otherwise the `Verification` stores the stripped rationale (free model text, not evidence, so M1
+   stripping is acceptable).
+6. Build `Verification(tenant_id, question_id, verdict, evidence_status, citations, rationale)` (the
+   existing validator re-runs; a failure here is an internal inconsistency,
+   `InvalidProvenanceValueError`, tested as unreachable) and return `VerifiedQuestion` with
+   `match_rules = MATCH_RULES`.
+
+Any failure rejects the whole output; no partial `Verification` is produced (P6).
+
+| Verdict | Accepted citations (question level) | `evidence_status` |
+|---|---|---|
+| `supported` | at least one; every one `vendor_statement` | `vendor_claim` |
+| `supported` | at least one `contract` or `third_party_report` (any mix) | `documentary_support` |
+| `supported` | none | rejected: `verdict_unsupported` |
+| `contradicted` | at least two distinct quote texts (any source types; one chunk may supply both) | `conflicting` |
+| `contradicted` | fewer than two distinct quote texts | rejected: `verdict_unsupported` |
+| `insufficient_evidence` | any number, including none (kept) | `missing` |
+
+These rows are exactly the existing `ALLOWED_STATUSES` and `_check_citations` rules, so the derived
+`Verification` always validates. With P7, every claim of a `supported` or `contradicted` output is
+also cited. `requires_documentary_support` does not change the Verification's status; it is handled
+by the rule finding (M5b-E).
+
+**Reload validation.** `recheck_verified(verified, evidence)` runs as one guarded operation and:
+
+1. rebuilds `verified` (all constructor invariants in M5b-B1, including `match_rules ==
+   MATCH_RULES`, aligned provenance, canonical claim indexes, P7 coverage and the status
+   derivation) and `evidence`;
+2. requires equal tenant, review, snapshot digest and question ID;
+3. for every `provenance[i]`: the chunk is among the retrieved items; the citation's tenant,
+   `document_revision_id`, `source_type` and `authenticity` and the stored `document_id` equal the
+   trusted item's values; and **`match_quote(item.evidence, citation.quote)` recomputed from the
+   trusted `ChunkEvidence` and the stored original quote returns a `QuoteMatch` equal in every field
+   to the stored `match`**. This one rule checks the span kind, chunk-text and source offsets, the
+   exact original quotation, unit boundaries, first-occurrence selection and the capped occurrence
+   count. (The stored original's quote form equals the model quote's form, because the original is
+   a unit-aligned occurrence without edge whitespace, so recomputation selects the same occurrence.)
+
+Any difference is `InvalidProvenanceInputError`. M5e/M5g reload paths call it with M5d's trusted
+reloaded evidence. It **detects values inconsistent with the trusted evidence supplied**; it does
+not prove which retrieval request originally ran, and it does not protect against a malicious
+trusted process or a direct database writer.
+
+##### M5b-E. Risk Analyst findings and the documentary-support rule
+
+[REC] `analyze_question(owner, question, result, *, shared=())`: `owner` is the question's
+`VerifiedQuestion` (the Verifier stage succeeded), `question` its `EvidenceQuestion` (same ID), and
+`result` a revalidated `StructuredResult` with `outcome` `completed`, `purpose` `risk_analyst` and
+`question_id` equal to the owner's; `shared` follows M5b-B1. Violations are
+`InvalidProvenanceInputError`. These identity checks run **before any finding is examined**,
+including for an Analyst output with no findings (M5b-E1). **Every finding is checked** (at most 20). For each finding `k`, the
+checks below run in order and stop at the finding's **first** failing check (later checks depend on
+earlier ones):
+
+1. **Question scope.** `question_ids` must contain the owner's ID; every other ID must be the
+   question of a supplied `shared` value → else `foreign_question`.
+2. **Citations.** Each `QuoteRef`, in order, must resolve to an owner citation with the same chunk
+   ID whose stored quote has the same M5b-C quote form `Q` (equivalence of the whole quote, never a
+   substring or a new passage) → else `citation_not_validated`. For a multi-question finding the
+   resolved citation must also be in every listed question's `Verification` (same chunk and quote)
+   → else `citation_not_shared`. The finding carries the stored, trusted `Citation`s, deduplicated,
+   in first-appearance order.
+3. **Status** (the model never supplies it): the verdicts of all listed questions must be equal →
+   else `mixed_verdicts`. Then: no citations → `missing`; `insufficient_evidence` → `missing`;
+   `supported` → `vendor_claim` or `documentary_support` by source type as in M5b-D;
+   `contradicted` → `conflicting` with at least two distinct quote texts, else
+   `finding_status_unsupported`. A finding citing one side of a conflict is therefore never shown as
+   support (P10).
+4. **Text.** `title` and `statement` must be non-blank after stripping (they become stripped
+   `Finding` fields) → else `finding_text_blank`. `severity` is the model's judgment.
+   `follow_up_questions` are kept verbatim in the parallel tuple; `Finding` has no such field, and
+   their report representation is M5f's decision (P13).
+5. **Identity.** `finding_id(tenant_id, review_id, owner question_id, analyst, k)`; the finding is
+   built through `Finding`'s validator.
+
+Any failing finding rejects the whole analysis (M5b-F). `owner` is never modified, re-derived or
+relabelled: a failed analysis leaves the valid `Verification` intact, and M5g records the analysis
+as unresolved (W14). The Analyst cannot supply status, tenant, revision, source type,
+authenticity, finding IDs or new evidence. `recheck_analyzed(analyzed, owner, question, *,
+shared=())` rebuilds and validates `analyzed`, `owner`, `question` and `shared`, checks the outer
+identities in M5b-E1 before iterating, and then repeats steps 1–5 against them for every stored
+finding (citations resolved by exact chunk and quote, statuses re-derived, IDs recomputed); any
+difference is `InvalidProvenanceInputError`.
+
+**Multi-question findings.** With the per-question analysis stage recommended for M5g (only the
+owner's Verification is in its request), `shared` is empty, so a finding listing another question is
+`foreign_question`. The general rule lets a later reviewed stage design supply shared questions
+without changing M5b (P9).
+
+**Documentary-support rule (P11).** `documentary_gap_finding(verified, question)` first rebuilds and
+validates `verified` and `question` and requires `verified.question_id == question.question_id`
+(M5b-E1), before evaluating `requires_documentary_support` or returning `None`. It then returns, when
+`question.requires_documentary_support` is set and the Verification's status is `vendor_claim`, one
+deterministic `Finding`: `finding_id(…, documentary_support_required, 0)`, `question_ids` the owner
+only, fixed title "Documentary evidence required", fixed statement "Only vendor statements support
+this answer; the question requires a contract or third-party report.", severity `medium`,
+`evidence_status` `missing` and the Verification's citations (all `vendor_statement`, allowed for
+`missing`). Otherwise it returns `None`. It is a **domain-rule obligation independent of model
+compliance**: it depends only on the valid Verification, not on the Analyst's output, and it is not
+a model judgment. **Binding obligation on M5f and M5g (accepted in Prompt 176):** once a valid `vendor_claim`
+Verification exists for a question requiring documentary support, this rule finding **must** be
+included in the later hash-covered report **even if analysis fails**; inclusion is not optional, and
+the valid Verification is preserved. Under the existing `ReportContent` rules a `missing` finding
+forces the question into `unresolved_question_ids`, and the vendor claim stays visible. This
+replaces, for M5, §4's literal requirement that the Risk Analyst itself raise the finding (the
+scoped clarification in M5b-A). M5b does not try to decide whether an Analyst finding semantically
+asks for documents.
+
+**Finding IDs (P12).** `finding_id = uuid5(FINDING_ID_NAMESPACE,
+f"{tenant_id}:{review_id}:{question_id}:{kind}:{index}")` with canonical lowercase UUID text, the
+`FindingKind` value and the decimal index (M5b-B1 bounds); `FINDING_ID_NAMESPACE = uuid5(NAMESPACE_URL,
+"https://evidenceguard.invalid/namespaces/finding-id/v1")`, pinned like `CHUNK_ID_NAMESPACE`. An
+identical replay yields identical IDs (M5e's identical-replay no-op), and `(review, question, kind,
+index)` is unique within a report. An ID is not a secret or an authorization.
+
+##### M5b-E1. Input identity binding (accepted clarification, Prompt 176)
+
+[DECISION] Set by the external reviewer as a binding clarification when accepting M5b in Prompt
+176. It clarifies the intended input binding only; it adds no module, persistence mechanism or
+production capability.
+
+- **`recheck_analyzed`** rebuilds and validates `analyzed`, `owner`, `question` and `shared`, then
+  requires `analyzed.tenant_id == owner.tenant_id`, `analyzed.review_id == owner.review_id` and
+  `analyzed.question_id == owner.question_id == question.question_id` **before iterating
+  findings**. These checks apply even when `findings` is empty.
+- **`documentary_gap_finding`** rebuilds and validates `verified` and `question` and requires
+  `verified.question_id == question.question_id` **before** evaluating
+  `requires_documentary_support` or returning `None`, so a mismatch is an error whether the rule's
+  condition would be true or false.
+- **`analyze_question`** keeps its owner, question and result identity checks (owner, question and
+  `result.question_id` equal; `shared` per M5b-B1) **before iterating**, including for an Analyst
+  output with no findings.
+- **Trusted owner and shared values.** The owner and shared `VerifiedQuestion`s supplied to
+  `analyze_question` or `recheck_analyzed` must come from the trusted path that has performed
+  `recheck_verified` against the appropriate trusted evidence (or from `verify_question` itself).
+  Analysis checks do **not** independently re-prove retrieval membership.
+- **Separate request digests.** An Analyst `request_sha256` is never compared with the Verifier's
+  `request_sha256`: they identify different calls. Each remains an audit field for its own stage.
+- **Errors.** Identity violations are fresh `InvalidProvenanceInputError` values with no cause or
+  context; process control propagates unchanged (M5b-F).
+
+##### M5b-F. Outcomes, errors, privacy and process control
+
+[REC] **Fixed reasons and precedence.** Caller-input errors always win: they raise before any model
+content is examined.
+
+| Stage and phase | Reasons (precedence within one item) | `item_index` | `citation_index` | `rejected_count` | §4 `provenance_check` |
+|---|---|---|---|---|---|
+| verification, phase 1 (references) | `chunk_not_retrieved`, `quote_blank`, `quote_not_found`, `quote_too_long`, `quote_not_exact` | claim index 0–9 | reference index 0–7 | rejected references, 1–80 | `citation_rejected` |
+| verification, phase 2 (claim coverage) | `claim_uncited` | claim index 0–9 | `None` | uncited claims, 1–10 | `citation_rejected` |
+| verification, phase 3 (aggregate) | `verdict_unsupported`, then `rationale_blank` | `None` | `None` | failed aggregate checks, 1–2 | `invalid_output` |
+| analysis (per finding) | `foreign_question`, `citation_not_validated`, `citation_not_shared`, `mixed_verdicts`, `finding_status_unsupported`, `finding_text_blank` | finding index 0–19 | reference index 0–7 for the two citation reasons (the first failing reference), otherwise `None` | failing findings, 1–20 | `citation_rejected` for the two citation reasons, otherwise `invalid_output` |
+
+- **Reported rejection.** Verification: the first failing phase is reported; within phases 1 and 2,
+  the failure at the lowest (claim, reference) position, with its first reason in the precedence
+  order; in phase 3, `verdict_unsupported` if it fails, otherwise `rationale_blank`. Analysis: the
+  lowest failing finding index with that finding's first failing reason. `rejected_count` counts the
+  failures of the **reported phase only** (later phases are not evaluated after a failure), so
+  simultaneous failures are fully deterministic.
+- **`ProvenanceRejection` fields:** `stage: RejectionStage`; `question_id` (`QuestionId` pattern);
+  `reason: RejectionReason`; `item_index: int | None`; `citation_index: int | None`;
+  `rejected_count: int`. Exact types (`int`, not `bool`); the constructor requires the reason to
+  belong to the stage and phase, and `item_index`, `citation_index` and `rejected_count` to be
+  present or `None` and in range exactly as in the table. It carries positions, a reason and a
+  count only, never text.
+- **Standalone `match_quote`** returns a `QuoteMatch` or one of its four reasons (`quote_blank`,
+  `quote_not_found`, `quote_too_long`, `quote_not_exact`, in that order) and never a
+  `ProvenanceRejection`; `verify_question` places that reason at the reference's position.
+- **Errors.** Model-caused failures never raise. **Bad caller or trusted input raises**
+  `InvalidProvenanceInputError` (`invalid_provenance_input`) from the functions;
+  `InvalidProvenanceValueError` (`invalid_provenance_value`) covers invalid direct construction of an
+  M5b value and unreachable internal inconsistencies. Each is raised fresh outside every `except`
+  block, with the code as its message and no cause or context.
+- **Whole-operation normalization.** Every public operation (each constructor and
+  `dataclasses.replace`, and every function) runs its **whole** supported-input operation (input
+  traversal, copying, nested revalidation, normalization, matching and Pydantic construction) inside
+  one boundary that suppresses ordinary `Exception` only (`InvalidRetrievalRequestError`,
+  `InvalidModelValueError`, Pydantic `ValidationError`, `ValueError`, `TypeError` and others) and
+  raises the fixed error after leaving the handler. Exception chains are never inspected.
+- **Process control** (`BaseException` that is not `Exception`) propagates as the same object.
+  M5b knows nothing about jobs; M5g runs `ctx.check()` around it (W7).
+- **Privacy.** No error, rejection or `repr` contains quotes, claim text, rationale, titles,
+  statements, follow-up questions or evidence text; representations show IDs, counts, reasons,
+  offsets and digests. Nothing in M5b logs. Explicit attribute access returns content by design.
+- **Immutability.** Every collection is a tuple of frozen values; `Citation`, `Verification` and
+  `Finding` are frozen `DomainModel`s.
+- **Trust limits.** No protection is claimed against malicious trusted Python (`object.__setattr__`,
+  `model_construct`, frame inspection) or direct database modification; constructors and the
+  recheck functions detect inconsistent values, not a determined in-process attacker.
+
+##### M5b-G. Compatibility and later boundaries
+
+- [REC] No change to M1–M4 or M5a behaviour. The only incompatibility found, `Citation`'s whitespace
+  stripping, is handled by the edge rule in M5b-C (8); the contract change was P5's rejected
+  alternative.
+- **Report bounds (explicit M5f review obligation, P16).** Up to 100 questions × (20 Analyst
+  findings + 1 rule finding) exceeds `ReportContent`'s 200-finding limit. M5f must settle the global
+  report bounds in its review; **no silent truncation and no unbounded report is authorized**.
+- **Documentary rule (P11).** M5f and M5g must include the rule finding whenever its condition holds,
+  even after a failed analysis (M5b-E).
+- **M5c.** M5b matches original evidence text only and does no entity or escape decoding. M5c must
+  give the model exactly the retrieved chunk IDs to cite and must either use an encoding whose
+  quotations of document content are original text, or apply one reviewed, deterministic decoder to
+  each `QuoteRef.quote` before M5b. An escaped quote that does not occur in the original (under
+  M5b-C) is `quote_not_found`. M5b prescribes no prompt format.
+- **M5d** supplies the trusted retrieval evidence and snapshot digest; **M5e** stores the M5b values
+  and must reload them through their constructors and the recheck functions; **M5f** decides the
+  hash-covered representation of claims, accepted quotes, follow-up questions, rule findings and
+  unresolved reasons; **M5g** owns stage order, the repair of a rejection within the accepted
+  budgets (P8), job precedence and error mapping; **M5h** owns the adapter.
+- **Canaries.** M5b rejects quotes naming unretrieved or Tenant B chunks and accepts a genuine
+  authorized quotation even if it contains canary text (the labelled limitation probe). No denylist,
+  no injection-resistance claim.
+
+##### M5b-H. Planned tests (not written or run)
+
+*Database-independent* (`tests/test_quote_matching.py`, `tests/test_provenance.py`,
+`tests/test_packaging.py`):
+
+- **Normalization and whitespace:** spaces, tabs, LF, CRLF, U+00A0, U+2028 and U+3000 runs collapse;
+  quote edges ignored; whitespace-only quote → `quote_blank`; common Latin precomposed versus
+  combining accents; marks in different canonical orders within one segment; complete Hangul
+  syllables in both spellings; supplementary characters; ligatures, full-width forms, case,
+  typographic quotes, zero-width space and soft hyphen **not** folded; a quote ending inside a unit
+  (for example before a base character's marks) is not found.
+- **Pinned limitations (M5b-C1):** the Tibetan pair `ཀཱིུ` / `ཀཱིུ`
+  does not match in either direction; the Hangul partial quote `가` is `quote_not_found` in span
+  `각` and matches the first two units of `각`, storing `가`; a span
+  and a quote beginning with a run of non-starters (for example U+0323 U+0307 before `x`, and the
+  quote spelled U+0307 U+0323 `x`) treat the initial run as **one** segment and match.
+- **Spans and offsets:** quotes inside the header, inside the body, and across the boundary
+  (rejected though contiguous in `text`); non-table chunks; chunk-text and source offsets for both
+  span kinds, with `span[start:end] == quote` and pinned examples.
+- **Repetition and bounds:** repeated quotes with differing originals (first selected, no fallback),
+  overlapping occurrences, the 64-occurrence cap, 4,000-code-point spans, 1,000-code-point quotes,
+  an original of 1,001 code points (`quote_too_long`), the degenerate edge unit (`quote_not_exact`),
+  `Citation` round-trip equality, the maximum NFD expansion and the pinned `unicodedata` version.
+- **Value invariants (M5b-B1):** every constructor bound and cross-field rule, including `bool`
+  offsets, `text_end <= text_start`, length mismatches, occurrence count 0 and 65, claim indexes out
+  of range, duplicated or out of canonical order, misaligned provenance, an unsupported match-rules
+  identifier, a non-derivable status, follow-up tuples not aligned with findings, finding IDs not
+  matching their position, `finding_id` kinds and index bounds (rule index other than 0), shared
+  bounds (20 values, duplicate IDs, the owner, another review), and every `ProvenanceRejection`
+  field combination.
+- **Binding:** tenant or snapshot-digest mismatch, wrong types, bypassed nested values caught by
+  rebuilding, non-completed outcomes, the Analyst purpose and a question mismatch passed to
+  `verify_question` (`InvalidProvenanceInputError`).
+- **Citations and counts:** forged chunk ID, Tenant B chunk ID, a chunk retrieved only for another
+  question, absent quote; several simultaneous failures (lowest position reported, `rejected_count`
+  exact, phase 2 and 3 not evaluated); no partial Verification; metadata always from evidence.
+- **Claim coverage (P7):** a `supported` output with one cited and one uncited claim →
+  `claim_uncited` at the uncited claim's index; the same for `contradicted`; the same claims under
+  `insufficient_evidence` → accepted with the uncited claim kept.
+- **Status:** every row of the M5b-D table, including two identical quotes from different chunks for
+  `contradicted` (rejected), `insufficient_evidence` with citations kept, both aggregate failures
+  together (`verdict_unsupported` reported, count 2), and deduplication within and across claims
+  with canonical claim indexes.
+- **Reload (`recheck_verified`):** independently altering source offsets with chunk-text offsets
+  unchanged; chunk-text offsets; span kind; occurrence count; the match-rules identifier; document,
+  revision, source type or authenticity metadata; claim indexes; provenance alignment; and evidence
+  with a removed chunk or changed text; each → `InvalidProvenanceInputError`, and the unaltered
+  value passes.
+- **Analysis:** scope and `shared` rules, multi-question ownership, `citation_not_validated` (an
+  unvalidated chunk, a substring of a validated quote, the same quote under another chunk),
+  `citation_not_shared`, `mixed_verdicts`, status per verdict, blank text, several failing findings
+  (count and lowest index), follow-ups kept, pinned finding IDs, `recheck_analyzed` against an
+  altered status, citation or ID, and an analysis rejection leaving the owner unchanged.
+- **Input identity (M5b-E1):** an **empty** `AnalyzedQuestion` whose outer tenant, review or question
+  ID differs from the owner's (and an owner/question ID mismatch) → `recheck_analyzed` raises
+  `InvalidProvenanceInputError` before any finding is iterated; `analyze_question` with mismatched
+  owner, question or result identity and an Analyst output with no findings raises the same;
+  `documentary_gap_finding` with mismatched `verified` and `question` IDs raises both when the
+  rule's condition would be true and when it would be false; a **valid empty analysis** (matching
+  identities, no findings) is accepted and rechecks cleanly; an Analyst `request_sha256` differing
+  from the Verifier's is accepted; each identity error has no cause or context, and process control
+  raised during rebuilding propagates as the same object.
+- **Documentary rule (P11):** required plus `vendor_claim` gives the rule finding (fixed text,
+  `medium`, `missing`, vendor citations, index-0 ID) regardless of the Analyst output;
+  `documentary_support` or a non-required question gives none; a `ReportContent` built with it lists
+  the question as unresolved.
+- **Privacy and process control:** canary-bearing quotes, claims, rationale, titles and statements
+  appear in no error, rejection, `repr` or captured log; errors have no cause or context; a
+  `KeyboardInterrupt` raised inside normalization, traversal or nested revalidation (by
+  monkeypatching) propagates as the same object, and a `RuntimeError` there becomes the fixed error;
+  attribute assignment fails.
+- **Packaging:** the new module's import allowlist.
+
+*PostgreSQL:* none. *Installed wheel* (P14): one line, for example "provenance matched a quote and
+derived a status from the installed wheel". The end-to-end canary fixtures belong to M5g.
+
+##### M5b-I. Intended files and exclusions
+
+- New: `packages/domain/evidenceguard_domain/provenance.py`, `tests/test_quote_matching.py`,
+  `tests/test_provenance.py`; ADR-0020 written with the implementation (not now).
+- Changed: `tests/test_packaging.py`; `.github/workflows/ci.yml` for the one wheel line (P14);
+  README, plan and threat-model status records. No `pyproject.toml` change is expected (the module
+  is inside an existing package).
+- Excluded: persistence, migrations, prompts, templates, the planner, request assembly, decoding of
+  encoded quotes, orchestration, handlers, endpoints, settings, credentials, provider calls, any
+  dependency or lockfile change, any change to M1–M4 or M5a contracts, and any live, quality or
+  injection-resistance claim.
+
+##### M5b-J. Reviewer decisions
+
+Proposed in Prompt 174. In Prompt 175 the external reviewer supported the directions below,
+subject to review of the corrected specification (historical); in **Prompt 176 the reviewer accepted
+the complete corrected specification, including P1–P16 as recorded below and the M5b-E1
+clarification, as the implementation contract.** Nothing is implemented.
+
+1. **P1 Matching rule** (*supported direction, revised in Prompt 175*). Segment-wise NFD matching as
+   a deliberately limited, bounded rule, with its departures from canonical equivalence disclosed
+   (M5b-C1), no case or compatibility folding. *Rejected alternatives:* NFKC or case folding (would
+   equate texts with different meaning, such as `10²` and `102`); a new full canonical-equivalence
+   implementation (not designed in this task). *Tradeoff:* simple, bounded and exact-offset matching
+   versus false rejections for some canonically equivalent spellings.
+2. **P2 Whitespace** (*supported*). Runs of Python whitespace collapse to one space; quote edges
+   ignored. *Tradeoff:* tolerance of reflowed lines versus stricter literalness.
+3. **P3 No other folding** (*supported*). No punctuation, quotation-mark, dash, ellipsis or
+   format-character folding. *Tradeoff:* rejecting a model that "tidies" typography versus accepting
+   quotes that are not in the document.
+4. **P4 Repeated quotes** (*supported*). The first occurrence by chunk-text offset, the count
+   recorded, no fallback. *Tradeoff:* determinism with a possibly different whitespace rendering
+   versus more rejections.
+5. **P5 Citation whitespace** (*supported*). `Citation` unchanged; only originals without edge
+   whitespace accepted, with post-construction equality pinned. *Tradeoff:* rare `quote_not_exact`
+   rejections versus reopening an accepted contract.
+6. **P6 All-or-nothing conversion** (*supported*). Any failure rejects the whole stage output.
+   *Tradeoff:* more unresolved questions versus silently hiding forged or unretrieved citations.
+7. **P7 Per-claim citations** (*supported, the stronger alternative selected in Prompt 175*). Every
+   claim of a `supported` or `contradicted` output must retain at least one accepted citation after
+   deduplication (`claim_uncited` otherwise); `insufficient_evidence` claims may have none.
+   *Tradeoff:* more rejections of explanatory claims versus claim-level structural provenance (still
+   not proof of support).
+8. **P8 Repair after rejection** (*supported*, for M5g, within the accepted budgets). A
+   `ProvenanceRejection` is treated like `invalid_output`: eligible for the stage's single repair
+   within the accepted three-reservation budget, built from the fixed reason and positions only.
+   *Tradeoff:* one more call versus an unresolved question on the first forged citation.
+9. **P9 Multi-question findings** (*supported*). The general rule in M5b-E with an empty `shared` in
+   the recommended per-question stage. *Tradeoff:* a slightly larger contract versus redesigning
+   later.
+10. **P10 Finding status** (*supported*). Derived from the listed questions' common verdict and the
+    finding's own citations. *Tradeoff:* a status that matches its own citations versus simpler but
+    possibly unsupported labels.
+11. **P11 Documentary rule** (*supported, Prompt 175*). A deterministic rule finding with fixed text,
+    severity `medium`, status `missing` and the vendor citations, which must be included in the
+    hash-covered report whenever its condition holds, even if analysis fails; it replaces, for M5,
+    §4's literal requirement that the Risk Analyst itself raise the finding (scoped clarification in
+    M5b-A). *Tradeoff:* a guaranteed rule outcome versus model behaviour that cannot be checked
+    semantically.
+12. **P12 Finding IDs** (*supported*). `uuid5` over tenant, review, question, kind and index.
+    *Tradeoff:* replay-stable IDs versus IDs that reveal nothing about position.
+13. **P13 Follow-up questions** (*supported*). Kept beside each `Finding`, verbatim; representation
+    left to M5f. *Tradeoff:* no M1 change versus an extra parallel value.
+14. **P14 Installed-wheel line** (*supported*). One added line. *Tradeoff:* a small workflow edit
+    versus no installed-artifact evidence for the new module.
+15. **P15 Unicode pin** (*supported*). A test pinning `unicodedata.unidata_version`. *Tradeoff:* an
+    interpreter upgrade fails a test versus silent matching changes.
+16. **P16 Report bounds** (*supported as an explicit M5f review obligation*). M5f must settle the
+    global report bounds; no silent truncation or unbounded report is authorized.
+
+**No M5b specification decision remains open** (Prompt 176): the value and rejection contracts in
+M5b-B1 and M5b-F, the M5b-C1 limitations, the reload rules, the M5b-E1 identity binding and the
+scoped §4 clarification are accepted. The disclosed Unicode limitations, the structural-only
+provenance guarantee, the mandatory hash-covered documentary-gap finding and the later-slice
+obligations (including M5f's report-bound obligation: no silent truncation or unbounded report)
+stand as written. Routine choices (value style, error codes, bounds, offsets, deduplication and
+precedence) are resolved above. **The M5b implementation and every M5b check remain pending.**
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.

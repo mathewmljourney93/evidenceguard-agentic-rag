@@ -1,10 +1,14 @@
 # ADR-0019: Model-call contracts, the validating call boundary and the scripted fake
 
-- **Status:** **Accepted at external review in Prompt 173 for the local implementation commit,
-  pending current-version CI.** Implemented in Prompt 171 and corrected in Prompt 172 (see
+- **Status:** **Accepted at external review in Prompt 173 for the local implementation commit;
+  published and verified in feature-branch CI at `9ba6a488` in Prompt 174; feature CI evidence
+  accepted at external review in Prompt 176** (see
+  [Feature-branch CI evidence (Prompt 174)](#feature-branch-ci-evidence-prompt-174)). When this
+  record was written (Prompt 176) M5a was not merged and `main` was `46c02257`; publication to
+  `main` was authorized, gated on exact-commit CI for the documentation commit, and had not yet run.
+  Implemented in Prompt 171 and corrected in Prompt 172 (see
   [Prompt 172 corrections](#prompt-172-corrections) and
-  [External review (Prompt 173)](#external-review-prompt-173)). Publication and merge are not
-  authorized; Linux verification and current-version CI are pending. Implements the
+  [External review (Prompt 173)](#external-review-prompt-173)). Implements the
   [accepted M5a specification](../plan.md#m5a-model-call-contracts-and-scripted-fake-provider-accepted-at-review-prompt-170-implementation-pending)
   (proposed in Prompt 167, corrected in Prompt 168, clarified in Prompt 169, accepted at external
   review in Prompt 170 with W-A1 to W-A11 as its implementation contract), the first slice of the
@@ -280,7 +284,78 @@ test-pinned Pydantic base-init convention and the Python-entry-point nested-inst
 
 **Pending:** publication and merge (unauthorized here), Linux verification, current-version CI
 including the PostgreSQL integration job and the installed-wheel check on both platforms, and
-overall M5 acceptance.
+overall M5 acceptance. *(Historical at Prompt 173: publication and feature-branch CI followed in
+Prompt 174, below; merge and overall M5 acceptance remain pending.)*
+
+## Feature-branch CI evidence (Prompt 174)
+
+**Publication.** Prompt 174 first recorded the publication authorization in the history-only commit
+`9ba6a48888ff39a06b336a22429d5b3dcfa0bad6` (`prompts.md` only; parent `79e32532`, the accepted
+implementation). The first push was cancelled while Git Credential Manager awaited an account choice
+(exit 128, nothing published). After Mathew returned, Claude Code re-verified the local and remote
+state (remote `main` `46c02257`, no remote feature branch, the 12 implementation, test, packaging and
+workflow blobs identical to the accepted tree `5d4febb6`) and ran
+`git push --set-upstream origin refs/heads/feat/model-call-contracts:refs/heads/feat/model-call-contracts`
+once: exit 0, remote `feat/model-call-contracts` = `9ba6a488`, remote `main` unchanged. **Not
+merged at that observation; `main` was `46c02257`.**
+
+**Runs** (both for head SHA `9ba6a488`, event `push`, branch `feat/model-call-contracts`, attempt 1,
+completed with conclusion `success`; the API listed exactly these two runs for the SHA):
+
+| Run | Job | Steps (API) | Log results (retrieved by the external reviewer) |
+|---|---|---|---|
+| [CI 39303677105](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39303677105) | [Ubuntu verify 118235104286](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39303677105/job/118235104286) | success; checkout, uv and Python 3.12, locked install, formatting, lint, type-check, test, build distribution and the installed-wheel step all succeeded | `2938 passed, 308 skipped in 26.62s`; installed-wheel lines below |
+| | [Windows verify 118235103507](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39303677105/job/118235103507) | success; the same steps all succeeded | `2937 passed, 309 skipped in 59.65s`; installed-wheel lines below |
+| | [PostgreSQL integration 118235104321](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39303677105/job/118235104321) | success; container initialization, checkout, uv, locked install, database readiness and "Run integration tests" succeeded | `308 passed, 2938 deselected in 189.30s`; the 104 M4 PostgreSQL cases passed, including both Voyage cases (M5a adds no PostgreSQL tests) |
+| | [Container 118235103996](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39303677105/job/118235103996) | success; all six required steps (Compose validation, build-context check, image build, image check, Compose smoke, cleanup) succeeded | effective build context 95 files with 19 planted fixtures excluded; image checks passed; smoke and cleanup succeeded (summary below) |
+| [Secret scan 39303677129](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39303677129) | [Gitleaks (full history) 118235103782](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39303677129/job/118235103782) | success; full-history checkout, checksum-verified install and the history scan succeeded | 75 commits scanned; no leaks found |
+
+No required job or step was skipped, cancelled or incomplete.
+
+**Installed-wheel output.** Both installed-wheel logs (Ubuntu and Windows) printed these six lines:
+
+- offline embedding, canonical storage and indexing modules ran from the installed wheel
+- retrieval modules imported and fusion ran from the installed wheel
+- evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+- Voyage adapter validated a mocked response from the installed wheel
+- model-call contracts classified a scripted fake response from the installed wheel
+- offline migration SQL rendered from the installed wheel
+
+The M5a line is the first CI evidence of the new package from an installed wheel. The Recall@5 line
+is pure arithmetic over a fixture, not a database-derived corpus Recall, and the Voyage line uses a
+mocked response.
+
+**Container smoke (reported checks).** The smoke reported a healthy stack, an accepted upload (202),
+successful ingestion, an active revision with 2 verified chunks, a duplicate upload returning the
+existing revision (200), one offline indexing job, a ready index with 2 embeddings and a successful
+indexing job, and an idle-worker exit 0 without an OOM kill. These are the smoke's own reported
+checks, not independent inspection of the underlying database rows. The smoke is unchanged from M4
+and covers offline ingestion, indexing and idle-worker shutdown only; **it does not exercise M5a**.
+
+**Attribution.**
+
+- *Claude Code (Prompt 174):* observed the run, job and step records above through the anonymous
+  GitHub REST API only. Its job-log downloads returned **HTTP 403** ("Must have admin rights to
+  Repository."), and no authentication was changed; at that point the log details were unobserved.
+- *External reviewer (after Prompt 174, recorded in Prompt 175):* independently retrieved both
+  workflow-run records, all five job records and all five job logs for `9ba6a488`; the counts, the
+  wheel lines, the container summary and the Gitleaks count above come from those logs. The reviewer
+  ran no project suite, build, installed-wheel check, database, Docker or provider locally.
+- The Prompt 171–172 local Windows checks and the reviewer's isolated Prompt 173 checks above remain
+  separately attributed.
+
+**Scope.** This is contract evidence for the M5a values and the scripted fake, not live-model
+quality. When this evidence was recorded (Prompts 174–176) M5a was **unmerged** and `main` was
+`46c02257`.
+
+**Acceptance and publication authorization (Prompt 176).** The external reviewer accepted this
+feature-branch CI evidence (Prompts 174–175) in Prompt 176, after independently verifying the
+Prompt 174 and Prompt 175 export files' byte sizes and checksums and inspecting their documentation
+changes; the reviewer's earlier log retrieval keeps its recorded scope, and no M5b implementation or
+project test was run for that review. Prompt 176 authorized a local documentation commit,
+publication of the feature branch and, only after all five required jobs pass for that exact new
+commit, a fast-forward of `main`. At the time of this record that publication was **pending
+execution**; no merge or new CI result is claimed here.
 
 ## Limits
 

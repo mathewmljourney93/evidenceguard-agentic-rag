@@ -391,17 +391,24 @@ acceptance. Residual risks once implemented:
 
 The settled decisions, details and the unresolved external API facts are listed in the plan.
 
-## Review workflow (M5: sequence and M5a specification accepted; M5a accepted for a local commit)
+## Review workflow (M5: sequence, M5a and M5b specifications accepted; M5a verified in feature-branch CI; M5b not implemented)
 
 The [M5 implementation sequence](plan.md#m5-implementation-sequence-accepted-at-review-prompt-170)
 and the [M5a specification](plan.md#m5a-model-call-contracts-and-scripted-fake-provider-accepted-at-review-prompt-170-implementation-pending)
 were accepted at external review in Prompt 170 (proposed in Prompt 167, corrected in Prompts
 168–169). **M5a was implemented in Prompt 171, corrected in Prompt 172 and accepted at
 external review in Prompt 173 for a local commit**
-([ADR-0019](decisions/0019-model-call-contracts.md)); publication, Linux verification and CI are
-pending, and only Claude Code's local Windows checks and the reviewer's isolated checks have run.
+([ADR-0019](decisions/0019-model-call-contracts.md)). **In Prompt 174 it was published on
+`feat/model-call-contracts` and all five required jobs passed in feature-branch CI at `9ba6a488`**
+([feature evidence](decisions/0019-model-call-contracts.md#feature-branch-ci-evidence-prompt-174)).
+From job logs independently retrieved by the external reviewer (Claude Code observed only API
+conclusions), both installed-wheel logs printed the M5a line and the Ubuntu, Windows and PostgreSQL
+test jobs and full-history Gitleaks (75 commits, no leaks) passed; this is scripted-fake contract
+evidence, not live-model behaviour. When this record was written (Prompt 176) it was not merged and
+`main` was `46c02257`; publication to `main` was authorized, gated on exact-commit CI, and had not
+yet run.
 
-| Threat | M5a control (accepted for a local commit; not yet published or CI-verified) |
+| Threat | M5a control (verified in feature-branch CI at `9ba6a488`; not merged when recorded) |
 |---|---|
 | Malformed, ambiguous or oversized model output treated as valid | Python-mode entry points, including `model_validate_strings` (corrected in Prompt 172), never coerce raw strings into enums or other types. A bounded preliminary JSON scan (duplicate keys, non-finite numbers, trailing text, top-level shape, depth 8, 2,000 values, 65,536 bytes) and strict JSON-mode validation against a closed, purpose-specific, deeply immutable schema; any failure is `invalid_output`. The model never supplies status, source type, tenant or revision fields. |
 | Provider failures, refusals or wrong models silently accepted | `call_validated` revalidates the request and the response, calls the provider at most once and turns every ordinary failure into a fixed outcome; a model mismatch wins over any stop kind. |
@@ -423,6 +430,27 @@ the M4d in-process snapshot limitation for review paths only, once implemented, 
 protection against direct database writers or malicious in-process code); call reservations,
 stage and output writes are fenced; and no production path can dispatch a review until a reviewed
 wiring decision.
+
+**Specified M5b controls (specification accepted in Prompt 176; not implemented; none operates
+yet).** The
+[M5b specification](plan.md#m5b-provenance-and-status-derivation-specification-accepted-at-review-prompt-176-implementation-pending)
+(proposed in Prompt 174, corrected in Prompt 175, accepted at external review in Prompt 176)
+specifies: input identity binding (tenant, review and question checked before any finding is
+examined, including for empty outputs, and analysis relying on Verifier values already rechecked
+against trusted evidence); citations accepted only for chunks in the question's trusted retrieval result, with
+tenant, revision, source type and authenticity taken from that evidence, never from the model;
+**segment-wise NFD matching** with whitespace collapsing, matched separately within body and
+repeated-header text and storing the exact original substring with exact offsets; all-or-nothing
+rejection with fixed, text-free reasons; every claim of a `supported` or `contradicted` verdict
+cited; status derived deterministically from the verdict and source types; reload validation that
+recomputes each match from trusted evidence; Analyst findings limited to citations the Verifier
+already validated; and a mandatory deterministic finding for vendor-only answers to questions that
+require documentary support, kept in the report even if analysis fails. **Limits:** the matching
+rule is deliberately limited and is not full Unicode canonical equivalence, so canonically
+equivalent spellings can match differently (false rejections, and a Hangul partial-syllable
+asymmetry); provenance would still prove quote existence only, not entailment or authenticity; and
+reload checks detect values inconsistent with trusted evidence, not a malicious trusted process or
+which retrieval request originally ran.
 
 The accepted sequence also requires that every conclusion shown in an approval or export artifact
 be in its canonical hashed content, or derived solely from it, so no displayed conclusion can come
