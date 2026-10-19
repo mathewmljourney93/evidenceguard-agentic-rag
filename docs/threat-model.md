@@ -391,6 +391,39 @@ acceptance. Residual risks once implemented:
 
 The settled decisions, details and the unresolved external API facts are listed in the plan.
 
+## Review workflow (M5, specification accepted; not implemented)
+
+The [M5 implementation sequence](plan.md#m5-implementation-sequence-accepted-at-review-prompt-170)
+and the [M5a specification](plan.md#m5a-model-call-contracts-and-scripted-fake-provider-accepted-at-review-prompt-170-implementation-pending)
+were accepted at external review in Prompt 170 (proposed in Prompt 167, corrected in Prompts
+168–169). **Implementation is pending: none of these controls exists or operates yet**, and the
+later slices' details (M5b–M5h) still need their own reviewed specifications. Specified: every ordinary model-provider failure becomes a fixed outcome that
+leaves the question unresolved; model output is parsed strictly against a closed, immutable
+schema, and validation errors never expose its text; output never supplies status, source type,
+tenant or revision; citations must name chunks retrieved for that review and question, with
+quotes found in them; evidence enters prompts only inside delimited blocks with document text
+safely encoded; review creation captures eligibility and stores the snapshot, configuration and
+job in one transaction, and the handler reloads it through a trusted, revalidating path (closing
+the M4d in-process snapshot limitation for review paths only, once implemented, and with no
+protection against direct database writers or malicious in-process code); call reservations,
+stage and output writes are fenced; and no production path can dispatch a review until a reviewed
+wiring decision.
+
+The accepted sequence also requires that every conclusion shown in an approval or export artifact
+be in its canonical hashed content, or derived solely from it, so no displayed conclusion can come
+from unhashed stage rows (Prompt 169).
+
+**Limits.** The M5 criterion "the injection canary never appears in output" is
+kept, as an end-to-end contract assertion over specified scripted-fake fixtures: an acceptance
+fixture with an authorized injected document in the retrieved evidence and the model request must
+show no canary in the checked outputs, and a canary-emitting negative control must make the same
+checker fail. Passing it would not show that a live model resists injection, which needs live
+evaluation (M7). Provenance checks prove quote existence only: a genuine quotation containing a
+canary from an authorized document passes them and can appear in a report (a separately labelled
+limitation probe), and there is no canary denylist, so canary text a model emits in free-text
+fields would be stored and rendered. Model calls stay at least once, bounded by persisted budgets;
+no exactly-once guarantee is made. The M4 limits above are unchanged.
+
 ## Not implemented yet
 
 - **Rate limiting, lockout, key expiry and usage auditing** for API keys. Direct domain callers (tests, later the worker) still construct `ActorContext` themselves and are trusted.

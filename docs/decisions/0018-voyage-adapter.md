@@ -14,8 +14,10 @@
   (proposed in Prompt 154, corrected in Prompts 155–156, accepted at external review in Prompt
   157), including V1–V15, N1–N13 and the Prompt 157 cleanup clarification. **Overall M4 was
   accepted at external review in Prompt 165** within the reviewed scope implemented at `5acb75e5`
-  (see the [acceptance assessment](../plan.md#overall-m4-acceptance-assessment-accepted-at-review-prompt-165); the acceptance record is committed
-  locally, its publication pending);
+  (see the [acceptance assessment](../plan.md#overall-m4-acceptance-assessment-accepted-at-review-prompt-165)); the acceptance record, committed
+  locally in Prompt 165, was published on `main` at `46c02257` in Prompt 166
+  ([publication evidence](../plan.md#acceptance-publication-evidence-prompt-166)), which changes
+  documentation only, so this ADR's implementation baseline stays `5acb75e5`;
   local Compose is unverified.
 - **Date:** 2026-10-18
 - **Builds on:** [ADR-0013](0013-embeddings.md) (M4a contracts), [ADR-0014](0014-embedding-persistence.md)

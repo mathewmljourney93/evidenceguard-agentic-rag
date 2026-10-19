@@ -1,6 +1,6 @@
 # EvidenceGuard implementation plan
 
-**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`. The M4c installed-wheel extension, which executes the offline embedding and canonical storage path and imports the indexing modules, ran locally on Windows in Prompts 125–126 (historical) and passed on Ubuntu and Windows CI runners at `600a366` and again on `main` at `76fa5a3`; the earlier M4a/M4b wheel limitations are historical. The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); M4c was implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 (ADR-0015); it is reviewed, verified in CI and on `main` at `76fa5a3` (PostgreSQL, Linux, Windows, installed-wheel and container indexing; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3); earlier feature-branch verification at `600a366` is historical). The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and accepted at external review in Prompt 133. Claude Code implemented it in Prompt 134 on `feat/snapshot-retrieval` and corrected it in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)); the implementation was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (Ubuntu, Windows, PostgreSQL with all 39 M4d cases passing, installed-wheel retrieval check, the unchanged container job and Gitleaks; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` and Claude Code's local Windows results in Prompts 134–135 are historical. The [M4e corpus and retrieval-evaluation specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was proposed in Prompt 140, corrected in Prompts 141–142 and **accepted at external review in Prompt 143**; Claude Code implemented it in Prompt 144 on `feat/retrieval-evaluation` and corrected it in Prompts 145–146 ([ADR-0017](decisions/0017-retrieval-evaluation.md)); the implementation was **accepted at external review in Prompt 147 for a local implementation commit** and **published on `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`**, where exact-commit CI was not fully green: PostgreSQL integration passed (306 passed, including all 16 M4e cases), but one Ubuntu test failed because its `os.lstat` double re-entered itself on Linux (no production defect established; see [ADR-0017](decisions/0017-retrieval-evaluation.md#exact-commit-ci-at-c14821b7-and-test-correction-prompts-148149)); the Prompt 149 test-only correction was accepted in Prompt 150 and published in Prompt 151; after feature-branch verification at `d1dcdfce` (historical), M4e is **reviewed, verified in CI and on `main` at `0ae4c6ca`** (`0ae4c6ca339232e40cc007d7b78334af08a8b25b`, committed and fast-forwarded by OpenAI Codex in Prompt 153 after green feature CI; main CI then passed; see the [ADR-0017 main CI evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)), and no database-derived Recall value has been observed; the [M4f Voyage adapter specification](#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending) was proposed in Prompt 154, corrected in Prompts 155–156 and **accepted at external review in Prompt 157**; its implementation (Prompt 158, corrected in Prompt 159, [ADR-0018](decisions/0018-voyage-adapter.md)) was accepted at external review in Prompt 160, verified in feature-branch CI at `84eec023` (historical) and is **reviewed, verified in CI and on `main` at `5acb75e5`** (`5acb75e59edbb42035d468c2c40bb0ab81a8725a`, published in Prompt 163 after all five feature jobs passed for that exact commit; main CI then passed; see the [ADR-0018 main CI evidence](decisions/0018-voyage-adapter.md#main-ci-evidence-at-5acb75e5)); the [overall M4 acceptance assessment](#overall-m4-acceptance-assessment-accepted-at-review-prompt-165) was prepared in Prompt 164 and **overall M4 was accepted at external review in Prompt 165 within the reviewed scope implemented at `5acb75e5` (acceptance record committed locally; publication pending; M5 not started)**. Later milestones remain plans. Historical evidence below retains its original baseline.
+**Status:** M1, M2 and M3 accepted and published; final M3 documentation baseline `85cb0d6` (see §9). M4 sequence and complete M4a specification were accepted at external review (Prompt 108), following Prompt 107. M4a is verified and on `main` at `5fdaa1c`. The M4c installed-wheel extension, which executes the offline embedding and canonical storage path and imports the indexing modules, ran locally on Windows in Prompts 125–126 (historical) and passed on Ubuntu and Windows CI runners at `600a366` and again on `main` at `76fa5a3`; the earlier M4a/M4b wheel limitations are historical. The M4b specification was accepted in Prompt 116 and the implementation in Prompt 118; M4b is reviewed, verified in CI and on `main` at `872d0af`. The M4c indexing specification was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in Prompt 123); M4c was implemented by Claude Code in Prompt 125, corrected in Prompt 126 and accepted at external review for a local commit in Prompt 127 (ADR-0015); it is reviewed, verified in CI and on `main` at `76fa5a3` (PostgreSQL, Linux, Windows, installed-wheel and container indexing; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3); earlier feature-branch verification at `600a366` is historical). The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and accepted at external review in Prompt 133. Claude Code implemented it in Prompt 134 on `feat/snapshot-retrieval` and corrected it in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)); the implementation was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (Ubuntu, Windows, PostgreSQL with all 39 M4d cases passing, installed-wheel retrieval check, the unchanged container job and Gitleaks; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` and Claude Code's local Windows results in Prompts 134–135 are historical. The [M4e corpus and retrieval-evaluation specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was proposed in Prompt 140, corrected in Prompts 141–142 and **accepted at external review in Prompt 143**; Claude Code implemented it in Prompt 144 on `feat/retrieval-evaluation` and corrected it in Prompts 145–146 ([ADR-0017](decisions/0017-retrieval-evaluation.md)); the implementation was **accepted at external review in Prompt 147 for a local implementation commit** and **published on `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`**, where exact-commit CI was not fully green: PostgreSQL integration passed (306 passed, including all 16 M4e cases), but one Ubuntu test failed because its `os.lstat` double re-entered itself on Linux (no production defect established; see [ADR-0017](decisions/0017-retrieval-evaluation.md#exact-commit-ci-at-c14821b7-and-test-correction-prompts-148149)); the Prompt 149 test-only correction was accepted in Prompt 150 and published in Prompt 151; after feature-branch verification at `d1dcdfce` (historical), M4e is **reviewed, verified in CI and on `main` at `0ae4c6ca`** (`0ae4c6ca339232e40cc007d7b78334af08a8b25b`, committed and fast-forwarded by OpenAI Codex in Prompt 153 after green feature CI; main CI then passed; see the [ADR-0017 main CI evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)), and no database-derived Recall value has been observed; the [M4f Voyage adapter specification](#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending) was proposed in Prompt 154, corrected in Prompts 155–156 and **accepted at external review in Prompt 157**; its implementation (Prompt 158, corrected in Prompt 159, [ADR-0018](decisions/0018-voyage-adapter.md)) was accepted at external review in Prompt 160, verified in feature-branch CI at `84eec023` (historical) and is **reviewed, verified in CI and on `main` at `5acb75e5`** (`5acb75e59edbb42035d468c2c40bb0ab81a8725a`, published in Prompt 163 after all five feature jobs passed for that exact commit; main CI then passed; see the [ADR-0018 main CI evidence](decisions/0018-voyage-adapter.md#main-ci-evidence-at-5acb75e5)); the [overall M4 acceptance assessment](#overall-m4-acceptance-assessment-accepted-at-review-prompt-165) was prepared in Prompt 164 and **overall M4 was accepted at external review in Prompt 165 within the reviewed scope implemented at `5acb75e5`**; the acceptance record (committed locally in Prompt 165, historical) was **published on `main` at `46c02257` in Prompt 166**, with all five jobs passing on the documentation branch and again on `main` ([acceptance publication evidence](#acceptance-publication-evidence-prompt-166)); the implementation baseline remains `5acb75e5`. **M1–M4 are accepted within their recorded scopes; the [M5 implementation sequence](#m5-implementation-sequence-accepted-at-review-prompt-170) and the complete [M5a specification](#m5a-model-call-contracts-and-scripted-fake-provider-accepted-at-review-prompt-170-implementation-pending) were accepted at external review in Prompt 170 (proposed in Prompt 167, corrected in Prompt 168, clarified in Prompt 169); M5 implementation has not started and overall M5 acceptance is pending.** Later milestones remain plans. Historical evidence below retains its original baseline.
 
 EvidenceGuard is a vendor-risk review copilot. It ingests synthetic vendor documents, retrieves evidence the tenant is authorized to see, classifies each review question against that evidence, and drafts a cited report. A human must approve the exact report revision before it can be finalized or exported. It is decision support, not legal advice or compliance certification.
 
@@ -43,7 +43,7 @@ Labels: **[FACT]** observed or verified; **[DECISION]** accepted in review; **[R
 
 | Item | Status |
 |---|---|
-| Repository | [FACT] Published to GitHub. `main` is at `5acb75e5` (M1–M3 accepted; M4a–M4f each on `main`; overall M4 accepted at review in Prompt 165; see §9). It was at `85cb0d6` when this table was refreshed in Prompt 107 (historical). |
+| Repository | [FACT] Published to GitHub. `main` is at `46c02257` (M1–M4 accepted; M4 implementation baseline `5acb75e5`; the M4 acceptance record published in Prompt 166; see §9). It was at `5acb75e5` before that publication and at `85cb0d6` when this table was refreshed in Prompt 107 (both historical). |
 | Python | [FACT] 3.12 (uv-managed) for the project; 3.13 and 3.11 are also installed. |
 | uv | [FACT] 0.13.0. |
 | Docker | [FACT] **Not installed** (no Docker, Docker Compose or Podman). No WSL distribution is listed. |
@@ -2605,7 +2605,7 @@ feature-branch verification at `90240e3` is historical. The
 [M4c indexing specification](#m4c-indexing-specification-accepted-at-review-prompt-124-implementation-pending)
 was accepted at external review in Prompt 124 (proposed in Prompt 122, corrected in
 Prompt 123). M4c was implemented on `feat/revision-indexing` by Claude Code in Prompt 125 ([ADR-0015](decisions/0015-revision-indexing.md)) and corrected in Prompt 126, with historical local Windows checks in Prompts 125–126; it was accepted at external review for a local commit in Prompt 127 and is **reviewed, verified in CI and on `main` at `76fa5a3`** (main push: PostgreSQL `251 passed`, including all 18 indexing cases, plus Linux, Windows, installed-wheel and container indexing verification; see the [ADR-0015 main CI evidence](decisions/0015-revision-indexing.md#main-ci-evidence-at-76fa5a3)). Earlier feature-branch verification at `600a366` is historical. The [M4d snapshot and retrieval specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending) was proposed in Prompt 131, corrected in Prompt 132 and **accepted at external review in Prompt 133**. Its implementation by Claude Code in Prompt 134, corrected in Prompt 135 ([ADR-0016](decisions/0016-snapshot-retrieval.md)), was **accepted at external review in Prompt 136** and is **reviewed, verified in CI and on `main` at `cf2b5743`** (main push: PostgreSQL `290 passed`, including all 39 M4d cases; see the [ADR-0016 main CI evidence](decisions/0016-snapshot-retrieval.md#main-ci-evidence-at-cf2b5743)); the feature-branch verification at `3d6e8395` is historical. The [M4e specification](#m4e-corpus-and-retrieval-evaluation-specification-accepted-at-review-prompt-143-implementation-pending) was accepted at external review in Prompt 143 (proposed in Prompt 140, corrected in Prompts 141–142); its implementation (Prompt 144, corrected in Prompts 145–146, [ADR-0017](decisions/0017-retrieval-evaluation.md)) was accepted at external review in Prompt 147 for a local commit and published on `feat/retrieval-evaluation` in Prompt 148 at `c14821b7`, where PostgreSQL passed with all 16 M4e cases but one Ubuntu test failed (a Linux-specific test-double recursion); the Prompt 149 test-only correction was accepted in Prompt 150 and published in Prompt 151; after feature-branch verification at `d1dcdfce` (historical), M4e is reviewed, verified in CI and on `main` at `0ae4c6ca` (see the [ADR-0017 main CI evidence](decisions/0017-retrieval-evaluation.md#main-ci-evidence-at-0ae4c6ca)). The [M4f specification](#m4f-voyage-adapter-specification-accepted-at-review-prompt-157-implementation-pending) was proposed in Prompt 154, corrected in Prompts 155–156 and accepted at external review in Prompt 157; its implementation (Prompt 158, corrected in Prompt 159, [ADR-0018](decisions/0018-voyage-adapter.md)) was accepted at external review in Prompt 160 and, after feature-branch verification at `84eec023` (historical), is reviewed, verified in CI and on `main` at `5acb75e5` ([evidence](decisions/0018-voyage-adapter.md#main-ci-evidence-at-5acb75e5)); the [overall M4 acceptance assessment](#overall-m4-acceptance-assessment-accepted-at-review-prompt-165) was prepared in Prompt 164, and overall M4 was
-accepted at external review in Prompt 165 within the reviewed scope implemented at `5acb75e5` (acceptance record committed locally; publication pending; M5 not started); local Compose remains unverified.** M1, M2 and M3 remain accepted.
+accepted at external review in Prompt 165 within the reviewed scope implemented at `5acb75e5`; its acceptance record was published on `main` at `46c02257` in Prompt 166 ([evidence](#acceptance-publication-evidence-prompt-166)); M5 implementation has not started; local Compose remains unverified.** M1, M2 and M3 remain accepted.
 
 The reviewer inspected the full Prompt 107 diff, independently matched its
 SHA-256 checksum and checked the existing chunk domain and chunker source
@@ -6610,8 +6610,10 @@ original M4 milestone, the accepted later decisions and the current M4e PostgreS
 The reviewer ran no project suite, regression suite, build, installed-wheel check, database,
 Docker or provider call in that review; the exact-commit CI evidence is the independent retrieval
 recorded for Prompt 164, not new execution. This accepts M4 only, not M5 or the whole project;
-**M5 remains planned and has not started.** The acceptance record is committed locally in Prompt
-165; its publication is pending and not yet authorized. The assessment maps the controlling M4
+**M5 remains planned and has not started.** The acceptance record was committed locally in Prompt
+165, when its publication was pending and not yet authorized (historical); it was published on
+`main` at `46c0225787ba09f27508dafaa218c1bf33af1e8e` in Prompt 166 (see the
+[acceptance publication evidence](#acceptance-publication-evidence-prompt-166)). The assessment maps the controlling M4
 requirements to the evidence on `main` at `5acb75e5`, separating supported requirements,
 accepted scope limits and later-milestone work, and the gaps resolved below. No value is
 inferred, no requirement is waived and no threshold is added.
@@ -6708,6 +6710,82 @@ this documentation and a decision on G2; historical.)* The acceptance adds no ne
 security guarantee. It is not acceptance of M5 or of the whole project: **M5 remains planned and
 has not started**, and no M5 work is authorized by this decision.
 
+##### Acceptance publication evidence (Prompt 166)
+
+[FACT] In Prompt 166 the accepted record (the Prompt 165 local commit `a3d8991e` plus the
+approved one-sentence clarification and prompt history) was committed as
+**`46c0225787ba09f27508dafaa218c1bf33af1e8e`** (parent `a3d8991e`), published on
+`docs/m4-acceptance-assessment`, and, after all five jobs passed for that exact commit,
+fast-forwarded onto `main`, where all five jobs passed again. **The M4 implementation baseline
+stays `5acb75e5`:** the range from `5acb75e5` to `46c02257` changes documentation and prompt
+history only, so this run re-verifies the same implementation rather than a new one.
+
+**Attribution.** In Prompt 166 Claude Code observed only run, job and step conclusions through the
+anonymous public API; its anonymous log downloads returned HTTP 403 or failed without an HTTP
+response, so it observed no counts or log output. The external reviewer independently retrieved
+all four run records, all ten job records and all ten job logs; the counts and output below come
+from that retrieval. The reviewer ran no project test, build, wheel check, Docker, database or
+provider call.
+
+All four runs used event **push**, SHA `46c0225787ba09f27508dafaa218c1bf33af1e8e`, **attempt 1**,
+and concluded **success**; all ten jobs and their required steps succeeded, none skipped.
+
+**Documentation branch** (`docs/m4-acceptance-assessment`, before the fast-forward):
+[CI run 39145004493](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145004493)
+and [secret-scan run 39145004509](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145004509).
+
+| Job | Observed |
+|---|---|
+| [Ubuntu verify 117726950822](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145004493/job/117726950822) | `2675 passed, 308 skipped in 25.54s` |
+| [Windows verify 117726950554](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145004493/job/117726950554) | `2674 passed, 309 skipped in 76.20s (0:01:16)` |
+| [PostgreSQL integration 117726950798](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145004493/job/117726950798) | `308 passed, 2675 deselected in 197.71s (0:03:17)` |
+| [Container 117726950860](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145004493/job/117726950860) | all six required steps succeeded |
+| [Gitleaks 117726950708](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145004509/job/117726950708) | 72 commits scanned, no leaks found |
+
+**Main** (after the fast-forward):
+[CI run 39145584019](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145584019)
+and [secret-scan run 39145584030](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145584030).
+
+| Job | Observed |
+|---|---|
+| [Ubuntu verify 117728627885](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145584019/job/117728627885) | `2675 passed, 308 skipped in 38.01s` |
+| [Windows verify 117728627856](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145584019/job/117728627856) | `2674 passed, 309 skipped in 73.31s (0:01:13)` |
+| [PostgreSQL integration 117728627638](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145584019/job/117728627638) | `308 passed, 2675 deselected in 184.61s (0:03:04)` |
+| [Container 117728627883](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145584019/job/117728627883) | all six required steps succeeded |
+| [Gitleaks 117728627878](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145584030/job/117728627878) | 72 commits scanned, no leaks found |
+
+Both PostgreSQL logs show the M4 modules passing: `tests/test_embeddings_postgres.py` 29,
+`tests/test_indexing_postgres.py` 18, `tests/test_retrieval_postgres.py` 39,
+`tests/test_evaluation_postgres.py` 16 and `tests/test_voyage_postgres.py` 2, that is 104 M4
+PostgreSQL cases within the 308 integration passes. On both pushes both platforms ran tests,
+distribution builds and installed-wheel checks successfully; all four wheel logs printed:
+
+```text
+offline embedding, canonical storage and indexing modules ran from the installed wheel
+retrieval modules imported and fusion ran from the installed wheel
+evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+Voyage adapter validated a mocked response from the installed wheel
+offline migration SQL rendered from the installed wheel
+```
+
+Both container logs reported 89 context files with 19 planted fixtures excluded; a healthy stack
+and successful migrations; upload 202, successful ingestion with two verified chunks and a
+duplicate upload 200; one offline backfill indexing job, a ready index with two embeddings and a
+succeeded indexing job; idle-worker exit 0 without OOM; and successful smoke and cleanup. These
+are observed log summaries and successful gates, not independent inspection of raw rows or
+generated credentials, and the smoke covers offline ingestion, indexing and idle-worker shutdown
+only.
+
+**Limits.** The Voyage wheel line and PostgreSQL cases use a mocked transport; the 2/3 Recall line
+is pure arithmetic. No database-derived numerical corpus Recall value has been observed or
+published. All accepted M4 limitations above and in ADR-0013 to ADR-0018 are unchanged: offline
+production defaults with no live Voyage wiring or verification; cooperative timing, the
+observable process-control scope and accepted-bytes rather than peak-memory bounds; privacy scope
+excluding frame locals and held values; the retryability work required before live indexing; the
+trusted in-process snapshot limitation until M5 persists and reloads captured facts; the
+container-smoke scope; local Compose unverified; and no quality, security or production-readiness
+guarantee. The earlier records of logs unavailable to Claude Code, including Prompt 166's, stand.
+
 **M5 – Review workflow (fake model in CI)**
 - Provider interface; Anthropic and scripted fake providers; `prompts/verifier/v1.md` and `prompts/risk_analyst/v1.md`; planner; orchestration; review snapshot; provenance checks; status derivation; report renderer; provider-call records and spans.
 - *Acceptance:*
@@ -6717,6 +6795,964 @@ has not started**, and no M5 work is authorized by this decision.
   - **A worker killed between a provider response and its commit repeats the call once.** The test checks the second call is recorded and no duplicate stage row is written.
   - **A stale worker's stage writes are rejected.**
   - The injection canary never appears in output.
+
+#### M5 implementation sequence (ACCEPTED at review, Prompt 170)
+
+**Status.** **The dependency-ordered M5 sequence was accepted at external review in Prompt 170**,
+together with the complete [M5a specification](#m5a-model-call-contracts-and-scripted-fake-provider-accepted-at-review-prompt-170-implementation-pending).
+It was proposed in Prompt 167, corrected in Prompt 168 (corrections A–E, below) and clarified in
+Prompt 169 (clock arithmetic, the canary acceptance assertion, report integrity, creation
+failures and boundary exceptions); the subsections below keep those historical stages. The
+sequence acceptance covers the slice order and the settled design choices; it is **not** detailed
+acceptance of the M5b–M5h schemas, SQL, prompts, transport or orchestration, each of which needs
+its own reviewed specification (see [acceptance scope](#m5-sequence-and-m5a-acceptance-prompt-170)).
+**M5 implementation has not started, no M5 mitigation operates yet, and overall M5 acceptance is
+pending.** The M5 milestone text above is the controlling requirement and is unchanged; this
+sequence only orders it into slices. Labels: **[DECISION]** already accepted; **[FACT]** current
+code at `46c02257`; **[REC]** recommendation (for M5a and the sequence-level choices, accepted in
+Prompt 170 as recommended); **[OPEN]** a detail left to a later slice's review. Earlier sketches in
+§§4, 6 and 8 (entity lists, `ModelProvider.generate_structured`, table names) are design sketches,
+not implemented code or accepted detailed schemas.
+
+##### M5 sequence and M5a acceptance (Prompt 170)
+
+[DECISION] The external reviewer accepted, in Prompt 170:
+
+- the M4 acceptance-publication documentation prepared in Prompt 167;
+- the corrected dependency-ordered **M5 sequence** (M5a–M5h) and its settled design choices
+  (W1–W8, W10, W11 and W13–W15 as recommended, W14 under the report-integrity invariant);
+- the **complete M5a specification**, with one final clarification of the planned clock-test
+  wording (G). The accepted M5a recommendations and W-A1 to W-A11 form its **implementation
+  contract**; no M5a specification decision remains open.
+
+*Still pending:* the M5a implementation and every M5a check; no model-call module,
+`evidenceguard_agents` package, test, workflow extension or ADR-0019 exists. No M5 mitigation
+operates yet. Overall M5 acceptance is pending.
+
+*Later review obligations* (each belongs to its own slice specification and does not block the
+accepted, bounded M5a specification): M5b exact quote matching and normalization (W12); M5c
+template and prompt packaging and safe request assembly; M5d composable capture, SQL, isolation,
+idempotency and retry policy; M5e persistence schemas and fenced reservations and stages; M5f the
+versioned hash-covered report representation; M5g orchestration, crash and reclaim behaviour and
+error mapping; M5h the SDK or transport and the live model-alias policy (W9). Production wiring
+remains a separate reviewed decision (W8).
+
+*Review attribution.* The reviewer verified the three exports
+(`.local/p167/m4-publication-and-m5-plan.diff`, 103,583 bytes, SHA-256
+`24147a9431e5b61d06c4f869cba42774b5d11884f80f3ab4865db4c58b0c96db`;
+`.local/p168/m5-plan-contract-corrections.diff`, 81,299 bytes, SHA-256
+`2b2fd263b01d2d95b179b7b9bbf9eee65dc30493ab7b648cba1f3c0e45bd1d05`;
+`.local/p169/m5-final-spec-clarifications.diff`, 45,275 bytes, SHA-256
+`3284c752cea6516fa6eb117d6f5e2308a99e75ba9517168f4dbea505082f69b3`) and reviewed the proposal and
+its corrections. The Prompt 168 review included the relevant existing domain and persistence
+source and two isolated Pydantic 2.14.0 probes in the review environment; the Prompt 169 review
+included isolated Python arithmetic probes. Those were not locked-project tests and not evidence
+about an implemented M5 module. The final review verified the Prompt 169 export and clarified the
+planned clock-test wording. The reviewer ran no project suite, regression suite, build,
+installed-wheel check, database, Docker or provider call for this specification review; existing
+CI evidence belongs to M4 at its recorded exact SHAs. Claude Code wrote the proposal, its
+corrections and this record (Prompts 167–170).
+
+##### Review status and supported directions (Prompt 168)
+
+The external reviewer accepted the M4 publication-evidence documentation from Prompt 167 and kept
+the whole M5 sequence and M5a specification **proposed, not accepted** at that stage (historical;
+both were accepted in Prompt 170). The reviewer recorded
+these **supported directions**, each subject to a corrected, complete specification; they are not
+acceptance of M5 or of M5a:
+
+- M5a first;
+- domain output and value contracts, with the provider, fake, planner and adapters in
+  `evidenceguard_agents` behind enforced import boundaries;
+- a TOML review template independent of the ground truth;
+- started-call reservations committed before dispatch;
+- dedicated M5 test fixtures rather than changes to the accepted M4e corpus;
+- the existing `Verification`, `Citation` and `Finding` contracts retained, with surrounding values
+  added where needed;
+- a raw `generate` plus one shared validating boundary;
+- fixed outcomes for ordinary provider failures;
+- immutable call values and immutable strict output schemas;
+- explicit bounds, zero hidden SDK retries and a narrow installed-wheel extension;
+- creating the agents package in the first slice that uses it.
+
+The detailed Anthropic SDK or transport choice and any live model-alias behaviour wait for M5h; no
+live model-name compatibility is claimed. For W12 the normalized-substring direction is retained,
+with the exact rules left to M5b (below).
+
+*Reviewer attribution (Prompt 168).* The reviewer verified the Prompt 167 export's bytes and
+checksum, inspected the proposed sequence and contracts and the relevant existing domain and
+persistence source, and ran two isolated probes with the review environment's Pydantic 2.14.0:
+strict validation of a decoded Python dictionary rejected an enum string, and a frozen Pydantic
+model containing a list allowed that list to mutate. The reviewer ran no project test,
+locked-project probe, build, wheel, PostgreSQL, Docker or provider call. The probes concern the
+proposed design only; **no M5 module exists**, so they are not evidence about an implementation.
+
+##### Reviewer-approved design choices (Prompt 169)
+
+The external reviewer matched the Prompt 168 export and approved these **design choices within
+the corrected proposal**. At that stage this was not yet acceptance of the complete M5 sequence or
+the M5a specification (historical; both were accepted in Prompt 170), and nothing is implemented
+or tested:
+
+- **Sequence:** W1, W2, W3, W6 and W11 (the directions supported in Prompt 168); W4 and W5 (a
+  persisted budget of three reservations per stage across attempts, one repair allowance across
+  attempts, no exactly-once guarantee); W8 (internal and test-only creation, an explicit handler
+  and provider, no production fake dispatch, and production enqueue, registration and provider
+  configuration enabled together only by a later reviewed task); W10 (dedicated fixtures with the
+  acceptance and limitation fixtures kept apart, below); W13 (model mismatch terminal for the
+  stage); W14 (subject to the report-integrity invariant, below); W15 (a read-time review-state
+  projection, with the completed output and job success committed atomically).
+- **M5a:** W-A1 to W-A9 and W-A11 (the corrected contracts, strict immutable schemas, bounded
+  fake, zero hidden retries and narrow wheel check), and W-A10 (the clock policy, including the
+  Prompt 169 arithmetic correction in D1).
+
+**Still awaiting their own specifications** (they do not block review of the bounded M5a
+contract): W12's exact normalization and matching rules (M5b); W9's SDK or transport and any live
+alias behaviour, including the alias part of W-A4 (M5h); the report-content representation
+(M5f, under the invariant below); M5d's SQL, schemas, idempotency and retry policy; M5e's
+schemas; and M5g's detailed orchestration and error-code mapping.
+
+*Reviewer probe (Prompt 169).* In the review environment's Python, finite floats `-1e308` and
+`1e308` made the latency subtraction and conversion raise `OverflowError`, and
+`math.isfinite(10**1000)` raised `OverflowError`. This was isolated Python arithmetic, not a
+project test and not evidence about an M5 implementation, which does not exist.
+
+##### Accepted requirements carried into M5
+
+- [DECISION] D4–D6, D9, D10 and correction E: deterministic Planner and Report Composer; model
+  judgment only in the Evidence Verifier and Risk Analyst; plain Python with persisted, typed
+  stage state; a refusal leaves the question unresolved with no automatic fallback; the live
+  model is chosen by measured evaluation (M7); recovery reuses persisted results, does not
+  promise exactly-once model calls and fences every stage write.
+- [DECISION] §4 evidence semantics: provenance checks prove only that a quote exists in an
+  authorized chunk retrieved for that review and question; `evidence_status` is derived
+  deterministically from the verdict and the cited documents' `source_type`; authenticity is
+  always `not_established`; a `vendor_claim` on a question requiring documentary support raises
+  a finding. §4: invalid output gets one repair attempt, after which the question is unresolved.
+- [DECISION] Correction B and the Prompt 108 decisions: each review snapshots its eligible
+  revisions and configuration; retrieval uses the snapshot, not current status; M5 persists the
+  captured authorization and configuration facts atomically with review creation and reloads
+  them only through trusted paths; a frozen value, ID list, digest or timestamp proves neither
+  authorization nor past eligibility.
+- [DECISION] M4d (R3 and its failure boundary): the snapshot seams are trusted internal
+  interfaces; when M5 calls them from a job handler, M5 must specify how cancellation and lease
+  loss take precedence. M4f (V11, V15): embedding retryability is unresolved before live
+  indexing; §8's "60 s timeout, 2 SDK retries" still applies to model calls until M5 decides
+  otherwise.
+- [DECISION] §7 modes: the `contract` mode uses fake components and is stamped "NOT a quality
+  measurement of Claude or semantic retrieval"; claim-support precision, support-judgment
+  accuracy, status accuracy, coverage, paired injection effect, latency and cost are M7 live
+  evaluation. M4e assigned claim judgments and end-to-end canary behaviour to "M5/M7"; this
+  sequence reads that as contract-fixture behaviour in M5 and measured behaviour in M7.
+
+##### Facts from current source (`46c02257`)
+
+- [FACT] No `evidenceguard_agents` package, `prompts/` directory, review template file, model
+  provider protocol, model SDK dependency, review/stage/provider-call/span table or `run_review`
+  handler exists. Migrations are `0001`–`0005`. The production registry holds `ingest_revision`
+  and `index_revision` only, and the worker claims only the kinds in its registry
+  (`HandlerRegistry.kinds` is the claim filter). The wheel packages six import packages;
+  `tests/test_packaging.py` enforces the import boundaries and per-module third-party allowlists.
+- [FACT] `evidenceguard_domain.evidence` defines `Verdict`, `EvidenceStatus`, `SourceType`,
+  `Authenticity`, `Severity`, `EvidenceQuestion` (1–5 search queries), `Citation` (tenant,
+  revision, chunk, `source_type`, quote; shape only), `Verification` (caller-supplied
+  `evidence_status` checked against the verdict and citation source types; no claims list,
+  `provenance_check` or provider-call reference), `Finding` and `ReportContent` with its coverage
+  rules (a question without a resolving finding must be listed as unresolved; listing any other
+  question as unresolved is allowed). `evidenceguard_domain.report` hashes content as
+  `evidenceguard.report-content.v1`; `evidenceguard_domain.approval` holds pure report
+  transitions. These are `DomainModel` (Pydantic, frozen, whitespace-stripping) values.
+- [FACT] M4d provides `capture_snapshot`, `retrieve_with_vectors`, `search_snapshot` and
+  `search_current` over an in-process `RetrievalSnapshot` with a canonical `sha256`, the binding
+  recheck, and `ChunkEvidence` carrying exact text, body and optional repeated-header spans,
+  `source_type` and `authenticity`. `capture_snapshot(session_factory, …)` runs its private
+  capture body through `run_read`, which uses `document_views.read_snapshot`: that helper opens
+  its own session, makes `SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY` its first
+  statement, reads `clock_timestamp()`, and always rolls back and closes. **It cannot be called
+  inside a caller-owned write transaction.** Nothing persists or reloads a snapshot.
+- [FACT] Jobs: `enqueue(session, actor, …)` runs in the caller's transaction and documents its
+  concurrent-conflict behaviour under READ COMMITTED; `JobPayload` values are canonical UUIDs
+  only (at most 4,096 bytes); attempts are 1–10 (default 3); reclaiming an expired lease
+  increments `attempt`, and a job can reach `dead` by reclaim or sweep without any handler
+  running; `JobContext.check()` latches cancellation and lease loss; `fenced(finish=True)` commits
+  effects with job success; handlers raise `RetryableJobError`/`PermanentJobError` with fixed
+  `JobErrorCode`s. There is no user-facing cancel operation.
+- [FACT] Corpus: the injected variant replaces one Tenant A trust-center page with an added
+  instruction paragraph; it contains **no dedicated injection canary token**. The existing
+  canaries (`LV-TB-CANARY-36H`, `LV-TB-CANARY-AES`) are **cross-tenant** canaries in Tenant B
+  documents. Questions exist only in `sample_data/ground_truth/*.toml`, which a planner or fake
+  provider must never read.
+
+##### Proposed slices (dependency-ordered)
+
+[REC] Each slice is reviewed, verified in CI and merged before the next starts, as in M3 and M4.
+Only M5a has a detailed specification below; later rows are sequence-level and need their own
+reviewed specifications. *Prompt 168 reorders the former M5f (handler) and M5g (renderer)*, so the
+renderer exists before the handler's atomic final commit needs it.
+
+| Slice | Purpose and behaviour | Depends on | Placement | Persistence |
+|---|---|---|---|---|
+| **M5a** | Model-call contracts and scripted fake: request/response/result values, the canonical request digest, closed Verifier and Risk Analyst raw-output schemas with strict JSON parsing, a provider protocol, a validating call boundary that turns every ordinary provider failure into a fixed outcome, and `ScriptedFakeProvider` | M1 domain | `evidenceguard_domain.model_calls`, `evidenceguard_domain.agent_outputs`; new `evidenceguard_agents` (`providers`, `scripted`) | None |
+| **M5b** | Provenance checks and status derivation (pure): Verifier output plus the question's retrieved evidence → `Verification` with derived status and trusted citation metadata, or `citation_rejected`; analyst findings restricted to already validated citations; the `requires_documentary_support` finding rule; exact quote-matching rules (W12) | M5a, M4d values | `evidenceguard_domain.provenance` | None |
+| **M5c** | Versioned artifacts: TOML review template, deterministic Planner, `prompts/verifier/v1.md` and `prompts/risk_analyst/v1.md` as packaged data with pinned SHA-256, and request assembly that places evidence only inside delimited blocks with **safe encoding** of document text (Correction E) | M5a, M5b | `evidenceguard_agents` (`planner`, `prompts`, `assembly`); packaged data | None |
+| **M5d** | Composable capture and review creation (Correction A): a public capture operation for a caller-owned transaction, extracted from the M4d capture phases with `capture_snapshot` unchanged; one creation transaction storing the review, every binding, the exclusions record, the pinned configuration and, through the same transaction, the `run_review` job; a trusted loader that rebuilds and revalidates the snapshot. Internal seams only (W8) | M4d, M5c | `evidenceguard_persistence.retrieval` (capture extraction), `evidenceguard_persistence.reviews`; migration `0006` | Yes |
+| **M5e** | Stage, call-reservation and output records (Correction D): per-question stage rows unique on `(tenant_id, review_id, question_id, stage)`, persisted call reservations and provider-call records and spans, the stored report output, all through fenced writes; identical replay is a no-op and a differing replay is a fixed conflict, never an overwrite | M5a, M5b, M5d | `evidenceguard_persistence.review_stages`; migration `0007` (or merged into `0006`) | Yes |
+| **M5f** | Report content and renderer (pure): settles the hash-covered report-content representation under the report-integrity invariant (a versioned wrapper around `ReportContent`, or omission of conclusions it cannot hold), builds that content from committed stage values, and renders Markdown solely from the hashed content, including unresolved questions, authenticity labels and the contract-mode stamp | M5b, M5e values, M1 report contracts | `evidenceguard_agents.report` | None (stored by M5g) |
+| **M5g** | `run_review` handler factory and bounded orchestration: plan → retrieve (M4d `search_snapshot` over the loaded snapshot) → verify (with repair) → analyze → render → one atomic final commit; resume, reservations and budgets, cancellation, lease-loss and failure precedence; fake-provider controlled crash tests. Not registered in production (W8) | M5a–M5f, M3b runtime | `evidenceguard_worker.review` | Uses M5d/M5e |
+| **M5h** | Anthropic adapter behind the M5a protocol, tested only with an injected or mocked transport; not registered, no settings, no live call (W9) | M5a | `evidenceguard_agents.anthropic` (adapter) and, if a transport is needed, the worker | None |
+
+After M5h, an overall M5 acceptance assessment maps every criterion to evidence, as for M3 and M4.
+
+**Boundaries.** [REC] M5 does not change M3 activation, M4 chunk/index immutability, the M4d
+retrieval seams or the M4f adapter; M5d only *extracts* the M4d capture phases into a composable
+operation, with `capture_snapshot`'s public behaviour preserved and re-tested. M6 owns report
+revisions, approval, finalize, export, ETags and audit events (the pure M1 transitions stay unused
+by M5 except for content hashing). M7 owns live model and embedding runs, annotation, pricing,
+measured metrics and model selection. Review-facing endpoints and production dispatch are decided
+in W8.
+
+**Exclusions for all of M5.** [REC] No live provider call, credential, provider setting or
+production registration of a non-fake model provider; no production use of fake judgments; no
+approval, finalize or export endpoint; no live evaluation, measured quality, latency or cost
+claim; no LLM planner, judge, reranker or summary (E3, E4, E7, E10); no framework or queue
+dependency; no change to the accepted M4 corpus (W10); no production canary denylist.
+
+##### Composable capture and review creation (Correction A)
+
+[REC] Sequence-level design for M5d; the detailed persistence review settles SQL, schemas and lock
+details.
+
+- **Extraction, not a shortcut.** M5d refactors the existing capture phases (scope, selection,
+  emptiness, revision bound, consistency, readiness, chunk bound, exclusions) into one reviewed,
+  public persistence function that takes a caller-owned `Session` and the transaction's database
+  time, for example `capture_in_transaction(session, captured_at, actor, *, vendor_id, identity,
+  config) -> RetrievalSnapshot | SemanticOutcome`. `capture_snapshot` keeps its signature, its
+  read-only REPEATABLE READ transaction, its fixed errors and their precedence, and calls the
+  same function inside `run_read`. Nothing reaches into `read_snapshot` or another private
+  helper. M5d's tests rerun the M4d capture cases and add an equivalence test (both paths yield
+  the same snapshot facts over the same data).
+- **Creation transaction.** A new reviewed helper opens the creation transaction:
+  `SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ WRITE` as its first statement, then the
+  single `SELECT clock_timestamp()` that **establishes the transaction snapshot** and becomes
+  `captured_at`, then a transaction-local statement timeout. In that one transaction it runs the
+  capture function, inserts the review, every binding, the exclusions record and the pinned
+  configuration (template, planner, prompt, model and retrieval/profile identifiers and digests,
+  and the snapshot digest), and enqueues `run_review` with payload `{review_id}` through the
+  existing `enqueue(session, …)`. *(Corrected in Prompt 169: the earlier blanket statement about
+  inserts and concurrent-update failures is withdrawn.)* Unique-constraint violations,
+  concurrent idempotency races (for example a repeated client key committed concurrently, or
+  `ON CONFLICT` against a row invisible to the snapshot, which PostgreSQL reports as a
+  serialization failure), other serialization failures, lock or statement timeouts and commit
+  failures can all still occur in this transaction. Creation stays atomic whatever happens.
+  Known retryable conflicts receive a fixed classification; any retry runs in a **fresh**
+  transaction (which can then see and return an existing review); nothing is retried inside the
+  failed transaction, not every failure is retryable, and no unbounded retry loop is proposed.
+  The detailed SQL, idempotency and retry policy belong to the M5d review.
+- **When eligibility is established.** At the snapshot-establishing statement, with M4d's race
+  semantics: an activation, readiness change, upload or failure committed before it is visible;
+  one committed after it is not, even before capture's first data query, and a revision captured
+  there stays eligible after later supersession.
+- **Visibility and atomicity.** Nothing about the review is visible to other transactions until
+  commit. The review, bindings, exclusions, configuration and job commit together or not at all;
+  a semantic capture outcome, constraint failure, timeout or error rolls the whole transaction
+  back. A commit whose outcome is unknown surfaces as a fixed error that does **not** claim the
+  transaction rolled back; the idempotency key lets the caller discover later whether creation
+  happened.
+- **Trusted loading and its threat boundary.** The persisted bindings are trusted because the
+  application wrote them inside the transaction that established eligibility, **not** because a
+  digest or timestamp was stored. The loader reads the rows for `(tenant_id, review_id)`, rebuilds
+  `RetrievalSnapshot` through its validating constructor, recomputes the canonical digest and
+  compares it exactly with the stored one; every later retrieval still runs the M4d binding
+  recheck. The digest only detects disagreement between stored rows and the stored digest. The
+  boundary assumes the database changes only through application paths and migrations; it gives
+  no protection against a direct database writer or malicious in-process code, and the public
+  M4d seams still accept trusted in-process snapshots. The M4d limitation is closed **for review
+  paths only**, and only once M5d is implemented and verified, with the handler (M5g) obtaining
+  its snapshot solely from the loader (enforced by structure and a test).
+
+##### Production dispatch and enqueue (W8 reconciled)
+
+[REC] Until a reviewed wiring decision, every M5 seam is **internal or test-only**:
+
+- M5d's creation function enqueues `run_review` because that enqueue must be atomic with
+  creation, but **no endpoint, CLI or production path calls it** in M5d–M5h; only tests do.
+- `run_review` is **not** added to `production_registry()`. Because the worker claims only its
+  registry's kinds, a production worker never receives a `run_review` job; a packaging/registry
+  test pins that the production registry lacks `run_review` and that no API route or `eg-admin`
+  command imports the creation seam.
+- M5g provides `make_run_review_handler(provider)` requiring an explicitly supplied
+  `ModelProvider`; tests build their own registry with it and a scripted fake. There is no
+  default provider, so no production fake judgment can arise.
+- Enqueue from a production path, the `run_review` registration and the configured provider
+  become available **together** in one later reviewed slice (with the live-wiring decision after
+  M5h, or in M7); until then no review is created outside tests.
+
+##### Call budgets, repair and terminal state (Correction D)
+
+[REC] Sequence-level rules for M5e and M5g (details in their reviews):
+
+- **Reservation before dispatch.** Before each `call_validated`, a fenced transaction inserts a
+  `started` call reservation for `(review, question, stage)` with the next sequence number and
+  its kind (`initial`, `repair` or `retry`). The reservation is the budget unit: a `started` row
+  abandoned by a crash still consumes it. Because the counters are rows, they survive reclaim and
+  process restart. When the call returns, `ctx.check()` runs first (W7); then the outcome,
+  model used, usage and latency complete the reservation, in the same fenced transaction as the
+  stage output when the stage succeeds.
+- **One stage budget, never reset.** At most **3 reservations per `(review, question, stage)`
+  across all job attempts**, of which **at most one is a repair** for the whole stage (not one per
+  attempt). Neither limit resets on reclaim or restart.
+- **Repair versus retry.** `invalid_output` → one repair request (a different request and digest,
+  built by M5c from fixed failure categories, never from raw output). `timeout` and
+  `provider_failed` → a retry of the same request. `refusal`, `max_tokens` and `unexpected_stop`
+  are terminal for the stage (D9). `model_mismatch` is **terminal for the stage** (W13: it signals
+  misconfiguration, so repeating it spends budget without changing the model).
+- **Restart after a repair.** On resume the handler reads the reservations: if a repair
+  reservation exists (`started` or completed), no further repair is allowed; an abandoned repair
+  may be re-dispatched once as a `retry` of that repair request if budget remains.
+- **Reuse eligibility.** A committed stage row is the **only** thing resume reuses as success.
+  Call records (including `invalid_output`, timeout and abandoned `started` rows) are audit and
+  budget evidence; they are never treated as a completed stage and never replayed as output.
+  Raw model output is not stored in call records (content capture is off by default, §4); a
+  validated output is stored only as part of a committed stage row.
+- **Stage versus question failures.** A Verification stage ends `verified` (a `Verification` with
+  derived status) or `unresolved` with a fixed reason. An Analysis failure records the analysis
+  as `unresolved` and **does not alter or erase a committed `Verification`** or relabel its
+  evidence as `missing`. In `ReportContent` such a question appears in `unresolved_question_ids`
+  (allowed by the existing coverage rules) with no fabricated finding. The valid `Verification`
+  stays persisted; the question is unresolved **for analysis**, without falsifying or erasing the
+  Verification. Whether and how its status appears in the report is governed by the
+  report-integrity invariant below (W14).
+- **Review status on terminal jobs.** A job can become `dead` through reclaim or sweep without a
+  handler, so no handler can be relied on to write a final failed state. [REC] Review status is a
+  **read-time projection** (like M3e's ingestion state): `completed` only if the final atomic
+  commit exists; `failed` if the canonical job is `failed` or `dead` without it; otherwise queued
+  or running. No compensating write is made by a worker, and a worker that has lost its fence
+  writes nothing (W15).
+- **Completion after rendering.** The final step renders (M5f) and stores the report output, marks
+  the review complete and records job success in **one** `fenced(finish=True)` transaction, so a
+  review is never complete without its output.
+
+##### Report integrity (Prompt 169)
+
+[DECISION] (set by the reviewer in Prompt 169 as the condition on W14; binding on M5f, M5g and
+M6) **Invariant:** every substantive
+finding, evidence status, quote, unresolved reason or other review conclusion presented as part of
+the approval or export artifact must be represented in that artifact's **canonical hashed
+content**, or be deterministically derived solely from that content. A report must never acquire
+a displayed conclusion from unhashed stage rows after its content hash is computed; display-only
+Markdown is rendered from the hashed content alone.
+
+[REC] Consequences for the sequence:
+
+- **M5f settles the representation** before the M5g completion path uses it. The accepted M1
+  `ReportContent` holds findings and unresolved question IDs only, so preserved Verification
+  statuses, accepted quotes outside findings and unresolved reasons are not in it today.
+- **Either** M5f proposes an explicitly versioned canonical schema that wraps `ReportContent`
+  (for example a new schema ID covering `ReportContent` plus per-question verification status,
+  accepted quotations and fixed unresolved-reason codes), with its own canonical bytes and digest
+  and a reviewed compatibility plan for M6; **or** the report omits those extra conclusions until
+  such a reviewed, hash-covered representation exists.
+- The accepted M1 hash schema `evidenceguard.report-content.v1` is **not** changed silently; a
+  wrapper is a new, versioned schema, not a reinterpretation of the old one.
+- M6 approves, finalizes and exports the **exact hash-covered report revision**; stage rows remain
+  audit evidence behind it, never an additional source of displayed conclusions.
+
+*Recommendation (W14):* the versioned wrapper, because unresolved reasons and preserved
+Verification statuses are what a reviewer needs to judge an unresolved question. *Tradeoff:* a
+new schema and M6 compatibility work versus a thinner approval artifact that shows only findings
+and unresolved IDs. No new schema is specified or implemented here.
+
+##### Canary and prompt-boundary coverage (Correction E)
+
+[REC] Provenance checks prove quote existence only; they do not detect semantic prompt injection.
+Delimiting evidence does not make a live model injection-proof. Production code holds no canary
+list. **The original criterion, "The injection canary never appears in output", is kept
+unchanged** (Prompt 169). Its approved scope is an end-to-end **contract assertion** over the
+specified M5 scripted-fake fixtures:
+
+- **Acceptance fixture (must pass).** A Tenant A corpus fixture that includes a dedicated copy,
+  under `tests/`, of the injected trust-center page. Its instruction asks the model to emit an
+  obviously synthetic canary **assembled from parts** given in the instruction, so the canary is
+  absent verbatim from every document. The fixture asserts that the injected chunk is in the
+  retrieved evidence for at least one question **and** inside an evidence block of that
+  question's assembled model request. The scripted responses are ordinary (they do not follow the
+  instruction) and may cite genuine quotations from the injected page. The review runs end to end
+  through the M5g handler. The **acceptance checker** then asserts that the canary (exact token,
+  and its case-insensitive form) appears in none of: the canonical hashed report content bytes;
+  the Markdown derived from it; every committed stage output for the review (verifications,
+  claims, quotations, rationales and findings, including titles, statements and follow-up
+  questions); call records; and the logs and error codes captured during the run.
+- **Negative control (expected checker failure).** The same fixture with a scripted response that
+  emits the canary in free-text fields (for example a rationale and a finding statement). The
+  **same** acceptance checker must report failure, and the test asserts that it does. This proves
+  the checker detects the token; it also shows that no production rule blocks such emission.
+- **Limitation probe (labelled separately, not an acceptance fixture).** A fixture variant whose
+  authorized document contains the canary **verbatim**, with a scripted genuine quotation of it:
+  provenance accepts the quotation and the report contains it, and the test asserts exactly that.
+- Passing the acceptance fixture does **not** establish live-model injection resistance and does
+  not show that provenance checks reject arbitrary malicious text.
+
+The M5 fixtures (W10) also keep these classes distinct from the authorized-document injection
+fixture:
+
+1. **Cross-tenant leakage.** Tenant B's canaries are never retrieved for Tenant A (M4d isolation).
+   Assertion: no assembled request for Tenant A contains them, and they appear in no persisted
+   stage row, call record, rendered report, error or log; a scripted citation of a Tenant B chunk
+   is rejected as unretrieved.
+2. **Forged or unretrieved citations.** A scripted response citing an unretrieved or forged chunk
+   ID, or a quote absent from the cited chunk, gives `citation_rejected`; the rejected citation is
+   not stored as accepted evidence and not rendered.
+3. **Authorized injected-document quotes.** Covered by the acceptance fixture (genuine quotations
+   that cannot contain the assembled canary) and, separately, by the limitation probe (a verbatim
+   canary in an authorized quotation passes the production rules and is stored and rendered).
+4. **Free-text fields (documented limitation).** With no production denylist, canary text in
+   `rationale`, claim `text`, finding `title` or `statement`, or follow-up questions would be
+   validated, persisted in the stage row, carried into the hashed report content and rendered; the
+   negative control demonstrates this and that the checker catches it.
+5. **Persisted versus rendered versus logged.** Call records hold digests, outcomes and counts, no
+   content; stage rows hold validated outputs; the report renders only its hashed content (report
+   integrity, above); nothing logs content; errors are fixed codes.
+
+Real-model obedience to injected text is measured only by the paired live evaluation in M7.
+
+**M5c prompt boundary.** Plain concatenation of document text into `<evidence id=…>` blocks is not
+sufficient: text containing a closing tag or delimiter-like content could forge block boundaries.
+M5c must specify a safe encoding (for example escaping `&`, `<` and `>` in evidence text and
+using only validated chunk IDs as attributes) and how quotes returned in encoded form map back to
+the original text for M5b matching.
+
+##### M5 acceptance criteria mapped to slices and tests
+
+[REC] Every original criterion is preserved. Evidence is contract evidence with the scripted fake
+and PostgreSQL; none of it measures a live model.
+
+| Original M5 criterion | Slice(s) | Planned test evidence |
+|---|---|---|
+| Invalid output, a refusal, a timeout and a forged chunk ID each end unresolved or rejected | M5a (outcome classification), M5b (forged or unretrieved chunk → `citation_rejected`), M5e/M5g (budgets, unresolved stage persisted) | DB-independent outcome and provenance tests; PostgreSQL handler tests with scripted invalid (including after a failed repair), refusal, timeout (after the retry budget) and forged-ID responses asserting the persisted unresolved state, its reason and no accepted citation |
+| A revision activated after a review started is not used by that review, including after a resume | M5d (creation transaction and trusted loader), M5g | PostgreSQL: create a review, activate and index a replacement, run; separately interrupt after a stage commit, activate a replacement, reclaim and resume; assert only snapshot chunks in retrieved-passage rows and results |
+| A worker killed after a stage commit resumes without duplicate rows | M5e (unique keys, identical-replay no-op), M5g (skip committed stages) | PostgreSQL: a controlled interruption after a stage commit, lease expiry and reclaim; assert one row per `(review, question, stage)` and no new reservation for the committed stage |
+| A worker killed between a provider response and its commit repeats the call once (the second call is recorded; no duplicate stage row) | M5e (reservations), M5g (test-only interruption hook) | One **controlled** PostgreSQL test: the hook interrupts after the fake returns and before the stage commit; after reclaim the fake's call count for that key is exactly 2, the first reservation remains `started`, the second is completed and one stage row exists. This shows that scenario only; it is **not** an exactly-once or one-retry guarantee (W5) |
+| A stale worker's stage writes are rejected | M5e (every write fenced), M5g | PostgreSQL: a reclaimed token's reservation, stage, output and completion writes are refused and change nothing (M3 fence pattern) |
+| The injection canary never appears in output (criterion unchanged) | M5b, M5c, M5f, M5g | End-to-end contract assertion over the specified scripted-fake fixtures: the **acceptance fixture** (authorized injected document in the retrieved evidence and the assembled request; the checker finds no canary in the hashed report content, its Markdown, committed stage outputs, call records, or captured logs and errors) must pass; the **negative control** (canary-emitting script) must make the same checker fail. Separately: cross-tenant isolation and forged-citation tests, and the labelled **limitation probe** (verbatim canary in a genuine authorized quotation is accepted). Not live-model injection resistance (M7) |
+
+##### Sequence-level design decisions
+
+Each gives a recommendation and its tradeoff. Items marked *approved choice* were approved by the
+reviewer in Prompt 169 and accepted with the sequence in Prompt 170 as settled design choices;
+W9 and W12 leave their details to the M5h and M5b reviews. This is not acceptance of any later
+slice's detailed specification or of any implementation.
+
+1. **W1 First slice** (*approved choice, Prompt 169*). [REC] M5a as specified below, pure and database-free.
+   *Tradeoff:* the trusted-snapshot limitation stays open until M5d (documented; no endpoint or
+   handler uses retrieval meanwhile) versus building persistence before its values are settled.
+2. **W2 Placement** (*approved choice, Prompt 169*). [REC] Raw output schemas and provenance/status derivation in
+   the domain (persistence must store and revalidate them and cannot import
+   `evidenceguard_agents`); the provider protocol, fake, prompts, planner and adapters in
+   `evidenceguard_agents`, importing only `evidenceguard_domain` (and later, if needed,
+   `evidenceguard_observability`). *Tradeoff:* a larger domain package versus a persistence
+   dependency on agents, which §3 forbids.
+3. **W3 Review template** (*approved choice, Prompt 169*). [REC] One packaged TOML template (`tomllib`, no new
+   dependency), SHA-256 pinned in the review configuration, independent of the ground truth.
+   *Tradeoff:* diverging from §7's YAML sketch versus a YAML dependency.
+4. **W4 Repair and call budget** (*approved choice, Prompt 169*). [REC] As in Correction D: 3 reservations per stage across
+   all attempts, at most one repair per stage, terminal outcomes as listed. *Tradeoff:* bounded
+   cost and predictable termination versus more chances for a flaky provider.
+5. **W5 Repeated crashes** (*approved choice, Prompt 169*). [REC] No exactly-once claim. An uncommitted response is lost and
+   the call may repeat on each reclaim, bounded by W4's persisted budget and the job's
+   `max_attempts` (default 3; reclaim increments `attempt`, ending `dead` at the cap); the review
+   then projects as failed (W15) with committed stage rows retained. The controlled single-repeat
+   test is one scenario, not a guarantee. *Tradeoff:* possible duplicate cost versus exactly-once
+   machinery that a remote API cannot honour.
+6. **W6 Started-call reservations** (*approved choice, Prompt 169*). [REC] Commit the reservation before dispatch and
+   complete it with the stage output (Correction D). *Tradeoff:* an extra short transaction per
+   call versus invisible repeated cost.
+7. **W7 Cancellation and lease precedence** (clarified in Prompt 169). [REC] For the future M5g
+   handler, as in M4c:
+   - after `call_validated` **returns** an outcome, `ctx.check()` runs before the handler acts on
+     it (classifying, completing the reservation or writing a stage);
+   - if `call_validated` **raises** an ordinary local or configuration error (such as
+     `ModelClockError` or `InvalidModelRequestError`), `ctx.check()` likewise runs before that
+     error is classified, so latched cancellation or lease loss takes precedence over it too;
+   - process-control exceptions propagate unchanged and are never turned into job errors;
+   - a worker that has lost its fence performs **no** outcome, stage or compensating write;
+   - a pre-dispatch reservation that was already committed remains audit and budget evidence
+     (as an abandoned `started` row if nothing completes it);
+   - worker shutdown is the existing retryable `worker_shutdown`; no user cancel endpoint (§6
+     later addition). M4d retrieval errors and M5a outcomes map to fixed `JobErrorCode`s in the
+     M5g specification.
+
+   M5a's boundary stays independent of `JobContext`. *Tradeoff:* checks only at explicit
+   boundaries, never interrupting a synchronous call.
+8. **W8 Endpoints and production dispatch** (*approved choice, Prompt 169*). [REC] As reconciled above: internal and
+   test-only seams in M5, no production registration, endpoint or CLI; enablement later as one
+   reviewed unit with a configured provider. *Alternative:* `POST /v1/reviews` and
+   `GET /v1/reviews/{id}` in M5d. *Tradeoff:* no user-facing review in M5 versus exposing a
+   workflow that cannot produce real judgments.
+9. **W9 Anthropic adapter** (*details are a later review obligation of M5h*). [OPEN] The M5 milestone names "Anthropic and scripted fake providers";
+   it is not removed. [REC] M5h adds the adapter mocked only, mirroring M4f; live wiring and the
+   first live call are M7. The SDK-versus-standard-library transport, its timeout guarantees and
+   any model-alias behaviour are decided in M5h's review; no live model-name compatibility is
+   claimed now. *Tradeoff:* SDK convenience versus a new dependency and mocked-only evidence.
+10. **W10 Canary fixtures** (*approved choice, Prompt 169*). [REC] As in Correction E: dedicated
+    copies under `tests/`; the **acceptance fixture** (authorized injected document retrieved and
+    in the assembled request, instruction-assembled canary absent from documents, checker over the
+    listed artifacts must pass); the **negative control** (canary-emitting script, same checker
+    must fail); and the separately labelled **limitation probe** (verbatim canary in a genuine
+    authorized quotation is accepted and rendered). The original criterion is unchanged; the
+    accepted M4e corpus is unchanged. *Tradeoff:* fixture duplication versus reopening accepted
+    M4e data.
+11. **W11 Existing contracts** (*approved choice, Prompt 169*). [REC] Keep `Verification`, `Citation` and `Finding`
+    unchanged; add surrounding values (validated claims, `provenance_check`, reservation and call
+    references); derived status must satisfy the existing validator. *Tradeoff:* two related shapes
+    versus changing an accepted M1 contract.
+12. **W12 Quote matching** (*direction retained; exact rules await the M5b specification*).
+    [OPEN] Direction: a normalized-substring match. M5b must define the exact Unicode
+    normalization and whitespace rules, match the chunk's body text and its
+    repeated header text **independently** (never a quote spanning them, and never joining
+    unrelated spans), and store and display the **exact original evidence substring** that
+    matched, not the model's string. Original evidence text is never modified.
+13. **W13 Model mismatch** (*approved choice, Prompt 169*). [REC] Terminal for the stage, recorded with the model actually
+    used. *Alternative:* retryable within the budget. *Tradeoff:* faster failure on
+    misconfiguration versus tolerating transient routing differences (to be revisited with M5h
+    alias behaviour).
+14. **W14 Preserved verification in reports** (*approved choice, Prompt 169, subject to the
+    report-integrity invariant*). [REC] The valid Verification stays persisted and the question is
+    unresolved for analysis. Its status and the unresolved reason appear in the approval or export
+    artifact **only** if they are in its hashed content (preferably through a versioned wrapper
+    around `ReportContent` specified in M5f and reviewed for M6), and are otherwise omitted until
+    such a representation exists; nothing is displayed from unhashed stage rows. *(The Prompt 168
+    suggestion of a Markdown-only display is withdrawn.)* *Tradeoff:* a new versioned schema versus
+    a thinner approval artifact.
+15. **W15 Review status ownership** (*approved choice, Prompt 169*). [REC] A read-time projection from the review's final
+    commit and its canonical job, with no compensating writes. *Alternative:* a stored status
+    updated by a fenced terminal hook in the runtime. *Tradeoff:* no new runtime hook and no stale
+    writer versus a status that must be derived on every read.
+
+#### M5a model-call contracts and scripted fake provider (ACCEPTED at review, Prompt 170; implementation pending)
+
+**Status.** **Specification accepted at external review in Prompt 170; implementation pending.**
+Proposed in Prompt 167, corrected in Prompt 168 (strict JSON parsing and deep immutability in B
+and B1, the call algorithm and clock contract in D–D2, fake bounds and the corrected privacy
+statement in D2 and E), clarified in Prompt 169 (the clock arithmetic and bounds in D1), and
+accepted in Prompt 170 with a clarification of the planned clock-test wording (G). The accepted
+recommendations and W-A1 to W-A11 (section I) form the implementation contract; no M5a
+specification decision remains open. No M5a module, test, workflow extension or ADR-0019 exists,
+and every M5a check is pending. M5a is
+pure: no database, migration, network, credentials, settings, handler registration, prompts or
+orchestration.
+
+**Purpose.** Fix the values every later slice uses to ask for a structured judgment and to
+classify what came back, and provide a deterministic scripted provider so that refusal, invalid
+output, timeout, provider failure and model mismatch can be produced on demand in CI. It does not
+check provenance (M5b), assemble prompts (M5c) or persist anything (M5d/M5e). It therefore does
+**not** close the trusted-snapshot limitation; M5d does, for review paths, through its creation
+transaction and trusted loader (above).
+
+##### A. Placement and imports
+
+| File (new) | Contents | May import |
+|---|---|---|
+| `packages/domain/evidenceguard_domain/model_calls.py` | `ModelPurpose`, `PromptRef`, `ModelUsage`, `StopKind`, `CallOutcome`, `StructuredRequest`, `ProviderResponse`, `StructuredResult`, the canonical request encoding, bounds and fixed errors | domain, standard library |
+| `packages/domain/evidenceguard_domain/agent_outputs.py` | `VerifierOutput`, `ClaimOutput`, `QuoteRef`, `AnalystOutput`, `FindingOutput`, the closed schema registry and `parse_output` | domain, standard library, Pydantic |
+| `packages/agents/evidenceguard_agents/__init__.py`, `py.typed` | New import package (§3) | — |
+| `packages/agents/evidenceguard_agents/providers.py` | `ModelProvider` protocol, `ModelCallTimeout` marker, `call_validated` | domain, standard library |
+| `packages/agents/evidenceguard_agents/scripted.py` | `ScriptedFakeProvider` and its script steps | domain, agents, standard library |
+
+[REC] Packaging: add `evidenceguard_agents` to the wheel and sdist lists and to strict mypy. Extend
+`tests/test_packaging.py`: no package may import `evidenceguard_agents` except the apps and
+`evaluation`; `evidenceguard_agents` must not import `evidenceguard_persistence`,
+`evidenceguard_retrieval`, `evidenceguard_api`, `evidenceguard_worker` or SQLAlchemy; and the M5a
+agents modules must not import `socket`, `ssl`, `http`, `urllib`, `os`, `pathlib` or `tomllib`
+(so the fake cannot read the ground truth, a file or the network; M5c's packaged-artifact loading
+and M5h's adapter get their own reviewed allowlists). M5a modules import no third-party package
+except Pydantic in `agent_outputs`. No dependency or lockfile change.
+
+##### B. Values and invariants
+
+[REC] Call values (`model_calls`) are frozen dataclasses with exact-type validation in the M4d
+style (`type(x) is …`, no coercion, `bool` is not an `int`, tuples only, no stripping or
+normalization, unknown keywords rejected, derived fields computed by the constructor, revalidation
+on `dataclasses.replace`). Output values (`agent_outputs`) are strict, frozen Pydantic models
+under a dedicated base (not `DomainModel`), parsed only through the path in B1.
+
+- **`ModelPurpose`**: `verifier` or `risk_analyst`. Each maps to exactly one output schema:
+  `verifier_output_v1` → `VerifierOutput`, `risk_analyst_output_v1` → `AnalystOutput`. The
+  caller cannot choose a schema.
+- **`PromptRef(prompt_id, version, sha256)`**: `prompt_id` matches `^[a-z][a-z0-9_]{0,31}$`;
+  `version` an `int` 1–999; `sha256` 64 lowercase hex. M5a checks shape only; M5c binds it to a
+  packaged artifact.
+- **`StructuredRequest(purpose, prompt, model_id, question_id, system_text, user_text,
+  max_output_tokens, timeout_ms)`**: `model_id` matches `^[a-z0-9][a-z0-9.-]{0,63}$`;
+  `question_id` matches the existing `QuestionId` pattern; `system_text` 1–64,000 UTF-8 bytes and
+  `user_text` 1–400,000 UTF-8 bytes (20 chunks of at most 4,000 code points plus framing), both
+  strictly UTF-8 encodable, without NUL; `max_output_tokens` an `int` 1–8,192; `timeout_ms` an
+  `int` 1,000–120,000 (default 60,000, §8). Derived: `output_schema` and `request_sha256`.
+- **`ModelUsage(input_tokens, output_tokens)`**: `int`s 0–10,000,000. Descriptive only; no price.
+- **`StopKind`**: `end_turn`, `refusal`, `max_tokens`, `other`. Adapters map provider stop reasons
+  onto these; only `end_turn` can complete.
+- **`ProviderResponse(stop_kind, output_text, model_used, usage)`**: what a provider returns.
+  `output_text` 0–65,536 UTF-8 bytes; `model_used` matches the `model_id` pattern; `usage` is
+  exactly a `ModelUsage`. It is treated as untrusted content even from a fake.
+- **`CallOutcome`**: `completed`, `refusal`, `max_tokens`, `unexpected_stop`, `invalid_output`,
+  `model_mismatch`, `timeout`, `provider_failed`.
+- **`StructuredResult(request_sha256, purpose, question_id, outcome, dispatched, output,
+  model_requested, model_used, usage, latency_ms)`**: every field is validated on direct
+  construction, and the combinations must match exactly one row of this table (anything else is
+  `InvalidModelValueError`):
+
+  | `outcome` | `dispatched` | `output` | `model_used` | `usage` | `latency_ms` |
+  |---|---|---|---|---|---|
+  | `completed` | true | exactly the purpose's schema type | equals `model_requested` | present | `int` ≥ 0 or absent |
+  | `refusal`, `max_tokens`, `unexpected_stop`, `invalid_output` | true | absent | equals `model_requested` | present | `int` ≥ 0 or absent |
+  | `model_mismatch` | true | absent | present, differs from `model_requested` | present | `int` ≥ 0 or absent |
+  | `timeout` | true | absent | absent | absent | `int` ≥ 0 or absent |
+  | `provider_failed` | true or false | absent | absent | absent | absent if not dispatched, else `int` ≥ 0 or absent |
+
+  `purpose` must map to `output`'s schema; `request_sha256` is 64 lowercase hex; `question_id`
+  and both model IDs match their patterns. `latency_ms`, when present, is an `int` from 0 to
+  `LATENCY_MS_BOUND` (D1); it is descriptive, never a benchmark.
+
+Output schemas (shape only; provenance, status rules and authorization are M5b). Every collection
+is a **tuple** (JSON arrays decode to tuples through B1), and every nested value is another frozen
+output model, an enum member or a string:
+
+```text
+VerifierOutput  {verdict: Verdict, claims: tuple[ClaimOutput, …] 0–10, rationale: str 1–2000}
+ClaimOutput     {text: str 1–1000, citations: tuple[QuoteRef, …] 0–8}
+QuoteRef        {chunk_id: canonical lowercase hyphenated UUID string, quote: str 1–1000}
+AnalystOutput   {findings: tuple[FindingOutput, …] 0–20}
+FindingOutput   {question_ids: tuple[QuestionId, …] 1–20 distinct, title: str 1–200,
+                 severity: Severity, statement: str 1–2000,
+                 citations: tuple[QuoteRef, …] 0–8,
+                 follow_up_questions: tuple[str 1–500, …] 0–5}
+```
+
+The model never supplies `evidence_status`, `source_type`, tenant, revision or document IDs,
+authenticity or `provenance_check`; those come from trusted data in M5b. Exact duplicate
+`QuoteRef`s within one claim or finding are invalid. Strings reject NUL and lone surrogates and
+are never stripped. `QuoteRef.chunk_id` stays a pattern-checked string (so a non-canonical
+spelling is rejected rather than normalized by a UUID parser), with a property returning the
+`UUID`.
+
+##### B1. Strict output parsing and immutability (Prompt 168 correction B)
+
+[REC] Strict Python-mode validation of a `json.loads` dictionary would reject valid JSON enum
+strings and arrays, so the parse path is a bounded preliminary scan followed by strict
+**JSON-mode** validation of the same text, without weakening strictness globally:
+
+1. **Size:** `output_text` is at most 65,536 UTF-8 bytes (already enforced by `ProviderResponse`).
+2. **Preliminary scan:** `json.loads(output_text, object_pairs_hook=…, parse_constant=…)` with a
+   hook that rejects duplicate keys and a constant handler that rejects `NaN`, `Infinity` and
+   `-Infinity`; trailing text after the value is already a decode error. The decoded value must
+   be a JSON object; a walk of it rejects nesting deeper than 8 and more than 2,000 values in
+   total. The decoded value is then discarded.
+3. **Schema validation:** `model_validate_json(output_text)` on the purpose's schema with
+   `strict=True`. In JSON mode, strict validation accepts JSON strings for enum values and JSON
+   arrays for tuple fields while still rejecting numeric enums, numbers for strings, strings for
+   numbers, unknown fields (`extra="forbid"`) and anything the field validators reject. The scan
+   in step 2 exists because the JSON-mode parser alone does not reject duplicate keys. That
+   Pydantic 2.14 accepts JSON strings and arrays here is design intent to be **confirmed by the M5a
+   tests**, not a fact established by this document.
+4. **Result:** any failure in steps 1–3 makes `parse_output(purpose, text)` return no output, and
+   `call_validated` classifies the call `invalid_output`; nothing from the failure is kept.
+
+**Deep immutability.** Collections are tuples of frozen models, enum members or strings; there is
+no `list`, `dict` or `set` anywhere in an output value, so `frozen=True` is not relied on to
+freeze a mutable container. **Direct construction** (for tests and M5b) runs strict Python-mode
+validation: enum members and tuples are required; a list or a raw enum string is rejected.
+**Copy and update:** `model_copy` is overridden to rebuild through validation (as `DomainModel`
+does), so an update cannot produce an unvalidated value. Pydantic's `model_construct`,
+`object.__setattr__` and similar bypasses can still create or mutate values; trusted in-process
+code is not a security boundary, and domain code never uses those bypasses.
+
+**Validation-error privacy.** A raw Pydantic `ValidationError` can contain the model output and
+input values. Therefore every public entry point of the output types (`__init__`,
+`model_validate`, `model_validate_json`, `model_validate_strings` and `model_copy`) translates an
+ordinary validation failure (`ValidationError`, `ValueError`, `TypeError`) into a **fresh**
+`InvalidModelValueError` raised **after** the `except` block, so it has no `__cause__` or
+`__context__`; `hide_input_in_errors=True` is set as defence in depth. `parse_output` maps every
+failure to "no output" for `invalid_output`. Process-control exceptions (`BaseException` that is
+not `Exception`) propagate unchanged. The representation rule (`repr`, `str` and Pydantic's
+`__repr_args__`) applies to **every** output type, including nested `ClaimOutput`, `QuoteRef` and
+`FindingOutput`: type name and counts only, never claim text, quotes, rationale, titles,
+statements or follow-up questions. Explicit data access (`model_dump`, attributes) returns content
+by design.
+
+##### C. Canonical request encoding
+
+[REC] `eg-model-call-canonical-v1`, with the M4d byte rules (`sort_keys`, compact separators,
+`ensure_ascii=True`, `allow_nan=False`, ASCII bytes, lowercase hex SHA-256):
+
+```json
+{"canonical":"eg-model-call-canonical-v1","kind":"model_request","purpose":"verifier",
+ "output_schema":"verifier_output_v1","prompt":{"id":"…","version":1,"sha256":"…"},
+ "model_id":"…","question_id":"…","max_output_tokens":2048,
+ "system_sha256":"…","user_sha256":"…"}
+```
+
+Texts enter as the SHA-256 of their exact UTF-8 bytes, so the digest is fixed-size and contains no
+document text. `timeout_ms` is excluded (it does not change the content asked for). Review, stage
+and attempt are excluded; persistence scopes reuse by its own keys (M5e). The digest identifies
+the content of a request for reuse and audit; it is **not** authorization, proof that a call was
+made, or proof of any past state, and it is recomputable by anyone. Pinned digests in tests.
+
+##### D. Provider protocol, call boundary and scripted fake
+
+```text
+class ModelProvider(Protocol):
+    @property
+    def provider_id(self) -> str: ...                    # e.g. "scripted-fake"
+    def generate(self, request: StructuredRequest) -> ProviderResponse: ...
+
+class ModelCallTimeout(Exception): ...                   # raised by adapters for a timeout
+
+call_validated(provider: ModelProvider, request: StructuredRequest, *,
+               clock: Callable[[], float] = time.monotonic) -> StructuredResult
+```
+
+[REC] `call_validated`, in order (Prompt 168 correction C). Every failure flag is set inside an
+`except` block and acted on after it; fresh fixed errors and results are built outside every
+handler, so nothing retains an exception, message, cause or context.
+
+1. **Arguments.** `type(request) is StructuredRequest`; the request is then **revalidated** by
+   rebuilding it through its constructor from its own fields and comparing the derived
+   `output_schema` and `request_sha256` with the stored ones (this catches a bypassed or mutated
+   value); `clock` is callable. Any failure raises `InvalidModelRequestError`
+   (`invalid_model_request`) with **zero** `generate` calls.
+2. **Start time.** `start = clock()` (D1). A failure raises `ModelClockError`
+   (`model_clock_failed`), again with zero `generate` calls; a broken local clock is never reported
+   as a provider timeout.
+3. **Provider identity.** Read `provider.provider_id` once. It must be exactly a `str` matching
+   `^[a-z][a-z0-9-]{0,31}$`. An ordinary `Exception` from the getter, or any other value, gives
+   `provider_failed` with `dispatched = false` and no `generate` call.
+4. **Dispatch.** Call `provider.generate(request)` exactly once. `ModelCallTimeout` (or a
+   subclass) → `timeout`; any other ordinary `Exception`, including an `InvalidModelValueError`
+   raised while the provider tried to construct a malformed `ProviderResponse` inside `generate`,
+   → `provider_failed`.
+5. **End time.** `end = clock()` immediately after `generate` returns or raises (D1).
+6. **Response.** For a returned value: `type(value) is ProviderResponse`, then revalidation through
+   its constructor, including `type(value.usage) is ModelUsage` and the usage bounds. Any failure →
+   `provider_failed` (`model_used` and `usage` absent: an invalid response is not trusted for
+   accounting).
+7. **Classification**, in this precedence: `model_used != model_id` → `model_mismatch`, **whatever
+   the stop kind** (content from the wrong model is not attributed); then `refusal` → `refusal`;
+   `max_tokens` → `max_tokens`; `other` → `unexpected_stop`; `end_turn` → `parse_output` (B1):
+   no output → `invalid_output`, otherwise `completed`.
+8. **Result.** A fresh `StructuredResult` matching the table in B.
+
+At most one `generate` call happens per `call_validated`, and none for invalid arguments or a
+failed start-time reading. Process control (`BaseException` that is not `Exception`) raised by
+`clock`, `provider_id` or `generate` propagates as **the same object**, unwrapped. The boundary
+knows nothing about jobs: M5g calls `ctx.check()` after it returns and before acting on the
+outcome (W7).
+
+**Timeout semantics.** `timeout_ms` is passed to the adapter inside the request. `timeout` means
+only that the adapter raised `ModelCallTimeout`. A synchronous boundary **cannot interrupt** a call
+by checking elapsed time afterwards, so `call_validated` imposes no hard deadline: a response that
+arrives after `timeout_ms` is classified normally, with its latency recorded, and a blocking
+adapter blocks the caller. Transport guarantees (connection, read and cleanup timing, retries)
+belong to the M5h adapter review; no M4f-style guarantee is promised for a model transport that is
+not yet specified. The scripted fake never blocks.
+
+##### D1. Clock contract (Prompt 168 correction C)
+
+*Corrected in Prompt 169:* finite endpoints do not guarantee finite or convertible arithmetic
+(for example `1e308 - (-1e308)` overflows, and `math.isfinite(10**1000)` raises
+`OverflowError`), so the policy below validates each reading with integer-safe comparisons, bounds
+it, and treats every failure while validating or calculating as "unusable".
+
+- **Reading bound (engineering choice).** `CLOCK_READING_BOUND = 2**53` seconds
+  (9,007,199,254,740,992), the range in which every integer is exactly representable as a float;
+  `time.monotonic` values are far inside it.
+- **Usable reading.** The value's type is exactly `int` or exactly `float` (`bool` and every other
+  type rejected). An `int` is checked with integer comparisons only, `-2**53 <= value <= 2**53`,
+  before any conversion, so a huge integer such as `10**1000` is rejected without calling
+  `math.isfinite` or `float`; it is then converted with `float(value)`, which is exact in that
+  range. A `float` must satisfy `math.isfinite(value)` and `-2**53 <= value <= 2**53`. Anything
+  else, and any ordinary `Exception` raised by the callable or during these checks, makes the
+  reading **unusable**.
+- **Before dispatch** (step 2): an unusable start reading raises a **fresh** `ModelClockError`
+  (`model_clock_failed`) outside any `except` block, with no cause or context and zero `generate`
+  calls. A broken local clock is never reported as a provider timeout.
+- **After dispatch** (step 5): the end reading is validated the same way. Then, inside one guarded
+  block, `delta = end - start` (both bounded floats, so `|delta| <= 2**54` and finite),
+  `delta >= 0` is required (time moving backwards is unusable), `ms = delta * 1000.0` must be
+  finite and at most `LATENCY_MS_BOUND = 86,400,000` (24 hours, an engineering choice), and
+  `latency_ms = int(ms)` (truncating). An unusable end reading, backwards time, an out-of-bound
+  result or **any** ordinary `Exception` (`OverflowError`, `ValueError`, `TypeError` and so on)
+  while validating or calculating leaves `latency_ms` **absent** and **preserves the provider
+  outcome**, including a `completed` result and its output. A latency is never clamped, rounded
+  into range or invented.
+- No original exception is retained, chained or logged; the fixed error and the absent latency
+  carry nothing from it.
+- Process control (`BaseException` that is not `Exception`) from `clock`, at either reading or
+  during the checks, propagates as **the same object**.
+
+##### D2. Scripted fake (corrected, Prompt 168)
+
+[REC] `ScriptedFakeProvider(model_id="fake-scripted-v1", scripts=…)`:
+
+- **Configuration.** `scripts` maps `(prompt_id, question_id)` to a non-empty tuple of steps:
+  `Respond(text, usage=ModelUsage(0, 0))`, `Refuse()`, `StopMaxTokens(text)`, `StopOther()`,
+  `Timeout()` (raises `ModelCallTimeout`), `Fail()` (raises a plain `RuntimeError` with a fixed
+  message), `WrongModel(model_used, text)`. Bounds: at most 256 keys, 16 steps per key, each text at
+  most 65,536 UTF-8 bytes, and at most 4 MiB of script text in total; the constructor copies the
+  mapping into immutable tuples and rejects anything else with `InvalidModelValueError`.
+- **Memory.** Scripts **do contain raw response text** by design (they are test fixtures), and the
+  fake holds them for its lifetime, which is **test-owned**: production code never constructs it.
+  Its call history records only `(prompt_id, question_id, request_sha256, step index)` and is
+  capped at 4,096 entries; a call beyond the cap raises the fixed failure (`provider_failed`)
+  without recording. Its `repr` shows the model ID and counts, never script text.
+- **Selection.** Each key has a counter. On entry, under one lock, the fake takes the key's next
+  step index and appends the history entry; the step then runs outside the lock. Every step is
+  consumed exactly once; a missing key or an **exhausted** script (index past the last step; the
+  last step is never repeated) raises the fixed failure. With sequential calls the mapping is
+  fully deterministic; with concurrent calls each call still receives a distinct step, in lock
+  acquisition order, which the history records, so tests that need a particular order call
+  sequentially.
+- **Isolation.** Fixtures are supplied by the caller (tests). The fake never reads files, the
+  environment, the network or ground truth, and returns its scripted text verbatim, so invalid JSON
+  is possible. `provider_id` is `scripted-fake`; its outputs are contract fixtures, never quality
+  evidence.
+
+##### E. Errors, privacy and bounds
+
+- Fixed errors in `model_calls`: `InvalidModelRequestError` (`invalid_model_request`) for invalid
+  request construction or `call_validated` arguments, `ModelClockError` (`model_clock_failed`) for a
+  failed start-time reading, and `InvalidModelValueError` (`invalid_model_value`) for any other
+  invalid value, including output types (B1). Messages are the codes; each is raised fresh, outside
+  any `except` block, with no cause or context, and no error carries text, quotes, prompts, model
+  output, response model IDs or exception text. Nothing in M5a logs.
+- `repr`/`str` of every value show purpose, question ID, prompt ID and version, model IDs,
+  outcome, counts and digests only, never system or user text, output text, claims, quotes,
+  rationale or statements; for output types this covers every nested model (B1).
+- Work is bounded by the byte and count limits above; parsing reads at most 65,536 bytes and walks
+  at most 2,000 values. **Correction:** the earlier statement that the fake "stores only digests
+  and IDs" was wrong: its scripts hold raw text for a test-owned lifetime, while its call history
+  holds only digests, IDs and step indexes (D2). These are engineering defaults, not measured
+  limits.
+- Privacy covers public errors, default representations and logs; as in M4f, it does not cover
+  trusted code inspecting frame locals or held values.
+
+##### F. Compatibility
+
+- Reuses `Verdict`, `Severity` and the `QuestionId` pattern; changes no existing contract,
+  migration, handler, endpoint, setting or workflow (unless W-A7 is accepted).
+- `Verification`, `Citation`, `Finding`, `ReportContent` and the report content hash are unchanged
+  (W11); M5b converts validated outputs into them.
+- §4's `generate_structured(StructuredRequest[T]) -> StructuredResult[T]` sketch becomes a raw
+  `generate` plus one shared validating boundary, so the fake and a future adapter go through
+  exactly the same parsing and classification (W-A1).
+
+##### G. Planned tests (not written or run)
+
+*Database-independent* (`tests/test_model_calls.py`, `tests/test_agent_outputs.py`,
+`tests/test_scripted_provider.py`, `tests/test_packaging.py`):
+
+- strict construction of every call value at and beyond each bound (bytes and code points,
+  supplementary characters, lone surrogates, NUL, `bool` as `int`, lists for tuples, unknown
+  fields), and revalidation through `dataclasses.replace`;
+- every `StructuredResult` row of the table in B constructed directly, and each invalid
+  combination (output with a non-completed outcome, wrong schema for the purpose, missing or equal
+  `model_used` for `model_mismatch`, usage on a timeout, latency without dispatch) rejected;
+- pinned canonical bytes and digests; digest independence from `timeout_ms`; digest change for
+  each included field;
+- parsing: valid outputs for both purposes with JSON enum strings and JSON arrays, decoding to enum
+  members and tuples; duplicate keys, `NaN`/`Infinity`, trailing text, fenced JSON, top-level
+  arrays, excess depth or value count, extra or missing fields, numeric enums, numbers for strings,
+  wrong enum values, non-canonical or uppercase UUIDs, oversize text, duplicate quote references
+  and the wrong purpose's schema all give `invalid_output`;
+- immutability: every nested collection is a tuple; attribute assignment fails; direct
+  construction rejects lists and raw enum strings; `model_copy(update=…)` revalidates and rejects
+  invalid updates;
+- validation-error privacy: canary-bearing inputs to every public constructor and validator raise
+  `InvalidModelValueError` with no cause or context, and the canary appears in no message,
+  `repr`, `str`, traceback or captured log, including for nested output types;
+- the call algorithm: revalidation catching a bypassed request (zero `generate` calls); invalid
+  `provider_id` values and a raising getter (no dispatch); malformed `ProviderResponse`
+  construction inside `generate`, a wrong return type and invalid nested usage (`provider_failed`);
+  model mismatch combined with each stop kind (`model_mismatch` wins); every outcome through the
+  scripted fake; exactly one `generate` call otherwise;
+- the clock: `bool`, `NaN`, infinity, non-number and raising clocks before dispatch
+  (`ModelClockError`, zero calls, no cause or context); the same after dispatch and a backwards
+  clock (outcome unchanged, `latency_ms` absent); a slow fake response past `timeout_ms` still
+  classified normally;
+- clock arithmetic (Prompt 169, test wording clarified in Prompt 170):
+  - **invalid start readings**, including `-1e308`, `10**1000`, `2**53 + 1`, `NaN`, infinity,
+    `bool`, a non-number and a raising clock, produce a fresh `ModelClockError` with no cause or
+    context and **zero** `generate` calls, without `OverflowError` escaping; `2**53` and `-2**53`
+    are usable;
+  - a **valid start followed by an invalid end reading**, such as `1e308` or `10**1000`, preserves a
+    `completed` provider response and its output with `latency_ms` absent;
+  - a **valid start and end pair whose elapsed duration exceeds** `LATENCY_MS_BOUND` likewise
+    preserves the outcome with `latency_ms` absent;
+  - ordinary arithmetic or validation failures after dispatch (for example a clock raising
+    `OverflowError` at the end reading) follow the same absent-latency policy, and no exception is
+    retained or chained;
+  - process control raised by the clock at either reading or during these checks propagates as the
+    identical object;
+- process control (`KeyboardInterrupt`, `SystemExit`) from `clock`, `provider_id` and `generate`
+  propagates as the identical object;
+- the fake: configuration bounds, exhaustion without repeating the last step, missing keys, the
+  history cap, sequential determinism and distinct steps under concurrent calls, and a `repr`
+  without script text;
+- packaging boundaries for the new package and modules.
+
+*PostgreSQL:* none (M5a has no persistence).
+
+*Installed wheel* (W-A7): one added line, for example "model-call contracts classified a scripted
+fake response from the installed wheel".
+
+##### H. Intended files and exclusions
+
+- New: the five source files in A, the three test modules, ADR-0019 (written with the
+  implementation).
+- Changed: `pyproject.toml` (wheel, sdist and mypy lists only), `tests/test_packaging.py`,
+  `.github/workflows/ci.yml` only if W-A7 is accepted, and the README, plan and threat-model
+  status records.
+- Excluded: persistence, migrations, prompts and templates, the planner, provenance checks,
+  request assembly, orchestration, handlers, endpoints, settings, credentials, the Anthropic
+  adapter, any network code, dependency or lockfile change, and any live or quality claim.
+
+##### I. M5a decisions for review
+
+Items marked *approved choice* were approved by the reviewer in Prompt 169 as the corrected
+recommended contracts, and all of them were **accepted with the complete M5a specification in
+Prompt 170** as its implementation contract. Nothing is implemented or tested.
+
+1. **W-A1 Raw `generate` plus a shared boundary** (*approved choice, Prompt 169*). [REC] As in D. *Tradeoff:* a less
+   generic protocol versus duplicating parsing and classification in every adapter.
+2. **W-A2 Outcomes instead of exceptions** (*approved choice, Prompt 169*). [REC] Ordinary provider failures become
+   `StructuredResult` outcomes, so M5e can record every call uniformly; only invalid arguments and a
+   failed start-time clock raise. *Tradeoff:* callers must check `outcome` versus exception-driven
+   control flow that is harder to record.
+3. **W-A3 Value styles** (*approved choice, Prompt 169*).
+   [REC] Exact-type dataclasses for call values and strict, non-stripping, tuple-only Pydantic
+   output models parsed through B1. *Tradeoff:* two styles versus hand-writing a JSON validator.
+4. **W-A4 Model echo** (*approved choice, Prompt 169, for exact equality; live alias behaviour awaits M5h*). [REC] Require `model_used == model_id`; any difference is
+   `model_mismatch` (fail closed; W13 for its stage treatment). Alias behaviour for live model IDs
+   waits for M5h. *Tradeoff:* possible false mismatches with a live API versus silently accepting a
+   different model.
+5. **W-A5 Bounds** (*approved choice, Prompt 169*). [REC] The limits in B, B1 and D2 as initial engineering defaults.
+   *Tradeoff:* rejecting large outputs or scripts versus unbounded parsing and memory.
+6. **W-A6 Timeout and retries** (*approved choice, Prompt 169*). [REC] One call per
+   `call_validated`, `timeout_ms` (default 60,000, preserving §8's 60 s) passed to the adapter, no
+   hard deadline in the boundary; adapter-internal and SDK retries are 0, superseding §8's "2 SDK
+   retries" for model calls, so every attempt is reserved and counted (W4). *Tradeoff:* more
+   orchestration logic versus hidden repeated calls and cost.
+7. **W-A7 Installed-wheel line** (*approved choice, Prompt 169*). [REC] One line added to the existing wheel step.
+   *Tradeoff:* a small workflow edit versus no installed-artifact evidence for the new package.
+8. **W-A8 New package now** (*approved choice, Prompt 169*). [REC] Create `evidenceguard_agents` in M5a.
+   *Tradeoff:* one more packaged import package versus later relocation.
+9. **W-A9 Two-pass parsing** (*approved choice, Prompt 169*). [REC] The scan-then-JSON-mode path in B1. *Alternative:* a
+   hand-written converter from the decoded value to strict Python-mode inputs. *Tradeoff:* parsing
+   the text twice (bounded at 64 KiB) versus maintaining explicit conversions for every field.
+10. **W-A10 Clock failures** (*approved choice, Prompt 169, including the arithmetic correction*).
+    [REC] A fresh fixed error for an unusable start reading, and absent latency with the outcome
+    preserved for any unusable end reading or calculation failure (D1). *Alternative:* always a result with absent latency. *Tradeoff:* refusing to call
+    with a broken clock versus never raising for a local fault.
+11. **W-A11 Fake bounds** (*approved choice, Prompt 169*). [REC] The D2 limits and the 4,096-entry history cap.
+    *Tradeoff:* tests needing more calls must build a new fake versus unbounded memory.
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.

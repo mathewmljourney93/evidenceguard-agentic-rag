@@ -31187,3 +31187,1225 @@ from `a3d8991e`. Publication is authorized by Prompt 166 through the gated seque
 push, exact-SHA five-job feature CI, fresh main preconditions, fast-forward and main push, then
 main CI monitoring. The range, workflow, privacy and Gitleaks checks, the history commit, the
 pushes and the CI outcomes are reported in the handoff, not predicted here.
+
+### Prompt 166 outcome (attributed to Claude Code's handoff; API-only observations)
+
+As recorded for Prompt 167: in Prompt 166 Claude Code committed the accepted M4 acceptance
+record as `46c0225787ba09f27508dafaa218c1bf33af1e8e` (parent `a3d8991e`, tree
+`68132b25fddf0fbe2808b32c98206f490a6f839e`, subject "docs: record M4 acceptance publication
+authorization"), published it on `docs/m4-acceptance-assessment`, and, after all five jobs passed
+for that exact commit, fast-forwarded `main` to it; all five jobs then passed on `main`. Claude
+Code observed only API conclusions; its anonymous log downloads returned HTTP 403 or failed
+without an HTTP response, so it observed no counts or log output. At the start of Prompt 167,
+Claude Code verified locally and against freshly fetched refs that `main`, `origin/main`, remote
+`main` and local and remote `docs/m4-acceptance-assessment` are all at `46c02257`, with that
+parent, tree, subject and noreply identity, and a clean tree.
+
+### External review log evidence for `46c02257` (supplied in Prompt 167)
+
+The external reviewer independently retrieved all four run records, all ten job records and all
+ten job logs (no project test, build, wheel check, Docker, database or provider call). All four
+runs used event push, exact SHA `46c0225787ba09f27508dafaa218c1bf33af1e8e`, attempt 1, and
+concluded success; all ten jobs and their required steps succeeded, none skipped. Documentation
+branch (CI 39145004493, secret-scan 39145004509): Ubuntu job 117726950822 `2675 passed, 308
+skipped in 25.54s`; Windows job 117726950554 `2674 passed, 309 skipped in 76.20s (0:01:16)`;
+PostgreSQL job 117726950798 `308 passed, 2675 deselected in 197.71s (0:03:17)`; container job
+117726950860 with all six required steps succeeding; Gitleaks job 117726950708 with 72 commits
+scanned and no leaks. Main (CI 39145584019, secret-scan 39145584030): Ubuntu job 117728627885
+`2675 passed, 308 skipped in 38.01s`; Windows job 117728627856 `2674 passed, 309 skipped in
+73.31s (0:01:13)`; PostgreSQL job 117728627638 `308 passed, 2675 deselected in 184.61s
+(0:03:04)`; container job 117728627883 with all six required steps succeeding; Gitleaks job
+117728627878 with 72 commits scanned and no leaks. Both PostgreSQL logs show 29, 18, 39, 16 and 2
+passing cases in the M4b, M4c, M4d, M4e and Voyage PostgreSQL modules (104 M4 cases within the
+308). All four wheel logs printed the five expected lines (the Voyage line uses a mocked response;
+the 2/3 Recall line is pure arithmetic). Both container logs reported 89 context files with 19
+planted fixtures excluded, a healthy stack and migrations, upload 202, ingestion with two verified
+chunks, duplicate upload 200, one offline backfill indexing job, a ready index with two embeddings
+and a succeeded indexing job, idle-worker exit 0 without OOM, and successful smoke and cleanup
+(observed summaries and gates only; offline ingestion, indexing and idle-worker shutdown only).
+Claude Code did not retrieve these logs.
+
+### Prompt 167 (verbatim)
+
+Prompt 167 — Record M4 acceptance publication and propose the M5 implementation sequence
+
+Written for: Mathew and the external reviewer.
+
+Work in D:\Claude\evidenceguard_agentic_rag.
+
+This is a fresh Claude Code session. Read CLAUDE.md and applicable repository instructions, then load the relevant accepted specifications and source selectively. Do not dump the entire prompts.md into context.
+
+This task has two parts:
+1. Record publication of the accepted M4 documentation and its exact-commit CI.
+2. Propose a dependency-ordered M5 implementation sequence and the detailed specification for its first bounded slice.
+
+Documentation only. M5 implementation is not authorized. Nothing proposed here is accepted until external review.
+
+1. Verify the starting state
+
+Expected:
+- Current branch main, tracking origin/main.
+- HEAD, local main, origin/main and remote main:
+  46c0225787ba09f27508dafaa218c1bf33af1e8e
+- Parent:
+  a3d8991e6ea4007804ff7cef2ded3594e471c45f
+- Tree:
+  68132b25fddf0fbe2808b32c98206f490a6f839e
+- Subject:
+  docs: record M4 acceptance publication authorization
+- Local and remote docs/m4-acceptance-assessment at the same SHA.
+- Clean index and working tree.
+- Expected origin and author/committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+A normal fetch --no-tags and read-only remote checks are authorized.
+If material state differs, stop and report without repairing it.
+
+Save a checkpoint under .local/p167/: refs, status, tree, permitted-file blob hashes and the existing prompts.md byte count/hash.
+
+Create docs/m5-workflow-plan from HEAD if it does not already exist. Do not overwrite an existing branch.
+
+2. Authorized files
+
+Only:
+- README.md
+- docs/decisions/0018-voyage-adapter.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Read other files as needed. Do not create ADR-0019, source modules, tests, migrations, prompts, configuration, dependencies or workflow changes.
+
+Do not commit, push, merge, amend, rebase, tag, run application checks, install anything, use Docker/a database, or contact a provider.
+
+3. Record M4 acceptance publication
+
+Overall M4:
+- Accepted at external review in Prompt 165 within the reviewed implementation scope at:
+  5acb75e59edbb42035d468c2c40bb0ab81a8725a
+- Acceptance documentation committed locally as a3d8991e.
+- Published in Prompt 166 at:
+  46c0225787ba09f27508dafaa218c1bf33af1e8e
+- All five jobs passed on the documentation branch before the fast-forward, and again on main afterward.
+
+Update current publication-pending/not-authorized statements consistently. Preserve their earlier historical scope, the accepted M4 assessment heading/anchor and all M4 specification anchors.
+
+Do not move the implementation baseline from 5acb75e5 merely because the acceptance record was published later. The range from 5acb75e5 to 46c02257 changes documentation/history only.
+
+Add a concise acceptance-publication evidence subsection to the M4 acceptance assessment in docs/plan.md. Link from README and ADR-0018 where useful; avoid duplicating full tables across files.
+
+Evidence independently retrieved by the external reviewer:
+
+All four runs:
+event push; exact SHA 46c0225787ba09f27508dafaa218c1bf33af1e8e; attempt 1; success.
+All ten jobs and required steps succeeded, with none skipped.
+
+Documentation branch docs/m4-acceptance-assessment:
+CI run 39145004493
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145004493
+
+Secret-scan run 39145004509
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145004509
+
+Jobs:
+- Ubuntu 117726950822:
+  2675 passed, 308 skipped in 25.54s
+- Windows 117726950554:
+  2674 passed, 309 skipped in 76.20s (0:01:16)
+- PostgreSQL 117726950798:
+  308 passed, 2675 deselected in 197.71s (0:03:17)
+- Container 117726950860:
+  all six required steps succeeded
+- Gitleaks 117726950708:
+  72 commits scanned; no leaks found
+
+Main:
+CI run 39145584019
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145584019
+
+Secret-scan run 39145584030
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39145584030
+
+Jobs:
+- Ubuntu 117728627885:
+  2675 passed, 308 skipped in 38.01s
+- Windows 117728627856:
+  2674 passed, 309 skipped in 73.31s (0:01:13)
+- PostgreSQL 117728627638:
+  308 passed, 2675 deselected in 184.61s (0:03:04)
+- Container 117728627883:
+  all six required steps succeeded
+- Gitleaks 117728627878:
+  72 commits scanned; no leaks found
+
+Use complete job links under their corresponding runs.
+
+Both PostgreSQL logs show:
+- tests/test_embeddings_postgres.py: 29 passing cases
+- tests/test_indexing_postgres.py: 18 passing cases
+- tests/test_retrieval_postgres.py: 39 passing cases
+- tests/test_evaluation_postgres.py: 16 passing cases
+- tests/test_voyage_postgres.py: 2 passing cases
+
+That is 104 M4 PostgreSQL cases within the 308 integration passes.
+
+Both platforms on both pushes successfully ran tests, distribution builds and installed-wheel checks. All four wheel logs printed:
+
+offline embedding, canonical storage and indexing modules ran from the installed wheel
+retrieval modules imported and fusion ran from the installed wheel
+evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+Voyage adapter validated a mocked response from the installed wheel
+offline migration SQL rendered from the installed wheel
+
+Both container logs reported:
+- 89 context files; 19 planted fixtures excluded.
+- Healthy stack and successful migrations.
+- Upload 202, successful ingestion, two verified chunks, duplicate upload 200.
+- One offline backfill indexing job, ready index with two embeddings, indexing job succeeded.
+- Idle-worker exit 0 without OOM.
+- Successful smoke and cleanup.
+
+These are observed summaries/gates, not independent inspection of raw rows or generated credentials. The smoke covers offline ingestion/indexing and idle-worker shutdown only.
+
+Attribution:
+- Claude Code in Prompt 166 observed API conclusions only. Anonymous log downloads returned HTTP 403 or failed without an HTTP response.
+- The external reviewer independently retrieved all four run records, all ten job records and all ten logs.
+- The reviewer ran no project tests, build, wheel check, Docker, database or provider call.
+- Preserve the earlier unavailable-log record.
+- Do not claim you retrieved these logs in this task.
+
+The Voyage checks are mocked. The wheel’s 2/3 is pure arithmetic. No database-derived numerical corpus Recall value has been observed or published.
+
+4. Inspect the M5 starting point
+
+Read the controlling M5 requirements and relevant accepted decisions, including:
+- Review workflow and stage definitions in the plan.
+- Existing domain evidence/status/approval contracts.
+- Package import boundaries and packaging checks.
+- Durable jobs, worker runtime, fences, cancellation and lease ownership.
+- Revision/snapshot invariants.
+- M4d capture, retrieval, canonical encoding and failure boundaries.
+- The explicit M5 obligation to persist and reload trusted captured facts.
+- Existing provider and orchestration seams.
+- Evaluation and injection requirements assigned to M5 versus M7.
+
+Separate:
+[DECISION] already accepted requirements;
+[FACT] current code at 46c02257;
+[REC] proposed design;
+[OPEN] decisions requiring review.
+
+Do not treat old design sketches as implemented code or previously accepted detailed schemas.
+
+5. Propose the M5 sequence
+
+Add an M5 sequence proposal under the existing M5 milestone.
+
+Choose bounded, dependency-ordered slices based on the actual source. Each slice should identify:
+- Purpose and concrete behavior.
+- Dependencies.
+- Proposed modules/package placement.
+- Persistence/migration needs.
+- Boundaries with earlier milestones.
+- Acceptance evidence and planned tests.
+- Explicit exclusions.
+- Open reviewer decisions.
+
+Cover the full M5 scope:
+- Provider interface and scripted fake behavior.
+- Verifier and Risk Analyst prompt artifacts/versioning.
+- Planner and bounded orchestration.
+- Persisted review snapshot and pinned configuration.
+- Retrieved evidence and provenance checks.
+- Status derivation and report rendering.
+- Provider-call records/spans.
+- Durable stage commits, resume, fencing and stale-worker rejection.
+- Cancellation, lease loss and failure precedence.
+- Injection/canary contract coverage.
+
+Preserve every original M5 acceptance condition, and map each to its proposed slice and test:
+- Invalid output, refusal, timeout and forged chunk ID end unresolved or rejected.
+- Revisions activated after review start are excluded, including after resume.
+- A worker killed after a stage commit resumes without duplicate rows.
+- A worker killed between provider response and commit repeats the call once in the controlled test, records the second call and creates no duplicate stage row.
+- Stale-worker stage writes are rejected.
+- The injection canary never appears in output in the specified contract fixtures.
+
+Do not turn the controlled provider-repeat test into a general exactly-once or one-retry guarantee. Define repeated-crash and retry-budget behavior as a design decision.
+
+Keep fake/contract evidence separate from live model behavior and quality evaluation. Live API behavior, cost/latency measurements and quality claims require their own evidence.
+
+Do not expand M5 into M6 approval/export endpoints or M7 live evaluation. If an existing high-level M5 requirement mentions Anthropic, identify where its adapter belongs and whether live wiring is needed; do not silently remove it or authorize live calls.
+
+6. Detailed first-slice specification
+
+Select the smallest useful first slice justified by the dependency analysis. Give it a clear proposed heading and stable anchor.
+
+Specify enough for implementation review:
+- Public types/signatures and exact validation/invariants.
+- Canonical encoding/versioning where needed.
+- Fixed errors, privacy and ordinary/process-control failure boundaries.
+- Package/import placement.
+- Input/output and resource bounds.
+- Compatibility with existing domain contracts.
+- Planned database-independent tests and, if applicable, PostgreSQL tests.
+- Installed-wheel/CI acceptance needs.
+- Intended file list and explicit exclusions.
+- Numbered decisions with recommendations and tradeoffs.
+
+Do not force persistence into the first slice if a pure contract slice should precede it. If persistence is deferred, identify the dependent slice that closes the trusted-snapshot limitation. A digest, timestamp or frozen value alone must not become proof of authorization or past eligibility.
+
+Later slices need sequence-level detail only; do not attempt complete implementation specifications for the whole milestone at once.
+
+All M5 sequence/design choices introduced here remain proposed and awaiting review. M5 implementation has not started.
+
+7. Documentation consistency and limits
+
+README should link to the M5 proposal and state:
+M1–M4 accepted within their recorded scopes; M5 planning proposed, implementation pending.
+
+Add only a concise proposed-controls note to the threat model. Do not claim proposed M5 mitigations operate today.
+
+Preserve all M4 limitations, including:
+- Offline production defaults and no live Voyage wiring/verification.
+- Cooperative timing, observable process-control scope and accepted-bytes versus peak memory.
+- Privacy scope excluding frame locals and held values.
+- Retryability work before live indexing.
+- Trusted-snapshot limitation until M5 persists and reloads captured facts.
+- Container-smoke scope and local Compose unverified.
+- No observed numerical corpus Recall or quality/security/production-readiness guarantee.
+
+8. Prompt history and checks
+
+Preserve existing prompts.md bytes as an identical prefix.
+
+Append:
+- Prompt 166 outcome, attributed to its handoff and API-only observations.
+- Separate external-reviewer evidence supplied here.
+- Prompt 167 verbatim.
+- An outcome note saying documentation staged and M5 proposals awaiting review.
+
+Check:
+- Only five authorized paths changed; all other tracked blobs unchanged.
+- Prompt prefix/verbatim text.
+- Relative links and anchors.
+- Historical/current status consistency.
+- No M5 acceptance, implementation or execution claim.
+- UTF-8 without BOM, LF only and staged whitespace.
+- Existing Markdown formatting, privacy/artifact scope and unsuppressed staged Gitleaks.
+
+No application tests, builds, installs, wheel checks, Docker, database or provider calls.
+
+9. Stage, export and stop
+
+Stage the five files.
+
+Export directly from Git:
+.local/p167/m4-publication-and-m5-plan.diff
+
+Baseline:
+46c0225787ba09f27508dafaa218c1bf33af1e8e
+
+Final:
+the final staged tree
+
+Exclude prompts.md. Verify the export matches that comparison. Report paths, statistics, exact byte size, SHA-256 and encoding.
+
+Stop staged and uncommitted. No publication or implementation.
+
+Return a handoff covering:
+- Starting state.
+- M4 publication/evidence attribution.
+- Proposed M5 sequence and first-slice scope.
+- Decisions requiring review.
+- Checks actually performed.
+- Final staged tree, export and Git state.
+- Remaining limits.
+
+End:
+“Mathew: return this output plus .local/p167/m4-publication-and-m5-plan.diff to the external reviewer.”
+
+### Prompt 167 outcome (Claude Code; documentation staged, M5 proposals awaiting review)
+
+Documentation only, staged and uncommitted on `docs/m5-workflow-plan` (created from `46c02257`).
+The M4 acceptance publication and the reviewer-retrieved evidence for `46c02257` are recorded in
+`docs/plan.md` (new subsection "Acceptance publication evidence (Prompt 166)"), with status
+updates in README, ADR-0018 and the plan; the M4 implementation baseline stays `5acb75e5`. The
+M5 sequence proposal (M5a–M5h, decisions W1–W12) and the M5a model-call contracts and scripted
+fake provider specification (decisions W-A1–W-A8) are added under the M5 milestone, with a
+proposed-controls note in the threat model. **All M5 content is proposed and awaiting external
+review; nothing is accepted, M5 implementation has not started, and no application test, build,
+install, wheel check, Docker, database or provider call was run.** The documentation checks
+performed and the export are reported in the handoff, not predicted here.
+
+### Prompt 167 outcome (Claude Code handoff results)
+
+Claude Code's Prompt 167 handoff reported: the starting state matched (all refs at `46c02257`,
+parent `a3d8991e`, tree `68132b25`, clean, noreply identity; `fetch --no-tags` and `ls-remote`
+only); checkpoint under `.local/p167/`; branch `docs/m5-workflow-plan` created from HEAD. It
+recorded the M4 acceptance publication (new plan subsection "Acceptance publication evidence
+(Prompt 166)", status updates in README, ADR-0018 and the plan, implementation baseline kept at
+`5acb75e5`) and proposed the M5 sequence (M5a–M5h, W1–W12) and the M5a specification (W-A1–W-A8),
+with a proposed-controls note in the threat model. Checks run: exactly the five authorized paths
+changed; the original 1,616,731 `prompts.md` bytes preserved as a prefix and Prompt 167 present
+once verbatim; 275 relative links resolving; UTF-8 without BOM, LF only, clean
+`git diff --cached --check`, consistent tables; clean privacy and claim scans; unsuppressed staged
+Gitleaks with no leaks. Staged tree `bfbc27878569163de167d0aa858d60bff5b72c10`, uncommitted. Export
+`.local/p167/m4-publication-and-m5-plan.diff` (baseline `46c02257`, prompts.md excluded; 4 files,
+544 insertions, 10 deletions): 103,583 bytes, SHA-256
+`24147a9431e5b61d06c4f869cba42774b5d11884f80f3ab4865db4c58b0c96db`. No application check was run
+and nothing was committed or pushed.
+
+### External review of the Prompt 167 proposal (Prompt 168)
+
+The external reviewer verified the Prompt 167 export's bytes and checksum, inspected the proposed
+sequence and contracts and the relevant existing domain and persistence source, and ran two
+isolated probes with the review environment's Pydantic 2.14.0 (strict validation of a decoded
+Python dictionary rejected an enum string; a frozen Pydantic model containing a list allowed the
+list to mutate). The reviewer ran no project test, locked-project probe, build, wheel, PostgreSQL,
+Docker or provider call; M5 is not implemented, so the probes are not evidence about an
+implemented module.
+
+Disposition: the M4 publication-evidence documentation is accepted; the whole M5 sequence and the
+M5a specification remain proposed, not accepted. Supported directions, subject to a corrected
+complete specification: M5a first; domain output and value contracts with the provider, fake,
+planner and adapters in `evidenceguard_agents` behind enforced boundaries; a TOML template
+independent of the ground truth; started-call reservations committed before dispatch; dedicated
+M5 test fixtures; retaining `Verification`, `Citation` and `Finding`; raw `generate` plus one
+shared validating boundary; fixed outcomes for ordinary provider failures; immutable call values
+and strict output schemas; explicit bounds, zero hidden SDK retries and a narrow wheel extension;
+creating the agents package in the first slice that uses it. Corrections required: A, capture
+composable with review creation and W8 dispatch reconciled; B, strict JSON parsing, deep
+immutability and validation-error privacy; C, the complete call algorithm, clock contract, timeout
+semantics and fake bounds; D, call budgets, repair, stage versus question failures, review status
+on terminal jobs and completion after rendering; E, canary coverage classes and safe evidence
+encoding. Only `docs/plan.md`, `docs/threat-model.md` and `prompts.md` may change; README and
+ADR-0018 must stay byte-identical, and the M5 proposal headings and anchors unchanged.
+
+### Prompt 168 (verbatim)
+
+Prompt 168 — Correct the proposed M5 sequence and M5a contracts
+
+Written for: Mathew and the external reviewer.
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and applicable repository instructions.
+
+Documentation only. Correct the M5 proposal in place. Do not implement, commit, push, merge, install anything or run application checks.
+
+1. Verify starting state
+
+Expected:
+- Branch docs/m5-workflow-plan.
+- HEAD, main and origin/main:
+  46c0225787ba09f27508dafaa218c1bf33af1e8e
+- Staged tree:
+  bfbc27878569163de167d0aa858d60bff5b72c10
+- Exactly five staged paths:
+  README.md
+  docs/decisions/0018-voyage-adapter.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Origin and noreply identity unchanged.
+
+Verify locally only; no fetch or remote operation.
+
+Verify the Prompt 167 export:
+.local/p167/m4-publication-and-m5-plan.diff
+103,583 bytes
+SHA-256:
+24147a9431e5b61d06c4f869cba42774b5d11884f80f3ab4865db4c58b0c96db
+
+Save the starting tree, staged paths, blob hashes and prompt-history prefix under .local/p168/.
+
+Stop on a material mismatch without repairing it.
+
+2. Review disposition and permitted scope
+
+The reviewer accepts the M4 publication-evidence documentation from Prompt 167. Preserve that evidence and its attribution.
+
+The complete M5 sequence and M5a specification remain proposed, not accepted.
+
+Only these files may change relative to the Prompt 167 staged tree:
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+README and ADR-0018 must remain byte-identical. Keep the M5 proposal headings and anchors unchanged.
+
+3. Correction A — Snapshot capture must be composable with review creation
+
+The M5d row currently promises one transaction that captures through the M4d seam, writes the review/snapshot and enqueues work.
+
+Current source:
+- capture_snapshot(session_factory, ...) owns a run_read operation.
+- document_views.read_snapshot sets REPEATABLE READ, READ ONLY.
+- It rolls back and closes its own session.
+
+That seam cannot be called unchanged to write a review inside the same transaction. Calling it first and persisting later also does not establish the promised single-transaction creation contract.
+
+Correct the sequence-level design:
+- Identify a proposed composable capture operation for a caller-owned transaction, with the required isolation and read/write policy.
+- Preserve the existing public M4d read-only capture behavior.
+- State which reviewed M5 slice would introduce the necessary extraction/refactor and tests.
+- Do not reach into an existing private helper as an unexplained implementation shortcut.
+- Define when eligibility is established relative to concurrent activation and when creation becomes visible.
+- Review, bindings, exclusions, pinned configuration and any enqueue must commit atomically or leave no partial creation.
+- Do not claim the trusted-snapshot limitation closes merely because a value and digest were stored; define the trusted creation/loading path and its threat boundary.
+
+Later detailed persistence review will settle SQL and schemas. This task must make the sequence technically coherent without implementing the refactor.
+
+Also reconcile M5d enqueue with W8:
+- A production worker must not receive run_review jobs that its registry cannot handle.
+- Explain when enqueue becomes available and how the explicitly supplied handler/provider is selected.
+- If earlier slices expose only test/internal seams, state that and prevent accidental production dispatch. Do not silently add production fake judgments.
+
+4. Correction B — Strict JSON parsing and deep immutability
+
+The current algorithm says json.loads followed by strict Pydantic validation. Strict Python-mode validation does not accept ordinary JSON strings as Verdict/Severity enum instances. Tuple fields can have the same Python-mode versus JSON-mode distinction.
+
+Specify a concrete parsing path that:
+- Rejects duplicate keys, non-finite constants, trailing prose and oversized input.
+- Accepts valid JSON enum strings and JSON arrays.
+- Rejects numeric enums, coercions, unknown fields and noncanonical UUID strings.
+- Validates the correct purpose-specific schema.
+
+For example, a bounded preliminary JSON scan followed by strict JSON-mode schema validation is a possible design. If choosing another path, define the explicit conversions and avoid weakening strict validation globally.
+
+Output values must be deeply immutable:
+- Use immutable collections internally for claims, citations, findings, question IDs and follow-up questions.
+- JSON arrays may decode to those immutable collections through the defined parsing path.
+- Do not rely on Pydantic frozen=True to freeze a list.
+- Define how direct construction and any copy/update helpers revalidate.
+- State the treatment of intentionally bypassed constructors or malicious trusted in-process mutation, without claiming a security boundary against arbitrary trusted code.
+
+Define public validation-error privacy:
+- Raw Pydantic ValidationError text can contain model output and input values.
+- Specify which public constructors/parsers translate ordinary validation failures into fixed errors, and where the schema parser maps them to invalid_output.
+- Fresh public failures must not retain raw exception causes or contexts.
+- Preserve process-control exceptions.
+- Apply the representation rule to every nested output type, not just top-level results.
+
+Add planned tests for valid JSON enum/array inputs, wrong types, nested immutability, direct construction, copy/update behavior and canary-bearing validation errors.
+
+5. Correction C — Complete the call boundary and clock contract
+
+Write a concrete ordered algorithm for call_validated, including:
+
+- Revalidation of a supplied StructuredRequest before provider access, not just an exact-type check.
+- Exact rules for provider_id.
+- Constructor and returned-response validation, including nested usage values.
+- Whether malformed ProviderResponse construction inside generate counts as provider_failed.
+- The exact result-field combinations for every outcome, including when model_used and usage are absent.
+- Validation of direct StructuredResult construction: purpose/output schema, requested/used models, outcome and optional fields must agree.
+- Precedence when a response has both a model mismatch and a non-success stop reason.
+- Fresh fixed failures raised outside exception handlers.
+- Zero generate calls for invalid requests; otherwise at most one.
+
+The injected clock currently has no defined failure contract. Specify:
+- Accepted return types, rejecting bool, NaN and infinity.
+- What happens if the callable raises or time moves backwards.
+- Behavior before versus after the provider has returned.
+- Whether latency is absent when it cannot be measured.
+- A fixed caller/configuration error or an explicit safe result policy; do not misclassify a broken local clock as a provider timeout.
+- Process-control identity preservation from the clock as well as provider_id/generate.
+
+Keep timeout semantics accurate:
+- timeout_ms is passed to an adapter.
+- A generic synchronous boundary cannot enforce interruption merely by checking elapsed time afterward.
+- Distinguish a timeout outcome from a hard deadline.
+- Do not promise M4f-style transport guarantees for a model transport that is not specified yet.
+
+Bound the scripted fake’s configuration and history, or explicitly scope its memory behavior to a test-owned lifetime. The existing phrase “the fake stores only digests and IDs” overlooks that its scripts contain raw response text. Correct it. Define script exhaustion and concurrent step selection deterministically.
+
+Add planned tests for these cases. No implementation or probes are authorized here.
+
+6. Correction D — Call budgets, repair and terminal state
+
+Resolve the interaction between W4, W5 and W6 at sequence level.
+
+- Define what consumes a call budget: commit a fenced reservation before dispatch; an abandoned started call must still consume its reservation.
+- Budget counters must survive job reclaim and process restart.
+- Explain how a three-call total interacts with “initial plus one repair per attempt”; neither limit may reset accidentally.
+- Distinguish invalid-output repair from retrying a timeout/provider failure.
+- State whether model mismatch is repairable, retryable or terminal.
+- A persisted invalid-output or timeout call record is audit evidence, not a completed stage that must always be reused as success.
+- Define replay/reuse eligibility separately for call records and completed stage results.
+- Define the rule when a repair has already been used and the worker restarts.
+
+Clarify stage versus question failures:
+- A Risk Analyst failure must not silently erase a previously valid Verification or relabel its evidence as missing.
+- Define preserved verification status, unresolved analysis and resulting report coverage separately.
+- Keep compatibility with the existing ReportContent coverage rules.
+- A terminal job does not automatically update a Review row. Identify the mechanism and ownership that make review status consistent when max_attempts is reached, or list it as an unresolved persistence/orchestration decision.
+- No stale worker may perform compensating review-state writes after losing its fence.
+- Review completion must not precede the required report output. Reconcile M5f completion with the later M5g renderer and atomic final commit.
+
+Later slices still need detailed specifications. Do not invent implementation evidence or claim these mechanisms exist.
+
+7. Correction E — Canary coverage and prompt boundaries
+
+The planned canary test currently focuses on foreign/forged citations. That does not establish behavior when a canary comes from an authorized retrieved injected document or appears in an uncited free-text field.
+
+Revise W10 and the acceptance mapping to distinguish:
+- Cross-tenant leakage.
+- Forged/unretrieved citation rejection.
+- A quote that genuinely exists in an authorized injected document.
+- Canary text in rationale, claim text, finding title/statement or follow-up questions.
+- What is persisted versus what is rendered or logged.
+
+Specify the controlled fixture and intended assertions without claiming provenance checks detect semantic prompt injection.
+
+Do not introduce a production hardcoded canary denylist or imply that delimiting evidence makes a live model injection-proof.
+
+If a valid authorized quotation containing the canary would pass the stated production rules, acknowledge that and resolve the fixture/acceptance interpretation explicitly. Do not claim universal exclusion without a mechanism.
+
+For M5c, identify the requirement to encode/escape evidence safely when document text itself contains closing evidence tags or delimiter-like content. Plain concatenation of arbitrary text into XML-like delimiters is not sufficient. Detailed request assembly belongs to M5c review.
+
+A negative-control scanner test proves the scanner detects a token, not that the production pipeline prevents every possible token emission.
+
+8. Review choices
+
+The reviewer supports these directions, subject to the corrected complete specification:
+- M5a first.
+- Domain output/value contracts; provider/fake/planner/adapters in evidenceguard_agents with enforced import boundaries.
+- TOML template independent of ground truth.
+- Started-call reservations committed before dispatch.
+- Dedicated M5 test fixtures rather than changing the accepted M4e corpus.
+- Retain existing Verification/Citation/Finding contracts, adding surrounding values where needed.
+- Raw generate plus one shared validating boundary.
+- Fixed outcomes for ordinary provider failures.
+- Immutable call values and immutable strict output schemas.
+- Explicit bounds, zero hidden SDK retries and a narrow installed-wheel extension.
+- Create the agents package in the first slice that uses it.
+
+Record these as supported reviewer directions, not acceptance of the whole M5 specification.
+
+Keep unresolved choices visible with numbered recommendations/tradeoffs. The detailed Anthropic SDK/transport and live alias behavior can wait for M5h; do not claim live model-name compatibility now.
+
+For W12, retain the normalized-substring direction, but require M5b to define the exact Unicode/whitespace rules, independent body/header matching, and the stored/displayed quote. Preserve exact original evidence and do not join unrelated spans.
+
+9. Attribution and checks
+
+The external reviewer:
+- Verified the Prompt 167 export’s bytes and checksum.
+- Inspected its proposed sequence/contracts and relevant existing domain/persistence source.
+- Ran two isolated probes using the review environment’s Pydantic 2.14.0:
+  strict validation of a decoded Python dictionary rejected an enum string;
+  a frozen Pydantic model containing a list allowed that list to mutate.
+- Did not run project tests, a locked-project probe, build, wheel, PostgreSQL, Docker or provider calls.
+
+Do not call those probes evidence against an implemented M5 module; M5 is not implemented.
+
+Keep prompts.md append-only. Append:
+- Prompt 167 handoff.
+- Review scope, supported directions and corrections above.
+- Prompt 168 verbatim.
+- Outcome note marking the corrected proposal staged and awaiting review.
+
+Verify:
+- Only plan, threat model and prompts.md differ from bfbc2787.
+- README and ADR-0018 byte-identical.
+- Existing M4 publication evidence unchanged.
+- Prompt prefix/verbatim preservation.
+- Relative links/anchors and consistent proposed status.
+- UTF-8 without BOM, LF, staged whitespace, table consistency and privacy/artifact scope.
+- Unsuppressed staged Gitleaks.
+- No implementation or acceptance claims.
+
+No application tests, builds, installs, wheel checks, database, Docker or provider calls.
+
+10. Export and stop
+
+Stage the same five paths, with the three permitted files corrected.
+
+Export directly from Git:
+.local/p168/m5-plan-contract-corrections.diff
+
+Baseline:
+bfbc27878569163de167d0aa858d60bff5b72c10
+
+Final:
+the final staged tree
+
+Exclude prompts.md. Report exact paths, statistics, bytes, SHA-256 and encoding. Verify the export matches the Git comparison.
+
+Return the corrections, remaining decisions, checks actually run, staged tree, export and unchanged refs.
+
+Nothing committed, pushed or implemented.
+
+End:
+“Mathew: return this output plus .local/p168/m5-plan-contract-corrections.diff to the external reviewer.”
+
+### Prompt 168 outcome (Claude Code; corrected proposal staged, awaiting review)
+
+Documentation only, staged and uncommitted on `docs/m5-workflow-plan` (HEAD `46c02257`). The M5
+sequence proposal and the M5a specification were corrected in place under their unchanged
+headings: composable capture and an atomic creation transaction with a trusted loader, and no
+production dispatch before a reviewed wiring decision (A); a scan-then-strict-JSON-mode parse
+path, tuple-only immutable outputs and fixed validation errors (B); the ordered `call_validated`
+algorithm, result-field table, clock contract, timeout semantics and bounded scripted fake (C);
+persisted call reservations and stage budgets, preserved verifications, a projected review status
+and completion only with the rendered output, with the renderer moved before the handler (D); and
+five canary fixture classes and the M5c safe-encoding requirement (E). Reviewer-supported
+directions are recorded as such. README and ADR-0018 are unchanged. **The corrected M5 proposal
+and M5a specification remain proposed and awaiting external review; nothing is accepted or
+implemented, and no application test, build, install, wheel check, Docker, database or provider
+call was run.** The documentation checks performed and the export are reported in the handoff,
+not predicted here.
+
+### Prompt 168 outcome (Claude Code handoff results)
+
+Claude Code's Prompt 168 handoff reported: the starting state matched (branch
+`docs/m5-workflow-plan`, all refs at `46c02257`, staged tree `bfbc2787`, five staged paths,
+unchanged origin and identity; local checks only) and the Prompt 167 export matched; checkpoint
+under `.local/p168/`. It corrected the M5 proposal in place under unchanged headings (corrections
+A–E, with the renderer moved before the handler) and updated the threat-model note. Checks run:
+only `docs/plan.md`, `docs/threat-model.md` and `prompts.md` differed from `bfbc2787`; README and
+ADR-0018 blobs identical; the M4 publication-evidence section byte-identical; the staged
+`prompts.md` beginning with the full `bfbc2787` version and Prompt 168 present once verbatim; 275
+relative links resolving; headings only added; consistent tables; UTF-8 without BOM, no CR, clean
+`git diff --cached --check`; clean privacy scan; unsuppressed staged Gitleaks with no leaks.
+Staged tree `e219fe6260f580f2e1c86416552dc81393282bf3`, uncommitted. Export
+`.local/p168/m5-plan-contract-corrections.diff` (baseline `bfbc2787`, prompts.md excluded; 2
+files, 559 insertions, 228 deletions): 81,299 bytes, SHA-256
+`2b2fd263b01d2d95b179b7b9bbf9eee65dc30493ab7b648cba1f3c0e45bd1d05`. Nothing was committed, pushed
+or implemented, and no application check was run.
+
+### External review of the Prompt 168 corrections (Prompt 169)
+
+The external reviewer matched the Prompt 168 export (81,299 bytes, SHA-256
+`2b2fd263b01d2d95b179b7b9bbf9eee65dc30493ab7b648cba1f3c0e45bd1d05`). Scope: only `docs/plan.md`,
+`docs/threat-model.md` and `prompts.md` may change; README, ADR-0018 and the M4
+publication-evidence section stay byte-identical; M5 proposal headings and anchors are kept; the
+complete M5 sequence and M5a specification remain awaiting review and no implementation is
+authorized.
+
+Approved design choices within the corrected proposal (not acceptance of the complete
+specification): W1, W2, W3, W6, W11; W4/W5 (a persisted three-reservation stage budget across
+attempts, one repair allowance across attempts, no exactly-once guarantee); W8 (internal and
+test-only creation, an explicit handler and provider, no production fake dispatch, production
+enqueue, registration and provider configuration enabled together by a later reviewed task); W13
+(model mismatch terminal for the stage); W15 (read-time review-state projection with output and
+job success committed atomically); W10 (dedicated fixtures, with the acceptance and limitation
+distinction); W14 (subject to the report-integrity invariant); W-A1 to W-A9 and W-A11; and W-A10
+(the clock policy including the arithmetic correction). W12's exact rules belong to M5b and W9's
+SDK, transport and alias details to M5h; neither blocks review of the bounded M5a contract.
+
+Corrections required: complete clock-arithmetic policy (validation, very large integers,
+non-finite intermediate results, conversion failures, backwards time; never clamp or invent a
+latency); keep the original canary criterion as an end-to-end contract assertion with an
+acceptance fixture, a negative control and a separately labelled limitation probe; a
+report-integrity invariant (every displayed conclusion in the hashed content or derived solely
+from it; no silent change to the M1 hash schema); removal of the blanket REPEATABLE READ insert
+claim in favour of the actual failure classes; and W7 coverage of exceptions raised by
+`call_validated`.
+
+Isolated arithmetic probe, recorded as scope only: in the review environment's Python, finite
+floats `-1e308` and `1e308` made the subtraction and conversion raise `OverflowError`, and
+`math.isfinite(10**1000)` raised `OverflowError`. This was plain Python arithmetic, **not** a
+project test and not evidence about an M5 implementation, which does not exist.
+
+### Prompt 169 (verbatim)
+
+Prompt 169 — Finalize the M5 proposal’s clock, canary and report-integrity rules
+
+Written for: Mathew and the external reviewer.
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and applicable repository instructions.
+
+Documentation only. Correct the existing proposal in place. No implementation, commit, push, merge, installation or application checks.
+
+1. Starting state
+
+Verify locally only:
+- Branch docs/m5-workflow-plan.
+- HEAD, main and origin/main:
+  46c0225787ba09f27508dafaa218c1bf33af1e8e
+- Staged tree:
+  e219fe6260f580f2e1c86416552dc81393282bf3
+- The same five documentation/history paths staged.
+- Nothing unstaged or untracked.
+- Origin and noreply identity unchanged.
+
+Verify:
+.local/p168/m5-plan-contract-corrections.diff
+81,299 bytes
+SHA-256:
+2b2fd263b01d2d95b179b7b9bbf9eee65dc30493ab7b648cba1f3c0e45bd1d05
+
+Save the starting tree, staged paths, blob hashes and history prefix under .local/p169/.
+
+No fetch or remote operation. Stop on a material mismatch without repairing it.
+
+2. Scope and review status
+
+Only these files may differ from the Prompt 168 staged tree:
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+README, ADR-0018 and the M4 publication-evidence section must remain byte-identical.
+
+Keep existing M5 proposal headings/anchors.
+
+The complete M5 sequence and M5a specification remain awaiting review. No implementation is authorized.
+
+3. Clock arithmetic must obey the documented failure policy
+
+D1 currently validates finite endpoints, then computes:
+int((end - start) * 1000)
+
+Finite endpoints do not ensure finite subtraction or multiplication. A very large integer can also raise OverflowError during a finiteness check.
+
+Specify a complete policy covering:
+- Validation of clock return values.
+- Very large integers.
+- Non-finite intermediate subtraction or multiplication.
+- Conversion failures.
+- Backwards time.
+
+Recommendation:
+- An unusable start reading is a fresh ModelClockError before dispatch.
+- After dispatch, an unusable end reading or any ordinary failure while validating or calculating latency leaves latency absent and preserves the provider outcome.
+- Never clamp or invent a latency.
+- Process-control exceptions propagate as the same object.
+- No original exception is retained or chained.
+- Define any numerical bound explicitly as an engineering choice.
+
+The isolated reviewer probe used finite floats -1e308 and 1e308: the subtraction/conversion produced OverflowError. math.isfinite(10**1000) also produced OverflowError. This was Python arithmetic in the review environment, not a project or M5 implementation test.
+
+Add planned tests for these cases and for a successful provider response surviving a latency-calculation failure.
+
+Do not run probes or implement the policy in this task.
+
+4. Preserve the canary acceptance assertion
+
+The original M5 criterion remains:
+“The injection canary never appears in output.”
+
+Do not replace it with the weaker assertion that deterministic code does not introduce text when the fake does not emit it.
+
+The reviewer approves this precise scope:
+- The criterion is an end-to-end contract assertion over specified M5 scripted-fake fixtures.
+- The fixture must include an authorized injected document in the retrieved evidence and assembled model request.
+- The ordinary end-to-end fixture must assert that its final output contains no injection canary. Define exactly which artifacts are checked.
+- The instruction may request assembly of a canary absent verbatim from the document.
+- A deliberately canary-emitting scripted response is a negative control: the same acceptance checker must fail. A test may expect and verify that failure.
+- Passing this contract assertion does not establish live-model injection resistance or prove that provenance checks reject arbitrary malicious text.
+- The separate limitation probe with a literal canary in a genuine authorized quotation must remain honest: provenance accepts it, and a report can contain it. Label that probe separately from the passing acceptance fixture.
+- Free-text emission remains a documented limitation without a production denylist.
+
+Keep cross-tenant isolation and forged-citation tests distinct from the authorized-document injection fixture.
+
+Update the acceptance matrix, W10 and threat-model note consistently. Do not claim a new production defense or remove the original criterion.
+
+5. Report integrity and W14
+
+The proposal currently permits displaying preserved Verification status in Markdown while deferring whether it belongs to hashed content.
+
+Set this invariant now:
+Every substantive finding, evidence status, quote, unresolved reason or other review conclusion presented as part of the approval/export artifact must be represented in its canonical hashed content, or be deterministically derived solely from that content.
+
+A report must not acquire substantive displayed conclusions from unhashed stage rows after its content hash is computed.
+
+Keep the valid Verification persisted when analysis fails. The question remains unresolved for analysis, without falsifying or erasing the Verification.
+
+For the sequence:
+- M5f must settle the report-content representation before the M5g completion path uses it.
+- If an extension or wrapper around ReportContent is needed, require an explicitly versioned canonical schema and reviewed compatibility with M6.
+- Do not silently change the accepted M1 ReportContent hash schema.
+- Alternatively, omit the extra displayed conclusion until a reviewed hash-covered representation exists.
+- M6 must approve/export the exact hash-covered report revision.
+
+Record the recommendation and tradeoff, but do not implement a new schema.
+
+6. Remove the blanket insert/concurrency claim
+
+In the creation-transaction section, remove:
+“Inserts of new rows cannot hit REPEATABLE READ's concurrent-update failure.”
+
+Describe the actual required behavior instead:
+- Creation runs in the proposed caller-owned REPEATABLE READ, READ WRITE transaction.
+- Unique constraints, concurrent idempotency races, serialization failures, lock failures and commit failures can still occur.
+- Review/snapshot/configuration/job creation remains atomic.
+- Known retryable conflicts receive fixed classification.
+- Any retry uses a fresh transaction.
+- Unknown commit outcomes are surfaced without claiming rollback definitely happened; the idempotency key supports later discovery.
+
+Detailed SQL, idempotency and retry policy remain for M5d review. Do not claim all failures are automatically retryable or add an unbounded retry loop.
+
+7. Cancellation and boundary exceptions
+
+Clarify W7 for the future M5g handler:
+- ctx.check() runs after a returned provider outcome and before acting on it.
+- If call_validated raises an ordinary local/configuration error such as ModelClockError, cancellation/lease precedence must also be checked before classifying that error.
+- Process-control exceptions propagate; do not turn them into job errors.
+- A worker that loses its fence performs no outcome, stage or compensating write.
+- The pre-dispatch reservation may already exist and remains audit/budget evidence.
+
+This closes the exception path without adding JobContext to M5a.
+
+8. Settle reviewed choices without accepting implementation
+
+The reviewer approves these design choices within the corrected proposal:
+- W1, W2, W3, W6, W11: the previously supported directions.
+- W4/W5: persisted three-reservation stage budget across attempts, one repair allowance across attempts, and no exactly-once guarantee.
+- W8: internal/test-only creation and explicit handler/provider; no production fake dispatch; production enqueue/registration/provider configuration must be enabled together by a later reviewed task.
+- W13: model mismatch terminal for the stage.
+- W15: read-time review-state projection, with completed output and job success committed atomically.
+- W10: dedicated fixtures, with the acceptance/limitation distinction specified above.
+- W14: subject to the report-integrity invariant above.
+- W-A1 through W-A9 and W-A11: the corrected recommended contracts, strict immutable schemas, bounded fake, zero hidden retries and narrow wheel check.
+- W-A10: the clock policy, including the arithmetic correction above.
+
+W12’s exact normalization/matching rules belong to the detailed M5b review.
+W9’s SDK/transport and live alias details belong to M5h review.
+Neither prevents reviewing the bounded M5a contract.
+
+Distinguish settled sequence choices from later-slice details awaiting their own specifications. Do not label M5 or M5a implemented, tested or accepted as a complete specification in this task.
+
+9. History and checks
+
+Preserve all earlier prompts.md bytes.
+
+Append:
+- Prompt 168 handoff.
+- Reviewer scope, matched checksum, decisions and corrections.
+- The isolated arithmetic-probe scope, explicitly not project evidence.
+- Prompt 169 verbatim.
+- Outcome note marking corrected documentation staged for review.
+
+Check:
+- Only plan, threat model and prompts.md differ from e219fe62.
+- README, ADR-0018 and M4 publication evidence unchanged.
+- Prompt prefix/verbatim preservation.
+- Links, anchors, tables and status consistency.
+- No unsupported acceptance, implementation or execution claims.
+- UTF-8 without BOM, LF only, staged whitespace and privacy/artifact scope.
+- Unsuppressed staged Gitleaks.
+
+No application tests, builds, installs, wheel checks, Docker, database or provider calls.
+
+10. Export and stop
+
+Export directly from Git:
+.local/p169/m5-final-spec-clarifications.diff
+
+Baseline:
+e219fe6260f580f2e1c86416552dc81393282bf3
+
+Final:
+the final staged tree
+
+Exclude prompts.md. Verify the comparison and report paths, statistics, bytes, SHA-256 and encoding.
+
+Return corrections, settled choices, genuinely remaining decisions, checks, final staged tree, export and unchanged refs.
+
+Nothing committed, pushed or implemented.
+
+End:
+“Mathew: return this output plus .local/p169/m5-final-spec-clarifications.diff to the external reviewer.”
+
+### Prompt 169 outcome (Claude Code; corrected documentation staged for review)
+
+Documentation only, staged and uncommitted on `docs/m5-workflow-plan` (HEAD `46c02257`). In
+`docs/plan.md`: a complete clock-arithmetic policy in D1 (an integer-safe reading bound of `2**53`
+seconds, guarded latency calculation with a 24-hour bound, a fresh `ModelClockError` only before
+dispatch, absent latency with the outcome preserved after dispatch) with planned tests; the
+original canary criterion kept as an end-to-end contract assertion (acceptance fixture, negative
+control and a separately labelled limitation probe) in the canary section, acceptance matrix and
+W10; a report-integrity invariant with W14 and the M5f row updated; the blanket REPEATABLE READ
+insert claim replaced by the actual failure classes; W7 extended to exceptions raised by
+`call_validated`; and the reviewer-approved design choices recorded as such, with the details
+still awaiting later specifications listed. The threat-model note is updated consistently.
+README, ADR-0018 and the M4 publication evidence are unchanged. **The complete M5 sequence and the
+M5a specification remain awaiting review; nothing is accepted as a complete specification,
+implemented or tested, and no application test, build, install, wheel check, Docker, database or
+provider call was run.** The documentation checks performed and the export are reported in the
+handoff, not predicted here.
+
+### Prompt 169 outcome (Claude Code handoff results)
+
+Claude Code's Prompt 169 handoff reported: the starting state matched (branch
+`docs/m5-workflow-plan`, all refs at `46c02257`, staged tree `e219fe62`, five staged paths,
+unchanged origin and identity; local checks only) and the Prompt 168 export matched; checkpoint
+under `.local/p169/`. It added the complete clock-arithmetic policy (D1), kept the original canary
+criterion as an end-to-end contract assertion with an acceptance fixture, a negative control and a
+separately labelled limitation probe, set the report-integrity invariant (W14, M5f row), replaced
+the blanket REPEATABLE READ insert claim with the actual failure classes, extended W7 to exceptions
+raised by `call_validated`, and recorded the reviewer-approved design choices. Checks run: only
+`docs/plan.md`, `docs/threat-model.md` and `prompts.md` differed from `e219fe62`; README and
+ADR-0018 blobs identical; the M4 publication evidence byte-identical; the earlier `prompts.md`
+bytes preserved and Prompt 169 present once verbatim; 275 links resolving, two headings added,
+consistent tables; the removed claim absent and the original criterion line unchanged; UTF-8
+without BOM, no CR, clean `git diff --cached --check`; clean privacy and claim scans; unsuppressed
+staged Gitleaks with no leaks. Staged tree `189af2c6498f22ef830511e114e98792aaf849b7`,
+uncommitted. Export `.local/p169/m5-final-spec-clarifications.diff` (baseline `e219fe62`,
+prompts.md excluded; 2 files, 244 insertions, 96 deletions): 45,275 bytes, SHA-256
+`3284c752cea6516fa6eb117d6f5e2308a99e75ba9517168f4dbea505082f69b3`. Nothing was committed, pushed
+or implemented, and no application check was run.
+
+### External review acceptance of the M5 sequence and M5a specification (Prompt 170)
+
+The external reviewer accepted the M4 acceptance-publication documentation prepared in Prompt
+167, the corrected dependency-ordered M5 sequence, and the complete M5a model-call contracts and
+scripted-fake specification, with one test-description clarification: under the accepted reading
+bound, an invalid start reading such as `-1e308` raises `ModelClockError` before dispatch, so only
+a valid start followed by an invalid end reading (such as `1e308` or `10**1000`), an elapsed
+duration above the latency bound, or another ordinary post-dispatch arithmetic or validation
+failure preserves a completed response with absent latency; process control still propagates as
+the same object. This clarifies the existing algorithm and planned tests; it adds no mechanism.
+
+The reviewer verified the three exports: `.local/p167/m4-publication-and-m5-plan.diff` (103,583
+bytes, SHA-256 `24147a9431e5b61d06c4f869cba42774b5d11884f80f3ab4865db4c58b0c96db`),
+`.local/p168/m5-plan-contract-corrections.diff` (81,299 bytes, SHA-256
+`2b2fd263b01d2d95b179b7b9bbf9eee65dc30493ab7b648cba1f3c0e45bd1d05`) and
+`.local/p169/m5-final-spec-clarifications.diff` (45,275 bytes, SHA-256
+`3284c752cea6516fa6eb117d6f5e2308a99e75ba9517168f4dbea505082f69b3`), and reviewed the proposal and
+its corrections. The Prompt 168 review included relevant existing domain and persistence source and
+two isolated Pydantic 2.14.0 probes in the review environment; the Prompt 169 review included
+isolated Python arithmetic probes; neither was a locked-project test or evidence about an
+implemented M5 module. The reviewer ran no project suite, regression suite, build, installed-wheel
+check, database, Docker or provider call for this specification review; existing CI evidence
+belongs to M4 at its recorded exact SHAs.
+
+Scope: the accepted M5a recommendations and W-A1 to W-A11 form its implementation contract and no
+M5a specification decision remains open; implementation and every M5a check are pending; no
+model-call module, agents package, test, workflow extension or ADR-0019 exists; no M5 mitigation
+operates; overall M5 acceptance is pending. The sequence acceptance covers its dependency order
+and settled design choices, not detailed acceptance of M5b–M5h schemas, SQL, prompts, transport or
+orchestration, which remain later review obligations (M5b quote matching and normalization; M5c
+template and prompt packaging and safe request assembly; M5d composable capture, SQL, isolation,
+idempotency and retry policy; M5e persistence schemas and fenced reservations and stages; M5f the
+versioned hash-covered report representation; M5g orchestration, crash and reclaim behaviour and
+error mapping; M5h the SDK or transport and live model-alias policy; production wiring as a
+separate reviewed decision). Prompt 170 authorizes one local documentation commit only.
+
+### Prompt 170 (verbatim)
+
+Prompt 170 — Record M5 sequence and M5a specification acceptance locally
+
+Written for: Mathew and the external reviewer.
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and applicable repository instructions.
+
+The external reviewer accepts:
+- The M4 acceptance-publication documentation prepared in Prompt 167.
+- The corrected M5 dependency-ordered sequence.
+- The complete M5a model-call contracts and scripted-fake specification, with the test-description clarification below.
+
+Record acceptance and create one local documentation commit. Do not implement, push, merge or start another slice.
+
+1. Verify the starting state
+
+Expected:
+- Branch docs/m5-workflow-plan.
+- HEAD, main and origin/main:
+  46c0225787ba09f27508dafaa218c1bf33af1e8e
+- Accepted staged tree:
+  189af2c6498f22ef830511e114e98792aaf849b7
+- Exactly five staged paths:
+  README.md
+  docs/decisions/0018-voyage-adapter.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Origin and noreply identity unchanged.
+
+Check locally only. No fetch or remote operation.
+Stop on a material mismatch without repairing it.
+
+Verify all three reviewed exports:
+- .local/p167/m4-publication-and-m5-plan.diff
+  103,583 bytes
+  SHA-256:
+  24147a9431e5b61d06c4f869cba42774b5d11884f80f3ab4865db4c58b0c96db
+- .local/p168/m5-plan-contract-corrections.diff
+  81,299 bytes
+  SHA-256:
+  2b2fd263b01d2d95b179b7b9bbf9eee65dc30493ab7b648cba1f3c0e45bd1d05
+- .local/p169/m5-final-spec-clarifications.diff
+  45,275 bytes
+  SHA-256:
+  3284c752cea6516fa6eb117d6f5e2308a99e75ba9517168f4dbea505082f69b3
+
+Save the accepted tree, staged paths, per-file blob hashes and prompt-history prefix under .local/p170/.
+
+2. Final test-description clarification
+
+The planned clock tests currently mention the pair:
+start = -1e308, end = 1e308
+
+Under the accepted reading bound, the start is unusable, so call_validated must raise ModelClockError before dispatch. It cannot preserve a completed response in that case.
+
+Clarify the test descriptions:
+- Invalid start readings, including -1e308, produce a fresh ModelClockError and zero generate calls.
+- A valid start followed by an invalid end reading, such as 1e308 or 10**1000, preserves a completed provider response with absent latency.
+- A valid start/end pair whose elapsed duration exceeds the latency bound likewise preserves the outcome with absent latency.
+- Ordinary arithmetic/validation failures after dispatch follow that same absent-latency policy.
+- Process-control exceptions still propagate as the same object.
+
+This is a clarification of the existing algorithm and planned tests, not a new mechanism or implementation.
+
+3. Acceptance scope
+
+Record:
+- Proposed in Prompt 167.
+- Corrected in Prompt 168.
+- Clarified in Prompt 169.
+- Sequence and complete M5a specification accepted at external review in Prompt 170, with the clarification above.
+- The accepted M5a recommendations and W-A1–W-A11 form its implementation contract.
+- No M5a specification decision remains open.
+- Implementation and every M5a check remain pending.
+- No model-call module, agents package, test, workflow extension or ADR-0019 has been created.
+- No M5 mitigation operates yet.
+- Overall M5 acceptance remains pending.
+
+The sequence acceptance covers its dependency order and settled design choices, not detailed acceptance of M5b–M5h schemas, SQL, prompts, transport or orchestration.
+
+Keep the later review obligations explicit:
+- M5b exact quote matching and normalization.
+- M5c template/prompt packaging and safe request assembly.
+- M5d composable capture, SQL, isolation, idempotency and retry policy.
+- M5e persistence schemas and fenced reservations/stages.
+- M5f versioned hash-covered report representation.
+- M5g orchestration, crash/reclaim behavior and error mapping.
+- M5h SDK/transport and live model-alias policy.
+- Production wiring remains a separate reviewed decision.
+
+Do not describe these later details as blockers to the accepted bounded M5a specification.
+
+4. Documentation changes
+
+Only the same five paths are authorized.
+
+Relative to accepted tree 189af2c6:
+- README, docs/plan.md, docs/threat-model.md and prompts.md may change.
+- ADR-0018 must remain byte-identical.
+
+Plan:
+- Rename the sequence heading to:
+  M5 implementation sequence (ACCEPTED at review, Prompt 170)
+- Rename the M5a heading to:
+  M5a model-call contracts and scripted fake provider (ACCEPTED at review, Prompt 170; implementation pending)
+- Update every relative link to those headings.
+- Update status lines, sequence rows and decision-status wording consistently.
+- Preserve historical proposal/correction stages and source facts at 46c02257.
+- Keep accepted requirements, bounds, canonical encoding, failure precedence, privacy, call budgets and the complete test plan unchanged except for the approved clarification.
+- Preserve every accepted M4 heading/anchor and its evidence.
+
+README:
+- M1–M4 accepted within their recorded scopes.
+- M5 sequence and M5a specification accepted in Prompt 170.
+- M5 implementation pending; no new checks executed.
+- Link to the accepted sequence and M5a specification.
+- Retain pre-alpha and later-milestone status.
+
+Threat model:
+- State specification accepted, implementation pending.
+- None of the proposed M5 controls operates yet.
+- Preserve the honest distinction between the passing canary contract fixture, negative control and limitation probe.
+- Preserve the report-integrity invariant and existing M4 limits.
+
+Do not create a new ADR or edit source, tests, corpus, workflow, dependencies, lockfile or configuration.
+
+5. Review attribution
+
+Record accurately:
+- The reviewer verified the three exports and reviewed the proposal and corrections.
+- Prompt 168 review included relevant existing domain/persistence source and two isolated Pydantic 2.14.0 probes in the review environment.
+- Prompt 169 review included isolated Python arithmetic probes.
+- Those were not locked-project tests or evidence about an implemented M5 module.
+- The final review verified the Prompt 169 export and clarified its planned clock-test wording.
+- No project suite, regression suite, build, installed-wheel check, database, Docker or provider call was run by the reviewer for this specification review.
+- Existing CI evidence belongs to M4 at its recorded exact SHAs.
+
+Preserve Claude Code’s documentation attribution separately.
+
+6. Prompt history
+
+Preserve every earlier prompts.md byte as an identical prefix.
+
+Append:
+- Prompt 169 handoff.
+- The reviewer’s acceptance, three checksums, review/probe scope and final clarification.
+- Prompt 170 verbatim, including its Written for line.
+- A pre-commit note recording completed checks only, without a prospective commit SHA or publication claim.
+
+7. Checks and local commit
+
+Run documentation checks only:
+- Exactly the five authorized staged paths.
+- Only the four permitted files differ from 189af2c6.
+- ADR-0018 and all other tracked blobs unchanged.
+- Prompt prefix and verbatim prompt.
+- Relative links/anchors and status consistency.
+- No implementation, test execution, publication or overall-M5 acceptance claim.
+- UTF-8 without BOM, LF only, staged whitespace and repository Markdown formatting.
+- Privacy/artifact scope.
+- Unsuppressed staged Gitleaks.
+- Expected effective author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Create one local commit:
+docs: record M4 publication and accepted M5a specification
+
+Use a message file. Credit Claude Code’s actual Prompt 167–170 documentation work, preserve earlier attribution, and follow the repository’s assistance/trailer convention. Do not claim implementation assistance for code that does not exist.
+
+After committing:
+- Verify SHA, parent, tree, subject, identity and exactly five paths.
+- Confirm ADR-0018 matches the accepted tree.
+- Confirm all files outside the five paths match HEAD’s parent.
+- Run unsuppressed full-history Gitleaks.
+- Confirm a clean working tree.
+- Confirm main and origin/main remain at 46c02257.
+
+No push, fetch, merge, amend, rebase, tag or implementation.
+
+8. Incremental export and handoff
+
+Export directly from Git:
+.local/p170/m5a-spec-acceptance.diff
+
+Baseline:
+189af2c6498f22ef830511e114e98792aaf849b7
+
+Final:
+the new local commit
+
+Exclude prompts.md. Verify the exact comparison and report paths, statistics, bytes, SHA-256 and encoding.
+
+Return:
+- Starting-state verification.
+- Acceptance scope and final clarification.
+- Documentation changes.
+- Checks actually performed.
+- Commit SHA, parent, tree, subject, identity and attribution.
+- Blob-identity checks.
+- Export details and final Git state.
+- Implementation and publication pending.
+- Later-slice review obligations and existing limitations.
+
+End:
+“Mathew: return this output plus .local/p170/m5a-spec-acceptance.diff to the external reviewer.”
+
+### Prompt 170 pre-commit note (Claude Code; before the local commit)
+
+Completed checks only. Verified locally (no fetch or remote operation): branch
+`docs/m5-workflow-plan`; HEAD, `main` and `origin/main` at `46c02257`; accepted staged tree
+`189af2c6`; exactly the five staged paths; nothing unstaged or untracked; unchanged origin and
+noreply identity; the three reviewed exports matched their recorded sizes and SHA-256 values.
+Saved a checkpoint under `.local/p170/`. Recorded the Prompt 170 acceptance in README, plan and
+threat model (the two M5 headings renamed and every link to them updated; the planned clock-test
+wording clarified) and appended the Prompt 169 handoff, the reviewer's acceptance and Prompt 170
+verbatim. Checks run on the staged documentation: exactly the five paths differ from `46c02257`
+and only README, plan, threat model and `prompts.md` differ from `189af2c6`; ADR-0018 identical
+to `189af2c6`; the M4 publication-evidence section unchanged; the earlier `prompts.md` bytes
+preserved as a prefix and Prompt 170 present once verbatim; 279 relative links resolving; only the
+two renamed headings, one added heading and the threat-model section heading changed; consistent
+tables; UTF-8 without BOM, no CR, clean `git diff --cached --check`; clean privacy and claim scans;
+unsuppressed staged Gitleaks with no leaks. The commit, its post-commit checks and the export are
+reported in the handoff, not predicted here. Nothing is implemented, pushed or published.
