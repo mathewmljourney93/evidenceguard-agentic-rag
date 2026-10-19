@@ -33318,3 +33318,360 @@ lint clean; no tracked `.local` or build artifacts; clean privacy scan; unsuppre
 with no leaks; effective author and committer the noreply identity. No application test, build or
 wheel check was repeated (the implementation is byte-identical). The commit, its post-commit checks
 and the export are reported in the handoff, not predicted here. Nothing is pushed or published.
+
+### Prompt 173 outcome (attributed to Claude Code's supplied handoff output)
+
+Claude Code's Prompt 173 handoff reported: the starting state matched (branch
+`feat/model-call-contracts`, HEAD `d34aaaac`, accepted staged tree `5d4febb6`, 17 staged paths,
+`main` and `origin/main` at `46c02257`) and both exports matched their recorded comparisons
+(Claude Code's verification). It recorded the scoped acceptance in README, ADR-0019 (status and a new
+"External review (Prompt 173)" section), plan and threat model, renamed the separate
+implementation-status heading with every link updated, and appended the history. Documentation
+checks only (no application test, build or wheel check repeated, as the implementation is
+byte-identical): exactly 17 staged paths, only the five documentation and history files differing
+from `5d4febb6` and the other 12 blobs identical, prompt prefix and verbatim text, 295 links
+resolving, UTF-8 without BOM, LF, clean staged whitespace, Ruff format and lint, privacy scan and
+unsuppressed staged Gitleaks clean. Local commit `79e32532ff045dd49f1f84bdcf10dd43bf27f5d4` (parent
+`d34aaaac`, tree `ca41c59b38848984aed2579aeb8511b6ec58992a`, subject "feat: add model-call contracts
+and scripted fake provider", noreply author and committer, 17 paths, the 12 implementation blobs
+matching `5d4febb6`); clean working tree; `main` and `origin/main` at `46c02257`; full-history
+Gitleaks over 74 commits with no leaks. Export `.local/p173/m5a-commit-incremental.diff` (baseline
+`5d4febb6`, final `79e32532`, prompts.md excluded; 4 files, 77 insertions, 26 deletions): 40,277
+bytes, 215 lines, SHA-256 `eb3baa2d6adb94a6dad8cde8beb41d86e0e863756bb480882b63d0277854aa5d`,
+printed in full in two parts. Nothing was pushed.
+
+### External review acceptance of the Prompt 173 commit (Prompt 174)
+
+The external reviewer accepted the pasted Prompt 173 incremental documentation. The reviewer
+inspected the pasted diff but did **not** independently checksum-verify the export file; the local
+verification of that file's bytes, checksum and Git comparison belongs to Claude Code. Prompt 174
+authorizes one history-only commit, normal publication of `feat/model-call-contracts`, monitoring of
+its exact-commit CI and, only if all five required jobs pass, staged post-CI documentation and a
+proposed M5b specification. No `main` update, second commit, M5b implementation or CI rerun is
+authorized.
+
+### Prompt 174 (verbatim)
+
+Prompt 174 — Publish M5a, verify feature CI and draft the M5b specification
+
+Written for: Mathew and the external reviewer.
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and applicable repository instructions.
+
+This is one extended session:
+A. Publish the accepted M5a branch and monitor exact-commit CI.
+B. If all five required jobs pass, record the feature evidence and propose the detailed M5b specification.
+
+Do not update main or implement M5b. Stop with the post-CI documentation staged and uncommitted for external review.
+
+1. Starting-state verification
+
+Expected:
+- Branch feat/model-call-contracts.
+- HEAD:
+  79e32532ff045dd49f1f84bdcf10dd43bf27f5d4
+- Parent:
+  d34aaaac548233df59399454d8a9a28ebdf02c4d
+- Tree:
+  ca41c59b38848984aed2579aeb8511b6ec58992a
+- Subject:
+  feat: add model-call contracts and scripted fake provider
+- Clean index and working tree.
+- No upstream for this branch.
+- Local main and origin/main:
+  46c0225787ba09f27508dafaa218c1bf33af1e8e
+- Expected origin URL.
+- Author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Fetch normally with --no-tags and inspect remote refs read-only.
+Expected remote main remains 46c02257 and remote feat/model-call-contracts is absent.
+Confirm local main equals origin/main and is an ancestor of HEAD.
+
+Stop on a material mismatch without repairing it.
+
+Verify:
+.local/p173/m5a-commit-incremental.diff
+Baseline:
+5d4febb69ab73b003c4c053ff0a7f5f8849d48fb
+Final:
+79e32532ff045dd49f1f84bdcf10dd43bf27f5d4
+Excluding prompts.md:
+40,277 bytes
+SHA-256:
+eb3baa2d6adb94a6dad8cde8beb41d86e0e863756bb480882b63d0277854aa5d
+
+Verify its exact Git comparison.
+
+Save a checkpoint under .local/p174/: refs, status, tree, reviewed blobs and prompt-history prefix.
+
+2. Publication preflight
+
+The unpublished range should contain:
+- d34aaaac: accepted M5 sequence/M5a specification and M4 publication documentation.
+- 79e32532: accepted M5a implementation.
+
+The range intentionally includes 18 paths: the 17 implementation-commit paths plus docs/decisions/0018-voyage-adapter.md from the specification/documentation commit.
+
+Verify:
+- Only the reviewed paths.
+- The 12 implementation, test, packaging and workflow blobs match accepted tree:
+  5d4febb69ab73b003c4c053ff0a7f5f8849d48fb
+- The workflow only adds the reviewed M5a wheel check.
+- pyproject.toml has only the reviewed packaging, mypy and Ruff first-party additions.
+- No dependency, lockfile, migration, settings, registry, .env.example, Docker, Compose or container-smoke changes.
+- No tracked .local files, artifacts, binaries, backups or credentials.
+- Correct identities and assistance attribution on both commits.
+- Both workflows trigger on push and all five required jobs remain enabled.
+- Integration still uses pytest -m integration and EG_REQUIRE_INTEGRATION=1.
+- Existing wheel checks and all six container steps remain.
+- No production model-provider registration, live wiring or workflow secret is added.
+
+Run privacy/artifact checks and unsuppressed Gitleaks over origin/main..HEAD.
+
+Do not repeat local application tests, builds or wheel checks; implementation is unchanged.
+
+3. History-only authorization commit
+
+Before publishing, append to prompts.md:
+- Prompt 173 handoff, attributed to its supplied output.
+- Reviewer acceptance of the pasted incremental documentation.
+- Explicitly state that the reviewer inspected the pasted diff but did not independently checksum-verify the export file; local verification belongs to Claude Code.
+- Prompt 174 verbatim, including the Written for line.
+- A preflight note recording completed checks and publication authorization, without predicting SHA, push success or CI results.
+
+Preserve every earlier byte as an identical prefix.
+
+Only prompts.md may change before this publication commit.
+
+Check prompt prefix/verbatim text, UTF-8 without BOM, LF, staged whitespace, privacy and unsuppressed staged Gitleaks.
+
+Create:
+docs: record M5a branch publication authorization
+
+Use a message file, expected noreply identity and repository assistance/trailer convention. Attribute this history/publication work accurately and preserve earlier attribution.
+
+After committing:
+- Verify parent, tree and prompts.md-only scope.
+- Verify every other blob is unchanged.
+- Confirm clean working tree.
+- Run unsuppressed full-history Gitleaks.
+
+4. Publish feature branch and monitor
+
+Recheck remote refs immediately before pushing.
+
+Run:
+git push --set-upstream origin refs/heads/feat/model-call-contracts:refs/heads/feat/model-call-contracts
+
+Record exit status and verify remote feature equals the exact published SHA.
+
+Monitor both push-triggered workflows for that SHA:
+- CI: Ubuntu verify, Windows verify, PostgreSQL integration, container.
+- Secret scan: full-history Gitleaks.
+
+Verify event, branch, SHA, run attempt, run/job conclusions and every required step. Poll at reasonable intervals within a 25-minute bound. Leave no monitor running after completion or timeout.
+
+If a required job fails, is skipped/cancelled, remains incomplete or cannot be matched to the SHA:
+- Stop.
+- Do not repair, rerun, amend, revert or update main.
+- Do not proceed to the post-CI documentation phase.
+- Return observed evidence and the blocker.
+
+Use available authorized log tooling. If logs cannot be retrieved, report API conclusions separately from unobserved log details. Do not extract credentials or change authentication to bypass access restrictions.
+
+Do not infer counts from earlier versions.
+
+While CI runs, read-only preparation for M5b is allowed. Keep any temporary notes under .local/p174/. Do not change tracked post-CI documentation until the five jobs pass.
+
+5. Record feature evidence after the gate passes
+
+After all five jobs and required steps pass, update only:
+- README.md
+- docs/decisions/0019-model-call-contracts.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+No application/test/workflow/packaging changes are authorized.
+
+Record:
+- M5a accepted in Prompt 173.
+- Published and verified in feature-branch CI at the exact published SHA in Prompt 174.
+- Not merged; main remains 46c02257.
+- Observed run/job/step records and links.
+- Exact test summaries, module results, wheel output, container summaries and Gitleaks count only if actually retrieved.
+- Any missing log evidence explicitly unobserved.
+- Historical Windows checks and reviewer isolated probes remain separately attributed.
+- No live-provider or quality evidence.
+- The unchanged container smoke does not exercise M5a.
+
+Add a feature-evidence section to ADR-0019. Link concise status updates from the other documents.
+
+Keep accepted specification headings/anchors unchanged. Preserve historical pending statements with their original scope.
+
+Do not commit these updates.
+
+6. Draft the detailed M5b specification
+
+Read the accepted M5 sequence, existing domain evidence/report contracts, M4d evidence values and the accepted M5a implementation.
+
+Add:
+“M5b provenance and status-derivation specification (PROPOSED, Prompt 174; not implemented)”
+
+Everything newly specified remains proposed until reviewed.
+
+M5b is pure and database-independent. It must not introduce persistence, prompts, request assembly, orchestration, endpoints, provider calls or production wiring.
+
+Separate:
+[DECISION] accepted direction;
+[FACT] current source at the published SHA;
+[REC] recommendation;
+[OPEN] decision needing review.
+
+Specify concrete public values/functions and package placement for:
+
+A. Verifier output conversion
+- Inputs bind actor/tenant, review/question identity and the exact trusted retrieved evidence supplied for that question.
+- Model-supplied identifiers are not authorization.
+- Every quote names a chunk in that question’s retrieved set.
+- Tenant, revision, source type and authenticity come from trusted evidence.
+- Validated claims, citations and derived Verification remain immutable.
+- Define duplicate, missing, unsupported-verdict/citation and inconsistent-input handling.
+- Preserve existing Verification, Citation and Finding contracts.
+
+B. Exact quote matching
+- Settle W12: exact Unicode normalization and whitespace rules.
+- Match original body and repeated-header spans independently.
+- Never join unrelated spans or fabricate a contiguous quotation across a boundary.
+- Specify deterministic mapping from a normalized match back to exact original evidence text and offsets.
+- Define ambiguous/repeated-match policy and bounds.
+- Preserve original evidence text.
+- Define how the selected exact quote remains compatible with the existing Citation quote-length limit.
+- Do not confuse provenance with semantic entailment or authenticity.
+
+C. Status derivation
+- Explicitly map every Verdict and source-type combination.
+- Supported needs appropriate accepted citations.
+- Conflicting must satisfy the existing distinct-quotation rule.
+- Insufficient evidence remains missing.
+- Documentary authenticity remains not_established.
+- Define per-claim validation versus question-level aggregation; avoid losing the relationship between a claim and its citations.
+
+D. Risk Analyst findings
+- Findings may cite only citations previously validated by the Verifier.
+- Define question-ID scope, multi-question findings and citation ownership.
+- Analyst output cannot invent status, metadata or new authorized evidence.
+- Define deterministic finding IDs if needed, including their inputs and encoding.
+- Preserve a valid Verification when analysis fails.
+- Enforce the documentary-support-required rule without fabricating a model judgment or unsupported finding.
+
+E. Outcomes, validation and privacy
+- Give fixed errors/outcomes, precedence and exact invariants.
+- Distinguish bad caller/trusted evidence from rejected model citations.
+- All ordinary validation failures are sanitized; process control propagates.
+- Define direct-call and nested-value revalidation.
+- No logging or raw error/context leakage.
+- No claim to protect against malicious trusted Python or direct database modification.
+
+F. Compatibility and scope
+- Domain placement and accepted import boundaries.
+- No changes to M1–M4 or M5a behavior unless an explicit incompatibility is reported for review.
+- M5c owns safe prompt encoding and request assembly.
+- M5d owns persisted snapshot trust.
+- M5f owns hash-covered report representation.
+- Canary fixtures show bounded contract behavior; no generic injection-resistance promise.
+- Identify how later request encoding maps back to original evidence without prescribing an unreviewed prompt format.
+
+G. Verification plan
+- Database-independent tests with concrete examples and failure cases.
+- Normalization, combining characters, whitespace, repeated quotes, offset mapping, table headers and body/header boundary cases.
+- Foreign/unretrieved chunks, wrong question, metadata mismatches and duplicate evidence.
+- Verdict/status/citation combinations.
+- Analyst citation restrictions and multi-question ownership.
+- Privacy, immutability and process-control tests.
+- Narrow installed-wheel acceptance if recommended.
+- Intended implementation files and explicit exclusions.
+
+List numbered reviewer decisions with recommendations and tradeoffs. Resolve routine implementation choices in the proposal, rather than leaving vague contracts. Clearly identify genuinely unresolved decisions.
+
+Do not create ADR-0020 or any implementation/test file.
+
+7. Documentation/history checks
+
+Update README and the threat model with concise links to the proposed M5b specification. State that its controls do not operate yet.
+
+Preserve all existing M4/M5a limitations, including offline defaults, no live provider, trusted snapshots, timing/privacy bounds, container-smoke scope, local Compose and overall M5 pending.
+
+Append to prompts.md after CI:
+- Actual publication outcome and observed evidence, clearly attributed.
+- Any unavailable log details.
+- The M5b proposal outcome, staged and awaiting review.
+
+Preserve the committed published prompts.md as an identical prefix. Prompt 174 must remain recorded verbatim once.
+
+Check:
+- Only the five authorized post-CI files differ from published HEAD.
+- Every implementation/test/workflow/packaging blob unchanged.
+- Links/anchors, tables and status consistency.
+- UTF-8 without BOM, LF, staged whitespace and repository formatting checks.
+- Privacy/artifact scope and unsuppressed staged Gitleaks.
+- No claim that M5b is accepted, implemented or tested.
+
+No application checks are needed for this documentation phase.
+
+8. Export and mobile handoff
+
+Stage the five post-CI documentation files, uncommitted.
+
+Export directly from Git:
+.local/p174/m5a-feature-evidence-and-m5b-spec.diff
+
+Baseline:
+the exact published SHA
+
+Final:
+the final staged tree
+
+Exclude prompts.md. Verify its exact Git comparison and report paths, statistics, bytes, SHA-256 and encoding.
+
+Return:
+- Preflight and history-commit details.
+- Push command/exit status and exact published SHA.
+- Both workflow/run links and all five job links.
+- Observed evidence separately from unavailable details.
+- Confirmation main is unchanged.
+- Proposed M5b scope and reviewer decisions.
+- Documentation checks, staged tree and export.
+- Stopped monitors and remaining limitations.
+
+Then print the COMPLETE exported diff in fenced diff blocks.
+Split into numbered consecutive parts at file boundaries if needed.
+Do not omit lines or use ellipses. Clearly mark the final part complete.
+The actual export remains the authoritative checksum source.
+
+No main update, second commit, M5b implementation or CI rerun.
+
+End:
+“Mathew: return this output and the complete printed .local/p174/m5a-feature-evidence-and-m5b-spec.diff to the external reviewer.”
+
+### Prompt 174 preflight (Claude Code; before the history commit and publication)
+
+Completed checks only. Verified locally and against freshly fetched refs (`fetch --no-tags`,
+read-only `ls-remote`): branch `feat/model-call-contracts` at `79e32532` (parent `d34aaaac`, tree
+`ca41c59b`), clean, no upstream; remote `main` `46c02257` and no remote
+`feat/model-call-contracts`; local `main` equal to `origin/main` and an ancestor of HEAD; unchanged
+origin and noreply identity. The Prompt 173 export matched its size, SHA-256 and exact Git
+comparison. Saved a checkpoint under `.local/p174/`. The unpublished range `origin/main..HEAD`
+contains exactly `d34aaaac` and `79e32532` with the noreply identity and Assistance trailers, and 18
+paths (the 17 implementation-commit paths plus `docs/decisions/0018-voyage-adapter.md`); the 12
+implementation, test, packaging and workflow blobs match `5d4febb6`; `ci.yml` removes no line and
+only adds the reviewed M5a wheel check; `pyproject.toml` adds only the four reviewed lines; no
+dependency, lockfile, migration, settings, registry, `.env.example`, Docker, Compose or
+container-smoke path changed; both workflows trigger on push with all five jobs present, the
+integration job still runs `uv run --locked pytest -m integration` with `EG_REQUIRE_INTEGRATION`
+`"1"`, the existing wheel checks and container steps remain, and no workflow uses a secret; no
+tracked `.local` file, build artifact, binary or backup; clean privacy scan; unsuppressed Gitleaks
+over `origin/main..HEAD` found no leaks. Publication of `feat/model-call-contracts` is authorized
+by Prompt 174 with exact-commit CI monitoring; `main` is not to be updated. The history commit, the
+push and the CI outcomes are reported afterwards, not predicted here.
