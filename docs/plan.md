@@ -6811,12 +6811,17 @@ its own reviewed specification (see [acceptance scope](#m5-sequence-and-m5a-acce
 **M5a was implemented in Prompt 171, corrected in Prompt 172 and accepted for a local commit in
 Prompt 173 (publication and CI were then pending); in Prompt 174 it was published on
 `feat/model-call-contracts` and verified in feature-branch CI at `9ba6a488` ([feature
-evidence](#m5a-feature-branch-ci-evidence-prompt-174)); when this record was written (Prompt 176,
-before the authorized `main` publication ran) it was not merged and `main` was `46c02257`. The
+evidence](#m5a-feature-branch-ci-evidence-prompt-174)); in Prompt 176 it was published on `main` at
+`f04e0957` after exact-commit feature CI, and main-push CI passed ([main
+evidence](#m5a-main-publication-evidence-prompts-176177); the Prompt 176 record of a pending
+publication is historical). The
 [M5b specification](#m5b-provenance-and-status-derivation-specification-accepted-at-review-prompt-176-implementation-pending)
 was proposed in Prompt 174, corrected in Prompt 175 and **accepted at external review in Prompt
-176**; its implementation is pending. M5b–M5h are not implemented; no review path, provenance check, persisted snapshot or
-orchestration exists, and overall M5 acceptance is pending.** The M5 milestone text above is the controlling requirement and is unchanged; this
+176**; **M5b was implemented in Prompt 177, corrected in Prompt 178 and accepted at external
+review in Prompt 179** ([implementation
+status](#m5b-implementation-status-accepted-at-review-prompt-179-ci-pending)); when this record was written its exact-commit CI and
+publication (authorized in Prompt 179, subject to the CI gates) were pending. M5c–M5h are not implemented; no review path, persisted snapshot or orchestration
+exists, no M5b control is used by any review path, and overall M5 acceptance is pending.** The M5 milestone text above is the controlling requirement and is unchanged; this
 sequence only orders it into slices. Labels: **[DECISION]** already accepted; **[FACT]** current
 code at `46c02257`; **[REC]** recommendation (for M5a and the sequence-level choices, accepted in
 Prompt 170 as recommended); **[OPEN]** a detail left to a later slice's review. Earlier sketches in
@@ -7352,8 +7357,9 @@ ADR-0019 existed (historical). **Implemented by Claude Code in Prompt 171, corre
 and accepted at external review in Prompt 173 for a local commit**; publication, Linux and current-version CI were then pending (see the
 [implementation status](#m5a-implementation-status-accepted-for-a-local-commit-prompt-173-ci-pending) below and
 [ADR-0019](decisions/0019-model-call-contracts.md)). **Published and verified in feature-branch CI at
-`9ba6a488` in Prompt 174; not merged when this record was written (Prompt 176, before the
-authorized `main` publication ran)** ([feature evidence](#m5a-feature-branch-ci-evidence-prompt-174)). M5a is
+`9ba6a488` in Prompt 174; published on `main` at `f04e0957` in Prompt 176 and verified in
+main-push CI** ([feature evidence](#m5a-feature-branch-ci-evidence-prompt-174), [main
+evidence](#m5a-main-publication-evidence-prompts-176177)). M5a is
 pure: no database, migration, network, credentials, settings, handler registration, prompts or
 orchestration.
 
@@ -7815,7 +7821,8 @@ commit on top of the accepted implementation `79e32532`; the 12 implementation, 
 workflow blobs are identical to the accepted tree `5d4febb6`). **Not merged when observed
 (Prompts 174–176): `main` was `46c02257`.** Publication to `main` was authorized in Prompt 176,
 gated on exact-commit CI for the documentation commit; it had not run when this record was
-written. Both push-triggered runs for that exact SHA (event `push`, attempt 1) and all five
+written (historical: it ran in Prompt 176, see the
+[main evidence](#m5a-main-publication-evidence-prompts-176177) below). Both push-triggered runs for that exact SHA (event `push`, attempt 1) and all five
 required jobs succeeded, with every required step successful and none skipped:
 [CI run 39303677105](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39303677105)
 (Ubuntu verify, Windows verify, PostgreSQL integration, container) and
@@ -7835,6 +7842,29 @@ contract evidence with the scripted fake, not live-model quality; the wheel's Re
 arithmetic, not a database-derived corpus Recall; the container smoke is unchanged and does not
 exercise M5a.
 
+##### M5a main publication evidence (Prompts 176–177)
+
+[FACT] In Prompt 176 Claude Code committed the reviewed documentation as `f04e0957`
+(`f04e09576e0ed358669f793c134d9dbc30141104`; documentation and history only), pushed it to
+`feat/model-call-contracts`, and, after all five required jobs passed for that exact commit,
+fast-forwarded `main` from `46c02257` to `f04e0957` and pushed it. **M5a and the accepted M5b
+specification are on `main` at `f04e0957`.** All four runs (feature
+[CI 39309049137](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309049137)
+and [secret scan 39309049185](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309049185);
+main [CI 39309653878](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309653878)
+and [secret scan 39309653917](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309653917))
+used event `push`, attempt 1 and the exact SHA, and every required job and step succeeded. From
+the job logs **independently retrieved by the external reviewer** (recorded in Prompt 177; Claude
+Code observed API conclusions only): feature Ubuntu `2938 passed, 308 skipped`, Windows `2937
+passed, 309 skipped`, PostgreSQL `308 passed, 2938 deselected`; main Ubuntu `2938 passed, 308
+skipped`, Windows `2937 passed, 309 skipped`, PostgreSQL `308 passed, 2938 deselected`; the 104 M4
+PostgreSQL cases passed on both pushes; all four installed-wheel logs printed the six expected
+lines; both container smokes reported their checks as successful; Gitleaks scanned 76 commits with
+no leaks on both pushes. Job links, durations, the container summary and the attribution are in
+[ADR-0019](decisions/0019-model-call-contracts.md#main-publication-evidence-prompts-176177). This is
+scripted-fake contract evidence, not live-model quality; the Recall wheel line is arithmetic; the
+container smoke does not exercise M5a or M5b.
+
 #### M5b provenance and status-derivation specification (ACCEPTED at review, Prompt 176; implementation pending)
 
 **Status.** **Proposed by Claude Code in Prompt 174, corrected in Prompt 175 after external review
@@ -7844,6 +7874,8 @@ clarification in [M5b-E1](#m5b-e1-input-identity-binding-accepted-clarification-
 below (M5b-B1, M5b-C, M5b-C1, M5b-D, M5b-E, M5b-E1, M5b-F) form the **implementation contract**;
 **no M5b specification decision remains open.** **The M5b implementation and every M5b check are
 pending:** no M5b module, test, ADR-0020 or workflow change exists, and no M5b control operates.
+*(Historical at acceptance: M5b was implemented in Prompt 177, corrected in Prompt 178 and is staged for review; see the
+[implementation status](#m5b-implementation-status-accepted-at-review-prompt-179-ci-pending).)*
 *Review scope (Prompt 176):* the reviewer independently verified the byte sizes and checksums of
 the Prompt 174 and Prompt 175 exports and inspected their documentation changes; the reviewer's
 Unicode probes and independently retrieved CI evidence keep their previously recorded scope, and no
@@ -8506,6 +8538,66 @@ provenance guarantee, the mandatory hash-covered documentary-gap finding and the
 obligations (including M5f's report-bound obligation: no silent truncation or unbounded report)
 stand as written. Routine choices (value style, error codes, bounds, offsets, deduplication and
 precedence) are resolved above. **The M5b implementation and every M5b check remain pending.**
+*(Historical at acceptance; see the implementation status below.)*
+
+##### M5b implementation status (accepted at review, Prompt 179; CI pending)
+
+[FACT] Claude Code implemented the accepted specification in Prompt 177 on
+`feat/provenance-validation` (from `f04e0957`), **corrected it in Prompt 178** after the external
+reviewer reproduced a defect (`recheck_analyzed` accepted stored finding citations whose revision,
+source type and status had been changed while chunk and quote stayed the same; analysis and reload
+now require full trusted `Citation` values, also across shared questions), and staged it for
+external review. **The corrected implementation was accepted at external review in Prompt 179,
+pending exact-commit CI**; publication is authorized by Prompt 179 subject to the feature and
+main CI gates, and had not run when this record was written. No review path uses M5b yet, and
+overall M5 acceptance is pending. See [ADR-0020](decisions/0020-provenance-validation.md) for the contract as
+implemented, the correction and its regression comparison, the implementation choices (three of
+them approved at review in Prompt 178: the added `chunks` import for the existing chunk bound, the
+read-only `provenance_check` property, and a `rejected_count` of exactly 1 for `rationale_blank`),
+the limits and the local verification actually run.
+
+*Reviewer evidence (Prompt 179).* The external reviewer independently verified the byte sizes
+and checksums of both attached exports and inspected them, reconstructed the corrected source by
+applying the Prompt 178 correction to the extracted submitted source (Git blob
+`23f941dcd0eb1542fe5a3a8aef6edd896e01585c`, matching the staged module), and reran the original 17
+isolated checks plus three new ones (valid shared analysis and reload; inconsistent shared
+metadata refused in analysis and in reload): all 20 passed, with Python 3.12.14, Pydantic 2.14.0,
+Unicode 15.0.0 and existing dependencies from `f04e0957`. These were isolated reviewer checks, not
+a project suite, build, installed-wheel, PostgreSQL, Docker or provider run. Claude Code's Prompt
+178 Windows results (below) remain separately attributed and are not exact-commit CI.
+
+- *Files:* `evidenceguard_domain.provenance`; `tests/test_quote_matching.py` and
+  `tests/test_provenance.py`; extended `tests/test_packaging.py`; one added installed-wheel check in
+  `.github/workflows/ci.yml`; ADR-0020. No dependency, lockfile, `pyproject.toml`, existing
+  contract, persistence, migration, setting, registry, Docker, Compose or corpus change.
+- *Local verification after the Prompt 178 correction (Windows; not CI):* the regression comparison
+  (the corrected module passes all 8 new tests; the submitted module fails 6: 4 reproduce the
+  reviewer's defect, 2 are new shared-consistency coverage); Ruff, format and strict mypy clean;
+  the two M5b modules 230 passed; the focused nine-file command 742 passed; full suite `3168
+  passed, 310 skipped`; collection 308 integration and 3,170 non-integration tests; the offline
+  build with only the authorized packaging differences; the isolated installed-wheel step; and a
+  direct installed-wheel probe of the corrected reload. Details are in ADR-0020.
+- *Local verification in Prompt 177 (historical):* Ruff, format and strict mypy clean; the two new modules
+  222 passed; the focused nine-file command 734 passed; full suite `3160 passed, 310 skipped` (308
+  PostgreSQL tests without a database, one symbolic-link test and one POSIX-only signal test);
+  collection 308 integration and 3,162 non-integration tests; a five-mutation test-strength probe
+  detected every mutation; the offline build comparison against `f04e0957`; and the extracted
+  installed-wheel step in an isolated offline environment, including the new M5b line. Details are
+  in ADR-0020.
+- *Not established:* Linux, current-version CI, the PostgreSQL job against this version (M5b adds no
+  PostgreSQL tests), any review path using these values, semantic entailment, authenticity or
+  injection resistance. The disclosed Unicode limitations (M5b-C1) are implemented and pinned by
+  tests. The binding obligations on later slices (M5c decoding, M5e reloading, M5f report bounds
+  and mandatory documentary rule finding, M5g orchestration) and overall M5 acceptance remain
+  pending.
+- *Text-fidelity note (found in Prompt 177):* the Tibetan and Hangul examples in M5b-C1 above, and
+  the corresponding Prompt 175 records in `prompts.md`, contain the literal characters rather than
+  the backslash-escape spellings used in Prompt 175: an escape-decoding step in Claude Code's
+  editing tools converted them. The code points are the intended ones (Tibetan U+0F40 U+0F74
+  U+0F73 and U+0F40 U+0F71 U+0F72 U+0F74 for the original and its full NFD; Hangul U+AC01, U+AC00
+  and U+1100 U+1161 U+11A8), so the rules and examples are unchanged in meaning, but the Prompt 175
+  verbatim record does not reproduce those escape spellings byte for byte. Committed history is not
+  rewritten; ADR-0020 and the new tests use `U+` notation and escapes.
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.

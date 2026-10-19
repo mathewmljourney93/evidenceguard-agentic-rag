@@ -2,10 +2,12 @@
 
 - **Status:** **Accepted at external review in Prompt 173 for the local implementation commit;
   published and verified in feature-branch CI at `9ba6a488` in Prompt 174; feature CI evidence
-  accepted at external review in Prompt 176** (see
-  [Feature-branch CI evidence (Prompt 174)](#feature-branch-ci-evidence-prompt-174)). When this
-  record was written (Prompt 176) M5a was not merged and `main` was `46c02257`; publication to
-  `main` was authorized, gated on exact-commit CI for the documentation commit, and had not yet run.
+  accepted at external review in Prompt 176; on `main` at `f04e0957` (Prompt 176), verified in
+  feature-branch and main-push CI for that exact commit** (see
+  [Feature-branch CI evidence (Prompt 174)](#feature-branch-ci-evidence-prompt-174) and
+  [Main publication evidence (Prompts 176–177)](#main-publication-evidence-prompts-176177)). The
+  Prompt 176 documentation commit itself records the pre-publication state (M5a not merged, `main`
+  at `46c02257`, publication authorized but not yet run); that wording is historical.
   Implemented in Prompt 171 and corrected in Prompt 172 (see
   [Prompt 172 corrections](#prompt-172-corrections) and
   [External review (Prompt 173)](#external-review-prompt-173)). Implements the
@@ -356,6 +358,65 @@ project test was run for that review. Prompt 176 authorized a local documentatio
 publication of the feature branch and, only after all five required jobs pass for that exact new
 commit, a fast-forward of `main`. At the time of this record that publication was **pending
 execution**; no merge or new CI result is claimed here.
+
+*(Historical: the authorized publication ran in Prompt 176 after the feature gate passed; see
+below.)*
+
+## Main publication evidence (Prompts 176–177)
+
+**Publication (Prompt 176, Claude Code).** The documentation commit
+`f04e09576e0ed358669f793c134d9dbc30141104` (parent `9ba6a488`, tree `3d48bdac`; documentation and
+history only, the 12 implementation, test, packaging and workflow blobs identical to `5d4febb6`)
+was pushed to `feat/model-call-contracts` (exit 0). After all five required jobs passed for that
+exact commit, `main` was fast-forwarded from `46c02257` to `f04e0957` and pushed (exit 0); the
+publication range was exactly `d34aaaac`, `79e32532`, `9ba6a488` and `f04e0957` with the 18 reviewed
+paths. **M5a and the accepted M5b specification are on `main` at `f04e0957`.**
+
+**Runs and jobs.** All four runs used event `push`, attempt 1 and the exact SHA `f04e0957`, on the
+branch shown; every required job and step succeeded, none skipped. Log results are from the logs
+independently retrieved by the external reviewer:
+
+- Feature branch `feat/model-call-contracts`:
+  - [CI run 39309049137](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309049137)
+    - [Ubuntu verify 118253589023](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309049137/job/118253589023): `2938 passed, 308 skipped in 29.80s`
+    - [Windows verify 118253588640](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309049137/job/118253588640): `2937 passed, 309 skipped in 60.14s`
+    - [PostgreSQL integration 118253589210](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309049137/job/118253589210): `308 passed, 2938 deselected in 138.89s`
+    - [Container 118253588979](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309049137/job/118253588979): successful
+  - [Secret-scan run 39309049185](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309049185)
+    - [Gitleaks 118253587912](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309049185/job/118253587912): 76 commits scanned, no leaks
+- `main`:
+  - [CI run 39309653878](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309653878)
+    - [Ubuntu verify 118255627355](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309653878/job/118255627355): `2938 passed, 308 skipped in 36.52s`
+    - [Windows verify 118255627999](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309653878/job/118255627999): `2937 passed, 309 skipped in 77.82s`
+    - [PostgreSQL integration 118255627842](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309653878/job/118255627842): `308 passed, 2938 deselected in 168.33s`
+    - [Container 118255629020](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309653878/job/118255629020): successful
+  - [Secret-scan run 39309653917](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309653917)
+    - [Gitleaks 118255627517](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39309653917/job/118255627517): 76 commits scanned, no leaks
+
+**Observed in the logs (both pushes).** The 104 M4 PostgreSQL cases passed: 29 embedding, 18
+indexing, 39 retrieval, 16 evaluation and 2 Voyage cases (M5a adds no PostgreSQL tests). All four
+installed-wheel logs printed the same six lines as at `9ba6a488` (above), including "model-call
+contracts classified a scripted fake response from the installed wheel". Both container logs
+reported an effective build context of 95 files with 19 planted fixtures excluded, successful image
+checks, a healthy database, migration and API stack, an accepted upload (202), successful ingestion
+and an active revision with 2 verified chunks, a duplicate upload returning the existing revision
+(200), one offline indexing job, a ready index with 2 embeddings and a successful indexing job, an
+idle-worker exit 0 without an OOM kill, and successful smoke and cleanup.
+
+**Attribution and scope.**
+
+- *Claude Code (Prompt 176):* published the commit, observed the run, job and step conclusions
+  through the anonymous GitHub API only, and could not retrieve the logs (feature logs HTTP 403;
+  main CI logs no HTTP response, main Gitleaks log HTTP 403).
+- *External reviewer (recorded in Prompt 177):* checksum-verified and inspected the Prompt 176
+  acceptance export, retrieved the commit and remote-branch records (both `main` and
+  `feat/model-call-contracts` at `f04e0957`), all four workflow-run records, all ten job records and
+  all ten job logs. The reviewer ran no project suite, build, wheel check, PostgreSQL, Docker or
+  provider locally.
+- The container details are the smoke's own reported checks, not independent inspection of
+  database rows; the smoke does not exercise M5a or M5b. M5a evidence is scripted-fake contract
+  evidence, not live-model quality; the wheel's Recall@5 line is arithmetic, not a database-derived
+  corpus Recall. The earlier `9ba6a488` feature evidence above keeps its own counts and attribution.
 
 ## Limits
 

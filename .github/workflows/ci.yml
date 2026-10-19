@@ -178,6 +178,30 @@ jobs:
           assert providers.call_validated(fake, request).outcome is calls.CallOutcome.PROVIDER_FAILED
           print("model-call contracts classified a scripted fake response from the installed wheel")
           PY
+          # M5b (ADR-0020): import the provenance module from the installed wheel, match one quote
+          # across a line break with exact original offsets and derive a status. No provider,
+          # network or database is used; this is a contract check, not a semantic judgment.
+          "${bin}/python" -I - <<'PY'
+          import hashlib
+          import uuid
+          import evidenceguard_domain.provenance as provenance
+          from evidenceguard_domain.evidence import Authenticity, Citation, EvidenceStatus, SourceType, Verdict
+          from evidenceguard_domain.retrieval import ChunkEvidence, SourceSpan
+          assert "site-packages" in (provenance.__file__ or ""), provenance.__name__
+          text = "Customer data is encrypted" + chr(10) + "  at rest."
+          span = SourceSpan(5, 6, 200, 200 + len(text))
+          evidence = ChunkEvidence(uuid.UUID(int=1), text, hashlib.sha256(text.encode()).hexdigest(), 0, ("Encryption",), False, span, None, "security-overview", "Security Overview", 1, None, None, SourceType.VENDOR_STATEMENT, Authenticity.NOT_ESTABLISHED)
+          match = provenance.match_quote(evidence, "encrypted at rest")
+          original = "encrypted" + chr(10) + "  at rest"
+          assert (match.kind, match.text_start, match.text_end) == (provenance.QuoteSpanKind.BODY, 17, 36)
+          assert (match.source_char_start, match.source_char_end, match.quote, match.occurrences) == (217, 236, original, 1)
+          assert provenance.match_quote(evidence, "decrypted at rest") is provenance.RejectionReason.QUOTE_NOT_FOUND
+          citation = Citation(tenant_id=uuid.UUID(int=7), document_revision_id=uuid.UUID(int=8), chunk_id=uuid.UUID(int=1), source_type=SourceType.VENDOR_STATEMENT, quote=match.quote)
+          assert citation.quote == original
+          assert provenance.derive_status(Verdict.SUPPORTED, (citation,)) is EvidenceStatus.VENDOR_CLAIM
+          assert provenance.derive_status(Verdict.CONTRADICTED, (citation,)) is None
+          print("provenance matched a quote and derived a status from the installed wheel")
+          PY
           "${bin}/python" -I -c "import io; from alembic import command; from evidenceguard_persistence.migration_config import alembic_config; buf = io.StringIO(); command.upgrade(alembic_config(output_buffer=buf), 'head', sql=True); assert 'CREATE TABLE api_keys' in buf.getvalue(); print('offline migration SQL rendered from the installed wheel')"
 
   integration:

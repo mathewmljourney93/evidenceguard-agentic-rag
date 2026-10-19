@@ -300,3 +300,43 @@ def test_m5a_is_not_imported_by_other_packages_or_registered() -> None:
         assert package.__file__ is not None
         assert "evidenceguard_agents" not in _top_level_imports(Path(package.__file__).parent)
     assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
+
+
+# --- M5b (ADR-0020) ------------------------------------------------------------------------------
+
+
+def test_m5b_provenance_uses_only_the_domain_and_the_standard_library() -> None:
+    """M5b is pure: no Pydantic import of its own, no other package, no network, file, logging
+    or environment module. An architectural check against accidental access, not a sandbox."""
+    assert evidenceguard_domain.__file__ is not None
+    path = Path(evidenceguard_domain.__file__).parent / "provenance.py"
+    imported = _module_imports(path)
+    assert imported - set(sys.stdlib_module_names) == {"evidenceguard_domain"}
+    assert not imported & (M5A_FORBIDDEN_MODULES | {"logging", "pydantic"})
+    domain_modules = {
+        node.module
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8")))
+        if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith("evidence")
+    }
+    assert domain_modules == {
+        "evidenceguard_domain.agent_outputs",
+        "evidenceguard_domain.chunks",
+        "evidenceguard_domain.evidence",
+        "evidenceguard_domain.model_calls",
+        "evidenceguard_domain.retrieval",
+    }
+
+
+def test_m5b_is_not_wired_into_any_application_or_handler() -> None:
+    """M5b adds no handler, endpoint, command or persistence use; later slices own that."""
+    for package in (
+        evidenceguard_agents,
+        evidenceguard_api,
+        evidenceguard_observability,
+        evidenceguard_persistence,
+        evidenceguard_retrieval,
+        evidenceguard_worker,
+    ):
+        assert package.__file__ is not None
+        for source in Path(package.__file__).parent.rglob("*.py"):
+            assert "provenance" not in source.read_text(encoding="utf-8"), source.name

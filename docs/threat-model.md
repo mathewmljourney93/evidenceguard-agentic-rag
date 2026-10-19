@@ -391,7 +391,7 @@ acceptance. Residual risks once implemented:
 
 The settled decisions, details and the unresolved external API facts are listed in the plan.
 
-## Review workflow (M5: sequence, M5a and M5b specifications accepted; M5a verified in feature-branch CI; M5b not implemented)
+## Review workflow (M5: sequence, M5a and M5b specifications accepted; M5a on main; M5b implemented and staged for review)
 
 The [M5 implementation sequence](plan.md#m5-implementation-sequence-accepted-at-review-prompt-170)
 and the [M5a specification](plan.md#m5a-model-call-contracts-and-scripted-fake-provider-accepted-at-review-prompt-170-implementation-pending)
@@ -404,11 +404,12 @@ external review in Prompt 173 for a local commit**
 From job logs independently retrieved by the external reviewer (Claude Code observed only API
 conclusions), both installed-wheel logs printed the M5a line and the Ubuntu, Windows and PostgreSQL
 test jobs and full-history Gitleaks (75 commits, no leaks) passed; this is scripted-fake contract
-evidence, not live-model behaviour. When this record was written (Prompt 176) it was not merged and
-`main` was `46c02257`; publication to `main` was authorized, gated on exact-commit CI, and had not
-yet run.
+evidence, not live-model behaviour. In Prompt 176 it was published on `main` at `f04e0957` after
+exact-commit feature CI, and the feature and main-push runs passed
+([main evidence](decisions/0019-model-call-contracts.md#main-publication-evidence-prompts-176177);
+the Prompt 176 record of a pending publication is historical).
 
-| Threat | M5a control (verified in feature-branch CI at `9ba6a488`; not merged when recorded) |
+| Threat | M5a control (on `main` at `f04e0957`, verified in feature and main-push CI) |
 |---|---|
 | Malformed, ambiguous or oversized model output treated as valid | Python-mode entry points, including `model_validate_strings` (corrected in Prompt 172), never coerce raw strings into enums or other types. A bounded preliminary JSON scan (duplicate keys, non-finite numbers, trailing text, top-level shape, depth 8, 2,000 values, 65,536 bytes) and strict JSON-mode validation against a closed, purpose-specific, deeply immutable schema; any failure is `invalid_output`. The model never supplies status, source type, tenant or revision fields. |
 | Provider failures, refusals or wrong models silently accepted | `call_validated` revalidates the request and the response, calls the provider at most once and turns every ordinary failure into a fixed outcome; a model mismatch wins over any stop kind. |
@@ -431,8 +432,9 @@ protection against direct database writers or malicious in-process code); call r
 stage and output writes are fenced; and no production path can dispatch a review until a reviewed
 wiring decision.
 
-**Specified M5b controls (specification accepted in Prompt 176; not implemented; none operates
-yet).** The
+**M5b controls (specification accepted in Prompt 176; implemented in Prompt 177, corrected in
+Prompt 178 and accepted at external review in Prompt 179, exact-commit CI pending at this record; no review path uses them yet, so none operates in the
+application).** See [ADR-0020](decisions/0020-provenance-validation.md). The
 [M5b specification](plan.md#m5b-provenance-and-status-derivation-specification-accepted-at-review-prompt-176-implementation-pending)
 (proposed in Prompt 174, corrected in Prompt 175, accepted at external review in Prompt 176)
 specifies: input identity binding (tenant, review and question checked before any finding is
@@ -480,7 +482,7 @@ no exactly-once guarantee is made. The M4 limits above are unchanged.
 - **Destructive integration tests.** The PostgreSQL tests drop the `public` schema of `EG_TEST_DATABASE_URL`. Before any engine exists, they refuse a missing or invalid URL, a database name without the `_test` suffix, an invalid `EG_DATABASE_URL`, or a target with the same host, port and database as `EG_DATABASE_URL` (ignoring credentials, spelling and loopback aliases). URL comparison cannot detect two different DNS names for one server, so the test database must be explicitly disposable. In CI for commit `9ad7dae`, the guard accepted the disposable service database before the [integration tests](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070229) ran against it. Its refusal paths are covered by database-independent tests on Ubuntu and Windows. Compose has never been run.
 - **Atomic, concurrent-safe transitions.** The report transitions are pure functions. Two simultaneous requests could both pass validation; persistence must serialize them (for example with a row lock or compare-and-set on revision and hash). The M3a job fence (above) provides this pattern for jobs; reports do not use it yet.
 - **Upload limits and untrusted-file handling** (M3e): implemented, reviewed, **verified in CI and on `main`** (see *Document API* above).
-- **Provenance checks:** that a cited chunk was actually retrieved for the review and that the quote occurs in it (M5).
+- **Provenance checks:** that a cited chunk was actually retrieved for the review and that the quote occurs in it (M5). The pure M5b checks are implemented and staged for review ([ADR-0020](decisions/0020-provenance-validation.md)); no review path uses them until M5g.
 - **Secret handling beyond the database URL and API keys.** The database URL (M2a) and API keys (M2b) are covered above. Other secrets, such as model-provider keys, arrive with later milestones. Request logging (M1c) writes only allowlisted fields; see ADR-0002.
 
 ## Open risks
