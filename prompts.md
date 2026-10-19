@@ -32409,3 +32409,912 @@ two renamed headings, one added heading and the threat-model section heading cha
 tables; UTF-8 without BOM, no CR, clean `git diff --cached --check`; clean privacy and claim scans;
 unsuppressed staged Gitleaks with no leaks. The commit, its post-commit checks and the export are
 reported in the handoff, not predicted here. Nothing is implemented, pushed or published.
+
+### Prompt 170 outcome (Claude Code handoff results)
+
+Claude Code's Prompt 170 handoff reported: the starting state matched (branch
+`docs/m5-workflow-plan`, all refs at `46c02257`, accepted staged tree `189af2c6`, five staged paths,
+unchanged origin and identity; local checks only) and the three reviewed exports matched. It
+recorded the M5 sequence and complete M5a specification acceptance in README, plan and threat model
+(both M5 headings renamed with every link updated; the planned clock-test wording clarified) and
+appended the history. Checks run: exactly the five paths differing from `46c02257` and only README,
+plan, threat model and `prompts.md` from `189af2c6`; ADR-0018 identical; earlier `prompts.md` bytes
+preserved and Prompt 170 present once verbatim; 279 links resolving; consistent tables; UTF-8
+without BOM, no CR, clean `git diff --cached --check`; clean privacy and claim scans; unsuppressed
+staged Gitleaks with no leaks. It created the local commit
+`d34aaaac548233df59399454d8a9a28ebdf02c4d` (parent `46c02257`, tree
+`dc318edc6e21cedaf97300a73546f5d6c2963892`, subject "docs: record M4 publication and accepted M5a
+specification", noreply author and committer, exactly the five paths, ADR-0018 matching the
+accepted tree, all other files matching the parent); full-history Gitleaks over 73 commits found no
+leaks; the working tree was clean and `main` and `origin/main` stayed at `46c02257`. Export
+`.local/p170/m5a-spec-acceptance.diff` (baseline `189af2c6`, final `d34aaaac`, prompts.md excluded;
+3 files, 106 insertions, 47 deletions): 40,948 bytes, SHA-256
+`b48b7b5c99a940ba412cbbc652e09cc3a8cfe48144a57937b507bf1fe4ee1745`. Nothing was pushed or
+implemented.
+
+### External review of the Prompt 170 commit (Prompt 171)
+
+The external reviewer matched `.local/p170/m5a-spec-acceptance.diff` (40,948 bytes, SHA-256
+`b48b7b5c99a940ba412cbbc652e09cc3a8cfe48144a57937b507bf1fe4ee1745`) and accepted the Prompt 170
+documentation commit `d34aaaac`. Prompt 171 authorizes implementing the accepted M5a specification
+on `feat/model-call-contracts`, local verification in the locked environment (including an isolated
+offline installed-wheel environment) and staging for review; no commit, push, merge, M5b–M5h work,
+database, Docker, external provider or live network call.
+
+### Prompt 171 (verbatim)
+
+Prompt 171 — Implement accepted M5a model-call contracts and scripted fake
+
+Written for: Mathew and the external reviewer.
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and applicable repository instructions.
+
+Implement the accepted M5a specification, verify it locally in the locked environment, and stage it for external review.
+
+Do not commit, push, merge or implement M5b–M5h. No database, Docker, external-provider or live-network call is authorized.
+
+1. Verify starting state
+
+Expected:
+- Branch docs/m5-workflow-plan.
+- HEAD:
+  d34aaaac548233df59399454d8a9a28ebdf02c4d
+- Parent:
+  46c0225787ba09f27508dafaa218c1bf33af1e8e
+- Tree:
+  dc318edc6e21cedaf97300a73546f5d6c2963892
+- Subject:
+  docs: record M4 publication and accepted M5a specification
+- Clean index and working tree.
+- main and origin/main:
+  46c0225787ba09f27508dafaa218c1bf33af1e8e
+- Expected origin and noreply identity.
+
+Check locally only. No fetch or remote operation.
+Stop on a material mismatch without repairing it.
+
+Verify:
+.local/p170/m5a-spec-acceptance.diff
+40,948 bytes
+SHA-256:
+b48b7b5c99a940ba412cbbc652e09cc3a8cfe48144a57937b507bf1fe4ee1745
+
+Verify its recorded Git comparison, excluding prompts.md.
+
+Save a checkpoint under .local/p171/: refs, tree, status, tracked blob hashes and prompt-history prefix.
+
+Create feat/model-call-contracts from HEAD if it does not exist. Do not overwrite an existing branch.
+
+2. Load the implementation contract
+
+Read the accepted M5a section in docs/plan.md:
+“M5a model-call contracts and scripted fake provider (ACCEPTED at review, Prompt 170; implementation pending)”.
+
+Read the accepted M5 sequence, import-boundary/packaging rules and relevant existing domain contracts. Preserve the accepted M5a heading/anchor.
+
+The complete specification, including W-A1–W-A11, is the implementation contract. Do not substitute earlier proposal wording.
+
+M5a is pure:
+- No persistence, migrations or database.
+- No provenance checking or status derivation.
+- No prompts/templates or request assembly.
+- No orchestration, JobContext or handler registration.
+- No Anthropic adapter, credentials, settings or network.
+- No changes to existing M1–M4 contracts.
+
+3. Authorized implementation paths
+
+New:
+- packages/domain/evidenceguard_domain/model_calls.py
+- packages/domain/evidenceguard_domain/agent_outputs.py
+- packages/agents/evidenceguard_agents/__init__.py
+- packages/agents/evidenceguard_agents/py.typed
+- packages/agents/evidenceguard_agents/providers.py
+- packages/agents/evidenceguard_agents/scripted.py
+- tests/test_model_calls.py
+- tests/test_agent_outputs.py
+- tests/test_scripted_provider.py
+- docs/decisions/0019-model-call-contracts.md
+
+Changed:
+- pyproject.toml
+- tests/test_packaging.py
+- .github/workflows/ci.yml
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+pyproject.toml changes are limited to packaging and strict-mypy inclusion of the new package. No dependency, version, script, tool-setting relaxation or lockfile change.
+
+The workflow change is limited to the accepted narrow installed-wheel extension. Preserve every existing wheel check, job and container step.
+
+If another path appears necessary, finish the work possible within scope and report the concrete blocker. Do not broaden implementation silently.
+
+4. Implement the accepted values and parsing
+
+Implement:
+- ModelPurpose, PromptRef, ModelUsage, StopKind, CallOutcome.
+- StructuredRequest, ProviderResponse and StructuredResult.
+- Fixed errors, including InvalidModelRequestError, InvalidModelValueError and ModelClockError.
+- eg-model-call-canonical-v1 request encoding and constructor-computed digest.
+- VerifierOutput, ClaimOutput, QuoteRef, AnalystOutput and FindingOutput.
+- Closed purpose-to-schema mapping and parse_output.
+
+Follow every accepted bound and invariant:
+- Exact call-value types, no bool-as-int or silent coercion.
+- Constructor-computed derived fields.
+- Deeply immutable output collections.
+- No stripping or normalization of model text.
+- Strict canonical UUID spelling.
+- Duplicate QuoteRef rejection.
+- Correct direct-construction and copy/update validation.
+- Complete outcome/result-field consistency.
+- Request revalidation before provider access.
+- Response and nested usage revalidation before trusting accounting fields.
+
+Use the accepted two-pass JSON path:
+- Bounded preliminary scan rejects duplicate keys, non-finite constants, trailing prose, invalid top-level shape and excessive nesting/value counts.
+- Strict JSON-mode validation accepts valid JSON enum strings and arrays while preserving strict field rules.
+- Confirm behavior using the project’s locked Pydantic version; reviewer probes used another environment and are not project evidence.
+- Invalid model output becomes invalid_output.
+- Public validation failures are fresh fixed errors without raw Pydantic input, cause or context.
+- Process-control exceptions propagate unchanged.
+
+Keep module dependencies acyclic. Do not change existing domain base classes to accommodate these new contracts. If local imports are necessary for type/schema relationships, keep them explicit and explain the dependency arrangement in ADR-0019.
+
+5. Provider boundary and scripted fake
+
+Implement the accepted ModelProvider protocol, ModelCallTimeout and call_validated.
+
+Preserve the specified order:
+- Validate/revalidate arguments.
+- Validate start clock.
+- Read and validate provider_id.
+- At most one generate call.
+- Read end clock.
+- Revalidate returned response.
+- Apply model-mismatch/stop/parsing precedence.
+- Build a fresh consistent result.
+
+No retry or repair inside call_validated.
+
+Clock:
+- Use the accepted ±2**53 reading bound and 24-hour latency bound.
+- Validate huge integers before float conversion.
+- Invalid start gives ModelClockError before dispatch.
+- Invalid end, backwards time or ordinary latency-calculation failure preserves the provider outcome with absent latency.
+- Never clamp or invent latency.
+- Process control propagates as the same object.
+- timeout_ms is an adapter parameter, not a hard deadline enforced by this synchronous seam.
+
+Implement ScriptedFakeProvider with the accepted:
+- Step types and strict configuration validation.
+- Key/step/text/aggregate bounds.
+- Copied immutable script configuration.
+- Lock-protected step selection and bounded call history.
+- Missing/exhausted-script behavior.
+- Sequential determinism and documented concurrent ordering.
+- No file/environment/network/ground-truth reads.
+- Private representations despite holding raw scripted text.
+
+All new ordinary tests must prevent accidental real-network access.
+
+6. Tests
+
+Implement the complete accepted M5a planned coverage, including meaningful adversarial cases for:
+
+- Every value boundary and invalid direct construction.
+- Dataclass replacement and model copy/update validation.
+- Deep immutability.
+- Canonical bytes/digests and included/excluded fields.
+- Valid JSON enums/arrays and both output purposes.
+- Duplicate keys, non-finite values, malformed/deep/oversized JSON, wrong types, unknown fields, wrong schema and invalid UUID spelling.
+- Every outcome and invalid result-field combination.
+- Getter failures, wrong return types and malformed response construction.
+- Request/response revalidation.
+- Model mismatch combined with each stop kind.
+- At-most-one generate call and zero calls on invalid pre-dispatch inputs.
+- Clock edge cases, including the Prompt 170 clarification.
+- Process-control identity from provider_id, generate and clock.
+- Canary-bearing validation errors, default repr/str, traceback chains and captured logs.
+- Script limits, exhaustion, history cap and concurrent step consumption.
+- Import and packaging boundaries.
+
+Do not claim that blocking imports proves security against malicious trusted Python code. These are architectural and accidental-access checks.
+
+M5a has no PostgreSQL tests. Do not create database fixtures or configure a database.
+
+Add the narrow wheel check that imports the new modules from site-packages and classifies a scripted response. It must assert actual behavior and package location, not merely print success.
+
+7. Documentation and history
+
+Create ADR-0019:
+- Status proposed/staged for implementation review.
+- Accepted specification link.
+- Placement and public contracts.
+- Canonical encoding, privacy and failure precedence.
+- Clock and timeout limitations.
+- Scripted-fake behavior.
+- Verification actually performed.
+- Any implementation choices or deviations, clearly identified.
+
+README, plan and threat model:
+- Specification accepted in Prompt 170.
+- Implemented and staged for review in Prompt 171.
+- Implementation acceptance, Linux and current-version CI pending.
+- No production wiring or live-provider claim.
+- M5b–M5h and overall M5 remain pending.
+- M4 evidence, snapshot limitations and later-slice obligations preserved.
+- Only M5a controls now exist; do not imply provenance, persisted snapshots or review orchestration is implemented.
+
+Keep the accepted specification heading/anchor unchanged. Add implementation status separately.
+
+Preserve every existing prompts.md byte as an identical prefix. Append:
+- Prompt 170 handoff.
+- The reviewer’s matched export and acceptance of that documentation.
+- Prompt 171 verbatim.
+- Outcome recording actual implementation/check results and staged review status.
+
+8. Local verification
+
+Use the existing locked project environment. Do not update dependencies or the lockfile.
+
+Run the repository’s required:
+- Formatting and lint.
+- Strict mypy, including the agents package.
+- Focused new/affected tests.
+- Full suite.
+- Test collection, reporting integration skips separately.
+- Offline distribution build.
+
+Verify:
+- Wheel contains the new package, modules and typing marker.
+- Existing packaging behavior is preserved.
+- Existing corpus packaging remains unchanged.
+
+Run the installed-wheel checks in a fresh environment outside the checkout:
+- Locked dependencies from the existing offline cache, with hashes.
+- Built wheel installed with --no-deps.
+- No dependency downloads or updates.
+- Existing CI wheel commands and the new M5a command.
+- Confirm imports resolve to site-packages.
+
+Creating this isolated environment and installing cached locked dependencies/the local wheel into it is authorized. Do not install new dependencies into the project.
+
+If an offline verification prerequisite is unavailable, report the exact blocker. Do not replace missing evidence with collection or assumptions.
+
+Do not run Docker, PostgreSQL, external providers or live network calls. CI remains a later task.
+
+9. Staging and export
+
+Before staging:
+- Confirm only authorized paths changed.
+- Confirm no tracked artifacts, .local files, backups or credentials.
+- Confirm existing contracts, dependency/lockfile/configuration and container behavior unchanged.
+- Verify prompt prefix/verbatim text, links/anchors, status consistency, UTF-8 without BOM and LF.
+- Run staged whitespace and unsuppressed staged Gitleaks checks after staging.
+
+Stage the intended implementation, tests, narrow packaging/workflow changes and documentation.
+
+Export directly from Git:
+.local/p171/m5a-implementation.diff
+
+Baseline:
+d34aaaac548233df59399454d8a9a28ebdf02c4d
+
+Final:
+the final staged tree
+
+Exclude prompts.md. Verify the exact comparison and report paths, statistics, bytes, SHA-256 and encoding.
+
+Stop staged and uncommitted. No push, merge or M5b work.
+
+Return a handoff stating:
+- Starting state.
+- Implementation and any deviations.
+- Checks actually run and their results.
+- Skipped/unexecuted checks and limitations.
+- Scope/blob checks.
+- Final staged tree and export.
+- Unchanged main refs.
+- Implementation acceptance and CI pending.
+
+End:
+“Mathew: return this output plus .local/p171/m5a-implementation.diff to the external reviewer.”
+
+### Prompt 171 outcome (Claude Code; M5a implemented and staged for review)
+
+Implemented the accepted M5a specification on `feat/model-call-contracts` (created from
+`d34aaaac`; starting state, the Prompt 170 export and its Git comparison verified locally; checkpoint
+under `.local/p171/`): `evidenceguard_domain.model_calls` and `.agent_outputs`, the new
+`evidenceguard_agents` package (`providers`, `scripted`, `py.typed`), three new test modules,
+extended packaging tests, `pyproject.toml` (wheel, sdist and mypy lists, plus Ruff's
+`known-first-party` entry for the new package), one installed-wheel check in `ci.yml`, ADR-0019 and
+README, plan and threat-model status. Implementation choices recorded in ADR-0019: Pydantic's
+base-init flag on the error-translating `__init__` (otherwise JSON-mode validation calls it with raw
+values and rejects valid enum strings, observed with the locked Pydantic 2.14.0), the
+nested-instance rule enforced at the Python-mode entry points (a schema-level `before` validator
+broke JSON-mode tuples), `WrongModel` steps required to name another model, the revalidated request
+dispatched, and no keyword options on the public validators.
+
+Local Windows checks actually run, in the locked environment with no dependency or lockfile change:
+Ruff check and format clean (186 files); strict mypy clean (148 source files); focused tests 352
+passed; full suite `2910 passed, 310 skipped` (308 PostgreSQL tests without a database, one
+POSIX-only signal test, one symbolic-link test this Windows user cannot run); collection 308
+integration and 2,912 non-integration tests; `uv build --offline` succeeded, and against a
+`git archive` build of `d34aaaac` the wheel gains exactly the four agents files and two domain
+modules, the sdist additionally the three test modules and ADR-0019, nothing is removed and the 16
+`sample_data` files are byte-identical; the extracted CI wheel step ran in a fresh environment outside
+the checkout (locked requirements with hashes from the offline cache, the built wheel with
+`--no-deps`) and every existing check plus the new M5a check passed with imports from
+`site-packages`. Not run: Linux, CI, PostgreSQL, Docker, the container smoke, providers or network.
+The staging checks and export are reported in the handoff. **Staged and uncommitted; implementation
+acceptance, Linux verification and current-version CI are pending; M5b–M5h and overall M5
+acceptance remain pending.**
+
+### Prompt 171 outcome (Claude Code handoff results)
+
+Claude Code's Prompt 171 handoff reported: the starting state matched (branch
+`docs/m5-workflow-plan` at `d34aaaac`, clean; `main` and `origin/main` at `46c02257`) and the
+Prompt 170 export matched; checkpoint under `.local/p171/`; `feat/model-call-contracts` created.
+It implemented M5a in the 17 authorized paths (the two domain modules, the `evidenceguard_agents`
+package, three test modules, extended packaging tests, `pyproject.toml` wheel/sdist/mypy and Ruff
+first-party entries, one installed-wheel check in `ci.yml`, ADR-0019 and status documentation),
+with implementation choices recorded in ADR-0019. Local Windows checks: Ruff and format clean (186
+files), strict mypy clean (148 source files), focused 352 passed (seven-file command), full suite
+`2910 passed, 310 skipped`, collection 308 integration and 2,912 non-integration tests, offline
+build with the wheel gaining exactly the new modules and `sample_data` byte-identical, the extracted
+CI wheel step passing in a fresh offline environment, staged whitespace and unsuppressed staged
+Gitleaks clean. Staged tree `c167b32e02f77c011cece08fa077c9528b0c1066`, uncommitted. Export
+`.local/p171/m5a-implementation.diff` (baseline `d34aaaac`, prompts.md excluded; 16 files, 3,328
+insertions, 14 deletions): 171,421 bytes, SHA-256
+`0e2e8599cb0070baeec8ee0efa493a964d38724d94ab145a8c4276d350b455b1`. Not run: Linux, CI,
+PostgreSQL, Docker, providers or network.
+
+### External review findings on the Prompt 171 implementation (Prompt 172)
+
+The external reviewer verified the Prompt 171 export's bytes and checksum, inspected the four new
+implementation modules, the relevant tests, the packaging and workflow changes and ADR-0019, and
+ran isolated probes against the extracted submitted modules plus the existing domain dependencies
+with Python 3.12.14 and Pydantic 2.14.0. Valid JSON parsing worked. The reviewer reproduced one
+raw-enum acceptance (Finding A: `VerifierOutput.model_validate_strings({"verdict": "supported",
+"rationale": "r"})` returned a value although direct construction and `model_validate` reject the
+raw string) and four raw canary-bearing mapping failures (Finding B: `dict` subclasses raising
+`RuntimeError("EG-REVIEW-CANARY")` escaped unchanged from `model_validate` and
+`model_validate_strings` through `__contains__`, from `model_copy(update=...)` through `__iter__`,
+and from `ScriptedFakeProvider(scripts=...)` through `items()`). The reviewer ran no project suite,
+build, installed-wheel check, PostgreSQL, Docker or provider call; the probes are separate from
+Claude Code's local checks.
+
+Approved implementation choices: the Ruff `known-first-party` addition (a package classification,
+not a lint relaxation); dispatching the revalidated equal request; rejecting `WrongModel` steps
+that name the fake's own model; and the documented, test-pinned Pydantic base-init convention and
+Python-entry-point nested-instance checks, provided the corrected public boundaries keep their
+promised behaviour. Implementation acceptance remains pending. Prompt 172 authorizes correcting
+both findings in nine paths with regression coverage, local verification and staging; no commit,
+push, merge, database, Docker, provider, network call or M5b work.
+
+### Prompt 172 (verbatim)
+
+Prompt 172 — Correct M5a public validation and configuration boundaries
+
+Written for: Mathew and the external reviewer.
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and applicable repository instructions.
+
+Correct the two review findings below, add regression coverage, verify locally and stage for review. M5a implementation acceptance remains pending.
+
+No commit, push, merge, database, Docker, external provider, network call or M5b work.
+
+1. Verify starting state
+
+Expected:
+- Branch feat/model-call-contracts.
+- HEAD:
+  d34aaaac548233df59399454d8a9a28ebdf02c4d
+- Staged tree:
+  c167b32e02f77c011cece08fa077c9528b0c1066
+- Exactly the 17 Prompt 171 paths staged.
+- Nothing unstaged or untracked.
+- main and origin/main:
+  46c0225787ba09f27508dafaa218c1bf33af1e8e
+- Origin and noreply identity unchanged.
+
+Verify locally only; no fetch or remote operation.
+
+Verify:
+.local/p171/m5a-implementation.diff
+171,421 bytes
+SHA-256:
+0e2e8599cb0070baeec8ee0efa493a964d38724d94ab145a8c4276d350b455b1
+
+Save the baseline tree, staged paths, blob hashes, history prefix and copies of the submitted modules under .local/p172/.
+
+Stop on a material mismatch without repairing it.
+
+2. Authorized changes
+
+Relative to c167b32e, only:
+- packages/domain/evidenceguard_domain/agent_outputs.py
+- packages/agents/evidenceguard_agents/scripted.py
+- tests/test_agent_outputs.py
+- tests/test_scripted_provider.py
+- docs/decisions/0019-model-call-contracts.md
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Keep model_calls.py, providers.py, packaging tests, pyproject.toml and ci.yml byte-identical.
+
+No dependency/lockfile changes, existing-contract changes or broader refactor.
+
+3. Finding A — model_validate_strings weakens Python-mode strictness
+
+Reproduced against the submitted module:
+
+VerifierOutput.model_validate_strings({
+    "verdict": "supported",
+    "rationale": "r",
+})
+
+It returns VerifierOutput.
+
+But ordinary direct construction and model_validate reject that raw enum string, as required by the accepted contract.
+
+Correct the public string-validation entry point so it cannot bypass the accepted Python-entry-point invariants.
+
+Use a clear consistent policy, such as routing it through the same strict Python-mode validation path. Do not silently change the specification to permit coercion.
+
+Requirements:
+- Raw verdict/severity strings and other disallowed Python-mode inputs remain rejected.
+- Exact nested model instances and immutable collections remain required where specified.
+- Valid JSON strings and arrays continue to work through the accepted JSON-mode parsing path.
+- Public keyword options cannot weaken strictness.
+- Invalid values raise fresh InvalidModelValueError outside handlers.
+- Process-control exceptions propagate unchanged.
+
+Add regression tests that specifically call model_validate_strings without strict=False or any other options. The existing option-rejection test does not cover this finding.
+
+4. Finding B — ordinary mapping failures expose raw error text
+
+The following were reproduced using small dict subclasses whose methods raise:
+RuntimeError("EG-REVIEW-CANARY")
+
+a. VerifierOutput.model_validate:
+A mapping whose __contains__ raises reaches _nested_are_instances and escapes as the original RuntimeError.
+
+b. VerifierOutput.model_validate_strings:
+The same containment failure escapes unchanged.
+
+c. output.model_copy(update=...):
+A mapping whose __iter__ raises escapes during update validation/copying.
+
+d. ScriptedFakeProvider(scripts=...):
+A mapping whose items() raises escapes unchanged.
+
+All four public calls expose the canary through str(error).
+
+Correct the ordinary-error boundaries around the relevant traversal, copying and validation operations:
+- Output entry points raise fresh InvalidModelValueError.
+- Scripted-fake configuration raises fresh InvalidModelValueError.
+- Original exception text, cause and context are not retained.
+- Raise the new error after leaving the exception handler.
+- No logging.
+- KeyboardInterrupt, SystemExit and other BaseException subclasses propagate as the same object.
+- Do not inspect exception chains.
+- Do not catch process control to convert it into a validation failure.
+
+Audit the adjacent operations within these same entry points so the fix covers the whole validation operation, not only the exact method used by the probe.
+
+This is an error-normalization contract for supported input operations, not a sandbox against malicious trusted Python code. Keep that distinction explicit.
+
+Preserve the approved Pydantic JSON-mode behavior, nested revalidation, deep immutability and source-level base-init flag.
+
+5. Regression evidence
+
+Add targeted tests for:
+- Finding A: raw enum input through model_validate_strings is rejected.
+- Valid JSON equivalents still parse.
+- Finding B: containment, iteration/items and copying failures at the affected public entry points.
+- Canary-bearing ordinary failures produce the correct fixed error.
+- No original cause/context, canary in formatted traceback, repr/str, captured output or logs.
+- Process-control identity through the same traversal paths.
+- Normal valid construction, copy and fake configuration remain usable.
+
+Run the targeted behavioral regressions against saved Prompt 171 modules and corrected modules.
+
+Use isolated ignored copies first on PYTHONPATH; confirm import locations. Do not overwrite or swap the working implementation.
+
+Distinguish:
+- Actual old-code failures reproducing the findings.
+- Tests that already passed.
+- Tests depending on new seams that cannot meaningfully compare.
+
+Do not claim a regression reproduction merely because a new helper is absent in the old code.
+
+6. Review disposition and documentation
+
+The reviewer:
+- Verified the Prompt 171 export’s bytes/checksum.
+- Inspected the four new implementation modules, relevant tests, packaging/workflow changes and ADR-0019.
+- Ran isolated probes against extracted submitted modules plus existing domain dependencies, using Python 3.12.14 and Pydantic 2.14.0.
+- Confirmed valid JSON parsing worked.
+- Reproduced one raw-enum acceptance and four raw canary-bearing mapping failures.
+- Ran no project suite, build, installed-wheel check, PostgreSQL, Docker or provider call.
+
+These probes are separate from Claude Code’s local Windows checks.
+
+Approved implementation choices:
+- Adding evidenceguard_agents to Ruff’s known-first-party list. This is a necessary package-classification addition, not a lint relaxation.
+- Dispatching the revalidated equal request.
+- Rejecting WrongModel steps that name the fake’s own model.
+- The documented, test-pinned Pydantic base-init convention and Python-entry-point nested-instance checks, provided the corrected public boundaries preserve their promised behavior.
+
+Implementation acceptance remains pending.
+
+Update ADR-0019 with both findings, corrections, regression evidence and actual verification results. Mark Prompt 171 checks historical rather than replacing them.
+
+Reconcile the focused-count reporting:
+- Prompt 171 handoff says 352 focused/affected passes.
+- ADR-0019 lists a six-file focused command with 317 passes.
+If these refer to different commands, record the commands and scopes separately. If one figure is inaccurate, correct it without inventing evidence or rewriting earlier prompt history.
+
+README, plan and threat model should say implemented in Prompt 171, corrected in Prompt 172, staged for review; Linux/current-version CI pending.
+
+Preserve:
+- Accepted specification heading/anchor.
+- All M4 evidence and limitations.
+- No production provider, handler, database or live wiring.
+- Trusted-snapshot limitation and later-slice obligations.
+- M5b–M5h and overall M5 pending.
+
+7. Verification
+
+Use the locked offline environment.
+
+Run:
+- Formatting and lint.
+- Strict mypy.
+- Targeted regression comparison.
+- Focused new/affected tests.
+- Full suite.
+- Collection, separating integration and platform skips.
+- Offline build.
+- Fresh isolated installed-wheel checks using cached locked dependencies with hashes and the wheel with --no-deps.
+- A direct installed-wheel probe of the corrected entry points.
+
+No downloads, dependency updates or lockfile changes. An isolated environment using cached locked dependencies/local wheel is authorized.
+
+Do not configure or run PostgreSQL, Docker, external providers or network.
+
+Report Linux and current-version CI as pending.
+
+8. History, staging and export
+
+Keep every earlier prompts.md byte as an identical prefix.
+
+Append:
+- Prompt 171 handoff.
+- Reviewer findings, probe scope and approved choices.
+- Prompt 172 verbatim.
+- Actual outcome and checks.
+
+Verify:
+- Only the nine authorized paths differ from c167b32e.
+- All other blobs unchanged.
+- The same 17 intended paths remain staged.
+- No unintended unstaged/untracked files or tracked .local/artifacts.
+- Prompt prefix/verbatim preservation.
+- Relative links, status consistency, UTF-8 without BOM and LF.
+- Clean staged whitespace and privacy/artifact scan.
+- Unsuppressed staged Gitleaks.
+
+Export directly from Git:
+.local/p172/m5a-validation-boundary-corrections.diff
+
+Baseline:
+c167b32e02f77c011cece08fa077c9528b0c1066
+
+Final:
+the final staged tree
+
+Exclude prompts.md. Verify the comparison and report paths, statistics, bytes, SHA-256 and encoding.
+
+Stop staged and uncommitted.
+
+Return findings fixed, regression evidence, checks actually run, unexecuted checks, scope/blob identity, staged tree, export and unchanged main refs.
+
+End:
+“Mathew: return this output plus .local/p172/m5a-validation-boundary-corrections.diff to the external reviewer.”
+
+### Prompt 172 addendum from Mathew during the task (verbatim)
+
+Additional handoff requirement for Prompt 172:
+
+I am switching to Claude remote control and ChatGPT on iOS, where I cannot conveniently attach the local diff file.
+
+After completing the task, include:
+1. The usual handoff, export details and checksum.
+2. The complete contents of .local/p172/m5a-validation-boundary-corrections.diff in a fenced diff code block.
+
+Print the exact exported diff, excluding prompts.md as already instructed. Do not summarize, omit sections or replace content with ellipses.
+
+If it exceeds one response, split it into numbered consecutive parts at file boundaries where possible, preserving every line in order. Clearly state when the final part is complete.
+
+Keep the exported file and all existing verification requirements. This changes only how the result is presented.
+
+### Prompt 172 outcome (Claude Code; corrections staged for review)
+
+Corrected both findings in `agent_outputs.py` and `scripted.py`: `model_validate_strings` now runs
+the same strict Python-mode validation as `model_validate`, and each public output operation
+(`__init__`, `model_validate`, `model_validate_json`, `model_validate_strings`, `model_copy`,
+including nested-instance traversal and reading the update once through `items()`) and the
+scripted fake's configuration copy run inside one boundary that suppresses ordinary `Exception`
+only and raises a fresh `InvalidModelValueError` afterwards; process control propagates as the same
+object. Added 26 public-entry-point regression tests and updated ADR-0019 (findings, corrections,
+regression evidence, Prompt 171 checks marked historical, focused-count reconciliation: 317 was the
+six-file command and 352 the seven-file command with `tests/test_container_files.py`), README, plan
+and threat model.
+
+Checks actually run (local Windows, locked offline environment, no dependency or lockfile change):
+regression comparison with isolated `PYTHONPATH` copies (import locations confirmed): corrected
+26 passed; submitted 17 failed and 9 passed, of which 13 failures reproduce the findings and 4
+depend on the new string-mode policy or the new `items()` read path; Ruff and format clean (186
+files); strict mypy clean (148 source files); focused six-file 343 passed and seven-file 378
+passed; full suite `2936 passed, 310 skipped` (308 PostgreSQL, one POSIX-only signal, one
+symbolic-link test); collection 308 integration and 2,938 non-integration; offline build with the
+wheel gaining exactly the new modules and the 16 `sample_data` files byte-identical; the extracted
+CI wheel step and a direct probe of the corrected entry points passed in a fresh offline
+environment outside the checkout. Not run: Linux, CI, PostgreSQL, Docker, providers or network.
+Staging checks and the export are reported in the handoff. **Staged and uncommitted;
+implementation acceptance, Linux verification and current-version CI are pending.**
+
+### Prompt 172 outcome (attributed to Claude Code's supplied handoff output)
+
+Claude Code's Prompt 172 handoff reported: the starting state matched (branch
+`feat/model-call-contracts`, HEAD `d34aaaac`, staged tree `c167b32e`, 17 staged paths, `main` and
+`origin/main` at `46c02257`) and the Prompt 171 export matched; checkpoint and submitted-module
+copies under `.local/p172/`. It corrected both findings in `agent_outputs.py` and `scripted.py`
+(`model_validate_strings` routed through strict Python-mode validation; one ordinary-`Exception`
+boundary around each whole public output operation and the scripted fake's configuration copy,
+raising fresh `InvalidModelValueError`, with process control propagating unchanged), added 26
+public-entry-point regression tests and updated ADR-0019, README, plan and threat model. Reported
+local Windows results: corrected regressions 26 passed; submitted modules 17 failed and 9 passed (13
+genuine reproductions, 4 non-reproductions); Ruff and format clean (186 files); strict mypy clean
+(148 source files); focused six-file 343 passed and seven-file 378 passed (reconciling Prompt 171's
+317 and 352 as different commands); full suite `2936 passed, 310 skipped`; collection 308
+integration and 2,938 non-integration; offline build, the isolated installed-wheel step and a direct
+installed-wheel boundary probe passed; staged whitespace, unsuppressed staged Gitleaks and privacy
+scan clean. Staged tree `5d4febb69ab73b003c4c053ff0a7f5f8849d48fb`. Export
+`.local/p172/m5a-validation-boundary-corrections.diff` (baseline `c167b32e`, prompts.md excluded;
+8 files, 478 insertions, 81 deletions): 67,685 bytes, 803 lines, SHA-256
+`30488346e80cdb0aff73f89385a7f7b5a941e64d1a1ad7dfa7e7f4aca9f03f7e`, printed in full in four parts
+at Mathew's request. Not run: Linux, CI, PostgreSQL, Docker, providers or network.
+
+### External review acceptance of the corrected M5a implementation (Prompt 173)
+
+The external reviewer accepted the corrected M5a implementation for a local commit only, pending
+Linux and current-version CI; no publication or merge is authorized. Verification distinction: for
+Prompt 171 the reviewer independently verified the original attachment's byte size and checksum
+(171,421 bytes, SHA-256 `0e2e8599cb0070baeec8ee0efa493a964d38724d94ab145a8c4276d350b455b1`) and
+inspected its implementation, relevant tests and packaging and workflow changes; for Prompt 172 the
+reviewer inspected the complete pasted correction diff, but the export file was not supplied, so the
+reviewer did not independently verify that file's bytes or checksum. The reviewer reconstructed the
+functional corrections in isolated review copies and ran 22 checks with Python 3.12.14 and Pydantic
+2.14.0 (raw-enum rejection, fixed private errors from mapping operations, identity preservation for
+`KeyboardInterrupt`, `SystemExit` and `GeneratorExit`, valid JSON parsing, valid Python
+construction, copying, and completed and refusal provider outcomes); all 22 passed. These were
+isolated reviewer checks on reconstructed copies, not byte-verified copies of the full export and
+not a project suite, regression suite, installed-wheel check, build, PostgreSQL, Docker or
+live-provider run. Acceptance also relies on Claude Code's separately attributed Prompt 172 local
+Windows evidence. None of the 308 integration tests has run against this version; M5a adds no
+PostgreSQL tests; M5b–M5h and overall M5 acceptance remain pending.
+
+### Prompt 173 (verbatim)
+
+Prompt 173 — Record M5a implementation acceptance and commit locally
+
+Written for: Mathew and the external reviewer.
+
+Work in D:\Claude\evidenceguard_agentic_rag. Read CLAUDE.md and applicable repository instructions.
+
+The external reviewer accepts the corrected M5a implementation for a local commit, pending Linux and current-version CI.
+
+Record acceptance and commit locally. Do not push, merge, start M5b or change implementation.
+
+1. Verify starting state
+
+Expected:
+- Branch feat/model-call-contracts.
+- HEAD:
+  d34aaaac548233df59399454d8a9a28ebdf02c4d
+- Accepted staged tree:
+  5d4febb69ab73b003c4c053ff0a7f5f8849d48fb
+- Exactly the same 17 intended paths staged.
+- Nothing unstaged or untracked.
+- main and origin/main:
+  46c0225787ba09f27508dafaa218c1bf33af1e8e
+- Origin and noreply identity unchanged.
+
+Verify locally only. No fetch or remote operation.
+Stop on a material mismatch without repairing it.
+
+Verify both exports and their recorded Git comparisons, excluding prompts.md:
+
+.local/p171/m5a-implementation.diff
+171,421 bytes
+SHA-256:
+0e2e8599cb0070baeec8ee0efa493a964d38724d94ab145a8c4276d350b455b1
+
+.local/p172/m5a-validation-boundary-corrections.diff
+67,685 bytes
+SHA-256:
+30488346e80cdb0aff73f89385a7f7b5a941e64d1a1ad7dfa7e7f4aca9f03f7e
+
+Save the accepted tree, staged paths, every staged blob hash and prompt-history prefix under .local/p173/.
+
+2. Acceptance scope and attribution
+
+Record:
+- Specification accepted in Prompt 170.
+- Implemented in Prompt 171.
+- Corrected in Prompt 172.
+- Implementation accepted at external review in Prompt 173 for a local commit only.
+- Linux and current-version CI pending.
+- No publication or merge authorized by this prompt.
+- None of the 308 integration tests has run against this version.
+- M5a introduces no PostgreSQL tests.
+- M5b–M5h and overall M5 acceptance remain pending.
+
+Review evidence:
+- The reviewer independently verified the original Prompt 171 attachment’s byte size and checksum and inspected its implementation, relevant tests and packaging/workflow changes.
+- For Prompt 172, the reviewer inspected the complete pasted correction diff. The actual export file was not supplied, so the reviewer did not independently verify that file’s bytes or checksum.
+- The reviewer reconstructed the functional corrections in isolated review copies and ran 22 checks using Python 3.12.14 and Pydantic 2.14.0.
+- These checked raw-enum rejection, fixed private errors from mapping operations, identity preservation for KeyboardInterrupt/SystemExit/GeneratorExit, valid JSON parsing, valid Python construction, copying, and completed/refusal provider outcomes.
+- All 22 passed.
+- These were isolated reviewer checks, not a project-suite, regression-suite, installed-wheel, build, PostgreSQL, Docker or live-provider run.
+- Do not describe reconstructed review copies as byte-verified copies of the full corrected export.
+- Local export verification in this task is Claude Code’s verification, not the reviewer’s.
+
+Acceptance also relies on the separately attributed Claude Code Windows evidence from Prompt 172:
+- Corrected targeted regressions: 26 passed.
+- Submitted modules: 17 failed, 9 passed, with 13 genuine reproductions and 4 non-reproductions.
+- Focused six-file command: 343 passed.
+- Focused seven-file command: 378 passed.
+- Full suite: 2936 passed, 310 skipped.
+- Collection: 308 integration, 2938 non-integration.
+- Ruff, strict mypy, offline build, isolated installed-wheel checks and direct installed-wheel boundary probe passed.
+
+Preserve the distinction between these historical local results and future exact-commit CI.
+
+3. Authorized documentation changes
+
+Only these five files may differ from accepted tree 5d4febb6:
+- README.md
+- docs/decisions/0019-model-call-contracts.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+All other 12 staged implementation, test, packaging and workflow blobs must remain byte-identical.
+
+ADR-0019:
+- Status Accepted at external review in Prompt 173 for the local implementation commit, pending current-version CI.
+- Add an external-review section recording scope, evidence attribution, checksum-verification distinction and pending verification.
+- Preserve implementation choices, fixes, limitations and historical results.
+- The previously reviewed Ruff first-party addition and other approved choices remain recorded.
+
+README, plan and threat model:
+- Consistent scoped acceptance, local commit only, publication/merge unauthorized.
+- Linux/current-version CI pending.
+- Integration tests unexecuted against this version.
+- No production wiring or live-provider claim.
+- Keep accepted specification headings/anchors unchanged.
+- Update the separate implementation-status wording and links if needed.
+- Preserve M4 evidence and later-slice obligations.
+
+Keep all limits:
+- Scripted fake is contract evidence, not model quality.
+- No provenance, persisted review snapshot, orchestration or report workflow yet.
+- M4d trusted-snapshot limitation remains.
+- No hard model-call deadline.
+- Privacy excludes explicit content access, frame locals and malicious trusted-code bypasses.
+- Pydantic source-convention coupling is test-pinned and disclosed.
+- Container smoke scope and unverified local Compose unchanged.
+- No semantic-quality, injection-resistance or production-readiness guarantee.
+
+4. Prompt history
+
+Preserve every earlier prompts.md byte as an identical prefix.
+
+Append:
+- Prompt 172 handoff, attributed to the supplied output.
+- Reviewer acceptance, verification distinction and isolated-check scope.
+- Prompt 173 verbatim, including this Written for line.
+- A pre-commit note recording completed checks only, without a prospective SHA or publication outcome.
+
+Do not rewrite the earlier history or imply the reviewer ran Claude Code’s checks.
+
+5. Verification and local commit
+
+No application tests, builds or wheel checks need repeating because the implementation must remain byte-identical.
+
+Check:
+- Exactly 17 intended paths staged.
+- Only five documentation/history files differ from 5d4febb6.
+- All 12 other staged blobs match accepted hashes.
+- Prompt prefix/verbatim text.
+- Relative links/anchors and status consistency.
+- UTF-8 without BOM, LF, clean staged whitespace and repository formatting checks.
+- Privacy/artifact scope; no tracked .local files.
+- Unsuppressed staged Gitleaks.
+- Effective author and committer:
+  mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Create one local commit:
+feat: add model-call contracts and scripted fake provider
+
+Use a commit-message file. Credit Claude Code’s actual implementation/corrections/documentation in Prompts 171–173, preserve earlier attribution and follow the repository’s assistance/trailer convention.
+
+After committing:
+- Verify SHA, parent, tree, subject, paths, identity and attribution.
+- Verify the 12 implementation/test/workflow/packaging blobs still match 5d4febb6.
+- Confirm clean working tree.
+- Confirm main and origin/main remain at 46c02257.
+- Run unsuppressed full-history Gitleaks.
+
+No push, fetch, merge, amend, rebase, tag or M5b work.
+
+6. Incremental export
+
+Export directly from Git:
+.local/p173/m5a-commit-incremental.diff
+
+Baseline:
+5d4febb69ab73b003c4c053ff0a7f5f8849d48fb
+
+Final:
+the new local commit
+
+Exclude prompts.md. Verify exact comparison, paths, statistics, bytes, SHA-256 and encoding.
+
+7. Mobile handoff requirement
+
+Return the usual handoff:
+- Starting state and local export verification.
+- Acceptance scope and attribution.
+- Documentation changes and checks actually run.
+- Commit SHA, parent, tree, subject, identity and attribution.
+- Implementation byte identity.
+- Export details and final refs.
+- Publication, Linux and current-version CI pending.
+
+Then print the COMPLETE incremental export in fenced diff blocks.
+Do not summarize, omit lines or replace content with ellipses.
+Split into numbered consecutive parts at file boundaries if needed.
+Clearly mark the final part complete.
+Keep the actual exported file as the authoritative checksum source.
+
+End:
+“Mathew: return this output and the complete printed .local/p173/m5a-commit-incremental.diff to the external reviewer.”
+
+### Prompt 173 pre-commit note (Claude Code; before the local commit)
+
+Completed checks only. Verified locally (no fetch or remote operation): branch
+`feat/model-call-contracts`, HEAD `d34aaaac`, accepted staged tree `5d4febb6`, the same 17 staged
+paths, nothing unstaged or untracked, `main` and `origin/main` at `46c02257`, unchanged origin and
+noreply identity; both exports (`.local/p171/m5a-implementation.diff` and
+`.local/p172/m5a-validation-boundary-corrections.diff`) matched their recorded sizes, SHA-256 values
+and Git comparisons (Claude Code's verification, not the reviewer's). Saved a checkpoint with every
+staged blob hash under `.local/p173/`. Recorded the scoped acceptance in README, ADR-0019, plan and
+threat model and appended the history. Checks run on the staged documentation: exactly 17 paths
+staged; only README, ADR-0019, plan, threat model and `prompts.md` differ from `5d4febb6`; the
+other 12 staged blobs identical to `5d4febb6`; earlier `prompts.md` bytes preserved and Prompt 173
+present once verbatim; 295 relative links resolving; consistent tables; accepted specification
+headings unchanged; UTF-8 without BOM, no CR, clean `git diff --cached --check`; Ruff format and
+lint clean; no tracked `.local` or build artifacts; clean privacy scan; unsuppressed staged Gitleaks
+with no leaks; effective author and committer the noreply identity. No application test, build or
+wheel check was repeated (the implementation is byte-identical). The commit, its post-commit checks
+and the export are reported in the handoff, not predicted here. Nothing is pushed or published.

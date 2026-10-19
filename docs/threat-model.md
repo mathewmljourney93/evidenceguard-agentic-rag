@@ -391,13 +391,28 @@ acceptance. Residual risks once implemented:
 
 The settled decisions, details and the unresolved external API facts are listed in the plan.
 
-## Review workflow (M5, specification accepted; not implemented)
+## Review workflow (M5: sequence and M5a specification accepted; M5a accepted for a local commit)
 
 The [M5 implementation sequence](plan.md#m5-implementation-sequence-accepted-at-review-prompt-170)
 and the [M5a specification](plan.md#m5a-model-call-contracts-and-scripted-fake-provider-accepted-at-review-prompt-170-implementation-pending)
 were accepted at external review in Prompt 170 (proposed in Prompt 167, corrected in Prompts
-168–169). **Implementation is pending: none of these controls exists or operates yet**, and the
-later slices' details (M5b–M5h) still need their own reviewed specifications. Specified: every ordinary model-provider failure becomes a fixed outcome that
+168–169). **M5a was implemented in Prompt 171, corrected in Prompt 172 and accepted at
+external review in Prompt 173 for a local commit**
+([ADR-0019](decisions/0019-model-call-contracts.md)); publication, Linux verification and CI are
+pending, and only Claude Code's local Windows checks and the reviewer's isolated checks have run.
+
+| Threat | M5a control (accepted for a local commit; not yet published or CI-verified) |
+|---|---|
+| Malformed, ambiguous or oversized model output treated as valid | Python-mode entry points, including `model_validate_strings` (corrected in Prompt 172), never coerce raw strings into enums or other types. A bounded preliminary JSON scan (duplicate keys, non-finite numbers, trailing text, top-level shape, depth 8, 2,000 values, 65,536 bytes) and strict JSON-mode validation against a closed, purpose-specific, deeply immutable schema; any failure is `invalid_output`. The model never supplies status, source type, tenant or revision fields. |
+| Provider failures, refusals or wrong models silently accepted | `call_validated` revalidates the request and the response, calls the provider at most once and turns every ordinary failure into a fixed outcome; a model mismatch wins over any stop kind. |
+| Model output or evidence leaking through errors, representations or logs | Fresh fixed errors with no cause or context, raised after one boundary around each whole public operation (including reading supplied mappings, corrected in Prompt 172); `hide_input_in_errors`; count-only representations of every value; no logging. Process control propagates unchanged. This normalizes errors for supported inputs; it is not a sandbox against malicious trusted code. |
+
+These controls are local to the M5a values: **no review path uses them yet**, nothing registers or
+configures a model provider, and the scripted fake is a test fixture. The remaining controls below
+are specified for later slices (M5b–M5h) and **do not exist or operate yet**; their details still
+need their own reviewed specifications. The privacy scope excludes trusted code inspecting frame
+locals or held values, and the call boundary imposes no hard deadline on a provider. Specified for
+later slices: every ordinary model-provider failure becomes a fixed outcome that
 leaves the question unresolved; model output is parsed strictly against a closed, immutable
 schema, and validation errors never expose its text; output never supplies status, source type,
 tenant or revision; citations must name chunks retrieved for that review and question, with

@@ -6,6 +6,7 @@ from types import ModuleType
 
 import pytest
 
+import evidenceguard_agents
 import evidenceguard_api
 import evidenceguard_domain
 import evidenceguard_observability
@@ -53,6 +54,7 @@ def _top_level_imports(package_dir: Path) -> set[str]:
         (
             evidenceguard_domain,
             {
+                "evidenceguard_agents",
                 "evidenceguard_api",
                 "evidenceguard_observability",
                 "evidenceguard_persistence",
@@ -63,6 +65,7 @@ def _top_level_imports(package_dir: Path) -> set[str]:
         (
             evidenceguard_observability,
             {
+                "evidenceguard_agents",
                 "evidenceguard_api",
                 "evidenceguard_persistence",
                 "evidenceguard_retrieval",
@@ -71,15 +74,31 @@ def _top_level_imports(package_dir: Path) -> set[str]:
         ),
         (
             evidenceguard_persistence,
-            {"evidenceguard_api", "evidenceguard_retrieval", "evidenceguard_worker"},
+            {
+                "evidenceguard_agents",
+                "evidenceguard_api",
+                "evidenceguard_retrieval",
+                "evidenceguard_worker",
+            },
         ),
         (
             evidenceguard_retrieval,
             {
+                "evidenceguard_agents",
                 "evidenceguard_api",
                 "evidenceguard_observability",
                 "evidenceguard_persistence",
                 "evidenceguard_worker",
+            },
+        ),
+        (
+            evidenceguard_agents,
+            {
+                "evidenceguard_api",
+                "evidenceguard_persistence",
+                "evidenceguard_retrieval",
+                "evidenceguard_worker",
+                "sqlalchemy",
             },
         ),
         (evidenceguard_api, {"evidenceguard_worker"}),
@@ -222,3 +241,62 @@ def test_m4f_leaves_the_production_providers_registry_and_commands_unchanged() -
             if "voyage" in source.read_text(encoding="utf-8").lower():
                 mentions.add(source.name)
     assert mentions == {"voyage_http.py"}  # no registration, setting, CLI or API wiring
+
+
+# --- M5a (ADR-0019) ------------------------------------------------------------------------------
+
+M5A_FORBIDDEN_MODULES = {"socket", "ssl", "http", "urllib", "os", "pathlib", "tomllib", "io"}
+
+
+@pytest.mark.parametrize(
+    ("module", "allowed"),
+    [
+        ("model_calls.py", {"evidenceguard_domain"}),
+        ("agent_outputs.py", {"evidenceguard_domain", "pydantic"}),
+    ],
+)
+def test_m5a_domain_modules_keep_the_accepted_imports(module: str, allowed: set[str]) -> None:
+    """M5a: the call values use only the standard library and the domain; the output schemas
+    add Pydantic. These are architectural checks against accidental access, not a sandbox."""
+    assert evidenceguard_domain.__file__ is not None
+    imported = _module_imports(Path(evidenceguard_domain.__file__).parent / module)
+    assert imported - set(sys.stdlib_module_names) <= allowed
+    assert not imported & M5A_FORBIDDEN_MODULES
+
+
+@pytest.mark.parametrize("module", ["__init__.py", "providers.py", "scripted.py"])
+def test_m5a_agents_modules_use_only_the_domain_and_the_standard_library(module: str) -> None:
+    """M5a: the provider boundary and the scripted fake cannot reach files, the environment,
+    the network or the ground truth through these imports, and use no third-party package."""
+    assert evidenceguard_agents.__file__ is not None
+    imported = _module_imports(Path(evidenceguard_agents.__file__).parent / module)
+    assert imported - set(sys.stdlib_module_names) <= {
+        "evidenceguard_domain",
+        "evidenceguard_agents",
+    }
+    assert not imported & M5A_FORBIDDEN_MODULES
+
+
+def test_m5a_agents_package_contains_only_the_accepted_modules() -> None:
+    assert evidenceguard_agents.__file__ is not None
+    root = Path(evidenceguard_agents.__file__).parent
+    names = {path.name for path in root.iterdir() if path.name != "__pycache__"}
+    assert names == {"__init__.py", "py.typed", "providers.py", "scripted.py"}
+
+
+def test_m5a_is_not_imported_by_other_packages_or_registered() -> None:
+    """Only the apps (and later evaluation) may import ``evidenceguard_agents``; M5a adds no
+    handler, command or production wiring, so no app imports it yet either."""
+    from evidenceguard_worker.handlers import production_registry
+
+    for package in (
+        evidenceguard_api,
+        evidenceguard_domain,
+        evidenceguard_observability,
+        evidenceguard_persistence,
+        evidenceguard_retrieval,
+        evidenceguard_worker,
+    ):
+        assert package.__file__ is not None
+        assert "evidenceguard_agents" not in _top_level_imports(Path(package.__file__).parent)
+    assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})

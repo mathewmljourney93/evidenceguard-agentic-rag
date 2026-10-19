@@ -47,6 +47,7 @@ packages = [
     "packages/observability/evidenceguard_observability",
     "packages/persistence/evidenceguard_persistence",
     "packages/retrieval/evidenceguard_retrieval",
+    "packages/agents/evidenceguard_agents",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -57,6 +58,7 @@ include = [
     "/packages/observability/evidenceguard_observability",
     "/packages/persistence/evidenceguard_persistence",
     "/packages/retrieval/evidenceguard_retrieval",
+    "/packages/agents/evidenceguard_agents",
     "/alembic.ini",
     "/tests",
     "/docs/decisions",
@@ -72,6 +74,7 @@ select = ["E", "W", "F", "I", "B", "UP", "SIM", "RUF"]
 
 [tool.ruff.lint.isort]
 known-first-party = [
+    "evidenceguard_agents",
     "evidenceguard_api",
     "evidenceguard_domain",
     "evidenceguard_observability",
@@ -89,6 +92,7 @@ files = [
     "packages/observability/evidenceguard_observability",
     "packages/persistence/evidenceguard_persistence",
     "packages/retrieval/evidenceguard_retrieval",
+    "packages/agents/evidenceguard_agents",
     "apps/worker/evidenceguard_worker",
     "infra/ci/container_ci.py",
     "tests",

@@ -154,6 +154,30 @@ jobs:
           assert tuple(SUPPORTED_PROVIDERS) == (HASH_IDENTITY.fingerprint,)
           print("Voyage adapter validated a mocked response from the installed wheel")
           PY
+          # M5a (ADR-0019): import the model-call contracts, the call boundary and the scripted
+          # fake from the installed wheel and classify one scripted response. No network,
+          # provider, key or database is used; the fake is a contract fixture, not a model.
+          "${bin}/python" -I - <<'PY'
+          import json
+          import evidenceguard_agents.providers as providers
+          import evidenceguard_agents.scripted as scripted
+          import evidenceguard_domain.agent_outputs as outputs
+          import evidenceguard_domain.model_calls as calls
+          for module in (providers, scripted, outputs, calls):
+              assert "site-packages" in (module.__file__ or ""), module.__name__
+          prompt = calls.PromptRef(prompt_id="verifier", version=1, sha256="1" * 64)
+          request = calls.StructuredRequest(purpose=calls.ModelPurpose.VERIFIER, prompt=prompt, model_id=scripted.FAKE_MODEL_ID, question_id="RET-01", system_text="system", user_text="user", max_output_tokens=2048)
+          assert request.request_sha256 == "20dcc59a564e16ff0069090555c0d14a4fbd5981beaa674f53c27002d64faf3d"
+          document = {"verdict": "supported", "claims": [{"text": "c", "citations": [{"chunk_id": "00000000-0000-0000-0000-000000000001", "quote": "q"}]}], "rationale": "r"}
+          fake = scripted.ScriptedFakeProvider(scripts={("verifier", "RET-01"): (scripted.Respond(json.dumps(document)), scripted.Refuse())})
+          result = providers.call_validated(fake, request, clock=iter((1.0, 1.5)).__next__)
+          assert result.outcome is calls.CallOutcome.COMPLETED and result.latency_ms == 500
+          assert type(result.output) is outputs.VerifierOutput and result.output.verdict.value == "supported"
+          assert type(result.output.claims) is tuple and result.output.claims[0].citations[0].quote == "q"
+          assert providers.call_validated(fake, request).outcome is calls.CallOutcome.REFUSAL
+          assert providers.call_validated(fake, request).outcome is calls.CallOutcome.PROVIDER_FAILED
+          print("model-call contracts classified a scripted fake response from the installed wheel")
+          PY
           "${bin}/python" -I -c "import io; from alembic import command; from evidenceguard_persistence.migration_config import alembic_config; buf = io.StringIO(); command.upgrade(alembic_config(output_buffer=buf), 'head', sql=True); assert 'CREATE TABLE api_keys' in buf.getvalue(); print('offline migration SQL rendered from the installed wheel')"
 
   integration:
