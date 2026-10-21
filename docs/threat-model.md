@@ -391,7 +391,7 @@ acceptance. Residual risks once implemented:
 
 The settled decisions, details and the unresolved external API facts are listed in the plan.
 
-## Review workflow (M5: sequence, M5a, M5b and M5c specifications accepted; M5a and M5b on main; M5c implementation accepted for a local commit)
+## Review workflow (M5: sequence and M5a–M5d specifications accepted; M5a, M5b and M5c on main; M5d implementation pending)
 
 The [M5 implementation sequence](plan.md#m5-implementation-sequence-accepted-at-review-prompt-170)
 and the [M5a specification](plan.md#m5a-model-call-contracts-and-scripted-fake-provider-accepted-at-review-prompt-170-implementation-pending)
@@ -460,10 +460,13 @@ reload checks detect values inconsistent with trusted evidence, not a malicious 
 which retrieval request originally ran.
 
 **Specified M5c controls (proposed in Prompt 179, revised in Prompt 180, specification accepted at
-external review in Prompt 181; implemented in Prompt 182, corrected in Prompt 183 and accepted for a
-local commit in Prompt 184, see
-[ADR-0021](decisions/0021-review-request-assembly.md); publication, Linux verification and
-current-version CI pending; no application path uses them, so none operates).** The
+external review in Prompt 181; implemented in Prompt 182, corrected in Prompt 183, accepted at
+external review in Prompt 184, verified in exact-commit feature and main-push CI and on `main` at
+`e8d1033c` in Prompt 185, see
+[ADR-0021](decisions/0021-review-request-assembly.md); from the job logs independently retrieved by
+the external reviewer (recorded in Prompt 186), the Ubuntu, Windows and PostgreSQL jobs passed on
+both pushes, all four installed-wheel logs printed the M5c line and Gitleaks scanned 80 commits
+with no leaks (contract evidence, not live-model behaviour); no application path uses them, so none operates).** The
 [M5c specification](plan.md#m5c-review-template-planner-prompts-and-request-assembly-specification-accepted-at-review-prompt-181-implementation-pending)
 specifies a packaged, digest-pinned review template and versioned prompts loaded only through
 pinned-reference loaders with bounded reads (no ground-truth access), a deterministic Planner, and
@@ -480,6 +483,31 @@ structural forgery only; it does not stop a model from following persuasive docu
 quotation wrongly, which fails the existing checks; request digests identify content, not tenant
 or review; and assembly cannot prove that its evidence or Verifier inputs came from trusted paths,
 which remains M5g's obligation.
+
+**Specified M5d controls (proposed in Prompt 185, revised in Prompts 186–187, specification
+accepted at external review in Prompt 188 with a binding cleanup clarification; implementation
+pending; none operates).** The
+[M5d specification](plan.md#m5d-composable-capture-and-atomic-review-creation-specification-accepted-at-review-prompt-188-implementation-pending)
+specifies one REPEATABLE READ, READ WRITE creation transaction whose visibility follows the MVCC
+snapshot established by its first data statement (the `clock_timestamp()` read, whose value is
+recorded but is not an ordering proof), captures the snapshot through a public capture
+function that never ends the caller's transaction, and commits the review, its bindings, the
+exclusions, the pinned template, prompt and model configuration and the `run_review` job (linked
+by a stored, validated reference) together or not at all; idempotent creation keyed by a
+tenant-scoped client key with a request digest bound to the actor's tenant that excludes the
+captured snapshot; database failures classified only into fixed, allowlisted categories (no raw
+error, message or SQL retained); a bounded retry in fresh transactions for known conflict codes
+only (during `COMMIT`, only exact serialization and deadlock rejections), a commit state tracked
+separately from the exception in flight, best-effort connection invalidation when cleanup fails (an automatic retry only when the normal
+rollback and close both returned; no claim that the original connection was physically discarded), and an
+unknown commit outcome (including PostgreSQL's resolution-unknown codes) that is never reported
+as a rollback or retried automatically; and a trusted reload that
+rebuilds the snapshot through its constructors, recomputes and compares the stored digests and
+loads the pinned template and prompts through the M5c loaders. **Limits:** the digests only detect
+disagreement between stored rows; nothing protects against direct database writes or malicious
+trusted in-process code; the M4d trusted-snapshot limitation would close for review paths only,
+once M5d is implemented and verified and M5g uses the loader; creation stays an internal or
+test-only seam, and `run_review` stays out of the production registry.
 
 The accepted sequence also requires that every conclusion shown in an approval or export artifact
 be in its canonical hashed content, or derived solely from it, so no displayed conclusion can come

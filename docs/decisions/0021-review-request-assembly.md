@@ -3,9 +3,13 @@
 - **Status:** **Implemented by Claude Code in Prompt 182, corrected in Prompt 183 (see
   [Prompt 183 corrections](#prompt-183-corrections)) and accepted at external review in Prompt
   184 for a local implementation commit only** (see
-  [External review (Prompt 184)](#external-review-prompt-184)). Publication and merge are not
-  authorized; Linux verification and current-version CI are pending (historical: until Prompt
-  184 the implementation was staged and implementation acceptance was pending). No application path, handler, endpoint, setting or production
+  [External review (Prompt 184)](#external-review-prompt-184)); **reviewed, verified in
+  exact-commit feature and main-push CI and on `main` at `e8d1033c`** (Prompt 185; see
+  [Main publication evidence (Prompt 185)](#main-publication-evidence-prompt-185); the final
+  history commit changes prompts.md only; job-log results independently retrieved by the external
+  reviewer and recorded in Prompt 186). Historical: until Prompt 184 the implementation was
+  staged and implementation acceptance was pending, and at Prompt 184 publication, merge, Linux
+  verification and current-version CI were pending. No application path, handler, endpoint, setting or production
   registry uses M5c, so none of its controls operates in the application, and overall M5
   acceptance is pending. Implements the
   [accepted M5c specification](../plan.md#m5c-review-template-planner-prompts-and-request-assembly-specification-accepted-at-review-prompt-181-implementation-pending)
@@ -234,8 +238,10 @@ prompt binding, the closed request schemas and deterministic serialization; stri
 reconstruction and warning privacy; size refusal and reassembly-based repairs; the tests, packaging
 changes and the additive installed-wheel workflow extension; and the three implementation choices
 approved in Prompt 183. Publication and merge are not authorized by Prompt 184. M5d–M5h and
-overall M5 acceptance are pending. None of the 308 integration tests has run against this
-implementation version; M5c adds no PostgreSQL tests.
+overall M5 acceptance are pending. At that point none of the 308 integration tests had run
+against this implementation version (historical: they passed on both pushes in Prompt 185; see
+[Main publication evidence (Prompt 185)](#main-publication-evidence-prompt-185)); M5c adds no
+PostgreSQL tests.
 
 **Reviewer evidence and scope.** The reviewer independently verified the byte sizes and SHA-256
 values of both exports (`.local/p182/m5c-implementation.diff`, 205,096 bytes,
@@ -273,6 +279,93 @@ failures reproducing Finding A and 3 new coverage; the three M5c modules 251 pas
 command 989 passed; full suite `3427 passed, 310 skipped`; collection 308 integration and 3,429
 non-integration tests; static checks, the offline build comparison, the installed-wheel step and
 the direct installed-wheel boundary probe) remain historical local evidence, not exact-commit CI.
+
+## Main publication evidence (Prompt 185)
+
+**Publication (Claude Code).** Prompt 185 added one history-only commit,
+`e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3` ("docs: record M5c publication authorization"; parent
+`36a41b1f`, tree `3ceeb788e70c33faef30da79ffa74c5d7a4aefce`; **prompts.md is its only changed path**;
+noreply author and committer). The publication range was exactly `09587126` (the M5c specification
+acceptance record), `36a41b1f` (the accepted implementation, 18 paths) and `e8d1033c`, 19 paths in
+total; the 13 implementation, resource, test, packaging and workflow blobs equal the accepted tree
+`687cb581`. Chronology:
+
+1. `git fetch --no-tags origin` (exit 0) and `ls-remote`: remote `main` `90295717`, no remote
+   feature branch.
+2. `git push --set-upstream origin
+   refs/heads/feat/review-request-assembly:refs/heads/feat/review-request-assembly` (exit 0);
+   remote feature `e8d1033c`, tracking set.
+3. Feature CI gate passed (below).
+4. `git fetch --no-tags origin` (exit 0), recheck (remote `main` still `90295717`, local `main`
+   equal to it and an ancestor of `e8d1033c`, range unchanged, clean tree), `git switch main`
+   (exit 0), `git merge --ff-only e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3` (exit 0), remote
+   `main` rechecked as `90295717`, then `git push origin refs/heads/main:refs/heads/main` (exit 0);
+   remote `main` = `e8d1033c`.
+5. Main CI gate passed (below). **M5c is on `main` at `e8d1033c`.**
+
+**Runs and jobs** (all for SHA `e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3`, event `push`, attempt 1,
+conclusion `success`; all five jobs and every one of the 53 steps per push succeeded, none skipped
+or cancelled). Log results are from the logs independently retrieved by the external reviewer
+(recorded in Prompt 186):
+
+- Feature branch `feat/review-request-assembly`:
+  - [CI run 39630863751](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39630863751)
+    - [Ubuntu verify 119328377578](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39630863751/job/119328377578): `3429 passed, 308 skipped in 32.89s`
+    - [Windows verify 119328376652](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39630863751/job/119328376652): `3428 passed, 309 skipped in 55.10s`
+    - [PostgreSQL integration 119328375989](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39630863751/job/119328375989): `308 passed, 3429 deselected in 177.03s`
+    - [Container 119328376728](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39630863751/job/119328376728): successful
+  - [Secret-scan run 39630863772](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39630863772)
+    - [Gitleaks (full history) 119328376412](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39630863772/job/119328376412): 80 commits scanned, no leaks
+- `main`:
+  - [CI run 39631692599](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39631692599)
+    - [Ubuntu verify 119331290453](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39631692599/job/119331290453): `3429 passed, 308 skipped in 36.06s`
+    - [Windows verify 119331290989](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39631692599/job/119331290989): `3428 passed, 309 skipped in 78.48s`
+    - [PostgreSQL integration 119331292512](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39631692599/job/119331292512): `308 passed, 3429 deselected in 192.29s`
+    - [Container 119331291561](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39631692599/job/119331291561): successful
+  - [Secret-scan run 39631692517](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39631692517)
+    - [Gitleaks (full history) 119331291172](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39631692517/job/119331291172): 80 commits scanned, no leaks
+
+**Observed in the logs (both pushes).** All four installed-wheel logs (Ubuntu and Windows, feature
+and `main`) printed the eight expected lines:
+
+- offline embedding, canonical storage and indexing modules ran from the installed wheel
+- retrieval modules imported and fusion ran from the installed wheel
+- evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+- Voyage adapter validated a mocked response from the installed wheel
+- model-call contracts classified a scripted fake response from the installed wheel
+- provenance matched a quote and derived a status from the installed wheel
+- review template, prompts and request assembly ran from the installed wheel
+- offline migration SQL rendered from the installed wheel
+
+Both container logs reported an effective build context of 104 files with 19 planted fixtures
+excluded; successful image checks (command help, installed imports, offline migration SQL and
+runtime contents); a healthy database, migration and API stack using the CI-built image; an
+accepted upload (202); successful ingestion and an active revision with 2 verified chunks; a
+duplicate upload returning the existing revision (200); one offline indexing job and a ready index
+with 2 embeddings; an idle-worker exit 0 without an OOM kill; and successful smoke and cleanup.
+
+**Attribution and scope.**
+
+- *Claude Code (Prompt 185):* published the commits and observed the run, job and step
+  conclusions through the anonymous GitHub REST API only, including success for the verify jobs'
+  "Test", "Build distribution" and "Install the wheel in a clean environment and import it" steps
+  and the integration job's "Run integration tests" step. All ten job-log downloads returned HTTP
+  403; authentication was not changed. Its Prompt 185 statement that test counts, PostgreSQL
+  results, wheel output, container summaries and Gitleaks counts were unobserved was accurate for
+  Claude Code at that time and is now historical.
+- *External reviewer (recorded in Prompt 186):* afterwards independently retrieved the four
+  workflow-run records, all ten job records and all ten job logs, the remote `main` and
+  `feat/review-request-assembly` refs (both at `e8d1033c`), the publication commit (parent
+  `36a41b1f`, tree `3ceeb788`, prompts.md only) and the published source, resource and test blob
+  hashes (including `assembly.py`, `templates.py`, `prompts.py`, both prompt resources,
+  `tests/test_request_assembly.py` and `tests/test_prompts.py`), which matched the reviewed
+  corrections. The reviewer ran no local project suite, build, installed-wheel check, PostgreSQL,
+  Docker or provider call.
+- The container details are the smoke's own reported checks, not independent database
+  inspection; the smoke covers offline ingestion, indexing and idle-worker shutdown only and does
+  not exercise M5c; local Compose remains unverified. The Recall@5 line is arithmetic, not a
+  database-derived corpus Recall, and the Voyage line uses a mocked response. None of this
+  establishes production use, live-model quality, prompt quality or injection resistance.
 
 ## Verification (Prompt 183, local Windows, Claude Code; historical local evidence)
 

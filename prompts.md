@@ -38020,3 +38020,1335 @@ references a secret or provider key; the production registry kinds are `index_re
 of the range's added lines found nothing. No application test, build, install, wheel, database,
 Docker or provider check was repeated. The commit, publication and CI results are reported
 afterwards, not predicted here.
+
+### Prompt 185 publication outcome (Claude Code)
+
+*Observed results only.*
+
+- **History commit.** `e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3` ("docs: record M5c publication
+  authorization"; parent `36a41b1f`, tree `3ceeb788e70c33faef30da79ffa74c5d7a4aefce`; prompts.md
+  only; noreply author and committer; Co-Authored-By trailer); every other blob identical to
+  `36a41b1f`; working tree clean; full-history Gitleaks over 80 commits found no leaks.
+- **Feature publication.** Immediately before: remote `main` `90295717`, no remote feature branch.
+  `git push --set-upstream origin
+  refs/heads/feat/review-request-assembly:refs/heads/feat/review-request-assembly` ran once,
+  exit 0; remote feature = `e8d1033c`; tracking set.
+- **Feature CI gate (passed).** CI run `39630863751` and secret-scan run `39630863772`, both event
+  `push`, branch `feat/review-request-assembly`, attempt 1, success; jobs Ubuntu `119328377578`,
+  Windows `119328376652`, PostgreSQL `119328375989`, container `119328376728`, Gitleaks
+  `119328376412` all success; 53 steps successful, none skipped or cancelled. The bounded monitor
+  exited after completion (about 4 minutes).
+- **Main publication.** After `fetch --no-tags` (exit 0; remote `main` still `90295717`, local
+  `main` equal to `origin/main` and an ancestor of `e8d1033c`, remote feature `e8d1033c`, range
+  exactly `09587126`, `36a41b1f` and `e8d1033c`, the 13 accepted blobs unchanged, clean tree):
+  `git switch main` (exit 0), `git merge --ff-only e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3`
+  (exit 0), remote `main` rechecked as `90295717`, `git push origin
+  refs/heads/main:refs/heads/main` (exit 0); remote `main` = `e8d1033c`.
+- **Main CI gate (passed).** CI run `39631692599` and secret-scan run `39631692517`, both event
+  `push`, branch `main`, attempt 1, success; jobs Ubuntu `119331290453`, Windows `119331290989`,
+  PostgreSQL `119331292512`, container `119331291561`, Gitleaks `119331291172` all success; 53
+  steps successful, none skipped or cancelled. The bounded monitor exited after completion (about
+  4 minutes).
+- **Unavailable.** All ten job-log downloads (both gates) returned HTTP 403 to the anonymous API.
+  Authentication was not changed; test counts, PostgreSQL results, wheel output, container
+  summaries and Gitleaks commit counts for `e8d1033c` are unobserved and were not inferred.
+- **Monitors.** Both bounded polling loops exited after completion; no monitor remains.
+
+### Prompt 185 documentation and M5d proposal outcome (Claude Code; staged, awaiting review)
+
+- **Branch.** `docs/review-creation-plan` created from `e8d1033c` (it did not exist locally or
+  remotely). Only README, ADR-0021, plan, threat model and this file changed; nothing committed.
+- **Evidence.** ADR-0021 gains "Main publication evidence (Prompt 185)" with the full SHA, the
+  publication chronology and commands, every job beneath its run, the API conclusions, the
+  unavailable logs and the container scope; README, plan and threat model record M5c as reviewed,
+  verified in exact-commit feature and main-push CI and on `main` at `e8d1033c`. The plan's M5c
+  implementation-status heading keeps its anchor; its "CI pending" is marked historical.
+- **M5d proposal.** "M5d composable capture and atomic review-creation specification (PROPOSED,
+  Prompt 185; not implemented)" added to the plan: a public `capture_in_transaction` for a
+  caller-owned session with `capture_snapshot` unchanged; domain review values with request,
+  configuration and snapshot digests; a REPEATABLE READ, READ WRITE creation transaction with an
+  explicit statement order and eligibility fixed at the first `clock_timestamp()` read; migration
+  `0006` with `reviews`, `review_bindings` and `review_excluded_revisions`; idempotent creation
+  keyed by `(tenant_id, idempotency_key)` with matching and conflicting replay, a bounded
+  three-attempt retry in fresh transactions for known SQLSTATEs only and an unknown commit outcome
+  that never claims a rollback; a trusted reload that rebuilds and digest-checks the snapshot and
+  loads the pinned artifacts through the M5c loaders; production isolation; a planned test set;
+  and nine reviewer decisions (D1–D9). A matching proposed-controls note is in the threat model.
+  Nothing in M5d is accepted, implemented or tested; no ADR-0022.
+- **Checks before this note** (documentation only): 366 relative links with 0 link or anchor
+  problems, 63 tables with 0 problems, `git diff --cached --check` clean. The final scope,
+  encoding, privacy and Gitleaks checks and the export follow and are reported in the handoff.
+  No application test, build, wheel, database, Docker or provider call was run in this prompt.
+- The documentation is staged for review, uncommitted and unpushed.
+
+### Prompt 185 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 185 handoff: M5c published through both CI gates; M5d proposed and staged
+
+M5c is published: both exact-commit CI gates passed, and `main` now points at P. The M5d specification is written into the plan and staged for your review; nothing in M5d is implemented.
+
+**Starting state.** Everything matched what you expected:
+- Branch `feat/review-request-assembly`, HEAD `36a41b1f` (parent `09587126`, tree `aa2d5921`); working tree clean; no upstream.
+- `main` and `origin/main` were at `90295717`; origin and the noreply identity are unchanged.
+- The p184 export matches its 40,412 bytes and SHA-256, and is byte-identical to the Git comparison from `687cb581`.
+- `git fetch --no-tags origin` exited 0. `ls-remote` showed remote `main` at `90295717` and no remote feature branch.
+- The checkpoint is saved in `.local/p185/`.
+
+**Preflight results**
+- **Range:** exactly `09587126` (documentation and history only) and `36a41b1f` (the 18 reviewed paths), 19 paths combined.
+- **Blobs and scope:** the 13 accepted blobs are unchanged. No dependency, domain, persistence, migration, corpus, Docker, Compose or infrastructure path changed. No `.local` file or binary is tracked.
+- **Workflows:** `ci.yml` is purely additive (+50 lines, none removed). Both workflows trigger on push, all five jobs are present, and integration still runs `pytest -m integration` with `EG_REQUIRE_INTEGRATION: "1"`. No workflow references a secret or provider key.
+- **Registry:** the production registry is still `ingest_revision, index_revision`.
+- **Leaks and privacy:** Gitleaks over the range (2 commits) and the privacy scan were both clean.
+
+**History commit P = `e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3`**
+
+| Item | Value |
+|---|---|
+| Subject | docs: record M5c publication authorization |
+| Parent | `36a41b1f` |
+| Tree | `3ceeb788e70c33faef30da79ffa74c5d7a4aefce` |
+| Changed paths | prompts.md only |
+| Author and committer | noreply identity |
+| Trailer | Co-Authored-By present |
+| Gitleaks | full history, 80 commits, no leaks |
+
+**Publication commands** (each run once):
+
+| Step | Exit |
+|---|---|
+| `git push --set-upstream origin refs/heads/feat/review-request-assembly:refs/heads/feat/review-request-assembly` | 0 |
+| `git fetch --no-tags origin`, then recheck (remote `main` still `90295717`) | 0 |
+| `git switch main` | 0 |
+| `git merge --ff-only e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3` | 0 |
+| `git push origin refs/heads/main:refs/heads/main` (remote `main` rechecked first) | 0 |
+
+**CI gates.** Both passed for SHA P: event `push`, attempt 1, all five jobs successful, and 53 of 53 steps successful per push, none skipped or cancelled.
+
+**Feature gate**
+- [CI run 39630863751](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39630863751):
+  - [Ubuntu 119328377578](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39630863751/job/119328377578)
+  - [Windows 119328376652](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39630863751/job/119328376652)
+  - [PostgreSQL 119328375989](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39630863751/job/119328375989)
+  - [Container 119328376728](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39630863751/job/119328376728)
+- [Secret-scan run 39630863772](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39630863772):
+  - [Gitleaks 119328376412](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39630863772/job/119328376412)
+
+**Main gate**
+- [CI run 39631692599](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39631692599):
+  - [Ubuntu 119331290453](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39631692599/job/119331290453)
+  - [Windows 119331290989](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39631692599/job/119331290989)
+  - [PostgreSQL 119331292512](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39631692599/job/119331292512)
+  - [Container 119331291561](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39631692599/job/119331291561)
+- [Secret-scan run 39631692517](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39631692517):
+  - [Gitleaks 119331291172](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39631692517/job/119331291172)
+
+**Log access**
+- All ten job-log downloads returned HTTP 403 to the anonymous API. I did not change authentication.
+- So the test counts, PostgreSQL results, wheel output (including the M5c line), container summaries and Gitleaks commit counts for P are unobserved and are not inferred from earlier runs.
+- Both bounded monitors exited after completion, about 4 minutes each; none is still running.
+
+**Final refs**
+
+| Ref | Value |
+|---|---|
+| `main`, `origin/main`, remote `main` | `e8d1033c` |
+| `feat/review-request-assembly` (local and remote) | `e8d1033c` |
+| Checked-out branch | `docs/review-creation-plan` (new from P, local only) |
+| Staged tree | `4332f1e221e7dc45e2daf7da22efed319a16b37d` |
+
+**Documentation (staged, not committed or pushed)**
+- **ADR-0021:** new section "Main publication evidence (Prompt 185)", covering the chronology and commands, every job under its own run, the API-only attribution and what remains unobserved.
+- **Status lines:** README, plan and threat model now say M5c is reviewed, verified in exact-commit feature and main-push CI and on `main` at P.
+- **Kept unchanged:** the specification headings and anchors. The plan's implementation-status heading keeps its anchor, with its "CI pending" marked historical.
+
+**M5d proposal summary** (proposed only: not reviewed, accepted, implemented or tested; no ADR-0022)
+- **Capture extraction:** a public `capture_in_transaction` for a caller-owned session; `capture_snapshot` keeps its behaviour.
+- **Domain values:** `ReviewConfiguration`, `ReviewRequest`, `CreatedReview` and `TrustedReview`. Their digests cover the request and configuration, never `captured_at` or the snapshot.
+- **Creation transaction:** REPEATABLE READ, READ WRITE, in a fixed statement order. Eligibility is fixed at the first `clock_timestamp()` read. The review, bindings, exclusions, pinned configuration and `run_review` job commit together or not at all.
+- **Migration `0006`:** three tables (`reviews`, `review_bindings`, `review_excluded_revisions`), with tenant-scoped foreign keys and no status column or credentials.
+- **Failure handling:**
+  - matching replay returns the existing review, and a conflicting replay is refused;
+  - concurrent same-key creation resolves through a bounded three-attempt retry in fresh transactions, only for known SQLSTATEs;
+  - an unknown commit outcome is reported as such, never as a rollback.
+- **Trusted reload:** rebuilds the snapshot through its constructors, recomputes the digests, and loads pinned artifacts through the M5c loaders.
+- **Isolation:** creation and reload stay internal or test-only, and `run_review` stays out of the production registry.
+
+The plan's M5d section also holds the threat-model limits and a planned test set (database-independent and PostgreSQL).
+
+**Decisions for your review**
+1. **D1:** public `capture_in_transaction` returning `RetrievalSnapshot | SemanticOutcome`, with `SemanticOutcome` made public.
+2. **D2:** a worker composition module, `evidenceguard_worker.review_seams`, as the only app module allowed to import agents. This narrows the existing "no app imports agents" packaging test.
+3. **D3:** review IDs are random `uuid4`, with uniqueness on `(tenant_id, idempotency_key)`.
+4. **D4:** retry policy of three attempts, no sleep, only for `40001`, `40P01`, `55P03` and `23505` on the review key.
+5. **D5:** binding foreign keys to `reviews`, `document_revisions` and `embedding_indexes`.
+6. **D6:** `statement_timeout` 30 s and `lock_timeout` 5 s; a statement timeout is not retryable.
+7. **D7:** idempotency-key format `^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$`.
+8. **D8:** a wheel assertion that the offline migration SQL includes `CREATE TABLE reviews`.
+9. **D9:** flat typed configuration columns plus a configuration digest.
+
+**Documentation checks run**
+- **Scope:** exactly five paths changed from P, every other blob identical, no `.local` file tracked.
+- **Links and tables:** 366 relative links with no bad links or anchors; 63 tables with no problems.
+- **Encoding:** UTF-8, no BOM, LF only, no replacement characters.
+- **Whitespace and leaks:** `git diff --cached --check` clean; staged Gitleaks found no leaks.
+- **Privacy:** scan of 504 added lines found nothing.
+- **Prompt history:** 60 lines added; the committed prefix is an identical byte prefix, and Prompt 185 verbatim is not duplicated.
+- No application test, build, wheel, database, Docker or provider call was run.
+
+**Export:** `.local/p185/m5c-main-evidence-and-m5d-spec.diff`
+
+| Item | Value |
+|---|---|
+| Baseline | `e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3` |
+| Final | staged tree `4332f1e2` |
+| Options | `--full-index`, prompts.md excluded |
+| Statistics | 4 files, 444 insertions, 17 deletions; 549 lines |
+| Size | 68,377 bytes |
+| SHA-256 | `c6618f6c75a937693dc810b4fa2949675cd2131dff5d6bab2cb378ef24b9197c` |
+| Encoding | UTF-8, no BOM, LF only |
+| Identity | byte-identical to both the staged and the tree Git comparisons |
+
+**Remaining:** review of the evidence documentation and the M5d proposal, then M5d–M5h and overall M5 acceptance. The `docs/review-creation-plan` branch is uncommitted and unpushed.
+
+This session is far past the 20-prompt guideline: start a new Claude session before the next task. The `.local/p185/` checkpoint and this handoff are enough to recover.
+
+**Next step:** please return **output plus the diff file** `.local/p185/m5c-main-evidence-and-m5d-spec.diff`.
+
+### External review of the Prompt 185 output and independently retrieved M5c CI evidence (Prompt 186)
+
+The external reviewer verified the Prompt 185 export (68,377 bytes, SHA-256
+`c6618f6c75a937693dc810b4fa2949675cd2131dff5d6bab2cb378ef24b9197c`, four-file scope, 444
+insertions and 17 deletions, UTF-8, LF and no BOM) and independently retrieved the four
+workflow-run records, all ten job records and logs, the remote `main` and feature refs (both at
+`e8d1033c`), the publication commit (parent `36a41b1f`, tree `3ceeb788`, prompts.md only) and the
+published source, resource and test blob hashes, which matched the reviewed corrections. All four
+runs used `e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3`, event `push`, attempt 1, the appropriate
+branch and conclusion `success`; all five jobs and 53 steps per push succeeded. Logs: feature
+Ubuntu `3429 passed, 308 skipped in 32.89s`, Windows `3428 passed, 309 skipped in 55.10s`,
+PostgreSQL `308 passed, 3429 deselected in 177.03s`, Gitleaks 80 commits, no leaks; main Ubuntu
+`3429 passed, 308 skipped in 36.06s`, Windows `3428 passed, 309 skipped in 78.48s`, PostgreSQL
+`308 passed, 3429 deselected in 192.29s`, Gitleaks 80 commits, no leaks; all four installed-wheel
+logs printed the eight expected lines including the M5c line; both container logs reported 104
+files of effective context with 19 planted fixtures excluded and every smoke check successful.
+The reviewer inspected relevant published source and the PostgreSQL 17 documentation for the
+proposal review and ran no local project suite, build, installed-wheel check, PostgreSQL, Docker
+or provider call; no M5d implementation or runtime test exists. Findings on the M5d proposal: the
+request digest depended on a tenant absent from `ReviewRequest`; `job_id`/`created_job_id` had no
+defined source; the public capture seam's fixed errors and the SQLSTATE-based retries could not
+both hold through the M4d `run_read` boundary; the visibility wording implied a wall-clock
+ordering; and the value, error, schema, cleanup and test contracts were incomplete. The reviewer
+supports D1–D9 as directions subject to these corrections and review of the complete revised
+text; M5d remains proposed and unaccepted. Prompt 186 authorizes documentation corrections only,
+staged and uncommitted.
+
+### Prompt 186 (verbatim)
+
+Prompt 186 — Complete the M5d contract and record independently verified M5c CI evidence
+
+Written for: Claude Code.
+Repository: D:\Claude\evidenceguard_agentic_rag
+
+Correct the M5d proposal and record the independently retrieved M5c CI evidence. Documentation only: stage the result for review, without committing or pushing.
+
+1. Recover and verify
+
+Read CLAUDE.md and applicable instructions, the accepted M5 sequence, the complete M5d proposal, ADR-0021 and the relevant current source.
+
+Expected:
+- Branch: docs/review-creation-plan.
+- HEAD: e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3.
+- Parent: 36a41b1fb806944868fc9e1c62962ac6cd8eec7e.
+- HEAD tree: 3ceeb788e70c33faef30da79ffa74c5d7a4aefce.
+- main and origin/main: e8d1033c.
+- Staged tree: 4332f1e221e7dc45e2daf7da22efed319a16b37d.
+- Exactly five staged paths: README, ADR-0021, plan, threat model and prompts.md.
+- Nothing unstaged or untracked.
+- Origin and noreply identity unchanged.
+
+Verify:
+.local/p185/m5c-main-evidence-and-m5d-spec.diff
+68,377 bytes
+549 lines
+SHA-256 c6618f6c75a937693dc810b4fa2949675cd2131dff5d6bab2cb378ef24b9197c
+
+Confirm byte identity to its Git comparison, excluding prompts.md.
+
+Checkpoint under .local/p186/: staged tree, paths, blob hashes and prompts.md prefix.
+
+Preserve the staged work. No reset, clean, stash, branch recreation or remote operation is needed.
+
+2. Independently verified M5c evidence
+
+The external reviewer verified the Prompt 185 export's size, checksum, four-file scope, 444 insertions and 17 deletions, UTF-8/LF/no-BOM encoding.
+
+The reviewer independently retrieved:
+- Four workflow-run records.
+- All ten job records and logs.
+- Remote main and feature refs, both at e8d1033c.
+- The publication commit: parent 36a41b1f, tree 3ceeb788, prompts.md only.
+- Published source, resource and test blob hashes matching the reviewed corrections, including assembly.py, templates.py, prompts.py, both prompt resources, test_request_assembly.py and test_prompts.py.
+
+All four runs used:
+SHA e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3
+event push
+attempt 1
+the appropriate feature or main branch
+conclusion success
+
+All five jobs and all 53 steps per push succeeded; none skipped or cancelled.
+
+Feature:
+CI run 39630863751; secret-scan run 39630863772.
+- Ubuntu 119328377578:
+  3429 passed, 308 skipped in 32.89s
+- Windows 119328376652:
+  3428 passed, 309 skipped in 55.10s
+- PostgreSQL 119328375989:
+  308 passed, 3429 deselected in 177.03s
+- Container 119328376728: success.
+- Gitleaks 119328376412:
+  80 commits scanned, no leaks.
+
+Main:
+CI run 39631692599; secret-scan run 39631692517.
+- Ubuntu 119331290453:
+  3429 passed, 308 skipped in 36.06s
+- Windows 119331290989:
+  3428 passed, 309 skipped in 78.48s
+- PostgreSQL 119331292512:
+  308 passed, 3429 deselected in 192.29s
+- Container 119331291561: success.
+- Gitleaks 119331291172:
+  80 commits scanned, no leaks.
+
+All four installed-wheel logs printed:
+- offline embedding, canonical storage and indexing modules ran from the installed wheel
+- retrieval modules imported and fusion ran from the installed wheel
+- evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+- Voyage adapter validated a mocked response from the installed wheel
+- model-call contracts classified a scripted fake response from the installed wheel
+- provenance matched a quote and derived a status from the installed wheel
+- review template, prompts and request assembly ran from the installed wheel
+- offline migration SQL rendered from the installed wheel
+
+Both container logs reported:
+- Effective context: 104 files; 19 planted fixtures excluded.
+- Successful image checks: command help, installed imports, offline migration SQL and runtime contents.
+- Healthy database/migration/API stack using the CI-built image.
+- Upload accepted, 202.
+- Ingestion succeeded; active revision with 2 verified chunks.
+- Duplicate upload returned the existing revision, 200.
+- One offline indexing job; ready index with 2 embeddings.
+- Idle worker exited 0 without an OOM kill.
+- Smoke and cleanup succeeded.
+
+Keep these scope distinctions:
+- Container details are the smoke's reported checks, not independent database inspection.
+- The smoke covers offline ingestion, indexing and idle-worker shutdown, not M5c.
+- Recall@5 is arithmetic, not database-derived corpus Recall.
+- Voyage is mocked.
+- None of this establishes live-model quality or injection resistance.
+
+Attribution:
+- Claude Code observed API conclusions in Prompt 185; its log downloads returned HTTP 403.
+- The external reviewer retrieved the logs afterwards.
+- The reviewer inspected relevant published source and PostgreSQL 17 documentation for this proposal review.
+- The reviewer ran no local project suite, build, installed-wheel check, PostgreSQL, Docker or provider call.
+- No M5d implementation or runtime test exists.
+
+Update ADR-0021 with the results under the existing run/job links. Mark the earlier “unobserved” statements historical for Claude Code at that time. Add short linked summaries in README, plan and threat model.
+
+3. Complete the M5d values and canonical identity
+
+The proposal currently gives ReviewRequest a derived digest containing a tenant supplied only later at creation. Its listed fields contain no tenant, so this contract cannot be implemented as written.
+
+Resolve this explicitly while preserving the actor as the authority for tenant scope.
+
+Recommended direction:
+- Keep ReviewRequest tenant-free.
+- Define its canonicalization/hash API with an explicit tenant parameter.
+- create_review obtains that tenant only from the validated ActorContext.
+- Reload recomputes the bound digest using the stored review tenant and validated actor scope.
+- Do not describe a tenant-dependent digest as an argument-free derived property.
+
+An alternative is a tenant-bound request value with an explicit actor-equality check. If chosen, justify it clearly.
+
+For every proposed public value and composition return:
+- Exact fields, types, bounds and defaults.
+- Nested reconstruction and cross-field invariants.
+- Validating replacement and safe representations.
+- Fixed errors and process-control behaviour.
+- Tenant, vendor, snapshot, configuration, timestamp and digest consistency rules.
+- Explain what the constructors cannot prove.
+
+Define exact canonical objects and byte encodings for:
+- eg-review-configuration-v1
+- eg-review-request-v1
+
+Specify every included field, ordering/serialization rules and digest calculation. Include all intended pinned settings, including timeout and retrieval k. Generated IDs, captured_at and the snapshot remain excluded from logical request identity.
+
+Give the composition functions complete signatures and a named, validated return contract; do not leave “returns snapshot, request, template and prompts” as an undefined tuple.
+
+4. Define durable job linkage
+
+CreatedReview returns job_id and TrustedReview returns created_job_id, but the proposed schema and reload steps currently provide no defined way to recover that ID.
+
+Choose and specify one complete design:
+- A persisted job reference with feasible atomic insert ordering and constraints; or
+- An exact canonical lookup using tenant, run_review kind and the review-ID idempotency key.
+
+For a lookup design:
+- Validate the job's payload and association with this review.
+- Define missing, mismatched and duplicate-result behaviour.
+- Permit legitimate changes in job lifecycle status without losing the creation association.
+- Explain how creation, replay and trusted reload obtain the same job ID.
+
+Specify the creation job's fixed max_attempts policy. Do not confuse job attempts with M5g's provider-call reservation budget.
+
+Do not assume a random UUID makes an existing conflicting job logically impossible; define the refusal path.
+
+5. Resolve the public capture and operational failure contract
+
+The new public capture seam promises fixed private errors, while creation promises SQLSTATE-based retries. Explain how both promises hold together.
+
+The current M4d run_read boundary intentionally removes operational exception details. Reusing it unchanged cannot supply SQLSTATE information after translation.
+
+Specify:
+- Exact capture return types and the full SemanticOutcome contract.
+- Ordinary operational-failure behaviour at the public capture boundary.
+- How creation obtains only the safe classification needed for retries before original exceptions are discarded.
+- Where classification occurs.
+- How existing capture_snapshot continues to expose its unchanged errors and precedence.
+
+A safe typed outcome/error or caller-owned classification before translation may work. Select a concrete design for review.
+
+Do not:
+- Leak raw database exceptions.
+- Parse exception messages.
+- Retain SQL, parameters, raw exceptions or exception chains.
+- Rely on information that has already been discarded.
+
+Any retained classification must be fixed and bounded: allowlisted SQLSTATE categories and recognition of the exact review-key constraint, not arbitrary database text.
+
+Define actor, request, role and scope error precedence for creation, reload and composition. Preserve capture_snapshot's existing input/role precedence and actor-type behaviour.
+
+6. Specify transaction ownership, visibility and cleanup precisely
+
+Keep:
+- Caller-owned composable capture.
+- Existing read-only capture_snapshot behaviour.
+- Creation at REPEATABLE READ, READ WRITE.
+- First SET TRANSACTION, then the clock_timestamp SELECT establishing the snapshot.
+- Atomic review, bindings, exclusions, configuration and job persistence.
+- Fresh transactions for bounded retries.
+
+Correct the timing wording:
+- Visibility follows the MVCC snapshot established by that statement.
+- captured_at records the database clock value returned by it.
+- Do not promise that every commit whose wall-clock timestamp precedes the returned captured_at is visible.
+- Keep the existing before/after-statement race tests.
+- No new wall-clock ordering or historical-authorization proof.
+
+Primary references:
+https://www.postgresql.org/docs/17/transaction-iso.html
+https://www.postgresql.org/docs/17/functions-datetime.html
+
+Document the public capture caller's trusted preconditions:
+- An active transaction with the required isolation and corresponding captured_at.
+- Compatibility with both the old read-only wrapper and the new read-write creation path.
+- No caller writes to eligibility-related rows that would undermine the claimed captured view.
+- The timestamp parameter itself is not proof that the caller followed those rules.
+
+Add an explicit failure/cleanup precedence table covering:
+- Semantic body outcome.
+- Retryable operational failure.
+- Non-retryable body failure.
+- Definitive commit rejection.
+- Unknown commit outcome.
+- Acknowledged commit success followed by cleanup failure.
+- Rollback or close failure.
+- Process control during setup, body, commit or cleanup.
+
+Ensure:
+- Cleanup cannot replace an unknown commit outcome with a claim of rollback.
+- Acknowledged commit success is never retried as though nothing committed.
+- Process-control exceptions propagate as the same object, including when ordinary cleanup fails.
+- Retry eligibility and transaction outcome are separate concepts.
+- No hard end-to-end deadline is claimed from per-statement and lock timeouts.
+
+Clarify the trusted reload boundary too: read_snapshot is a transaction helper, while run_read's semantic mapping is specific to M4d. Explain the proposed review-specific errors without silently mapping them to RetrievalDatabaseError.
+
+7. Complete the schema and test plan
+
+Expand the schema tables into an implementable contract:
+- Exact SQL types, nullability, lengths and CHECK expressions.
+- Explicit names for uniqueness and other constraints used by classification.
+- Composite tenant-scoped foreign keys with existing valid targets.
+- Stored job linkage or its canonical lookup.
+- Configuration/reference checks.
+- Binding and exclusion cardinality, ordering and consistency checks.
+- Reconstruction rules and allowed timestamp precision.
+- No deletion cascades or mutable status introduced accidentally.
+
+Keep constructor/reload checks distinct from constraints actually enforced by PostgreSQL.
+
+Add planned tests for all corrected contracts:
+- Tenant-bound digest behaviour.
+- Exact canonical bytes and pinned digest fixtures.
+- Cross-field inconsistencies.
+- Job association on creation, replay and reload.
+- Missing/mismatched jobs.
+- Capture classification without raw error leakage.
+- Cleanup and commit-state precedence.
+- Role/input precedence.
+- MVCC race semantics.
+- Existing M4d compatibility.
+- Bounded retries and no automatic unknown-commit retry.
+
+No tests or migrations are written or executed now.
+
+8. Review disposition
+
+M5d remains proposed and unaccepted.
+
+The reviewer supports D1–D9 as directions, subject to the corrections above and review of the complete revised text:
+- Public composable capture.
+- A narrowly isolated worker composition module.
+- Random review IDs with tenant/key uniqueness.
+- Bounded fresh-transaction retries.
+- Tenant-scoped foreign keys.
+- Per-statement and lock timeouts.
+- The proposed key format.
+- The offline migration wheel assertion.
+- Flat typed configuration columns.
+
+This does not accept the incomplete value, error, schema or cleanup contracts.
+
+Keep the decision list accurate. Add numbered decisions where a correction introduces a material choice. Do not mark the complete specification accepted.
+
+9. Scope, history and checks
+
+Only the same five tracked files may change:
+README.md
+docs/decisions/0021-review-request-assembly.md
+docs/plan.md
+docs/threat-model.md
+prompts.md
+
+Preserve existing headings and anchors; add subsections as needed.
+
+Append:
+- The actual Prompt 185 handoff.
+- This review and independently retrieved evidence.
+- Prompt 186 verbatim.
+- A completed-results note.
+
+Preserve the earlier prompts.md bytes and both text-fidelity disclosures. Verify literal backslashes and verbatim fidelity.
+
+Run documentation checks only:
+- Exact scope and unchanged blobs.
+- Links, anchors and tables.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --cached --check.
+- Privacy scan and unsuppressed staged Gitleaks.
+- No M5d-accepted or implemented claims.
+
+Do not run application tests, builds, installs, wheel checks, database, Docker or provider calls. No remote operation, commit or push.
+
+10. Export
+
+Stage the corrected documentation, uncommitted.
+
+Export directly from Git:
+.local/p186/m5d-contract-corrections-and-m5c-ci-evidence.diff
+
+Baseline:
+4332f1e221e7dc45e2daf7da22efed319a16b37d
+
+Final:
+the corrected staged tree
+
+Exclude prompts.md.
+
+Return:
+- Handoff with corrected contracts and remaining decisions.
+- Final staged tree and unchanged refs.
+- Checks actually performed.
+- Export statistics, size, SHA-256, encoding and Git-comparison identity.
+- The diff attachment.
+
+Stop with M5d proposed, unimplemented and staged for review.
+
+### Prompt 186 outcome (Claude Code; staged, awaiting review)
+
+*Work actually completed; nothing below has been reviewed.*
+
+- **Start.** Branch `docs/review-creation-plan`, HEAD `e8d1033c` (parent `36a41b1f`, tree
+  `3ceeb788`), `main` and `origin/main` at `e8d1033c`, staged tree `4332f1e2` with the five
+  documentation paths, nothing unstaged or untracked, origin and noreply identity unchanged; the
+  Prompt 185 export matched 68,377 bytes, 549 lines, its SHA-256 and the staged Git comparison.
+  Checkpoint under `.local/p186/`. No remote operation.
+- **M5c evidence.** ADR-0021's main publication evidence now carries each job's log result under
+  its existing run and job links, the eight installed-wheel lines, the container summary and
+  separate Claude Code and reviewer attribution; the Prompt 185 "unobserved" statement is marked
+  historical for Claude Code at that time. Matching short summaries in README, plan and threat
+  model.
+- **M5d corrections** (the heading and anchor kept; subsections M5d-A1, A2, B1 and C1 added):
+  tenant-free `ReviewRequest` with `request_sha256(request, *, tenant_id)` from the validated actor;
+  exact `eg-review-configuration-v1` and `eg-review-request-v1` canonical objects and digests; a
+  value table with fields, bounds, defaults, invariants and what each constructor cannot prove,
+  including the named `ResolvedReview` composition return; a stored `run_review_job_id` (job
+  enqueued before the review insert, composite FK to `jobs`, uniqueness, `max_attempts = 3`, an
+  exact association check on replay and reload, a defined refusal path for an existing job);
+  `capture_in_transaction` returning `RetrievalSnapshot | SemanticOutcome | CaptureFailure`, with a
+  shared allowlisted SQLSTATE classifier applied in the handler and `capture_snapshot` unchanged;
+  input, role and composition precedence; MVCC visibility wording with the PostgreSQL 17
+  references and no wall-clock ordering claim; the caller's trusted preconditions; a failure and
+  cleanup precedence table; an implementable schema with named constraints and an
+  enforced-versus-reload table; a review-specific reload boundary; the expanded test plan; and the
+  reviewer's supported directions D1–D9 with new decisions D10–D15. M5d remains proposed,
+  unaccepted, unimplemented and untested; no ADR-0022.
+- **Checks before this note** (documentation only): 366 relative links with 0 link or anchor
+  problems, 65 tables with 0 problems, `git diff --cached --check` clean. The final scope,
+  encoding, privacy and Gitleaks checks and the export follow and are reported in the handoff.
+- **Text fidelity.** The Prompt 185 handoff and Prompt 186 verbatim blocks were written with a
+  file-writing tool, not a shell heredoc. Both earlier text-fidelity disclosures stand.
+
+### Prompt 186 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 186 handoff: M5d contract corrected and M5c CI evidence recorded
+
+This is documentation only. The corrected M5d proposal and the M5c CI evidence are staged for review, not committed. M5d is still proposed: not accepted, implemented or tested.
+
+**Starting state.** Everything matched what you expected:
+- Branch `docs/review-creation-plan`, HEAD `e8d1033c` (parent `36a41b1f`, tree `3ceeb788`); `main` and `origin/main` at `e8d1033c`.
+- Staged tree `4332f1e2` with the five paths; nothing unstaged or untracked; origin and the noreply identity are unchanged.
+- The p185 export matches its 68,377 bytes, 549 lines and SHA-256, and is byte-identical to the staged Git comparison.
+- Checkpoint saved in `.local/p186/`. No remote operation was run.
+
+**M5c CI evidence**
+- **ADR-0021:** each job now shows its log result under its existing run and job links: Ubuntu, Windows and PostgreSQL counts for both pushes, and Gitleaks over 80 commits. The section also records the eight installed-wheel lines and the container summary.
+- **Attribution:** what I observed in Prompt 185 (API conclusions only, every log download HTTP 403) is kept separate from your log retrieval. My earlier "unobserved" statement is marked historical.
+- **Scope limits:** the smoke does not exercise M5c, Recall is arithmetic, the Voyage line is mocked, and none of this shows live-model quality or injection resistance.
+- **Summaries:** short linked summaries are added to README, plan and threat model.
+
+**M5d corrections**
+- **Tenant binding (D10):** `ReviewRequest` stays tenant-free. Its digest is now `request_sha256(request, *, tenant_id)`. Creation supplies the tenant only from the validated actor; reload recomputes it with the stored tenant, which must equal the actor's.
+- **Canonical encodings:** exact JSON objects for `eg-review-configuration-v1` and `eg-review-request-v1`, using the existing retrieval canonical form. They cover the timeout and `retrieval_k`, and exclude `captured_at`, the snapshot and generated IDs.
+- **Values:** a full table for `ReviewConfiguration`, `ReviewRequest`, `CreatedReview`, `TrustedReview` and the named composition return `ResolvedReview`. For each it lists fields, bounds, defaults, invariants and what the constructor cannot prove.
+- **Job linkage (D11, D14):**
+  - Creation enqueues the job before inserting the review, then stores `run_review_job_id` with a composite FK to `jobs` and a uniqueness constraint. The job has `max_attempts = 3`, separate from M5g's provider-call budget.
+  - Replay and reload validate the job's kind, key, payload and `max_attempts`; the job's lifecycle status may change freely. Creation, replay and reload all return the same job ID.
+  - An existing or unexpected job is refused with `ReviewJobConflictError`.
+- **Capture classification (D12):**
+  - `capture_in_transaction` returns `RetrievalSnapshot | SemanticOutcome | CaptureFailure`.
+  - One shared classifier, running inside the error handler, reads only the SQLSTATE and, for `23505`, the exact constraint name `uq_reviews_tenant_id_idempotency_key`. No message, SQL, parameter or raw exception is kept.
+  - `capture_snapshot` still raises `RetrievalDatabaseError`, with its existing precedence.
+- **Precedence:** actor type, then request or inputs, then role, then the database phases, defined for creation, reload and both composition seams.
+- **Visibility:** wording now follows the MVCC snapshot, citing the PostgreSQL 17 documentation. `captured_at` is a recorded clock value, not an ordering proof. The capture caller's trusted preconditions are documented.
+- **Failure and cleanup (D13, D15):**
+  - a precedence table covers every case you listed;
+  - a COMMIT error carrying a server SQLSTATE is a definitive rejection, and one without it is an unknown outcome, never reported as a rollback;
+  - an acknowledged commit followed by a cleanup failure returns success and is never retried;
+  - process-control exceptions propagate as the same object;
+  - per-statement and lock timeouts bound individual waits, with no end-to-end deadline.
+- **Reload:** it uses the public `read_snapshot` helper with its own review-specific errors, not `run_read`'s M4d mapping.
+- **Schema:** an implementable schema with exact SQL types, nullability, CHECKs, constraint names and no-cascade foreign keys. A separate table distinguishes what PostgreSQL enforces from what reload checks.
+- **Tests:** an expanded plan covering every corrected contract. Nothing is written or run.
+
+**Decisions.** You supported D1–D9 as directions (composable capture, isolated worker module, random IDs, bounded retries, tenant-scoped FKs, timeouts, key format, wheel assertion, flat columns). These need your review:
+
+| Decision | Recommendation |
+|---|---|
+| D10 | Tenant-free request with an explicit-tenant digest |
+| D11 | Stored, validated job reference |
+| D12 | Typed `CaptureFailure` with an allowlisted classifier |
+| D13 | An acknowledged commit followed by a cleanup failure returns success |
+| D14 | Creation job `max_attempts = 3` |
+| D15 | SQLSTATE-bearing COMMIT error is definitive; one without it is unknown |
+
+**Git state.** The final staged tree is `8a146aae2a704d0bd438b9acc2d829404f49c118`; HEAD, `main` and `origin/main` are unchanged at `e8d1033c`. Only the five authorized paths changed, every other blob is identical, nothing is committed or pushed, and no `.local` file is tracked.
+
+**Checks actually run (documentation only)**
+- **Links and tables:** 366 relative links with no bad links or anchors; 65 tables with no problems.
+- **Encoding:** all five files are UTF-8 without BOM, LF only, with no replacement characters.
+- **Whitespace and leaks:** `git diff --cached --check` is clean; staged Gitleaks found no leaks, with no suppressions.
+- **Privacy:** scan of the 1,080 added lines found nothing.
+- **Status claims:** none of the docs says M5d is accepted or implemented.
+- **Prompt history:** 536 lines added, and the earlier bytes are an identical prefix. In the Prompt 186 verbatim block, the em dash, curly quotes, en dash and backslash path match the source.
+- No application test, build, wheel, database, Docker or provider call was run.
+
+**Export:** `.local/p186/m5d-contract-corrections-and-m5c-ci-evidence.diff`
+
+| Item | Value |
+|---|---|
+| Baseline | `4332f1e221e7dc45e2daf7da22efed319a16b37d` |
+| Final | `8a146aae2a704d0bd438b9acc2d829404f49c118` |
+| Options | `--full-index`, prompts.md excluded |
+| Statistics | 4 files, 544 insertions, 300 deletions; 1,013 lines |
+| Size | 110,686 bytes |
+| SHA-256 | `5191cc7d702b40823727eaa5f1ae0611279f9a47ef078de34ab5376ec303024c` |
+| Encoding | UTF-8, no BOM, LF only |
+| Identity | byte-identical to the Git comparison |
+
+Start a new Claude session before the next task: this one is far past the 20-prompt guideline. The `.local/p186/` checkpoint and this handoff are enough to recover.
+
+**Next step:** please return **output plus the diff file** `.local/p186/m5d-contract-corrections-and-m5c-ci-evidence.diff`.
+
+### External review of the Prompt 186 output (Prompt 187)
+
+The external reviewer independently verified the Prompt 186 export (110,686 bytes, 1,013 lines,
+SHA-256 `5191cc7d702b40823727eaa5f1ae0611279f9a47ef078de34ab5376ec303024c`, four-file scope,
+insertion and deletion counts, UTF-8 and LF), inspected the corrected proposal and the relevant
+published domain contracts and consulted primary PostgreSQL and SQLAlchemy documentation; the
+reviewer ran no project suite, build, installed-wheel check, database, Docker or provider check.
+The M5c CI evidence recorded in ADR-0021 is supported. The reviewer supports the directions of
+D10 (tenant-free request with an actor-derived tenant in the digest), D11 (stored, validated job
+linkage), D14 (`run_review` `max_attempts = 3`, separate from provider-call budgets) and D13 (an
+ordinary cleanup failure after an acknowledged commit must not turn that creation into a retry);
+these are supported directions, not acceptance. Findings: D15 wrongly treated any SQLSTATE on a
+`COMMIT` failure as proof of rejection (PostgreSQL defines `08007` and `40003`); M5d-B1 did not
+track commit outcome separately from the exception being handled, define which process-control
+object wins during cleanup, or make connection disposal concrete; the capture and
+diagnostic-access failure boundaries covered only statement errors; and the M5c status still said
+none of the 308 integration tests had run against that version. M5d remains proposed, unaccepted,
+unimplemented and untested. Prompt 187 authorizes documentation corrections only, staged and
+uncommitted.
+
+### Prompt 187 (verbatim)
+
+Written for: Claude Code.
+Prompt 187 — correct the remaining M5d failure contracts and stale M5c status; documentation only.
+
+Work autonomously through this complete documentation task. Do not implement M5d, create a migration, write application tests, create ADR-0022, commit, push, merge or run remote operations.
+
+1. Recover and verify the starting state
+
+Read the applicable repository instructions and recover from .local/p186/ and the Prompt 186 handoff.
+
+Expected state:
+- Branch: docs/review-creation-plan.
+- HEAD, main and origin/main:
+  e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3
+- HEAD parent:
+  36a41b1fb806944868fc9e1c62962ac6cd8eec7e
+- HEAD tree:
+  3ceeb788e70c33faef30da79ffa74c5d7a4aefce
+- Staged tree:
+  8a146aae2a704d0bd438b9acc2d829404f49c118
+- Exactly these five paths staged:
+  README.md
+  docs/decisions/0021-review-request-assembly.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Origin and the established noreply identity unchanged.
+
+Verify:
+.local/p186/m5d-contract-corrections-and-m5c-ci-evidence.diff
+
+Expected:
+- 110,686 bytes.
+- 1,013 lines.
+- SHA-256:
+  5191cc7d702b40823727eaa5f1ae0611279f9a47ef078de34ab5376ec303024c
+- Byte-identical to:
+  git diff --full-index
+  4332f1e221e7dc45e2daf7da22efed319a16b37d
+  8a146aae2a704d0bd438b9acc2d829404f49c118
+  excluding prompts.md.
+
+Save a checkpoint under .local/p187/ containing the staged tree, path list, blob hashes and exact prompts.md prefix with its checksum.
+
+If a material state mismatch exists, stop and report it without resetting or overwriting anything.
+
+2. Review disposition and scope
+
+The external reviewer independently verified the Prompt 186 export's size, line count, checksum, four-file scope, insertion/deletion counts and UTF-8/LF encoding. The reviewer inspected the corrected proposal and relevant published domain contracts and consulted primary PostgreSQL and SQLAlchemy documentation.
+
+The reviewer ran no project suite, build, installed-wheel check, database, Docker or provider check for this review.
+
+The M5c CI evidence as recorded in ADR-0021 is supported. Preserve its exact results, links, attribution and limitations.
+
+The reviewer supports the directions of:
+- D10: tenant-free request with an explicit actor-derived tenant in the digest.
+- D11: stored and validated job linkage.
+- D14: run_review job max_attempts = 3, separate from provider-call budgets.
+- D13: an ordinary cleanup failure after an acknowledged commit must not turn that committed creation into a retry.
+
+These are supported directions, not acceptance of the complete M5d specification. M5d remains proposed, unaccepted, unimplemented and untested.
+
+Only the same five documentation/history paths are authorized. Make substantive changes in docs/plan.md and matching summaries only where necessary. Preserve existing specification headings and anchors.
+
+3. Correct D15: separate commit outcome from failure category
+
+Remove every rule asserting that any COMMIT exception carrying a server SQLSTATE proves the transaction did not commit.
+
+SQLSTATE presence is insufficient. PostgreSQL explicitly defines:
+- 08007: transaction_resolution_unknown.
+- 40003: statement_completion_unknown.
+
+References:
+https://www.postgresql.org/docs/17/errcodes-appendix.html
+https://www.postgresql.org/docs/17/transaction-iso.html
+
+Use this conservative proposed policy:
+- An acknowledged commit is committed and never retried.
+- During COMMIT, only exact SQLSTATE 40001 or 40P01 establishes a recognized retryable rejection for this contract.
+- Every other ordinary COMMIT failure is an unknown outcome, including missing, unreadable or unrecognized diagnostics, 08007 and 40003.
+- Unknown outcome produces ReviewCommitOutcomeUnknownError and never triggers an automatic retry.
+- A later call using the same tenant and idempotency key may resolve whether creation occurred.
+- A subsequent rollback or successful cleanup does not retrospectively prove that an unknown COMMIT failed.
+
+Keep the existing body-phase retry categories distinct from this narrower COMMIT policy. For example, a body-phase 23505 on the exact reviewed key constraint can still be retryable; that must not automatically make a COMMIT-phase 23505 retryable.
+
+Specify an exact, implementable API/value contract for the commit classifier or resolution result. It must use only fixed bounded values and guarded allowlisted diagnostic access. Do not retain raw exceptions, messages, SQL or parameters in returned values.
+
+Update D15, the failure table, error descriptions, retry prose, threat-model summary where needed, and planned tests consistently. Do not present this revised policy as accepted yet.
+
+4. Correct cleanup and process-control precedence
+
+Rewrite M5d-B1 so outcome is tracked independently from the exception currently being handled.
+
+Distinguish at least:
+- COMMIT not entered.
+- COMMIT entered, no definitive outcome observed.
+- Recognized COMMIT rejection.
+- COMMIT acknowledged.
+
+In particular:
+- Process control after an acknowledged commit leaves the transaction outcome committed.
+- The same process-control object still propagates, with no retry.
+- Process control during COMMIT leaves the outcome unknown unless acknowledgement or a definitive rejection was already observed.
+- Cleanup cannot change an acknowledged commit into an uncommitted outcome.
+- Do not claim rollback succeeded when rollback itself failed.
+
+Define which process-control object wins if another occurs during cleanup. Preserve the first observed process-control object and prevent subsequent cleanup failures from replacing it.
+
+Make connection disposal concrete:
+- A fresh Session alone does not establish that a failed underlying connection was discarded.
+- Specify bounded cleanup and connection invalidation/disposal using the appropriate public SQLAlchemy APIs.
+- Explain what happens if rollback, close or invalidation itself raises.
+- Do not retry on a connection whose cleanup left it unsafe.
+- Do not assert guaranteed disposal if disposal itself failed.
+- Ordinary cleanup failures after an acknowledged commit must preserve the successful CreatedReview result and must not cause another creation attempt.
+- Process-control exceptions remain the explicit precedence exception to returning that result.
+
+Reference:
+https://docs.sqlalchemy.org/en/20/orm/session_api.html#sqlalchemy.orm.Session.invalidate
+
+Ensure the cleanup rules also cover replay, semantic failure, retryable body failure and unknown COMMIT outcome. Preserve bounded attempts, fixed private errors, no logging and no end-to-end deadline claim.
+
+5. Complete the capture and diagnostic-access failure boundaries
+
+The current text covers ordinary exceptions “from a statement.” Complete the contract for the whole capture operation after argument/role validation.
+
+Preserve:
+- Existing semantic outcome order.
+- Existing capture_snapshot signature, error mapping and precedence.
+- Caller ownership of isolation, timeout, commit, rollback and close.
+- Same-object propagation of process-control exceptions.
+
+Specify:
+- Ordinary operational failures during execute, fetching, row iteration, row access and otherwise-unhandled result processing return CaptureFailure.
+- Existing explicitly recognized semantic inconsistencies remain SemanticOutcome rather than becoming operational failures.
+- Unrecognized ordinary failures become the fixed other category.
+- No raw exception crosses the public capture result boundary.
+
+For classify_database_failure and the proposed commit classifier:
+- Diagnostic attributes may be missing, malformed or raise.
+- Ordinary failures while accessing diagnostics produce the conservative fixed fallback.
+- Only exact supported diagnostic values are recognized.
+- Messages, SQL, parameters and exception chains are never inspected.
+- Process control raised during diagnostic access propagates as the same object.
+- Define the supported argument contract and behavior for unsupported inputs.
+- Do not claim this is a sandbox against malicious trusted in-process code.
+
+Expand the planned tests to cover these cases. Do not write or run those application tests now.
+
+6. Remove the stale M5c integration claim
+
+In the M5c implementation-status subsection, remove or explicitly mark historical:
+“None of the 308 integration tests has run against this implementation version.”
+
+It now contradicts the recorded exact-commit PostgreSQL results for e8d1033c.
+
+Keep these separate and accurate:
+- The existing 308 integration tests passed on both pushes.
+- M5c added no PostgreSQL tests.
+- The container smoke does not exercise M5c.
+- No application review path uses M5c yet.
+
+Search the current status text in the authorized documents for equivalent stale claims. Preserve historical evidence by labelling it historically rather than rewriting prompt history.
+
+7. Preserve everything outside these corrections
+
+Keep unchanged:
+- Accepted M5a–M5c contracts and specification anchors.
+- M5c exact-commit CI results and reviewer/Claude attribution.
+- Tenant binding, canonical encodings and stored job linkage.
+- MVCC visibility wording and captured_at limitations.
+- Production isolation: no endpoints, commands, runtime registration, handler or provider wiring.
+- The later M5e–M5h obligations.
+- All M4 limitations.
+- Existing prompt-history fidelity disclosures.
+
+M5d remains proposed. No implementation or acceptance claim.
+
+8. History, checks and export
+
+Append to prompts.md:
+- The supplied Prompt 186 handoff.
+- This review disposition and corrections.
+- Prompt 187 verbatim.
+- An outcome note listing checks actually completed.
+
+Preserve all earlier bytes exactly. Preserve literal backslashes and punctuation. Do not reconstruct unavailable historical text and label it verbatim.
+
+Run documentation-only checks:
+- Exactly the same five paths staged against HEAD.
+- Only authorized documentation/history changes against the starting staged tree.
+- Every other tracked blob unchanged.
+- Links and anchors resolve; tables are consistent.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --cached --check.
+- Privacy scan of added lines.
+- Unsuppressed staged Gitleaks using the established command.
+- Status consistency: M5c published and verified; M5d proposed and unimplemented; overall M5 pending.
+
+Do not repeat application tests, builds, installed-wheel checks, PostgreSQL, Docker, provider calls or CI. No remote operation, commit or push.
+
+Export directly from Git:
+.local/p187/m5d-commit-outcome-and-cleanup-corrections.diff
+
+Baseline:
+8a146aae2a704d0bd438b9acc2d829404f49c118
+
+Final:
+the final staged tree.
+
+Use --full-index and exclude prompts.md. Verify byte identity against that exact Git comparison. Report the final staged tree, paths, statistics, line count, byte size, SHA-256, encoding and prompt-history prefix check.
+
+Finish with a self-contained handoff for Mathew and the external reviewer, clearly stating:
+- What changed.
+- Which choices remain proposed.
+- Checks actually run.
+- Nothing committed, pushed or implemented.
+- The exact export path.
+
+Mathew should return the handoff plus:
+.local/p187/m5d-commit-outcome-and-cleanup-corrections.diff
+
+### Prompt 187 outcome (Claude Code; staged, awaiting review)
+
+*Work actually completed; nothing below has been reviewed.*
+
+- **Start.** Branch `docs/review-creation-plan`, HEAD, `main` and `origin/main` at `e8d1033c`
+  (parent `36a41b1f`, tree `3ceeb788`), staged tree `8a146aae` with the five documentation paths,
+  nothing unstaged or untracked, origin and noreply identity unchanged; the Prompt 186 export
+  matched 110,686 bytes, 1,013 lines, its SHA-256 and `git diff --full-index 4332f1e2 8a146aae`
+  excluding prompts.md. Checkpoint (staged tree, paths, blob hashes, prompts.md prefix and
+  checksum) under `.local/p187/`. No remote operation.
+- **D15 corrected.** The rule that any SQLSTATE on a `COMMIT` failure proves a rejection is
+  withdrawn. Proposed: `CommitFailureResolution` (`rejected_retryable`, `unknown`) from
+  `classify_commit_failure(error: object)`, `rejected_retryable` only for exactly `40001` or
+  `40P01` read through the guarded allowlisted diagnostic access; every other ordinary `COMMIT`
+  failure (including `08007`, `40003`, `23505` and missing or unreadable diagnostics) is unknown,
+  raises `ReviewCommitOutcomeUnknownError` and is never retried automatically; body-phase
+  categories stay separate.
+- **M5d-B1 rewritten** (heading and anchor kept): a commit state (`not_entered`, `entered`,
+  `rejected`, `committed`) tracked independently of the exception in flight; an attempt-result
+  table decided before cleanup; a bounded cleanup table (`rollback`, `close`, `invalidate` at most
+  once each; no rollback after an unknown `COMMIT`); unsafe cleanup prevents a retry; no claim of a
+  successful rollback or guaranteed disposal; the first process-control object wins and later
+  ones during cleanup are suppressed; process control after acknowledgement leaves the outcome
+  committed and propagates without retry. New decisions D16 (commit state and process-control
+  precedence) and D17 (connection disposal).
+- **M5d-A2 completed:** the whole capture operation after validation returns `CaptureFailure` for
+  ordinary failures (execute, fetch, iteration, row access, result processing), recognized
+  semantic inconsistencies stay `SemanticOutcome`, `other` for unrecognized ones; the diagnostic
+  classifier's supported inputs, guarded access, conservative fallback and process-control
+  behaviour are defined, with no sandbox claim.
+- **M5c status.** The stale "none of the 308 integration tests has run" statements in the plan's
+  implementation status and in ADR-0021's Prompt 184 review are now accurate or labelled
+  historical; the 308 tests passed on both pushes, M5c added no PostgreSQL tests, the smoke does
+  not exercise M5c and no application path uses it.
+- Retry prose, the error table, the decision list (supported directions recorded; D12, D15–D17
+  proposed), README and threat-model summaries and the planned tests are updated consistently.
+  M5d remains proposed, unaccepted, unimplemented and untested; no ADR-0022.
+- **Checks before this note** (documentation only): 367 relative links with 0 link or anchor
+  problems, 67 tables with 0 problems, `git diff --cached --check` clean. The final scope,
+  encoding, privacy and Gitleaks checks and the export follow and are reported in the handoff.
+- **Text fidelity.** The Prompt 186 handoff and Prompt 187 verbatim blocks were written with a
+  file-writing tool, not a shell heredoc. Both earlier text-fidelity disclosures stand.
+
+### Prompt 187 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 187 handoff: M5d commit-outcome and cleanup contracts corrected
+
+The remaining M5d failure contracts and the stale M5c status are corrected and staged. This was documentation only: nothing is committed, pushed or implemented, and no remote operation was run. M5d is still proposed, not accepted, implemented or tested.
+
+**Starting state.** Everything matched what you expected:
+- Branch `docs/review-creation-plan`; HEAD, `main` and `origin/main` at `e8d1033c` (parent `36a41b1f`, tree `3ceeb788`).
+- Staged tree `8a146aae` with the five paths; nothing unstaged or untracked; origin and the noreply identity are unchanged.
+- The p186 export matches its 110,686 bytes, 1,013 lines and SHA-256, and is byte-identical to `git diff --full-index 4332f1e2 8a146aae` excluding prompts.md.
+- The checkpoint is in `.local/p187/` (staged tree, paths, blob hashes, prompts.md prefix and checksum).
+
+**What changed**
+
+*D15 (commit outcome)*
+- I withdrew the rule that any SQLSTATE on a failed COMMIT proves the transaction did not commit.
+- The new proposed policy: only exactly `40001` or `40P01` during COMMIT counts as a retryable rejection. It is decided by `classify_commit_failure(error: object) -> CommitFailureResolution` (`rejected_retryable` or `unknown`), which reads diagnostics through guarded access and an allowlist.
+- Every other ordinary COMMIT failure is an unknown outcome: `08007`, `40003`, `23505`, and missing or unreadable diagnostics. It raises `ReviewCommitOutcomeUnknownError` and is never retried automatically; a later call with the same key can discover whether creation happened.
+- Body-phase retry categories stay separate, so a body-phase `23505` on the review key is still retryable.
+
+*M5d-B1 (rewritten; heading and anchor kept)*
+- **Commit state:** each attempt tracks `not_entered`, `entered`, `rejected` or `committed`, independently of any exception being handled.
+- **Attempt result:** a table decides the result before cleanup; cleanup never changes it.
+- **Bounded cleanup:**
+  - `rollback`, `close` and `Session.invalidate()` are each called at most once;
+  - after an unknown COMMIT there is no rollback, only invalidation;
+  - if cleanup is unsafe, the attempt is not retried;
+  - no claim is made that a failed rollback succeeded, or that a connection was disposed when disposal failed.
+- **After an acknowledged commit:** an ordinary cleanup failure still returns `CreatedReview`, with no retry.
+- **Process control:**
+  - the first process-control object wins, and later ones raised during cleanup are suppressed;
+  - process control during COMMIT leaves the outcome unknown;
+  - after acknowledgement the outcome stays committed, and the same object still propagates.
+
+*M5d-A2 (capture and diagnostics)*
+- After validation, the whole capture operation (execute, fetch, iteration, row access and result processing) returns `CaptureFailure` for ordinary failures, with `other` when unrecognized.
+- Recognized semantic inconsistencies remain `SemanticOutcome`, and `capture_snapshot` is unchanged.
+- The classifier contract is now explicit:
+  - it accepts any input, and non-`DBAPIError` input gives `other`;
+  - diagnostic access is guarded, with a conservative fallback when an attribute is missing, malformed or raises;
+  - it never inspects messages or exception chains;
+  - process-control exceptions propagate as the same object;
+  - it makes no sandbox claim.
+
+*M5c status*
+- The stale "none of the 308 integration tests has run" statements, in the plan's implementation status and in ADR-0021's Prompt 184 section, are now accurate or labelled historical.
+- They now say: the 308 tests passed on both pushes, M5c added no PostgreSQL tests, the smoke does not exercise M5c, and no application path uses it.
+
+The error table, retry prose, decisions, README and threat-model summaries, and the planned tests are updated to match. Everything else is preserved: the M5c CI evidence and its attribution, tenant binding, canonical encodings, job linkage, the MVCC wording, production isolation, and the M4 and M5e–M5h obligations.
+
+**What remains proposed**
+
+| Decisions | Status |
+|---|---|
+| D1–D11, D13, D14 | Supported as directions only, not accepted |
+| D12 | Open (capture classification, completed in this revision) |
+| D15 | Revised conservative COMMIT policy |
+| D16 | New: commit-state and process-control precedence |
+| D17 | New: connection disposal by invalidation |
+
+**Checks run (documentation only)**
+- **Scope:** the same five paths are staged against HEAD and are the only ones changed from `8a146aae`; every other blob is identical; no `.local` file is tracked.
+- **Links and tables:** 367 relative links with no bad links or anchors; 67 tables with no problems.
+- **Encoding:** all five files are UTF-8 without BOM, LF only, with no replacement characters.
+- **Whitespace and leaks:** `git diff --cached --check` is clean; staged Gitleaks found no leaks, with no suppressions.
+- **Privacy:** scan of the 575 added lines found nothing.
+- **Status:** M5c is published and verified; M5d is proposed and unimplemented, with no acceptance or implementation claim; overall M5 is pending.
+- **Prompt history:** 371 lines added and the earlier bytes are an identical prefix. In the Prompt 187 verbatim block, the punctuation matches the source.
+- No application test, build, wheel, database, Docker, provider or CI check was run.
+
+**Export:** `.local/p187/m5d-commit-outcome-and-cleanup-corrections.diff`
+
+| Item | Value |
+|---|---|
+| Baseline | `8a146aae2a704d0bd438b9acc2d829404f49c118` |
+| Final | staged tree `9a7f1714e8f549b8be6c8b33843a242c4e09c562` |
+| Options | `--full-index`, prompts.md excluded |
+| Statistics | 4 files, 204 insertions, 82 deletions; 445 lines |
+| Size | 66,122 bytes |
+| SHA-256 | `b8f72da5f839e8470b0137a7a51c4cf9940d21a18c863587c7280139d37290cf` |
+| Encoding | UTF-8, no BOM, LF only |
+| Identity | byte-identical to the Git comparison |
+
+Start a new Claude session before the next task: this session is far past the 20-prompt guideline. The `.local/p187/` checkpoint and this handoff are enough to recover.
+
+**Next step:** please return **output plus the diff file** `.local/p187/m5d-commit-outcome-and-cleanup-corrections.diff`.
+
+### External review acceptance of the M5d specification (Prompt 188)
+
+The external reviewer accepted the complete M5d specification in Prompt 188, including D1–D17,
+with a binding cleanup clarification that supersedes the conflicting Prompt 187 cleanup-safety
+rule: for a retryable attempt in `not_entered` or `rejected`, an automatic retry is allowed only
+when the normal `rollback()` and `close()` both returned without any exception or process-control
+interruption; any ordinary failure of either permanently disables automatic retry for that attempt
+and a later successful `Session.invalidate()` does not restore it; `invalidate()` is a best-effort
+fallback (once, after a failed `rollback()` without calling `close()`, or after a failed `close()`;
+once without rollback after an unknown `COMMIT`; once after a failed `close()` following an
+acknowledged commit, whose `CreatedReview` is kept); the first process-control object stays
+primary; and because `Session.invalidate()` reaches only connections still associated with the
+session's transaction, its normal return does not prove that the original connection was
+invalidated. No M5d specification decision remains open. The acceptance covers the specification
+only; implementation, migration `0006`, tests, ADR-0022, implementation acceptance, publication and
+overall M5 acceptance remain pending, and no M5d control operates. Evidence: the reviewer
+independently verified the Prompt 187 export (66,122 bytes, 445 lines, SHA-256
+`b8f72da5f839e8470b0137a7a51c4cf9940d21a18c863587c7280139d37290cf`, four files, 204 insertions and
+82 deletions, UTF-8 and LF), inspected the corrections, checked that the published lockfile pins
+SQLAlchemy 2.1.1, inspected the relevant SQLAlchemy 2.1.1 session source and official
+documentation, and ran one isolated probe of the extracted `Session.close`, `Session.invalidate`,
+`Session._close_impl` and `SessionTransaction.close` methods with simulated resources: after an
+injected connection-close failure the session had detached its transaction, `Session.invalidate`
+returned normally and the original connection's invalidation count was zero. That was
+extracted-library-method evidence with simulated resources, not execution of the installed
+SQLAlchemy package, the project, a driver or a database; the reviewer ran no project suite, build,
+installed-wheel check, PostgreSQL, Docker or provider call. The M5c CI evidence and its
+attribution are unchanged. Prompt 188 authorizes the acceptance record and one local
+documentation commit, with no push, merge or remote operation.
+
+### Prompt 188 (verbatim)
+
+Written for: Claude Code.
+Prompt 188 — record M5d specification acceptance with the binding cleanup clarification; commit locally only.
+
+Complete this documentation task. Do not implement M5d, write application tests, create migration 0006 or ADR-0022, push, merge, fetch or perform any remote operation.
+
+1. Verify and checkpoint
+
+Read the applicable repository instructions and recover from .local/p187/ and the supplied Prompt 187 handoff.
+
+Expected state:
+- Branch: docs/review-creation-plan.
+- HEAD, main and origin/main:
+  e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3
+- HEAD parent:
+  36a41b1fb806944868fc9e1c62962ac6cd8eec7e
+- HEAD tree:
+  3ceeb788e70c33faef30da79ffa74c5d7a4aefce
+- Staged tree:
+  9a7f1714e8f549b8be6c8b33843a242c4e09c562
+- Exactly five paths staged:
+  README.md
+  docs/decisions/0021-review-request-assembly.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Origin and the established noreply identity unchanged.
+
+Verify:
+.local/p187/m5d-commit-outcome-and-cleanup-corrections.diff
+
+Expected:
+- 66,122 bytes.
+- 445 lines.
+- SHA-256:
+  b8f72da5f839e8470b0137a7a51c4cf9940d21a18c863587c7280139d37290cf
+- Byte-identical to git diff --full-index between:
+  8a146aae2a704d0bd438b9acc2d829404f49c118
+  9a7f1714e8f549b8be6c8b33843a242c4e09c562
+  excluding prompts.md.
+
+Save .local/p188/ checkpoint evidence: refs, status, staged tree, five blob hashes and the exact prompts.md prefix and checksum.
+
+Stop on a material mismatch without resetting or overwriting anything.
+
+2. External review decision and evidence
+
+The external reviewer accepts the complete M5d specification in Prompt 188, including D1–D17, WITH the binding cleanup clarification in section 3 below. It supersedes the conflicting Prompt 187 cleanup-safety rule.
+
+No M5d specification decision remains open after recording that clarification.
+
+Acceptance covers the specification only:
+- composable capture and preserved M4d behavior;
+- tenant-bound canonical request identity;
+- atomic review, snapshot facts, configuration and job creation;
+- persisted job linkage and validation;
+- bounded retry and conservative COMMIT classification;
+- schema, reload and isolated composition contracts;
+- planned verification and production isolation.
+
+Implementation, migration, tests, ADR-0022, implementation acceptance, publication and overall M5 acceptance remain pending. No M5d control operates.
+
+Reviewer evidence:
+- Independently verified the Prompt 187 export's byte size, line count, SHA-256, four-file scope, +204/-82 statistics and UTF-8/LF encoding.
+- Inspected the corrections.
+- Checked the published lockfile, which pins SQLAlchemy 2.1.1.
+- Inspected relevant SQLAlchemy 2.1.1 session source and official documentation.
+- Ran one isolated probe using extracted Session.close, Session.invalidate, Session._close_impl and SessionTransaction.close methods with simulated session/transaction/connection resources. After an injected connection-close failure, the session had detached its transaction; Session.invalidate returned normally and the original connection's invalidation count was zero.
+- This was extracted-library-method evidence with simulated resources, not execution of the installed SQLAlchemy package, the project, a driver or a database.
+- The reviewer ran no project suite, build, installed-wheel check, PostgreSQL, Docker or provider call.
+
+References:
+https://docs.sqlalchemy.org/en/21/orm/session_api.html#sqlalchemy.orm.Session.invalidate
+https://github.com/sqlalchemy/sqlalchemy/blob/rel_2_1_1/lib/sqlalchemy/orm/session.py
+
+Preserve the previously recorded M5c CI evidence and attribution unchanged.
+
+3. Binding cleanup clarification
+
+Replace the rule:
+“Cleanup was safe means rollback and close returned, or invalidate returned.”
+
+Use this exact policy:
+
+For a retryable attempt in not_entered or rejected state:
+- Automatic retry is allowed only when the normal rollback and close calls both returned without any exception or process-control interruption.
+- Any ordinary rollback or close failure permanently disables automatic retry for that attempt.
+- Subsequent successful invalidation does not restore retry eligibility.
+- Such an otherwise-retryable attempt ends with ReviewConflictRetryableError, without another internal attempt.
+- An already non-retryable result retains its existing fixed result.
+
+Define the normal cleanup sequence explicitly:
+- Call rollback at most once.
+- If rollback returns normally, call close at most once.
+- If rollback raises, skip the normal close call and attempt Session.invalidate once.
+- If close raises, attempt Session.invalidate once.
+- These are best-effort cleanup calls, not proof that the original connection was physically discarded.
+
+For entered/unknown:
+- Attempt Session.invalidate once.
+- Do not attempt rollback.
+- Preserve ReviewCommitOutcomeUnknownError and never retry automatically.
+
+For committed:
+- Call close once.
+- On an ordinary close failure, attempt Session.invalidate once.
+- Preserve CreatedReview and never retry, even if invalidation also fails.
+
+Process control:
+- The first observed process-control object remains primary and propagates as the same object after bounded best-effort cleanup.
+- A later ordinary or process-control cleanup failure cannot replace it.
+- An interrupt during rollback or close may trigger the one best-effort invalidation attempt, but never an automatic retry.
+- An interrupt after an acknowledged commit leaves the state committed.
+- Preserve the existing unknown-outcome rule for interruption during COMMIT.
+
+Clarify the limitation:
+Session.invalidate only reaches connections still associated with the session's transaction. Rollback or close may already have detached that transaction before raising. Therefore:
+- normal return from a fallback invalidation does not prove that the original connection was invalidated;
+- do not claim guaranteed physical disposal or pool quarantine;
+- no private SQLAlchemy state inspection or new connection-ownership mechanism is introduced by this specification.
+
+Update M5d-B1, D13/D17, retry prose, error descriptions, planned tests and matching summaries consistently.
+
+Also narrow the phrase “otherwise ... ReviewConflictRetryableError” in M5d-E so it applies only to an already-classified retryable failure whose cleanup failed or whose attempt limit was reached. It must not remap semantic, idempotency, job-conflict or other non-retryable errors.
+
+Planned tests must now assert:
+- rollback failure plus normally returning invalidation: no automatic retry;
+- close failure plus normally returning invalidation: no automatic retry;
+- both normal cleanup calls returning: retry remains permitted for a retryable failure;
+- a detached-transaction simulated resource where fallback invalidation returns without touching the original connection;
+- acknowledged commit plus cleanup failures: successful result retained;
+- unknown COMMIT outcome and process-control precedence remain unchanged.
+
+Do not write or run these application tests now.
+
+4. Record specification acceptance
+
+In docs/plan.md:
+- Rename the M5d specification heading to:
+  “M5d composable capture and atomic review-creation specification (ACCEPTED at review, Prompt 188; implementation pending)”
+- Update every link to its renamed anchor.
+- Add a separate Prompt 188 acceptance subsection recording scope, reviewer evidence, the Prompt 187 export checksum and the binding clarification.
+- Mark D1–D17 accepted, with D17 expressly subject to the clarified conservative policy.
+- Mark earlier proposed/supported states historical where necessary.
+- Preserve other contracts, schemas, canonical encodings, MVCC wording, production isolation and later-slice obligations.
+
+README and threat model:
+- Record specification acceptance and implementation pending.
+- State that no M5d control operates.
+- Preserve the M4 limits and M5c evidence.
+
+ADR-0021:
+- Keep its M5c evidence unchanged.
+- Do not create ADR-0022.
+
+5. History and checks
+
+Append to prompts.md:
+- The supplied Prompt 187 handoff.
+- This review decision and evidence.
+- Prompt 188 verbatim.
+- A pre-commit note listing only completed checks.
+
+Preserve the exact earlier byte prefix and existing text-fidelity disclosures.
+
+Documentation checks:
+- Exactly the same five authorized paths differ from HEAD.
+- Against the starting staged tree, only authorized documentation/history changes.
+- Every other tracked blob unchanged.
+- Relative links and anchors resolve; tables remain consistent.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --cached --check.
+- Privacy scan.
+- Unsuppressed staged Gitleaks.
+- Status consistency: M5c published and verified; M5d specification accepted, implementation pending; overall M5 pending.
+
+Do not repeat application tests, builds, installed-wheel checks, database checks, Docker or CI.
+
+6. Local commit only
+
+After those checks pass, commit the five files locally.
+
+Suggested subject:
+docs: record accepted M5d review creation specification
+
+Use the established noreply author and committer identity. Write the commit message from a file. Preserve the repository's attribution convention and Co-Authored-By trailer, crediting this documentation work and the external review accurately.
+
+Do not push or merge.
+
+Verify afterward:
+- Commit parent is e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3.
+- Exactly the five authorized paths changed.
+- All other tracked blobs match the parent.
+- Working tree is clean.
+- main and origin/main remain unchanged.
+- No .local file or artifact is tracked.
+- Run the established unsuppressed full-history Gitleaks check.
+
+7. Export and handoff
+
+Export directly from Git:
+.local/p188/m5d-spec-acceptance.diff
+
+Baseline:
+9a7f1714e8f549b8be6c8b33843a242c4e09c562
+
+Final:
+the new local commit.
+
+Use --full-index and exclude prompts.md. Verify byte identity with that comparison.
+
+Report:
+- Commit SHA, parent, tree, subject and identity.
+- Changed paths and scope checks.
+- Export statistics, line count, byte size, SHA-256 and encoding.
+- Prompt-history prefix verification.
+- Checks actually run and their limits.
+- Nothing pushed, merged or implemented.
+- M5d implementation and overall M5 acceptance remain pending.
+
+Mathew should return the handoff plus:
+.local/p188/m5d-spec-acceptance.diff
+
+### Prompt 188 pre-commit note (Claude Code; before the local documentation commit)
+
+Completed checks only. Starting state matched: branch `docs/review-creation-plan`, HEAD, `main` and
+`origin/main` at `e8d1033c` (parent `36a41b1f`, tree `3ceeb788`), staged tree `9a7f1714` with the
+five documentation paths, nothing unstaged or untracked, origin and noreply identity unchanged;
+the Prompt 187 export matched 66,122 bytes, 445 lines, its SHA-256 and `git diff --full-index
+8a146aae 9a7f1714` excluding prompts.md. Checkpoint (refs, status, staged tree, five blob hashes,
+prompts.md prefix and checksum) under `.local/p188/`. No remote operation. Documentation: the M5d
+heading renamed to "ACCEPTED at review, Prompt 188; implementation pending" with every link
+updated; an "M5d acceptance (Prompt 188)" subsection; M5d-B1's cleanup and process-control rules
+replaced by the binding clarification (normal rollback then close, `invalidate()` only as a
+best-effort fallback, automatic retry only when both normal calls returned, never restored by a
+later invalidation, no disposal claim); the M5d-E retry wording narrowed to already classified
+retryable failures; the error table, D13 and D17, the planned tests and the README and
+threat-model summaries updated; D1–D17 marked accepted with earlier states historical. ADR-0021 is
+unchanged in this prompt. Checks on README, plan and threat model after these edits: 367 relative
+links with 0 link or anchor problems, 67 tables with 0 problems, `git diff --cached --check` clean.
+No application test, build, wheel, database, Docker or provider check was run. The final scope,
+prefix, encoding, privacy and Gitleaks checks, the commit and the export follow and are reported
+in the handoff.

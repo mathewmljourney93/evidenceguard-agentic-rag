@@ -6823,10 +6823,13 @@ status](#m5b-implementation-status-accepted-at-review-prompt-179-ci-pending)); i
 `90295717` (Prompt 179; job-log results independently retrieved by the external reviewer and
 recorded in Prompt 180). The [M5c specification](#m5c-review-template-planner-prompts-and-request-assembly-specification-accepted-at-review-prompt-181-implementation-pending)
 (proposed in Prompt 179, revised in Prompt 180) was **accepted at external review in Prompt 181**;
-**M5c was implemented in Prompt 182, corrected in Prompt 183 and accepted at external review for a
-local commit in Prompt 184** ([implementation
-status](#m5c-implementation-status-accepted-for-a-local-commit-prompt-184-ci-pending); publication, Linux
-verification and current-version CI pending). M5d–M5h are not implemented; no review path, persisted snapshot or orchestration
+**M5c was implemented in Prompt 182, corrected in Prompt 183, accepted at external review in Prompt
+184 and published on `main` at `e8d1033c` after exact-commit feature and main-push CI (Prompt
+185)** ([implementation
+status](#m5c-implementation-status-accepted-for-a-local-commit-prompt-184-ci-pending)). The
+[M5d specification](#m5d-composable-capture-and-atomic-review-creation-specification-accepted-at-review-prompt-188-implementation-pending)
+(proposed in Prompt 185, revised in Prompts 186–187) was **accepted at external review in Prompt
+188**; its implementation is pending. M5d–M5h are not implemented; no review path, persisted snapshot or orchestration
 exists, no M5b or M5c control is used by any review path, and overall M5 acceptance is pending.** The M5 milestone text above is the controlling requirement and is unchanged; this
 sequence only orders it into slices. Labels: **[DECISION]** already accepted; **[FACT]** current
 code at `46c02257`; **[REC]** recommendation (for M5a and the sequence-level choices, accepted in
@@ -9347,9 +9350,18 @@ the accepted verdict mapping, and both prompts describe the optional `repair` me
 provenance checks prove quote existence only), and staged it for external review. **The
 corrected implementation was accepted at external review in Prompt 184 for a local
 implementation commit only, pending Linux verification and current-version CI**; publication
-and merge are not authorized yet (historical: until Prompt 184 implementation acceptance was
-pending). None of the 308 integration tests has run against this implementation version; M5c
-adds no PostgreSQL tests. No
+and merge were not authorized at that point (historical: until Prompt 184 implementation
+acceptance was pending). **In Prompt 185 it passed exact-commit feature and main-push CI and was
+published on `main` at `e8d1033c`** (the heading's "CI pending" is historical; see the
+[main publication evidence](decisions/0021-review-request-assembly.md#main-publication-evidence-prompt-185):
+Claude Code observed only API conclusions; from the job logs independently retrieved by the
+external reviewer and recorded in Prompt 186: Ubuntu `3429 passed, 308 skipped`, Windows
+`3428 passed, 309 skipped` and PostgreSQL `308 passed, 3429 deselected` on both pushes, all four
+installed-wheel logs printed eight lines including the M5c line, both container smokes reported
+success (they do not exercise M5c) and Gitleaks scanned 80 commits with no leaks; the reviewer ran
+no local project checks). The 308 existing integration tests passed on both pushes; M5c added no
+PostgreSQL tests (historical: at the Prompt 184 acceptance none of them had run against this
+version); the container smoke does not exercise M5c. No
 application path, handler, endpoint, setting or production registry uses M5c, so none of its
 controls operates in the application, and overall M5 acceptance is pending. See
 [ADR-0021](decisions/0021-review-request-assembly.md) for the implementation, the pinned
@@ -9392,8 +9404,741 @@ test).
   POSIX-only signal test); collection 308 integration and 3,408 non-integration tests; the offline
   build compared with `09587126` (only the M5c additions, all 16 sample files byte-identical);
   and the extracted installed-wheel step in a fresh offline environment with the new M5c line.
-- *Not established:* Linux, current-version CI, any review path using these values, live-model
-  behaviour, injection resistance or prompt quality.
+- *Not established:* (Linux and current-version CI were pending at acceptance and have since
+  passed for `e8d1033c`; see above.) Any review path using these values, live-model behaviour,
+  injection resistance or prompt quality.
+
+#### M5d composable capture and atomic review-creation specification (ACCEPTED at review, Prompt 188; implementation pending)
+
+**Status.** **The complete M5d specification, including D1–D17, was accepted at external review
+in Prompt 188 with a binding cleanup clarification (recorded in M5d-B1) and is the M5d
+implementation contract; implementation is pending.** It was proposed by Claude Code in Prompt 185
+and revised in Prompts 186 and 187 after external review (historical: in Prompts 186 and 187 the
+reviewer supported directions only). No M5d module, migration, test, ADR-0022 or workflow change
+exists, and none of the controls below operates. Labels: **[DECISION]** already accepted (the M5
+sequence with Correction A, W5, W8 and W15, the M4d capture and race rules, the accepted M5a–M5c
+contracts); **[FACT]** current source at `e8d1033c`; **[REC]** Claude Code's proposal, **accepted
+as specified (with the clarification) in Prompt 188**; **[OPEN]** none remains (M5d-H). M5d
+adds **no** endpoint, CLI, production registry entry, handler, setting, provider, network call or
+live model; creation and reload remain internal or test-only seams.
+
+##### M5d acceptance (Prompt 188)
+
+**Decision.** The external reviewer accepted the complete M5d specification in Prompt 188,
+including D1–D17, with the binding cleanup clarification recorded in
+[M5d-B1](#m5d-b1-failure-and-cleanup-precedence), which supersedes the conflicting Prompt 187
+cleanup-safety rule. No M5d specification decision remains open. The acceptance covers the
+specification only: composable capture with the M4d behaviour preserved; tenant-bound canonical
+request identity; atomic creation of the review, snapshot facts, configuration and job; persisted
+job linkage and its validation; bounded retry and the conservative `COMMIT` classification; the
+schema, reload and isolated composition contracts; and the planned verification and production
+isolation. Implementation, migration `0006`, tests, ADR-0022, implementation acceptance,
+publication and overall M5 acceptance remain pending, and no M5d control operates.
+
+**Binding clarification (summary).** For a retryable attempt in `not_entered` or `rejected`, an
+automatic retry is allowed only when the normal `rollback()` and `close()` both returned without
+any exception or process-control interruption; any ordinary failure of either permanently disables
+automatic retry for that attempt, a later successful `Session.invalidate()` does not restore it,
+and such an attempt ends with `ReviewConflictRetryableError` without another internal attempt.
+`Session.invalidate()` reaches only connections still associated with the session's transaction,
+so its normal return does not prove that the original connection was invalidated; no physical
+disposal or pool quarantine is claimed.
+
+**Reviewer evidence and scope.** The reviewer independently verified the Prompt 187 export
+(`.local/p187/m5d-commit-outcome-and-cleanup-corrections.diff`, 66,122 bytes, 445 lines, SHA-256
+`b8f72da5f839e8470b0137a7a51c4cf9940d21a18c863587c7280139d37290cf`, four files, 204 insertions and
+82 deletions, UTF-8 and LF), inspected the corrections, checked that the published lockfile pins
+SQLAlchemy 2.1.1, and inspected the relevant SQLAlchemy 2.1.1 session source
+([`session.py` at `rel_2_1_1`](https://github.com/sqlalchemy/sqlalchemy/blob/rel_2_1_1/lib/sqlalchemy/orm/session.py))
+and official documentation. One isolated probe ran the extracted `Session.close`,
+`Session.invalidate`, `Session._close_impl` and `SessionTransaction.close` methods against simulated
+session, transaction and connection resources: after an injected connection-close failure the
+session had detached its transaction, `Session.invalidate` returned normally, and the original
+connection's invalidation count was zero. This was extracted-library-method evidence with
+simulated resources, not execution of the installed SQLAlchemy package, the project, a driver or a
+database. The reviewer ran no project suite, build, installed-wheel check, PostgreSQL, Docker or
+provider call.
+
+##### M5d-A0. Accepted requirements and current-source facts
+
+[DECISION]
+
+- Sequence row M5d and *Composable capture and review creation (Correction A)*: extract the M4d
+  capture phases (scope, selection, emptiness, revision bound, consistency, readiness, chunk
+  bound, exclusions) into one public persistence function for a caller-owned `Session` and the
+  transaction's database time; keep `capture_snapshot`'s signature, read-only REPEATABLE READ
+  transaction, fixed errors and precedence; never reach into another module's private helper;
+  rerun the M4d capture cases and add an equivalence test.
+- One creation transaction: `SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ WRITE` first,
+  then the single `SELECT clock_timestamp()` that establishes the snapshot and becomes
+  `captured_at`, then transaction-local timeouts; review, bindings, exclusions, pinned
+  configuration and the `run_review` job (payload `{review_id}`, through the existing
+  `enqueue(session, …)`) commit together or not at all. Known retryable conflicts get a fixed
+  classification; any retry uses a fresh transaction; no unbounded retry loop; an unknown commit
+  outcome never claims a rollback.
+- Trusted loading: rows for `(tenant_id, review_id)` rebuilt through validating constructors, the
+  canonical snapshot digest recomputed and compared; later retrievals still run the M4d binding
+  recheck; no protection against direct database writers or malicious in-process code; the M4d
+  limitation closes for review paths only, once M5d is implemented and verified and M5g obtains
+  its snapshot solely from the loader.
+- W5: a job's `max_attempts` defaults to 3; W8: no endpoint, CLI or production path calls
+  creation, `run_review` is not added to `production_registry()`, and the worker claims only
+  registered kinds; W15: review status is a read-time projection, so M5d stores no mutable
+  status; W2 and §3: persistence must not import `evidenceguard_agents`.
+- M5c: the review configuration pins the `TemplateRef`, both `PromptRef`s and the model settings;
+  artifacts are loaded only through `load_pinned_template` and `load_pinned_prompt`.
+
+[FACT]
+
+- `capture_snapshot` runs `_capture_body` inside `run_read`, which uses
+  `document_views.read_snapshot` (`SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY`,
+  then `SELECT clock_timestamp()`), sets `SET LOCAL statement_timeout = 30000`, and maps semantic
+  outcomes to the fixed M4d errors and **every other ordinary exception to
+  `RetrievalDatabaseError` after discarding it**, so no SQLSTATE survives that boundary.
+  Precedence today: actor type (`TypeError`), inputs (`InvalidRetrievalRequestError`), role
+  (`PermissionDeniedError`), then the database phases.
+- `RetrievalSnapshot` derives `profile_id`, `total_chunks` and `sha256` (canonical JSON with
+  sorted keys, compact separators, ASCII, no NaN; `captured_at` as
+  `YYYY-MM-DDTHH:MM:SS.ffffffZ` in UTC) and enforces 1–100 bindings in ascending revision order,
+  one binding per document, derived index IDs, at most 100,000 chunks and disjoint exclusions;
+  `PendingExclusions(count, revision_ids, truncated)` with `len(revision_ids) == min(count, 100)`.
+- `jobs.enqueue` inserts with `ON CONFLICT DO NOTHING` on `uq_jobs_tenant_id_kind_idempotency_key`,
+  then returns an identical existing job or raises `JobIdempotencyConflictError`, or
+  `JobEnqueueRaceError` if no row is visible. `jobs` has a unique `(tenant_id, id)`;
+  `max_attempts` is 1–10 (default 3).
+- Persistence names constraints with `uq_%(table_name)s_%(column_0_N_name)s`,
+  `fk_%(table_name)s_%(column_0_N_name)s_%(referred_table_name)s`,
+  `ck_%(table_name)s_%(constraint_name)s` and `pk_%(table_name)s`. FK targets exist as unique keys:
+  `vendors(tenant_id, id)`, `document_revisions(tenant_id, id)` and `(tenant_id, document_id, id)`,
+  `embedding_indexes(tenant_id, id)` and `jobs(tenant_id, id)`. No persistence code deletes
+  vendors, documents, revisions, indexes or jobs. Migrations end at `0005`.
+
+##### M5d-A. Public contracts and placement
+
+[REC] Files:
+
+| File | Contents |
+|---|---|
+| `packages/domain/evidenceguard_domain/reviews.py` (new) | `ReviewConfiguration`, `ReviewRequest`, `CreatedReview`, `TrustedReview`, the canonical encodings, `REVIEW_JOB_KIND = "run_review"`, `REVIEW_JOB_MAX_ATTEMPTS = 3` and the fixed review errors |
+| `packages/persistence/evidenceguard_persistence/database_failures.py` (new) | `DatabaseFailureCategory`, `RETRYABLE_CATEGORIES`, `classify_database_failure` (M5d-A2), `CommitFailureResolution` and `classify_commit_failure` (M5d-B1) |
+| `packages/persistence/evidenceguard_persistence/retrieval.py` (changed) | public `CaptureFailure`, public `SemanticOutcome` and `capture_in_transaction`; `capture_snapshot` delegates to it without behaviour change |
+| `packages/persistence/evidenceguard_persistence/reviews.py` (new) | `create_review` and `load_review` |
+| `packages/persistence/evidenceguard_persistence/models.py` (changed) | the three review tables (M5d-C) |
+| `packages/persistence/evidenceguard_persistence/migrations/versions/v0006_reviews.py` (new) | migration `0006` |
+| `apps/worker/evidenceguard_worker/review_seams.py` (new; D2) | `ResolvedReview`, `create_review_with_artifacts`, `load_trusted_review`; internal and test-only |
+
+**Persistence seams** (complete signatures):
+
+- `capture_in_transaction(session: Session, captured_at: datetime, actor: ActorContext, *,
+  vendor_id: UUID, identity: EmbeddingIdentity, config: RetrievalConfig = RETRIEVAL_CONFIG_V1)
+  -> RetrievalSnapshot | SemanticOutcome | CaptureFailure` (M5d-A2).
+- `create_review(session_factory: sessionmaker[Session], actor: ActorContext, request:
+  ReviewRequest) -> CreatedReview` (M5d-B, B1, E).
+- `load_review(session_factory: sessionmaker[Session], actor: ActorContext, review_id: UUID)
+  -> TrustedReview` (M5d-D).
+
+**Composition seams** (worker module, D2):
+
+- `create_review_with_artifacts(session_factory, actor, request) -> CreatedReview`.
+- `load_trusted_review(session_factory, actor, review_id) -> ResolvedReview`.
+
+##### M5d-A1. Values and canonical identity
+
+[REC] Every value is a frozen dataclass with a validating keyword-only constructor: exact types
+(`bool` is never an `int`; tuples only), unknown keywords rejected, every nested value rebuilt
+through its own constructor (`PromptRef`, `EmbeddingIdentity` through `require_storable_identity`,
+`RetrievalConfig`, `RetrievalSnapshot` and the review values), `dataclasses.replace` running the
+same constructor, and `repr`/`str` showing identifiers, versions, counts and digests only (never
+the idempotency key). Any construction or replacement failure is a fresh
+`InvalidReviewValueError` (`invalid_review_value`) with no cause or context; process control
+propagates as the same object. Timestamps must be timezone-aware and are normalized to UTC with
+microsecond precision (PostgreSQL `timestamptz` precision).
+
+**Tenant scope (D10).** `ReviewRequest` is **tenant-free**. Its digest is not an argument-free
+property: `request_canonical_bytes(request, *, tenant_id)` and `request_sha256(request, *,
+tenant_id)` take the tenant explicitly (an exact `UUID`, else `InvalidReviewRequestError`).
+`create_review` passes only `actor.tenant_id` from the validated `ActorContext`; `load_review`
+selects the row with `tenant_id = actor.tenant_id`, then recomputes the digest with that stored and
+equal tenant. The actor remains the only authority for tenant scope.
+
+| Value | Fields (exact types, bounds, defaults) | Cross-field invariants | What it cannot prove |
+|---|---|---|---|
+| `ReviewConfiguration` | `template_id: str` (`^[a-z][a-z0-9_]{0,31}$`), `template_version: int` 1–999, `template_sha256: str` (64 lowercase hex), `verifier_prompt: PromptRef`, `analyst_prompt: PromptRef`, `model_id: str` (M5a model-ID pattern), `max_output_tokens: int` 1–8,192 (default 4,096), `timeout_ms: int` 1,000–120,000 (default 60,000), `retrieval_k: int` 1–20 (default 8). Derived `configuration_sha256` (tenant-independent) | `verifier_prompt.prompt_id != analyst_prompt.prompt_id` | that the references name registered, loadable artifacts (the composition seams check that) |
+| `ReviewRequest` | `vendor_id: UUID`, `idempotency_key: str` (`^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$`), `identity: EmbeddingIdentity`, `config: RetrievalConfig` (must equal `RETRIEVAL_CONFIG_V1`), `configuration: ReviewConfiguration` | none beyond nested validity | that the vendor belongs to any tenant (capture checks scope) |
+| `CreatedReview` | `review_id: UUID`, `tenant_id: UUID`, `vendor_id: UUID`, `request_sha256`, `snapshot_sha256`, `configuration_sha256` (64-hex `str`), `captured_at: datetime`, `job_id: UUID`, `replayed: bool` | aware UTC `captured_at` | that the review was committed or matches any database row |
+| `TrustedReview` | `review_id: UUID`, `tenant_id: UUID`, `request: ReviewRequest`, `request_sha256: str`, `snapshot: RetrievalSnapshot`, `job_id: UUID` | `request_sha256 == request_sha256(request, tenant_id=tenant_id)`; `snapshot.tenant_id == tenant_id`; `snapshot.vendor_id == request.vendor_id`; `snapshot.identity == request.identity`; `snapshot.config == request.config` | that the values came from the database or that the database rows are authentic (only `load_review` builds it from rows) |
+| `ResolvedReview` (worker) | `review: TrustedReview`, `template: ReviewTemplate`, `verifier: PromptSpec`, `verifier_system_text: str`, `analyst: PromptSpec`, `analyst_system_text: str` | `template.ref` equals the configuration's template ID, version and digest; `verifier.ref`/`analyst.ref` equal the configured `PromptRef`s with purposes `verifier`/`risk_analyst`; each system text's SHA-256 equals its reference digest | that the artifacts came from the pinned loaders (only `load_trusted_review` builds it) |
+
+**Canonical encodings.** Both use the existing retrieval canonical form: a JSON object serialized
+with `json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True,
+allow_nan=False)`, encoded as ASCII; the digest is the lowercase hex SHA-256 of those bytes. UUIDs
+are canonical lowercase hyphenated strings; integers are JSON numbers; no float, timestamp,
+generated ID or snapshot field appears.
+
+`eg-review-configuration-v1` (`configuration_sha256`):
+
+```text
+{"analyst_prompt":{"id":<str>,"sha256":<hex>,"version":<int>},
+ "canonical":"eg-review-configuration-v1",
+ "kind":"review_configuration",
+ "model":{"max_output_tokens":<int>,"model_id":<str>,"timeout_ms":<int>},
+ "retrieval_k":<int>,
+ "template":{"id":<str>,"sha256":<hex>,"version":<int>},
+ "verifier_prompt":{"id":<str>,"sha256":<hex>,"version":<int>}}
+```
+
+`eg-review-request-v1` (`request_sha256`, with the explicit tenant):
+
+```text
+{"canonical":"eg-review-request-v1",
+ "configuration_sha256":<hex>,
+ "embedding_profile":{"algorithm_version":<str>,"dims":<int>,"fingerprint":<hex>,
+                      "model_id":<str>,"normalization":<str>,"provider_id":<str>},
+ "idempotency_key":<str>,
+ "kind":"review_request",
+ "retrieval_config":{"config_sha256":<hex>,"version":<str>},
+ "tenant_id":<uuid>,
+ "vendor_id":<uuid>}
+```
+
+(The line breaks above are for reading; the encoding has none.) Logical request identity is
+therefore the tenant, vendor, key, embedding profile, retrieval configuration and the complete
+pinned configuration including the timeout and `retrieval_k`; it never includes `captured_at`,
+the snapshot, the review ID or the job ID.
+
+##### M5d-A2. Capture contract and failure classification
+
+[REC] (D1 as corrected, D12; revised in Prompt 187.)
+
+- **`SemanticOutcome`** (made public, unchanged values): a frozen value whose `code` is one of the
+  M4d codes `retrieval_scope`, `snapshot_empty`, `snapshot_bounds_exceeded`, `snapshot_not_ready`
+  and `snapshot_inconsistent`; the existing module constants are its only instances in use.
+- **`CaptureFailure`** (new public frozen value): `category: DatabaseFailureCategory`; nothing
+  else (no exception, message, SQL, parameter or chain).
+- **`DatabaseFailureCategory`** (`StrEnum`, body phase): `serialization_failure` (SQLSTATE
+  `40001`), `deadlock_detected` (`40P01`), `lock_not_available` (`55P03`), `query_canceled`
+  (`57014`, including statement timeout), `review_key_unique_violation` (`23505` **and** the
+  reported constraint name exactly `uq_reviews_tenant_id_idempotency_key`), `other`.
+  `RETRYABLE_CATEGORIES` = `serialization_failure`, `deadlock_detected`, `lock_not_available` and
+  `review_key_unique_violation`. These categories apply only to failures **before** `COMMIT`;
+  `COMMIT` failures use the narrower `CommitFailureResolution` (M5d-B1).
+- **`classify_database_failure(error: object) -> DatabaseFailureCategory`.** *Supported input:* an
+  ordinary exception the seam has just caught. *Behaviour:* if `error` is not an instance of
+  SQLAlchemy's `DBAPIError`, the result is `other`. Otherwise it reads, inside one guard that
+  catches only `Exception`, `error.orig`, then that object's `sqlstate`, and, only when the state is
+  `23505`, `error.orig.diag.constraint_name`. A value is recognized only if it is exactly a `str`
+  equal to an allowlisted SQLSTATE (or, for the constraint, exactly
+  `uq_reviews_tenant_id_idempotency_key`); a missing, `None`, non-`str`, unknown or raising
+  attribute gives `other` (or, for an unrecognized constraint, `other`). It never reads messages,
+  `str()`/`repr()` of the error, SQL, parameters, `__cause__`, `__context__` or tracebacks, never
+  raises an ordinary exception, and returns only an enum member, keeping no reference to the error.
+  Process control raised while reading an attribute propagates as the same object. This is a
+  bounded classification of supported driver errors, not a sandbox against malicious trusted
+  in-process code (an attribute can run arbitrary code).
+- **`capture_in_transaction` precedence** (preserving `capture_snapshot`): actor type (the
+  existing `TypeError`), inputs (`InvalidRetrievalRequestError`, now also for a naive or
+  non-`datetime` `captured_at`), role (`PermissionDeniedError`). After that validation, the **whole
+  remaining operation** (every `execute`, fetch, row iteration, row attribute access, result
+  processing and domain-value construction) runs inside one guard: the M4d phases return their
+  explicitly recognized results as `SemanticOutcome` exactly as today (including
+  `snapshot_inconsistent` for a domain constructor's `RetrievalError` in the existing `_build`
+  path) or the built `RetrievalSnapshot`; any **other** ordinary `Exception` is classified inside
+  the handler and returned as `CaptureFailure(category)` after leaving it (`other` when
+  unrecognized). No raw exception crosses the public result boundary. Process control propagates
+  as the same object. The function never commits, rolls back, closes the session, sets isolation or
+  sets a timeout.
+- **`capture_snapshot` unchanged.** Inside `run_read`, its body sets the statement timeout, calls
+  `capture_in_transaction`, returns a snapshot or `SemanticOutcome` unchanged, and for a
+  `CaptureFailure` raises a private marker that `run_read` records as operational, so the caller
+  still receives `RetrievalDatabaseError` with the same signature, mapping and precedence as today
+  (today any non-semantic body exception already becomes `RetrievalDatabaseError`).
+- **Trusted caller preconditions** (documented; the function cannot verify them): the session has
+  an active transaction at REPEATABLE READ whose snapshot was established by the statement that
+  returned `captured_at`; the caller has not written rows that affect eligibility (vendors,
+  documents, revisions, chunk sets, profiles or indexes) earlier in that transaction; and the
+  caller ends the transaction itself. `captured_at` is not proof that the caller followed these
+  rules. Both the read-only `capture_snapshot` path and the read-write creation path satisfy them.
+
+##### M5d-B. Transaction and eligibility
+
+[REC] `create_review` checks, in order: actor type (`InvalidReviewRequestError`), request type
+and reconstruction (`InvalidReviewRequestError`), role reviewer or approver
+(`PermissionDeniedError`); then it runs at most three attempts (D4). Each attempt uses one fresh
+session and transaction, in this statement order:
+
+1. `SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ WRITE` (first statement).
+2. `SELECT clock_timestamp()`; its value is `captured_at`.
+3. `SET LOCAL statement_timeout = 30000` and `SET LOCAL lock_timeout = 5000` (D6).
+4. Replay lookup: `SELECT` the review by `(actor.tenant_id, idempotency_key)`. If visible: a
+   matching `request_sha256` returns the stored review with `replayed=True` and its stored
+   `run_review_job_id` after validating the job association (M5d-D step 4); a different digest
+   raises `ReviewIdempotencyConflictError`. Either way nothing is written.
+5. `capture_in_transaction(session, captured_at, actor, vendor_id=…, identity=…, config=…)`.
+6. Generate `review_id = uuid4()` (D3); check that no `run_review` job with key `str(review_id)`
+   is visible for the tenant (if one is, the attempt fails with `ReviewJobConflictError`); then
+   `enqueue(session, actor, kind="run_review", idempotency_key=str(review_id),
+   payload=JobPayload.from_mapping({"review_id": str(review_id)}),
+   max_attempts=REVIEW_JOB_MAX_ATTEMPTS)` and require the returned job to have exactly that
+   tenant, kind, key, payload and `max_attempts`, status `queued` and `attempt` 0 (else
+   `ReviewJobConflictError`); `JobIdempotencyConflictError` and `JobEnqueueRaceError` are also
+   `ReviewJobConflictError`.
+7. `INSERT` the review row with `run_review_job_id` = that job's ID (a plain insert; no
+   `ON CONFLICT`), then one `review_bindings` row per binding (ordinal = position) and one
+   `review_excluded_revisions` row per listed excluded revision.
+8. `COMMIT`.
+
+**Visibility and time.** The snapshot is the MVCC snapshot that PostgreSQL establishes for the
+transaction's first data statement (the `SELECT` in step 2), as documented for REPEATABLE READ
+([transaction isolation](https://www.postgresql.org/docs/17/transaction-iso.html)): changes
+committed before that snapshot was taken are visible, and later commits are not. `captured_at` is
+the `clock_timestamp()` value that statement returned
+([date/time functions](https://www.postgresql.org/docs/17/functions-datetime.html)); it is a
+recorded clock reading, **not** an ordering proof: a transaction whose commit's wall-clock time
+precedes the returned `captured_at` (for example one committing while the statement runs) need not
+be visible. M5d keeps the M4d race tests (changes committed before the creation transaction's
+first statement are captured; changes committed after `captured_at` was returned are not) and
+adds no wall-clock ordering or historical-authorization claim. A captured revision stays bound
+after later supersession.
+
+No capture or enqueue helper commits, rolls back or closes the session; `create_review` alone
+ends each transaction. Nothing about the review is visible to other transactions until commit,
+and the review, bindings, exclusions, pinned configuration and job commit together or not at all.
+Per-statement and lock timeouts bound individual waits only; there is **no** end-to-end deadline.
+
+##### M5d-B1. Failure and cleanup precedence
+
+[DECISION, accepted in Prompt 188 with the binding cleanup clarification] (D13, D15, D16, D17;
+revised in Prompt 187.) Each attempt tracks its **commit state**
+independently of whatever exception is currently being handled:
+
+| Commit state | Meaning |
+|---|---|
+| `not_entered` | `COMMIT` was never sent (setup, replay, body or semantic outcome) |
+| `entered` | `Session.commit()` was called and has neither returned nor raised a recognized rejection; the outcome is **unknown** |
+| `rejected` | `Session.commit()` raised and `classify_commit_failure` returned `rejected_retryable` |
+| `committed` | `Session.commit()` returned normally (acknowledged) |
+
+**Commit classification (D15).** A SQLSTATE on a `COMMIT` failure does not by itself prove that
+the transaction did not commit: PostgreSQL defines `08007` (`transaction_resolution_unknown`) and
+`40003` (`statement_completion_unknown`)
+([error codes](https://www.postgresql.org/docs/17/errcodes-appendix.html)), and serialization
+failures can be reported at commit
+([transaction isolation](https://www.postgresql.org/docs/17/transaction-iso.html)). The proposed
+conservative policy:
+
+- `CommitFailureResolution` (`StrEnum`): `rejected_retryable`, `unknown`.
+- `classify_commit_failure(error: object) -> CommitFailureResolution`: `rejected_retryable` only if
+  `error` is a SQLAlchemy `DBAPIError` whose `orig.sqlstate`, read inside the same guard as
+  `classify_database_failure`, is exactly the `str` `"40001"` or `"40P01"`; **every** other case is
+  `unknown`, including a missing, `None`, non-`str` or raising diagnostic, `08007`, `40003`, `23505`
+  (even on the review-key constraint) and every other SQLSTATE. It never reads messages, SQL,
+  parameters or exception chains, returns only an enum member and keeps no reference; process
+  control raised during diagnostic access propagates as the same object.
+- An acknowledged commit is committed and is never retried; an `unknown` outcome raises
+  `ReviewCommitOutcomeUnknownError` and is never retried automatically; a later call with the same
+  tenant and idempotency key may discover whether creation happened (a matching replay returns
+  it). No later rollback, successful cleanup or connection disposal retrospectively proves that an
+  unknown `COMMIT` failed.
+- The body-phase categories stay separate: a body-phase `23505` on
+  `uq_reviews_tenant_id_idempotency_key` is retryable, a `COMMIT`-phase one is `unknown`.
+
+**Attempt result** (decided before cleanup and never changed by it; the first applicable row):
+
+| Situation | Commit state | Result | Retry |
+|---|---|---|---|
+| Matching replay or `ReviewIdempotencyConflictError` | `not_entered` | the replay value or that error | no |
+| Semantic capture outcome | `not_entered` | its fixed M4d error | no |
+| Ordinary body failure in `RETRYABLE_CATEGORIES` | `not_entered` | retryable | next attempt only if the normal `rollback()` and `close()` both returned (below); after the third attempt, or if either failed, `ReviewConflictRetryableError` |
+| Other ordinary body failure (`ReviewJobConflictError`, `query_canceled`, `other`) | `not_entered` | that error or `ReviewDatabaseError` | no |
+| `COMMIT` raised, `rejected_retryable` | `rejected` | retryable | as for a retryable body failure |
+| `COMMIT` raised, `unknown` | `entered` | `ReviewCommitOutcomeUnknownError` | never automatically |
+| `COMMIT` acknowledged | `committed` | the `CreatedReview` | never |
+
+**Cleanup** (binding clarification accepted in Prompt 188, superseding the Prompt 187
+cleanup-safety rule). Each call below is made at most once per attempt; these are best-effort
+cleanup calls, not proof that the original connection was physically discarded, and no time bound
+is claimed for them:
+
+| Commit state | Normal cleanup sequence | Fallback |
+|---|---|---|
+| `not_entered` or `rejected` | `Session.rollback()` once; only if it returned normally, `Session.close()` once | if `rollback()` raises, skip `close()` and call [`Session.invalidate()`](https://docs.sqlalchemy.org/en/21/orm/session_api.html#sqlalchemy.orm.Session.invalidate) once; if `close()` raises, call `Session.invalidate()` once |
+| `entered` (unknown) | `Session.invalidate()` once; **no** rollback | none |
+| `committed` | `Session.close()` once | if `close()` raises, call `Session.invalidate()` once |
+
+**Retry eligibility after cleanup** (for an attempt in `not_entered` or `rejected` whose classified
+failure is retryable):
+
+- an automatic retry is allowed **only** when the normal `rollback()` and `close()` calls both
+  returned without any exception or process-control interruption;
+- any ordinary `rollback()` or `close()` failure permanently disables automatic retry for that
+  attempt, and a later successful `invalidate()` does **not** restore it; such an otherwise
+  retryable attempt ends with `ReviewConflictRetryableError` and no further internal attempt;
+- an already non-retryable result (replay, idempotency conflict, semantic outcome, job conflict,
+  `ReviewDatabaseError`) keeps its own fixed result whatever cleanup does.
+
+Further rules:
+
+- **Unknown outcome:** after `entered`, `invalidate()` is attempted once; whatever it does, the
+  result stays `ReviewCommitOutcomeUnknownError` and is never retried automatically.
+- **Committed:** after an acknowledged commit the result stays the `CreatedReview` and is never
+  retried, even if both `close()` and the fallback `invalidate()` fail.
+- Cleanup never changes the attempt result or commit state; M5d does **not** claim that a rollback
+  succeeded when `rollback()` raised.
+- **Limitation.** `Session.invalidate()` reaches only connections still associated with the
+  session's transaction, and `rollback()` or `close()` may already have detached that transaction
+  before raising. A normal return from the fallback `invalidate()` therefore does **not** prove that
+  the original connection was invalidated; M5d claims neither guaranteed physical disposal nor
+  pool quarantine, and introduces no private SQLAlchemy state inspection or new
+  connection-ownership mechanism. (Reviewer evidence, Prompt 188: an isolated probe of the
+  extracted SQLAlchemy 2.1.1 `Session.close`, `Session.invalidate`, `Session._close_impl` and
+  `SessionTransaction.close` methods with simulated resources showed that after an injected
+  connection-close failure the transaction was detached and `invalidate()` returned without
+  invalidating the original connection.)
+- Ordinary cleanup exceptions are suppressed (never raised, logged or chained); the fixed result is
+  raised or returned after leaving every handler, with no cause or context.
+
+**Process control** (`BaseException` that is not `Exception`):
+
+- The **first** process-control object observed in an attempt (during setup, body, `COMMIT` or
+  cleanup) is primary: after bounded best-effort cleanup for the current commit state it is
+  re-raised as the same object, never translated, and no further attempt runs.
+- A later ordinary failure or a later process-control object during that cleanup is suppressed and
+  never replaces the first.
+- An interrupt during `rollback()` or `close()` may trigger the one best-effort `invalidate()`
+  attempt, but never an automatic retry.
+- If process control arrives during `COMMIT` before acknowledgement or a recognized rejection, the
+  commit state stays `entered` (unknown); after acknowledgement it stays `committed` (the
+  transaction did commit, but the `CreatedReview` is not returned because process control takes
+  precedence; a replay with the same key returns it).
+
+Retry eligibility (a property of the classified failure) and commit state (a property of the
+transaction) are separate; only `not_entered` or `rejected` attempts with a retryable
+classification whose normal `rollback()` and `close()` both returned are retried, at most three
+attempts in total. Per-statement and
+lock timeouts bound individual waits only; there is no end-to-end deadline. Nothing logs.
+
+##### M5d-C. Persistence and migration 0006
+
+[REC] Migration `0006` mirrors the models; constraint text is spelled out; plain DDL so offline
+`--sql` rendering needs no database; downgrade drops exactly these three tables in reverse order.
+All foreign keys use the default `NO ACTION` (no cascades). PostgreSQL `timestamptz` stores
+microseconds, matching the canonical timestamp.
+
+**`reviews`**
+
+| Column | SQL type | Null | Check (`ck_reviews_<name>`) |
+|---|---|---|---|
+| `id` | `uuid` | no | primary key `pk_reviews` |
+| `tenant_id` | `uuid` | no | FK `fk_reviews_tenant_id_tenants` → `tenants(id)` |
+| `vendor_id` | `uuid` | no | FK `fk_reviews_tenant_id_vendor_id_vendors` (`tenant_id`, `vendor_id`) → `vendors(tenant_id, id)` |
+| `idempotency_key` | `varchar(128)` | no | `idempotency_key`: `idempotency_key ~ '^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$'` |
+| `request_sha256`, `configuration_sha256`, `snapshot_sha256` | `varchar(64)` | no | `<column>`: `<column> ~ '^[0-9a-f]{64}$'` |
+| `captured_at` | `timestamptz` | no | — |
+| `provider_id`, `embedding_model_id`, `algorithm_version` | `varchar(64)` | no | `<column> ~ '^[a-z][a-z0-9._-]{0,63}$'` |
+| `dims` | `integer` | no | `dims`: `dims BETWEEN 1 AND 4096` |
+| `normalization` | `varchar(16)` | no | `normalization`: `normalization = 'l2'` |
+| `fingerprint` | `varchar(64)` | no | `fingerprint ~ '^[0-9a-f]{64}$'` |
+| `profile_id` | `uuid` | no | — (recomputed on reload) |
+| `retrieval_config_version` | `varchar(64)` | no | `retrieval_config_version`: `char_length(retrieval_config_version) BETWEEN 1 AND 64` |
+| `retrieval_config_sha256` | `varchar(64)` | no | hex check |
+| `exclusion_count` | `integer` | no | `exclusion_count`: `exclusion_count >= 0` |
+| `exclusions_truncated` | `boolean` | no | `exclusions_truncated`: `exclusions_truncated = (exclusion_count > 100)` |
+| `template_id` | `varchar(32)` | no | `template_id ~ '^[a-z][a-z0-9_]{0,31}$'` |
+| `template_version`, `verifier_prompt_version`, `analyst_prompt_version` | `integer` | no | `<column> BETWEEN 1 AND 999` |
+| `template_sha256`, `verifier_prompt_sha256`, `analyst_prompt_sha256` | `varchar(64)` | no | hex checks |
+| `verifier_prompt_id`, `analyst_prompt_id` | `varchar(32)` | no | `<column> ~ '^[a-z][a-z0-9_]{0,31}$'`; `distinct_prompts`: `verifier_prompt_id <> analyst_prompt_id` |
+| `model_id` | `varchar(64)` | no | `model_id ~ '^[a-z0-9][a-z0-9.-]{0,63}$'` |
+| `max_output_tokens` | `integer` | no | `BETWEEN 1 AND 8192` |
+| `timeout_ms` | `integer` | no | `BETWEEN 1000 AND 120000` |
+| `retrieval_k` | `integer` | no | `BETWEEN 1 AND 20` |
+| `run_review_job_id` | `uuid` | no | FK `fk_reviews_tenant_id_run_review_job_id_jobs` (`tenant_id`, `run_review_job_id`) → `jobs(tenant_id, id)` |
+| `created_at` | `timestamptz` | no | default `now()` |
+
+Unique constraints: `uq_reviews_tenant_id_id` (`tenant_id`, `id`; FK target),
+`uq_reviews_tenant_id_idempotency_key` (`tenant_id`, `idempotency_key`; the only constraint the
+retry classifier recognizes) and `uq_reviews_tenant_id_run_review_job_id` (`tenant_id`,
+`run_review_job_id`). No status, lease, credential, provider key, prompt text, template text or
+document text column exists.
+
+**`review_bindings`**: `tenant_id uuid`, `review_id uuid`, `ordinal smallint` (check
+`ordinal BETWEEN 0 AND 99`), `revision_id uuid`, `document_id uuid`, `index_id uuid`,
+`chunker_version varchar(32)` (check `^[a-z0-9][a-z0-9.-]{0,31}$`), `chunk_count integer` (check
+`BETWEEN 1 AND 4096`), `manifest_sha256 varchar(64)` and `vector_manifest_sha256 varchar(64)`
+(hex checks), all `NOT NULL`. Primary key `pk_review_bindings` (`review_id`, `revision_id`);
+unique `uq_review_bindings_review_id_ordinal` and `uq_review_bindings_review_id_document_id`; FKs
+`(tenant_id, review_id)` → `reviews(tenant_id, id)`, `(tenant_id, document_id, revision_id)` →
+`document_revisions(tenant_id, document_id, id)` and `(tenant_id, index_id)` →
+`embedding_indexes(tenant_id, id)` (D5).
+
+**`review_excluded_revisions`**: `tenant_id uuid`, `review_id uuid`, `revision_id uuid`, all
+`NOT NULL`; primary key (`review_id`, `revision_id`); FKs `(tenant_id, review_id)` → `reviews` and
+`(tenant_id, revision_id)` → `document_revisions(tenant_id, id)`.
+
+**Captured facts versus current state.** Every stored binding and exclusion is an immutable copy
+of what the creation transaction saw. Reload never consults a revision's current status, active
+pointer, chunk set or index state, so a revision superseded later stays bound and one activated
+later never joins. Retrieval over the reloaded snapshot still runs the M4d binding recheck
+against current rows (which uses `activated_at`, not `status`).
+
+##### M5d-C1. Enforced constraints versus reload checks
+
+| Rule | Enforced by PostgreSQL | Checked on reload or by constructors |
+|---|---|---|
+| tenant ownership of vendor, revisions, documents, indexes and job | composite FKs | also implied by the tenant-filtered selects |
+| one key per tenant; one job per review | unique constraints | replay and job association checks |
+| single-column formats and ranges | `CHECK`s above | the value constructors (again) |
+| 1–100 bindings, ascending revision order, ordinals 0…n−1 with no gap, one binding per document, derived index IDs, ≤ 100,000 chunks | only uniqueness of ordinal, document and revision | `RetrievalSnapshot` and the ordinal check |
+| excluded revisions belong to the vendor, ≤ 100 rows, row count = `min(exclusion_count, 100)`, disjoint from bindings | none | `PendingExclusions` and `RetrievalSnapshot` |
+| binding revision belongs to the vendor | none (FK only to tenant and document) | `RetrievalSnapshot` digest and later M4d binding recheck |
+| stored digests match the stored facts | none | recomputation and exact comparison |
+| job payload, kind, key and `max_attempts` match the review | none | job association check |
+
+##### M5d-D. Trusted reload
+
+[REC] `load_review` checks actor type and `review_id` type (`InvalidReviewRequestError`) and role
+(`PermissionDeniedError`), then runs one transaction through the public `read_snapshot` helper
+(REPEATABLE READ, READ ONLY, then `SELECT clock_timestamp()`, which is unused) with its **own**
+failure boundary (it does not reuse `run_read`, whose mapping is specific to M4d):
+
+1. select the review by `(actor.tenant_id, review_id)`; none → `ReviewNotFoundError` (also for
+   another tenant's ID);
+2. select its bindings ordered by `ordinal` and its excluded revisions ordered by `revision_id`;
+3. rebuild `EmbeddingIdentity`, the retrieval configuration (version and digest must identify
+   `RETRIEVAL_CONFIG_V1`), `ReviewConfiguration`, `ReviewRequest`, every `RevisionBinding`,
+   `PendingExclusions` and `RetrievalSnapshot` (with the stored `captured_at`), and require the
+   recomputed `snapshot.sha256`, `profile_id`, `configuration_sha256` and
+   `request_sha256(request, tenant_id=<stored tenant>)` to equal the stored values;
+4. **job association:** select the job by `(tenant_id, run_review_job_id)` and require kind
+   `run_review`, idempotency key `str(review_id)`, payload exactly `{"review_id": "<review_id>"}`
+   and `max_attempts == 3`; the job's status, attempt, lease and error fields may be anything (its
+   lifecycle continues independently). A missing row (possible only through direct tampering,
+   given the FK) or any mismatch is `ReviewRecordInconsistentError`;
+5. return `TrustedReview(review_id, tenant_id, request, request_sha256, snapshot, job_id)`.
+
+Errors: reconstruction or comparison failures are `ReviewRecordInconsistentError`; other ordinary
+failures (including those of the helper's own statements and cleanup) are `ReviewDatabaseError`;
+process control propagates as the same object. **Creation, replay and reload return the same job
+ID**: creation from `enqueue`, replay and reload from the stored `run_review_job_id`, each with
+the association validated.
+
+`load_trusted_review` checks the same inputs and role, calls `load_review`, then loads the
+template and both prompts through `load_pinned_template` and `load_pinned_prompt` (purposes
+`verifier` and `risk_analyst`); `UnknownTemplateError`, `TemplateIntegrityError`,
+`UnknownPromptError` and `PromptIntegrityError` become `ReviewArtifactsUnavailableError`; it
+returns `ResolvedReview`.
+
+**Boundary.** Stored rows are trusted because the application wrote them in the transaction that
+established eligibility, not because digests exist; the digests only detect disagreement between
+stored rows. There is no protection against direct database writes, data-altering migrations or
+malicious trusted in-process code. The M4d trusted-snapshot limitation closes **for review paths
+only**, once M5d is implemented and verified and M5g obtains its snapshot solely from
+`load_trusted_review`.
+
+##### M5d-E. Idempotency, concurrency and failures
+
+[REC]
+
+- **Logical identity** is `(tenant_id, idempotency_key)` with `request_sha256` (M5d-A1). A replay
+  after documents changed returns the **original** review, snapshot and job.
+- **Matching replay** writes nothing and returns `replayed=True` with the stored job ID;
+  **conflicting replay** raises `ReviewIdempotencyConflictError` and writes nothing.
+- **Concurrent creation** with one key: both attempts may capture; the later review insert waits
+  on `uq_reviews_tenant_id_idempotency_key` and fails with `23505` on that constraint (or a
+  serialization failure) once the first commits; that attempt is not committed and is retried in a
+  fresh transaction, which sees the committed review and returns the matching replay (or the
+  conflict error).
+- **Retry policy (D4, D15, D17):** at most three attempts in total, no sleep; a not-committed
+  attempt is retried only for a body-phase failure in `RETRYABLE_CATEGORIES` or a `COMMIT`
+  rejection classified `rejected_retryable` (exactly `40001` or `40P01`), and only when its normal
+  `rollback()` and `close()` both returned (M5d-B1). Such an already classified retryable failure
+  ends with `ReviewConflictRetryableError` when either of those cleanup calls failed or the third
+  attempt is reached; semantic, idempotency, job-conflict and other non-retryable errors keep their
+  own fixed results. An unknown commit outcome or an acknowledged commit is never retried.
+- **Job conflicts:** a visible `run_review` job with the new review's key, an enqueue idempotency
+  conflict or race, or a returned job that is not the expected new queued job is
+  `ReviewJobConflictError` (not retryable); a random review ID makes this unlikely but not
+  logically impossible, so it has a defined refusal path.
+- **Job attempts versus call budget:** `REVIEW_JOB_MAX_ATTEMPTS = 3` (W5) limits how often the
+  worker may run the `run_review` job; it is unrelated to M5g's persisted provider-call
+  reservations (3 per stage, W4).
+
+**Errors** (in `evidenceguard_domain.reviews`; fixed codes; nothing logs; the key and document text
+never appear):
+
+| Error (code) | Raised for | Retryable |
+|---|---|---|
+| `InvalidReviewRequestError` (`invalid_review_request`) | invalid seam arguments (actor type, request, review ID, tenant parameter) | no |
+| `InvalidReviewValueError` (`invalid_review_value`) | invalid value construction or replacement | no |
+| `PermissionDeniedError` (existing) | a role other than reviewer or approver | no |
+| existing M4d capture errors (`retrieval_scope`, `snapshot_empty`, `snapshot_bounds_exceeded`, `snapshot_not_ready`, `snapshot_inconsistent`) | semantic capture outcomes during creation | no |
+| `ReviewIdempotencyConflictError` (`review_idempotency_conflict`) | the key exists for the tenant with a different request digest | no |
+| `ReviewJobConflictError` (`review_job_conflict`) | the job refusal paths above | no |
+| `ReviewConflictRetryableError` (`review_conflict_retryable`) | an already classified retryable failure (a body-phase retryable category or a `rejected_retryable` `COMMIT`) after three attempts, or when its normal `rollback()` or `close()` failed | by a later fresh call |
+| `ReviewCommitOutcomeUnknownError` (`review_commit_outcome_unknown`) | any ordinary `COMMIT` failure not classified `rejected_retryable` (including `08007`, `40003`, `23505` and missing, unreadable or unrecognized diagnostics); the transaction may or may not have committed | never automatically |
+| `ReviewDatabaseError` (`review_database_error`) | other database or session failures, including `57014` | no |
+| `ReviewNotFoundError` (`review_not_found`) | no review with that ID for the actor's tenant | no |
+| `ReviewRecordInconsistentError` (`review_record_inconsistent`) | stored rows or job association that fail reconstruction or comparison | no |
+| `ReviewArtifactsUnavailableError` (`review_artifacts_unavailable`) | a pinned template or prompt that is unknown or fails its integrity check | no |
+
+**Composition precedence.** `create_review_with_artifacts`: actor type and request
+(`InvalidReviewRequestError`), role (`PermissionDeniedError`), artifacts (load the template and
+both prompts; `ReviewArtifactsUnavailableError`) before any database work, then `create_review`.
+`load_trusted_review`: inputs, role, `load_review`'s errors, then artifacts.
+
+##### M5d-F. Production isolation
+
+[DECISION, restated] Creation and reload are internal or test-only seams: no endpoint, CLI, API
+route, `eg-admin` command or worker runtime path imports them; `run_review` is **not** added to
+`production_registry()`, and the worker's registered-kind claim filter is unchanged, so a
+production worker never claims a `run_review` job created by a test. M5d creates no handler and
+no fake judgment; enqueue from a production path, handler registration and a configured provider
+remain one later reviewed wiring decision.
+
+##### M5d-G. Verification plan (planned, not written or run)
+
+*Database-independent* (`tests/test_review_values.py`, `tests/test_review_creation.py`,
+`tests/test_database_failures.py`):
+
+- every value bound, default and cross-field rule; replacement and bypass revalidation;
+  representations without the key; `TrustedReview` and `ResolvedReview` consistency failures;
+- canonical bytes of both encodings pinned as hand-written literals and their SHA-256 values
+  computed independently; the same request under two tenants gives two digests; no
+  argument-free request digest exists; missing or non-`UUID` tenant parameter refused;
+- `classify_database_failure` for each allowlisted SQLSTATE, `23505` with the exact and with
+  another constraint name, missing SQLSTATE, `None`, a non-`str` SQLSTATE, a raising `orig`,
+  `sqlstate`, `diag` or `constraint_name` attribute (`other`), non-`DBAPIError` and non-exception
+  inputs (`other`), and process control raised from a diagnostic attribute (same object); no
+  message, `str`, `repr`, chain or traceback read (fakes whose `__str__`, `__repr__`, message and
+  `args` raise when touched);
+- `classify_commit_failure`: `rejected_retryable` for exactly `40001` and `40P01`; `unknown` for
+  `08007`, `40003`, `23505` (also on the review-key constraint), `55P03`, `57014`, other states,
+  missing, malformed or raising diagnostics and non-`DBAPIError` inputs; process control from
+  diagnostic access propagates as the same object;
+- `capture_in_transaction` with a recording session: never commits, rolls back, closes or sets
+  isolation or a timeout; returns `CaptureFailure` for ordinary failures raised by `execute`, by
+  fetching, by row iteration, by row attribute access and by other result processing, with no
+  exception retained and `other` for unrecognized ones; recognized semantic inconsistencies
+  (including a domain constructor's `RetrievalError`) still return `SemanticOutcome`;
+  process-control identity from each of those points; `capture_snapshot`'s signature, precedence
+  and `RetrievalDatabaseError` mapping unchanged;
+- `create_review` and `load_review` input, role and composition precedence;
+- the commit-state and cleanup tables, row by row, with fake sessions recording every call:
+  replay, semantic, retryable and non-retryable body failures; `COMMIT` raising `40001`, `40P01`
+  (retried in a new session), `08007`, `40003`, `23505` and a diagnostic-free error
+  (`ReviewCommitOutcomeUnknownError`, no retry, `invalidate()` called and no rollback attempted);
+  an acknowledged commit followed by a `close()` failure and by both `close()` and `invalidate()`
+  failures (the `CreatedReview` returned, no further attempt); `rollback()` failing with a
+  normally returning `invalidate()` and `close()` not called (no automatic retry,
+  `ReviewConflictRetryableError`); `close()` failing with a normally returning `invalidate()`
+  (no automatic retry); both normal cleanup calls returning (retry still permitted for a retryable
+  failure); a simulated detached-transaction resource on which the fallback `invalidate()` returns
+  without touching the original connection (the result and retry decision are unchanged and no
+  disposal is claimed); each of `rollback`, `close` and `invalidate` called at most once per
+  attempt; an interrupt during `rollback()` or `close()` (one `invalidate()` attempt, same object
+  raised, no retry); process control during setup, body, `COMMIT` (state stays unknown) and after
+  acknowledgement (state committed, same object raised, no retry, a later replay returns the
+  review); a second process-control object and ordinary failures during cleanup never replacing
+  the first; at most three attempts; fresh errors without cause, context, key or text; no logs;
+- packaging: import boundaries, persistence still not importing agents, the production registry
+  without `run_review`, no route or command importing the seams, and the narrowed agents-import
+  exception for exactly `review_seams.py` (D2).
+
+*PostgreSQL* (`tests/test_reviews_postgres.py`, integration; the existing capture tests in
+`tests/test_retrieval_postgres.py` rerun unchanged):
+
+- equivalence of `capture_snapshot` and `capture_in_transaction` over the same data;
+- atomicity: success writes the review, every binding, the exclusions and exactly one queued
+  `run_review` job with `max_attempts = 3` and the review's payload; each semantic outcome, an
+  injected failure after the job insert and after the review insert leave no row and no job;
+- MVCC races (two connections and a barrier, as in M4d): a change committed before the creation
+  transaction's first statement is captured; one committed after `captured_at` was returned is
+  not; a captured revision stays bound after supersession;
+- persisted facts equal the captured snapshot; reload rebuilds the same snapshot, digests and job
+  ID; tampered binding, ordinal, exclusion, identity, configuration, digest or job rows (payload,
+  kind, key, `max_attempts`) give `ReviewRecordInconsistentError`; a job whose status changed to
+  `running`, `succeeded` or `dead` still reloads; another tenant's ID gives `ReviewNotFoundError`;
+- idempotency: matching replay returns the same review and job ID and writes nothing; conflicting
+  replay is refused; concurrent same-key creation yields one review and one job and the other call
+  returns the replay; a pre-existing `run_review` job with the generated key (inserted by the
+  test with a fixed ID) gives `ReviewJobConflictError`;
+- deterministic lock-timeout and serialization cases where feasible, and the three-attempt bound;
+- an unknown commit outcome (simulated by a test hook that raises after the server acknowledged
+  `COMMIT`) followed by a replay with the same key that returns the committed review;
+- the production worker registry does not claim a `run_review` job;
+- `alembic upgrade`, `downgrade`, `check` and offline SQL rendering for `0006`, and that every
+  named constraint exists with its exact name.
+
+*Wheel* (D8): assert that the offline migration SQL includes `CREATE TABLE reviews`. No new
+dependency.
+
+##### M5d-H. Scope, files and reviewer decisions
+
+*Files:* the seven in M5d-A; `tests/test_review_values.py`, `tests/test_review_creation.py`,
+`tests/test_database_failures.py`, `tests/test_reviews_postgres.py`; changes to
+`tests/test_packaging.py`, `tests/test_retrieval_postgres.py` (equivalence) and, with D8,
+`.github/workflows/ci.yml`; ADR-0022 with the implementation; README, plan and threat-model status.
+*Excluded:* M5e stage, call-reservation and output records; M5f report representation; M5g
+orchestration and handler; M5h transport; any endpoint, CLI, production registration, provider,
+live call, corpus, dependency or lockfile change.
+
+**Review status (Prompt 188): D1–D17 are accepted**, D17 expressly subject to the clarified
+conservative cleanup policy in M5d-B1; no specification decision remains open. *Historical:* in
+Prompt 186 the reviewer supported D1–D9 as directions and in Prompt 187 D10, D11, D13 and D14;
+D12 was open and D15–D17 were proposed until Prompt 188.
+
+1. **D1 Public composable capture** (*accepted, Prompt 188*). [REC]
+   `capture_in_transaction` returning `RetrievalSnapshot | SemanticOutcome | CaptureFailure`, with
+   `SemanticOutcome` public. *Tradeoff:* a three-way result versus raising and losing
+   classification.
+2. **D2 Isolated worker composition** (*accepted, Prompt 188*). [REC]
+   `evidenceguard_worker.review_seams` is the only app module that may import `evidenceguard_agents`.
+3. **D3 Random review IDs** (*accepted, Prompt 188*). [REC] `uuid4` with
+   `uq_reviews_tenant_id_idempotency_key`.
+4. **D4 Bounded fresh-transaction retries** (*accepted, Prompt 188*). [REC] Three attempts, no
+   sleep, `RETRYABLE_CATEGORIES` only.
+5. **D5 Tenant-scoped foreign keys** (*accepted, Prompt 188*). [REC] As in M5d-C, including
+   `embedding_indexes` and `jobs`.
+6. **D6 Timeouts** (*accepted, Prompt 188*). [REC] `statement_timeout` 30 s, `lock_timeout` 5 s;
+   `57014` not retryable; no end-to-end deadline.
+7. **D7 Key format** (*accepted, Prompt 188*). [REC] `^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$`.
+8. **D8 Offline-migration wheel assertion** (*accepted, Prompt 188*).
+9. **D9 Flat typed configuration columns** (*accepted, Prompt 188*).
+10. **D10 Tenant binding of the request digest** (*accepted, Prompt 188*). [REC] Tenant-free `ReviewRequest` with
+    `request_sha256(request, *, tenant_id)` supplied from the validated actor. *Alternative:* a
+    tenant-bound request value plus an actor-equality check. *Tradeoff:* the actor stays the only
+    tenant authority versus a self-contained value that can disagree with the actor.
+11. **D11 Durable job linkage** (*accepted, Prompt 188*). [REC] A stored `run_review_job_id` with a composite FK to
+    `jobs` and a uniqueness constraint, the job enqueued before the review insert, and an exact
+    association check on replay and reload. *Alternative:* a canonical lookup by tenant, kind and
+    key. *Tradeoff:* referential integrity and a direct reload versus no new FK into `jobs`.
+12. **D12 Capture failure classification** (*accepted, Prompt 188*). [REC] A typed
+    `CaptureFailure` with a fixed, allowlisted `DatabaseFailureCategory` produced in the handler,
+    for the whole operation after validation, by one shared guarded classifier reading only the
+    SQLSTATE and, for `23505`, the exact constraint name. *Alternative:* a
+    caller-supplied classifier callback. *Tradeoff:* one reviewed classifier versus flexibility.
+13. **D13 Acknowledged commit then cleanup failure** (*accepted, Prompt 188*). Return the
+    `CreatedReview`; call `close()` once and, on an ordinary failure, `invalidate()` once; never
+    retry, even if invalidation also fails; process control remains the precedence exception. *Alternative:* `ReviewDatabaseError` as `run_read` does after a
+    successful read. *Tradeoff:* an accurate result for a committed write versus uniformity.
+14. **D14 Creation job attempts** (*accepted, Prompt 188*). [REC] `max_attempts = 3`
+    (W5), checked on reload, separate from provider-call budgets.
+15. **D15 Commit-failure classification** (*accepted, Prompt 188*; revised in Prompt 187). [REC] Only exactly
+    `40001` or `40P01` during `COMMIT` is a recognized retryable rejection; every other ordinary
+    `COMMIT` failure (including `08007`, `40003`, `23505` and missing or unreadable diagnostics) is
+    an unknown outcome, never retried automatically. *(The Prompt 186 rule that any SQLSTATE
+    proves a rejection is withdrawn.)* *Tradeoff:* fewer automatic retries versus never
+    re-creating after a commit that may have succeeded.
+16. **D16 Commit state and process-control precedence** (*accepted, Prompt 188*). [REC] Track `not_entered`,
+    `entered`, `rejected` and `committed` independently of the exception in flight; the first
+    process-control object wins and later ones during cleanup are suppressed. *Alternative:* let a
+    later process-control object propagate. *Tradeoff:* a stable, testable outcome versus
+    surfacing the most recent interrupt.
+17. **D17 Connection cleanup** (*accepted, Prompt 188, subject to the binding clarification*).
+    `rollback()` once, then `close()` once only if `rollback()` returned; `invalidate()` once as a
+    fallback if either raised (and once, without rollback, after an unknown `COMMIT`); automatic
+    retry only when both normal calls returned, never restored by a later `invalidate()`; no claim
+    of physical disposal or pool quarantine. *Tradeoff:* abandoning some retries versus reusing a
+    connection whose cleanup failed.
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.
