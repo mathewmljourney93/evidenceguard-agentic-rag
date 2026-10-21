@@ -37580,3 +37580,443 @@ wheel check was repeated (the accepted implementation blobs are unchanged). The 
 183 handoff is Claude Code's output as supplied; the Prompt 179 reconstruction disclosure and the
 Prompt 175 text-fidelity disclosure are kept. The final scope, prefix, encoding, privacy and
 Gitleaks checks, the commit and the export follow and are reported in the handoff.
+
+### Prompt 184 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 184 handoff: accepted M5c implementation committed locally
+
+The accepted M5c implementation is committed locally on `feat/review-request-assembly`. Nothing was pushed or merged.
+
+**Starting state.** Everything matched what you expected:
+- Branch `feat/review-request-assembly`, HEAD `09587126` (parent `90295717`, tree `88e02932`); `main` and `origin/main` at `90295717`.
+- Accepted staged tree `687cb581` with the 18 paths; nothing unstaged or untracked; origin and the noreply identity are unchanged.
+- Both exports match their sizes and SHA-256 values, and each is byte-identical to its Git comparison (excluding prompts.md):
+
+| Export | Compared with |
+|---|---|
+| p182 | `git diff --full-index 09587126 563acd58` |
+| p183 | `git diff --full-index 563acd58 687cb581` |
+
+- The five blob hashes you cited match the staged blobs exactly.
+- Checkpoint saved in `.local/p184/`: refs, status, the 18 blob hashes, and the prompts.md bytes with their SHA-256. No remote operation was run.
+
+**Commit**
+
+| Item | Value |
+|---|---|
+| SHA | `36a41b1fb806944868fc9e1c62962ac6cd8eec7e` |
+| Parent | `0958712661263fd05d5e62813212f11b1f4ed2c8` |
+| Tree | `aa2d5921050b1bc2f74ad310a89d1044381f84da` |
+| Subject | feat: add review templates prompts and request assembly |
+| Author and committer | `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>` |
+| Message | written from a file; Claude Code, reviewer and earlier attribution preserved; Co-Authored-By trailer present |
+
+**Scope**
+- The commit contains exactly the 18 reviewed paths.
+- Against `687cb581`, only the 5 authorized documentation and history files differ. The 13 implementation, resource, test, packaging and workflow blobs are identical.
+- Every other tracked path is unchanged from `09587126`.
+- The working tree is clean and no `.local` file is tracked.
+
+**Documentation changes**
+- **ADR-0021:** the status now records acceptance for a local commit in Prompt 184. A new "External review (Prompt 184)" section records the decision, your evidence and its isolated-check scope, and Claude Code's Prompt 183 results attributed separately as historical local evidence. It also states that none of the 308 integration tests has run against this version, and that M5c adds no PostgreSQL tests.
+- **README, plan and threat model:** all three now record specification accepted (Prompt 181), implemented (182), corrected (183), and accepted for a local commit (184). Publication, Linux verification and current-version CI stay pending, and there is still no application use.
+- **Plan heading:** the implementation-status heading is renamed "M5c implementation status (accepted for a local commit, Prompt 184; CI pending)", and every link to it is updated. The accepted specification heading is unchanged.
+
+**Checks actually run (documentation only)**
+- **Links and tables:** 359 relative links with no bad links or anchors; 59 tables with no problems.
+- **Encoding:** UTF-8 without BOM, LF only, no replacement characters.
+- **Whitespace:** `git diff --cached --check` is clean.
+- **Privacy:** scan of 459 added lines; the only hit is the public noreply identity quoted in Prompt 184.
+- **Gitleaks:** the staged scan found no leaks; the full-history scan after the commit covered 79 commits with no leaks; no suppressions.
+- No application test, build or wheel check was repeated, because the accepted implementation blobs are unchanged.
+
+**Prompt history:** 374 lines added:
+- the Prompt 183 handoff as I supplied it;
+- your Prompt 184 acceptance with its evidence scope;
+- Prompt 184 verbatim;
+- a pre-commit note listing completed checks only, with no prospective SHA.
+
+The earlier bytes are an identical prefix. Both text-fidelity disclosures are kept. In the verbatim block, the dashes and backslash path match the source.
+
+**Export:** `.local/p184/m5c-commit-incremental.diff`
+
+| Item | Value |
+|---|---|
+| Baseline | `687cb58103b22a8cf82bceb605841c8d702dcb52` |
+| Final | commit `36a41b1f` |
+| Options | `--full-index`, prompts.md excluded |
+| Statistics | 4 files, 85 insertions, 18 deletions; 195 lines |
+| Size | 40,412 bytes |
+| SHA-256 | `d630d022e046085e44ec2bfee6387417e7f494c6c8e55a7d3bde06c4731da724` |
+| Encoding | UTF-8, no BOM, LF only |
+| Identity | byte-identical to the Git comparison |
+
+**Refs:** `feat/review-request-assembly` is at `36a41b1f` (local only, no upstream); `main` and `origin/main` are still at `90295717`.
+
+**Remaining:** feature-branch publication, exact-commit CI (including the first PostgreSQL integration run for this version), the merge to `main`, M5d–M5h and overall M5 acceptance. Each needs your authorization.
+
+This session is long past the 20-prompt guideline, so start a new Claude session before the publication prompt. The `.local/p184/` checkpoint and this handoff are enough to recover.
+
+**Next step:** please return **output plus the diff file** `.local/p184/m5c-commit-incremental.diff`.
+
+### External review of the Prompt 184 commit and publication authorization (Prompt 185)
+
+The external reviewer independently verified `.local/p184/m5c-commit-incremental.diff` (size,
+SHA-256 `d630d022e046085e44ec2bfee6387417e7f494c6c8e55a7d3bde06c4731da724`, four-file scope, 85
+insertions and 18 deletions, UTF-8, LF and no BOM) and its acceptance-record wording: the
+documentation records the Prompt 184 local implementation acceptance and separates the isolated
+reviewer checks from Claude Code's historical local checks. The reviewer repeated no project
+tests, build or wheel check for this documentation review. Prompt 185 authorizes one
+prompts.md-only publication-history commit, publication of `feat/review-request-assembly`, a
+fast-forward of `main` to that exact commit only after all five required jobs and steps pass for
+it, the main push and CI monitoring, and, only after both CI gates pass, the evidence
+documentation and a proposed (not implemented) M5d specification.
+
+### Prompt 185 (verbatim)
+
+Prompt 185 — Publish M5c through CI gates, then propose M5d
+
+Written for: Claude Code.
+Repository: D:\Claude\evidenceguard_agentic_rag
+
+Publish the accepted M5c implementation through the feature and main CI gates below. After both gates pass, record the evidence and prepare the M5d specification for review.
+
+Do not implement M5d.
+
+1. Fresh-session recovery
+
+Read CLAUDE.md and applicable instructions, the accepted M5 sequence, M5c acceptance, ADR-0021, recent prompt entries and .local/p184/ checkpoint.
+
+Expected local state:
+- Branch: feat/review-request-assembly.
+- HEAD: 36a41b1fb806944868fc9e1c62962ac6cd8eec7e.
+- Parent: 0958712661263fd05d5e62813212f11b1f4ed2c8.
+- Tree: aa2d5921050b1bc2f74ad310a89d1044381f84da.
+- Subject: feat: add review templates prompts and request assembly.
+- Working tree and index clean.
+- No upstream for the feature branch.
+- main and origin/main: 90295717ad693b945eea1a10e176b9dd339b4049.
+- Origin and configured noreply identity unchanged.
+
+Verify:
+.local/p184/m5c-commit-incremental.diff
+40,412 bytes
+SHA-256 d630d022e046085e44ec2bfee6387417e7f494c6c8e55a7d3bde06c4731da724
+
+Confirm byte identity to the comparison from accepted tree
+687cb58103b22a8cf82bceb605841c8d702dcb52
+to 36a41b1f, excluding prompts.md.
+
+External review:
+- The reviewer independently verified the export's size, SHA-256, four-file scope, 85 insertions and 18 deletions, UTF-8/LF/no-BOM encoding and acceptance-record wording.
+- The documentation correctly records the Prompt 184 local implementation acceptance and separates isolated reviewer checks from Claude Code's historical local checks.
+- No project tests, build or wheel check were repeated by the reviewer for this documentation review.
+
+Fetch with --no-tags and inspect remote refs read-only:
+- Remote main must still be 90295717.
+- Remote feat/review-request-assembly is expected to be absent.
+- Local main must equal origin/main and be an ancestor of HEAD.
+
+Save the starting refs, status, tree and relevant blob hashes under .local/p185/.
+
+If state differs materially, preserve it and report before dependent changes. Do not reset, clean, stash, rewrite history or overwrite a branch.
+
+2. Publication authorization and preflight
+
+This prompt authorizes:
+- One prompts.md-only publication-history commit.
+- Publication of feat/review-request-assembly.
+- A fast-forward of main to the exact feature commit only after all five required jobs and required steps pass for that SHA.
+- The subsequent main push and CI monitoring.
+- Documentation and M5d proposal work only after both CI gates pass.
+
+Before committing or pushing, verify:
+- The unpublished range contains exactly 09587126 and 36a41b1f.
+- 09587126 is documentation/history only.
+- 36a41b1f contains exactly the 18 reviewed M5c paths.
+- All 13 implementation, resource, test, packaging and workflow blobs equal accepted tree 687cb581.
+- The combined range is expected to touch 19 paths: the 18 M5c paths plus ADR-0020 carried by the earlier documentation commit. Verify this rather than confusing the range with the implementation commit.
+- No dependency, lockfile, existing domain contract, migration, corpus, settings, production registry, Docker, Compose or container-smoke change.
+- No tracked .local files, binaries or build artifacts.
+- The ci.yml change is the reviewed additive installed-wheel extension.
+- Both workflows trigger on push.
+- Ubuntu verify, Windows verify, PostgreSQL integration, container and Gitleaks jobs remain present.
+- Integration retains EG_REQUIRE_INTEGRATION=1 and pytest -m integration.
+- All existing wheel checks and container steps remain.
+- No workflow introduces provider credentials or live calls.
+- No production review handler or model provider is registered.
+- Commit identities, privacy scan and unsuppressed Gitleaks over the unpublished range are clean.
+
+Do not repeat local application tests, builds, installs, wheel checks, Docker or database checks. The accepted implementation is unchanged.
+
+3. History-only commit
+
+Append to prompts.md:
+- The actual Prompt 184 handoff.
+- This review and publication authorization.
+- Prompt 185 verbatim.
+- A preflight note recording completed checks only.
+
+Preserve the earlier bytes exactly and both text-fidelity disclosures. Verify the verbatim text, including backslashes.
+
+Only prompts.md may change in this commit.
+
+Run the relevant encoding, whitespace, privacy, staged Gitleaks and identity checks.
+
+Commit locally:
+docs: record M5c publication authorization
+
+Write the message from a file, follow existing assistance attribution and retain the required Co-Authored-By trailer.
+
+Verify afterwards:
+- Parent is 36a41b1f.
+- Only prompts.md changed.
+- All other blobs remain identical.
+- Working tree is clean.
+- Full-history unsuppressed Gitleaks is clean.
+
+Call the resulting full commit SHA P throughout the remaining work. Do not assume a prospective SHA.
+
+4. Publish the feature branch and check CI
+
+Immediately before pushing, recheck remote main and the feature ref.
+
+Push once:
+git push --set-upstream origin refs/heads/feat/review-request-assembly:refs/heads/feat/review-request-assembly
+
+Record the exit status. Confirm the remote feature branch equals P and tracking is set.
+
+Do not force-push, amend, squash or rerun workflows.
+
+If authentication requires Mathew's interaction, report the actual blocker and pause. Do not change authentication or leave an unmanaged credential-blocked push running. If the push fails, establish the remote state and report without an automatic retry.
+
+Monitor both workflows for exact SHA P:
+- Event push.
+- Branch feat/review-request-assembly.
+- Correct workflow identities.
+- All five jobs and their required steps completed successfully.
+- No required job or step skipped, cancelled or missing.
+
+Use a bounded monitor, at most 25 minutes for this gate. Keep waits short enough to provide progress updates. Stop the monitor on completion or at the bound.
+
+Attempt job-log retrieval through available authorized access. If unavailable, record the actual failure and distinguish API conclusions from unobserved counts and output. Do not change authentication to obtain logs and do not infer results from earlier SHAs.
+
+If any required check fails, is missing or remains incomplete at the bound:
+- Do not update main.
+- Save the checkpoint and actual CI evidence.
+- Stop for review.
+- Do not start the tracked post-CI documentation or M5d proposal.
+
+5. Fast-forward main only after the feature gate passes
+
+After the exact-commit feature gate passes, fetch --no-tags and recheck:
+- Remote main is still 90295717.
+- Local main equals origin/main.
+- Remote feature equals P.
+- main is an ancestor of P.
+- The range consists only of 09587126, 36a41b1f and the history-only commit P.
+- The reviewed path set and all 13 accepted implementation blobs remain unchanged.
+- Working tree is clean.
+
+Then:
+git switch main
+git merge --ff-only P
+
+Use the actual full SHA in the command.
+
+Immediately before pushing, confirm remote main is still the expected old SHA.
+
+Push once:
+git push origin refs/heads/main:refs/heads/main
+
+Record command exit statuses and confirm remote main equals P.
+
+No force-push, merge commit, squash, amend or branch deletion.
+
+6. Main-push CI gate
+
+Monitor the two push workflows on main for exact SHA P under the same five-job and required-step criteria.
+
+Use a separate bound of at most 25 minutes. Stop every monitor when finished or at the bound.
+
+Retrieve logs if authorized access permits. Keep API conclusions and log observations separate.
+
+If main CI fails or remains incomplete:
+- Report the published state and actual failure.
+- Do not revert, rerun or change implementation automatically.
+- Save a checkpoint and stop before M5d proposal work.
+
+Do not edit tracked documentation between the feature push and completion of main CI. The committed pre-publication wording is historical and will be corrected in the following documentation task.
+
+7. Record publication evidence after both gates pass
+
+Create docs/review-creation-plan from main at P if the branch does not exist. If it exists, inspect it before using it; do not overwrite it.
+
+Authorized tracked files for this phase:
+- README.md
+- docs/decisions/0021-review-request-assembly.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Record:
+- Full published SHA.
+- Feature and main run links.
+- Each job link under its own run.
+- Event, branch, attempt and conclusions.
+- Required-step observations.
+- Test counts, wheel lines, container summaries and Gitleaks counts only where logs were actually retrieved.
+- What remains unobserved.
+- Commands and publication chronology, with attribution.
+
+Update M5c status to reviewed, verified in exact-commit feature and main CI, and published on main at P.
+
+Preserve:
+- Accepted specification headings and anchors.
+- Earlier exact-commit records and their attribution.
+- The fact that the final history commit changes prompts.md only.
+- No production use, live-model quality or injection-resistance claim.
+- The unchanged offline container-smoke scope and unverified local Compose status.
+- Overall M5 acceptance pending.
+
+8. Prepare the M5d proposal, not implementation
+
+Inspect the actual current domain, persistence, migration, snapshot-capture, job-enqueue and worker-registry code before proposing changes.
+
+Write a complete proposed M5d specification in docs/plan.md. Preserve existing headings and add a new proposed-specification section.
+
+M5d is the accepted sequence's composable capture and atomic review-creation slice. Address:
+
+A. Public contracts and placement
+- Exact proposed inputs, outputs, value invariants and error taxonomy.
+- Internal/test-only creation and reload seams.
+- The proposed public capture function operating inside a caller-owned transaction.
+- No access through private helpers.
+- Preserve the existing capture_snapshot behaviour and read-only wrapper.
+
+B. Transaction and eligibility
+- REPEATABLE READ, READ WRITE creation transaction.
+- Explicit transaction ownership and statement order.
+- Eligibility fixed at the first clock_timestamp() read, with the accepted M4d race rules.
+- Review, bindings, exclusions, pinned configuration and run_review job committed atomically.
+- No capture helper commits or rolls back its caller's transaction.
+
+C. Persistence and migration
+- Proposed migration 0006 and exact schema, constraints, foreign keys, uniqueness and tenant ownership.
+- Persist every captured fact required to reconstruct the snapshot.
+- Pin the template, both prompt references, model settings and relevant retrieval/index configuration.
+- Store no credentials.
+- Explain how captured facts differ from current mutable revision state.
+
+D. Trusted reload
+- Load through constructors and recompute the snapshot digest.
+- Load pinned templates and prompts through the accepted M5c loaders.
+- Define consistency, missing-resource and corrupted-record failures.
+- Close the trusted-snapshot limitation for review paths only, once implemented and verified.
+- Do not claim protection against a malicious trusted process or direct database tampering.
+
+E. Idempotency and failures
+- Define logical request identity separately from captured timestamps and snapshots.
+- Specify matching replay, conflicting replay and concurrent creation.
+- Handle unique, serialization, deadlock, lock and commit failures accurately.
+- Classify only known retryable cases as retryable.
+- Any retry uses a fresh transaction and a bounded policy.
+- Unknown commit outcome must not be described as a confirmed rollback.
+- No unbounded retry loop.
+
+F. Production isolation
+- Creation remains an internal/test seam.
+- run_review remains unregistered in production.
+- Preserve the worker's registered-kind claim filter.
+- No production fake judgments.
+- Production enqueue, handler registration and configured provider remain a later reviewed wiring decision.
+
+G. Verification plan
+- Compatibility tests for the existing capture_snapshot path.
+- PostgreSQL tests for atomicity, races, persisted facts, idempotency, concurrency and reload.
+- Failure and unknown-outcome cases where feasible.
+- Privacy, process-control and fixed-error boundaries.
+- Packaging or wheel changes only if justified.
+- Tests are planned, not executed in this prompt.
+
+H. Scope and review decisions
+- Concrete proposed file list.
+- Separate settled sequence requirements from new decisions needing review.
+- Keep M5e stage/call records, M5f report representation, M5g orchestration and M5h transport out of implementation scope.
+- No M5d code, migration, tests or ADR-0022 yet.
+
+Add a short proposed-controls note to the threat model. State explicitly that M5d remains proposed, unaccepted, unimplemented and untested.
+
+Use judgment for routine proposal details; do not stop to ask about each design choice. Surface material decisions in a numbered review list.
+
+9. History, checks and export
+
+Append to prompts.md:
+- The publication and CI outcome with accurate evidence attribution.
+- The M5d proposal outcome.
+- A final note that the documentation is staged for review.
+
+Keep the already committed history prefix unchanged. Do not duplicate the verbatim Prompt 185 entry.
+
+Documentation checks only:
+- Exactly the five authorized paths changed from P.
+- Every other tracked blob identical.
+- No tracked .local files.
+- Links, anchors and tables consistent.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --cached --check clean.
+- Privacy scan and unsuppressed staged Gitleaks clean.
+- No claim that M5d is accepted or implemented.
+
+Stage these five files, but do not commit or push them.
+
+Export directly from Git:
+.local/p185/m5c-main-evidence-and-m5d-spec.diff
+
+Baseline: full published SHA P.
+Final: the completed staged tree.
+Exclude prompts.md.
+
+Report statistics, byte size, SHA-256, encoding and byte identity to the Git comparison.
+
+10. Final handoff
+
+Return:
+- Starting and final refs, full SHAs and tree.
+- History commit details and attribution.
+- Push and fast-forward commands with exit statuses.
+- Both CI gates, with run/job links and observed evidence.
+- Log-access limitations and unobserved details.
+- Confirmation that all monitors exited.
+- M5d proposal summary and numbered decisions for review.
+- Final staged scope and export details.
+- The diff attachment.
+
+No implementation tests, local builds, wheel installs, database, Docker or provider calls are authorized in this prompt.
+
+Stop with M5c published only if both gates pass, and the M5d proposal staged and uncommitted for review. Do not implement M5d or declare overall M5 acceptance.
+
+### Prompt 185 preflight note (Claude Code; before the publication-history commit)
+
+Completed checks only. Starting state matched: branch `feat/review-request-assembly`, HEAD
+`36a41b1f` (parent `09587126`, tree `aa2d5921`), clean, no upstream, `main` and `origin/main` at
+`90295717`, origin and noreply identity unchanged; the Prompt 184 export matched 40,412 bytes, its
+SHA-256 and `git diff --full-index 687cb581 36a41b1f` excluding prompts.md. `git fetch --no-tags
+origin` (exit 0) and read-only `ls-remote` (exit 0): remote `main` `90295717`, remote
+`feat/review-request-assembly` absent; local `main` equals `origin/main` and is an ancestor of
+HEAD. Checkpoint under `.local/p185/`. Preflight: the unpublished range is exactly `09587126`
+(documentation and history: README, ADR-0020, plan, threat model, prompts.md) and `36a41b1f`
+(the 18 reviewed paths), both with the noreply author and committer; the 13 implementation,
+resource, test, packaging and workflow blobs equal the accepted tree `687cb581`; the range touches
+19 paths and none is a dependency, lockfile, pyproject, domain, persistence, application,
+migration, corpus, Docker, Compose or infrastructure path; no tracked `.local` file or binary;
+`ci.yml` changes by 50 added lines and none removed; both workflows trigger on push; the `verify`
+matrix (ubuntu-24.04, windows-2025), `integration` (with `EG_REQUIRE_INTEGRATION: "1"` and
+`uv run --locked pytest -m integration`), `container` and `gitleaks` jobs are present; no workflow
+references a secret or provider key; the production registry kinds are `index_revision` and
+`ingest_revision`; Gitleaks over `origin/main..HEAD` (2 commits) found no leaks and the privacy scan
+of the range's added lines found nothing. No application test, build, install, wheel, database,
+Docker or provider check was repeated. The commit, publication and CI results are reported
+afterwards, not predicted here.
