@@ -6823,8 +6823,11 @@ status](#m5b-implementation-status-accepted-at-review-prompt-179-ci-pending)); i
 `90295717` (Prompt 179; job-log results independently retrieved by the external reviewer and
 recorded in Prompt 180). The [M5c specification](#m5c-review-template-planner-prompts-and-request-assembly-specification-accepted-at-review-prompt-181-implementation-pending)
 (proposed in Prompt 179, revised in Prompt 180) was **accepted at external review in Prompt 181**;
-its implementation is pending. M5c–M5h are not implemented; no review path, persisted snapshot or orchestration
-exists, no M5b control is used by any review path, and overall M5 acceptance is pending.** The M5 milestone text above is the controlling requirement and is unchanged; this
+**M5c was implemented in Prompt 182, corrected in Prompt 183 and accepted at external review for a
+local commit in Prompt 184** ([implementation
+status](#m5c-implementation-status-accepted-for-a-local-commit-prompt-184-ci-pending); publication, Linux
+verification and current-version CI pending). M5d–M5h are not implemented; no review path, persisted snapshot or orchestration
+exists, no M5b or M5c control is used by any review path, and overall M5 acceptance is pending.** The M5 milestone text above is the controlling requirement and is unchanged; this
 sequence only orders it into slices. Labels: **[DECISION]** already accepted; **[FACT]** current
 code at `46c02257`; **[REC]** recommendation (for M5a and the sequence-level choices, accepted in
 Prompt 170 as recommended); **[OPEN]** a detail left to a later slice's review. Earlier sketches in
@@ -8616,9 +8619,10 @@ a project suite, build, installed-wheel, PostgreSQL, Docker or provider run. Cla
 181 and is the M5c implementation contract; implementation is pending.** It was proposed by Claude
 Code in Prompt 179 and revised in Prompt 180 after external review (historical: in Prompt 180 the
 reviewer supported directions C1, C2 and C4–C11 subject to those corrections and narrowed C3,
-which was not yet acceptance). No M5c module, packaged template, prompt file, test, ADR-0021 or
-workflow change exists, every M5c implementation check is pending, and none of the controls below
-operates. Labels: **[DECISION]** already accepted (§4, the M5 sequence and its settled W-choices,
+which was not yet acceptance). At acceptance no M5c module, packaged template, prompt file, test,
+ADR-0021 or workflow change existed (historical: M5c was implemented in Prompt 182, corrected in
+Prompt 183 and accepted for a local commit in Prompt 184; see [implementation status](#m5c-implementation-status-accepted-for-a-local-commit-prompt-184-ci-pending)),
+and none of the controls below operates in the application. Labels: **[DECISION]** already accepted (§4, the M5 sequence and its settled W-choices,
 the accepted M5a and M5b contracts); **[FACT]** current source at `90295717`; **[REC]** Claude
 Code's proposal, **accepted as specified in Prompt 181**; **[OPEN]** none remains (C1–C11 in
 [M5c-J](#m5c-j-reviewer-decisions) are accepted). M5c adds **no** persistence, migration, review
@@ -8852,10 +8856,14 @@ resource name and its pinned SHA-256 (v1: `vendor_security_review` 1 →
   reload therefore obtain the template only through `load_pinned_template` and never accept a
   caller-supplied `ReviewTemplate` as proof of origin.
 - **Bounded read.** The resource is opened in binary mode through `importlib.resources` and read
-  with repeated `read(n)` calls whose total requested size never exceeds the limit plus one byte
-  (65,537 for templates, 64,001 for prompts), stopping at end of file or as soon as more than the
-  limit has been read; more than the limit is rejected. The file is never read whole and then
-  measured.
+  with repeated `read(n)` calls, each bounded by the remaining allowance (the limit plus one byte,
+  65,537 for templates and 64,001 for prompts, minus the bytes already received); short reads are
+  continued, reading stops at end of file or as soon as more than the limit has been received,
+  and under the reader contract no more than the limit plus one byte is received. More than the
+  limit is rejected. The file is never read whole and then measured. *(Wording corrected in
+  Prompt 183: it previously said the total requested size never exceeds the limit plus one byte,
+  which does not hold for the sum of requests when reads are short; the reviewer approved the
+  implemented strategy.)*
 
 ##### M5c-C2. Proposed first-template content
 
@@ -9207,8 +9215,9 @@ logs. Resource reads are bounded as in [M5c-C1](#m5c-c1-loading-identity-and-tru
   preservation; `parse_template` digest equals the SHA-256 of the exact input bytes (also for CRLF
   and trailing-newline variants, which differ).
 - **Loading and identity:** pinned digest of the packaged v1 file; tampered bytes, a missing
-  resource and an oversize resource → `TemplateIntegrityError`; the bounded read never requests
-  more than the limit plus one byte (a counting reader stub); unknown ID or version →
+  resource and an oversize resource → `TemplateIntegrityError`; each bounded-read request stays
+  within the remaining allowance and no more than the limit plus one byte is received (a counting
+  reader stub); unknown ID or version →
   `UnknownTemplateError`; wrong argument types → `InvalidAgentArgumentError`;
   `load_pinned_template` with a reference whose digest, ID or version differs →
   `TemplateIntegrityError` or `UnknownTemplateError` as specified; a directly constructed
@@ -9327,6 +9336,64 @@ and review of the complete revised text, and narrowed C3 as recorded below.
 
 Routine choices (key names, error codes, ordering, bounds and the JSON parameters) are specified
 above and were accepted with this text in Prompt 181.
+
+##### M5c implementation status (accepted for a local commit, Prompt 184; CI pending)
+
+[FACT] Claude Code implemented the accepted specification in Prompt 182 on
+`feat/review-request-assembly` (from `09587126`), **corrected it in Prompt 183** after external
+review (Finding A: a nested `EvidenceQuestion` is now checked with exact field types at the M5c
+boundary before any reconstruction could normalize it; Finding B: the Verifier prompt now states
+the accepted verdict mapping, and both prompts describe the optional `repair` member and say that
+provenance checks prove quote existence only), and staged it for external review. **The
+corrected implementation was accepted at external review in Prompt 184 for a local
+implementation commit only, pending Linux verification and current-version CI**; publication
+and merge are not authorized yet (historical: until Prompt 184 implementation acceptance was
+pending). None of the 308 integration tests has run against this implementation version; M5c
+adds no PostgreSQL tests. No
+application path, handler, endpoint, setting or production registry uses M5c, so none of its
+controls operates in the application, and overall M5 acceptance is pending. See
+[ADR-0021](decisions/0021-review-request-assembly.md) for the implementation, the pinned
+artifacts, routine choices, the Prompt 183 corrections with their regression comparison, and
+the three implementation choices approved at review in Prompt 183 (the narrowed M5b packaging
+test, the bounded-read strategy with corrected wording, and the limited ground-truth separation
+test).
+
+- *Files:* `evidenceguard_agents.artifact_errors`, `templates`, `planner`, `prompts` and
+  `assembly`; `data/templates/vendor_security_review_v1.toml` (SHA-256
+  `26fcbe26dcc47f5991da5b741475c736cec27b1f2bd6ab515ec07ac59895786a`),
+  `data/prompts/verifier/v1.md` (`629f8f972a0f5d6247a54364da59f04d53a1a023472fa00830ebedfe106b007d`)
+  and `data/prompts/risk_analyst/v1.md`
+  (`f8e485998dc2ff79c839100c27326a6e119135788060237a9fcbe5fed0051b29`); three new test modules;
+  extended `tests/test_packaging.py`; one added installed-wheel check in
+  `.github/workflows/ci.yml`; ADR-0021. No dependency, lockfile, `pyproject.toml`, existing
+  contract, persistence, migration, setting, registry, Docker, Compose or corpus change. The
+  prompt wording and packaged bytes are new and part of the implementation review.
+- *Reviewer evidence (Prompt 184):* the external reviewer verified both exports' sizes and
+  SHA-256 values, reconstructed the corrected code by applying the Prompt 183 correction to the
+  extracted Prompt 182 files (the changed-file blobs matched), verified the three packaged
+  artifacts' sizes and digests, and ran 38 isolated checks (the original 27 with the corrected
+  pins plus 11 new ones), all passing, with Python 3.12.14, Pydantic 2.14.0 and dependencies from
+  `90295717`. These were isolated checks on reconstructed copies, not the project suite, the
+  submitted pytest modules, a build, an installed wheel, a database, Docker or a provider; the
+  prompt checks and scripted contract paths do not establish live-model behaviour.
+- *Local verification after the Prompt 183 corrections (Windows; Claude Code; historical local
+  evidence, not exact-commit CI):* the regression
+  comparison (submitted copies 10 failed and 8 passed, 7 failures reproducing Finding A and 3 new
+  coverage; corrected 18 passed); Ruff and format clean; strict mypy no issues in 159 source
+  files; the three M5c modules 251 passed; the focused twelve-file command 989 passed; full suite
+  `3427 passed, 310 skipped` (308 PostgreSQL without a database, one symbolic-link and one
+  POSIX-only signal test); collection 308 integration and 3,429 non-integration tests; the
+  offline build compared with `09587126` (only the M5c additions, all 16 sample files
+  byte-identical); the extracted installed-wheel step with the corrected pins; and a direct
+  installed-wheel probe of Finding A.
+- *Local verification in Prompt 182 (historical):* Ruff and format clean; strict mypy no issues in
+  159 source files; the three new modules 230 passed; a focused twelve-file command 968 passed;
+  full suite `3406 passed, 310 skipped` (308 PostgreSQL without a database, one symbolic-link and one
+  POSIX-only signal test); collection 308 integration and 3,408 non-integration tests; the offline
+  build compared with `09587126` (only the M5c additions, all 16 sample files byte-identical);
+  and the extracted installed-wheel step in a fresh offline environment with the new M5c line.
+- *Not established:* Linux, current-version CI, any review path using these values, live-model
+  behaviour, injection resistance or prompt quality.
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.

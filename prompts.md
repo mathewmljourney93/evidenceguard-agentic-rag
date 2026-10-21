@@ -36383,3 +36383,1200 @@ plan and threat model after these edits: 347 relative links with 0 link or ancho
 tables with 0 problems, `git diff --cached --check` clean, UTF-8 without BOM, LF only, no
 replacement characters. The final scope, prefix, verbatim, encoding, privacy and Gitleaks checks,
 the commit and the export follow and are reported in the handoff.
+
+### Prompt 181 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 181 handoff: M5c specification acceptance committed locally (not pushed)
+
+**Starting state.** Everything matched what you expected:
+- Branch `docs/m5c-prompts-plan`, HEAD `90295717` (parent `f04e0957`, tree `b2b3eb70`). `main` and `origin/main` are at `90295717`.
+- Staged tree `12824c3b` with the five paths; nothing unstaged or untracked; origin and the noreply identity are unchanged.
+- All three exports match their sizes and SHA-256 values, and each is byte-identical to its Git comparison (excluding prompts.md):
+
+| Export | Compared with |
+|---|---|
+| p179 spec | `git diff --full-index b2b3eb70 dea9056b` |
+| p179 acceptance | `git diff --full-index fa62abe5 b2b3eb70` |
+| p180 corrections | `git diff --full-index dea9056b 12824c3b` |
+
+- Checkpoint saved in `.local/p181/`. No remote operation was run.
+
+**Changes**
+- **plan.md:**
+  - The M5c heading is renamed to "…(ACCEPTED at review, Prompt 181; implementation pending)", and the plan, README and threat-model links to it are updated.
+  - A new subsection, "M5c acceptance (Prompt 181)", records the scope, the three export checksums, your evidence and the two-pass clarification. The acceptance export is marked as reviewer-verified only now, in Prompt 181.
+  - C1–C11, the first-template table and all contracts are marked accepted; the earlier proposed and supported statements are marked historical.
+  - Every "parsed exactly once" or "single parse" claim is replaced with the two-pass `parse_output` description. The literal-backslash behaviour, round-trip tests, table, limits and later-slice obligations are unchanged.
+- **README and threat model:** both say the specification was accepted in Prompt 181, implementation and every M5c implementation check are pending, and no M5c control operates. The structural-encoding versus semantic-injection distinction is kept. I renamed the threat-model section heading to name the accepted specification; nothing links to that heading.
+- **ADR-0020:** unchanged. It never said whether you had verified the M5b acceptance export.
+- **prompts.md:** appended 305 lines:
+  - my Prompt 180 handoff as I supplied it;
+  - your Prompt 181 acceptance;
+  - Prompt 181 verbatim;
+  - a pre-commit note listing completed checks only.
+
+  The earlier bytes are an identical prefix (checked with `cmp`). The Prompt 179 reconstruction disclosure and the Prompt 175 fidelity disclosure are kept. In the verbatim block, the literal backslash path, the curly quotes and the dashes match the source.
+
+**Commit**
+
+| Item | Value |
+|---|---|
+| SHA | `0958712661263fd05d5e62813212f11b1f4ed2c8` |
+| Parent | `90295717ad693b945eea1a10e176b9dd339b4049` |
+| Tree | `88e02932e0d09129547807d21734678158b95fcf` |
+| Subject | docs: record accepted M5c template and request assembly specification |
+| Author and committer | `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>` |
+| Message | written from a file; Co-Authored-By trailer present |
+
+- The commit contains exactly the five paths. Every other blob is identical to `90295717`.
+- The working tree is clean, no `.local` file is tracked, and `main` and `origin/main` are still at `90295717`.
+- Nothing was pushed or merged.
+
+**Checks actually run (documentation only)**
+- **Scope:** exactly five paths changed from HEAD. Against `12824c3b`, only README, plan, threat model and prompts.md changed.
+- **Links and tables:** 347 relative links, no bad links or anchors, including the renamed heading; 57 tables, no problems.
+- **Encoding:** all five files are UTF-8 without BOM, LF only, with no replacement characters.
+- **Whitespace:** `git diff --cached --check` is clean.
+- **Privacy:** scan of the 404 added lines found nothing.
+- **Gitleaks:** the staged scan and the full-history scan (78 commits) found no leaks, with no suppressions.
+- No application test, build, wheel, database, Docker, provider or network check was run.
+
+**Export:** `.local/p181/m5c-spec-acceptance.diff`
+
+| Item | Value |
+|---|---|
+| Baseline | `12824c3bca513a034df1934b1a562ba0958c308c` |
+| Final | commit `09587126` |
+| Options | `--full-index`, prompts.md excluded |
+| Statistics | 3 files, 99 insertions, 50 deletions; 286 lines |
+| Size | 45,816 bytes |
+| SHA-256 | `9024f2495262e1fe7f620d12b950dfdcb4b46340aadf0feb95c5607f91b8d294` |
+| Encoding | UTF-8, no BOM, LF only |
+| Identity | byte-identical to the Git comparison |
+
+**Remaining work.** M5c implementation, its tests, ADR-0021, CI, publication and overall M5 acceptance are all pending. Pushing this commit needs your separate approval.
+
+**Next step:** please return **output plus the diff file** `.local/p181/m5c-spec-acceptance.diff`.
+
+### External review of the Prompt 181 acceptance commit (Prompt 182)
+
+The external reviewer independently verified the size and SHA-256 of
+`.local/p181/m5c-spec-acceptance.diff` (45,816 bytes,
+`9024f2495262e1fe7f620d12b950dfdcb4b46340aadf0feb95c5607f91b8d294`); it applied cleanly to the
+previously reconstructed reviewed documents, and the resulting README, plan and threat-model blobs
+matched the export. The acceptance record and the two-pass wording clarification were inspected.
+The reviewer ran no project suite, build, wheel, database, Docker or provider check for this
+documentation review. Prompt 182 authorizes the implementation of the accepted M5c specification
+on `feat/review-request-assembly`, the authorized local checks and a staged, uncommitted result
+for review.
+
+### Prompt 182 (verbatim)
+
+Prompt 182 — Implement the accepted M5c specification
+
+Written for: Claude Code.
+Repository: D:\Claude\evidenceguard_agentic_rag
+
+Implement the complete accepted M5c specification, run the authorized local checks, and stage the result for external review. Do not commit, push, merge or start M5d.
+
+1. Recover and verify the baseline
+
+Read CLAUDE.md and applicable repository instructions, the accepted M5 sequence, the complete M5c specification and acceptance record in docs/plan.md, and the relevant M5a/M5b source and packaging tests.
+
+Expected starting state:
+- Branch: docs/m5c-prompts-plan.
+- HEAD: 0958712661263fd05d5e62813212f11b1f4ed2c8.
+- Parent: 90295717ad693b945eea1a10e176b9dd339b4049.
+- Tree: 88e02932e0d09129547807d21734678158b95fcf.
+- Subject: docs: record accepted M5c template and request assembly specification.
+- Working tree and index clean.
+- main and origin/main remain at 90295717.
+- Origin and noreply identity unchanged.
+
+Verify:
+.local/p181/m5c-spec-acceptance.diff
+45,816 bytes
+SHA-256 9024f2495262e1fe7f620d12b950dfdcb4b46340aadf0feb95c5607f91b8d294
+
+Confirm it matches the Git comparison from accepted tree
+12824c3bca513a034df1934b1a562ba0958c308c
+to HEAD, excluding prompts.md.
+
+Reviewer acceptance of this export:
+- The external reviewer independently verified its size and checksum.
+- It applied cleanly to the previously reconstructed reviewed documents.
+- The resulting README, plan and threat-model blobs matched the export.
+- The acceptance and two-pass wording clarification were inspected.
+- The reviewer ran no project suite, build, wheel, database, Docker or provider check for this documentation review.
+
+Save a checkpoint under .local/p182/ with refs, status, baseline tree, tracked blob hashes and the prompts.md prefix.
+
+Create feat/review-request-assembly from HEAD if it does not exist. If it already exists, inspect it and do not overwrite it. No remote operation is needed.
+
+2. Implementation contract
+
+The controlling contract is the complete M5c specification accepted in Prompt 181, including C1–C11, M5c-B1, C1/C2, E1, F1–F5, the error table, planned tests and later-slice obligations.
+
+Implement that contract without changing M1–M5b behaviour.
+
+New agents modules:
+- packages/agents/evidenceguard_agents/artifact_errors.py
+- packages/agents/evidenceguard_agents/templates.py
+- packages/agents/evidenceguard_agents/planner.py
+- packages/agents/evidenceguard_agents/prompts.py
+- packages/agents/evidenceguard_agents/assembly.py
+
+Packaged data:
+- packages/agents/evidenceguard_agents/data/templates/vendor_security_review_v1.toml
+- packages/agents/evidenceguard_agents/data/prompts/verifier/v1.md
+- packages/agents/evidenceguard_agents/data/prompts/risk_analyst/v1.md
+
+Implement:
+- Fixed artifact errors.
+- TemplateRef and ReviewTemplate.
+- parse_template, load_template and load_pinned_template.
+- PlannedQuestion and plan_review.
+- PromptSpec, load_prompt and load_pinned_prompt.
+- ModelSettings, VerifierRequestInputs, AnalystRequestInputs and RepairReason.
+- Both request assemblers and reassembly-based repair requests.
+- The exact closed input schemas and deterministic serializer.
+
+Use the accepted eight-question template table exactly: IDs, texts, query order and documentary flags. Do not generate it from evaluation files or copy answer-bearing labels.
+
+Write the actual Verifier and Risk Analyst system prompts now, satisfying all accepted content requirements. Their exact wording and packaged bytes will be reviewed with this implementation.
+
+Pin actual file-byte SHA-256 constants in the registries. Read resources only by the fixed registered names, using the accepted bounded-read algorithm. Preserve exact bytes and decoded text.
+
+Respect the accepted module import boundaries. If an implementation detail appears to require a broader boundary or contract change, first look for a compliant implementation. Record any genuinely necessary deviation explicitly rather than silently weakening the contract.
+
+3. Boundaries that need particular care
+
+Values:
+- Exact types, frozen tuple-based collections and validating replacement.
+- Rebuild nested values, including bypass-constructed values.
+- Preserve equality checks that prevent silent whitespace stripping.
+- Unknown keywords and ordinary failures become the specified fresh fixed errors.
+- Whole-operation boundaries include input traversal, copying and resource handling.
+- Process-control exceptions propagate as the same object.
+- No logging or content-bearing representations.
+
+Loading and planning:
+- Unknown identifiers and malformed arguments receive their specified distinct errors.
+- Trusted loaders compare complete pinned references.
+- Directly constructed values do not prove packaged origin.
+- Queries remain unchanged and in order; default k is 8.
+- No model call or query expansion.
+
+Prompt binding:
+- Validate purpose, registry membership, version, pinned reference digest and exact system-text digest before serialization.
+- Do not rely on StructuredRequest to establish this binding.
+
+Assembly:
+- Preserve original evidence and validated model text exactly.
+- Keep header and body separate.
+- Include only the accepted schema fields, in the specified order after sorting.
+- Validate every serialized string for strict UTF-8 encodability, including metadata.
+- Omit trusted tenant/review/snapshot/revision/document IDs as metadata; do not remove identifier-like strings from original content.
+- Measure the complete serialized UTF-8 user text, including metadata.
+- Refuse above 400,000 bytes without truncating or dropping evidence.
+- Make no peak-memory or hard-timeout claim.
+
+Decoding:
+- Keep M5a parse_output unchanged: preliminary JSON scan followed by strict JSON-mode validation of the same original response text.
+- Add no entity, escape, Unicode or JSON decoding of the returned quotation strings.
+- Preserve literal backslashes and the disclosed NUL/output limitation.
+
+Repair:
+- Rebuild and validate original, inputs and reason.
+- Reassemble the unrepaired request and require equality with original in every field, including timeout.
+- Reject already-repaired requests and all mismatched inputs.
+- Add only the accepted fixed repair fields.
+- Preserve purpose, prompt, model, question, system text, token limit and timeout.
+- Enforce the specified reason/purpose/position combinations.
+- Do not introduce a stateless claim of enforcing the lifetime repair or call budget; that belongs to M5g.
+
+4. Tests and packaging
+
+Add:
+- tests/test_review_templates.py
+- tests/test_prompts.py
+- tests/test_request_assembly.py
+
+Use the repository's autouse network guard in each new test module.
+
+Implement the accepted M5c-H coverage, including:
+- Every value, template and loader bound and cross-field rule.
+- Nested reconstruction, replacement and invalid bypass-built values.
+- Resource tampering, missing resources and bounded reads.
+- Exact packaged digests and deterministic planner output.
+- Prompt-reference/system-text mismatches that StructuredRequest alone would accept.
+- Exact closed schemas, pinned serialized bytes and pinned request digests.
+- Empty evidence, ordering and separate header/body handling.
+- Adversarial JSON-like text and Unicode/control-character round trips.
+- Literal backslashes versus escaped newlines.
+- Invalid metadata Unicode.
+- Structural identifier omission while preserving identifier-like document text.
+- Size boundaries at 400,000 and 400,001 bytes, including metadata and repair overhead.
+- Both repair purposes, every allowed reason, invalid combinations, mismatches and already-repaired input.
+- M5a/M5b compatibility using the scripted fake and real provenance checks.
+- Fixed private errors, no logs and process-control identity.
+- Ground-truth separation as specified; evaluation files may be read by tests only.
+
+Pin expected outputs independently; do not calculate expected digests by calling the implementation being checked.
+
+Extend tests/test_packaging.py narrowly for the accepted file set, resource packaging and import boundaries. Preserve all existing checks.
+
+Append one installed-wheel check to .github/workflows/ci.yml:
+- Load the packaged template and prompts through the pinned loaders.
+- Run the deterministic planner.
+- Assemble a Verifier request from a fixed evidence fixture.
+- Check its independently pinned digest and installed import/resource locations.
+- Print:
+  review template, prompts and request assembly ran from the installed wheel
+
+Do not remove or weaken existing workflow lines or checks.
+
+Change pyproject.toml only if packaging the accepted data files demonstrably requires an explicit include. Record the evidence if needed. No dependency or lockfile change is authorized.
+
+5. Documentation and history
+
+Create:
+docs/decisions/0021-review-request-assembly.md
+
+Record:
+- The accepted contract and actual implementation.
+- Prompt and template versions and pinned digests.
+- The trusted loader and assembly boundaries.
+- Routine implementation choices and any deviations requiring review.
+- Verification actually completed, with commands and counts.
+- Limits and later-slice obligations.
+
+Update README, plan and threat-model implementation status consistently:
+- Implemented and staged for review.
+- Implementation acceptance, Linux verification and current-version CI pending.
+- No production wiring or application review path.
+- Overall M5 acceptance pending.
+
+Preserve the accepted M5c specification heading and anchor. Add a separate implementation-status subsection.
+
+Keep ADR-0020 and earlier exact-commit evidence unchanged.
+
+Append to prompts.md:
+- The actual Prompt 181 handoff.
+- This review outcome.
+- Prompt 182 verbatim.
+- A completed-results note.
+
+Preserve the earlier bytes exactly, including both existing text-fidelity disclosures. Use a writing method that preserves backslashes and verify the verbatim entry.
+
+6. Authorized local verification
+
+Use the existing locked offline environment and repository commands.
+
+Run:
+- Ruff lint and format checks.
+- Strict mypy, including all new modules.
+- The three new test modules.
+- One clearly recorded focused command covering the new modules, packaging and relevant M5a/M5b contracts.
+- Full suite.
+- Integration and non-integration collection counts.
+
+No database is configured for this task. Report PostgreSQL skips accurately. Do not start Docker or configure a database.
+
+Build wheel and sdist offline. Compare with a baseline build of 09587126 made from git archive in an ignored temporary location:
+- Report actual added, changed and removed archive members.
+- Check all 16 sample_data files remain byte-identical.
+- Verify packaged template/prompt bytes and digests.
+- Confirm no unrelated package content was lost.
+
+Run the complete installed-wheel step extracted from ci.yml in a fresh environment outside the checkout:
+- Install locked dependencies with hashes from the offline cache.
+- Install the wheel with --no-deps.
+- Confirm imports and resources come from the installed package.
+- Preserve every existing wheel check.
+- Verify the new M5c check succeeds.
+
+If an offline prerequisite is missing, report that specific blocker rather than changing dependencies or downloading silently.
+
+Run final scope, whitespace, encoding, link/anchor, table, privacy and unsuppressed staged Gitleaks checks.
+
+Do not repeatedly run unchanged expensive checks. Re-run checks when changes or failures materially require it, and ensure the final artifact is covered by the recorded evidence.
+
+7. Scope and staging
+
+Expected scope is 18 paths:
+- Five new agents modules.
+- Three packaged data files.
+- Three new test modules.
+- tests/test_packaging.py.
+- .github/workflows/ci.yml.
+- ADR-0021.
+- README.md.
+- docs/plan.md.
+- docs/threat-model.md.
+- prompts.md.
+
+A necessary explicit packaging include in pyproject.toml is the only conditional extra path.
+
+No changes to:
+- Existing domain contracts or M5a/M5b implementation.
+- uv.lock or dependencies.
+- Persistence, migrations, settings, registries or endpoints.
+- Docker, Compose, container smoke or sample_data.
+- Provider adapters or live wiring.
+
+Stage the completed implementation and documentation for review. Do not commit, push or merge.
+
+8. Export and handoff
+
+Write directly from Git:
+.local/p182/m5c-implementation.diff
+
+Baseline:
+0958712661263fd05d5e62813212f11b1f4ed2c8
+
+Final:
+the completed staged tree
+
+Exclude prompts.md.
+
+Report:
+- Branch, HEAD, final staged tree and exact changed paths.
+- Implementation and any deviations needing review.
+- Actual check commands, results, collection counts and skip reasons.
+- Build comparison and isolated installed-wheel results.
+- What was not run.
+- Prompt-history prefix preservation.
+- Export statistics, byte size, SHA-256, encoding and byte identity to the Git comparison.
+
+Return the handoff plus the diff attachment. Printing the full diff is unnecessary.
+
+Continue through implementation, checks and export without stopping for routine design choices already resolved by the specification. If interrupted, save a precise checkpoint with the last completed check and first unfinished step.
+
+Stop with the result staged and uncommitted. Implementation acceptance, publication, current-version CI and overall M5 acceptance remain pending.
+
+### Prompt 182 outcome (Claude Code; staged, awaiting review)
+
+*Work actually completed; nothing below has been reviewed.*
+
+- **Start.** Branch `docs/m5c-prompts-plan`, HEAD `09587126` (parent `90295717`, tree `88e02932`),
+  clean, `main` and `origin/main` at `90295717`, origin and noreply identity unchanged; the
+  Prompt 181 export matched 45,816 bytes, its SHA-256 and `git diff --full-index 12824c3b HEAD`
+  excluding prompts.md. Checkpoint (refs, status, tracked blob hashes, prompts.md prefix) under
+  `.local/p182/`. `feat/review-request-assembly` did not exist and was created from HEAD. No
+  remote operation.
+- **Implementation.** The five agents modules, the accepted eight-question template and the two v1
+  prompts (pinned digests `26fcbe26…`, `2201e3fa…`, `9f250b8e…`), three new test modules, the
+  extended packaging test, one installed-wheel check in `ci.yml` and ADR-0021. No
+  `pyproject.toml`, dependency or lockfile change. Items needing review are listed in ADR-0021:
+  the narrowed M5b "not wired" packaging test (only `assembly.py` may mention `provenance`), the
+  bounded-read wording (the bound is on bytes read; requests are at most the limit plus one minus
+  bytes already read) and the ground-truth separation test scope.
+- **Checks (Windows, locked offline, no database URL).** `ruff check .` clean; `ruff format
+  --check .` 200 files formatted; strict mypy no issues in 159 source files; the three new modules
+  230 passed; the focused twelve-file command 968 passed; full suite `3406 passed, 310 skipped`
+  (308 PostgreSQL without `EG_TEST_DATABASE_URL`, one symbolic-link, one POSIX-signal test);
+  collection 308 integration and 3,408 non-integration. Offline `uv build` against a
+  `git archive` build of `09587126` (first build, before the documentation edits): wheel 96 to
+  104 members (the eight M5c files added, only `RECORD` changed, nothing removed); sdist with the
+  M5c modules, data and tests added and only `tests/test_packaging.py` changed at that point; 16 sample files byte-identical; the packaged
+  data bytes match the pinned digests. The extracted CI wheel step ran outside the checkout
+  (requirements exported with hashes, installed offline with `--require-hashes`, wheel with
+  `--no-deps`): exit 0, eight lines including the new M5c line, imports and resources from
+  `site-packages`.
+- **Text fidelity.** The Prompt 181 handoff and Prompt 182 verbatim blocks were written with a
+  file-writing tool, not a shell heredoc; the literal backslash path was checked afterwards. Both
+  earlier text-fidelity disclosures stand.
+- The final rebuild after the documentation edits, the scope, unchanged-blob, link, table,
+  encoding, whitespace, privacy and Gitleaks checks and the export follow this note and are
+  reported in the handoff.
+
+### Prompt 182 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 182 handoff: M5c implemented and staged, not committed
+
+**Starting state.** Everything matched what you expected:
+- HEAD `09587126` (parent `90295717`, tree `88e02932`); working tree clean; `main` and `origin/main` at `90295717`; origin and the noreply identity are unchanged.
+- The p181 export matches its 45,816 bytes and SHA-256, and is byte-identical to `git diff --full-index 12824c3b HEAD` excluding prompts.md.
+- Checkpoint saved in `.local/p182/`. `feat/review-request-assembly` did not exist, so I created it from HEAD. No remote operation was run.
+
+**Git state**
+- Branch `feat/review-request-assembly`, HEAD `0958712661263fd05d5e62813212f11b1f4ed2c8`.
+- Final staged tree: `563acd584e970ddd0b66dd24ec3bf17bf9026076`.
+- Exactly the 18 expected paths: 5 agents modules, 3 data files, 3 new test modules, `tests/test_packaging.py`, `ci.yml`, ADR-0021, README, plan, threat model and prompts.md.
+- Every other blob is identical to HEAD; `pyproject.toml`, `uv.lock`, M5a/M5b and ADR-0020 are untouched. Nothing is committed and no `.local` file is tracked.
+
+**What was built**
+- **Template and loaders:** the accepted eight-question template, read through pinned loaders with bounded reads.
+- **Prompts:** two v1 system prompts, written now; their wording and bytes are part of this review.
+
+  | Artifact | SHA-256 |
+  |---|---|
+  | Template | `26fcbe26…786a` |
+  | Verifier prompt | `2201e3fa…e325` |
+  | Risk Analyst prompt | `9f250b8e…84e6` |
+
+- **Planner:** deterministic; queries unchanged and in order; default `k` is 8.
+- **Prompt binding:** the system text's SHA-256 must equal the pinned prompt digest; `StructuredRequest` is not relied on for this.
+- **Assembly:** closed JSON schemas with the normative serializer, Unicode checks on every string, and refusal above 400,000 bytes.
+- **Repair:** reassembly-based repair requests.
+- **Errors and isolation:** fixed private errors; process-control exceptions propagate as the same object; nothing logs.
+- **CI:** one added installed-wheel check, purely additive.
+
+**Needs your review (also recorded in ADR-0021)**
+1. **Existing M5b packaging test narrowed.** It asserted that no agents module mentions `provenance`, but the accepted M5c-B puts that import in `assembly.py`. Only that one file is now exempt. The agents file-set test now lists the M5c modules.
+2. **Bounded-read wording.** The spec says the total *requested* never exceeds limit + 1 byte. With short reads, the sum of requested sizes can exceed that; the bytes actually read cannot, because each request is at most limit + 1 minus what has already been read. The tests pin that bound, and that an oversize file stops after exactly limit + 1 bytes.
+3. **Ground-truth separation test scope.** The check excludes epoch names and `expected_status` values. One status value, `documentary_support`, is also part of the template key `requires_documentary_support`, so including statuses would flag the template's own key.
+
+**Checks run (Windows, locked offline, no database URL)**
+- **Lint and format:** `ruff check .` clean; `ruff format --check .` reports 200 files formatted.
+- **Types:** strict `mypy` reports no issues in 159 source files.
+- **Three new test modules:** 230 passed.
+- **Focused command:** the new modules plus packaging, model_calls, agent_outputs, scripted_provider, provenance, quote_matching, retrieval_contracts and evidence: 968 passed.
+- **Full suite:** `3406 passed, 310 skipped`. The skips are 308 PostgreSQL tests (`EG_TEST_DATABASE_URL` not set), 1 symbolic-link test and 1 POSIX-only signal test.
+- **Collection:** 308 integration and 3,408 non-integration tests.
+- **Pinned values:** all are literals computed independently with the standard library, never by calling the code under test.
+
+**Build comparison** (offline `uv build` against a `git archive` build of `09587126`):
+- **Wheel:** 96 → 104 members. The 8 M5c files were added, with the pinned digests. Only `RECORD` and `METADATA` changed (the long description is the README). Nothing was removed.
+- **Sdist:** 199 → 211 members. Only `PKG-INFO`, `README.md` and `tests/test_packaging.py` changed. Nothing was removed.
+- All 16 `sample_data` files are byte-identical. No `pyproject.toml` include was needed.
+- The wheel rebuilt from the final staged tree is byte-identical to the one the isolated check ran on.
+
+**Isolated installed-wheel step:** I ran the full step extracted from `ci.yml` in a fresh environment outside the checkout, with dependencies installed offline using `--require-hashes` and the wheel with `--no-deps`. It exited 0 on both the first build and the final wheel. All eight lines printed, including "review template, prompts and request assembly ran from the installed wheel", and imports and resources came from `site-packages`.
+
+**Final documentation checks**
+- 357 links checked with no bad links or anchors; 59 tables with no problems.
+- All 18 files are UTF-8 without BOM, LF only, with no replacement characters.
+- `git diff --cached --check` is clean, and staged Gitleaks found no leaks.
+- The privacy scan of 4,257 added lines flagged only benign matches: pytest decorators, the corpus filename and the public noreply identity.
+
+**Not run:** Linux, CI, PostgreSQL, Docker, the container smoke, and any provider, network or live-model call.
+
+**Prompt history:** 409 lines added, and the earlier bytes are an identical prefix. Both existing text-fidelity disclosures are kept. In the Prompt 182 verbatim block, the backslash path and the dashes match the source.
+
+**Export:** `.local/p182/m5c-implementation.diff`
+
+| Item | Value |
+|---|---|
+| Baseline | `0958712661263fd05d5e62813212f11b1f4ed2c8` |
+| Final | staged tree `563acd58` |
+| Options | `--full-index`, prompts.md excluded |
+| Statistics | 17 files, 3,848 insertions, 12 deletions; 4,030 lines |
+| Size | 205,096 bytes |
+| SHA-256 | `f0ff49b14ef6e956e754afc588ce2d1832320ea86fad556613ad42c266537381` |
+| Encoding | UTF-8, no BOM, LF only |
+| Identity | byte-identical to both the tree and the staged (`--cached`) Git comparisons |
+
+**Remaining:** implementation acceptance, the commit, publication, current-version CI and overall M5 acceptance are all pending.
+
+This is about 25 substantial prompts into the session, so start a new Claude session before the next task (fresh context for the review); the checkpoint in `.local/p182/` plus this handoff are enough to recover.
+
+**Next step:** please return **output plus the diff file** `.local/p182/m5c-implementation.diff`.
+
+### External review of the Prompt 182 implementation (Prompt 183)
+
+The external reviewer independently verified the Prompt 182 export's size and SHA-256; extracted
+the five new agents modules and three resources (all eight Git blob hashes matched the
+attachment) and verified the three resource SHA-256 values; inspected the implementation, prompts,
+relevant tests, packaging and workflow changes and ADR-0021; and, using published M5a/M5b and other
+domain dependencies from fixed baseline `90295717`, ran 27 isolated checks with Python 3.12.14 and
+Pydantic 2.14.0 (23 passed, 4 failed) with fixture helpers extracted from the submitted test
+module, plus targeted observations of a serializer warning and a verdict mismatch. The reviewer ran
+no project suite, build, installed-wheel check, database, Docker or provider call. Findings:
+(A) nested `EvidenceQuestion` values with padded text, a `search_queries` list or an integer flag
+were accepted and normalized on the Verifier path (with a serializer warning echoing a query), and
+the integer flag on the Analyst path; (B) Verifier v1 rule 7 asked for `contradicted` for a
+negative answer, contrary to the accepted verdict mapping, and the prompts did not describe the
+`repair` member. The reviewer approved the exemption of exactly `assembly.py` from the agents-wide
+provenance-mention prohibition, the implemented bounded-read strategy (with a wording correction)
+and the narrowed ground-truth substring test as a limited check. Implementation acceptance remains
+pending. Prompt 183 authorizes the corrections, verification and a staged, uncommitted result.
+
+### Prompt 183 (verbatim)
+
+Prompt 183 — Correct M5c nested-question validation and prompt semantics
+
+Written for: Claude Code.
+Repository: D:\Claude\evidenceguard_agentic_rag
+
+Recover the staged M5c implementation, correct the two review findings below, verify the result and stage it for review.
+
+Do not commit, push, merge, fetch or start M5d.
+
+1. Recover and verify the starting state
+
+Read CLAUDE.md and applicable instructions, the accepted M5c specification and Prompt 181 acceptance, ADR-0021, the M5c implementation, relevant M5a/M5b contracts and the latest checkpoint.
+
+Expected:
+- Branch: feat/review-request-assembly.
+- HEAD: 0958712661263fd05d5e62813212f11b1f4ed2c8.
+- Parent: 90295717ad693b945eea1a10e176b9dd339b4049.
+- HEAD tree: 88e02932e0d09129547807d21734678158b95fcf.
+- main and origin/main: 90295717.
+- Staged tree: 563acd584e970ddd0b66dd24ec3bf17bf9026076.
+- Exactly the 18 Prompt 182 paths staged.
+- Nothing unstaged or untracked.
+- Origin and noreply identity unchanged.
+
+Verify:
+.local/p182/m5c-implementation.diff
+205,096 bytes
+4,030 lines
+SHA-256 f0ff49b14ef6e956e754afc588ce2d1832320ea86fad556613ad42c266537381
+
+Confirm byte identity to the Git comparison from HEAD to the staged tree, excluding prompts.md.
+
+Checkpoint under .local/p183/:
+- Starting staged tree, paths and blob hashes.
+- Original prompts.md prefix.
+- Submitted copies of the modules and tests needed for regression comparison.
+- Submitted prompt resources and their digests.
+
+Preserve all existing work. Do not reset, clean, stash or recreate it. If the starting state differs materially, report the discrepancy before dependent changes.
+
+2. External review evidence
+
+The external reviewer:
+- Independently verified the export's size and SHA-256.
+- Extracted the five new agents modules and three resources; all eight Git blob hashes matched the attachment.
+- Verified all three packaged resource SHA-256 values.
+- Inspected the implementation, prompts, relevant tests, packaging/workflow changes and ADR-0021.
+- Used published M5a/M5b and other domain dependencies from fixed baseline 90295717.
+- Ran 27 isolated checks using Python 3.12.14 and Pydantic 2.14.0: 23 passed, 4 failed.
+- Used fixture-building helpers extracted from the submitted test module without running its pytest tests.
+- Ran additional targeted observations for the warning and verdict mismatch described below.
+- Ran no project suite, build, installed-wheel check, database, Docker or provider call.
+
+The 23 passing checks covered packaged digests, planner behaviour, loader classifications, pinned Verifier and Analyst request digests, prompt binding, JSON round trips, invalid metadata Unicode, both size boundaries, repair preservation and rejection, fixed resource errors and process-control identity.
+
+Implementation acceptance remains pending.
+
+3. Finding A — Nested question validation silently normalizes invalid values
+
+The accepted M5c-B1 contract requires exact types, nested reconstruction and equality checks preventing silent changes to EvidenceQuestion.
+
+Observed through the public M5c entry points:
+
+Verifier:
+- A bypass-built nested question with text containing surrounding spaces was accepted and stripped.
+- A nested search_queries list was accepted and converted to a tuple.
+- requires_documentary_support set to integer 1 was accepted and converted to True.
+
+Analyst:
+- requires_documentary_support set to integer 1 was accepted and converted to True.
+- Existing Analyst checks already reject padded text and a search_queries list.
+
+The reviewer used copies of otherwise valid fixtures and changed only the identified question field. VerifierRequestInputs reconstruction and subsequent assembly accepted the normalized values.
+
+The Verifier route delegates to QuestionEvidence before checking the original question. M5b's reconstruction calls the Pydantic model-copy path, which can normalize these fields. With a list containing a canary query, it also emitted a Pydantic serializer warning containing that query.
+
+The Analyst equality check does not distinguish integer 1 from boolean True.
+
+Required correction:
+- Validate the original nested EvidenceQuestion fields at the M5c boundary before any reconstruction that could normalize them or emit serializer warnings.
+- Enforce the applicable exact field types, including an actual bool and an actual tuple of actual strings.
+- Rebuild through public validation and require unchanged field values and the required types.
+- Apply this consistently to Verifier and Analyst inputs.
+- Ensure assembly and repair revalidation cannot bypass the same checks.
+- Preserve valid ordinary domain values and valid bypass-constructed values whose fields already satisfy the contract.
+- Do not change EvidenceQuestion, QuestionEvidence, M5a or M5b.
+- Do not add unrelated template-only restrictions to the general Analyst question contract.
+- Do not suppress warnings globally or weaken the contract.
+
+Expected failures:
+- Invalid direct construction or dataclasses.replace: fresh InvalidAgentValueError.
+- Malformed already-constructed inputs passed to assembly or repair: fresh InvalidAssemblyInputError.
+- No cause, context, submitted text, warning, stdout/stderr output or log record.
+- Process-control identity remains preserved.
+
+Add targeted regressions for all four reproduced failures, plus appropriate valid controls and direct assembly/repair revalidation.
+
+4. Finding B — Verifier prompt conflicts with the accepted verdict mapping
+
+Verifier v1 rule 7 currently says:
+“Use contradicted when the cited passages conflict with each other or show that the answer is negative…”
+
+This conflicts with the existing evidence-status contract.
+
+Reviewer observations with ordinary validated outputs:
+- One exact quotation stating that customer data is not encrypted, under contradicted, produces verdict_unsupported.
+- The same quotation under supported is accepted with vendor_claim.
+- Two distinct but consistent negative quotations under contradicted are structurally accepted as conflicting.
+
+The last observation is not a new M5b defect: M5b explicitly does not prove semantic contradiction. It demonstrates why the prompt must request the correct verdict.
+
+Correct the Verifier prompt:
+- supported means the evidence supports the stated answer or claims; that answer may be affirmative or negative.
+- contradicted is for conflicting cited evidence, with at least two distinct quotations as required by M5b.
+- insufficient_evidence remains appropriate when the supplied evidence does not answer the question.
+- Do not imply that provenance checks prove entailment, authenticity or actual conflict.
+
+Also describe the optional repair member in the prompts:
+- It supplies a fixed failure category and optional positions for regenerating a complete valid response from the same supplied inputs.
+- Positions refer to the previous output's claim/finding and citation positions, not evidence ranks.
+- No previous raw response is supplied.
+- Preserve the output schemas, untrusted-data rules and no-additional-decoding contract.
+
+These resource files are staged and unpublished, so correct v1 in place; no new published version is needed.
+
+Recompute and independently pin every affected prompt and request digest:
+- Registry constants.
+- Relevant test literals.
+- Installed-wheel check.
+- ADR-0021 artifact table.
+- Any other affected documented pinned value.
+
+Do not derive expected request digests by calling the assembler under test.
+
+Add deterministic contract tests for:
+- A supported negative answer with one valid quotation.
+- A contradicted result with two genuinely conflicting fixture quotations.
+- The existing structural rejection of contradicted with only one distinct quotation.
+- Prompt wording consistent with this mapping.
+
+Scripted responses test the contract paths; they do not prove that a live model follows the prompt.
+
+5. Reviewed implementation choices
+
+The reviewer approves:
+- Exempting exactly assembly.py from the old agents-wide provenance mention prohibition, while keeping the application/handler restrictions.
+- The current bounded-read strategy: each read requests at most limit plus one minus bytes already received, and no more than limit plus one bytes are accumulated.
+- The narrowed ground-truth substring test as a limited check, alongside the separately reviewed exact template table. It is not a universal proof against evaluation contamination.
+
+Correct the stale _read_packaged docstring and accepted specification wording that say the sum of requested sizes never exceeds limit plus one.
+
+State accurately:
+- Each request is bounded by the remaining allowance.
+- Short reads are continued.
+- The total bytes received cannot exceed limit plus one under the reader contract.
+- Oversize resources are rejected.
+- The file is not read whole and then measured.
+
+This is approval of the implemented read strategy and a wording correction, not a request to replace it.
+
+Keep the actual accepted template content unchanged.
+
+6. Regression comparison and verification
+
+Run the new boundary regressions against:
+- Isolated submitted package copies from the starting staged tree.
+- The corrected package copies.
+
+Confirm import locations for both runs.
+
+Classify results honestly:
+- Which failures genuinely reproduce Finding A.
+- Which cases are controls or new coverage.
+- Prompt-semantic tests are contract coverage, not evidence that the old prompt was executed by a model.
+
+Use the locked offline environment:
+- Ruff lint and format.
+- Strict mypy.
+- Three M5c test modules.
+- The recorded focused command.
+- Full suite.
+- Integration/non-integration collection counts.
+
+No database is configured. Do not start Docker or configure a database.
+
+Rebuild wheel and sdist offline:
+- Compare with the preserved 09587126 baseline build, if available; do not rebuild the unchanged baseline unnecessarily.
+- Confirm only authorized packaging differences.
+- Confirm all 16 sample_data files remain byte-identical.
+- Verify corrected resource bytes and pinned digests.
+
+Run the complete CI installed-wheel step in a fresh environment outside the checkout:
+- Locked dependencies with hashes, installed offline.
+- Wheel installed with --no-deps.
+- All existing checks retained.
+- Corrected M5c check and pinned digests pass.
+- Imports and resources come from site-packages.
+
+Add a direct installed-wheel probe covering Finding A's corrected entry points and valid controls.
+
+If checks fail, fix within scope and rerun the affected verification. Record actual results only.
+
+7. Documentation, scope and history
+
+Keep the same 18-path overall scope. Change only files necessary for these corrections, tests, updated digest pins and documentation.
+
+No existing domain implementation, dependency, lockfile, persistence, migration, settings, registry, Docker, corpus or live-provider change.
+
+ADR-0021:
+- Record both findings and fixes.
+- Separate reviewer isolated observations from Claude Code project checks.
+- Record the approved implementation choices and corrected bounded-read wording.
+- Mark Prompt 182 local results historical.
+- Add the actual new verification results.
+- Keep implementation acceptance pending.
+
+README, plan and threat model:
+- State implemented in Prompt 182, corrected in Prompt 183 and staged for review.
+- Preserve accepted specification headings and anchors.
+- Keep no application use, Linux/current-version CI pending and overall M5 pending.
+- Make no new security or live-quality claim.
+
+prompts.md:
+- Append the actual Prompt 182 handoff, this review, Prompt 183 verbatim and a completed-results note.
+- Preserve the earlier bytes exactly.
+- Preserve both existing text-fidelity disclosures.
+- Verify literal backslashes and verbatim fidelity.
+
+Final checks:
+- Exact scope and unchanged-blob checks.
+- No tracked .local files or artifacts.
+- Relative links, anchors and tables.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --cached --check.
+- Privacy scan and unsuppressed staged Gitleaks.
+- No prospective or unsupported verification claims.
+
+8. Export and handoff
+
+Stage the corrections, uncommitted.
+
+Write directly from Git:
+.local/p183/m5c-question-boundary-and-prompt-corrections.diff
+
+Baseline:
+563acd584e970ddd0b66dd24ec3bf17bf9026076
+
+Final:
+the corrected staged tree
+
+Exclude prompts.md.
+
+Report:
+- Branch, HEAD and final staged tree.
+- Exact correction scope and unchanged blobs.
+- Regression comparison and classification.
+- Actual commands, counts, skip reasons and wheel results.
+- Changed artifact digests and affected request pins.
+- Export statistics, byte size, SHA-256, encoding and byte identity to the Git comparison.
+- What remains pending.
+
+Return the handoff plus the diff attachment. Printing the complete diff is unnecessary.
+
+Do not commit, push or merge. M5c implementation acceptance, publication, current-version CI and overall M5 acceptance remain pending.
+
+### Prompt 183 outcome (Claude Code; staged, awaiting review)
+
+*Work actually completed; nothing below has been reviewed.*
+
+- **Start.** Branch `feat/review-request-assembly`, HEAD `09587126` (parent `90295717`, tree
+  `88e02932`), staged tree `563acd58` with the 18 Prompt 182 paths, nothing unstaged or
+  untracked, `main` and `origin/main` at `90295717`, origin and noreply identity unchanged; the
+  Prompt 182 export matched 205,096 bytes, 4,030 lines, its SHA-256 and the Git comparison.
+  Checkpoint (staged tree, paths, blob hashes, prompts.md prefix, submitted module, test and
+  resource copies with digests) under `.local/p183/`. No remote operation.
+- **Finding A.** `assembly._checked_question` checks a nested `EvidenceQuestion`'s own fields with
+  exact types before any reconstruction, rebuilds it with `EvidenceQuestion.model_validate` and
+  requires unchanged values and types; the Verifier inputs check the question before rebuilding
+  `QuestionEvidence` and recheck the stored one; the Analyst inputs use the same check; assembly
+  and repair rebuild inputs through these constructors. No domain, M5a or M5b change.
+- **Finding B.** The Verifier v1 prompt states the accepted verdict mapping; both v1 prompts state
+  that provenance checks prove quote existence only and describe the `repair` member. New
+  digests: `verifier` `629f8f972a0f5d6247a54364da59f04d53a1a023472fa00830ebedfe106b007d`,
+  `risk_analyst` `f8e485998dc2ff79c839100c27326a6e119135788060237a9fcbe5fed0051b29`; the affected
+  request digests were recomputed independently with the standard library and updated in the
+  registry, tests, `ci.yml`, ADR-0021 and the plan. Bounded-read wording corrected in the
+  docstring, specification and ADR.
+- **Regression comparison** (isolated package copies first on `PYTHONPATH`, import locations
+  printed): submitted 10 failed, 8 passed (7 failures reproduce Finding A, 3 are new
+  `str`-subclass coverage; the passes are controls and the two verdict-mapping contract tests);
+  corrected 18 passed.
+- **Checks (Windows, locked offline, no database URL).** `ruff check .` clean; `ruff format
+  --check .` 201 files formatted; strict mypy no issues in 159 source files; the three M5c modules
+  251 passed; the focused twelve-file command 989 passed; full suite `3427 passed, 310 skipped`
+  (308 PostgreSQL without `EG_TEST_DATABASE_URL`, one symbolic-link, one POSIX-signal test);
+  collection 308 integration and 3,429 non-integration. Offline `uv build` compared with the
+  preserved `09587126` baseline: wheel 96 to 104 (eight M5c files added, only `METADATA` and
+  `RECORD` changed), sdist 199 to 211 (only `PKG-INFO`, `README.md` and `tests/test_packaging.py`
+  changed), 16 sample files byte-identical, resources with the pinned digests. The extracted CI
+  wheel step (locked requirements with hashes installed offline, wheel with `--no-deps`, outside
+  the checkout): exit 0, eight lines, imports and resources from `site-packages`. A direct
+  installed-wheel probe refused all four Finding A cases with no warning and accepted the valid
+  controls.
+- **Text fidelity.** The Prompt 182 handoff and Prompt 183 verbatim blocks were written with a
+  file-writing tool, not a shell heredoc. Both earlier text-fidelity disclosures stand.
+- The final rebuild confirmation, scope, unchanged-blob, link, table, encoding, whitespace,
+  privacy and Gitleaks checks and the export follow this note and are reported in the handoff.
+
+### Prompt 183 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 183 handoff: M5c corrections staged, not committed
+
+Both findings are fixed and every authorized check passed. The result is staged, uncommitted, on `feat/review-request-assembly`.
+
+**Starting state.** Everything matched what you expected:
+- Branch and HEAD `09587126` as expected, staged tree `563acd58` with the 18 paths, nothing unstaged or untracked.
+- The p182 export matches its 205,096 bytes, 4,030 lines and SHA-256, and is byte-identical to the Git comparison.
+- Checkpoint and the submitted module, test and resource copies (with digests) are in `.local/p183/`. No remote operation was run.
+
+**Git state**
+- Branch `feat/review-request-assembly`, HEAD `0958712661263fd05d5e62813212f11b1f4ed2c8`; `main` and `origin/main` at `90295717`.
+- Final staged tree: `687cb58103b22a8cf82bceb605841c8d702dcb52`, still the same 18 paths against HEAD.
+- Against `563acd58`, 13 paths changed:
+  - code: `assembly.py`, `prompts.py`, and `templates.py` (docstring only);
+  - resources: both prompt files;
+  - tests: `test_request_assembly.py`, `test_prompts.py`;
+  - `ci.yml`;
+  - documentation: ADR-0021, plan, README, threat model and prompts.md.
+- Every other blob is unchanged: the template, `artifact_errors.py`, `planner.py`, `test_review_templates.py`, `test_packaging.py`, and every domain, M5a and M5b file. Nothing is committed and no `.local` file is tracked.
+
+**Finding A fix.** A new `assembly._checked_question` checks a nested question before anything can normalize it:
+- It requires an exact `str` ID and text, an exact `tuple` of exact `str` queries, and an exact `bool` flag.
+- It then rebuilds the question through `EvidenceQuestion.model_validate` and requires every field to be unchanged in value and type.
+- The Verifier inputs run this before rebuilding `QuestionEvidence`, then recheck the stored question; the Analyst inputs use the same check.
+- Assembly and repair rebuild their inputs, so they cannot bypass it.
+- Failures produce no warning, output or log record, and process-control exceptions still propagate as the same object.
+
+**Finding B fix**
+- **Verifier mapping:** `supported` covers an affirmative or a negative answer; `contradicted` is only for conflicting cited passages, with at least two distinct quotations; `insufficient_evidence` is unchanged.
+- **Both prompts:** they now say EvidenceGuard checks quote provenance only, and they describe the `repair` member: a fixed failure category plus positions in the previous response's claims or findings, not evidence ranks or input citation indexes, with no previous response supplied.
+- **Contract tests:** a supported negative answer, a contradicted result with two conflicting quotations, rejection of contradicted with one quotation, and prompt wording. These test the contract paths only; they don't show that a live model follows the prompt.
+
+The bounded-read wording is corrected in the docstring, the specification and the ADR. The read strategy itself is unchanged, as you approved.
+
+**Changed pins.** All recomputed independently with the standard library; the user texts and their digests are unchanged.
+
+| Pin | Old | New |
+|---|---|---|
+| Verifier prompt (now 4,213 bytes) | `2201e3fa…` | `629f8f972a0f5d6247a54364da59f04d53a1a023472fa00830ebedfe106b007d` |
+| Risk Analyst prompt (now 4,002 bytes) | `9f250b8e…` | `f8e485998dc2ff79c839100c27326a6e119135788060237a9fcbe5fed0051b29` |
+| Verifier request | `fe199a9c…` | `fd742bf8…` |
+| Analyst request | `5e991897…` | `81933079…` |
+| Repaired Verifier request | `6584b818…` | `864c1ad3…` |
+| Installed-wheel check request | `2ad19d60…` | `59eaf2e3…` |
+
+**Regression comparison** (isolated package copies first on `PYTHONPATH`; a plugin printed each run's import location):
+
+| Run | Result |
+|---|---|
+| Submitted copies | 10 failed, 8 passed |
+| Corrected copies | 18 passed |
+
+- **7 failures genuinely reproduce Finding A:** Verifier padded text, list queries and integer flag, each through inputs and through assembly/repair (6), plus the Analyst integer flag (1). Each was a "DID NOT RAISE".
+- **3 failures are new coverage:** a `str`-subclass query on both Verifier paths and on the Analyst path.
+- **The 8 passes are controls and contract tests:** the `None` flag (already refused), the Analyst padded text and list (already refused), valid bypass-built questions, process-control identity, and the two verdict-mapping contract tests.
+
+**Checks run (Windows, locked offline, no database URL)**
+- **Lint and format:** `ruff check .` clean; `ruff format --check .` reports 201 files formatted.
+- **Types:** strict `mypy` reports no issues in 159 source files.
+- **Three M5c modules:** 251 passed.
+- **Focused command** (the twelve files recorded in Prompt 182): 989 passed.
+- **Full suite:** `3427 passed, 310 skipped`. The skips are 308 PostgreSQL tests (`EG_TEST_DATABASE_URL` not set), 1 symbolic-link test and 1 POSIX-only signal test.
+- **Collection:** 308 integration and 3,429 non-integration tests.
+- **Build** (compared with the preserved `09587126` baseline, which was not rebuilt):
+  - Wheel 96 → 104 members: the 8 M5c files added, only `METADATA` and `RECORD` changed.
+  - Sdist 199 → 211 members: only `PKG-INFO`, `README.md` and `tests/test_packaging.py` changed.
+  - All 16 `sample_data` files are byte-identical, and the resources have the pinned digests.
+  - The wheel rebuilt from the final staged tree is byte-identical to the one tested.
+- **Installed-wheel step:** run outside the checkout, with hashed dependencies installed offline and the wheel with `--no-deps`. It exited 0, printed all eight lines with the new request pin, and imported modules and resources from `site-packages`.
+- **Direct Finding A probe:** from the installed wheel, all four reproduced cases were refused with no warning, and the valid controls were accepted.
+- **Final documentation checks:**
+  - 358 links with no bad links or anchors; 59 tables with no problems.
+  - All files are UTF-8 without BOM, LF only, with no replacement characters.
+  - `git diff --cached --check` is clean, and staged Gitleaks found no leaks.
+  - The privacy scan of 881 added lines flagged only benign pytest decorators.
+
+**Prompt history:** 414 lines added, and the earlier bytes are an identical prefix. Both text-fidelity disclosures are kept. In the Prompt 183 verbatim block, the dashes, curly quotes, ellipsis and backslash path match the source.
+
+**Not run:** Linux, CI, PostgreSQL, Docker, the container smoke, and any provider, network or live-model call.
+
+**Export:** `.local/p183/m5c-question-boundary-and-prompt-corrections.diff`
+
+| Item | Value |
+|---|---|
+| Baseline | `563acd584e970ddd0b66dd24ec3bf17bf9026076` |
+| Final | `687cb58103b22a8cf82bceb605841c8d702dcb52` |
+| Options | `--full-index`, prompts.md excluded |
+| Statistics | 12 files, 467 insertions, 70 deletions; 835 lines |
+| Size | 78,465 bytes |
+| SHA-256 | `6af16679af451c865b0d8167eff8bbf2c72702e0a3aeda1363f9db3b3324a16c` |
+| Encoding | UTF-8, no BOM, LF only |
+| Identity | byte-identical to the Git comparison |
+
+**Pending:** M5c implementation acceptance, the commit, publication, current-version CI and overall M5 acceptance.
+
+This session is now well past 20 substantial prompts. Start a new Claude session before the next task, so its context is fresh for the next review. The `.local/p183/` checkpoint and this handoff are enough to recover.
+
+**Next step:** please return **output plus the diff file** `.local/p183/m5c-question-boundary-and-prompt-corrections.diff`.
+
+### External review acceptance of the corrected M5c implementation (Prompt 184)
+
+The external reviewer accepted the corrected M5c implementation from Prompts 182–183 for a local
+implementation commit only, pending Linux verification and current-version CI. The acceptance
+covers the five agents modules, the exact accepted template and both corrected v1 prompt
+resources, pinned loading, bounded reads, deterministic planning, prompt binding, the closed
+request schemas, deterministic serialization, strict nested-question reconstruction and warning
+privacy, size refusal and reassembly-based repairs, the tests, packaging changes and the additive
+installed-wheel workflow extension, and the three implementation choices approved in Prompt 183.
+Publication and merge are not authorized; M5d–M5h and overall M5 acceptance remain pending.
+Evidence: the reviewer independently verified both exports' sizes and SHA-256 values
+(205,096 bytes `f0ff49b14ef6e956e754afc588ce2d1832320ea86fad556613ad42c266537381`; 78,465 bytes
+`6af16679af451c865b0d8167eff8bbf2c72702e0a3aeda1363f9db3b3324a16c`); reconstructed the corrected
+code by applying the Prompt 183 correction to the extracted Prompt 182 files, with the eight
+reconstructed changed-file blobs matching the correction export (including `assembly.py`
+`67a1d6b987c8f1d4d645fb54dc7a75045e3d4c0c`, `prompts.py`
+`1e646a1dc46eb4d8c4aa30e7edc2eadc9ddc8ed5`, `templates.py`
+`dcd5341cdbb9235a6f64ce24a076af381329e0eb`, `test_request_assembly.py`
+`d5771de5f26573c488862622182c65cbb4aa0273` and `test_prompts.py`
+`9e0b425e207bb98ac30ffbfa6c669dfd53b35786`); verified the template (1,969 bytes,
+`26fcbe26dcc47f5991da5b741475c736cec27b1f2bd6ab515ec07ac59895786a`), Verifier prompt (4,213
+bytes, `629f8f972a0f5d6247a54364da59f04d53a1a023472fa00830ebedfe106b007d`) and Risk Analyst
+prompt (4,002 bytes, `f8e485998dc2ff79c839100c27326a6e119135788060237a9fcbe5fed0051b29`); and
+ran 38 isolated checks (the original 27 with the corrected pins plus 11 additional checks), all
+passing, with Python 3.12.14, Pydantic 2.14.0 and existing dependencies from fixed baseline
+`90295717`, using fixture helpers extracted from the submitted test module without executing its
+pytest tests. These were isolated checks on reconstructed copies, not execution of the project
+suite, the submitted pytest modules, a build, an installed wheel, a database, Docker or a
+provider; the prompt checks and scripted contract paths do not establish live-model behaviour.
+Claude Code's Prompt 183 Windows results remain separately attributed historical local evidence,
+not exact-commit CI. Prompt 184 authorizes the acceptance record and one local implementation
+commit, with no push, merge or remote operation.
+
+### Prompt 184 (verbatim)
+
+Prompt 184 — Record M5c implementation acceptance and commit locally
+
+Written for: Claude Code.
+Repository: D:\Claude\evidenceguard_agentic_rag
+
+Record the external review below and commit the accepted M5c implementation locally. Do not push, merge, fetch or start M5d.
+
+1. Recover and verify the starting state
+
+Read CLAUDE.md and applicable instructions, the accepted M5c specification, ADR-0021 and the latest checkpoint and handoff.
+
+Expected:
+- Branch: feat/review-request-assembly.
+- HEAD: 0958712661263fd05d5e62813212f11b1f4ed2c8.
+- Parent: 90295717ad693b945eea1a10e176b9dd339b4049.
+- HEAD tree: 88e02932e0d09129547807d21734678158b95fcf.
+- main and origin/main: 90295717.
+- Accepted staged tree: 687cb58103b22a8cf82bceb605841c8d702dcb52.
+- Exactly the same 18 paths staged.
+- Nothing unstaged or untracked.
+- Origin and noreply identity unchanged.
+
+Verify both preserved exports against their recorded Git comparisons:
+
+.local/p182/m5c-implementation.diff
+205,096 bytes
+SHA-256 f0ff49b14ef6e956e754afc588ce2d1832320ea86fad556613ad42c266537381
+
+.local/p183/m5c-question-boundary-and-prompt-corrections.diff
+78,465 bytes
+SHA-256 6af16679af451c865b0d8167eff8bbf2c72702e0a3aeda1363f9db3b3324a16c
+
+Save a checkpoint under .local/p184/:
+- Accepted staged tree, paths and all 18 blob hashes.
+- Existing prompts.md bytes and their SHA-256.
+- Refs and status.
+
+Preserve the staged work. Do not reset, clean, stash or recreate it. If the state differs materially, report the discrepancy before dependent changes.
+
+2. External review decision
+
+The external reviewer accepts the corrected M5c implementation from Prompts 182–183 for a local implementation commit only, pending Linux verification and current-version CI.
+
+Acceptance covers:
+- The five agents modules.
+- The exact accepted template and both corrected v1 prompt resources.
+- Pinned loading, bounded reads and deterministic planning.
+- Prompt binding, closed request schemas and deterministic serialization.
+- Strict nested-question reconstruction and warning privacy.
+- Size refusal and reassembly-based repairs.
+- Tests, packaging changes and the additive installed-wheel workflow extension.
+- The three previously approved implementation choices recorded in Prompt 183.
+
+Publication and merge are not authorized by this prompt.
+
+M5d–M5h and overall M5 acceptance remain pending.
+
+3. Reviewer evidence and attribution
+
+Record accurately:
+
+- The reviewer independently verified both exports' byte sizes and SHA-256 values.
+- The corrected code was reconstructed by applying the supplied Prompt 183 correction to the extracted Prompt 182 files.
+- The eight reconstructed changed-file blobs matched the correction export, including:
+  assembly.py:
+  67a1d6b987c8f1d4d645fb54dc7a75045e3d4c0c
+  prompts.py:
+  1e646a1dc46eb4d8c4aa30e7edc2eadc9ddc8ed5
+  templates.py:
+  dcd5341cdbb9235a6f64ce24a076af381329e0eb
+  test_request_assembly.py:
+  d5771de5f26573c488862622182c65cbb4aa0273
+  test_prompts.py:
+  9e0b425e207bb98ac30ffbfa6c669dfd53b35786
+
+- The reviewer verified the packaged artifact sizes and SHA-256 values:
+  Template: 1,969 bytes,
+  26fcbe26dcc47f5991da5b741475c736cec27b1f2bd6ab515ec07ac59895786a
+  Verifier prompt: 4,213 bytes,
+  629f8f972a0f5d6247a54364da59f04d53a1a023472fa00830ebedfe106b007d
+  Risk Analyst prompt: 4,002 bytes,
+  f8e485998dc2ff79c839100c27326a6e119135788060237a9fcbe5fed0051b29
+
+- All 38 isolated reviewer checks passed using Python 3.12.14, Pydantic 2.14.0 and existing dependencies from fixed baseline 90295717.
+- These covered the original 27 checks, with the corrected artifact/request pins, and 11 additional checks.
+- Coverage included:
+  packaged digests; planner behaviour; loader classifications; prompt binding; pinned request digests; adversarial JSON round trips; invalid metadata Unicode; both size boundaries; repair preservation and rejection; fixed resource errors; process-control identity; all four previous nested-question failures; no warning from a malformed query; assembly and repair revalidation for both stages; valid bypass-built controls; string-subclass query rejection; supported negative answers; conflicting quotations; one-quotation rejection; and revised prompt/repair wording.
+- Fixture-building helpers were extracted from the submitted test module without executing its pytest tests.
+- These are isolated checks on reconstructed copies, not execution of the project suite, submitted pytest modules, build, installed wheel, database, Docker or a provider.
+- The prompt checks and scripted contract paths do not establish live-model behaviour.
+
+Keep Claude Code's Prompt 183 Windows results separately attributed:
+- Corrected regression comparison: 18 passed.
+- Submitted comparison: 10 failed, 8 passed; 7 failures reproduce Finding A and 3 are new coverage.
+- Three M5c modules: 251 passed.
+- Focused command: 989 passed.
+- Full suite: 3427 passed, 310 skipped.
+- Collection: 308 integration and 3,429 non-integration tests.
+- Static checks, offline build comparison, installed-wheel step and direct installed-wheel boundary probe passed.
+
+Those results remain historical local evidence, not exact-commit CI.
+
+4. Authorized changes
+
+Only these five documentation/history files may differ from accepted tree 687cb581:
+- README.md
+- docs/decisions/0021-review-request-assembly.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Do not change the other 13 accepted implementation, resource, test, packaging and workflow blobs.
+
+ADR-0021:
+- Record implementation acceptance in Prompt 184 for a local commit only, pending CI.
+- Add an External review (Prompt 184) section with the decision, evidence and attribution above.
+- Mark earlier implementation-acceptance-pending statements historical where appropriate.
+- Preserve the design, fixes, artifact pins, approved choices and limitations.
+- State publication and merge are not authorized here.
+- State that none of the 308 integration tests has run against this implementation version; M5c adds no PostgreSQL tests.
+
+README, plan and threat model:
+- Record specification accepted in Prompt 181, implemented in Prompt 182, corrected in Prompt 183 and implementation accepted for a local commit in Prompt 184.
+- Keep publication, Linux verification and current-version CI pending.
+- Keep no application use or production wiring.
+- Keep overall M5 acceptance pending.
+- Rename the separate implementation-status heading to:
+  M5c implementation status (accepted for a local commit, Prompt 184; CI pending)
+- Update every link to that heading.
+- Preserve the accepted specification heading and anchor.
+- Do not alter earlier exact-commit CI evidence.
+
+prompts.md:
+- Append the actual Prompt 183 handoff.
+- Append this external review decision and its evidence scope.
+- Append Prompt 184 verbatim.
+- Append a pre-commit note containing completed checks only, with no prospective commit SHA.
+- Preserve the earlier bytes exactly and retain both text-fidelity disclosures.
+- Verify literal backslashes and verbatim fidelity.
+
+5. Checks before committing
+
+Documentation checks only; do not repeat application tests, builds or wheel checks when their accepted blobs are unchanged.
+
+Verify:
+- Exactly 18 paths remain staged against HEAD.
+- Only the five authorized files differ from accepted tree 687cb581.
+- All other 13 accepted blobs are identical.
+- Every tracked path outside the 18 matches HEAD.
+- Earlier prompts.md bytes remain an identical prefix.
+- Relative links and anchors resolve.
+- Tables are structurally consistent.
+- Accepted specification headings remain unchanged.
+- UTF-8, no BOM, LF only, no replacement characters.
+- git diff --cached --check is clean.
+- No tracked .local files or artifacts.
+- Privacy scan and unsuppressed staged Gitleaks are clean.
+- Status statements distinguish local acceptance from publication and CI.
+
+6. Local commit
+
+After those checks pass, commit the 18 accepted paths locally.
+
+Subject:
+feat: add review templates prompts and request assembly
+
+Use the configured noreply author and committer:
+mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Write the commit message from a file. Follow the existing attribution convention:
+- Credit Claude Code's Prompt 182–184 implementation, corrections and documentation.
+- Preserve earlier Claude Code, OpenAI Codex and external-reviewer attribution accurately.
+- Include the required Co-Authored-By trailer.
+
+Do not amend an earlier commit.
+
+Afterwards verify:
+- Parent is 09587126.
+- Exactly the 18 reviewed paths are in the commit.
+- The 13 implementation/resource/test/packaging/workflow blobs still equal accepted tree 687cb581.
+- All other tracked paths are unchanged.
+- Working tree is clean.
+- main and origin/main remain at 90295717.
+- Author and committer are correct.
+- The usual unsuppressed full-history Gitleaks scan is clean.
+
+7. Export and handoff
+
+Write directly from Git:
+.local/p184/m5c-commit-incremental.diff
+
+Baseline:
+687cb58103b22a8cf82bceb605841c8d702dcb52
+
+Final:
+the new local commit
+
+Exclude prompts.md.
+
+Report:
+- Full commit SHA, parent, tree, subject and identity.
+- Exact scope and unchanged-blob verification.
+- Documentation checks actually performed.
+- Prompt-history prefix preservation and added-line count.
+- Export statistics, byte size, SHA-256, encoding and byte identity to the Git comparison.
+- Final branch/ref state and remaining work.
+
+Return the handoff plus the diff attachment. Printing the complete diff is unnecessary.
+
+Stop after the local commit and export. No push, merge, remote operation, CI monitoring or M5d work is authorized here.
+
+### Prompt 184 pre-commit note (Claude Code; before the local implementation commit)
+
+Completed checks only. Starting state matched: branch `feat/review-request-assembly`, HEAD
+`09587126` (parent `90295717`, tree `88e02932`), `main` and `origin/main` at `90295717`, accepted
+staged tree `687cb581` with the 18 paths, nothing unstaged or untracked, origin and noreply
+identity unchanged. Both exports matched their sizes, SHA-256 values and Git comparisons
+(`git diff --full-index 09587126 563acd58` and `git diff --full-index 563acd58 687cb581`, each
+excluding prompts.md), and the five blob hashes the reviewer cited equal the staged blobs.
+Checkpoint (refs, status, the 18 blob hashes, prompts.md bytes and SHA-256) under `.local/p184/`.
+No remote operation. Documentation: ADR-0021 status and a new "External review (Prompt 184)"
+section (decision, reviewer evidence and scope, separately attributed Claude Code results, the
+statement that none of the 308 integration tests has run against this version); the Prompt 183
+verification heading marked historical local evidence; README, plan and threat-model status
+updated to "accepted for a local commit in Prompt 184" with publication, Linux verification and
+current-version CI pending; the plan's implementation-status heading renamed to "M5c
+implementation status (accepted for a local commit, Prompt 184; CI pending)" with every link
+updated; the accepted specification heading unchanged. Checks on README, ADR-0021, plan and threat
+model after these edits: 359 relative links with 0 link or anchor problems, 59 tables with 0
+problems, `git diff --cached --check` clean, UTF-8 without BOM, LF only, no replacement
+characters; against `687cb581` only those four files differed. No application test, build or
+wheel check was repeated (the accepted implementation blobs are unchanged). The appended Prompt
+183 handoff is Claude Code's output as supplied; the Prompt 179 reconstruction disclosure and the
+Prompt 175 text-fidelity disclosure are kept. The final scope, prefix, encoding, privacy and
+Gitleaks checks, the commit and the export follow and are reported in the handoff.

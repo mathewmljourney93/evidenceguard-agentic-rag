@@ -202,6 +202,56 @@ jobs:
           assert provenance.derive_status(Verdict.CONTRADICTED, (citation,)) is None
           print("provenance matched a quote and derived a status from the installed wheel")
           PY
+          # M5c (ADR-0021): load the packaged template and prompts through the pinned loaders,
+          # plan, and assemble one Verifier request from a fixed evidence fixture; its digests
+          # are pinned independently. No provider, network or database is used.
+          "${bin}/python" -I - <<'PY'
+          import hashlib
+          import uuid
+          from datetime import UTC, datetime
+          from fractions import Fraction
+          from importlib.resources import files
+          import evidenceguard_agents.assembly as assembly
+          import evidenceguard_agents.planner as planner
+          import evidenceguard_agents.prompts as prompts
+          import evidenceguard_agents.templates as templates
+          from evidenceguard_domain.evidence import Authenticity, SourceType
+          from evidenceguard_domain.model_calls import ModelPurpose, PromptRef
+          from evidenceguard_domain.provenance import QuestionEvidence
+          from evidenceguard_domain.retrieval import RETRIEVAL_CONFIG_V1, ChannelHit, ChunkEvidence, PendingExclusions, RetrievalResult, RetrievalSnapshot, RetrievedChunk, RevisionBinding, SourceSpan
+          from evidenceguard_retrieval.embeddings import HASH_IDENTITY
+          for module in (assembly, planner, prompts, templates):
+              assert "site-packages" in (module.__file__ or ""), module.__name__
+          data = files("evidenceguard_agents").joinpath("data")
+          assert "site-packages" in str(data), str(data)
+          template_sha = "26fcbe26dcc47f5991da5b741475c736cec27b1f2bd6ab515ec07ac59895786a"
+          prompt_sha = "629f8f972a0f5d6247a54364da59f04d53a1a023472fa00830ebedfe106b007d"
+          analyst_sha = "f8e485998dc2ff79c839100c27326a6e119135788060237a9fcbe5fed0051b29"
+          template_bytes = data.joinpath("templates", "vendor_security_review_v1.toml").read_bytes()
+          assert hashlib.sha256(template_bytes).hexdigest() == template_sha
+          ref = templates.TemplateRef(template_id="vendor_security_review", version=1, sha256=template_sha)
+          template = templates.load_pinned_template(ref)
+          assert [q.question_id for q in template.questions] == ["RET-01", "ENC-01", "CMP-01", "CMP-02", "INC-01", "BCP-01", "SUB-01", "SOC-01"]
+          planned = planner.plan_review(template)
+          assert len(planned) == 8 and planned[1].retrieval.k == 8
+          assert planned[1].retrieval.queries == ("customer data encryption at rest", "stored data encryption")
+          spec, system_text = prompts.load_pinned_prompt(PromptRef(prompt_id="verifier", version=1, sha256=prompt_sha), ModelPurpose.VERIFIER)
+          assert hashlib.sha256(system_text.encode("utf-8")).hexdigest() == prompt_sha
+          prompts.load_pinned_prompt(PromptRef(prompt_id="risk_analyst", version=1, sha256=analyst_sha), ModelPurpose.RISK_ANALYST)
+          tenant, rev, doc = uuid.UUID("11111111-1111-4111-8111-111111111111"), uuid.UUID("33333333-3333-4333-8333-333333333333"), uuid.UUID("44444444-4444-4444-8444-444444444444")
+          binding = RevisionBinding(rev, doc, uuid.UUID("5b7601bd-c104-574b-afc4-8e43c3da8ecc"), "md-v1", 2, "a" * 64, "b" * 64)
+          snapshot = RetrievalSnapshot(tenant_id=tenant, vendor_id=uuid.UUID("22222222-2222-4222-8222-222222222222"), identity=HASH_IDENTITY, config=RETRIEVAL_CONFIG_V1, bindings=(binding,), exclusions=PendingExclusions(0, (), False), captured_at=datetime(2026, 10, 17, 9, 30, tzinfo=UTC))
+          body = "Customer data is encrypted at rest."
+          chunk = ChunkEvidence(uuid.UUID(int=1), body, hashlib.sha256(body.encode()).hexdigest(), 0, ("Encryption",), False, SourceSpan(5, 6, 200, 200 + len(body)), None, "security-overview", "Security Overview", 1, None, None, SourceType.VENDOR_STATEMENT, Authenticity.NOT_ESTABLISHED)
+          item = RetrievedChunk(chunk_id=uuid.UUID(int=1), revision_id=rev, document_id=doc, fused_rank=1, fused_score=Fraction(1, 61), hits=(ChannelHit(0, "lexical", 1, 1.0),), evidence=chunk)
+          result = RetrievalResult(snapshot, 1, 8, (), (item,))
+          evidence = QuestionEvidence(tenant_id=tenant, review_id=uuid.UUID(int=8), snapshot_sha256=result.snapshot_sha256, question=planned[1].question, result=result)
+          inputs = assembly.VerifierRequestInputs(evidence=evidence, prompt=spec, system_text=system_text, settings=assembly.ModelSettings(model_id="fake-scripted-v1"))
+          request = assembly.assemble_verifier_request(inputs)
+          assert hashlib.sha256(request.user_text.encode("utf-8")).hexdigest() == "d9be2e48d1a403f0e5974f6f1be263198ea501c887579cff905dc1463cb748c6"
+          assert request.request_sha256 == "59eaf2e372637cda70ff659c66e8d2a97d032ec323cd89d9f07b26aa35746580"
+          print("review template, prompts and request assembly ran from the installed wheel")
+          PY
           "${bin}/python" -I -c "import io; from alembic import command; from evidenceguard_persistence.migration_config import alembic_config; buf = io.StringIO(); command.upgrade(alembic_config(output_buffer=buf), 'head', sql=True); assert 'CREATE TABLE api_keys' in buf.getvalue(); print('offline migration SQL rendered from the installed wheel')"
 
   integration:

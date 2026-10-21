@@ -278,10 +278,18 @@ def test_m5a_agents_modules_use_only_the_domain_and_the_standard_library(module:
 
 
 def test_m5a_agents_package_contains_only_the_accepted_modules() -> None:
+    """The M5a modules plus exactly the accepted M5c modules and data directory (M5c-B)."""
     assert evidenceguard_agents.__file__ is not None
     root = Path(evidenceguard_agents.__file__).parent
     names = {path.name for path in root.iterdir() if path.name != "__pycache__"}
-    assert names == {"__init__.py", "py.typed", "providers.py", "scripted.py"}
+    assert names == {
+        "__init__.py",
+        "py.typed",
+        "providers.py",
+        "scripted.py",
+        *M5C_MODULES,
+        "data",
+    }
 
 
 def test_m5a_is_not_imported_by_other_packages_or_registered() -> None:
@@ -328,7 +336,8 @@ def test_m5b_provenance_uses_only_the_domain_and_the_standard_library() -> None:
 
 
 def test_m5b_is_not_wired_into_any_application_or_handler() -> None:
-    """M5b adds no handler, endpoint, command or persistence use; later slices own that."""
+    """M5b adds no handler, endpoint, command or persistence use; later slices own that. The
+    accepted M5c request assembly (M5c-B) is the only agents module that may use its values."""
     for package in (
         evidenceguard_agents,
         evidenceguard_api,
@@ -339,4 +348,88 @@ def test_m5b_is_not_wired_into_any_application_or_handler() -> None:
     ):
         assert package.__file__ is not None
         for source in Path(package.__file__).parent.rglob("*.py"):
+            if package is evidenceguard_agents and source.name == "assembly.py":
+                continue
             assert "provenance" not in source.read_text(encoding="utf-8"), source.name
+
+
+# --- M5c (ADR-0021) ------------------------------------------------------------------------------
+
+M5C_MODULES = {"artifact_errors.py", "templates.py", "planner.py", "prompts.py", "assembly.py"}
+M5C_DATA_FILES = {
+    "templates/vendor_security_review_v1.toml",
+    "prompts/verifier/v1.md",
+    "prompts/risk_analyst/v1.md",
+}
+# M5c-B: the standard library each module may import, and the domain modules it may use.
+M5C_STDLIB = {
+    "artifact_errors.py": {"collections", "typing"},
+    "templates.py": {"tomllib", "hashlib", "dataclasses", "contextlib", "importlib"},
+    "prompts.py": {"tomllib", "hashlib", "dataclasses", "contextlib", "importlib"},
+    "planner.py": {"json", "hashlib", "dataclasses", "enum", "contextlib"},
+    "assembly.py": {"json", "hashlib", "dataclasses", "enum", "contextlib"},
+}
+M5C_DOMAIN = {
+    "artifact_errors.py": set(),
+    "templates.py": {"evidenceguard_domain.evidence", "evidenceguard_domain.model_calls"},
+    "prompts.py": {"evidenceguard_domain.model_calls"},
+    "planner.py": {"evidenceguard_domain.evidence", "evidenceguard_domain.retrieval"},
+    "assembly.py": {
+        "evidenceguard_domain.evidence",
+        "evidenceguard_domain.model_calls",
+        "evidenceguard_domain.provenance",
+    },
+}
+
+
+def _agents_root() -> Path:
+    assert evidenceguard_agents.__file__ is not None
+    return Path(evidenceguard_agents.__file__).parent
+
+
+def test_m5c_packaged_data_is_exactly_the_accepted_file_set() -> None:
+    data = _agents_root() / "data"
+    found = {path.relative_to(data).as_posix() for path in data.rglob("*") if path.is_file()}
+    assert found == M5C_DATA_FILES
+
+
+@pytest.mark.parametrize("module", sorted(M5C_MODULES))
+def test_m5c_modules_keep_the_accepted_imports(module: str) -> None:
+    """M5c-B allowlists: no network, file-path, environment, logging or third-party import;
+    resources are read only through ``importlib.resources``. Architectural checks against
+    accidental access, not a sandbox."""
+    path = _agents_root() / module
+    imported = _module_imports(path)
+    stdlib = imported & set(sys.stdlib_module_names)
+    assert stdlib <= M5C_STDLIB[module]
+    assert imported - stdlib <= {"evidenceguard_agents", "evidenceguard_domain"}
+    assert not imported & {"os", "pathlib", "io", "socket", "ssl", "http", "urllib", "logging"}
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    domain = {
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+        and node.module
+        and node.module.startswith("evidenceguard_domain")
+    }
+    assert domain == M5C_DOMAIN[module]
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith("importlib"):
+            assert node.module == "importlib.resources"
+            assert [alias.name for alias in node.names] == ["files"]
+        if isinstance(node, ast.Import):
+            assert not any(alias.name.startswith("importlib") for alias in node.names)
+
+
+def test_no_agents_module_reads_the_evaluation_data() -> None:
+    for source in _agents_root().rglob("*.py"):
+        text = source.read_text(encoding="utf-8")
+        assert "ground_truth" not in text and "sample_data" not in text, source.name
+
+
+def test_m5c_resources_are_readable_through_the_package() -> None:
+    from importlib.resources import files
+
+    root = files("evidenceguard_agents").joinpath("data")
+    for name in M5C_DATA_FILES:
+        assert root.joinpath(*name.split("/")).is_file(), name

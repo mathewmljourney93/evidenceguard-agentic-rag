@@ -1,0 +1,54 @@
+# EvidenceGuard review template (M5c-C2, accepted in Prompt 181). Authored product content.
+# Published versions are immutable: any change is a new version file with a new pinned digest.
+format = "eg-review-template-v1"
+template_id = "vendor_security_review"
+version = 1
+title = "Vendor security review"
+
+[[questions]]
+id = "RET-01"
+text = "How long is customer data retained after termination?"
+search_queries = ["customer data retention after contract termination", "data deletion after termination"]
+requires_documentary_support = false
+
+[[questions]]
+id = "ENC-01"
+text = "Is customer data encrypted at rest?"
+search_queries = ["customer data encryption at rest", "stored data encryption"]
+requires_documentary_support = false
+
+[[questions]]
+id = "CMP-01"
+text = "Does the vendor hold an ISO 27001 certification?"
+search_queries = ["ISO 27001 certificate", "information security management certification"]
+requires_documentary_support = true
+
+[[questions]]
+id = "CMP-02"
+text = "Is the vendor HIPAA compliant?"
+search_queries = ["HIPAA compliance status", "protected health information safeguards"]
+requires_documentary_support = true
+
+[[questions]]
+id = "INC-01"
+text = "What is the breach-notification timeframe?"
+search_queries = ["security breach notification period", "incident notification to customers"]
+requires_documentary_support = false
+
+[[questions]]
+id = "BCP-01"
+text = "What is the recovery time objective for production?"
+search_queries = ["recovery time objective production", "disaster recovery targets"]
+requires_documentary_support = false
+
+[[questions]]
+id = "SUB-01"
+text = "Which subprocessors are used, and in which regions?"
+search_queries = ["subprocessor list and regions", "third-party subprocessors data location"]
+requires_documentary_support = false
+
+[[questions]]
+id = "SOC-01"
+text = "Is there an independent SOC 2 report?"
+search_queries = ["SOC 2 report", "independent service auditor report"]
+requires_documentary_support = true

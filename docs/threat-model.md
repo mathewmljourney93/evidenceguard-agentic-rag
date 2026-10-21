@@ -391,7 +391,7 @@ acceptance. Residual risks once implemented:
 
 The settled decisions, details and the unresolved external API facts are listed in the plan.
 
-## Review workflow (M5: sequence, M5a, M5b and M5c specifications accepted; M5a and M5b on main; M5c implementation pending)
+## Review workflow (M5: sequence, M5a, M5b and M5c specifications accepted; M5a and M5b on main; M5c implementation accepted for a local commit)
 
 The [M5 implementation sequence](plan.md#m5-implementation-sequence-accepted-at-review-prompt-170)
 and the [M5a specification](plan.md#m5a-model-call-contracts-and-scripted-fake-provider-accepted-at-review-prompt-170-implementation-pending)
@@ -460,8 +460,10 @@ reload checks detect values inconsistent with trusted evidence, not a malicious 
 which retrieval request originally ran.
 
 **Specified M5c controls (proposed in Prompt 179, revised in Prompt 180, specification accepted at
-external review in Prompt 181; implementation and every M5c implementation check pending; none
-operates).** The
+external review in Prompt 181; implemented in Prompt 182, corrected in Prompt 183 and accepted for a
+local commit in Prompt 184, see
+[ADR-0021](decisions/0021-review-request-assembly.md); publication, Linux verification and
+current-version CI pending; no application path uses them, so none operates).** The
 [M5c specification](plan.md#m5c-review-template-planner-prompts-and-request-assembly-specification-accepted-at-review-prompt-181-implementation-pending)
 specifies a packaged, digest-pinned review template and versioned prompts loaded only through
 pinned-reference loaders with bounded reads (no ground-truth access), a deterministic Planner, and
