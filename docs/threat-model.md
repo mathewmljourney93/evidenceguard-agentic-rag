@@ -391,7 +391,7 @@ acceptance. Residual risks once implemented:
 
 The settled decisions, details and the unresolved external API facts are listed in the plan.
 
-## Review workflow (M5: sequence, M5a and M5b specifications accepted; M5a on main; M5b implemented and staged for review)
+## Review workflow (M5: sequence, M5a, M5b and M5c specifications accepted; M5a and M5b on main; M5c implementation pending)
 
 The [M5 implementation sequence](plan.md#m5-implementation-sequence-accepted-at-review-prompt-170)
 and the [M5a specification](plan.md#m5a-model-call-contracts-and-scripted-fake-provider-accepted-at-review-prompt-170-implementation-pending)
@@ -433,8 +433,13 @@ stage and output writes are fenced; and no production path can dispatch a review
 wiring decision.
 
 **M5b controls (specification accepted in Prompt 176; implemented in Prompt 177, corrected in
-Prompt 178 and accepted at external review in Prompt 179, exact-commit CI pending at this record; no review path uses them yet, so none operates in the
-application).** See [ADR-0020](decisions/0020-provenance-validation.md). The
+Prompt 178, accepted at external review in Prompt 179, verified in exact-commit feature and main-push CI and on `main` at `90295717`; no review path uses them yet, so none operates in the
+application).** See [ADR-0020](decisions/0020-provenance-validation.md); from the job logs
+independently retrieved by the external reviewer (recorded in Prompt 180; Claude Code observed
+only API conclusions), the Ubuntu, Windows and PostgreSQL jobs passed on both pushes, all four
+installed-wheel logs printed the provenance line, and Gitleaks scanned 77 commits with no leaks
+([main evidence](decisions/0020-provenance-validation.md#main-publication-evidence-prompt-179)).
+This is contract evidence, not live-model behaviour. The
 [M5b specification](plan.md#m5b-provenance-and-status-derivation-specification-accepted-at-review-prompt-176-implementation-pending)
 (proposed in Prompt 174, corrected in Prompt 175, accepted at external review in Prompt 176)
 specifies: input identity binding (tenant, review and question checked before any finding is
@@ -453,6 +458,26 @@ equivalent spellings can match differently (false rejections, and a Hangul parti
 asymmetry); provenance would still prove quote existence only, not entailment or authenticity; and
 reload checks detect values inconsistent with trusted evidence, not a malicious trusted process or
 which retrieval request originally ran.
+
+**Specified M5c controls (proposed in Prompt 179, revised in Prompt 180, specification accepted at
+external review in Prompt 181; implementation and every M5c implementation check pending; none
+operates).** The
+[M5c specification](plan.md#m5c-review-template-planner-prompts-and-request-assembly-specification-accepted-at-review-prompt-181-implementation-pending)
+specifies a packaged, digest-pinned review template and versioned prompts loaded only through
+pinned-reference loaders with bounded reads (no ground-truth access), a deterministic Planner, and
+request assembly that binds the system text to the pinned prompt digest (which M5a's request does
+not check), places every untrusted document string and earlier model-derived text only inside JSON
+string values of a closed schema (so delimiter-like text cannot forge structure, and a correctly
+encoded quotation is returned as original text by M5a's existing two-pass validation, with no
+further decoding, before M5b
+matching), rejects metadata that is not valid Unicode, inserts no trusted tenant, review, snapshot
+or document ID as metadata, refuses oversize requests before dispatch instead of truncating, and
+builds repair requests by reassembly with only fixed repair fields. **Limits:** encoding prevents
+structural forgery only; it does not stop a model from following persuasive document text
+(semantic injection), which only live evaluation can measure (M7); a model may still encode a
+quotation wrongly, which fails the existing checks; request digests identify content, not tenant
+or review; and assembly cannot prove that its evidence or Verifier inputs came from trusted paths,
+which remains M5g's obligation.
 
 The accepted sequence also requires that every conclusion shown in an approval or export artifact
 be in its canonical hashed content, or derived solely from it, so no displayed conclusion can come
@@ -482,7 +507,7 @@ no exactly-once guarantee is made. The M4 limits above are unchanged.
 - **Destructive integration tests.** The PostgreSQL tests drop the `public` schema of `EG_TEST_DATABASE_URL`. Before any engine exists, they refuse a missing or invalid URL, a database name without the `_test` suffix, an invalid `EG_DATABASE_URL`, or a target with the same host, port and database as `EG_DATABASE_URL` (ignoring credentials, spelling and loopback aliases). URL comparison cannot detect two different DNS names for one server, so the test database must be explicitly disposable. In CI for commit `9ad7dae`, the guard accepted the disposable service database before the [integration tests](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38158076257/job/114525070229) ran against it. Its refusal paths are covered by database-independent tests on Ubuntu and Windows. Compose has never been run.
 - **Atomic, concurrent-safe transitions.** The report transitions are pure functions. Two simultaneous requests could both pass validation; persistence must serialize them (for example with a row lock or compare-and-set on revision and hash). The M3a job fence (above) provides this pattern for jobs; reports do not use it yet.
 - **Upload limits and untrusted-file handling** (M3e): implemented, reviewed, **verified in CI and on `main`** (see *Document API* above).
-- **Provenance checks:** that a cited chunk was actually retrieved for the review and that the quote occurs in it (M5). The pure M5b checks are implemented and staged for review ([ADR-0020](decisions/0020-provenance-validation.md)); no review path uses them until M5g.
+- **Provenance checks:** that a cited chunk was actually retrieved for the review and that the quote occurs in it (M5). The pure M5b checks are implemented, reviewed, CI-verified and on `main` at `90295717` ([ADR-0020](decisions/0020-provenance-validation.md)); no review path uses them until M5g.
 - **Secret handling beyond the database URL and API keys.** The database URL (M2a) and API keys (M2b) are covered above. Other secrets, such as model-provider keys, arrive with later milestones. Request logging (M1c) writes only allowlisted fields; see ADR-0002.
 
 ## Open risks

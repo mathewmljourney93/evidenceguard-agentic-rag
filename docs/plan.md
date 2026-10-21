@@ -6819,8 +6819,11 @@ publication is historical). The
 was proposed in Prompt 174, corrected in Prompt 175 and **accepted at external review in Prompt
 176**; **M5b was implemented in Prompt 177, corrected in Prompt 178 and accepted at external
 review in Prompt 179** ([implementation
-status](#m5b-implementation-status-accepted-at-review-prompt-179-ci-pending)); when this record was written its exact-commit CI and
-publication (authorized in Prompt 179, subject to the CI gates) were pending. M5c–M5h are not implemented; no review path, persisted snapshot or orchestration
+status](#m5b-implementation-status-accepted-at-review-prompt-179-ci-pending)); it was then verified in exact-commit feature and main-push CI and published on `main` at
+`90295717` (Prompt 179; job-log results independently retrieved by the external reviewer and
+recorded in Prompt 180). The [M5c specification](#m5c-review-template-planner-prompts-and-request-assembly-specification-accepted-at-review-prompt-181-implementation-pending)
+(proposed in Prompt 179, revised in Prompt 180) was **accepted at external review in Prompt 181**;
+its implementation is pending. M5c–M5h are not implemented; no review path, persisted snapshot or orchestration
 exists, no M5b control is used by any review path, and overall M5 acceptance is pending.** The M5 milestone text above is the controlling requirement and is unchanged; this
 sequence only orders it into slices. Labels: **[DECISION]** already accepted; **[FACT]** current
 code at `46c02257`; **[REC]** recommendation (for M5a and the sequence-level choices, accepted in
@@ -8548,8 +8551,16 @@ reviewer reproduced a defect (`recheck_analyzed` accepted stored finding citatio
 source type and status had been changed while chunk and quote stayed the same; analysis and reload
 now require full trusted `Citation` values, also across shared questions), and staged it for
 external review. **The corrected implementation was accepted at external review in Prompt 179,
-pending exact-commit CI**; publication is authorized by Prompt 179 subject to the feature and
-main CI gates, and had not run when this record was written. No review path uses M5b yet, and
+pending exact-commit CI**; publication was authorized by Prompt 179 subject to the feature and
+main CI gates (historical: both gates passed and M5b is on `main` at `90295717`; see the
+[main publication evidence](decisions/0020-provenance-validation.md#main-publication-evidence-prompt-179)). From the
+job logs independently retrieved by the external reviewer afterwards (recorded in Prompt 180;
+Claude Code observed only API conclusions in Prompt 179): Ubuntu `3170 passed, 308 skipped`,
+Windows `3169 passed, 309 skipped` and PostgreSQL `308 passed, 3170 deselected` on both pushes;
+all four installed-wheel logs printed seven lines, including "provenance matched a quote and
+derived a status from the installed wheel"; both container smokes reported success (they do not
+exercise M5b); Gitleaks scanned 77 commits with no leaks. The reviewer ran no project suite,
+build, wheel, database, Docker or provider locally. No review path uses M5b yet, and
 overall M5 acceptance is pending. See [ADR-0020](decisions/0020-provenance-validation.md) for the contract as
 implemented, the correction and its regression comparison, the implementation choices (three of
 them approved at review in Prompt 178: the added `chunks` import for the existing chunk bound, the
@@ -8584,8 +8595,8 @@ a project suite, build, installed-wheel, PostgreSQL, Docker or provider run. Cla
   detected every mutation; the offline build comparison against `f04e0957`; and the extracted
   installed-wheel step in an isolated offline environment, including the new M5b line. Details are
   in ADR-0020.
-- *Not established:* Linux, current-version CI, the PostgreSQL job against this version (M5b adds no
-  PostgreSQL tests), any review path using these values, semantic entailment, authenticity or
+- *Not established:* (Linux, current-version CI and the PostgreSQL job for this version were
+  pending at acceptance and have since passed for `90295717`; see above.) Any review path using these values, semantic entailment, authenticity or
   injection resistance. The disclosed Unicode limitations (M5b-C1) are implemented and pinned by
   tests. The binding obligations on later slices (M5c decoding, M5e reloading, M5f report bounds
   and mandatory documentary rule finding, M5g orchestration) and overall M5 acceptance remain
@@ -8598,6 +8609,724 @@ a project suite, build, installed-wheel, PostgreSQL, Docker or provider run. Cla
   and U+1100 U+1161 U+11A8), so the rules and examples are unchanged in meaning, but the Prompt 175
   verbatim record does not reproduce those escape spellings byte for byte. Committed history is not
   rewritten; ADR-0020 and the new tests use `U+` notation and escapes.
+
+#### M5c review template, planner, prompts and request assembly specification (ACCEPTED at review, Prompt 181; implementation pending)
+
+**Status.** **The complete corrected M5c specification was accepted at external review in Prompt
+181 and is the M5c implementation contract; implementation is pending.** It was proposed by Claude
+Code in Prompt 179 and revised in Prompt 180 after external review (historical: in Prompt 180 the
+reviewer supported directions C1, C2 and C4–C11 subject to those corrections and narrowed C3,
+which was not yet acceptance). No M5c module, packaged template, prompt file, test, ADR-0021 or
+workflow change exists, every M5c implementation check is pending, and none of the controls below
+operates. Labels: **[DECISION]** already accepted (§4, the M5 sequence and its settled W-choices,
+the accepted M5a and M5b contracts); **[FACT]** current source at `90295717`; **[REC]** Claude
+Code's proposal, **accepted as specified in Prompt 181**; **[OPEN]** none remains (C1–C11 in
+[M5c-J](#m5c-j-reviewer-decisions) are accepted). M5c adds **no** persistence, migration, review
+handler, endpoint, production registry entry, setting, live provider or network execution. Prompt
+encoding does **not** make a live model injection-resistant.
+
+##### M5c acceptance (Prompt 181)
+
+**Decision.** The external reviewer accepted, in Prompt 181: the complete corrected M5c
+specification (proposed in Prompt 179, revised in Prompt 180); decisions C1–C11 as specified,
+including the eight-question first-template table of
+[M5c-C2](#m5c-c2-proposed-first-template-content) with its separately authored search queries and
+explicit documentary flags; and the value and API contracts, pinned artifact loaders, bounded
+reads, prompt binding, closed request schemas, deterministic serialization, size refusal, repair
+reassembly, fixed errors, privacy boundaries and planned checks. These form the M5c implementation
+contract; no M5c specification decision remains open. The same review accepted the M5b
+main-publication CI evidence as recorded in Prompt 180, with its exact-commit scope and split
+attribution.
+
+**Binding wording clarification.** M5a `parse_output` keeps its existing two-pass validation: a
+bounded preliminary JSON scan, then strict JSON-mode schema validation of the **same original
+response text**. M5c and M5g perform no additional entity, escape, Unicode or JSON decoding of the
+quotation strings returned by that validation. Earlier wording such as "parsed exactly once by
+M5a" is replaced below by this description. The literal-backslash behaviour and all round-trip
+tests are unchanged, and the clarification changes no algorithm, output schema or existing M5a
+contract.
+
+**Reviewer evidence and scope.** The reviewer independently checked the byte sizes and SHA-256
+values of the three exports: `.local/p179/m5b-main-evidence-and-m5c-spec.diff` (57,650 bytes,
+`c82867b4f076fa7aec554e367509cb41a425e30d0e83fcf52a3b6fe9a2e99cb0`),
+`.local/p179/m5b-acceptance.diff` (30,213 bytes,
+`77ed93bb26cd3ae7896dd0088b90632cb576df4ca50a9d2eb1bb708a816838b0`; omitted from the Prompt 179
+handoff and independently verified only now, in Prompt 181) and
+`.local/p180/m5c-contract-corrections-and-m5b-ci-evidence.diff` (111,202 bytes,
+`23630eafc0e54de4df96c7831fc671965c99fa6059762462901a1fba372e87df`). Applying the Prompt 179 and
+Prompt 180 exports in sequence to the published `90295717` documentation reproduced all four
+final document blobs (README `f15dc993`, ADR-0020 `ea457ebe`, plan `a9727ab4`, threat model
+`43fc56ea`). The reviewer inspected the corrected contracts and the relevant published domain
+source, including M5a's two-pass `parse_output`, and checked the proposed template against the
+published evaluation question inputs and search-query lists. No project suite, build,
+installed-wheel check, database, Docker or provider call was run for this acceptance; earlier
+isolated probes and independently retrieved CI logs keep their recorded scope and are not M5c
+implementation evidence. Exact prompt wording and packaged artifact bytes will be inspected with
+the implementation; their future pinned digests are not checked by this acceptance.
+
+*Reviewer probes (recorded in Prompt 180).* The reviewer's encoding, metadata and prompt-binding
+probes were isolated standard-library and existing-domain checks, not M5c implementation tests (no
+M5c code exists). They confirmed that M5a `StructuredRequest` accepts a prompt-reference digest and
+a system text that are independent of each other (its existing, shape-only contract, not an M5a
+defect; M5c must perform the binding, [M5c-E1](#m5c-e1-prompt-binding-in-assembly)); that
+`ChunkEvidence` accepts a lone surrogate in `title`, `section_path` and `version_label`; and that
+`json.dumps(..., ensure_ascii=False)` output containing one then fails during UTF-8 encoding
+([M5c-F3](#m5c-f3-encoding-rule-unicode-and-identifiers)).
+
+##### M5c-A. Accepted requirements and current-source facts
+
+[DECISION]
+
+- Sequence row M5c: a TOML review template, a deterministic Planner, `prompts/verifier/v1.md` and
+  `prompts/risk_analyst/v1.md` as packaged data with pinned SHA-256, and request assembly that
+  places evidence only inside delimited blocks with **safe encoding** of document text
+  (Correction E). Placement `evidenceguard_agents` (`planner`, `prompts`, `assembly`); depends on
+  M5a and M5b; no persistence.
+- W2/W3: the template is one packaged TOML file read with `tomllib` (no new dependency), SHA-256
+  pinned in the review configuration (stored by M5d) and **independent of the ground truth**; a
+  planner or fake must never read `sample_data/ground_truth/`. D4: the Planner is deterministic
+  code (no LLM query expansion, E3).
+- M5a: `StructuredRequest(purpose, prompt, model_id, question_id, system_text, user_text,
+  max_output_tokens, timeout_ms)` with `system_text` 1–64,000 UTF-8 bytes, `user_text` 1–400,000
+  UTF-8 bytes, both without NUL, `max_output_tokens` 1–8,192, `timeout_ms` 1,000–120,000 (default
+  60,000). Its canonical request digest covers the purpose, output schema, prompt reference, model,
+  question, token limit and the SHA-256 of both texts (not `timeout_ms`). `PromptRef` checks shape
+  only, and `StructuredRequest` does not relate `prompt.sha256` to `system_text`. Zero hidden
+  retries; one repair per stage built by M5c **from fixed failure categories, never from raw
+  output** (W4/P8).
+- M5b: quotations are matched against original evidence text only (segment-wise NFD and
+  whitespace collapsing; header and body separately); M5b does no entity or escape decoding; M5c
+  must give the model exactly the retrieved chunk IDs to cite and either present document text so
+  that quotations of it are original text, or apply one reviewed deterministic decoder before M5b.
+  The Analyst stage is per question with an empty `shared` (P9). `QuestionEvidence` and
+  `VerifiedQuestion` check consistency only; they cannot prove that a result was retrieved for the
+  question or that a `VerifiedQuestion` came from `verify_question` or `recheck_verified`.
+- Canary distinction (Correction E): the end-to-end **acceptance fixture** (authorized injected
+  document in the retrieved evidence **and inside an evidence block of the assembled request**;
+  canary absent from all checked outputs), the **negative control** (a script that emits the canary;
+  the same checker must fail) and the separately labelled **limitation probe** (a verbatim canary in
+  a genuine authorized quotation is accepted). The end-to-end run belongs to M5g; M5c supplies the
+  assembled requests these fixtures inspect.
+
+[FACT]
+
+- `evidenceguard_agents` holds `providers` and `scripted` only; the packaging test fixes its file
+  set and forbids `socket`, `ssl`, `http`, `urllib`, `os`, `pathlib`, `tomllib` and `io` in the M5a
+  modules, with "M5c's packaged-artifact loading ... its own reviewed allowlists" (M5a A).
+- `EvidenceQuestion(question_id, text 1–500, search_queries 1–5 of ShortText 1–200,
+  requires_documentary_support)` is a frozen M1 `DomainModel` that strips surrounding whitespace
+  and rejects unknown fields; `RetrievalRequest(queries, k)` requires 1–8 distinct queries and `k`
+  1–20 (default 8 in `RETRIEVAL_CONFIG_V1`); `RetrievalResult.items` hold at most `k` chunks with
+  `fused_rank` exactly 1 … n in that order.
+- `ChunkEvidence` bounds `text` to 1–4,000 code points with a verified digest (so chunk text is
+  UTF-8 encodable) and `section_path` to at most 6 parts, but it does **not** bound the length of
+  `title`, any `section_path` part or `version_label`, does not bound `revision_no` above, and
+  does not require those metadata strings to be UTF-8 encodable. M5c does not change M4d.
+- `ReportContent` allows at most 100 questions. The wheel packages every file inside each listed
+  package directory (hatch `packages`), so data files under `evidenceguard_agents/` ship in the wheel.
+- The ground truth (`sample_data/ground_truth/*.toml`) holds authored questions (IDs `RET-01`,
+  `ENC-01`, `CMP-01`, `CMP-02`, `INC-01`, `BCP-01`, `SUB-01`, `SOC-01`) with their own search
+  queries, expected statuses, gold and forbidden anchors, acceptable claims and quotes for
+  evaluation; nothing in the packages reads it outside M4e evaluation code.
+
+##### M5c-B. Placement, files and imports
+
+[REC] New files (all in `packages/agents/evidenceguard_agents/`):
+
+| File | Contents |
+|---|---|
+| `artifact_errors.py` | the fixed M5c errors ([M5c-G](#m5c-g-errors-privacy-and-process-control)) |
+| `templates.py` | `TemplateRef`, `ReviewTemplate`, `parse_template`, `load_template`, `load_pinned_template`, the template registry with pinned digests |
+| `planner.py` | `PlannedQuestion`, `plan_review` |
+| `prompts.py` | `PromptSpec`, `load_prompt`, `load_pinned_prompt`, the prompt registry with pinned digests and purposes |
+| `assembly.py` | `VERIFIER_INPUT_FORMAT`, `ANALYST_INPUT_FORMAT`, `ModelSettings`, `VerifierRequestInputs`, `AnalystRequestInputs`, `RepairReason`, `assemble_verifier_request`, `assemble_analyst_request`, `assemble_repair_request` |
+| `data/templates/vendor_security_review_v1.toml` | the first review template ([M5c-C2](#m5c-c2-proposed-first-template-content)) |
+| `data/prompts/verifier/v1.md`, `data/prompts/risk_analyst/v1.md` | the versioned system prompts |
+
+Imports: `templates.py` and `prompts.py` may use the standard library modules `tomllib` (templates
+only), `hashlib`, `dataclasses`, `contextlib` and `importlib.resources` (packaged-resource reads
+only, by fixed relative names; no path from a caller, no environment, no `os`, `pathlib` or `io`
+import of their own); `planner.py` and `assembly.py` use only `json`, `hashlib`, `dataclasses`,
+`enum`, `contextlib` and the domain (`evidence`, `retrieval`, `model_calls`, `provenance`) plus
+`templates`, `prompts` and `artifact_errors`. No network module, no `sample_data` access, no
+persistence, worker or API import. The packaging test gains these exact allowlists, the new file
+set, and a check that no agents module mentions `ground_truth` or `sample_data`.
+
+##### M5c-B1. Value and API contract
+
+[REC] Every M5c value is a frozen dataclass with `init=False` and a validating keyword-only
+constructor, in the M5a/M5b style:
+
+- **Exact types.** Each field must have exactly the stated type (`type(x) is T`); a `bool` is
+  never an `int`, a `list` is never a `tuple`, and a subclass is not accepted. Unknown keyword
+  arguments are rejected.
+- **Nested reconstruction.** Each nested domain value is rebuilt through its own public
+  constructor from its fields (`EvidenceQuestion.model_validate` of its own field values for
+  the Pydantic question; the constructors of `PromptRef`, `RetrievalRequest`, `QuestionEvidence`
+  and `VerifiedQuestion` for the others) and the **rebuilt** value is stored; a value made with
+  `model_construct`, `object.__setattr__` or any other bypass is therefore revalidated, and for
+  `EvidenceQuestion` the rebuilt value must also equal the supplied one (so stripping cannot
+  silently change it).
+- **Tuple immutability.** Sequence fields are exact `tuple`s of rebuilt, frozen elements; no list,
+  dict or other mutable container is stored.
+- **Replacement.** `dataclasses.replace` calls the same constructor, so every replacement is
+  validated exactly like direct construction.
+- **Errors.** Any failure in direct construction or replacement raises a fresh
+  `InvalidAgentValueError` (`invalid_agent_value`) with no cause or context. Equality compares all
+  fields. `str` equals `repr`; the representations below show identifiers, versions, purposes,
+  digests and counts only.
+
+| Value | Fields (exact types) | Bounds and allowed combinations | Representation |
+|---|---|---|---|
+| `TemplateRef` | `template_id: str`, `version: int`, `sha256: str` | `template_id` matches `^[a-z][a-z0-9_]{0,31}$`; `version` 1–999; `sha256` 64 lowercase hex. Shape only: it does not prove that a packaged file has this digest. | `TemplateRef(template_id='…', version=N, sha256='…')` |
+| `ReviewTemplate` | `ref: TemplateRef`, `title: str`, `questions: tuple[EvidenceQuestion, ...]` | `ref` rebuilt; `title` satisfies the template-string rule (1–200 code points); 1–100 questions; question IDs unique; every question satisfies the template-question rule ([M5c-C](#m5c-c-review-template-format-validation-identity)). Direct construction cannot prove packaged-file origin even with a plausible digest ([M5c-C1](#m5c-c1-loading-identity-and-trusted-paths)). | `ReviewTemplate(template_id='…', version=N, questions=N)` (no title or question text) |
+| `PlannedQuestion` | `question: EvidenceQuestion`, `retrieval: RetrievalRequest` | `question` rebuilt and satisfies the template-question rule; `retrieval` rebuilt with `k` 1–20; **`retrieval.queries` must equal `question.search_queries` exactly** (same strings, same order, same count). | `PlannedQuestion(question_id='…', queries=N, k=N)` |
+| `PromptSpec` | `ref: PromptRef`, `purpose: ModelPurpose` | `ref` rebuilt through `PromptRef`. Shape only: registry membership, purpose and digest are checked by the loaders and by assembly ([M5c-E1](#m5c-e1-prompt-binding-in-assembly)). | `PromptSpec(prompt_id='…', version=N, purpose='…')` |
+| `ModelSettings` | `model_id: str`, `max_output_tokens: int`, `timeout_ms: int` | `model_id` matches the M5a model-ID pattern; `max_output_tokens` 1–8,192 (default 4,096, C6); `timeout_ms` 1,000–120,000 (default 60,000). | `ModelSettings(model_id='…', max_output_tokens=N, timeout_ms=N)` |
+| `RepairReason` | `purpose: ModelPurpose`, `question_id: str`, `code: CallOutcome` or `RejectionReason`, `item_index: int` or `None`, `citation_index: int` or `None` | See [M5c-F5](#m5c-f5-repair-requests). `code` is exactly `CallOutcome.INVALID_OUTPUT` (both positions `None`, either purpose) or an M5b `RejectionReason` whose stage matches `purpose` (verification → `verifier`, analysis → `risk_analyst`) and whose positions follow the `ProvenanceRejection` rules. Any other `CallOutcome` is rejected. | `RepairReason(purpose='…', question_id='…', code='…', item_index=N, citation_index=N)` |
+| `VerifierRequestInputs` | `evidence: QuestionEvidence`, `prompt: PromptSpec`, `system_text: str`, `settings: ModelSettings` | Each rebuilt; `prompt.purpose` is `verifier`. Binding to the registry and the system text is checked by assembly. | `VerifierRequestInputs(question_id='…', items=N, prompt_id='…', prompt_version=N)` |
+| `AnalystRequestInputs` | `owner: VerifiedQuestion`, `question: EvidenceQuestion`, `prompt: PromptSpec`, `system_text: str`, `settings: ModelSettings` | Each rebuilt; `owner.question_id == question.question_id`; `prompt.purpose` is `risk_analyst`. | `AnalystRequestInputs(question_id='…', claims=N, citations=N, prompt_id='…', prompt_version=N)` |
+
+`RepairReason` also has two constructors: `RepairReason.invalid_output(*, purpose, question_id)`
+and `RepairReason.from_rejection(rejection: ProvenanceRejection)`, which rebuilds the rejection
+through its own constructor, maps its stage to the purpose and copies its question ID, reason and
+positions (its `rejected_count` is not carried).
+
+##### M5c-C. Review template (format, validation, identity)
+
+[REC] TOML, UTF-8 without BOM, at most 65,536 bytes, parsed with `tomllib` after a strict UTF-8
+decode; unknown keys rejected at every level; line endings are not normalized (the digest covers the
+exact bytes):
+
+| Key | Type and bound |
+|---|---|
+| `format` | exactly `"eg-review-template-v1"` |
+| `template_id` | `^[a-z][a-z0-9_]{0,31}$` |
+| `version` | integer 1–999 (not a boolean) |
+| `title` | template string, 1–200 code points |
+| `[[questions]]` | 1–100 tables, in file order |
+| `questions.id` | the `QuestionId` pattern, unique within the template |
+| `questions.text` | template string, 1–500 code points |
+| `questions.search_queries` | array of 1–5 distinct template strings, each 1–200 code points |
+| `questions.requires_documentary_support` | boolean, required (no default, so intent is explicit) |
+
+**Template-string rule** (applied identically to `title`, question text and every query): an exact
+`str`; strictly UTF-8 encodable (no lone surrogate); no U+0000; equal to its own `str.strip()`
+(no leading or trailing whitespace); within the stated code-point bound; therefore never blank.
+**Template-question rule:** the question ID matches `QuestionId`; text and queries satisfy the
+template-string rule; queries are distinct by exact code points; the flag is a `bool`; and the
+`EvidenceQuestion` built from these values equals them exactly (so the M1 whitespace stripping can
+never alter a value silently, even where Pydantic's notion of whitespace differs from
+`str.strip()`).
+
+`parse_template(data: bytes) -> ReviewTemplate` is pure: `data` must be exactly `bytes`, at most
+65,536 bytes and not start with the UTF-8 BOM; it is decoded strictly, parsed and validated, and the
+returned `ref` is `TemplateRef(template_id, version, sha256=SHA-256 of the exact input bytes)`. Any
+failure, including a non-`bytes` argument, raises `InvalidTemplateError`. `parse_template` is for
+tests and for the trusted loaders; its digest identifies the bytes it was given, nothing more.
+
+**Versioning.** A packaged template file is never edited after publication: any change is a new
+`version` with a new file and pinned digest; earlier versions stay packaged so a stored review's
+`TemplateRef` remains loadable (M5d stores the ref with the review).
+
+##### M5c-C1. Loading, identity and trusted paths
+
+[REC] The registry is a fixed in-code mapping from `(template_id, version)` to a fixed relative
+resource name and its pinned SHA-256 (v1: `vendor_security_review` 1 →
+`data/templates/vendor_security_review_v1.toml`).
+
+- `load_template(template_id: str, version: int) -> ReviewTemplate`: arguments of the wrong type or
+  shape → `InvalidAgentArgumentError`; a well-formed pair not in the registry →
+  `UnknownTemplateError`; otherwise a **bounded read** of the resource (below), then the digest of
+  the bytes must equal the pinned digest, `parse_template` must succeed, and the parsed
+  `template_id` and `version` must equal the registry key; a missing or unreadable resource, an
+  oversize resource, a digest mismatch, a parse failure or a key mismatch →
+  `TemplateIntegrityError`.
+- `load_pinned_template(ref: TemplateRef) -> ReviewTemplate` is the **only trusted production and
+  reload path**: `ref` must be exactly a `TemplateRef` (rebuilt; else `InvalidAgentArgumentError`);
+  it calls `load_template(ref.template_id, ref.version)` and then requires the **complete** loaded
+  reference (ID, version and digest) to equal `ref`, the reference pinned in the review's stored
+  configuration; a digest that differs → `TemplateIntegrityError`.
+- A directly constructed `ReviewTemplate` (or one from `parse_template` on other bytes) can carry
+  any plausible digest; nothing in the value proves that a packaged file had it. M5d, M5g and every
+  reload therefore obtain the template only through `load_pinned_template` and never accept a
+  caller-supplied `ReviewTemplate` as proof of origin.
+- **Bounded read.** The resource is opened in binary mode through `importlib.resources` and read
+  with repeated `read(n)` calls whose total requested size never exceeds the limit plus one byte
+  (65,537 for templates, 64,001 for prompts), stopping at end of file or as soon as more than the
+  limit has been read; more than the limit is rejected. The file is never read whole and then
+  measured.
+
+##### M5c-C2. Proposed first-template content
+
+[REC, proposed in Prompt 180; **accepted as specified in Prompt 181**] `vendor_security_review` v1, title "Vendor
+security review", eight questions in this order. Per C3 as narrowed by the reviewer, the question
+IDs and texts are shared with the evaluation questions so M7 can score them; the search queries are
+**authored separately** from the question text and none equals a ground-truth search query; no
+expected status, gold or forbidden anchor, acceptable claim, quote, relevance list or other
+answer-bearing label is copied into the template or its queries, and nothing generates the template
+from `ground_truth` at runtime or build time. The documentary flags (proposed by Claude Code,
+accepted in Prompt 181) are:
+`true` where the question asks about an independent certification, attestation or compliance
+status that a vendor statement alone should not settle.
+
+| ID | Question text | Search queries (in order) | Documentary |
+|---|---|---|---|
+| `RET-01` | How long is customer data retained after termination? | "customer data retention after contract termination"; "data deletion after termination" | `false` |
+| `ENC-01` | Is customer data encrypted at rest? | "customer data encryption at rest"; "stored data encryption" | `false` |
+| `CMP-01` | Does the vendor hold an ISO 27001 certification? | "ISO 27001 certificate"; "information security management certification" | `true` |
+| `CMP-02` | Is the vendor HIPAA compliant? | "HIPAA compliance status"; "protected health information safeguards" | `true` |
+| `INC-01` | What is the breach-notification timeframe? | "security breach notification period"; "incident notification to customers" | `false` |
+| `BCP-01` | What is the recovery time objective for production? | "recovery time objective production"; "disaster recovery targets" | `false` |
+| `SUB-01` | Which subprocessors are used, and in which regions? | "subprocessor list and regions"; "third-party subprocessors data location" | `false` |
+| `SOC-01` | Is there an independent SOC 2 report? | "SOC 2 report"; "independent service auditor report" | `true` |
+
+##### M5c-D. Deterministic Planner
+
+[REC] `plan_review(template: ReviewTemplate, *, k: int = 8) -> tuple[PlannedQuestion, ...]`: the
+template is rebuilt (not exactly a `ReviewTemplate`, or invalid → `InvalidAgentArgumentError`) and
+`k` must be an `int` 1–20 (else `InvalidAgentArgumentError`); it returns exactly one
+`PlannedQuestion(question, RetrievalRequest(question.search_queries, k))` per template question,
+**in template order**. No query expansion, rewriting, reordering, deduplication across questions or
+model call (D4/E3). The output is a pure function of the template and `k`; it is trusted only when
+the template came from `load_pinned_template`. M5d stores the template reference, and M5g calls
+`plan_review` again on the reloaded template rather than storing a second copy of the questions.
+
+##### M5c-E. Prompts (identity, versions, hashes)
+
+[REC] The prompt registry maps `(prompt_id, version)` to a fixed relative resource name, its
+pinned SHA-256 and its `ModelPurpose`: `verifier` v1 → `data/prompts/verifier/v1.md` (purpose
+`verifier`), `risk_analyst` v1 → `data/prompts/risk_analyst/v1.md` (purpose `risk_analyst`).
+
+- `load_prompt(prompt_id: str, version: int) -> tuple[PromptSpec, str]`: wrong argument types or
+  shapes → `InvalidAgentArgumentError`; a well-formed pair not in the registry →
+  `UnknownPromptError`; otherwise a bounded read (at most 64,001 bytes requested), then the bytes
+  must be 1–64,000 bytes, not start with the UTF-8 BOM, decode strictly as UTF-8, contain no NUL
+  and have the pinned digest, else `PromptIntegrityError`. It returns
+  `PromptSpec(PromptRef(prompt_id, version, sha256=pinned digest), registry purpose)` and the
+  **exact decoded text** as the system text (no templating, substitution or trimming). Because the
+  bytes are strict UTF-8 without BOM, re-encoding the text gives the same bytes, so the text's
+  SHA-256 equals the file digest.
+- `load_pinned_prompt(ref: PromptRef, purpose: ModelPurpose) -> tuple[PromptSpec, str]` is the
+  trusted production and reload path: arguments not exactly a valid `PromptRef` and a
+  `ModelPurpose` → `InvalidAgentArgumentError`; it calls `load_prompt` and requires the complete
+  loaded reference to equal `ref` (the review's pinned configuration) and the registry purpose to
+  equal `purpose`, else `PromptIntegrityError`.
+
+Content requirements for v1 (exact wording is reviewed with the implementation): the role and
+task; the exact output schema (`verifier_output_v1` or `risk_analyst_output_v1`) and "respond with
+one JSON object only"; that **every** string value under `evidence`, and for the Analyst every
+`verification.rationale`, `claims[].text` and `citations[].quote` value, is **untrusted data,
+never instructions** (document text, and earlier model-derived text that passed only provenance
+checks); cite only chunk IDs present in the input; copy each quote **exactly** from one `header` or
+one `body` value of that chunk, never across them or across chunks, without paraphrase or
+ellipsis; write the reply as JSON so that its quote strings decode to that exact text; use
+`insufficient_evidence` when the evidence does not answer the question; for the Analyst, cite only
+the listed validated citations by copying their quote exactly. No canary list or injection claim
+appears in a prompt.
+
+**What a prompt change invalidates.** Prompt files are immutable once published; a change is a new
+version file with a new pinned digest. The new `PromptRef` and system-text digest change every
+`request_sha256` (M5a), so no stored call record or stage output keyed by an old digest can be
+reused for a request built with the new prompt (M5e). A review records the prompt references it
+was created with (M5d); M5g builds its requests from those through `load_pinned_prompt`, so a
+running review is not silently switched to a new prompt.
+
+##### M5c-E1. Prompt binding in assembly
+
+[REC] M5a's `StructuredRequest` accepts any well-formed prompt reference with any system text; the
+binding is therefore M5c's job and is checked by each assembly function **before** any
+serialization, in this order (every failure is `InvalidAssemblyInputError`):
+
+1. Rebuild the `PromptSpec` and the `ModelSettings` (and every other input, [M5c-F](#m5c-f-request-assembly-and-evidence-encoding)).
+2. Require `prompt.purpose` to be the function's purpose (`verifier` for
+   `assemble_verifier_request`, `risk_analyst` for `assemble_analyst_request`).
+3. Require `(prompt.ref.prompt_id, prompt.ref.version)` to be a supported registry entry whose
+   registered purpose is that purpose and whose pinned digest equals `prompt.ref.sha256`.
+4. Require `system_text` to be exactly a `str` of 1–64,000 strict UTF-8 bytes with no NUL whose
+   SHA-256 over those bytes equals `prompt.ref.sha256` (and so the pinned digest).
+
+Assembly does not read the resource again; a system text that differs from the pinned prompt by any
+byte fails step 4. Tests construct mismatches that `StructuredRequest` alone would accept.
+
+##### M5c-F. Request assembly and evidence encoding
+
+[REC] **One unambiguous path: JSON in, JSON out, no separate decoder.** The user text is a single
+JSON object; every untrusted string (question text is trusted template content, but document
+titles, section paths, version labels, headers, bodies and all earlier model-derived text are
+untrusted) appears **only as a JSON string value**. The model's reply is itself strict JSON,
+validated by M5a `parse_output` with its existing two passes (a bounded preliminary JSON scan, then
+strict JSON-mode schema validation of the same original response text); M5c and M5g perform no
+additional entity, escape, Unicode or JSON decoding of the quotation strings that validation
+returns, and no entity encoding is used.
+
+**Common algorithm** for `assemble_verifier_request(inputs: VerifierRequestInputs)` and
+`assemble_analyst_request(inputs: AnalystRequestInputs)`, both returning `StructuredRequest`:
+
+1. `inputs` must be exactly the function's input type; it and every nested value are rebuilt
+   ([M5c-B1](#m5c-b1-value-and-api-contract)); then the prompt binding of
+   [M5c-E1](#m5c-e1-prompt-binding-in-assembly) and the identity checks of the stage run.
+2. The user object is built ([M5c-F1](#m5c-f1-verifier-input-schema-eg-verifier-input-v1),
+   [M5c-F2](#m5c-f2-analyst-input-schema-eg-analyst-input-v1)); every string in it is checked for
+   strict UTF-8 encodability ([M5c-F3](#m5c-f3-encoding-rule-unicode-and-identifiers)).
+3. It is serialized with the rule of M5c-F3 and its exact UTF-8 size is checked
+   ([M5c-F4](#m5c-f4-size-refusal-and-bounds)).
+4. `StructuredRequest(purpose, prompt=prompt.ref, model_id=settings.model_id, question_id,
+   system_text, user_text, max_output_tokens=settings.max_output_tokens,
+   timeout_ms=settings.timeout_ms)` is constructed; an unexpected failure is
+   `InvalidAssemblyInputError`.
+
+Errors before step 3 are `InvalidAssemblyInputError`; only an oversize user text is
+`RequestTooLargeError`. No request exists until every check has passed.
+
+**Trusted-input boundary.** Assembly checks types, values, purposes, prompt binding and internal
+identities only. It cannot prove that the `QuestionEvidence` result was retrieved for this question
+under this review's snapshot, or that an Analyst `owner` came from `verify_question` or
+`recheck_verified` for this review (M5b-E1); M5g must supply only values obtained through those
+trusted paths. **Request digests identify content and configuration, not tenant authorization or
+review identity:** two reviews (or tenants) with identical inputs produce identical user text and
+`request_sha256`. M5d, M5e and M5g retain the tenant, review, snapshot and question bindings
+around each request and call record.
+
+##### M5c-F1. Verifier input schema (`eg-verifier-input-v1`)
+
+[REC] `assemble_verifier_request` additionally requires nothing beyond its rebuilt
+`QuestionEvidence` (whose question and result it uses); `question_id` is
+`evidence.question.question_id`. The object is closed (exactly these keys); keys are emitted in
+sorted order by the serializer, so the order shown is the byte order:
+
+| Path | JSON type | Source and bounds |
+|---|---|---|
+| `evidence` | array, 0–20 entries | one entry per `evidence.result.items`, in that (fused-rank) order |
+| `evidence[].body` | string | the chunk's `body_text`, unchanged; with the header at most 4,000 code points |
+| `evidence[].chunk_id` | string | canonical lowercase hyphenated UUID of the chunk |
+| `evidence[].document` | object | the seven keys below |
+| `evidence[].document.authenticity` | string | always `"not_established"` |
+| `evidence[].document.effective_date` | string or `null` | ISO `YYYY-MM-DD` |
+| `evidence[].document.revision_no` | integer | ≥ 1 (no upper bound in `ChunkEvidence`) |
+| `evidence[].document.section_path` | array of strings, 0–6 | in order; each part unchanged and unbounded in length |
+| `evidence[].document.source_type` | string | `vendor_statement`, `contract` or `third_party_report` |
+| `evidence[].document.title` | string | unchanged; ≥ 1 code point, unbounded in length |
+| `evidence[].document.version_label` | string or `null` | unchanged; unbounded in length |
+| `evidence[].header` | string or `null` | the repeated table header `header_text`, given separately from the body |
+| `evidence[].rank` | integer | the item's `fused_rank`, 1 … n in order |
+| `format` | string | exactly `"eg-verifier-input-v1"` |
+| `question` | object | the three keys below |
+| `question.id` | string | the `QuestionId` |
+| `question.requires_documentary_support` | boolean | the template flag |
+| `question.text` | string | trusted template text, 1–500 code points |
+
+Not included: tenant, review, snapshot, revision or document IDs, `document_key`, content digest,
+ordinal, table flag, spans, offsets, fused score and channel hits. `header` and `body` match M5b's
+independent spans. An empty result gives `"evidence":[]` (the model should answer
+`insufficient_evidence`).
+
+##### M5c-F2. Analyst input schema (`eg-analyst-input-v1`)
+
+[REC] `assemble_analyst_request` requires, after rebuilding, `owner.question_id ==
+question.question_id`, `owner.verification.question_id == question.question_id` and the owner's
+claims to reference only existing citation indexes (already guaranteed by the rebuilt
+`VerifiedQuestion`). No raw chunk text and no unvalidated evidence is included (C4). The object is
+closed; keys are in serializer (sorted) order:
+
+| Path | JSON type | Source and bounds |
+|---|---|---|
+| `citations` | array, 0–80 entries | `owner.verification.citations`, in index order |
+| `citations[].authenticity` | string | always `"not_established"` |
+| `citations[].chunk_id` | string | canonical lowercase hyphenated UUID |
+| `citations[].index` | integer | the citation's position, 0–79, equal to its array position |
+| `citations[].quote` | string | the stored, validated quote, unchanged, 1–1,000 code points (document text; untrusted) |
+| `citations[].source_type` | string | `vendor_statement`, `contract` or `third_party_report` |
+| `claims` | array, 0–10 entries | `owner.claims`, in order |
+| `claims[].citation_indexes` | array of integers, 0–8 distinct | each 0–79, as stored |
+| `claims[].text` | string | the stored claim text, unchanged, 1–1,000 code points (model-derived; untrusted) |
+| `format` | string | exactly `"eg-analyst-input-v1"` |
+| `question` | object | `id`, `requires_documentary_support`, `text` exactly as in M5c-F1 |
+| `verification` | object | the three keys below |
+| `verification.evidence_status` | string | the derived `EvidenceStatus` value |
+| `verification.rationale` | string | the stored `Verification.rationale`, unchanged, 1–2,000 code points (model-derived; untrusted) |
+| `verification.verdict` | string | the `Verdict` value |
+
+Not included: tenant, review, snapshot, revision and document IDs, match offsets, request digests
+and the `AcceptedCitation` match details.
+
+##### M5c-F3. Encoding rule, Unicode and identifiers
+
+[REC] **Serializer (normative parameters).** `json.dumps(value, ensure_ascii=False,
+sort_keys=True, separators=(",", ":"), allow_nan=False)`, then strict UTF-8 encoding for size
+measurement; the resulting string is the `user_text`. With these parameters Python escapes the
+quotation mark as `\"` and the backslash as `\\`; uses the two-character named escapes `\b`, `\t`,
+`\n`, `\f` and `\r` for backspace, tab, newline, form feed and carriage return; writes every other
+control U+0000–U+001F as a six-character lowercase Unicode escape (for example `\u0000`, `\u001f`);
+and writes every other character literally, including U+007F, U+2028/U+2029, combining marks,
+bidirectional controls, a BOM character and characters outside the BMP. Evidence and model-derived
+text are never normalized, stripped, trimmed or truncated. The parameters above, not this summary,
+are normative.
+
+**Round trip and its limits.** A model reply that JSON-encodes a quotation correctly reproduces the
+original characters in the quotation strings returned by M5a's validation, and M5b then matches
+original text. The model is not guaranteed to encode correctly: a double-escaped or otherwise
+changed quotation (for example a backslash followed by `n` where the evidence has a newline) is
+returned by that validation as different text and fails the existing output or provenance checks
+(`invalid_output` or a quote rejection). Evidence that itself contains a literal backslash followed
+by a letter is encoded as `\\` plus the letter, and in the quotation string M5a's validation
+returns for a correct reply it is again a literal backslash and letter; nothing decodes it a
+second time. NUL: an evidence string containing U+0000 round-trips structurally (as `\u0000`) through the
+request, but M5a `QuoteRef` forbids NUL, so a reply quoting it is `invalid_output`; not every
+representable evidence string is a valid output quotation.
+
+**Unicode validation.** M4d's text digest makes chunk text UTF-8 encodable, but metadata is not
+checked: `ChunkEvidence` accepts a lone surrogate in `title`, `section_path` and `version_label`,
+and the serializer's output would then fail UTF-8 encoding. Assembly therefore checks **every**
+string placed in the user object (metadata, header, body, question text, rationale, claim text and
+quotes) for strict UTF-8 encodability before serialization and raises the fixed private
+`InvalidAssemblyInputError` for any invalid one; it does not replace, drop or escape it. M4d is
+unchanged.
+
+**Why delimiter-like content is safe.** No raw delimiter exists in the format: text such as a
+closing tag, a fake `"chunk_id"` key, a closing brace, an instruction line or another JSON object
+inside a document is inside one escaped string value, so it cannot end that value or create a new
+field. Encoding prevents **structural** forgery only; a model can still be persuaded by the content
+of a string (semantic injection), which is measured in M7.
+
+**Identifiers.** The assembler does not insert trusted tenant, review, snapshot, revision or
+document IDs as metadata ([M5c-F1](#m5c-f1-verifier-input-schema-eg-verifier-input-v1),
+[M5c-F2](#m5c-f2-analyst-input-schema-eg-analyst-input-v1)). Original document text or earlier model
+text may itself contain exactly those strings; such content is preserved like any other text, not
+silently removed, rejected or rewritten because it resembles an identifier. Tests check the
+structural omission (the closed key sets), not the absence of a substring from the whole text.
+
+##### M5c-F4. Size refusal and bounds
+
+[REC] **Size refusal, never truncation.** After serialization, assembly computes the exact UTF-8
+byte length of the whole user text, **all metadata included**; above 400,000 bytes it raises
+`RequestTooLargeError` (`request_too_large`) **before** any `StructuredRequest` exists, so nothing
+is dispatched; no evidence or text is dropped, shortened or reordered to fit. The system text is
+bounded by the pinned prompt (at most 64,000 bytes; a different text fails the binding). M5g maps
+the refusal to an unresolved question with a fixed reason (no provider call, no reservation).
+
+**Bound analysis.** Chunk text alone cannot bound the request: Verifier text is at most 20 chunks
+of 4,000 code points, which is up to 320,000 bytes of literal 4-byte characters or 480,000 bytes
+when every character is a control written as a six-byte escape, and `title`, `section_path` parts
+and `version_label` have no length bound in `ChunkEvidence`, so metadata alone can exceed the
+limit. Analyst text is at most 80 quotes and 10 claims of 1,000 code points and a 2,000-code-point
+rationale, which can also exceed 400,000 bytes after escaping. In every case the exact measured size
+decides; the refusal path is expected, not exceptional.
+
+**Byte limits are not memory limits.** The 400,000-byte limit bounds accepted request bytes. The
+user text is built in full before it is measured, so peak memory during assembly grows with the
+size of the supplied inputs (including unbounded metadata already held in memory); M5c makes no
+peak-memory guarantee.
+
+##### M5c-F5. Repair requests
+
+[REC] `assemble_repair_request(original: StructuredRequest, inputs: VerifierRequestInputs |
+AnalystRequestInputs, reason: RepairReason) -> StructuredRequest` uses **reassembly**:
+
+1. `original` must be exactly a `StructuredRequest` and is rebuilt through its constructor; `inputs`
+   must be exactly one of the two input types and is rebuilt; `reason` must be exactly a
+   `RepairReason` and is rebuilt. Any failure → `InvalidAssemblyInputError`.
+2. The input type fixes the purpose; `original.purpose` and `reason.purpose` must equal it, and
+   `reason.question_id` must equal `original.question_id`; else `InvalidAssemblyInputError`.
+3. The unrepaired request is reassembled from `inputs` by the same algorithm
+   ([M5c-F](#m5c-f-request-assembly-and-evidence-encoding)), including the prompt binding and
+   Unicode checks; its own fixed errors propagate unchanged.
+4. The reassembled request must equal `original` in every field (purpose, prompt reference, model,
+   question, system text, user text, token limit and timeout, hence the same `request_sha256`);
+   else `InvalidAssemblyInputError`. A request that already contains a `repair` member can never
+   equal a reassembled one, so an already-repaired request is rejected here
+   (`InvalidAssemblyInputError`); a test pins this case explicitly.
+5. The repair member is added to the reassembled user object, the object is serialized with the
+   same rule, the size rule applies (`RequestTooLargeError`), and a new `StructuredRequest` is
+   built with the **same** purpose, prompt reference, system text, model, question, token limit and
+   timeout and the new user text.
+
+**Repair member** (closed, sorted keys): `"repair":{"citation_index":<int or null>,
+"item_index":<int or null>,"reason":<code>}`. For `invalid_output` both positions are `null`; M5a
+gives no position and none is invented. For an M5b `RejectionReason` the positions are those of the
+`ProvenanceRejection` for the same question and purpose, with the M5b stage and position rules:
+
+| Codes | Purpose | `item_index` | `citation_index` |
+|---|---|---|---|
+| `invalid_output` | either | `null` | `null` |
+| `chunk_not_retrieved`, `quote_blank`, `quote_not_found`, `quote_too_long`, `quote_not_exact` | `verifier` | 0–9 | 0–7 |
+| `claim_uncited` | `verifier` | 0–9 | `null` |
+| `verdict_unsupported`, `rationale_blank` | `verifier` | `null` | `null` |
+| `citation_not_validated`, `citation_not_shared` | `risk_analyst` | 0–19 | 0–7 |
+| `foreign_question`, `mixed_verdicts`, `finding_status_unsupported`, `finding_text_blank` | `risk_analyst` | 0–19 | `null` |
+
+Positions are range-checked only; the failed output is not an input, so whether a position existed
+in it is M5g's responsibility (it passes the M5b rejection of that attempt). An unknown code, a
+code from the wrong stage or purpose, out-of-range positions or a mismatched question are fixed
+private errors (`InvalidAgentValueError` at `RepairReason` construction,
+`InvalidAssemblyInputError` at assembly).
+
+**What a repair request contains.** No raw response, failed-attempt output or exception text is
+added; the repair member holds only the fixed fields above. An Analyst repair request still
+contains, like its original, the already-validated Verifier rationale, claims and quotations
+(model-derived and document text that M5b accepted). Its digest differs from the original's because
+the user text differs. The function cannot know how many repairs a stage has used; enforcing the
+one-repair-per-stage lifetime budget remains M5g's responsibility (W4/P8).
+
+**Request digest.** Unchanged M5a rule ([M5c-A](#m5c-a-accepted-requirements-and-current-source-facts)).
+With the deterministic serializer, identical inputs give identical bytes and digests (pinned by
+tests).
+
+##### M5c-G. Errors, privacy and process control
+
+[REC] Fixed errors in `evidenceguard_agents.artifact_errors`, all subclasses of
+`ReviewArtifactError` (code as message, fresh, raised after the handler, no cause or context):
+
+| Error (code) | Raised for |
+|---|---|
+| `InvalidTemplateError` (`invalid_review_template`) | any `parse_template` failure, including a non-`bytes` argument |
+| `UnknownTemplateError` (`unknown_review_template`) | a well-formed template ID and version not in the registry |
+| `TemplateIntegrityError` (`template_integrity_failed`) | a registered template whose resource is missing, unreadable or oversize, whose digest differs from the pinned one, whose bytes fail parsing or whose ID or version differs from the key; a loaded reference that differs from the pinned reference |
+| `UnknownPromptError` (`unknown_prompt`) | a well-formed prompt ID and version not in the registry |
+| `PromptIntegrityError` (`prompt_integrity_failed`) | a registered prompt whose resource is missing, unreadable, oversize, empty, BOM-prefixed, not strict UTF-8, NUL-bearing or of the wrong digest; a loaded reference or purpose that differs from the pinned one |
+| `InvalidAgentArgumentError` (`invalid_agent_argument`) | wrong argument types or shapes for `load_template`, `load_pinned_template`, `load_prompt`, `load_pinned_prompt` and `plan_review` (including `k`) |
+| `InvalidAgentValueError` (`invalid_agent_value`) | invalid direct construction or replacement of any M5c value |
+| `InvalidAssemblyInputError` (`invalid_assembly_input`) | invalid or mismatched assembly inputs, purpose or prompt-binding failures, invalid Unicode, repair mismatches, already-repaired requests |
+| `RequestTooLargeError` (`request_too_large`) | a serialized user text above 400,000 bytes |
+
+Checks run in the order given in each section, so the same invalid input always produces the same
+error. Every public operation runs as one guarded operation (as in M5a/M5b); process control
+propagates as the same object. `repr`/`str` show identifiers, versions, purposes, digests and
+counts only, never template title, question or prompt text, evidence, quotes or model text. Nothing
+logs. Resource reads are bounded as in [M5c-C1](#m5c-c1-loading-identity-and-trusted-paths).
+
+##### M5c-H. Planned tests (not written or run)
+
+*Database-independent* (`tests/test_review_templates.py`, `tests/test_prompts.py`,
+`tests/test_request_assembly.py`, `tests/test_packaging.py`):
+
+- **Template:** every key and bound, unknown keys, duplicate IDs and queries, booleans for integers,
+  missing flag, BOM, invalid UTF-8, oversize file (65,536 accepted, 65,537 rejected), NUL, lone
+  surrogate (through a direct `ReviewTemplate`/`PlannedQuestion` construction, since TOML text
+  cannot carry one) and edge whitespace rejected in the title, texts and queries alike, file-order
+  preservation; `parse_template` digest equals the SHA-256 of the exact input bytes (also for CRLF
+  and trailing-newline variants, which differ).
+- **Loading and identity:** pinned digest of the packaged v1 file; tampered bytes, a missing
+  resource and an oversize resource → `TemplateIntegrityError`; the bounded read never requests
+  more than the limit plus one byte (a counting reader stub); unknown ID or version →
+  `UnknownTemplateError`; wrong argument types → `InvalidAgentArgumentError`;
+  `load_pinned_template` with a reference whose digest, ID or version differs →
+  `TemplateIntegrityError` or `UnknownTemplateError` as specified; a directly constructed
+  `ReviewTemplate` with the pinned digest and altered questions is **not** equal to the loaded one
+  and is never accepted by `load_pinned_template`.
+- **Values:** direct construction, `dataclasses.replace`, nested `model_construct` and
+  `object.__setattr__` bypasses, lists for tuples, `bool` for `int`, unknown keywords and
+  subclasses for every value in M5c-B1 → `InvalidAgentValueError`; `PlannedQuestion` with
+  reordered, missing or extra queries; representations free of title, question and prompt text.
+- **Planner:** one planned question per template question in order, `k` bounds and default,
+  queries passed unchanged, determinism across calls.
+- **Prompts:** pinned digests of both v1 files, exact-bytes system text and its SHA-256 equal to
+  the file digest, tampered, BOM, NUL or oversize bytes → `PromptIntegrityError`, unknown prompt →
+  `UnknownPromptError`, `load_pinned_prompt` reference and purpose mismatches.
+- **Prompt binding:** wrong purpose, an unregistered prompt reference, a registered reference with a
+  different digest, and a system text that differs by one byte (each accepted by `StructuredRequest`
+  alone) → `InvalidAssemblyInputError` for both stages.
+- **Assembly:** pinned user-text bytes and `request_sha256` for fixed inputs; exact closed key sets
+  and sorted key order of both schemas; header and body kept separate; rank order; empty evidence;
+  adversarial bodies (quotation marks, backslashes, a literal backslash followed by a letter, a
+  closing tag, a fake `chunk_id` key, a closing brace and new object, the five named-escape controls,
+  other controls, U+007F, U+2028, a BOM character, combining marks, bidirectional controls,
+  supplementary characters, a NUL control) round-trip exactly through one `json.loads`, produce
+  exactly the supplied entry count and leave the structure intact; lone surrogates in `title`,
+  `section_path` and `version_label` → `InvalidAssemblyInputError`; trusted IDs absent as keys and
+  values the assembler adds, while document text containing a tenant-ID-like string is preserved
+  unchanged; the Analyst text holds only validated citations, claims and rationale; size refusal at
+  400,000 (accepted) and 400,001 bytes (refused, no request created), tuned through metadata.
+- **Repair:** valid repairs for `invalid_output` and for each M5b code; deterministic repaired
+  bytes and digest; mismatched original and inputs (different evidence item, metadata, question,
+  claim or rationale); wrong prompt, purpose, question or settings (model, token limit, timeout);
+  an already-repaired request; unknown codes, wrong-stage codes and out-of-range positions; size
+  refusal of a repaired text just over the limit; no raw output or exception text in any repair.
+- **M5b compatibility (round trip):** a scripted response whose quote is copied from a JSON string
+  value (including an escaped quotation mark, backslash and newline) passes M5a `parse_output` and is
+  accepted by `verify_question` with the exact original quote; a quote that keeps a visible escape
+  sequence (double-escaped) is rejected; a quote containing NUL is `invalid_output`.
+- **Canary support:** an assembled request built from the injected trust-center fixture contains the
+  injected chunk inside exactly one evidence string value (the input to M5g's acceptance fixture and
+  negative control); the limitation probe stays in M5g.
+- **Ground-truth separation (test-only reads):** no template query equals a ground-truth search
+  query and the template contains no ground-truth anchor, acceptable claim or quote (the test reads
+  `sample_data`; product code never does).
+- **Privacy and process control:** canary-bearing evidence absent from errors and representations;
+  no captured logs; process control from resource reads and encoding propagates unchanged.
+- **Packaging:** the new allowlists, the file set, packaged data present in the wheel, and no agents
+  module mentioning `ground_truth` or `sample_data`.
+
+*Installed wheel* (**C10**, accepted in Prompt 181): one line, for example "review template, prompts and request
+assembly ran from the installed wheel" (load the packaged template and prompts through the pinned
+loaders, plan, assemble a Verifier request from a fixed evidence fixture and compare its pinned
+digest). *PostgreSQL:* none.
+
+##### M5c-I. Intended files and exclusions
+
+- New: the five modules and three data files in M5c-B, the three test modules; ADR-0021 with the
+  implementation.
+- Changed: `tests/test_packaging.py`; `.github/workflows/ci.yml` for one wheel line (if C10 is
+  accepted); `pyproject.toml` only if the packaged data needs an explicit include (to be confirmed
+  by the wheel comparison); README, plan and threat-model status.
+- Excluded: persistence, migrations, review creation, handlers, orchestration, retry or repair
+  budgeting, endpoints, settings, credentials, the Anthropic adapter, any network code, any
+  change to M1–M5b contracts, any live run and any quality or injection-resistance claim.
+- **Later-slice obligations** (each reviewed with its slice): M5d stores the `TemplateRef`, both
+  `PromptRef`s, the model settings and the tenant, review and snapshot bindings; M5e keys stored
+  calls and outputs by request digest **within** those bindings; M5g loads artifacts only through
+  `load_pinned_template` and `load_pinned_prompt`, supplies only trusted evidence and Verifier
+  values, enforces the repair budget and runs the canary acceptance fixture, negative control and
+  limitation probe; M7 measures live quality and injection behaviour.
+
+##### M5c-J. Reviewer decisions
+
+**All eleven decisions were accepted as specified at external review in Prompt 181**; none remains
+open. *Historical:* each was proposed as [OPEN] with Claude Code's recommendation; in Prompt 180 the
+reviewer supported C1, C2 and C4–C11 as design directions, subject to the Prompt 180 corrections
+and review of the complete revised text, and narrowed C3 as recorded below.
+
+1. **C1 Evidence encoding.** [REC] JSON user message with untrusted text only in JSON string values
+   (JSON in, JSON out; the reply validated by M5a's existing two-pass `parse_output`; no
+   additional decoding of returned quotations). *Alternative:* delimited tags
+   with `&`, `<`, `>` escaping plus a reviewed entity decoder before M5b. *Tradeoff:* a format models
+   handle well with one parser for both directions versus a more prompt-like layout that needs a
+   second decoder and decoder-specific failure cases. *Accepted (Prompt 181);* a supported direction in Prompt 180.
+2. **C2 Data location.** [REC] Packaged files under `evidenceguard_agents/data/` read through
+   `importlib.resources` with bounded reads and pinned digests. *Tradeoff:* a new resource-reading
+   allowlist versus embedding long text in Python constants. *Accepted (Prompt 181);* a supported direction in Prompt 180.
+3. **C3 First template content.** *Reviewer (Prompt 180):* shared question IDs and question texts
+   may be used as evaluation inputs; expected answers, gold anchors, relevance lists and
+   answer-bearing labels must not be copied into product content or queries, and nothing generates
+   the template from `ground_truth` at runtime or build time. [REC] The concrete table in
+   [M5c-C2](#m5c-c2-proposed-first-template-content), with separately authored queries and explicit
+   flags. *Status:* accepted as specified in Prompt 181, including the table.
+4. **C4 Analyst input.** [REC] Validated Verification values and accepted quotations only, no raw
+   chunks (schema in M5c-F2). *Tradeoff:* the Analyst cannot use unvalidated context versus
+   exposing unvalidated text it may not cite. *Accepted (Prompt 181);* a supported direction in Prompt 180.
+5. **C5 Document metadata in the prompt.** [REC] Include title, section path, source type,
+   revision number, version label, effective date and `authenticity: not_established`, with every
+   string Unicode-checked and counted in the size limit. *Tradeoff:* more context for the model
+   versus more untrusted strings in the request. *Accepted (Prompt 181);* a supported direction in Prompt 180.
+6. **C6 Output and timeout settings.** [REC] 4,096 output tokens for both stages, timeout 60,000 ms.
+   *Tradeoff:* headroom for ten claims versus cost per call. *Accepted (Prompt 181);* a supported direction in Prompt 180.
+7. **C7 Version policy.** [REC] Immutable published templates and prompts; changes are new versions;
+   old versions stay packaged. *Tradeoff:* a growing data directory versus irreproducible reviews.
+   *Accepted (Prompt 181);* a supported direction in Prompt 180.
+8. **C8 Retrieval per question.** [REC] Template queries unchanged and deterministic, `k = 8`.
+   *Tradeoff:* simplicity versus recall gained by expansion (deferred to M7 measurement).
+   *Accepted (Prompt 181);* a supported direction in Prompt 180.
+9. **C9 Oversize requests.** [REC] Refuse before dispatch with a fixed error and no truncation; M5g
+   records the question unresolved. *Tradeoff:* an unresolved question versus silently dropping
+   evidence. *Accepted (Prompt 181);* a supported direction in Prompt 180.
+10. **C10 Installed-wheel line.** [REC] Add one line. *Tradeoff:* a small workflow edit versus no
+    installed evidence for the packaged data. *Accepted (Prompt 181);* a supported direction in Prompt 180.
+11. **C11 Required documentary flag.** [REC] `requires_documentary_support` required in every
+    template question. *Tradeoff:* a more verbose template versus an implicit default.
+    *Accepted (Prompt 181);* a supported direction in Prompt 180.
+
+Routine choices (key names, error codes, ordering, bounds and the JSON parameters) are specified
+above and were accepted with this text in Prompt 181.
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.

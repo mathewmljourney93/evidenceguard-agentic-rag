@@ -2,10 +2,13 @@
 
 - **Status:** **Implemented by Claude Code in Prompt 177, corrected in Prompt 178 (full citation
   values during analysis and its reload; see [Prompt 178 correction](#prompt-178-correction)) and
-  accepted at external review in Prompt 179, pending exact-commit CI** (see
-  [External review (Prompt 179)](#external-review-prompt-179)). Publication is authorized by
-  Prompt 179 subject to the feature and main CI gates and had not run when this record was
-  written. Overall M5 acceptance is pending; no review path uses M5b yet. Implements the
+  accepted at external review in Prompt 179; reviewed, verified in feature-branch and main-push
+  CI for the exact commit and on `main` at `90295717`** (see
+  [External review (Prompt 179)](#external-review-prompt-179) and
+  [Main publication evidence (Prompt 179)](#main-publication-evidence-prompt-179), whose job-log
+  results were independently retrieved by the external reviewer and recorded in Prompt 180; the
+  acceptance commit itself records the pre-publication state, which is historical). Overall M5
+  acceptance is pending; no review path uses M5b yet. Implements the
   [accepted M5b specification](../plan.md#m5b-provenance-and-status-derivation-specification-accepted-at-review-prompt-176-implementation-pending)
   (proposed in Prompt 174, corrected in Prompt 175, accepted at external review in Prompt 176 with
   the M5b-E1 input-identity clarification; P1–P16 are its implementation contract), the second
@@ -220,6 +223,80 @@ isolated reviewer checks, not a project suite, build, installed-wheel, PostgreSQ
 provider run. Claude Code's Prompt 178 Windows results below remain separately attributed and are
 not exact-commit CI.
 
+## Main publication evidence (Prompt 179)
+
+**Publication (Claude Code).** The acceptance commit `90295717ad693b945eea1a10e176b9dd339b4049` (parent
+`f04e0957`, tree `b2b3eb709ef5a824418e2a78731e6cd10ffd6c85`, subject "feat: add provenance
+validation and evidence status derivation", noreply author and committer; 11 paths, the six
+accepted implementation, test, packaging, workflow and ADR-0019 blobs identical to the accepted
+tree `fa62abe5`) was pushed once with
+`git push --set-upstream origin refs/heads/feat/provenance-validation:refs/heads/feat/provenance-validation`
+(exit 0). After all five required jobs passed for that exact commit, `main` was fast-forwarded
+from `f04e0957` to it (`git merge --ff-only`, exit 0) and pushed once with
+`git push origin refs/heads/main:refs/heads/main` (exit 0); the publication range was exactly this
+commit and its 11 paths. **M5b is on `main` at `90295717`.**
+
+**Runs and jobs** (all for SHA `90295717ad693b945eea1a10e176b9dd339b4049`, event `push`, attempt 1, conclusion
+`success`; all five jobs and every one of the 53 steps per push succeeded, none skipped or
+cancelled). Log results are from the logs independently retrieved by the external reviewer
+(recorded in Prompt 180):
+
+- Feature branch `feat/provenance-validation`:
+  - [CI run 39320787615](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39320787615)
+    - [Ubuntu verify 118293972520](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39320787615/job/118293972520): `3170 passed, 308 skipped in 38.46s`
+    - [Windows verify 118293972136](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39320787615/job/118293972136): `3169 passed, 309 skipped in 76.99s`
+    - [PostgreSQL integration 118293971400](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39320787615/job/118293971400): `308 passed, 3170 deselected in 188.62s`
+    - [Container 118293972104](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39320787615/job/118293972104): successful
+  - [Secret-scan run 39320787909](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39320787909)
+    - [Gitleaks (full history) 118293972043](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39320787909/job/118293972043): 77 commits scanned, no leaks
+- `main`:
+  - [CI run 39321412908](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39321412908)
+    - [Ubuntu verify 118296128688](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39321412908/job/118296128688): `3170 passed, 308 skipped in 39.14s`
+    - [Windows verify 118296128951](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39321412908/job/118296128951): `3169 passed, 309 skipped in 69.63s`
+    - [PostgreSQL integration 118296128303](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39321412908/job/118296128303): `308 passed, 3170 deselected in 143.97s`
+    - [Container 118296128861](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39321412908/job/118296128861): successful
+  - [Secret-scan run 39321412862](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39321412862)
+    - [Gitleaks (full history) 118296127340](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39321412862/job/118296127340): 77 commits scanned, no leaks
+
+**Observed in the logs (both pushes).** All four installed-wheel logs (Ubuntu and Windows, feature
+and `main`) printed the seven expected lines:
+
+- offline embedding, canonical storage and indexing modules ran from the installed wheel
+- retrieval modules imported and fusion ran from the installed wheel
+- evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+- Voyage adapter validated a mocked response from the installed wheel
+- model-call contracts classified a scripted fake response from the installed wheel
+- provenance matched a quote and derived a status from the installed wheel
+- offline migration SQL rendered from the installed wheel
+
+Both container logs reported an effective build context of 96 files with 19 planted fixtures
+excluded, successful image checks, a healthy stack, an accepted upload (202), successful ingestion
+and an active revision with 2 verified chunks, a duplicate upload returning the existing revision
+(200), one offline indexing job, a ready index with 2 embeddings and a successful indexing job, an
+idle-worker exit 0 without an OOM kill, and successful smoke and cleanup.
+
+**Attribution and scope.**
+
+- *Claude Code (Prompt 179):* published the commit and observed the run, job and step
+  conclusions through the anonymous GitHub REST API only. Its log downloads failed (feature: the
+  four CI job logs no HTTP response, the Gitleaks log HTTP 403; `main`: the Ubuntu, PostgreSQL,
+  container and Gitleaks logs no HTTP response, the Windows log HTTP 403); authentication was not
+  changed. The Prompt 179 statement that test counts, wheel output, container summaries and the
+  Gitleaks commit count were unobserved was accurate for Claude Code at that time and is now
+  historical.
+- *External reviewer (recorded in Prompt 180):* afterwards independently retrieved all four
+  workflow-run records, all ten job records and all ten job logs, the remote `main` and
+  `feat/provenance-validation` refs (both at `90295717`), and the published tree's
+  `provenance.py`, `test_provenance.py` and `test_quote_matching.py` blob hashes
+  (`23f941dcd0eb1542fe5a3a8aef6edd896e01585c`, `f015204775d9ffd7fc1a9278a41327d3f30dd654` and
+  `2da83a655d5867635e9876c045db45cecc584fd7`), which matched the reviewed copies. The reviewer ran
+  no project suite, build, installed-wheel check, database, Docker or provider locally.
+- The container details are the smoke's own reported checks, not independent inspection; the
+  smoke covers offline ingestion, indexing and idle-worker shutdown only and does not exercise M5b.
+  The wheel's Recall@5 line is arithmetic, not a database-derived corpus Recall, and the Voyage
+  line uses a mocked response. None of this establishes live-model quality, semantic support,
+  entailment, authenticity or injection resistance.
+
 ## Verification (Prompt 178, local Windows, Claude Code; historical)
 
 In the existing locked environment, offline, with no database URL set and no dependency, lockfile
@@ -290,8 +367,9 @@ provider or network call.
 
 ## Pending
 
-Implementation review, Linux verification, current-version CI (including the installed-wheel step
-on both platforms), publication, and the later slices that use these values: M5c (safe prompt
+*(Historical at implementation: implementation review, Linux verification, current-version CI and
+publication have since completed; see above.)* The later slices that use these values remain
+pending: M5c (safe prompt
 encoding and request assembly, including any decoding of encoded quotes before matching), M5d
 (persisted snapshot trust), M5e (stage persistence, reloading through the constructors and recheck
 functions), M5f (the hash-covered report representation, global report bounds with no silent

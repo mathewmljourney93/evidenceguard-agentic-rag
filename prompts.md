@@ -35624,3 +35624,762 @@ on the unchanged files: both workflows trigger on push, the `verify` matrix, `in
 `uv run --locked pytest -m integration`, no workflow uses a secret, and `ci.yml` differs from
 `f04e0957` by 24 added lines and none removed. No application test, build or wheel check was
 repeated. The commit, its CI and any publication are reported afterwards, not predicted here.
+
+### Prompt 179 publication outcome (Claude Code)
+
+*Observed results only.*
+
+- **Commit.** `90295717ad693b945eea1a10e176b9dd339b4049` (parent `f04e0957`, tree
+  `b2b3eb709ef5a824418e2a78731e6cd10ffd6c85`, subject "feat: add provenance validation and evidence
+  status derivation", noreply author and committer, Co-Authored-By trailer); 11 paths; the six
+  accepted blobs (implementation, two test modules, packaging test, workflow and ADR-0019)
+  identical to `fa62abe5`; working tree clean; full-history Gitleaks over 77 commits and
+  `origin/main..HEAD` Gitleaks with no leaks. Acceptance export `.local/p179/m5b-acceptance.diff`
+  (baseline `fa62abe5`, prompts.md excluded; 4 files, 50 insertions, 13 deletions; 146 lines):
+  30,213 bytes, SHA-256 `77ed93bb26cd3ae7896dd0088b90632cb576df4ca50a9d2eb1bb708a816838b0`.
+- **Feature publication.** Remote `main` `f04e0957` and no remote feature branch immediately
+  before; `git push --set-upstream origin
+  refs/heads/feat/provenance-validation:refs/heads/feat/provenance-validation` ran once, exit 0;
+  remote feature = `90295717`; `main` unchanged.
+- **Feature CI gate (passed).** CI run `39320787615` and secret-scan run `39320787909`, both event
+  `push`, branch `feat/provenance-validation`, attempt 1, success; jobs Ubuntu `118293972520`,
+  Windows `118293972136`, PostgreSQL `118293971400`, container `118293972104`, Gitleaks
+  `118293972043` all success, 53 steps successful, none skipped or cancelled.
+- **Main publication.** After `fetch --no-tags` (remote `main` still `f04e0957`, local `main` equal
+  to `origin/main`, remote feature `90295717`, `main` its ancestor, clean tree, range exactly
+  `90295717` with 11 paths, accepted blobs unchanged): `git switch main`, `git merge --ff-only
+  90295717...` (exit 0), remote `main` rechecked as `f04e0957`, `git push origin
+  refs/heads/main:refs/heads/main` exit 0; remote `main` = `90295717`.
+- **Main CI gate (passed).** CI run `39321412908` and secret-scan run `39321412862`, both event
+  `push`, branch `main`, attempt 1, success; jobs Ubuntu `118296128688`, Windows `118296128951`,
+  PostgreSQL `118296128303`, container `118296128861`, Gitleaks `118296127340` all success, 53 steps
+  successful, none skipped or cancelled.
+- **Unavailable.** Feature logs: four CI job logs no HTTP response, Gitleaks HTTP 403. Main logs:
+  Ubuntu, PostgreSQL, container and Gitleaks no HTTP response, Windows HTTP 403. Authentication was
+  not changed; test counts, wheel output, container summaries and the Gitleaks commit count for
+  `90295717` are unobserved and were not inferred.
+- **Monitors.** Both bounded polling loops exited after completion; no monitor remains.
+
+### Prompt 179 documentation and M5c proposal outcome (Claude Code; staged, awaiting review)
+
+- **Branch.** `docs/m5c-prompts-plan` created from `90295717` (it did not exist locally or
+  remotely). Only README, ADR-0020, plan, threat model and this file changed; nothing committed.
+- **Evidence.** ADR-0020 gains "Main publication evidence (Prompt 179)" with the full SHA, every
+  job beneath its run, the API conclusions, the unavailable logs and the container scope; status
+  updates in README, plan and threat model record M5b as reviewed, CI-verified and on `main` at
+  `90295717`.
+- **M5c proposal.** "M5c review template, planner, prompts and request assembly specification
+  (PROPOSED, Prompt 179; not implemented)" added to the plan: packaged digest-pinned TOML template
+  and versioned prompts in `evidenceguard_agents/data/`, a deterministic Planner, and JSON request
+  assembly in which every untrusted document string is a JSON string value, so quotations decode to
+  original text through M5a's strict JSON parser with no separate decoder before M5b; size refusal
+  before dispatch; repair requests from fixed codes; fixed errors; planned tests and eleven
+  reviewer decisions (C1–C11). Matching proposed-controls notes in the threat model and README.
+  Nothing in M5c is accepted or implemented.
+- **Text fidelity.** The Prompt 179 verbatim block above and this note contain no backslash
+  sequence, so no escape was decoded while writing them; the earlier Prompt 175 disclosure stands.
+- **Checks before this note** (documentation only): 0 link or anchor problems, 0 table problems,
+  `git diff --check` clean, `ruff format --check .` 190 files already formatted. The final staged
+  scope, encoding, privacy and Gitleaks checks and the export follow and are reported in the
+  handoff. No application test, build, wheel, database, Docker or provider call was run for this
+  documentation phase.
+
+### Prompt 179 outcome (attributed to Claude Code's supplied handoff output)
+
+*Reconstructed in Prompt 180.* Claude Code's Prompt 179 handoff text is not available in the fresh
+Prompt 180 session; this summary is taken from the Prompt 179 notes above, the `.local/p179/`
+checkpoint files and Git, and its values were rechecked in Prompt 180. Claude Code's Prompt 179
+handoff reported: the starting state and both earlier exports matched; the acceptance commit
+`90295717ad693b945eea1a10e176b9dd339b4049` (parent `f04e0957`, tree
+`b2b3eb709ef5a824418e2a78731e6cd10ffd6c85`, 11 paths, the six accepted blobs unchanged) with
+acceptance export `.local/p179/m5b-acceptance.diff` (baseline `fa62abe5`, prompts.md excluded; 4
+files, 50 insertions, 13 deletions): 30,213 bytes, SHA-256
+`77ed93bb26cd3ae7896dd0088b90632cb576df4ca50a9d2eb1bb708a816838b0`; one feature push and, after
+the feature CI gate passed, a fast-forward and one push of `main` (all exit 0); feature CI run
+`39320787615` and secret-scan run `39320787909`, main CI run `39321412908` and secret-scan run
+`39321412862`, all event `push`, attempt 1, success, with all five jobs and 53 steps per push
+successful (API conclusions only; every log download failed, so counts and wheel output were
+reported as unobserved); branch `docs/m5c-prompts-plan` from `90295717` with the five
+documentation paths staged, uncommitted (staged tree `dea9056bbbce890d42ecfd0e317791be0b40aa74`);
+and export `.local/p179/m5b-main-evidence-and-m5c-spec.diff` (baseline `90295717` tree
+`b2b3eb70`, final staged tree `dea9056b`, prompts.md excluded, written with `--full-index`; 4
+files, 400 insertions, 14 deletions; 507 lines): 57,650 bytes, SHA-256
+`c82867b4f076fa7aec554e367509cb41a425e30d0e83fcf52a3b6fe9a2e99cb0`, byte-identical to the Git
+comparison. Nothing else was committed.
+
+### External review of the Prompt 179 output (Prompt 180)
+
+The external reviewer received `.local/p179/m5b-main-evidence-and-m5c-spec.diff` and verified its
+size and SHA-256 (57,650 bytes, `c82867b4f076fa7aec554e367509cb41a425e30d0e83fcf52a3b6fe9a2e99cb0`).
+`.local/p179/m5b-acceptance.diff` was omitted from the handoff attachments, so the reviewer has not
+independently checksum-verified it; Claude Code's local verification of it in Prompt 180 is not
+the reviewer's. The reviewer independently retrieved all four M5b workflow records, all ten job
+records and all ten job logs, the remote `main` and `feat/provenance-validation` refs (both at
+`90295717`) and the published tree's provenance module and two new test blob hashes, which matched
+the reviewed copies. All runs used `90295717ad693b945eea1a10e176b9dd339b4049`, event `push`,
+attempt 1, on the appropriate branch, with all five jobs and all 53 steps per push successful and
+none skipped. Logs: feature Ubuntu `3170 passed, 308 skipped in 38.46s`, Windows `3169 passed, 309
+skipped in 76.99s`, PostgreSQL `308 passed, 3170 deselected in 188.62s`, Gitleaks 77 commits, no
+leaks; main Ubuntu `3170 passed, 308 skipped in 39.14s`, Windows `3169 passed, 309 skipped in
+69.63s`, PostgreSQL `308 passed, 3170 deselected in 143.97s`, Gitleaks 77 commits, no leaks; all
+four installed-wheel logs printed the seven expected lines including the provenance line; both
+container logs reported 96 files of effective context with 19 planted fixtures excluded and every
+smoke check successful. The reviewer ran no project suite, build, installed-wheel check, database,
+Docker or provider locally. The reviewer's encoding, metadata and prompt-binding probes were
+isolated standard-library and existing-domain checks, not M5c implementation tests (no M5c code
+exists): M5a `StructuredRequest` accepts an independent prompt-reference digest and system text
+(its existing contract); `ChunkEvidence` accepts a lone surrogate in `title`, `section_path` and
+`version_label`, and JSON encoding with `ensure_ascii=False` then fails during UTF-8 encoding. The
+reviewer supports M5c directions C1, C2 and C4–C11 subject to corrections and review of the
+complete revised text, narrowed C3, and requested the Prompt 180 corrections; M5c is not accepted.
+
+### Prompt 180 (verbatim)
+
+Prompt 180 — Fresh-session recovery, M5c contract corrections and verified M5b CI evidence
+
+Written for: Mathew and the external reviewer.
+
+You are starting a fresh Claude Code session in:
+D:\Claude\evidenceguard_agentic_rag
+
+Recover the existing state before making changes. This is continuation of the existing project, not a new implementation task.
+
+M1–M4 are accepted within their recorded scopes. M5a and M5b are accepted, published and CI-verified on main. The M5c specification is staged and awaiting correction and review.
+
+This task is documentation only. Do not implement M5c, commit, push, merge, change application code, run project checks or create ADR-0021.
+
+1. Recover instructions and verify the state
+
+Read:
+- CLAUDE.md and any applicable repository instructions.
+- The accepted M5 implementation sequence in docs/plan.md.
+- The complete proposed M5c specification in docs/plan.md.
+- ADR-0020’s acceptance and publication records.
+- Relevant existing M5a/M5b contracts when needed.
+- The relevant recent prompt-history entries and .local/p179/ checkpoint files.
+
+Do not dump the entire prompts.md history. Use targeted searches and reads.
+
+Expected:
+- Branch docs/m5c-prompts-plan.
+- HEAD 90295717ad693b945eea1a10e176b9dd339b4049.
+- HEAD parent f04e09576e0ed358669f793c134d9dbc30141104.
+- HEAD tree b2b3eb709ef5a824418e2a78731e6cd10ffd6c85.
+- main and origin/main at 90295717.
+- Staged tree dea9056bbbce890d42ecfd0e317791be0b40aa74.
+- Exactly these five files staged:
+  README.md
+  docs/decisions/0020-provenance-validation.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Origin and noreply identity unchanged.
+
+Preserve all staged work. Do not reset, clean, stash, recreate the branch or overwrite checkpoints.
+
+Verify .local/p179/m5b-main-evidence-and-m5c-spec.diff:
+- 57,650 bytes.
+- SHA-256 c82867b4f076fa7aec554e367509cb41a425e30d0e83fcf52a3b6fe9a2e99cb0.
+- Byte-identical to its recorded Git comparison, excluding prompts.md.
+
+Also verify the preserved .local/p179/m5b-acceptance.diff:
+- 30,213 bytes.
+- SHA-256 77ed93bb26cd3ae7896dd0088b90632cb576df4ca50a9d2eb1bb708a816838b0.
+
+The external reviewer received and checksum-verified the first file. The second file was omitted from the handoff attachments, so the reviewer has not independently checksum-verified it. Do not attribute your local verification to the reviewer.
+
+Save the starting staged tree, paths, five blob hashes and prompts.md prefix under .local/p180/.
+
+No remote operation is needed. If the state differs materially, report the difference without discarding work or guessing.
+
+Give a short recovery update, then continue.
+
+2. Record independently retrieved M5b CI evidence
+
+The external reviewer independently retrieved:
+- All four workflow records.
+- All ten job records.
+- All ten job logs.
+- Remote main and feat/provenance-validation refs, both at 90295717.
+- The published tree’s provenance module and two new test blob hashes, matching the reviewed copies.
+
+All runs used:
+90295717ad693b945eea1a10e176b9dd339b4049
+
+All were event push, attempt 1, on the appropriate branch. All five jobs and all 53 steps per push succeeded, with none skipped.
+
+Feature branch feat/provenance-validation:
+- CI 39320787615.
+- Secret scan 39320787909.
+- Ubuntu 118293972520:
+  3170 passed, 308 skipped in 38.46s.
+- Windows 118293972136:
+  3169 passed, 309 skipped in 76.99s.
+- PostgreSQL 118293971400:
+  308 passed, 3170 deselected in 188.62s.
+- Container 118293972104: success.
+- Gitleaks 118293972043:
+  77 commits scanned; no leaks.
+
+Main:
+- CI 39321412908.
+- Secret scan 39321412862.
+- Ubuntu 118296128688:
+  3170 passed, 308 skipped in 39.14s.
+- Windows 118296128951:
+  3169 passed, 309 skipped in 69.63s.
+- PostgreSQL 118296128303:
+  308 passed, 3170 deselected in 143.97s.
+- Container 118296128861: success.
+- Gitleaks 118296127340:
+  77 commits scanned; no leaks.
+
+All four installed-wheel logs printed:
+- offline embedding, canonical storage and indexing modules ran from the installed wheel
+- retrieval modules imported and fusion ran from the installed wheel
+- evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+- Voyage adapter validated a mocked response from the installed wheel
+- model-call contracts classified a scripted fake response from the installed wheel
+- provenance matched a quote and derived a status from the installed wheel
+- offline migration SQL rendered from the installed wheel
+
+Both container logs reported:
+- Effective context: 96 files; 19 planted fixtures excluded.
+- Successful image checks.
+- Healthy stack.
+- Upload accepted, 202.
+- Successful ingestion and active revision with 2 verified chunks.
+- Duplicate upload returned the existing revision, 200.
+- One offline indexing job.
+- Ready index with 2 embeddings and successful indexing job.
+- Idle-worker exit 0 without an OOM kill.
+- Smoke and cleanup succeeded.
+
+Update ADR-0020 and linked short summaries. Keep every job under its own run, using the existing full links.
+
+Preserve attribution:
+- Claude Code observed API conclusions only in Prompt 179; its log downloads failed.
+- The reviewer retrieved the logs afterwards.
+- The reviewer ran no project suite, build, installed-wheel check, database, Docker or provider locally.
+- Container observations are the smoke’s reported checks and do not exercise M5b.
+- The Recall line is arithmetic; Voyage is mocked.
+- None establishes live-model quality.
+
+Do not retrieve or rerun this evidence again.
+
+3. Complete values, loading and identity contracts
+
+Add an explicit value/API contract table for:
+- TemplateRef.
+- ReviewTemplate.
+- PlannedQuestion.
+- PromptSpec.
+- ModelSettings.
+- RepairReason.
+- Any purpose-specific repair input values introduced.
+
+Specify exact types, bounds, allowed combinations, nested reconstruction, tuple immutability, direct construction and replacement validation, representations and fixed error classification.
+
+Clarify:
+- parse_template computes its reference digest from the exact input bytes.
+- A directly constructed ReviewTemplate cannot prove packaged-file origin merely by carrying a plausible digest.
+- Trusted production/reload paths must load the pinned packaged template and compare its complete reference with the review’s pinned configuration.
+- PlannedQuestion binds its retrieval queries to its EvidenceQuestion search_queries.
+- Template strings reject NUL, lone surrogates and unintended edge whitespace consistently, including title.
+- Unknown IDs/versions, malformed data, missing resources, digest failures and invalid caller arguments have deterministic fixed errors.
+- Resource reads use an actual bounded read of at most the limit plus one byte, then reject oversize content.
+- Do not describe read-all-then-check as a bounded read.
+
+Prompt binding must be explicit:
+- Revalidate PromptSpec and settings.
+- Require the correct ModelPurpose for the assembly function.
+- Require the prompt reference to identify a supported registry entry.
+- Require the exact system text’s SHA-256 to equal the referenced/pinned prompt digest.
+- Do not rely on StructuredRequest to enforce that last relationship.
+
+The reviewer confirmed in an isolated probe that the existing M5a StructuredRequest accepts an independent prompt-reference digest and system text. That is its existing contract, not an M5a defect. M5c must perform the additional binding.
+
+Add planned mismatch, nested-value and direct-construction tests.
+
+4. Make request and repair schemas complete
+
+Specify the complete closed Analyst JSON schema with exact key names, field types, ordering and bounds. Do not leave it as a prose list.
+
+For both assembly functions:
+- Revalidate all inputs and identities before serialization.
+- Preserve the trusted-input provenance boundary.
+- Treat document content and all previous model-derived rationale/claim text as untrusted data, never instructions.
+- State that request digests identify content/configuration, not tenant authorization or review identity.
+- M5d/M5e/M5g retain those external bindings.
+
+Replace the undefined “inputs” placeholder in assemble_repair_request with a complete typed API and algorithm.
+
+Use the reassembly approach:
+- Define exact purpose-specific inputs.
+- Reconstruct the unrepaired request from those inputs.
+- Require it to equal the supplied revalidated original request before adding repair information.
+- Preserve prompt, system text, model, question, token limit and timeout.
+- Reject a request that already contains the repair member.
+- Define exact closed RepairReason fields and purpose/stage/position constraints.
+- invalid_output carries no arbitrary text or invented positions.
+- M5b rejection reasons use their existing stage and position rules and must match the request’s question and purpose.
+- Unknown reasons and mismatched inputs are fixed private errors.
+- The function cannot enforce a stage’s lifetime repair budget; M5g remains responsible.
+
+Correct the claim that repair requests contain “no model text”:
+- No failed-attempt raw response or exception text is added.
+- An Analyst request still retains its already-validated Verifier rationale and claims.
+- Repair information itself contains only the fixed permitted fields.
+
+Add planned tests for mismatched original/input content, wrong prompt/purpose/question/settings, already-repaired input, valid repair, deterministic bytes/digest and size refusal.
+
+5. Correct encoding and privacy claims
+
+Keep JSON-in/JSON-out, with exactly one JSON decode of a model reply and no extra entity, escape or Unicode decoder.
+
+Correct the JSON escape description:
+Python json.dumps uses two-character named escapes for backspace, tab, newline, form feed and carriage return. Other relevant controls use Unicode escapes. The documented json.dumps parameters are normative.
+
+Clarify:
+- A correctly JSON-encoded response can reproduce the original quotation after one parse.
+- The model is not guaranteed to encode it correctly.
+- Double-escaped or otherwise changed text fails existing output/provenance checks.
+- Literal backslash-plus-letter content must not be decoded a second time.
+
+Correct the identifier statement:
+- The assembler does not insert trusted tenant, review, snapshot or document IDs as metadata.
+- Original document/model text may itself contain those exact strings.
+- Such content is preserved, not silently removed, rejected or rewritten merely because it resembles an identifier.
+- Tests check structural omission, not blanket substring absence.
+
+Correct the surrogate claim:
+- M4d’s text digest ensures chunk text is UTF-8 encodable.
+- It does not ensure every metadata string is UTF-8 encodable.
+- The reviewer’s isolated probes confirmed ChunkEvidence accepts a lone surrogate in title, section_path and version_label; JSON encoding with ensure_ascii=False then fails during UTF-8 encoding.
+- M5c must validate every serialized metadata string and return a fixed private InvalidAssemblyInputError for invalid Unicode.
+- Do not change M4d.
+
+Include all metadata in size accounting. Do not base the whole request-size analysis only on the 4,000-character chunk-text bound.
+
+Distinguish accepted request-byte limits from peak-memory limits. Do not add a peak-memory guarantee.
+
+Clarify the NUL test:
+- JSON input can structurally round-trip an escaped NUL.
+- M5a QuoteRef forbids NUL, so a response quote containing it is invalid_output.
+- Do not promise every representable evidence string is also a valid output quotation.
+
+The reviewer’s encoding, metadata and prompt-binding probes were isolated standard-library/domain checks, not M5c implementation tests. No M5c code exists.
+
+6. Record supported directions and concrete template content
+
+The reviewer supports C1, C2 and C4–C11 subject to these corrections and review of the complete revised text. These are design directions, not acceptance of the whole specification.
+
+For C3:
+- Shared question IDs and question texts may be used as evaluation inputs.
+- Do not copy expected answers, gold anchors, relevance lists or answer-bearing labels into product content or queries.
+- No runtime or build-time generation from ground_truth.
+- Add a concrete proposed first-template table containing every question ID, text, search query and documentary flag.
+- The actual table remains part of specification review. Do not label unspecified content approved.
+
+Retain:
+- Deterministic query handling and default k=8.
+- Immutable published template/prompt versions.
+- Explicit documentary flags.
+- Size refusal without truncation.
+- Canary acceptance fixture, negative control and authorized-quotation limitation probe.
+- No injection-resistance or live-quality claim.
+- Later-slice review obligations.
+
+7. Scope, checks and handoff
+
+Modify only:
+- README.md
+- docs/decisions/0020-provenance-validation.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+No module, resource, test, workflow, packaging or dependency change.
+
+Preserve existing headings and anchors; add subsections where needed.
+
+Append to prompts.md:
+- Prompt 179’s handoff.
+- This review, matched export checksum, CI evidence and isolated-probe scope.
+- Prompt 180 verbatim.
+- An outcome note containing completed work only.
+
+Preserve the complete previous prompts.md bytes. Keep the historical Prompt 175 fidelity disclosure. Use a writing method that preserves literal text, and verify any verbatim claim against its source.
+
+Run documentation checks only:
+- Exact five-file scope and unchanged other blobs.
+- Links, anchors and tables.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --cached --check.
+- Privacy scan.
+- Unsuppressed staged Gitleaks.
+
+No additional probe, application test, build, install, wheel, database, Docker or provider call is required.
+
+Stage the result, uncommitted.
+
+Export directly from Git:
+.local/p180/m5c-contract-corrections-and-m5b-ci-evidence.diff
+
+Baseline:
+dea9056bbbce890d42ecfd0e317791be0b40aa74
+
+Final:
+the corrected staged tree
+
+Exclude prompts.md. Report statistics, byte size, SHA-256 and Git-comparison identity.
+
+Return:
+- A self-contained handoff.
+- The new correction export.
+- The previously omitted .local/p179/m5b-acceptance.diff attachment.
+
+Preserve that original acceptance export rather than overwriting it.
+
+M5c remains proposed, unimplemented and awaiting review.
+
+### Prompt 180 outcome (Claude Code; staged, awaiting review)
+
+*Work actually completed; nothing below has been reviewed.*
+
+- **Start.** The state matched exactly: branch `docs/m5c-prompts-plan`, HEAD `90295717` (parent
+  `f04e0957`, tree `b2b3eb70`), `main` and `origin/main` at `90295717`, staged tree `dea9056b` with
+  the five documentation paths, nothing unstaged or untracked, origin and noreply identity
+  unchanged. `.local/p179/m5b-main-evidence-and-m5c-spec.diff` matched 57,650 bytes and its SHA-256
+  and is byte-identical to `git diff --full-index b2b3eb70 dea9056b` excluding prompts.md;
+  `.local/p179/m5b-acceptance.diff` matched 30,213 bytes and its SHA-256 (Claude Code's local
+  check; not reviewer-verified). Checkpoint (staged tree, paths, five blob hashes, prompts.md
+  prefix) saved under `.local/p180/`. No remote operation.
+- **M5b CI evidence.** ADR-0020's main publication evidence now carries each job's log result
+  under its own run with the existing links, the seven installed-wheel lines, the container
+  summary and separate Claude Code and reviewer attribution; the Prompt 179 "unobserved" statement
+  is marked historical. Matching short summaries in README, plan and threat model (whose stale
+  "staged for review" M5b line was also corrected).
+- **M5c corrections** (specification text only, heading and anchors kept, subsections added):
+  M5c-B1 value and API contract table; template-string and template-question rules; M5c-C1 loading,
+  identity, trusted pinned loaders and an actual bounded read; M5c-C2 proposed first-template table
+  (eight shared question IDs and texts, separately authored queries, explicit flags; not
+  approved); pinned prompt loader; M5c-E1 prompt binding in assembly; closed Verifier and Analyst
+  schemas (M5c-F1, M5c-F2); corrected escape, round-trip, NUL, Unicode-validation and identifier
+  statements (M5c-F3); size accounting including metadata and the byte-limit versus memory
+  distinction (M5c-F4); reassembly-based repair API, closed repair member and code table and the
+  corrected "model text" statement (M5c-F5); an error classification table; expanded planned tests;
+  later-slice obligations; the reviewer's supported directions and narrowed C3. M5c remains
+  proposed, unimplemented and awaiting review; no ADR-0021.
+- **Text fidelity.** The Prompt 180 verbatim block was written from the prompt text with a
+  file-writing tool (not a shell heredoc or escape-processing step) and checked afterwards for its
+  literal backslash path; the specification's escape examples were checked as literal backslash
+  sequences with no control bytes. The earlier Prompt 175 disclosure stands.
+- The final staged scope, unchanged-blob, link, table, encoding, whitespace, privacy and Gitleaks
+  checks and the export follow this note and are reported in the handoff.
+
+### Prompt 180 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 180 handoff: documentation only, staged and not committed
+
+**Recovery.** The starting state matched what you expected:
+- Branch `docs/m5c-prompts-plan`, HEAD `90295717` (parent `f04e0957`, tree `b2b3eb70`). `main` and `origin/main` are also at `90295717`.
+- Staged tree `dea9056b` with exactly the five paths; nothing unstaged or untracked; origin and the noreply identity are unchanged.
+- `.local/p179/m5b-main-evidence-and-m5c-spec.diff` matches its 57,650 bytes and SHA-256 `c82867b4…`. It is byte-identical to `git diff --full-index b2b3eb70 dea9056b` excluding prompts.md.
+- `.local/p179/m5b-acceptance.diff` matches its 30,213 bytes and SHA-256 `77ed93bb…`. Only Claude Code has checked this file; the reviewer has not.
+- The starting checkpoint (staged tree, paths, blob hashes, prompts.md prefix) is saved in `.local/p180/`. No remote operation was run.
+
+**Changes**
+- **ADR-0020:** each job now shows its log result under its own run, using the existing links. The section also records the seven installed-wheel lines and the container summary, with Claude Code and the reviewer credited separately. The Prompt 179 "unobserved" statement is marked historical. I checked that the three published blob hashes are the ones in `90295717`.
+- **README, plan, threat model:** short summaries now match ADR-0020. I also fixed a stale threat-model line that still said M5b was "staged for review".
+- **M5c specification:** the heading and anchors are kept, with new subsections:
+  - **Contracts:** a value and API contract table (M5c-B1) covering two new input values, `VerifierRequestInputs` and `AnalystRequestInputs`; one rule for template strings and questions; and trusted loading through `load_pinned_template` and `load_pinned_prompt`, with a real bounded read.
+  - **Prompt binding (M5c-E1):** assembly checks the system text's digest against the pinned prompt, because `StructuredRequest` does not.
+  - **Schemas and encoding:** closed Verifier and Analyst input schemas (M5c-F1 and F2), and corrected statements on escapes, round trip, NUL, Unicode and identifiers (F3).
+  - **Size and repair:** size accounting now counts metadata and separates the byte limit from memory use (F4). Repair requests are rebuilt from the original inputs with a fixed set of repair fields (F5).
+  - **Other:** an error classification table, expanded planned tests and later-slice obligations.
+  - **Template and status:** a proposed first-template table (M5c-C2) with eight shared question IDs and texts, separately written queries and explicit documentary flags, marked not approved. The reviewer's supported directions are recorded, and C3 is narrowed to your wording.
+- **prompts.md:** appended four entries:
+  - the Prompt 179 handoff, rebuilt from the notes and Git and labelled as such, because the original handoff text isn't available in this session;
+  - the review record;
+  - Prompt 180 verbatim;
+  - an outcome note.
+
+  The earlier bytes are kept exactly; I checked the prefix with `cmp`.
+
+**Checks run in this session**
+- **Scope:** exactly the five paths changed against both HEAD and `dea9056b`; every other blob is unchanged.
+- **Links and tables:** 347 checked with no bad links or anchors; 57 tables with no problems.
+- **Encoding:** all five files are UTF-8 without BOM, LF only, with no replacement characters.
+- **Whitespace and leaks:** `git diff --cached --check` is clean. Staged Gitleaks 8.30.1 found no leaks, with no suppressions.
+- **Privacy:** scan of the 1,022 added lines found no emails, keys or personal paths.
+- **Text fidelity:** the literal backslash escapes in the spec and the backslash path in the verbatim prompt are intact. The curly quotes and dashes match the source prompt.
+- No application test, build, wheel, database, Docker or provider call was run.
+- **Mistake, no effect:** I accidentally re-ran my splice script once. It rewrote the same text between the same markers, and `git diff` then showed no working-tree change.
+
+**Git state.** HEAD and `main` are still at `90295717`. The final staged tree is `12824c3bca513a034df1934b1a562ba0958c308c`. Staged blobs:
+
+| File | Blob |
+|---|---|
+| README.md | `f15dc993` |
+| docs/decisions/0020-provenance-validation.md | `ea457ebe` |
+| docs/plan.md | `a9727ab4` |
+| docs/threat-model.md | `43fc56ea` |
+| prompts.md | `8f5ebf7e` |
+
+Nothing is committed and no `.local` file is tracked.
+
+**Export:** `.local/p180/m5c-contract-corrections-and-m5b-ci-evidence.diff`
+
+| Item | Value |
+|---|---|
+| Baseline | `dea9056bbbce890d42ecfd0e317791be0b40aa74` |
+| Final | `12824c3bca513a034df1934b1a562ba0958c308c` |
+| Options | `--full-index`, prompts.md excluded |
+| Statistics | 4 files, 627 insertions, 230 deletions; 1,076 lines |
+| Size | 111,202 bytes |
+| SHA-256 | `23630eafc0e54de4df96c7831fc671965c99fa6059762462901a1fba372e87df` |
+| Identity | byte-identical to both the tree-to-tree and the staged (`--cached`) Git comparisons |
+
+The original `.local/p179/m5b-acceptance.diff` is preserved unchanged (30,213 bytes, SHA-256 `77ed93bb26cd3ae7896dd0088b90632cb576df4ca50a9d2eb1bb708a816838b0`).
+
+**Limitations**
+- M5c is still only proposed: it is not implemented, has no ADR-0021, and is awaiting review.
+- The first-template content, documentary flags, error names and repair schema are proposals for review.
+- The Prompt 179 handoff entry is rebuilt from the notes and Git, not copied from the original.
+
+**Next step:** please return **output plus the diff files**: `.local/p180/m5c-contract-corrections-and-m5b-ci-evidence.diff` and the previously omitted `.local/p179/m5b-acceptance.diff`.
+
+### External review acceptance of the M5c specification (Prompt 181)
+
+The external reviewer accepted the M5b main-publication CI evidence as recorded in Prompt 180 (its
+exact-commit scope and split attribution retained) and the complete corrected M5c specification
+prepared in Prompt 179 and revised in Prompt 180: C1–C11 as specified, including the eight-question
+first-template table with its separately authored search queries and explicit documentary flags,
+and the value and API contracts, pinned artifact loaders, bounded reads, prompt binding, closed
+request schemas, deterministic serialization, size refusal, repair reassembly, fixed errors,
+privacy boundaries and planned checks. These form the M5c implementation contract; no M5c
+specification decision remains open. Binding wording clarification: M5a `parse_output` keeps its
+existing two-pass validation (a bounded preliminary JSON scan, then strict JSON-mode schema
+validation of the same original response text), and M5c and M5g perform no additional entity,
+escape, Unicode or JSON decoding of the quotation strings it returns; this changes no algorithm,
+output schema or M5a contract. Exact prompt wording and packaged artifact bytes will be inspected
+with the implementation, and their future pinned digests are not checked now. Reviewer evidence:
+independently checked the byte sizes and SHA-256 values of all three exports (57,650 bytes
+`c82867b4f076fa7aec554e367509cb41a425e30d0e83fcf52a3b6fe9a2e99cb0`; 30,213 bytes
+`77ed93bb26cd3ae7896dd0088b90632cb576df4ca50a9d2eb1bb708a816838b0`, the previously omitted M5b
+acceptance export, now independently verified; 111,202 bytes
+`23630eafc0e54de4df96c7831fc671965c99fa6059762462901a1fba372e87df`); applied the Prompt 179 and
+Prompt 180 exports in sequence to the published `90295717` documentation and reproduced all four
+final document blobs (README `f15dc99322829471831e771b4ea1b50269165200`, ADR-0020
+`ea457ebe73c28add25e9bfb5a25b70a7a818cee4`, plan `a9727ab46b25b18159c145436fd8c76e81a943eb`,
+threat model `43fc56eadc842ae64a5ac040c712d61c122c5475`); inspected the corrected contracts and the
+relevant published domain source, including M5a's two-pass `parse_output`; and checked the
+proposed template against the published evaluation question inputs and search-query lists. The
+reviewer ran no project suite, build, installed-wheel check, database, Docker or provider call;
+earlier isolated probes and retrieved CI logs keep their recorded scope and are not M5c
+implementation evidence. Prompt 181 authorizes the acceptance record and one local documentation
+commit, with no push or merge.
+
+### Prompt 181 (verbatim)
+
+Prompt 181 — Record M5c specification acceptance and commit locally
+
+Written for: Claude Code.
+Repository: D:\Claude\evidenceguard_agentic_rag
+
+Record the external review below in the authorized documentation and make one local documentation commit. Do not implement M5c, push, merge, fetch or start M5d.
+
+1. Recover and verify the starting state
+
+Read CLAUDE.md and applicable repository instructions, the accepted M5 sequence, the complete corrected M5c proposal, and the relevant recent checkpoint and prompt entries.
+
+Expected state:
+- Branch: docs/m5c-prompts-plan.
+- HEAD: 90295717ad693b945eea1a10e176b9dd339b4049.
+- Parent: f04e09576e0ed358669f793c134d9dbc30141104.
+- HEAD tree: b2b3eb709ef5a824418e2a78731e6cd10ffd6c85.
+- main and origin/main: 90295717.
+- Accepted staged tree: 12824c3bca513a034df1934b1a562ba0958c308c.
+- Exactly five staged paths:
+  README.md
+  docs/decisions/0020-provenance-validation.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Origin and noreply identity unchanged.
+
+Verify the preserved exports locally against their recorded comparisons:
+- .local/p179/m5b-main-evidence-and-m5c-spec.diff
+  57,650 bytes
+  SHA-256 c82867b4f076fa7aec554e367509cb41a425e30d0e83fcf52a3b6fe9a2e99cb0
+- .local/p179/m5b-acceptance.diff
+  30,213 bytes
+  SHA-256 77ed93bb26cd3ae7896dd0088b90632cb576df4ca50a9d2eb1bb708a816838b0
+- .local/p180/m5c-contract-corrections-and-m5b-ci-evidence.diff
+  111,202 bytes
+  SHA-256 23630eafc0e54de4df96c7831fc671965c99fa6059762462901a1fba372e87df
+
+Save a checkpoint under .local/p181/: refs, status, accepted staged tree, staged paths and blob hashes, and the existing prompts.md byte prefix.
+
+Preserve the existing staged work. Do not reset, clean, stash or recreate it. If the state differs materially, report the discrepancy before making dependent changes.
+
+2. External review decision
+
+The external reviewer accepts:
+- The M5b main-publication CI evidence as recorded in Prompt 180, retaining its exact-commit scope and split attribution.
+- The complete corrected M5c specification prepared in Prompt 179 and revised in Prompt 180.
+- C1–C11 as specified, including the concrete eight-question first-template table, its separately authored search queries and explicit documentary flags.
+- The value and API contracts, pinned artifact loaders, bounded reads, prompt binding, closed request schemas, deterministic serialization, size refusal, repair reassembly, fixed errors, privacy boundaries and planned checks.
+
+These form the M5c implementation contract. No M5c specification decision remains open.
+
+Acceptance includes this binding wording clarification:
+- M5a parse_output retains its existing two-pass validation: the bounded preliminary JSON scan, followed by strict JSON-mode schema validation of the same original response text.
+- M5c and M5g perform no additional entity, escape, Unicode or JSON decoding of the quotation strings returned by that validation.
+- Replace claims such as “parsed exactly once by M5a” with this accurate description wherever they describe the implementation.
+- Preserve the intended literal-backslash behaviour and all round-trip tests.
+- This changes no algorithm, output schema or existing M5a contract.
+
+Exact prompt wording and packaged artifact bytes will be inspected with the implementation. Their future pinned digests cannot be claimed as checked now.
+
+Reviewer evidence for this review:
+- Independently checked the byte sizes and SHA-256 values of all three supplied exports above. The previously omitted M5b acceptance export has now been independently verified.
+- Applied the Prompt 179 proposal export and Prompt 180 correction export sequentially to the published 90295717 documentation baseline.
+- All four reconstructed final document blobs matched:
+  README.md:
+  f15dc99322829471831e771b4ea1b50269165200
+  docs/decisions/0020-provenance-validation.md:
+  ea457ebe73c28add25e9bfb5a25b70a7a818cee4
+  docs/plan.md:
+  a9727ab46b25b18159c145436fd8c76e81a943eb
+  docs/threat-model.md:
+  43fc56eadc842ae64a5ac040c712d61c122c5475
+- Inspected the corrected contracts and relevant published domain source, including M5a's existing two-pass parse_output.
+- Checked the proposed template against the published evaluation question inputs and search-query lists.
+- Ran no project suite, build, installed-wheel check, database, Docker or provider call for this specification acceptance.
+- Earlier isolated probes and independently retrieved CI logs retain their previously recorded scope; they are not M5c implementation evidence.
+
+3. Authorized documentation changes
+
+Only the same five paths may change.
+
+docs/plan.md:
+- Rename the M5c specification heading to:
+  “M5c review template, planner, prompts and request assembly specification (ACCEPTED at review, Prompt 181; implementation pending)”
+- Update every link to the renamed heading.
+- Add an acceptance subsection recording the scope, the three export checksums, reviewer evidence and the two-pass wording clarification.
+- Record C1–C11 and the detailed corrected contracts as accepted.
+- Mark earlier proposed/supported status statements historical where necessary.
+- Apply the wording clarification consistently throughout the M5c text.
+- Keep all other accepted content, the first-template table, limits and later-slice obligations unchanged.
+
+README.md and docs/threat-model.md:
+- Record that the complete M5c specification was accepted in Prompt 181.
+- State that implementation and every M5c implementation check remain pending, and no M5c control operates.
+- Update links as needed.
+- Preserve the distinction between structural JSON encoding and semantic injection resistance.
+
+ADR-0020:
+- Preserve the M5b design and exact-commit CI evidence.
+- If its current attribution still says the reviewer has not verified the M5b acceptance export, add the now-verified status with the correct timing.
+- Do not create ADR-0021; it belongs with M5c implementation.
+
+prompts.md:
+- Append the actual Prompt 180 handoff supplied in this conversation, this external review decision, this prompt verbatim and a pre-commit note containing completed checks only.
+- Preserve the earlier bytes exactly.
+- Keep the existing disclosure that the earlier Prompt 179 handoff entry was reconstructed.
+- Keep the Prompt 175 text-fidelity disclosure.
+- Do not retroactively rewrite historical entries or describe a reconstructed entry as verbatim.
+- Use a writing method that preserves literal backslashes and verify the newly added verbatim text.
+
+4. Verification
+
+Documentation checks only:
+- Exactly the five authorized paths differ from HEAD.
+- Against accepted tree 12824c3b, only the authorized acceptance-record changes differ.
+- Every other tracked blob remains identical to HEAD.
+- No tracked .local files or artifacts.
+- Earlier prompts.md bytes remain an identical prefix.
+- All relative links and anchors resolve, including the renamed M5c heading.
+- Tables are structurally consistent.
+- UTF-8, no BOM, LF only, no replacement characters.
+- git diff --cached --check is clean.
+- Privacy scan and unsuppressed staged Gitleaks are clean.
+- Current status consistently says M5c specification accepted, implementation pending, overall M5 pending.
+- No application tests, build, install, wheel, database, Docker, provider or network check is required.
+
+5. Local commit
+
+After these checks pass, commit the five documentation/history paths locally.
+
+Subject:
+docs: record accepted M5c template and request assembly specification
+
+Follow the repository's existing attribution convention:
+- Credit Claude Code for this documentation and history work.
+- Preserve prior implementation and reviewer attribution.
+- Use the configured noreply author and committer.
+- Retain the required Co-Authored-By trailer.
+- Write the commit message from a file.
+
+Do not push or merge.
+
+Afterwards verify:
+- Commit parent is 90295717.
+- Exactly the five authorized paths are in the commit.
+- Every other tracked blob is unchanged.
+- Working tree is clean.
+- main and origin/main remain at 90295717.
+- Run the usual unsuppressed full-history Gitleaks check.
+
+6. Export and handoff
+
+Write directly from Git:
+.local/p181/m5c-spec-acceptance.diff
+
+Baseline:
+12824c3bca513a034df1934b1a562ba0958c308c
+
+Final:
+the new local commit
+
+Exclude prompts.md.
+
+Report:
+- Full commit SHA, parent, tree, subject and identity.
+- Changed paths and scope checks.
+- Export statistics, byte size, SHA-256, UTF-8/LF/no-BOM status and byte identity to the Git comparison.
+- Prompt-history prefix preservation and added-line count.
+- Checks actually performed and remaining work.
+
+Return the handoff plus the diff attachment. Printing the complete diff is unnecessary.
+
+Stop after this local acceptance commit. M5c implementation, its tests, CI, publication and overall M5 acceptance remain pending.
+
+### Prompt 181 pre-commit note (Claude Code; before the local documentation commit)
+
+Completed checks only. Starting state matched: branch `docs/m5c-prompts-plan`, HEAD `90295717`
+(parent `f04e0957`, tree `b2b3eb70`), `main` and `origin/main` at `90295717`, staged tree
+`12824c3b` with the five documentation paths, nothing unstaged or untracked, origin and noreply
+identity unchanged. All three exports matched their sizes, SHA-256 values and Git comparisons
+(`.local/p179/m5b-main-evidence-and-m5c-spec.diff` to `git diff --full-index b2b3eb70 dea9056b`,
+`.local/p179/m5b-acceptance.diff` to `git diff --full-index fa62abe5 b2b3eb70`,
+`.local/p180/m5c-contract-corrections-and-m5b-ci-evidence.diff` to `git diff --full-index dea9056b
+12824c3b`, each excluding prompts.md). Checkpoint saved under `.local/p181/`. No remote operation.
+Documentation: the M5c heading renamed to "ACCEPTED at review, Prompt 181; implementation pending"
+with every link updated; an "M5c acceptance (Prompt 181)" subsection; C1–C11 and the contracts
+recorded as accepted, the earlier proposed and supported statements marked historical; the two-pass
+`parse_output` wording applied in the plan and threat model; README and threat-model status updated
+(the threat-model section heading now names the accepted M5c specification). ADR-0020 is unchanged:
+it never stated the reviewer's verification status of the M5b acceptance export. The appended
+Prompt 180 handoff is Claude Code's output as supplied in that session; the Prompt 179
+reconstruction disclosure and the Prompt 175 text-fidelity disclosure are kept. Checks on README,
+plan and threat model after these edits: 347 relative links with 0 link or anchor problems, 57
+tables with 0 problems, `git diff --cached --check` clean, UTF-8 without BOM, LF only, no
+replacement characters. The final scope, prefix, verbatim, encoding, privacy and Gitleaks checks,
+the commit and the export follow and are reported in the handoff.
