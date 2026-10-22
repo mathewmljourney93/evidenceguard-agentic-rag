@@ -40974,3 +40974,855 @@ noreply identity unchanged; the Prompt 191 export matched 54,515 bytes, 340 line
   address is the established noreply identity. Unsuppressed Gitleaks over `e8d1033c..HEAD`: 2
   commits, no leaks.
 - No local application test or build was repeated for this prompt.
+
+### Prompt 192 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 192 handoff: publication blocked by authentication; nothing was pushed
+
+The feature-branch push failed because Git could not get GitHub credentials. I did not retry. The remote is unchanged, no CI ran, and the history-only commit exists locally only.
+
+**Starting state.** Everything matched what you expected:
+- Branch `feat/review-creation`; HEAD `755c13a7` (parent `76f0b2c0`, tree `3b603181`, subject "feat: add atomic review creation and persisted snapshots").
+- Index and working tree clean; `main` and `origin/main` at `e8d1033c`; origin and noreply identity unchanged.
+- The Prompt 191 export matched: 54,515 bytes, 340 lines, SHA-256 `a9c114ef…b4c5`, byte-identical to `git diff --full-index 2fbb2fd5 755c13a7` excluding `prompts.md`.
+- Checkpoint saved under `.local/p192/`: refs, status, range paths, HEAD blob list and the `prompts.md` prefix with its checksum.
+
+**Preflight results** (all completed):
+- `git fetch --no-tags origin` succeeded.
+- Read-only `ls-remote`: remote `main` is `e8d1033c` and there is no remote `feat/review-creation`.
+- Local `main` equals `origin/main` and is an ancestor of HEAD.
+- The unpublished range was exactly `76f0b2c0` then `755c13a7`, both with the noreply author and committer.
+- **Path union:** the 22 reviewed paths plus `docs/decisions/0021-review-request-assembly.md`. There are no dependency, lockfile, existing-migration, settings, environment, corpus, Docker, Compose or secret-scan workflow changes, no binaries and no tracked `.local` files.
+- **Workflows:** both still trigger on push.
+  - `ci.yml` keeps Ubuntu and Windows verify (format, lint, mypy, test, build, installed wheel), the PostgreSQL job with `EG_REQUIRE_INTEGRATION: "1"` and `pytest -m integration`, and the container job.
+  - `secret-scan.yml` keeps Gitleaks.
+  - The range changes `ci.yml` by one added line, the offline review-migration assertion. Production-registry assertions and container steps are unchanged.
+- **Privacy and Gitleaks:** files are UTF-8, LF only, no U+FFFD; the only address is the noreply identity. Gitleaks over `e8d1033c..HEAD`: 2 commits, no leaks.
+- No local application tests or builds were repeated.
+
+**History-only commit (local only)**
+- SHA `1bea3731f965c4555b9dc6bf0d9fa64447bf3789`, parent `755c13a7`, tree `476237eaa8c0c51236ca772566a3a720b6808b26`.
+- Subject: `docs: record M5d feature publication authorization`. Author and committer are the noreply identity, the message came from a file, and it ends with the Co-Authored-By trailer.
+- Only `prompts.md` changed. It appends the Prompt 191 handoff (verbatim), the review disposition and publication authorization, Prompt 192 (verbatim) and the preflight note; the earlier 2,144,824 bytes are preserved.
+- Checks: `git diff --cached --check` clean; no BOM, LF only, no U+FFFD; privacy scan found only the noreply identity; staged Gitleaks found no leaks; full-history Gitleaks found no leaks in 83 commits.
+- This SHA is the intended publication target.
+
+**Push (run once)**
+- Remote refs immediately before: `main` at `e8d1033c`, no feature branch.
+- Command: `GIT_TERMINAL_PROMPT=0 timeout 120 git push --set-upstream origin refs/heads/feat/review-creation:refs/heads/feat/review-creation`
+- Output: `fatal: could not read Username for 'https://github.com': terminal prompts disabled`.
+- The pipeline reported exit status 124, which is what the 120-second `timeout` wrapper returns when it ends the command.
+- The configured helper is `credential.helper = manager` (Git Credential Manager), and it did not supply credentials non-interactively. I added `GIT_TERMINAL_PROMPT=0` and the timeout so a credential prompt could not hang. That probably stopped any interactive sign-in fallback, so this does not show that the stored credentials are missing or invalid.
+- No Git configuration, credentials or account setup were changed, and the push was not retried.
+
+**Read-only check afterwards**
+- `ls-remote` shows remote `main` still at `e8d1033c` and **no remote `feat/review-creation`**, so publication did not happen.
+- No upstream is set, and no git or credential process is still running.
+
+**CI and PostgreSQL**
+- No CI or secret-scan run exists for `1bea3731`, because nothing was pushed. I collected no runs, jobs, steps or logs, and no monitor was started.
+- **PostgreSQL: not run.** It is still pending, and the first database execution will come from CI after a successful push.
+
+**Final state**
+- Local `feat/review-creation` is at `1bea3731`, and the working tree is clean.
+- `main` and `origin/main` are unchanged at `e8d1033c`.
+- No merge, no push to `main`, no history rewrite, and no M5e work.
+- Resume notes are in `.local/p192/resume-note.md`.
+
+**To continue**, one of these:
+1. Authorize a single retry from me without `GIT_TERMINAL_PROMPT=0`, so Git Credential Manager can complete its normal sign-in.
+2. Run the same push yourself: `git push --set-upstream origin refs/heads/feat/review-creation:refs/heads/feat/review-creation`.
+
+Either way, I'll then verify that the remote branch equals `1bea3731` and run the bounded CI monitoring.
+
+**Next step:** please return **output only**. There is no new diff to review, because nothing outside `prompts.md` changed.
+
+### Prompt 192 resume after the authentication-blocked push (verbatim)
+
+Resume Prompt 192 after the authentication-blocked push.
+
+I authorize one feature-branch push attempt using the existing Git Credential Manager authentication, without GIT_TERMINAL_PROMPT=0. I will complete any account-selection or sign-in window myself.
+
+Do not change Git configuration, inspect credentials, create another commit, amend history, merge or push main.
+
+1. Verify the saved state
+
+Read .local/p192/resume-note.md and the Prompt 192 handoff.
+
+Expected:
+- Branch: feat/review-creation.
+- HEAD:
+  1bea3731f965c4555b9dc6bf0d9fa64447bf3789
+- Parent:
+  755c13a7b8906efcdad933587ced8d3f73128107
+- Tree:
+  476237eaa8c0c51236ca772566a3a720b6808b26
+- Working tree and index clean.
+- main and origin/main:
+  e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3
+- Origin and noreply identity unchanged.
+- No previous push or credential process remains running.
+
+Reuse the completed preflight and local checks. Do not repeat tests, builds or history edits.
+
+2. Recheck remote refs
+
+Run fetch --no-tags and read-only remote-ref checks.
+
+Remote main must remain at e8d1033c.
+
+If feat/review-creation is absent, proceed with the single authorized push.
+
+If it already equals the intended publication SHA, skip the push and inspect existing exact-commit CI.
+
+If it points elsewhere, stop and report the mismatch without overwriting it.
+
+3. Push once with normal interactive authentication
+
+Run:
+git push --set-upstream origin refs/heads/feat/review-creation:refs/heads/feat/review-creation
+
+Do not set GIT_TERMINAL_PROMPT=0 or otherwise disable the existing interactive authentication.
+
+If Git Credential Manager opens a window, tell me to complete it on the PC. Do not choose an account, enter credentials or alter authentication on my behalf.
+
+Observe the command to completion. Do not launch another push while it is running. If it fails or remains blocked, do not retry automatically or leave it running unattended; report the state and verify remote refs read-only.
+
+4. Verify publication and monitor CI
+
+After success, confirm:
+- Remote feature branch equals:
+  1bea3731f965c4555b9dc6bf0d9fa64447bf3789
+- Upstream tracking is set.
+- Remote main remains unchanged.
+
+Continue Prompt 192's exact-commit CI monitoring, bounded to 25 minutes:
+- Ubuntu verify.
+- Windows verify.
+- PostgreSQL integration.
+- Container.
+- Gitleaks.
+
+Collect run/job links, required-step conclusions and available logs. Distinguish observed results from unavailable log details.
+
+If any required job or step fails, is cancelled or times out, stop without edits, reruns or further pushes.
+
+Even if everything passes, do not merge or push main.
+
+5. Return the handoff
+
+Keep tracked files unchanged. Save evidence under .local/p192/.
+
+Report the push exit status, verified refs, exact-commit CI results, actual PostgreSQL evidence and any unavailable logs.
+
+Confirm all push/credential/monitor processes have ended, the working tree is clean and main is unchanged.
+
+No new diff or commit is required.
+
+### Prompt 192 resume handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 192 resume handoff: feature branch published, but the PostgreSQL integration job failed
+
+The feature branch is published at `1bea3731`. Four of the five required CI jobs passed; the PostgreSQL integration job failed in its test step. As the prompt instructs, I stopped without edits, reruns or further pushes. I can't see why it failed, because the job log needs repository admin rights.
+
+**State before the push.** Everything matched the resume note:
+- Branch `feat/review-creation` at `1bea3731` (parent `755c13a7`, tree `476237ea`), clean index and working tree.
+- `main` and `origin/main` at `e8d1033c`; origin and noreply identity unchanged; no git or credential process running.
+- `git fetch --no-tags origin` succeeded. Read-only `ls-remote` showed remote `main` at `e8d1033c` and no remote feature branch, so I pushed.
+
+**Push (single authorized attempt, normal authentication)**
+- Command: `git push --set-upstream origin refs/heads/feat/review-creation:refs/heads/feat/review-creation`
+- Exit 0, `[new branch] feat/review-creation -> feat/review-creation`, tracking set. No sign-in window appeared, and nothing was changed about Git configuration or credentials.
+
+**Refs verified afterwards**
+- Remote `feat/review-creation` is `1bea3731f965c4555b9dc6bf0d9fa64447bf3789`, the same as local HEAD and `@{u}`.
+- Remote `main` is still `e8d1033c`.
+
+**Exact-commit CI for `1bea3731`** (both runs on `feat/review-creation`, triggered by the push, attempt 1)
+- `ci` run [39739061688](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39739061688): **failure**.
+- `secret-scan` run [39739061684](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39739061684): **success**.
+
+| Job | Conclusion | Steps |
+|---|---|---|
+| [verify (ubuntu-24.04)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39739061688/job/119691602245) | success | format, lint, type-check, test, build and installed wheel all succeeded |
+| [verify (windows-2025)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39739061688/job/119691602154) | success | same steps, all succeeded |
+| [integration (PostgreSQL 17 + pgvector)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39739061688/job/119691602147) | **failure** | setup, checkout, dependencies and "Confirm the database is ready" succeeded; **step 7 "Run integration tests" failed**; "Post Set up uv" skipped, which follows from the failure |
+| [container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39739061688/job/119691601997) | success | all 8 steps succeeded |
+| [Gitleaks (full history)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39739061684/job/119691601837) | success | all steps succeeded |
+
+**Log evidence**
+- I observed only API conclusions. Downloading the job log returned **HTTP 403** ("Must have admin rights to Repository.").
+- The check-run annotations API returned only a generic "Process completed with exit code 1."
+- So I have no pytest summary, no test names, and no M5d module, migration or installed-wheel output for any job. I can't tell which tests failed. Do not take this to mean that only M5d tests are involved, even though they are the first PostgreSQL tests this code has had.
+
+**PostgreSQL execution status.** The integration tests ran in CI for `1bea3731` and the step **failed**. Which tests failed, and whether other tests passed, can't be observed without the log.
+
+**Final state**
+- The monitor (bounded to 25 minutes) ended when both runs completed, after about 4 minutes of polling. No monitor, push or credential process is still running.
+- Working tree clean; local and remote `feat/review-creation` at `1bea3731`; `main` and `origin/main` unchanged at `e8d1033c`.
+- No merge, no push to `main`, no rerun, no new commit, no M5e work, and no tracked file changed.
+- Evidence is saved in `.local/p192/`: `runs.json`, both `jobs-*.json` files, the annotations, the 403 response body and an updated `resume-note.md`.
+
+**Next step:** please return **output only**. There is no new diff. To diagnose the failure, the integration job's log is needed: you can open the job link above while signed in, or download the run's logs, and supply the pytest failure section. I'll wait for your direction before making any correction.
+
+### External review and diagnosis of the failed feature CI at `1bea3731` (Prompt 193)
+
+The external reviewer independently retrieved the run records, job metadata, all five job logs and
+the relevant published source for `1bea3731f965c4555b9dc6bf0d9fa64447bf3789` (push runs on
+`feat/review-creation`, attempt 1): ci run 39739061688 and secret-scan run 39739061684. Observed:
+Ubuntu verify (job 119691602245) 3637 passed, 335 skipped, with format, lint, mypy, tests, build and
+installed-wheel steps succeeding; Windows verify (job 119691602154) 3636 passed, 336 skipped, same
+steps succeeding; PostgreSQL integration (job 119691602147) 3 failed, 332 passed, 3637 deselected;
+container (job 119691601997) success; Gitleaks (job 119691601837) 83 commits, no leaks. Both verify
+logs printed nine installed-wheel result lines (listed in ADR-0022); the container log reported its
+smoke checks (109-file effective build context with 19 planted fixtures excluded, healthy database,
+migrations and API, upload 202 with two verified active chunks, duplicate upload 200, one offline
+backfill job with two embeddings and a ready index, idle worker exit 0 without OOM). The three
+failures, all in `tests/test_reviews_postgres.py`, were diagnosed as test defects:
+`test_tenants_are_isolated` (one worker run processed the corpus fixture's older queued job, so
+the target revision stayed inactive and indexing raised `IndexSourceNotEligibleError`);
+`test_an_activation_committed_after_the_snapshot_is_established_is_not_bound` (SQLSTATE 40001 on the
+`review_bindings` insert from the foreign-key key-share lock meeting the concurrent supersession;
+the accepted fresh-transaction retry then correctly raised `SnapshotNotReadyError` for the active
+but unindexed replacement); and `test_creation_returns_its_pooled_connection_with_default_settings`
+(the listener matched both the capture clock read and the job enqueue's `clock_timestamp()`). The
+reviewer inspected source and logs and did not run the project suite, PostgreSQL, Docker, a build
+or an installed-wheel check locally. Claude Code had observed only API conclusions (HTTP 403 for
+logs); these are results for `1bea3731`, not for the Prompt 193 corrections. Binding
+clarification: snapshot visibility is fixed within each attempt; only the committed attempt's
+snapshot is persisted; a rolled-back attempt's timestamp and bindings are not promised to survive a
+fresh-transaction retry; and a committed review's bindings do not change on later activation.
+Prompt 193 authorizes test and documentation corrections only (six paths), staged and uncommitted;
+no commit, push, CI rerun, merge or M5e work.
+
+### Prompt 193 (verbatim)
+
+Prompt 193 — Correct the three PostgreSQL test failures and record the independently retrieved CI evidence
+
+Written for: Claude Code, Mathew and the external reviewer.
+
+Work in the existing EvidenceGuard checkout. Read the repository instructions and recover from .local/p192/resume-note.md and the published Git state before editing.
+
+This prompt authorizes test and documentation corrections only. Stage the result for external review, uncommitted. Do not commit, push, merge, rerun GitHub Actions, change authentication, or begin M5e.
+
+1. Verify and checkpoint the starting state
+
+Expected:
+- Branch: feat/review-creation.
+- HEAD and upstream: 1bea3731f965c4555b9dc6bf0d9fa64447bf3789.
+- Parent: 755c13a7b8906efcdad933587ced8d3f73128107.
+- HEAD tree: 476237eaa8c0c51236ca772566a3a720b6808b26.
+- main and origin/main: e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3.
+- Clean index and working tree.
+- Origin and the established noreply identity unchanged.
+
+Check locally; no remote operation is needed for this task. If the starting state differs materially, report it before dependent edits.
+
+Save a checkpoint under .local/p193/ containing refs, status, the starting tree and relevant blob hashes, and the complete prompts.md prefix with its checksum. Preserve the published test module for comparison.
+
+2. External reviewer evidence and diagnosis
+
+The external reviewer independently retrieved the run records, job metadata, all five job logs and the relevant published source for commit 1bea3731.
+
+CI run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39739061688
+
+Secret-scan run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39739061684
+
+Both are push runs on feat/review-creation, attempt 1, for the exact SHA above.
+
+Observed results:
+- Ubuntu verify, job 119691602245:
+  3637 passed, 335 skipped.
+  Format, lint, mypy, tests, build and installed-wheel check succeeded.
+- Windows verify, job 119691602154:
+  3636 passed, 336 skipped.
+  The same required verification steps succeeded.
+- PostgreSQL integration, job 119691602147:
+  3 failed, 332 passed, 3637 deselected.
+- Container, job 119691601997: success.
+- Gitleaks, job 119691601837: 83 commits scanned, no leaks.
+
+The three failures are all in tests/test_reviews_postgres.py:
+- test_tenants_are_isolated
+- test_an_activation_committed_after_the_snapshot_is_established_is_not_bound
+- test_creation_returns_its_pooled_connection_with_default_settings
+
+The reviewer inspected source and logs; the reviewer did not run the project suite, PostgreSQL, Docker, a build or an installed-wheel check locally.
+
+Keep attribution separate:
+- Claude Code previously observed API conclusions and received HTTP 403 for logs.
+- The external reviewer subsequently retrieved the logs.
+- These are results for 1bea3731, not results for the corrections made by this prompt.
+
+3. Authorized paths
+
+Only these six paths may change:
+- tests/test_reviews_postgres.py
+- docs/decisions/0022-review-creation.md
+- docs/plan.md
+- README.md
+- docs/threat-model.md
+- prompts.md
+
+All production, migration, model, dependency, packaging, workflow and other test blobs must remain byte-identical to HEAD.
+
+If investigation identifies a production defect that requires another path, document the evidence and stop before changing that path. Do not weaken production behavior to make a test pass.
+
+4. Correct the fixture’s job-completion assumption
+
+The corpus fixture leaves an ingestion job pending. In test_tenants_are_isolated, _ready creates another tenant’s revision, but _ingest runs the worker only once. The worker can process the older job, leaving the target revision inactive. The subsequent indexing enqueue then raises IndexSourceNotEligibleError.
+
+Correct the test-owned preparation helpers so completion is established for the specific target revision/job, rather than inferred from one successful worker invocation.
+
+Requirements:
+- Use bounded processing and explicit target-state checks.
+- Do not add sleeps or unbounded polling.
+- Fail clearly if the target cannot complete within the bound or reaches a terminal failure.
+- Verify the target revision is eligible before enqueueing indexing.
+- Likewise, establish readiness of the specific target index rather than assuming one worker invocation completed it.
+- Account explicitly for other queued fixture work.
+- Preserve tests that deliberately require pending revisions; do not indiscriminately drain the queue during fixture construction.
+- Preserve the tenant-isolation assertions and the production-registry isolation test.
+- Do not change worker scheduling, job claiming, authentication or production registries.
+
+Use the existing public test infrastructure where practical. Keep the correction small and readable.
+
+5. Correct the concurrent-activation test
+
+The integration log shows SQLSTATE 40001 during insertion into review_bindings. PostgreSQL’s foreign-key check acquires a key-share lock on document_revisions and encounters the concurrent revision update.
+
+The creation code then retries in a fresh transaction, as accepted. The replacement revision is active but unindexed, so that fresh attempt correctly returns SnapshotNotReadyError.
+
+Binding clarification for the tests and documentation:
+- Snapshot visibility is fixed within each attempt.
+- Only the successfully committed attempt’s snapshot becomes the persisted review snapshot.
+- A rolled-back attempt’s captured timestamp or bindings are not promised to survive a fresh-transaction retry.
+- Once a review has committed, later revision activation does not change its stored bindings.
+
+Replace the existing misleading race assertion with deterministic coverage of:
+a. A concurrent replacement that remains unindexed:
+   observe the initial serialization failure and fresh attempt, expect SnapshotNotReadyError, and prove there is no orphan review, run_review job or child row from the rolled-back attempt.
+b. A concurrent replacement that is fully ingested and indexed before releasing the held attempt:
+   observe the serialization failure and fresh retry, then require a committed review bound to the replacement revision. Check the final job and row counts and absence of abandoned-attempt rows.
+c. A review committed before replacement activation:
+   activate a replacement afterwards, reload the original review, and require its original binding, snapshot digest and job identity to remain unchanged.
+
+Use bounded event synchronization with finally-based release and listener cleanup. Do not rely on timing sleeps.
+
+Instrument attempts and failed statements through test-owned listeners or existing seams. Distinguish attempted SQL from successfully executed SQL, as corrected in Prompt 191.
+
+Do not:
+- reuse a rolled-back snapshot across attempts;
+- change retry classification or isolation;
+- remove foreign keys;
+- accept an unready replacement;
+- add production hooks or broad locks;
+- alter the existing M4d tests.
+
+If PostgreSQL behavior prevents the proposed synchronization from being made deterministic, report the specific issue rather than weakening assertions.
+
+6. Correct the pooled-connection assertion
+
+The existing listener matches any SQL containing clock_timestamp. Both the capture clock SELECT and the job enqueue expression match, producing two records for the same backend.
+
+Correct the observation:
+- Either identify the capture-clock SELECT precisely, or record creation backend IDs and assert that the nonempty set equals the subsequently reused backend ID.
+- Do not assume there must be exactly one statement containing the expression.
+- Keep QueuePool with pool_size=1 and max_overflow=0.
+- Continue proving that creation and the subsequent settings read use the same PostgreSQL backend.
+- Keep all four default-setting assertions unchanged:
+  transaction_isolation = read committed
+  transaction_read_only = off
+  statement_timeout = 20s
+  lock_timeout = 0
+
+Do not replace this with a weaker fresh-connection check.
+
+7. Documentation
+
+In ADR-0022, add a clearly attributed section for the failed exact-commit CI and this test correction.
+
+Record:
+- The exact commit, run links, job links and observed results above.
+- All three failures and their diagnoses.
+- The distinction between per-attempt visibility and persisted committed bindings.
+- That these corrections are staged for review, not yet PostgreSQL-verified or CI-verified.
+- The prior local-commit acceptance remains a historical scoped decision; the feature CI gate failed and main publication remains blocked.
+
+Keep short linked status summaries consistent in README, plan and threat model. Preserve accepted specification headings and anchors. Clarify retry visibility beside the relevant contract without rewriting the accepted retry or transaction rules.
+
+Both verify logs printed these nine installed-wheel result lines:
+- offline embedding, canonical storage and indexing modules ran from the installed wheel
+- retrieval modules imported and fusion ran from the installed wheel
+- evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+- Voyage adapter validated a mocked response from the installed wheel
+- model-call contracts classified a scripted fake response from the installed wheel
+- provenance matched a quote and derived a status from the installed wheel
+- review template, prompts and request assembly ran from the installed wheel
+- offline migration SQL rendered from the installed wheel
+- offline review migration SQL rendered from the installed wheel
+
+Record the observed lines accurately; do not repeat the historical claim of ten result lines as though independently confirmed.
+
+The container log reports:
+- Effective build context: 109 files; 19 planted fixtures excluded.
+- Database healthy, migrations completed and API healthy.
+- Upload 202, ingestion succeeded with two verified active chunks.
+- Duplicate upload 200 with the same revision.
+- One offline backfill job, two embeddings and a ready index.
+- Idle worker exit 0 without OOM; smoke succeeded.
+
+Label these as the smoke’s reported checks. It does not exercise M5d review creation. Recall is arithmetic, Voyage is mocked, and none of these results establishes live-model quality, injection resistance or production readiness.
+
+Preserve all existing M4d, cleanup/invalidation, unknown-COMMIT and later-slice limitations.
+
+8. Verification
+
+Use the existing locked offline environment.
+
+Run:
+- Ruff lint and format checks.
+- Strict mypy.
+- Focused tests covering the edited module and existing review-creation, review-value, classifier, persistence, readiness and packaging tests.
+- Full non-database suite using the repository’s normal command.
+- Integration and non-integration collection counts.
+
+If an already configured dedicated test PostgreSQL database is available, run the affected PostgreSQL module and then the complete integration suite. Otherwise explicitly report PostgreSQL tests as written but not run.
+
+Do not provision a database, start Docker, install dependencies from the network or change environment/account configuration.
+
+Do not rerun builds or installed-wheel checks solely for these test/documentation changes. Production and packaging blobs are unchanged; the passing 1bea3731 checks remain exact-commit evidence for that published version.
+
+Do not claim local skips prove the PostgreSQL corrections.
+
+9. History and final checks
+
+Append to prompts.md:
+- The supplied Prompt 192 resume handoff verbatim.
+- This external review and diagnosis.
+- Prompt 193 verbatim.
+- An outcome note containing completed checks only.
+
+Preserve the previous bytes as an identical prefix. Keep both existing text-fidelity disclosures. Verify new verbatim entries without decoding literal escape sequences.
+
+Before staging, check:
+- Only the six authorized paths changed.
+- Every other tracked blob equals HEAD.
+- No tracked .local files or build artifacts.
+- Relative links, anchors and table consistency.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --check and git diff --cached --check.
+- Privacy scan.
+- Unsuppressed staged Gitleaks.
+
+Stage the six-path result without committing.
+
+10. Export and handoff
+
+Create:
+.local/p193/m5d-postgres-test-corrections.diff
+
+Compare:
+- Baseline: 1bea3731f965c4555b9dc6bf0d9fa64447bf3789
+- Final: the new staged tree
+- Full-index diff, excluding prompts.md
+
+Report its byte size, line count, file statistics, SHA-256, encoding and byte identity against the Git comparison.
+
+The handoff must distinguish:
+- Independently retrieved failed CI evidence for 1bea3731.
+- Local checks actually run during this task.
+- PostgreSQL corrections written but unrun, if no test database is configured.
+- The unchanged production blobs.
+- The new staged tree and unchanged refs.
+
+No commit, push, CI rerun, merge, main publication or M5e work is authorized by this prompt.
+
+End by asking Mathew to return the handoff plus:
+.local/p193/m5d-postgres-test-corrections.diff
+
+### Prompt 193 outcome (Claude Code; staged, awaiting review)
+
+Completed checks only. Starting state matched: branch `feat/review-creation`, HEAD and upstream
+`1bea3731` (parent `755c13a7`, tree `476237ea`), `main` and `origin/main` at `e8d1033c`, clean index
+and working tree, origin and noreply identity unchanged. Checkpoint, HEAD blob list, prompts.md
+prefix and the published test module under `.local/p193/`. No remote operation.
+
+- **Corrections (test-only, `tests/test_reviews_postgres.py`).** Target-specific completion
+  (`_complete`, with a caller-declared bound on other queued fixture work, `_ingest` requiring an
+  active revision and `_index` an eligible revision and a ready index); the misleading race test
+  replaced by three deterministic tests (unindexed replacement: 40001 then `SnapshotNotReadyError`
+  and no orphans; indexed replacement: 40001 then a committed review bound to the replacement; a
+  committed review unchanged by later activation), with attempted, successful and rejected
+  statements recorded separately; and the pooled-connection test asserting the nonempty set of
+  creation backends equals the reused backend, defaults unchanged. ADR-0022, plan (including a
+  retry-visibility clarification beside the transaction contract), README and threat-model status
+  updated; the Prompt 192 handoffs, this review and Prompt 193 recorded.
+- **Checks** (locked offline, no database URL): Ruff clean, 211 files formatted; strict mypy no
+  issues in 168 files; focused seven-module command 298 passed, 28 skipped; full suite 3635 passed,
+  339 skipped, 0 failed (337 PostgreSQL, one symbolic-link, one POSIX-only signal test); collection
+  337 integration and 3,637 non-integration (3,974); links 390 and tables 69 without problems.
+- **PostgreSQL: not run** (no `EG_TEST_DATABASE_URL`); the corrected tests are written, unexecuted.
+  No build or installed-wheel check was repeated (production and packaging blobs unchanged).
+- **Text fidelity.** The Prompt 192 handoff, the Prompt 192 resume prompt and its handoff, and
+  Prompt 193 below were extracted by script from the session transcript, not retyped. Earlier
+  text-fidelity disclosures stand.
+- The final scope, encoding, privacy and Gitleaks checks and the export follow and are reported in
+  the handoff.
+
+### Prompt 193 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 193 handoff: the three PostgreSQL test failures are corrected and staged
+
+The corrections are staged and uncommitted. They are test and documentation changes only, and no production file changed. None of the corrected database tests has run, because no test database is configured here. Nothing was committed, pushed or rerun, and no remote operation was performed.
+
+**Starting state.** Everything matched:
+- Branch `feat/review-creation`; HEAD and upstream `1bea3731` (parent `755c13a7`, tree `476237ea`).
+- `main` and `origin/main` at `e8d1033c`; clean index and working tree; origin and noreply identity unchanged.
+- Checkpoint saved in `.local/p193/`: refs, status, HEAD blob list, the `prompts.md` prefix with its checksum, and a copy of the published test module.
+
+**1. CI evidence for `1bea3731` (retrieved by you, not by me).** I had seen only API conclusions and got HTTP 403 for logs. You then retrieved all five job logs, and ADR-0022 records your results:
+- Ubuntu verify: 3637 passed, 335 skipped.
+- Windows verify: 3636 passed, 336 skipped.
+- PostgreSQL integration: 3 failed, 332 passed.
+- Container: success.
+- Gitleaks: 83 commits, no leaks.
+
+ADR-0022 also lists:
+- the run and job links;
+- the nine installed-wheel lines exactly as you observed them, with a note that my earlier "ten lines" count also included the production-registry line;
+- the container smoke's reported checks, marked as not exercising M5d.
+
+These are results for `1bea3731`, not for these corrections.
+
+**2. Corrections, all in `tests/test_reviews_postgres.py`**
+- **Job completion.** A new helper, `_complete`, runs the worker one job at a time until the *specific target* job succeeds.
+  - It is bounded by the jobs actually queued ahead of the target, plus one.
+  - The caller must declare how much other queued fixture work is allowed (`other_queued`). It fails clearly if that is exceeded, if the target fails an attempt, or if the bound runs out.
+  - `_ingest` requires the target revision to end up active.
+  - `_index` requires the revision to be active before enqueueing, and the target index to end up ready.
+  - The tenant-isolation test explicitly declares the corpus fixture's one pending ingestion job. Nothing else is drained, there are no sleeps, and worker and registry behaviour is unchanged.
+- **Concurrent activation.** The misleading race test is replaced by three tests. Failed statements are recorded with their SQLSTATE through a `handle_error` listener, kept separate from attempted and successful statements:
+  - **(a) Unindexed replacement:** two attempts; one attempted and zero successful `review_bindings` inserts; the only rejected statement is that insert with `40001`; then `SnapshotNotReadyError`, with no review, `run_review` job or child row left behind.
+  - **(b) Replacement ingested and indexed before release:** the same `40001`, then a committed review bound only to the replacement, with one review, one binding, one `run_review` job (the committed attempt's) and no exclusion row.
+  - **(c) Review committed before a later activation:** after reload, its binding, snapshot, digest and job ID are unchanged.
+  - All three use bounded events, with release and listener removal in `finally` blocks.
+- **Pooled connection.** The test records the backend of every creation statement and requires that non-empty set to equal the backend that then serves the settings read. The one-connection `QueuePool` and all four default-setting assertions are unchanged.
+
+**3. Documentation**
+- ADR-0022 has a new section, "Exact-commit CI at `1bea3731` and PostgreSQL test corrections (Prompts 192–193)". It covers the CI evidence with attribution, the three diagnoses, the per-attempt versus committed-snapshot clarification and the corrections, and states that they are not yet PostgreSQL- or CI-verified. The Prompt 191 acceptance stays a historical, scoped decision, and main publication is blocked.
+- In the plan, an attributed retry-visibility clarification sits beside the M5d transaction contract. The accepted rules are unchanged.
+- The README, plan and threat-model status lines are updated. Specification headings and anchors are unchanged.
+- `prompts.md`: the 2,161,753-byte prefix is preserved. Appended, each verbatim and checked as raw bytes: the original Prompt 192 handoff (authentication-blocked push), the Prompt 192 resume prompt and its handoff, and Prompt 193. Your review and diagnosis and an outcome note are also appended. The resume prompt and the first handoff are recorded in addition to what you listed, to keep the history complete.
+
+**4. Checks I ran** (locked offline environment, no database URL):
+
+| Check | Result |
+|---|---|
+| `ruff check .` | clean |
+| `ruff format --check .` | 211 files formatted |
+| `mypy` (strict) | no issues in 168 files |
+| Focused (7 modules) | 298 passed, 28 skipped |
+| Full suite | 3635 passed, 339 skipped, 0 failed |
+| Collection | 337 integration, 3,637 non-integration (3,974) |
+| Links / tables | 390 links, 69 tables, 0 problems |
+| Encoding (6 files) | UTF-8, no BOM, LF only, no U+FFFD |
+| `git diff --check` and `git diff --cached --check` | clean |
+| Privacy scan | no hits |
+| Gitleaks, staged and unsuppressed | no leaks |
+
+- The focused modules are `test_reviews_postgres`, `test_review_creation`, `test_review_values`, `test_database_failures`, `test_persistence`, `test_readiness` and `test_packaging`. All 28 skips are PostgreSQL tests.
+- The full-suite skips are 337 PostgreSQL tests, one symbolic-link test and one POSIX-only signal test.
+- Integration collection rose from 335 to 337 because one test was replaced by three.
+- I did not repeat builds or installed-wheel checks. Production and packaging files are unchanged, so the passing verify jobs at `1bea3731` remain the evidence for that version.
+
+**PostgreSQL: not run.** The corrected and new tests are written but unexecuted, and local skips prove nothing about them. The deterministic `40001` on the `review_bindings` insert in tests (a) and (b) rests on your log diagnosis, and only CI will confirm it.
+
+**Scope and refs**
+- Staged tree `bd5a38dfb2548f83a159ef9df18e55b0e171d652` changes exactly the six authorized paths against HEAD.
+- The other 230 tracked files are identical, including every production, migration, model, dependency, packaging, workflow and other test file. No `.local` file is tracked.
+- HEAD and upstream are still `1bea3731`; `main` and `origin/main` are still `e8d1033c`.
+
+**Export: `.local/p193/m5d-postgres-test-corrections.diff`**
+- Baseline `1bea3731`, final staged tree `bd5a38df`, `prompts.md` excluded.
+- 63,687 bytes, 552 lines, 5 files, 368 insertions and 40 deletions.
+- SHA-256 `0955695679822bb5d65782be81dea2fccd920db64d0ae8e7b5f0d80fd33e697b`.
+- UTF-8, LF only; byte-identical to both the staged and the tree comparisons.
+
+**Remaining limitations**
+- PostgreSQL and CI verification of these corrections is pending, and main publication is blocked.
+- Nothing in the application uses M5d, and the M4d trusted-snapshot limitation is not closed.
+- The existing cleanup/invalidation and unknown-`COMMIT` limitations remain.
+- Overall M5 acceptance is pending.
+
+Start a new Claude session before the next task: this session spans Prompts 180–193 and has been summarized once. The `.local/p193/` checkpoint and this handoff are enough to recover.
+
+**Next step:** please return **output plus the diff file** `.local/p193/m5d-postgres-test-corrections.diff`.
+
+### External review acceptance of the PostgreSQL test corrections for commit and feature publication (Prompt 194)
+
+The external reviewer accepted the Prompt 193 test corrections for a commit and feature-branch
+publication, pending actual PostgreSQL and exact-commit CI results; they are not yet
+PostgreSQL-verified, and main publication remains blocked pending successful CI and subsequent
+review. Evidence scope: the reviewer independently checked the Prompt 193 export's size (63,687
+bytes), line count (552) and SHA-256
+(`0955695679822bb5d65782be81dea2fccd920db64d0ae8e7b5f0d80fd33e697b`), inspected the complete diff,
+applied the test patch to the published `1bea3731` source and verified the resulting test blob
+`981d7f209967dd340a44cfe5417eea1aa2db34ec`, and ran eight isolated checks of the extracted
+`_complete` helper's control flow with substitutes for database operations (target first; older job
+first; target before another queued job; excess queued work; failed target; retrying target;
+exhausted bound; worker error), all passing. The reviewer did not run the project suite,
+PostgreSQL, a build, Docker or an installed-wheel check; the isolated checks do not verify SQL
+execution, queue ordering, foreign-key behaviour or either serialization race. Prompt 194 also
+requires correcting stale status wording and the `_complete` bound description (it counts all other
+queued jobs of registered kinds, not jobs proven to be ahead of the target), and authorizes one
+commit of the six reviewed paths, one normal push of `feat/review-creation` and read-only monitoring
+of that commit's CI; no merge, push to main, CI rerun, production change or M5e work.
+
+### Prompt 194 (verbatim)
+
+Prompt 194 — Commit the reviewed PostgreSQL test corrections, publish the feature branch and observe exact-commit CI
+
+Written for: Claude Code, Mathew and the external reviewer.
+
+Recover the existing EvidenceGuard checkout from .local/p193/ and the Prompt 193 handoff. Read the repository instructions first.
+
+The external reviewer accepts the Prompt 193 test corrections for a commit and feature-branch publication, pending actual PostgreSQL and exact-commit CI results.
+
+This prompt authorizes:
+- The limited documentation adjustments below.
+- One commit containing the six reviewed paths.
+- One normal push to feat/review-creation.
+- Read-only monitoring of that commit’s CI.
+
+It does not authorize a merge, a push to main, CI reruns, production changes or M5e work.
+
+1. Verify and checkpoint
+
+Expected starting state:
+- Branch: feat/review-creation.
+- HEAD and upstream:
+  1bea3731f965c4555b9dc6bf0d9fa64447bf3789
+- HEAD parent:
+  755c13a7b8906efcdad933587ced8d3f73128107
+- HEAD tree:
+  476237eaa8c0c51236ca772566a3a720b6808b26
+- main and origin/main:
+  e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3
+- Staged tree:
+  bd5a38dfb2548f83a159ef9df18e55b0e171d652
+- Exactly these six staged paths, nothing unstaged or untracked:
+  tests/test_reviews_postgres.py
+  docs/decisions/0022-review-creation.md
+  docs/plan.md
+  README.md
+  docs/threat-model.md
+  prompts.md
+
+Verify origin and the established noreply identity.
+
+Verify .local/p193/m5d-postgres-test-corrections.diff:
+- 63,687 bytes
+- 552 lines
+- SHA-256:
+  0955695679822bb5d65782be81dea2fccd920db64d0ae8e7b5f0d80fd33e697b
+- Byte-identical to the full-index comparison from HEAD to the starting staged tree, excluding prompts.md.
+
+The reviewed final test blob must be:
+981d7f209967dd340a44cfe5417eea1aa2db34ec
+
+Save the starting refs, tree, six blob hashes, status and prompts.md prefix with its checksum under .local/p194/.
+
+Stop before dependent work if the expected state differs materially.
+
+2. Record the external review accurately
+
+The reviewer:
+- Independently checked the attached export’s size, line count and SHA-256.
+- Inspected the complete diff.
+- Applied the test patch to the published 1bea3731 source and verified the resulting test blob above.
+- Ran eight isolated checks of the extracted _complete helper’s control flow, using substitutes for database operations:
+  target first; older job first; target before another queued job; excess queued work; failed target; retrying target; exhausted bound; worker error.
+- All eight passed.
+- Did not run the project suite, PostgreSQL, a build, Docker or an installed-wheel check.
+
+These isolated checks do not verify SQL execution, queue ordering, foreign-key behavior or either serialization race.
+
+The test corrections are accepted for commit and feature publication. They are not yet PostgreSQL-verified, and main publication remains blocked pending successful CI and subsequent review.
+
+Keep the existing independently retrieved failed-CI evidence for 1bea3731 unchanged and clearly attributed.
+
+3. Limited documentation adjustments
+
+Only the same six paths may differ from HEAD.
+
+Do not change tests/test_reviews_postgres.py: preserve its reviewed blob exactly.
+
+In ADR-0022, plan, README and threat model:
+- Record this scoped acceptance and the pending new CI.
+- Fix current status wording that still says feature publication, Linux verification and PostgreSQL execution have never occurred.
+- State the actual sequence:
+  feature 1bea3731 was published;
+  Ubuntu and Windows verify passed;
+  PostgreSQL executed and failed three tests;
+  the test corrections are now accepted for a corrective commit;
+  their PostgreSQL and CI verification remain pending;
+  main publication remains blocked.
+- Keep historical Prompt 191 statements historical.
+- Preserve accepted specification headings and anchors.
+
+Correct the helper-bound description wherever needed:
+_complete counts all other queued jobs whose kinds are registered, not only jobs proven to be ahead of the target. Its loop bound is that count plus one; the caller limits the permitted other queued fixture work. Do not claim the query establishes queue position.
+
+Keep the per-attempt snapshot clarification, all failure diagnoses, evidence attribution and existing limitations.
+
+Do not change production, migration, model, dependency, packaging, workflow or other test files.
+
+4. History
+
+Append to prompts.md:
+- The Prompt 193 handoff verbatim.
+- This review decision and its evidence scope.
+- Prompt 194 verbatim.
+- A pre-commit note containing completed checks only.
+
+Preserve the existing bytes as an identical prefix. Preserve the existing text-fidelity disclosures and check the new verbatim entries as raw bytes.
+
+Do not record a prospective commit SHA or successful publication before either exists.
+
+5. Pre-commit checks and commit
+
+Verify:
+- Exactly the six authorized paths differ from HEAD.
+- The reviewed test blob is unchanged.
+- Every production and other tracked blob equals HEAD.
+- No tracked .local file or build artifact.
+- Links, anchors and tables are consistent.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --cached --check is clean.
+- Privacy scan is clean apart from explicitly identified established public identities.
+- Unsuppressed staged Gitleaks is clean.
+
+Run appropriate documentation checks. Do not repeat the application suite, build or installed-wheel checks solely for these documentation adjustments; attribute Prompt 193 results as historical local evidence.
+
+Commit using the established noreply author and committer:
+test: correct review creation PostgreSQL fixtures and race assertions
+
+Write the message from a file. Preserve the project’s assistance attribution and established Co-Authored-By convention.
+
+After committing:
+- Verify the parent is 1bea3731.
+- Verify exactly the six paths changed.
+- Verify the reviewed test blob and all production blobs.
+- Verify the working tree is clean.
+- Run full-history Gitleaks without suppressions.
+- Record the actual commit SHA, parent and tree.
+
+6. Publication preflight
+
+Fetch without tags and inspect remote refs read-only.
+
+Require:
+- Remote feat/review-creation is still exactly 1bea3731.
+- Remote main is still exactly e8d1033c.
+- Local main equals origin/main.
+- The new commit is a direct child of 1bea3731.
+- The range from upstream contains only this corrective commit.
+- The working tree is clean.
+- No unexpected paths, artifacts or identity changes.
+- Workflows are unchanged and still contain all five required jobs.
+
+If a remote ref differs, stop and report it. Do not reset, force-push, rebase or overwrite another change.
+
+Push once:
+git push origin refs/heads/feat/review-creation:refs/heads/feat/review-creation
+
+Use normal authentication. Do not add GIT_TERMINAL_PROMPT=0 or alter credentials, Git configuration or account setup.
+
+If authentication requires Mathew’s interaction, explain the observed prompt. Do not retry automatically. If the push fails, check remote refs read-only to establish whether publication occurred, then stop.
+
+After a successful push, verify the remote feature branch and upstream equal the actual new commit. Confirm main remains unchanged.
+
+7. Exact-commit CI
+
+Monitor the push runs for the new SHA for at most 25 minutes total.
+
+Require these five jobs:
+- Ubuntu verify
+- Windows verify
+- PostgreSQL integration
+- Container
+- Gitleaks
+
+Check SHA, branch, event and run attempt. Keep the failed 1bea3731 evidence separate.
+
+Collect:
+- Run, job and required-step conclusions.
+- Logs where available through existing authorized access.
+- Actual pytest summaries.
+- The corrected PostgreSQL tests’ results if visible.
+- Installed-wheel output, container summaries and Gitleaks count if visible.
+
+Do not change authentication to obtain logs. If logs remain inaccessible, report API conclusions separately and identify the unobserved details. Do not infer counts.
+
+If any job fails, stop without edits, reruns, another commit or another push. Report the available failure details and links for external review.
+
+If all five jobs pass, stop and report the evidence for external review. Do not merge or push main.
+
+If monitoring reaches the time bound, save the observations and stop. Leave no polling process running.
+
+8. Export and final handoff
+
+Before publication, create:
+.local/p194/m5d-postgres-test-correction-acceptance.diff
+
+Compare the starting staged tree bd5a38df to the actual corrective commit, using full-index output and excluding prompts.md.
+
+Report:
+- Baseline and final commit.
+- Byte size, line count and diff statistics.
+- SHA-256 and encoding.
+- Byte identity against the Git comparison.
+
+Do not edit tracked documentation after the push. Put subsequent CI observations in the handoff and .local/p194/ evidence.
+
+The final handoff must state:
+- Actual commit and verified refs.
+- Whether the push succeeded.
+- Exact-commit CI evidence and its limits.
+- Whether the corrected PostgreSQL tests actually ran.
+- The unchanged production blobs.
+- Clean working-tree and process state.
+- That main publication and M5e remain unauthorized.
+
+Return the handoff plus:
+.local/p194/m5d-postgres-test-correction-acceptance.diff
+
+### Prompt 194 pre-commit note (Claude Code; before the corrective commit)
+
+Completed checks only. Starting state matched: branch `feat/review-creation`, HEAD and upstream
+`1bea3731` (parent `755c13a7`, tree `476237ea`), `main` and `origin/main` at `e8d1033c`, staged tree
+`bd5a38df` with exactly the six paths, nothing unstaged or untracked, origin and noreply identity
+unchanged, staged test blob `981d7f209967dd340a44cfe5417eea1aa2db34ec`; the Prompt 193 export
+matched 63,687 bytes, 552 lines, its SHA-256 and the full-index comparison from HEAD to `bd5a38df`
+excluding prompts.md. Checkpoint under `.local/p194/`.
+
+- **Documentation adjustments** (ADR-0022, plan, README, threat model): the actual sequence since
+  the Prompt 191 acceptance (feature `1bea3731` published; Ubuntu and Windows verify passed;
+  PostgreSQL executed and failed three tests; the test corrections accepted for a corrective commit;
+  their PostgreSQL and CI verification pending; main publication blocked), with the Prompt 191
+  statements kept historical; an "External review (Prompt 194)" section; and the corrected
+  `_complete` bound description. `tests/test_reviews_postgres.py` is unchanged (reviewed blob).
+- **Checks before this note:** relative links 391 and tables 69 without problems. No application
+  test, build or installed-wheel check was run for these documentation adjustments; the Prompt 193
+  local checks are historical local evidence.
+- The scope, blob, encoding, whitespace, privacy and Gitleaks checks, the commit, the export, the
+  publication preflight and push and the CI observations follow and are reported in the handoff.

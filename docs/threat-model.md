@@ -487,8 +487,10 @@ which remains M5g's obligation.
 **Specified M5d controls (proposed in Prompt 185, revised in Prompts 186–187, specification
 accepted at external review in Prompt 188 with a binding cleanup clarification; implemented
 in Prompt 189, corrected in Prompt 190 after external review, test-corrected and accepted at
-external review in Prompt 191 for a local commit only, with publication, CI and PostgreSQL
-execution pending; no production path uses them, so none operates in the application).** See
+external review in Prompt 191 for a local commit only; feature CI at `1bea3731` failed on three
+PostgreSQL tests, and test-only corrections were accepted for a corrective commit and feature
+publication (Prompts 192–194), with their PostgreSQL and CI verification and main publication
+pending; no production path uses them, so none operates in the application).** See
 [ADR-0022](decisions/0022-review-creation.md) and the
 [implementation status](plan.md#m5d-implementation-status-accepted-for-a-local-commit-prompt-191-ci-pending). The
 [M5d specification](plan.md#m5d-composable-capture-and-atomic-review-creation-specification-accepted-at-review-prompt-188-implementation-pending)

@@ -27,7 +27,11 @@ from evidenceguard_domain.context import ActorContext, Role
 from evidenceguard_domain.evidence import SourceType
 from evidenceguard_domain.jobs import JobPayload
 from evidenceguard_domain.model_calls import PromptRef
-from evidenceguard_domain.retrieval import EmptySnapshotError, RetrievalScopeError
+from evidenceguard_domain.retrieval import (
+    EmptySnapshotError,
+    RetrievalScopeError,
+    SnapshotNotReadyError,
+)
 from evidenceguard_domain.reviews import (
     ReviewCommitOutcomeUnknownError,
     ReviewConfiguration,
@@ -196,12 +200,105 @@ def _work(factory: sessionmaker[Session], registry: HandlerRegistry) -> WorkerRe
     )
 
 
+def _job(engine: Engine, job_id: UUID) -> Any:
+    with engine.connect() as connection:
+        return connection.execute(select(Job.__table__).where(Job.id == job_id)).one()
+
+
+def _complete(
+    factory: sessionmaker[Session],
+    engine: Engine,
+    registry: HandlerRegistry,
+    job_id: UUID,
+    *,
+    other_queued: int,
+) -> None:
+    """Run the worker, one claim at a time, until the **target** job has succeeded.
+
+    The worker claims the oldest claimable job, which may not be the target, so one successful
+    worker run proves nothing about it. The caller declares how many other queued jobs of the
+    registry's kinds may be ahead of the target (``other_queued``, an upper bound); more is a
+    clear failure, and the loop is bounded by the jobs actually queued plus one. A target that
+    fails an attempt or ends in another state fails the test. No sleep, no unbounded polling."""
+    with engine.connect() as connection:
+        others = connection.execute(
+            select(Job.id).where(
+                Job.status == "queued", Job.kind.in_(sorted(registry.kinds)), Job.id != job_id
+            )
+        ).all()
+    assert len(others) <= other_queued, (
+        f"{len(others)} other queued jobs could be claimed before the target; "
+        f"the caller allowed {other_queued}"
+    )
+    for _ in range(len(others) + 1):
+        assert _work(factory, registry).exit_code == 0
+        job = _job(engine, job_id)
+        if job.status == "succeeded":
+            return
+        assert job.status == "queued" and job.attempt == 0, (
+            f"target job {job.kind} is {job.status} after attempt {job.attempt} "
+            f"(last_error={job.last_error})"
+        )
+    pytest.fail(f"target job {job_id} did not complete within {len(others) + 1} worker runs")
+
+
 def _ingest(
-    factory: sessionmaker[Session], actor: ActorContext, vendor: UUID, key: str, body: str
+    factory: sessionmaker[Session],
+    engine: Engine,
+    actor: ActorContext,
+    vendor: UUID,
+    key: str,
+    body: str,
+    *,
+    other_queued: int = 0,
 ) -> UUID:
+    """Create a revision and complete **its** ingestion job; the revision must end active."""
     revision = _create(factory, actor, vendor, key, body)
-    assert _work(factory, INGEST_ONLY).exit_code == 0
+    with engine.connect() as connection:
+        job_id = connection.execute(
+            select(Job.id).where(
+                Job.tenant_id == actor.tenant_id,
+                Job.kind == INGEST_REVISION_KIND,
+                Job.idempotency_key == str(revision),
+            )
+        ).scalar_one()
+    _complete(factory, engine, INGEST_ONLY, job_id, other_queued=other_queued)
+    assert _revision_status(engine, revision) == "active"
     return revision
+
+
+def _revision_status(engine: Engine, revision: UUID) -> str:
+    with engine.connect() as connection:
+        status: str = connection.execute(
+            select(DocumentRevision.status).where(DocumentRevision.id == revision)
+        ).scalar_one()
+    return status
+
+
+def _index(
+    factory: sessionmaker[Session],
+    engine: Engine,
+    actor: ActorContext,
+    revision: UUID,
+    *,
+    other_queued: int = 0,
+) -> UUID:
+    """Index an eligible (active) revision and complete **its** index job; the index must end
+    ready."""
+    assert _revision_status(engine, revision) == "active"
+    with transaction(factory) as session:
+        result = indexing.enqueue_index_revision(
+            session, actor, revision_id=revision, identity=HASH_IDENTITY
+        )
+    if result.outcome is not indexing.EnqueueOutcome.READY:
+        assert result.job is not None
+        _complete(factory, engine, production_registry(), result.job.id, other_queued=other_queued)
+    with engine.connect() as connection:
+        status = connection.execute(
+            select(EmbeddingIndex.status).where(EmbeddingIndex.id == result.index.id)
+        ).scalar_one()
+    assert status == "ready"
+    return result.index.id
 
 
 def _ready(
@@ -211,19 +308,13 @@ def _ready(
     vendor: UUID,
     key: str,
     body: str,
+    *,
+    other_queued: int = 0,
 ) -> UUID:
-    revision = _ingest(factory, actor, vendor, key, body)
-    with transaction(factory) as session:
-        result = indexing.enqueue_index_revision(
-            session, actor, revision_id=revision, identity=HASH_IDENTITY
-        )
-    if result.outcome is not indexing.EnqueueOutcome.READY:
-        assert _work(factory, production_registry()).exit_code == 0
-    with engine.connect() as connection:
-        status = connection.execute(
-            select(EmbeddingIndex.status).where(EmbeddingIndex.id == result.index.id)
-        ).scalar_one()
-    assert status == "ready"
+    """An active revision with a ready index. ``other_queued`` declares fixture jobs (for
+    example the corpus's pending ingestion) that may be processed ahead of the target."""
+    revision = _ingest(factory, engine, actor, vendor, key, body, other_queued=other_queued)
+    _index(factory, engine, actor, revision, other_queued=other_queued)
     return revision
 
 
@@ -508,7 +599,17 @@ def test_tenants_are_isolated(
     with pytest.raises(RetrievalScopeError):  # the vendor belongs to another tenant
         reviews.create_review(factory, outsider, _request(vendor))
     other_vendor = _vendor(engine, outsider.tenant_id, "lumenvale")
-    _ready(factory, engine, outsider, other_vendor, "retention", "Retention is ninety days.\n")
+    # The corpus fixture's pending ingestion job (tenant A) is queued ahead and may be claimed
+    # first; it is declared, and completion is established for tenant B's own jobs.
+    _ready(
+        factory,
+        engine,
+        outsider,
+        other_vendor,
+        "retention",
+        "Retention is ninety days.\n",
+        other_queued=1,
+    )
     theirs = reviews.create_review(factory, outsider, _request(other_vendor))
     assert not theirs.replayed and theirs.review_id != created.review_id
     assert theirs.request_sha256 != created.request_sha256
@@ -576,40 +677,146 @@ def test_concurrent_creations_with_one_key_produce_one_review(
     assert _count(engine, Review) == 1 and len(_review_jobs(engine)) == 1
 
 
-def test_an_activation_committed_after_the_snapshot_is_established_is_not_bound(
+def _record_failures(engine: Engine) -> tuple[list[tuple[str, str | None]], Any]:
+    """Record each statement the database rejected on ``engine``, with its SQLSTATE
+    (test-owned ``handle_error`` listener)."""
+    failures: list[tuple[str, str | None]] = []
+
+    def listener(context: Any) -> None:
+        statement = context.statement or ""
+        sqlstate = getattr(context.original_exception, "sqlstate", None)
+        failures.append((statement.split("(")[0].strip(), sqlstate))
+
+    event.listen(engine, "handle_error", listener)
+    return failures, listener
+
+
+def _create_while_replacing(
+    factory: sessionmaker[Session],
+    engine: Engine,
+    actor: ActorContext,
+    vendor: UUID,
+    test_database_url: URL,
+    *,
+    index_replacement: bool,
+) -> tuple[Any, UUID, dict[str, int], int, list[tuple[str, str | None]]]:
+    """Hold a creation attempt right after its snapshot-establishing clock read, ingest (and
+    optionally index) a replacement of the bound revision, then release the attempt.
+
+    Returns the creation outcome (a ``CreatedReview`` or the raised exception), the replacement
+    revision, successfully executed statement counts, attempted ``review_bindings`` inserts and
+    the statements the database rejected."""
+    held_engine = _engine(test_database_url)
+    paused, release, pause_listener = _pause_after(held_engine, "clock_timestamp")
+    executed, counter = _record_statements(held_engine, (ATTEMPT, "INSERT INTO review_bindings"))
+    failures, failure_listener = _record_failures(held_engine)
+    attempted_bindings = 0
+
+    def count_attempt(*args: Any) -> None:
+        nonlocal attempted_bindings
+        if "INSERT INTO review_bindings" in args[2]:
+            attempted_bindings += 1
+
+    event.listen(held_engine, "before_cursor_execute", count_attempt)
+
+    def create() -> Any:
+        try:
+            return reviews.create_review(
+                create_session_factory(held_engine), actor, _request(vendor)
+            )
+        except Exception as error:  # returned for the caller's assertions
+            return error
+
+    try:
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            running = pool.submit(create)
+            try:
+                assert paused.wait(WAIT_SECONDS)  # attempt 1's snapshot is established
+                replacement = _ingest(
+                    factory, engine, actor, vendor, "retention", "Retention is thirty days.\n"
+                )
+                if index_replacement:
+                    _index(factory, engine, actor, replacement)
+            finally:
+                release.set()
+            outcome = running.result(timeout=WAIT_SECONDS)
+    finally:
+        event.remove(held_engine, "after_cursor_execute", pause_listener)
+        event.remove(held_engine, "after_cursor_execute", counter)
+        event.remove(held_engine, "handle_error", failure_listener)
+        event.remove(held_engine, "before_cursor_execute", count_attempt)
+        held_engine.dispose()
+    return outcome, replacement, executed, attempted_bindings, failures
+
+
+def test_a_concurrent_unindexed_replacement_fails_the_retry_without_orphans(
     factory: sessionmaker[Session],
     engine: Engine,
     actor: ActorContext,
     vendor: UUID,
     test_database_url: URL,
 ) -> None:
+    """Snapshot visibility is fixed within each attempt, not across attempts. Attempt 1 binds
+    the old revision, but its ``review_bindings`` insert fails with 40001 (the foreign-key
+    check's key-share lock meets the committed supersession); the fresh attempt sees the
+    replacement active but unindexed and refuses with ``SnapshotNotReadyError``."""
     old = _ready(factory, engine, actor, vendor, "retention", "Retention is ninety days.\n")
-    held_engine = _engine(test_database_url)
-    paused, release, listener = _pause_after(held_engine, "clock_timestamp")
-    try:
-        with ThreadPoolExecutor(max_workers=1) as pool:
-            running = pool.submit(
-                reviews.create_review,
-                create_session_factory(held_engine),
-                actor,
-                _request(vendor),
-            )
-            try:
-                assert paused.wait(WAIT_SECONDS)  # the creation snapshot is established
-                _ingest(factory, actor, vendor, "retention", "Retention is thirty days.\n")
-                with engine.connect() as connection:
-                    status = connection.execute(
-                        select(DocumentRevision.status).where(DocumentRevision.id == old)
-                    ).scalar_one()
-                assert status == "superseded"
-            finally:
-                release.set()
-            created = running.result(timeout=WAIT_SECONDS)
-    finally:
-        event.remove(held_engine, "after_cursor_execute", listener)
-        held_engine.dispose()
-    trusted = reviews.load_review(factory, actor, created.review_id)
-    assert [b.revision_id for b in trusted.snapshot.bindings] == [old]
+    outcome, replacement, executed, attempted, failures = _create_while_replacing(
+        factory, engine, actor, vendor, test_database_url, index_replacement=False
+    )
+    assert isinstance(outcome, SnapshotNotReadyError)
+    assert executed[ATTEMPT] == 2  # the held attempt and one fresh attempt
+    assert attempted == 1 and executed["INSERT INTO review_bindings"] == 0
+    assert failures == [("INSERT INTO review_bindings", "40001")]
+    assert _revision_status(engine, old) == "superseded"
+    assert _revision_status(engine, replacement) == "active"
+    _assert_nothing_created(engine)  # nothing survives the rolled-back attempt
+
+
+def test_a_concurrent_indexed_replacement_is_bound_by_the_committed_retry(
+    factory: sessionmaker[Session],
+    engine: Engine,
+    actor: ActorContext,
+    vendor: UUID,
+    test_database_url: URL,
+) -> None:
+    """Only the committed attempt's snapshot is persisted: the rolled-back attempt bound the old
+    revision, the fresh attempt binds the fully indexed replacement."""
+    old = _ready(factory, engine, actor, vendor, "retention", "Retention is ninety days.\n")
+    outcome, replacement, executed, attempted, failures = _create_while_replacing(
+        factory, engine, actor, vendor, test_database_url, index_replacement=True
+    )
+    assert not isinstance(outcome, BaseException), outcome
+    assert not outcome.replayed
+    assert executed[ATTEMPT] == 2
+    assert attempted == 2 and executed["INSERT INTO review_bindings"] == 1
+    assert failures == [("INSERT INTO review_bindings", "40001")]
+    trusted = reviews.load_review(factory, actor, outcome.review_id)
+    assert [b.revision_id for b in trusted.snapshot.bindings] == [replacement]
+    assert old not in {b.revision_id for b in trusted.snapshot.bindings}
+    assert trusted.snapshot.sha256 == outcome.snapshot_sha256
+    (job,) = _review_jobs(engine)  # the rolled-back attempt's job did not survive
+    assert job.id == outcome.job_id == trusted.job_id
+    assert _count(engine, Review) == 1 and _count(engine, ReviewBinding) == 1
+    assert _count(engine, ReviewExcludedRevision) == 0
+
+
+def test_a_committed_review_keeps_its_bindings_after_a_later_activation(
+    factory: sessionmaker[Session],
+    engine: Engine,
+    actor: ActorContext,
+    vendor: UUID,
+) -> None:
+    old = _ready(factory, engine, actor, vendor, "retention", "Retention is ninety days.\n")
+    created = reviews.create_review(factory, actor, _request(vendor))
+    before = reviews.load_review(factory, actor, created.review_id)
+    replacement = _ready(factory, engine, actor, vendor, "retention", "Retention is thirty days.\n")
+    assert _revision_status(engine, old) == "superseded"
+    after = reviews.load_review(factory, actor, created.review_id)
+    assert [b.revision_id for b in after.snapshot.bindings] == [old] != [replacement]
+    assert after.snapshot == before.snapshot
+    assert after.snapshot.sha256 == created.snapshot_sha256
+    assert after.job_id == before.job_id == created.job_id
 
 
 def test_creation_returns_its_pooled_connection_with_default_settings(
@@ -624,8 +831,9 @@ def test_creation_returns_its_pooled_connection_with_default_settings(
     pids: list[int] = []
 
     def record(connection: Any, *args: Any) -> None:
-        if "clock_timestamp" in args[1]:
-            pids.append(connection.connection.dbapi_connection.info.backend_pid)
+        # Every statement of the creation: the clock read, the job enqueue (whose values also
+        # call clock_timestamp()) and the rest. Only the set of backends matters.
+        pids.append(connection.connection.dbapi_connection.info.backend_pid)
 
     event.listen(pooled, "after_cursor_execute", record)
     try:
@@ -645,7 +853,8 @@ def test_creation_returns_its_pooled_connection_with_default_settings(
         event.remove(pooled, "after_cursor_execute", record)
         pooled.dispose()
     assert not created.replayed
-    assert pids == [pid]  # the same pooled connection served the creation
+    # The creation used exactly one backend, and the settings read reused it.
+    assert pids and set(pids) == {pid}
     assert settings == {
         "transaction_isolation": "read committed",
         "transaction_read_only": "off",

@@ -6830,7 +6830,9 @@ status](#m5c-implementation-status-accepted-for-a-local-commit-prompt-184-ci-pen
 [M5d specification](#m5d-composable-capture-and-atomic-review-creation-specification-accepted-at-review-prompt-188-implementation-pending)
 (proposed in Prompt 185, revised in Prompts 186–187) was **accepted at external review in Prompt
 188**; its implementation (Prompt 189, corrected in Prompts 190–191) was accepted at external review in
-Prompt 191 for a local commit only, with PostgreSQL and current-version CI pending ([implementation
+Prompt 191 for a local commit only; feature CI at `1bea3731` then failed three PostgreSQL tests, and
+test-only corrections were accepted for a corrective commit in Prompt 194, with their PostgreSQL and
+CI verification pending ([implementation
 status](#m5d-implementation-status-accepted-for-a-local-commit-prompt-191-ci-pending)). M5e–M5h are not
 implemented; no review path or orchestration exists, the M5d persistence is used only by tests,
 no M5b or M5c control is used by any review path, and overall M5 acceptance is pending.** The M5 milestone text above is the controlling requirement and is unchanged; this
@@ -9703,6 +9705,14 @@ first statement are captured; changes committed after `captured_at` was returned
 adds no wall-clock ordering or historical-authorization claim. A captured revision stays bound
 after later supersession.
 
+*Clarification (Prompt 193, after the failed feature CI at `1bea3731`):* snapshot visibility is
+fixed within each attempt; only the successfully committed attempt's snapshot is persisted, and a
+rolled-back attempt's `captured_at` and bindings are not promised to survive a fresh-transaction
+retry (for example, a concurrent supersession can make an attempt's `review_bindings` insert fail
+with `40001`, and the fresh attempt then sees the replacement). Once a review has committed, later
+activation does not change its stored bindings. The retry and transaction rules above are
+unchanged ([ADR-0022](decisions/0022-review-creation.md#exact-commit-ci-at-1bea3731-and-postgresql-test-corrections-prompts-192193)).
+
 No capture or enqueue helper commits, rolls back or closes the session; `create_review` alone
 ends each transaction. Nothing about the review is visible to other transactions until commit,
 and the review, bindings, exclusions, pinned configuration and job commit together or not at all.
@@ -10151,10 +10161,13 @@ result, and normalization of timestamp-validation failures; the migration-head t
 under explicit authorization; PostgreSQL tests strengthened); in Prompt 191 a concurrency-test
 counter was corrected and a row-access regression added, and the implementation was **accepted at
 external review in Prompt 191 for a local implementation commit only**
-([ADR-0022](decisions/0022-review-creation.md#external-review-prompt-191)). Publication, merge,
-PostgreSQL execution, Linux verification and current-version CI are pending, and overall M5
-acceptance is pending. (Historical: until Prompt 191 it was staged and implementation acceptance
-was pending.) No endpoint, CLI command, handler, setting, production registry entry or
+([ADR-0022](decisions/0022-review-creation.md#external-review-prompt-191)). (Historical: at that
+acceptance publication, PostgreSQL execution, Linux verification and current-version CI were
+pending; until Prompt 191 it was staged and implementation acceptance was pending.)
+**Since then:** feature branch `1bea3731` was published (Prompt 192); Ubuntu and Windows verify passed; PostgreSQL executed and failed three tests; the test corrections were staged (Prompt 193) and accepted for a corrective commit and feature publication (Prompt 194); their PostgreSQL and CI verification remain pending, and main publication remains blocked; the failed-CI logs were independently
+retrieved by the external reviewer and recorded in Prompt 193
+([ADR-0022](decisions/0022-review-creation.md#exact-commit-ci-at-1bea3731-and-postgresql-test-corrections-prompts-192193)).
+Overall M5 acceptance is pending. No endpoint, CLI command, handler, setting, production registry entry or
 production enqueue path uses it; `run_review` stays out of `production_registry()`, so none of
 its controls operates in the application. The M4d trusted-snapshot limitation is **not** closed:
 it closes for review paths only once M5g obtains its snapshot solely through the trusted reload.
