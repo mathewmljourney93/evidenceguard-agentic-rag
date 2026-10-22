@@ -40656,3 +40656,321 @@ and checksum) under `.local/p191/`. No remote operation.
 - **PostgreSQL: not run.**
 - The final scope, encoding, privacy and Gitleaks checks, the commit and the export follow and
   are reported in the handoff.
+
+### Prompt 191 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 191 handoff: M5d accepted and committed locally
+
+Both test corrections are in and M5d is committed locally. Nothing was pushed or merged, and no remote operation ran.
+
+**Commit**
+- SHA `755c13a7b8906efcdad933587ced8d3f73128107`
+- Parent `76f0b2c0523d6ad8eca04c15badb30948d2f5347`
+- Tree `3b603181e9c65c7d7927e3dc25b408c3ebb6e70b`, identical to the final staged tree.
+- Subject: `feat: add atomic review creation and persisted snapshots`
+- Author and committer: `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>`.
+- The message was written from a file. It credits Claude Code's work (Prompts 189–191), keeps the reviewer's and earlier attribution, and ends with the `Co-Authored-By: Claude Opus 5.5` trailer.
+
+**Starting state.** Everything matched: tree `2fbb2fd5` with the 22 paths, nothing unstaged or untracked, and `main` and `origin/main` at `e8d1033c`. The Prompt 190 export matched (79,170 bytes, 970 lines, SHA-256 `4333e9ca…02f8`) and was byte-identical to `0090ecdf..2fbb2fd5` excluding `prompts.md`. The checkpoint is in `.local/p191/`.
+
+**Scope and production-blob identity**
+- The commit contains exactly the 22 authorized paths against `76f0b2c0`.
+- Compared with `2fbb2fd5`, only the seven permitted files changed: the two test modules, ADR-0022, README, plan, threat model and `prompts.md`.
+- Every production, migration, model, packaging, workflow and head-pin-test file is identical to `2fbb2fd5`.
+- The other 214 tracked files are unchanged and no `.local` file is tracked.
+- The working tree is clean, and `main` and `origin/main` are still at `e8d1033c`.
+
+**Test correction (concurrency).** On the second creation's engine, `test_concurrent_creations_with_one_key_produce_one_review` now asserts each of these separately:
+- **Transactions:** exactly 2, counted after each attempt's `SET TRANSACTION` ran.
+- **Attempted review INSERTs:** exactly 1, counted by the `before_cursor_execute` listener. That listener also confirms the conflicting path is reached before the first creation is released.
+- **Successfully executed review INSERTs:** exactly 0, counted by `after_cursor_execute`.
+- **Final state:** one review, one `run_review` job, a creation followed by a replay with the same review and job IDs.
+
+The synchronization is unchanged, and the docstring of the statement-counting helper now says it counts successful executions only. ADR-0022 now says the "one review insert" in the concurrency test was attempted and rejected, not a successful insert. This test is written but **not run**.
+
+**Row-access regression.** A row attribute read in the reload body raises `KeyboardInterrupt`, `SystemExit` or `GeneratorExit`, with normal, ordinary-failure or interrupting cleanup. In all 9 cases the first object propagates by identity: 9 passed. They also pass against the Prompt 189 modules, so this is new coverage, not a reproduced defect.
+
+**Checks run** (locked offline environment, no database URL):
+
+| Check | Result |
+|---|---|
+| `ruff check .` | clean |
+| `ruff format --check .` | 211 files formatted |
+| `mypy` (strict) | no issues in 168 files |
+| Focused 7 modules | 298 passed, 26 skipped (PostgreSQL) |
+| Full suite | 3635 passed, 337 skipped, 0 failed |
+| Collection | 335 integration, 3,637 non-integration (3,972) |
+| Links / tables | 387 links, 68 tables, 0 problems |
+| Encoding (22 files) | UTF-8, no BOM, LF only, no U+FFFD |
+| `git diff --cached --check` | clean |
+| Gitleaks, staged | no leaks |
+| Gitleaks, full history after commit | 82 commits, no leaks |
+| Privacy scan | one hit: the established noreply identity |
+
+- The full-suite skips are 335 PostgreSQL tests, one symbolic-link test and one POSIX-only signal test.
+- The focused modules are `test_review_creation`, `test_review_values`, `test_database_failures`, `test_reviews_postgres`, `test_persistence`, `test_readiness` and `test_packaging`.
+- I did not repeat the build or the installed-wheel check, because no production file changed. Prompt 190's results stand as historical local evidence, not exact-commit CI.
+
+**PostgreSQL: not run.** No test database is configured. All M5d database tests, including the corrected concurrency test, still need exact-commit CI.
+
+**Documentation and history**
+- **ADR-0022:**
+  - Acceptance for a local commit only.
+  - A new "External review (Prompt 191)" section with your scope and evidence.
+  - A Prompt 191 test-correction and verification section.
+  - Implementation choices marked approved.
+  - Prompt 190 and 189 verification marked historical.
+- **README, plan and threat model:** implemented in Prompt 189, corrected in Prompt 190, test-corrected and accepted for a local commit in Prompt 191. Publication, PostgreSQL and current-version CI stay pending, no production path uses M5d, the trusted-snapshot limitation stays open and overall M5 acceptance is pending.
+- **Renamed heading:** the plan's implementation-status heading is now "accepted for a local commit, Prompt 191; CI pending", and all its links were updated. The specification heading and anchor are unchanged.
+- **`prompts.md`:** its 2,123,164-byte prefix is preserved. Appended: the Prompt 190 handoff (verbatim), your review decision, Prompt 191 (verbatim) and a pre-commit note with completed checks only.
+
+**Export: `.local/p191/m5d-commit-incremental.diff`**
+- Baseline `2fbb2fd5`, final `755c13a7`, `prompts.md` excluded.
+- 54,515 bytes, 340 lines, 6 files, 159 insertions and 28 deletions.
+- SHA-256 `a9c114efcd63cd0ba9fd2e0ccded238e81c909c72181ff65389c90fe99e7b4c5`.
+- UTF-8, LF only; byte-identical to `git diff --full-index 2fbb2fd5 HEAD` excluding `prompts.md`.
+
+**Remaining limitations**
+- PostgreSQL execution, Linux verification, current-version CI, publication and merge are all pending.
+- Nothing in the application uses M5d, and the M4d trusted-snapshot limitation is not closed.
+- `invalidate()` does not prove the original connection was discarded.
+- Overall M5 acceptance is pending.
+
+Start a new Claude session before the next task: this session spans Prompts 180–191 and has been summarized once. The `.local/p191/` checkpoint and this handoff are enough to recover.
+
+**Next step:** please return **output plus the diff file** `.local/p191/m5d-commit-incremental.diff`.
+
+### External review of the Prompt 191 commit and feature-branch publication authorization (Prompt 192)
+
+The external reviewer verified the Prompt 191 export (`.local/p191/m5d-commit-incremental.diff`,
+54,515 bytes, 340 lines, SHA-256
+`a9c114efcd63cd0ba9fd2e0ccded238e81c909c72181ff65389c90fe99e7b4c5`, six files, +159/−28, UTF-8 and
+LF) and inspected the concurrency-counter correction, the row-access regression and the acceptance
+documentation. Both test changes match the review instructions, and the scoped acceptance of M5d
+for a local implementation commit (`755c13a7`) stands. The reviewer ran no additional project
+tests, builds, installed-wheel checks, PostgreSQL, Docker or provider calls for this incremental
+review. Prompt 192 authorizes publication of `feat/review-creation` only; main publication and
+merge remain unauthorized, and PostgreSQL execution and current-version CI are still pending.
+
+### Prompt 192 (verbatim)
+
+Written for: Claude Code.
+Prompt 192 — publish the accepted M5d feature branch and collect exact-commit CI evidence.
+
+Authorize feature-branch publication only. Do not merge, push main, amend implementation commits, rerun CI, change implementation or begin M5e implementation.
+
+1. Recover and verify
+
+Read applicable repository instructions and the supplied Prompt 191 handoff.
+
+Expected state:
+- Branch: feat/review-creation.
+- HEAD:
+  755c13a7b8906efcdad933587ced8d3f73128107
+- Parent:
+  76f0b2c0523d6ad8eca04c15badb30948d2f5347
+- Tree:
+  3b603181e9c65c7d7927e3dc25b408c3ebb6e70b
+- Subject:
+  feat: add atomic review creation and persisted snapshots
+- Working tree and index clean.
+- main and origin/main:
+  e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3
+- Origin and established noreply identity unchanged.
+
+Verify:
+.local/p191/m5d-commit-incremental.diff
+
+Expected:
+- 54,515 bytes.
+- 340 lines.
+- SHA-256:
+  a9c114efcd63cd0ba9fd2e0ccded238e81c909c72181ff65389c90fe99e7b4c5
+- Byte-identical to git diff --full-index between:
+  2fbb2fd59b0658563de6d990722b51d1018b748f
+  755c13a7b8906efcdad933587ced8d3f73128107
+  excluding prompts.md.
+
+Save a checkpoint under .local/p192/: refs, status, commit/tree, changed paths, relevant blob hashes and exact prompts.md prefix with checksum.
+
+Stop on a material mismatch without resetting or overwriting anything.
+
+2. External review disposition
+
+The external reviewer verified the Prompt 191 export's size, line count, SHA-256, six-file scope, +159/-28 statistics and UTF-8/LF encoding, and inspected the concurrency-counter correction, row-access regression and acceptance documentation.
+
+Both test changes match the review instructions. The previously granted scoped acceptance for a local implementation commit stands.
+
+The reviewer ran no additional project tests, builds, installed-wheel checks, PostgreSQL, Docker or provider calls for this incremental review.
+
+Feature-branch publication is now authorized. Main publication and merge remain unauthorized. PostgreSQL execution and current-version CI are still pending.
+
+3. Remote checks and publication preflight
+
+Run fetch --no-tags and read-only remote-ref checks.
+
+Expected:
+- Remote main remains:
+  e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3
+- No remote feat/review-creation branch exists.
+- Local main equals origin/main and is an ancestor of HEAD.
+- The unpublished commit range is exactly:
+  76f0b2c0523d6ad8eca04c15badb30948d2f5347
+  755c13a7b8906efcdad933587ced8d3f73128107
+
+If the remote feature branch already exists, inspect and report its SHA rather than overwriting it or automatically repeating a publication.
+
+Verify the complete range:
+- It contains only the accepted specification and implementation changes.
+- The path union is the reviewed 22 implementation paths plus ADR-0021 from the specification/documentation commit.
+- No dependency, lockfile, existing migration, settings, environment, corpus, Docker, Compose or secret-scan workflow changes.
+- No tracked .local files, artifacts or binaries.
+- Commit identities are the established noreply identity.
+
+Verify both workflows still trigger on push and retain all five required jobs:
+- Ubuntu verify.
+- Windows verify.
+- PostgreSQL integration.
+- Container.
+- Gitleaks.
+
+Confirm:
+- EG_REQUIRE_INTEGRATION=1 and pytest -m integration remain.
+- Formatting, lint, types, test, build and installed-wheel checks remain.
+- The new offline review migration assertion remains.
+- Container steps and production-registry boundaries remain unchanged.
+
+Run the established privacy/artifact checks and unsuppressed Gitleaks over the unpublished range.
+
+Do not repeat local application tests or builds: the first database execution is to come from CI.
+
+4. Record authorization in one history-only commit
+
+Append to prompts.md:
+- The supplied Prompt 191 handoff.
+- This review disposition and publication authorization.
+- Prompt 192 verbatim.
+- A preflight note listing only checks actually completed.
+
+Preserve the earlier bytes exactly.
+
+Do not edit README, ADRs, plan, threat model or implementation files before the push.
+
+Verify only prompts.md changed. Run whitespace, encoding, privacy and staged Gitleaks checks.
+
+Create one local history-only commit using the established noreply identity, message-file method and attribution convention.
+
+Suggested subject:
+docs: record M5d feature publication authorization
+
+Verify:
+- Parent is 755c13a7b8906efcdad933587ced8d3f73128107.
+- Only prompts.md changed.
+- Every other blob matches that parent.
+- Working tree clean.
+- Full-history Gitleaks passes.
+
+Record the new publication SHA and tree. That SHA is the target for all subsequent remote and CI verification.
+
+5. Publish once
+
+Immediately recheck remote refs. Main must remain at e8d1033c and the remote feature branch must still be absent.
+
+Run once:
+git push --set-upstream origin refs/heads/feat/review-creation:refs/heads/feat/review-creation
+
+Use the existing configured authentication. Do not change Git configuration, credentials or account setup.
+
+If authentication blocks or the push fails:
+- Do not retry automatically.
+- Do not leave a credential-blocked push running.
+- Determine the remote ref read-only before reporting whether publication occurred.
+- Preserve all work and stop.
+
+If successful:
+- Confirm remote feat/review-creation equals the exact publication SHA.
+- Confirm tracking is set.
+- Confirm remote main is unchanged.
+
+No force-push or branch deletion.
+
+6. Monitor exact-commit CI
+
+Monitor the push-triggered CI and secret-scan runs for the exact publication SHA on feat/review-creation.
+
+Use one bounded monitoring period, at most 25 minutes total. Keep progress updates concise and leave no polling process running afterward.
+
+Verify run SHA, branch, event, attempt, job and step conclusions. Do not infer success from an older run or branch badge.
+
+Collect:
+- Run and job URLs.
+- All five job conclusions.
+- Required-step conclusions, including any skipped or cancelled steps.
+- Job logs where available through existing authorized access.
+
+If logs are available, record actual:
+- Ubuntu and Windows pytest summaries.
+- PostgreSQL summary and observed M5d module results.
+- Migration upgrade/downgrade/check observations.
+- Installed-wheel output.
+- Container summaries.
+- Gitleaks commit count and result.
+
+Do not infer per-module results from a non-verbose aggregate summary. Do not reuse earlier counts as results for this SHA.
+
+If log access fails, report the actual failure and distinguish observed API conclusions from unavailable log output. Do not change authentication to obtain logs.
+
+If any job fails, is cancelled, skips a required step or exceeds the monitoring bound:
+- Stop without edits, reruns or further pushes.
+- Report the exact job/step and available diagnostic evidence.
+- Preserve the failed-run evidence for external review.
+
+Even if every job passes, do not merge or push main in this prompt.
+
+7. Final handoff
+
+Do not edit tracked documentation after the push. Save retrieved evidence and resume notes only under .local/p192/.
+
+Return:
+- Starting-state and export verification.
+- Preflight results and exact path range.
+- History-only commit SHA, parent, tree, subject and identity.
+- Push command and exit status.
+- Verified local/remote refs.
+- Exact-commit CI run/job/step results and links.
+- Actual observed log evidence, with attribution and limitations.
+- Explicit PostgreSQL execution status.
+- Any failure or missing evidence.
+- Confirmation that monitors stopped and the working tree is clean.
+- Confirmation that main remains unchanged and no M5e implementation started.
+
+This handoff will be reviewed before authorizing main publication.
+
+### Prompt 192 preflight note (Claude Code; before the publication-history commit)
+
+Completed checks only. Starting state matched: branch `feat/review-creation`, HEAD `755c13a7`
+(parent `76f0b2c0`, tree `3b603181`, subject "feat: add atomic review creation and persisted
+snapshots"), clean index and working tree, `main` and `origin/main` at `e8d1033c`, origin and
+noreply identity unchanged; the Prompt 191 export matched 54,515 bytes, 340 lines, its SHA-256 and
+`git diff --full-index 2fbb2fd5 755c13a7` excluding prompts.md. Checkpoint under `.local/p192/`.
+
+- `git fetch --no-tags origin` succeeded; read-only `ls-remote` showed remote `main` at
+  `e8d1033c` and no remote `feat/review-creation`. Local `main` equals `origin/main` and is an
+  ancestor of HEAD; the unpublished range is exactly `76f0b2c0` and `755c13a7`, both with the
+  noreply author and committer identity.
+- The range's path union is the 22 reviewed implementation paths plus
+  `docs/decisions/0021-review-request-assembly.md` (from the specification commit); no
+  dependency, lockfile, existing migration, settings, environment, corpus, Docker, Compose or
+  secret-scan workflow change, no binary and no tracked `.local` file.
+- Both workflows trigger on push; `ci.yml` keeps the Ubuntu and Windows verify matrix (format,
+  lint, mypy, test, build and installed-wheel steps), the PostgreSQL integration job with
+  `EG_REQUIRE_INTEGRATION: "1"` and `pytest -m integration`, and the container job;
+  `secret-scan.yml` keeps the Gitleaks job. The range changes `ci.yml` by one added line (the
+  offline review migration assertion); the production-registry assertions and container steps are
+  unchanged.
+- Privacy and artifact scan of the range: 22 files UTF-8 without BOM, LF only, no U+FFFD; the only
+  address is the established noreply identity. Unsuppressed Gitleaks over `e8d1033c..HEAD`: 2
+  commits, no leaks.
+- No local application test or build was repeated for this prompt.
