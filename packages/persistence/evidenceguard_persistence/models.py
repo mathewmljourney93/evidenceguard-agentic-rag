@@ -69,6 +69,7 @@ from sqlalchemy import (
     Integer,
     MetaData,
     PrimaryKeyConstraint,
+    SmallInteger,
     String,
     Text,
     UniqueConstraint,
@@ -729,3 +730,166 @@ class ChunkEmbedding(Base):
     vector_sha256: Mapped[str] = mapped_column(String(64))
     is_zero: Mapped[bool] = mapped_column(Boolean)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+# --- reviews (M5d, ADR-0022) ---------------------------------------------------------------------
+
+REVIEW_SHA256 = "'^[0-9a-f]{64}$'"
+REVIEW_IDENTIFIER = "'^[a-z][a-z0-9._-]{0,63}$'"
+REVIEW_ARTIFACT_ID = "'^[a-z][a-z0-9_]{0,31}$'"
+REVIEW_IDEMPOTENCY_KEY_CHECK = "idempotency_key ~ '^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$'"
+REVIEW_MODEL_ID_CHECK = "model_id ~ '^[a-z0-9][a-z0-9.-]{0,63}$'"
+REVIEW_KEY_CONSTRAINT = "uq_reviews_tenant_id_idempotency_key"
+REVIEW_HEX_COLUMNS = (
+    "request_sha256",
+    "configuration_sha256",
+    "snapshot_sha256",
+    "fingerprint",
+    "retrieval_config_sha256",
+    "template_sha256",
+    "verifier_prompt_sha256",
+    "analyst_prompt_sha256",
+)
+REVIEW_IDENTIFIER_COLUMNS = ("provider_id", "embedding_model_id", "algorithm_version")
+REVIEW_ARTIFACT_ID_COLUMNS = ("template_id", "verifier_prompt_id", "analyst_prompt_id")
+REVIEW_VERSION_COLUMNS = ("template_version", "verifier_prompt_version", "analyst_prompt_version")
+REVIEW_CHECKS: tuple[tuple[str, str], ...] = (
+    ("idempotency_key", REVIEW_IDEMPOTENCY_KEY_CHECK),
+    *((c, f"{c} ~ {REVIEW_SHA256}") for c in REVIEW_HEX_COLUMNS),
+    *((c, f"{c} ~ {REVIEW_IDENTIFIER}") for c in REVIEW_IDENTIFIER_COLUMNS),
+    ("dims", "dims BETWEEN 1 AND 4096"),
+    ("normalization", "normalization = 'l2'"),
+    ("retrieval_config_version", "char_length(retrieval_config_version) BETWEEN 1 AND 64"),
+    ("exclusion_count", "exclusion_count >= 0"),
+    ("exclusions_truncated", "exclusions_truncated = (exclusion_count > 100)"),
+    *((c, f"{c} ~ {REVIEW_ARTIFACT_ID}") for c in REVIEW_ARTIFACT_ID_COLUMNS),
+    *((c, f"{c} BETWEEN 1 AND 999") for c in REVIEW_VERSION_COLUMNS),
+    ("distinct_prompts", "verifier_prompt_id <> analyst_prompt_id"),
+    ("model_id", REVIEW_MODEL_ID_CHECK),
+    ("max_output_tokens", "max_output_tokens BETWEEN 1 AND 8192"),
+    ("timeout_ms", "timeout_ms BETWEEN 1000 AND 120000"),
+    ("retrieval_k", "retrieval_k BETWEEN 1 AND 20"),
+)
+REVIEW_BINDING_CHECKS: tuple[tuple[str, str], ...] = (
+    ("ordinal", "ordinal BETWEEN 0 AND 99"),
+    ("chunker_version", f"chunker_version ~ '{CHUNKER_VERSION_PATTERN}'"),
+    ("chunk_count", "chunk_count BETWEEN 1 AND 4096"),
+    ("manifest_sha256", f"manifest_sha256 ~ {REVIEW_SHA256}"),
+    ("vector_manifest_sha256", f"vector_manifest_sha256 ~ {REVIEW_SHA256}"),
+)
+
+
+class Review(Base):
+    """A review's captured snapshot facts, pinned configuration and ``run_review`` job link,
+    written once by the creation transaction (M5d). No status column (W15); application code
+    never updates or deletes a review."""
+
+    __tablename__ = "reviews"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "id"),
+        UniqueConstraint("tenant_id", "idempotency_key"),
+        UniqueConstraint("tenant_id", "run_review_job_id"),
+        ForeignKeyConstraint(["tenant_id", "vendor_id"], ["vendors.tenant_id", "vendors.id"]),
+        ForeignKeyConstraint(["tenant_id", "run_review_job_id"], ["jobs.tenant_id", "jobs.id"]),
+        *(CheckConstraint(check, name=name) for name, check in REVIEW_CHECKS),
+    )
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
+    tenant_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("tenants.id"))
+    vendor_id: Mapped[UUID] = mapped_column(Uuid)
+    idempotency_key: Mapped[str] = mapped_column(String(128))
+    request_sha256: Mapped[str] = mapped_column(String(64))
+    configuration_sha256: Mapped[str] = mapped_column(String(64))
+    snapshot_sha256: Mapped[str] = mapped_column(String(64))
+    captured_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    provider_id: Mapped[str] = mapped_column(String(64))
+    embedding_model_id: Mapped[str] = mapped_column(String(64))
+    algorithm_version: Mapped[str] = mapped_column(String(64))
+    dims: Mapped[int] = mapped_column(Integer)
+    normalization: Mapped[str] = mapped_column(String(16))
+    fingerprint: Mapped[str] = mapped_column(String(64))
+    profile_id: Mapped[UUID] = mapped_column(Uuid)
+    retrieval_config_version: Mapped[str] = mapped_column(String(64))
+    retrieval_config_sha256: Mapped[str] = mapped_column(String(64))
+    exclusion_count: Mapped[int] = mapped_column(Integer)
+    exclusions_truncated: Mapped[bool] = mapped_column(Boolean)
+    template_id: Mapped[str] = mapped_column(String(32))
+    template_version: Mapped[int] = mapped_column(Integer)
+    template_sha256: Mapped[str] = mapped_column(String(64))
+    verifier_prompt_id: Mapped[str] = mapped_column(String(32))
+    verifier_prompt_version: Mapped[int] = mapped_column(Integer)
+    verifier_prompt_sha256: Mapped[str] = mapped_column(String(64))
+    analyst_prompt_id: Mapped[str] = mapped_column(String(32))
+    analyst_prompt_version: Mapped[int] = mapped_column(Integer)
+    analyst_prompt_sha256: Mapped[str] = mapped_column(String(64))
+    model_id: Mapped[str] = mapped_column(String(64))
+    max_output_tokens: Mapped[int] = mapped_column(Integer)
+    timeout_ms: Mapped[int] = mapped_column(Integer)
+    retrieval_k: Mapped[int] = mapped_column(Integer)
+    run_review_job_id: Mapped[UUID] = mapped_column(Uuid)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ReviewBinding(Base):
+    """One captured revision binding of a review, in snapshot order (``ordinal``)."""
+
+    __tablename__ = "review_bindings"
+    __table_args__ = (
+        PrimaryKeyConstraint("review_id", "revision_id"),
+        UniqueConstraint("review_id", "ordinal"),
+        UniqueConstraint("review_id", "document_id"),
+        ForeignKeyConstraint(
+            ["tenant_id", "review_id"],
+            ["reviews.tenant_id", "reviews.id"],
+            name="fk_review_bindings_review",
+        ),
+        ForeignKeyConstraint(
+            ["tenant_id", "document_id", "revision_id"],
+            [
+                "document_revisions.tenant_id",
+                "document_revisions.document_id",
+                "document_revisions.id",
+            ],
+            name="fk_review_bindings_revision",
+        ),
+        ForeignKeyConstraint(
+            ["tenant_id", "index_id"],
+            ["embedding_indexes.tenant_id", "embedding_indexes.id"],
+            name="fk_review_bindings_index",
+        ),
+        *(CheckConstraint(check, name=name) for name, check in REVIEW_BINDING_CHECKS),
+    )
+
+    tenant_id: Mapped[UUID] = mapped_column(Uuid)
+    review_id: Mapped[UUID] = mapped_column(Uuid)
+    ordinal: Mapped[int] = mapped_column(SmallInteger)
+    revision_id: Mapped[UUID] = mapped_column(Uuid)
+    document_id: Mapped[UUID] = mapped_column(Uuid)
+    index_id: Mapped[UUID] = mapped_column(Uuid)
+    chunker_version: Mapped[str] = mapped_column(String(CHUNKER_VERSION_MAX_LENGTH))
+    chunk_count: Mapped[int] = mapped_column(Integer)
+    manifest_sha256: Mapped[str] = mapped_column(String(64))
+    vector_manifest_sha256: Mapped[str] = mapped_column(String(64))
+
+
+class ReviewExcludedRevision(Base):
+    """One listed pending or processing revision recorded at a review's capture."""
+
+    __tablename__ = "review_excluded_revisions"
+    __table_args__ = (
+        PrimaryKeyConstraint("review_id", "revision_id"),
+        ForeignKeyConstraint(
+            ["tenant_id", "review_id"],
+            ["reviews.tenant_id", "reviews.id"],
+            name="fk_review_excluded_revisions_review",
+        ),
+        ForeignKeyConstraint(
+            ["tenant_id", "revision_id"],
+            ["document_revisions.tenant_id", "document_revisions.id"],
+            name="fk_review_excluded_revisions_revision",
+        ),
+    )
+
+    tenant_id: Mapped[UUID] = mapped_column(Uuid)
+    review_id: Mapped[UUID] = mapped_column(Uuid)
+    revision_id: Mapped[UUID] = mapped_column(Uuid)

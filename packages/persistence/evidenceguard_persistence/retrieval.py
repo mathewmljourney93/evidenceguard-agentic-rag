@@ -98,6 +98,10 @@ from evidenceguard_domain.retrieval import (
     vector_skipped,
 )
 from evidenceguard_persistence.chunks import CHUNK_SETS
+from evidenceguard_persistence.database_failures import (
+    DatabaseFailureCategory,
+    classify_database_failure,
+)
 from evidenceguard_persistence.document_views import read_snapshot
 from evidenceguard_persistence.documents import DOCUMENTS, REVISIONS, vendor_statement
 from evidenceguard_persistence.embeddings import INDEXES, PROFILES, READY
@@ -465,34 +469,114 @@ def evaluate_selection(
     return tuple(bindings)
 
 
+def _capture_phases(
+    session: Session,
+    captured_at: datetime,
+    tenant_id: UUID,
+    vendor_id: UUID,
+    identity: EmbeddingIdentity,
+) -> RetrievalSnapshot | SemanticOutcome:
+    """The M4d capture phases, unchanged: scope, selection, the evaluation phases, then the
+    exclusion record. Ordinary exceptions propagate to the caller's boundary."""
+    if session.execute(vendor_statement(tenant_id, vendor_id)).first() is None:
+        return SCOPE
+    rows = session.execute(selection_statement(tenant_id, vendor_id, identity.fingerprint)).all()
+    bindings = evaluate_selection(rows, tenant_id, identity)
+    if isinstance(bindings, SemanticOutcome):
+        return bindings
+    count = session.execute(exclusion_count_statement(tenant_id, vendor_id)).scalar_one()
+    excluded = tuple(session.execute(exclusion_ids_statement(tenant_id, vendor_id)).scalars())
+    return _build(
+        lambda: RetrievalSnapshot(
+            tenant_id,
+            vendor_id,
+            identity,
+            RETRIEVAL_CONFIG_V1,
+            bindings,
+            PendingExclusions(count, excluded, count > MAX_EXCLUSION_IDS),
+            captured_at,
+        )
+    )
+
+
+@dataclass(frozen=True)
+class CaptureFailure:
+    """An ordinary operational failure of ``capture_in_transaction``, as a fixed category only
+    (no exception, message, SQL, parameter or chain)."""
+
+    category: DatabaseFailureCategory
+
+    def __post_init__(self) -> None:
+        if type(self.category) is not DatabaseFailureCategory:
+            raise ValueError("unknown capture failure category")
+
+
+def _is_aware_datetime(value: object) -> bool:
+    """Whether ``value`` is an exact, timezone-aware ``datetime``. An ordinary failure while
+    checking it (for example a ``tzinfo`` whose ``utcoffset`` raises) counts as invalid; the
+    caller raises its fixed error outside this guard. Process control propagates."""
+    aware: list[bool] = []
+    with suppress(Exception):
+        aware.append(
+            type(value) is datetime and value.tzinfo is not None and value.utcoffset() is not None
+        )
+    return bool(aware and aware[0])
+
+
+def capture_in_transaction(
+    session: Session,
+    captured_at: datetime,
+    actor: ActorContext,
+    *,
+    vendor_id: UUID,
+    identity: EmbeddingIdentity,
+    config: RetrievalConfig = RETRIEVAL_CONFIG_V1,
+) -> RetrievalSnapshot | SemanticOutcome | CaptureFailure:
+    """Capture the vendor's eligible revisions inside the **caller's** transaction (M5d-A2).
+
+    Precedence: actor type (``TypeError``), inputs (``InvalidRetrievalRequestError``, including a
+    naive or non-``datetime`` ``captured_at`` or one whose offset cannot be read), role
+    (``PermissionDeniedError``); then the M4d
+    phases. A semantic result is a ``SemanticOutcome``; any other ordinary exception during the
+    whole remaining operation (execute, fetch, iteration, row access, result processing) is
+    classified in the handler and returned as a ``CaptureFailure``. Process control propagates as
+    the same object. It never commits, rolls back, closes the session, sets isolation or sets a
+    timeout.
+
+    Trusted preconditions (not verifiable here): an active REPEATABLE READ transaction whose
+    snapshot was established by the statement that returned ``captured_at``, no earlier write to
+    eligibility-related rows in that transaction, and the caller ends the transaction itself.
+    """
+    _require_actor(actor)
+    checked_vendor, checked_identity = _capture_inputs(vendor_id, identity, config)
+    if not _is_aware_datetime(captured_at):
+        raise InvalidRetrievalRequestError()
+    _require_role(actor)
+    category: DatabaseFailureCategory | None = None
+    try:
+        return _capture_phases(
+            session, captured_at, actor.tenant_id, checked_vendor, checked_identity
+        )
+    except Exception as error:  # classified here; the exception is not retained
+        category = classify_database_failure(error)
+    return CaptureFailure(category)
+
+
+class _CaptureFailed(Exception):
+    """Private: lets ``run_read`` record a ``CaptureFailure`` as operational."""
+
+
 def _capture_body(
     actor: ActorContext, vendor_id: UUID, identity: EmbeddingIdentity
 ) -> Callable[[Session, datetime], RetrievalSnapshot | SemanticOutcome]:
-    tenant_id = actor.tenant_id
-
     def body(session: Session, now: datetime) -> RetrievalSnapshot | SemanticOutcome:
         _set_timeout(session)
-        if session.execute(vendor_statement(tenant_id, vendor_id)).first() is None:
-            return SCOPE
-        rows = session.execute(
-            selection_statement(tenant_id, vendor_id, identity.fingerprint)
-        ).all()
-        bindings = evaluate_selection(rows, tenant_id, identity)
-        if isinstance(bindings, SemanticOutcome):
-            return bindings
-        count = session.execute(exclusion_count_statement(tenant_id, vendor_id)).scalar_one()
-        excluded = tuple(session.execute(exclusion_ids_statement(tenant_id, vendor_id)).scalars())
-        return _build(
-            lambda: RetrievalSnapshot(
-                tenant_id,
-                vendor_id,
-                identity,
-                RETRIEVAL_CONFIG_V1,
-                bindings,
-                PendingExclusions(count, excluded, count > MAX_EXCLUSION_IDS),
-                now,
-            )
+        outcome = capture_in_transaction(
+            session, now, actor, vendor_id=vendor_id, identity=identity
         )
+        if isinstance(outcome, CaptureFailure):
+            raise _CaptureFailed
+        return outcome
 
     return body
 

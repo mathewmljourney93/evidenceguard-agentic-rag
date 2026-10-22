@@ -1349,3 +1349,38 @@ def test_evidence_matches_the_stored_rows_including_a_repeated_header(
     assert evidence.version_label is None and evidence.effective_date is None
     assert item.revision_id == revision and item.document_id == document.id
     assert result.snapshot_sha256 == snapshot.sha256
+
+
+# --- M5d composable capture equivalence (ADR-0022) -----------------------------------------------
+
+
+def test_capture_in_transaction_matches_capture_snapshot_and_leaves_the_transaction_open(
+    factory: sessionmaker[Session], engine: Engine, actor: ActorContext, vendor: UUID
+) -> None:
+    from evidenceguard_persistence.retrieval import CaptureFailure, capture_in_transaction
+
+    first = _ready(factory, engine, actor, vendor, "retention", "Retention is ninety days.\n")
+    second = _ready(factory, engine, actor, vendor, "encryption", "Data is encrypted at rest.\n")
+    pending = _create(factory, actor, vendor, "pending", "Pending.\n")
+    before = _rows(engine)
+    reference = _capture(factory, actor, vendor)
+    with factory() as session:
+        session.execute(text("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"))
+        captured_at = session.execute(select(func.clock_timestamp())).scalar_one()
+        composed = capture_in_transaction(
+            session, captured_at, actor, vendor_id=vendor, identity=HASH_IDENTITY
+        )
+        assert session.in_transaction()  # the caller still owns the transaction
+        assert session.execute(text("SELECT 1")).scalar_one() == 1
+        session.rollback()
+    assert not isinstance(composed, CaptureFailure)
+    assert isinstance(composed, RetrievalSnapshot)
+    assert composed.captured_at == captured_at
+    assert composed.bindings == reference.bindings
+    assert {b.revision_id for b in composed.bindings} == {first, second}
+    assert composed.exclusions == reference.exclusions
+    assert composed.exclusions.revision_ids == (pending,)
+    assert (composed.tenant_id, composed.vendor_id) == (reference.tenant_id, reference.vendor_id)
+    assert (composed.identity, composed.config) == (reference.identity, reference.config)
+    assert composed.profile_id == reference.profile_id
+    assert _rows(engine) == before

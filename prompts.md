@@ -39352,3 +39352,1307 @@ links with 0 link or anchor problems, 67 tables with 0 problems, `git diff --cac
 No application test, build, wheel, database, Docker or provider check was run. The final scope,
 prefix, encoding, privacy and Gitleaks checks, the commit and the export follow and are reported
 in the handoff.
+
+### Prompt 188 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 188 handoff: M5d specification acceptance committed locally
+
+The M5d specification acceptance, with your binding cleanup clarification, is committed locally on `docs/review-creation-plan`. Nothing was pushed or merged, and nothing was implemented. M5d implementation and overall M5 acceptance are still pending.
+
+**Starting state.** Everything matched what you expected:
+- Branch `docs/review-creation-plan`; HEAD, `main` and `origin/main` at `e8d1033c` (parent `36a41b1f`, tree `3ceeb788`).
+- Staged tree `9a7f1714` with the five paths; nothing unstaged or untracked; origin and the noreply identity are unchanged.
+- The p187 export matches its 66,122 bytes, 445 lines and SHA-256, and is byte-identical to `git diff --full-index 8a146aae 9a7f1714` excluding prompts.md.
+- The checkpoint is in `.local/p188/` (refs, status, staged tree, five blob hashes, prompts.md prefix and checksum). No remote operation was run.
+
+**What changed**
+- **Plan heading and links:** the M5d heading is now "…(ACCEPTED at review, Prompt 188; implementation pending)", and all three links to it are updated (plan, README, threat model).
+- **Acceptance subsection:** a new "M5d acceptance (Prompt 188)" subsection records the scope, your evidence and its limits (the isolated SQLAlchemy 2.1.1 extracted-method probe), the p187 export checksum and the binding clarification.
+- **Cleanup rules (M5d-B1),** rewritten to your exact policy:
+  - Call `rollback()` once. Only if it returned, call `close()` once.
+  - If `rollback()` fails, skip `close()` and call `invalidate()` once. If `close()` fails, call `invalidate()` once.
+  - After an unknown COMMIT, call `invalidate()` once and never roll back.
+  - After an acknowledged commit, call `close()` once, falling back to `invalidate()`. The `CreatedReview` is kept even if both fail.
+  - Automatic retry is allowed only when the normal `rollback()` and `close()` both returned; a later successful `invalidate()` never restores it.
+  - The first process-control object stays primary.
+  - The limitation is stated: `invalidate()` reaches only connections still attached to the session, so its normal return proves nothing about the original connection. No physical disposal or pool quarantine is claimed.
+- **Related text:** the M5d-E retry wording is narrowed to failures already classified as retryable, so semantic, idempotency and job-conflict errors are never remapped. The error table, D13, D17 and the planned tests are updated to match (including the detached-transaction case).
+- **Decisions:** D1–D17 are marked accepted, with D17 subject to the clarification; the earlier "supported direction" states are marked historical. No decision remains open.
+- **README and threat model:** they now say the specification is accepted, implementation is pending and no M5d control operates. The M4 limits and M5c evidence are unchanged.
+- **ADR-0021** is unchanged in this prompt, and no ADR-0022 exists.
+
+**Commit**
+
+| Item | Value |
+|---|---|
+| SHA | `76f0b2c0523d6ad8eca04c15badb30948d2f5347` |
+| Parent | `e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3` |
+| Tree | `8654848cb1aba64b750e287cb62b3145d97c538e` |
+| Subject | docs: record accepted M5d review creation specification |
+| Author and committer | `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>` |
+| Message | written from a file; attributes this documentation work and your reviews; Co-Authored-By trailer present |
+
+The commit contains exactly the five authorized paths, and every other blob matches the parent. The working tree is clean, no `.local` file is tracked, and `main` and `origin/main` are still at `e8d1033c`.
+
+**Checks actually run (documentation only)**
+- **Scope:** against the starting tree `9a7f1714`, only README, plan, threat model and prompts.md changed.
+- **Links and tables:** 367 relative links with no bad links or anchors; 67 tables with no problems.
+- **Encoding:** all five files are UTF-8 without BOM, LF only, with no replacement characters.
+- **Whitespace:** `git diff --cached --check` is clean.
+- **Privacy:** scan of the 520 added lines found nothing.
+- **Gitleaks:** the staged scan found no leaks, and the full-history scan after the commit covered 81 commits with no leaks; no suppressions.
+- **Status:** M5c is published and verified, the M5d specification is accepted with implementation pending, and overall M5 is pending.
+- **Prompt history:** 365 lines added, and the earlier bytes are an identical prefix. In the Prompt 188 verbatim block, the punctuation matches the source.
+- No application test, build, wheel, database, Docker, provider or CI check was run.
+
+**Export:** `.local/p188/m5d-spec-acceptance.diff`
+
+| Item | Value |
+|---|---|
+| Baseline | `9a7f1714e8f549b8be6c8b33843a242c4e09c562` |
+| Final | commit `76f0b2c0` |
+| Options | `--full-index`, prompts.md excluded |
+| Statistics | 3 files, 155 insertions, 82 deletions; 390 lines |
+| Size | 61,261 bytes |
+| SHA-256 | `b2895d3d9f996f31b0293cd8477456e451fadd55ad12e165c964bcf8f86c2a9c` |
+| Encoding | UTF-8, no BOM, LF only |
+| Identity | byte-identical to the Git comparison |
+
+**Remaining:** publishing this documentation commit, then the M5d implementation (migration `0006`, tests, ADR-0022), implementation acceptance, CI and overall M5 acceptance. Each needs your authorization.
+
+Start a new Claude session before the next task: this one is far past the 20-prompt guideline. The `.local/p188/` checkpoint and this handoff are enough to recover.
+
+**Next step:** please return **output plus the diff file** `.local/p188/m5d-spec-acceptance.diff`.
+
+### Prompt 189 (verbatim)
+
+Written for: Claude Code.
+Prompt 189 — implement the accepted M5d review-creation specification; stage for review only.
+
+Implement M5d completely within the accepted scope, perform the authorized checks, and return a reviewable staged result. Do not commit, push, merge or start M5e.
+
+1. Recover and verify
+
+Read the applicable repository instructions, the Prompt 188 handoff, and the accepted M5d specification in docs/plan.md, including its acceptance subsection and binding cleanup clarification.
+
+Expected starting state:
+- Branch: docs/review-creation-plan.
+- HEAD:
+  76f0b2c0523d6ad8eca04c15badb30948d2f5347
+- Parent:
+  e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3
+- Tree:
+  8654848cb1aba64b750e287cb62b3145d97c538e
+- Subject:
+  docs: record accepted M5d review creation specification
+- Working tree and index clean.
+- main and origin/main:
+  e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3
+- Origin and the established noreply identity unchanged.
+
+Verify:
+.local/p188/m5d-spec-acceptance.diff
+
+Expected:
+- 61,261 bytes.
+- 390 lines.
+- SHA-256:
+  b2895d3d9f996f31b0293cd8477456e451fadd55ad12e165c964bcf8f86c2a9c
+- Byte-identical to git diff --full-index between:
+  9a7f1714e8f549b8be6c8b33843a242c4e09c562
+  76f0b2c0523d6ad8eca04c15badb30948d2f5347
+  excluding prompts.md.
+
+Save a checkpoint under .local/p189/ containing refs, status, tree, tracked blob hashes and the exact prompts.md prefix with its checksum.
+
+If a material mismatch exists, stop without resetting or overwriting anything.
+
+Create feat/review-creation from HEAD only if that branch does not already exist. Do not overwrite an existing branch.
+
+No remote operation is authorized. The local specification commit is a sufficient implementation baseline.
+
+2. Scope and controlling contract
+
+The complete accepted M5d specification, including D1–D17 and the Prompt 188 clarification, is the implementation contract.
+
+Authorized implementation paths:
+- packages/domain/evidenceguard_domain/reviews.py — new.
+- packages/persistence/evidenceguard_persistence/database_failures.py — new.
+- packages/persistence/evidenceguard_persistence/retrieval.py.
+- packages/persistence/evidenceguard_persistence/reviews.py — new.
+- packages/persistence/evidenceguard_persistence/models.py.
+- Migration 0006 in the existing migration directory, using the accepted v0006_reviews.py naming and repository conventions.
+- apps/worker/evidenceguard_worker/review_seams.py — new.
+
+Authorized verification paths:
+- tests/test_review_values.py — new.
+- tests/test_review_creation.py — new.
+- tests/test_database_failures.py — new.
+- tests/test_reviews_postgres.py — new.
+- tests/test_retrieval_postgres.py — accepted equivalence coverage only; preserve existing cases.
+- tests/test_packaging.py.
+- .github/workflows/ci.yml — the accepted additive offline-migration wheel assertion only.
+
+Authorized documentation:
+- docs/decisions/0022-review-creation.md — new ADR-0022.
+- README.md.
+- docs/plan.md.
+- docs/threat-model.md.
+- prompts.md.
+
+Do not change dependencies, uv.lock, pyproject.toml, existing migrations, corpus files, Docker, Compose, settings, environment files, M5a–M5c contracts or prompt resources.
+
+Do not add endpoints, CLI commands, production enqueue paths, handler registration, providers or live calls.
+
+If an actual specification conflict or necessary out-of-scope change blocks implementation, preserve completed work and report the concrete issue. Do not silently weaken a contract or broaden an allowlist.
+
+3. Implement the accepted values and canonical encodings
+
+Implement the exact fields, bounds, defaults, invariants, constructors, representations and fixed errors specified for:
+- ReviewConfiguration.
+- ReviewRequest.
+- CreatedReview.
+- TrustedReview.
+- ResolvedReview.
+
+Preserve:
+- Exact types, including bool versus int.
+- Revalidation of nested and bypass-built values.
+- Replacement validation.
+- No content or idempotency key in representations or errors.
+- Fresh fixed ordinary errors outside handlers, without cause or context.
+- Same-object propagation of process-control exceptions.
+- No logging.
+
+Implement both accepted canonical encodings exactly:
+- eg-review-configuration-v1.
+- eg-review-request-v1.
+
+The request digest requires an explicit tenant:
+request_sha256(request, *, tenant_id)
+
+Creation obtains that tenant only from the validated actor. Reload checks the stored tenant against the actor and recomputes the digest with it.
+
+Pin canonical bytes and SHA-256 values independently in tests. Do not compute expected values using the production function under test.
+
+4. Extract composable capture without changing M4d behavior
+
+Implement the public capture_in_transaction contract and public SemanticOutcome and CaptureFailure values.
+
+Preserve capture_snapshot’s existing signature, read-only transaction behavior, semantic precedence, fixed errors and process-control behavior.
+
+The public composable capture function:
+- Runs in a transaction owned by its caller.
+- Never commits, rolls back, closes, sets isolation or sets timeouts.
+- Preserves the accepted input and role precedence.
+- Covers the whole post-validation operation with its ordinary-failure boundary.
+- Preserves recognized semantic results.
+- Returns fixed CaptureFailure categories for other ordinary operational failures, including fetch, iteration and row processing.
+- Retains no raw exception in returned values.
+
+Use the accepted shared diagnostic classifiers. Guard diagnostic access and recognize only the exact allowlisted types and values. Never inspect messages, SQL, parameters, exception chains or tracebacks.
+
+Do not reach into another module’s private capture helper.
+
+5. Implement creation, persistence and trusted reload
+
+Implement migration 0006 and matching models with the exact accepted columns, CHECKs, named constraints, composite foreign keys, uniqueness rules and no cascades.
+
+Implement the accepted REPEATABLE READ, READ WRITE creation sequence:
+- Validate actor, request and role in the specified order.
+- Establish the snapshot with the clock read.
+- Set transaction-local timeouts.
+- Resolve matching or conflicting replay.
+- Capture the trusted snapshot.
+- Generate the review ID.
+- Enqueue and validate the new run_review job before inserting the review.
+- Store the job reference, review, bindings and exclusions.
+- Commit atomically.
+
+Preserve:
+- Actor-derived tenant authority.
+- max_attempts = 3 for the job.
+- Exact job kind, key, payload and association checks.
+- Matching replay returning the original review, snapshot facts and job ID.
+- Defined refusal of unexpected existing jobs.
+- At most three creation attempts with fresh sessions and transactions.
+- MVCC visibility rules; captured_at is not an ordering proof.
+
+Trusted reload must use the public read_snapshot helper with the accepted review-specific failure boundary. Rebuild stored values, check ordinals and cross-field invariants, recompute all specified digests and validate the stored job association.
+
+Implement the isolated worker composition seams using pinned M5c artifact loaders. Narrow the packaging import exception only to review_seams.py. Keep production_registry and the registered-kind claim filter unchanged.
+
+6. Implement commit and cleanup rules exactly
+
+Track commit state separately from errors:
+not_entered, entered, rejected, committed.
+
+COMMIT classification:
+- Only exact 40001 or 40P01 is rejected_retryable.
+- Every other ordinary COMMIT failure is unknown.
+- Unknown outcome raises ReviewCommitOutcomeUnknownError and never triggers automatic retry.
+- Later rollback or cleanup cannot establish that an unknown COMMIT failed.
+- Acknowledged commit never triggers another creation attempt.
+
+For not_entered or rejected:
+- Call rollback once.
+- Only if rollback returned normally, call close once.
+- If rollback raises, skip the normal close call and attempt invalidate once.
+- If close raises, attempt invalidate once.
+- Any ordinary rollback or close failure permanently disables automatic retry for that attempt.
+- A later successful invalidate does not restore retry eligibility.
+- An otherwise-retryable failure then ends with ReviewConflictRetryableError.
+- Already non-retryable results retain their own fixed result.
+
+For entered/unknown:
+- Attempt invalidate once.
+- Do not roll back.
+- Preserve the unknown-outcome result.
+
+For committed:
+- Close once, with one fallback invalidation attempt on failure.
+- Ordinary cleanup failures preserve CreatedReview.
+
+Process control:
+- Preserve the first observed object by identity.
+- Later cleanup failures cannot replace it.
+- Never run another attempt after process control.
+- Preserve committed state after acknowledgement and unknown state during an unresolved COMMIT.
+
+Do not claim guaranteed physical disposal or pool quarantine. Session.invalidate may have no original connection left to invalidate.
+
+7. Verification
+
+Use the repository’s existing locked environment and offline tooling. Do not upgrade or download dependencies.
+
+Implement meaningful tests from M5d-G, including:
+- Value bounds, nested revalidation, canonical literals and tenant binding.
+- Guarded body and COMMIT classifiers, including malformed or raising diagnostics.
+- Capture equivalence and preservation of existing M4d behavior.
+- Every commit-state, result and cleanup path.
+- Exact cleanup call order and count.
+- No automatic retry after rollback or close failure, even when invalidation returns normally.
+- Detached-transaction invalidation limitation.
+- Unknown COMMIT followed by matching replay.
+- First process-control identity and cleanup precedence.
+- Atomicity, replay, concurrency, job linkage, tenant isolation and tampered-row rejection.
+- Migration upgrade, downgrade, model check and offline rendering.
+- Production isolation and import boundaries.
+
+Run:
+- Ruff lint and format checks.
+- Strict mypy.
+- Focused new and affected tests.
+- Full suite and integration/non-integration collection.
+- Offline build.
+- Packaging comparison against a git-archive build of 76f0b2c0.
+- The full installed-wheel step extracted from ci.yml in a fresh environment outside the checkout, using the established offline hashed-dependency method.
+- The accepted CREATE TABLE reviews assertion against rendered offline migration SQL.
+
+Use an already configured, dedicated local PostgreSQL test database only if available through the established test configuration. Do not print its URL or credentials. Do not create a database service, start Docker, change authentication or install anything to obtain one.
+
+If no test database is configured, report PostgreSQL tests as unrun/skipped and leave their execution for later exact-commit CI. Do not replace PostgreSQL evidence with SQLite or fake-session results.
+
+Do not weaken checks to make them pass. Report exact commands, counts, skips, failures and limits. Re-run checks when subsequent changes invalidate their results.
+
+8. Documentation and history
+
+Create ADR-0022 documenting:
+- Implemented contract and architecture.
+- Any implementation choices or deviations requiring review.
+- Actual local verification with commands and results.
+- What remains unrun.
+- The cleanup and unknown-outcome limitations.
+- Production isolation and later-slice obligations.
+
+Update README, plan and threat model to:
+- Specification accepted in Prompt 188.
+- Implementation staged for review in Prompt 189.
+- Implementation acceptance, publication and current-version CI pending.
+- No production review path or handler uses it.
+- Overall M5 acceptance pending.
+
+Keep the accepted specification heading and anchor unchanged. Add a separate implementation-status subsection.
+
+Do not prematurely claim that the trusted-snapshot limitation is closed globally or that M5g uses this path. Preserve the accepted conditional scope and all M4 limitations.
+
+Append the supplied Prompt 188 handoff, this prompt verbatim and an outcome note to prompts.md. Preserve its earlier bytes exactly and retain existing fidelity disclosures.
+
+9. Final staging and export
+
+Stage only the authorized paths.
+
+Verify:
+- Exact staged path list and no unrelated changes.
+- Every other tracked blob matches 76f0b2c0.
+- No tracked .local file, artifact, binary or secret.
+- Existing workflows and checks preserved.
+- Links, anchors and tables.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --cached --check.
+- Privacy scan and unsuppressed staged Gitleaks.
+- Prompt-history prefix and verbatim fidelity.
+- Final wheel/source/resource identity where applicable.
+
+Export directly from Git:
+.local/p189/m5d-implementation.diff
+
+Baseline:
+76f0b2c0523d6ad8eca04c15badb30948d2f5347
+
+Final:
+the final staged tree.
+
+Use --full-index and exclude prompts.md. Verify byte identity with both the staged and tree comparisons.
+
+Return a self-contained handoff with:
+- Starting state and final branch, HEAD and staged tree.
+- Exact changed paths.
+- Implementation summary.
+- Choices or deviations needing review.
+- Checks actually run, commands, counts and skips.
+- PostgreSQL execution status stated explicitly.
+- Build and installed-wheel evidence.
+- Export statistics, line count, bytes, SHA-256 and encoding.
+- Remaining limitations.
+
+Stop with the implementation staged and uncommitted. Nothing is authorized for publication or merge.
+
+Mathew should return the handoff plus:
+.local/p189/m5d-implementation.diff
+
+### Prompt 189 interruption and recovery (Claude Code)
+
+- **Start.** Prompt 189 began from the expected state: branch `docs/review-creation-plan`, HEAD
+  `76f0b2c0` (parent `e8d1033c`, tree `8654848c`), `main` and `origin/main` at `e8d1033c`, clean
+  index and working tree, unchanged origin and noreply identity. Checkpoint
+  `.local/p189/checkpoint.md` (2026-10-21T17:51:32Z) with the prompts.md prefix (2,069,547 bytes,
+  SHA-256 `b1bfe2bd3d0d681a416ab36cdd266865faee39c715413719ac0101e2e52c69e1`) and the tracked blob
+  list. `feat/review-creation` did not exist and was created from HEAD.
+- **Interruption.** A usage limit stopped the session after two new untracked files had been
+  written (`packages/domain/evidenceguard_domain/reviews.py` and
+  `packages/persistence/evidenceguard_persistence/database_failures.py`) and before any check had
+  completed. Nothing was staged, no tracked file had changed and prompts.md was unchanged.
+- **Recovery.** Mathew sent the continuation prompt recorded below (it arrived twice,
+  byte-identical, and is recorded once). Recovery at 2026-10-22T04:58:36Z found exactly that
+  state, no task from the interrupted session still running and no partial check output, and
+  saved `.local/p189/recovery-checkpoint.md` (refs, status, the two untracked blob hashes, the
+  prompts.md prefix and checksum) before further edits; the earlier checkpoint is preserved. The
+  first unfinished step was the rest of the implementation (capture extraction, models, migration
+  `0006`, creation and reload, worker seams), then every test, document and check.
+- **Reused versus rerun.** The two files written before the interruption were kept and completed;
+  their final content is in the export. No check result was reused, because none had completed;
+  every check in the outcome note ran after recovery on the final inputs. The Prompt 188 export
+  was verified again after recovery (61,261 bytes, 390 lines, SHA-256
+  `b2895d3d9f996f31b0293cd8477456e451fadd55ad12e165c964bcf8f86c2a9c`, byte-identical to
+  `git diff --full-index 9a7f1714 76f0b2c0` excluding prompts.md).
+- **Text fidelity.** The session context was later summarized automatically once; work continued
+  from the files and checkpoints. The Prompt 188 handoff, Prompt 189 and the continuation prompt
+  below were extracted by script from the session transcript (the content inside the paste
+  markers, as in earlier entries), not retyped. Earlier text-fidelity disclosures stand.
+
+### Prompt 189 continuation after the usage-limit interruption (verbatim)
+
+Resume Prompt 189 after the usage-limit interruption.
+
+This is recovery and continuation of the existing M5d implementation task. Keep its accepted scope and authorization. Do not restart, discard completed work or assume the repository is still at the clean starting state.
+
+1. Recover before making changes
+
+Read:
+- Applicable repository instructions.
+- The original Prompt 189 in this conversation.
+- The accepted M5d specification and Prompt 188 binding cleanup clarification in docs/plan.md.
+- Available checkpoints, notes and saved verification output under .local/p189/.
+- The Prompt 188 checkpoint if needed.
+
+Inspect the current branch, HEAD, index, working tree and any still-running task from the interrupted session. Do not launch duplicate checks or terminate an active task blindly.
+
+Expected implementation baseline:
+76f0b2c0523d6ad8eca04c15badb30948d2f5347
+
+Its parent:
+e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3
+
+Its tree:
+8654848cb1aba64b750e287cb62b3145d97c538e
+
+The intended implementation branch is feat/review-creation. It may already exist and contain partial work. Preserve it.
+
+main and origin/main should remain:
+e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3
+
+No fetch or other remote operation is needed.
+
+2. Establish exactly where work stopped
+
+Compare current files with the baseline and checkpoint. Determine:
+- What is already implemented.
+- What remains incomplete.
+- Which checks actually completed.
+- Whether any files changed after those checks.
+- Whether a failed or interrupted command left incomplete output.
+
+Do not treat a started check as passed. Reuse completed check results only when their inputs are unchanged. Repeat interrupted checks and checks invalidated by later edits.
+
+Save a recovery checkpoint under .local/p189/ before further edits. Include current refs, status, staged and working-tree differences, relevant blob hashes and the current prompts.md prefix and checksum. Preserve earlier checkpoints.
+
+Give me a short recovery update, then continue autonomously. Stop only for a material unexplained state mismatch, an actual specification conflict or a necessary unauthorized scope change.
+
+3. Continue the original implementation
+
+Resume at the first unfinished step of Prompt 189 and finish all remaining authorized work.
+
+The accepted specification controls. In particular, preserve:
+- Public composable capture with unchanged M4d behavior.
+- Actor-derived tenant binding and exact canonical encodings.
+- Atomic review, bindings, exclusions, configuration and job creation.
+- Stored and validated run_review job linkage.
+- Trusted reload and pinned artifact composition.
+- Exact migration constraints and production isolation.
+- Fresh private errors, no logging and same-object process-control propagation.
+
+The Prompt 188 cleanup clarification remains binding:
+- Retryable attempts may retry only when normal rollback and close both returned without interruption.
+- Any rollback or close failure disables automatic retry, even if subsequent invalidate returns normally.
+- If rollback fails, skip normal close and attempt invalidate once.
+- Unknown COMMIT: invalidate once, no rollback and no automatic retry.
+- Acknowledged commit: preserve CreatedReview despite ordinary cleanup failure.
+- The first process-control object remains primary.
+- Do not claim guaranteed physical disposal or pool quarantine.
+
+During COMMIT, only exact 40001 or 40P01 is a recognized retryable rejection. Every other ordinary COMMIT failure is an unknown outcome.
+
+4. Finish verification and documentation
+
+Complete the checks authorized by Prompt 189 using the locked offline environment. Do not download or upgrade dependencies.
+
+Run PostgreSQL checks only if the established dedicated test database is already configured. Otherwise report them as unrun/skipped. Do not start Docker, provision services or change authentication.
+
+Keep the authorized file scope from Prompt 189. Do not change dependencies, lockfiles, existing migrations, settings, corpus, Docker, M5a–M5c contracts or prompt resources.
+
+Finish ADR-0022 and the implementation-status documentation using only checks actually completed. Preserve accepted specification headings and existing evidence attribution.
+
+Record this interruption and recovery accurately in prompts.md, along with this continuation prompt verbatim. Preserve all previously existing bytes and fidelity disclosures.
+
+5. Finish with the original staged handoff
+
+Do not commit, push, merge or start M5e.
+
+Complete the final scope, encoding, whitespace, links, privacy, Gitleaks, packaging and prompt-history checks required by Prompt 189.
+
+Export:
+.local/p189/m5d-implementation.diff
+
+Baseline:
+76f0b2c0523d6ad8eca04c15badb30948d2f5347
+
+Final:
+the final staged tree.
+
+Use --full-index and exclude prompts.md. Verify byte identity against the exact Git comparison.
+
+Return the complete Prompt 189 handoff, including:
+- Recovery findings and the first unfinished step.
+- Completed work reused versus checks rerun.
+- Final branch, HEAD, staged tree and exact changed paths.
+- Implementation choices or deviations requiring review.
+- Actual verification commands, results, counts and skips.
+- PostgreSQL execution status explicitly.
+- Export statistics, bytes, line count and SHA-256.
+- Remaining limitations.
+
+The final result must be staged and uncommitted for external review.
+
+### Prompt 189 outcome (Claude Code; staged, awaiting review)
+
+- **Implemented and staged, not committed.** On `feat/review-creation` (HEAD `76f0b2c0`): the
+  review values and canonical encodings (`evidenceguard_domain.reviews`), the guarded
+  database-failure classifiers (`database_failures`), public `capture_in_transaction` with
+  `capture_snapshot` behaviour preserved, the three review models and migration `0006`, atomic
+  creation with idempotent replay and the clarified commit-state and cleanup policy, the trusted
+  reload (`evidenceguard_persistence.reviews`), and the isolated worker composition
+  (`review_seams`). Four new test modules, the capture equivalence test, M5d packaging-boundary
+  tests, one additive installed-wheel assertion, ADR-0022 and the README, plan and threat-model
+  status. No endpoint, CLI command, handler, production enqueue or registry entry, provider or
+  dependency was added; `run_review` is not registered.
+- **Choices for review** are listed in ADR-0022 (testable step functions, private `_Refusal`,
+  replay depth, job-conflict mapping, process control first seen during cleanup, session-factory
+  failures, the reload recording session and the seam's artifact check before any session).
+- **Out-of-scope pins (not changed; authorization needed).** Migration `0006` changes the Alembic
+  head and table set, which `tests/test_persistence.py` (two tests) and `tests/test_readiness.py`
+  (two tests) pin for head `0005`; they fail locally. `tests/test_persistence_postgres.py` pins
+  the same in integration tests (not run). A proposed, unapplied patch is at
+  `.local/p189/proposed-head-pins.diff`; applied to scratch copies outside the tracked tree, the
+  two non-integration modules passed (51 passed).
+- **Checks run before this note** (locked offline environment, no database URL): Ruff lint clean
+  and 211 files formatted; strict mypy no issues in 168 source files; the three new
+  non-integration modules 172 passed; a twelve-module focused command 4 failed, 659 passed, 62
+  skipped; full suite 4 failed (the four pins above), 3600 passed, 333 skipped (331 PostgreSQL,
+  one symbolic-link, one POSIX-only signal test); collection 331 integration and 3,606
+  non-integration (3,937). Offline build of the staged tree against a `git archive` build of
+  `76f0b2c0`: wheel 104 → 109 and sdist 211 → 221 members with only the M5d additions and
+  changes, all 16 sample files and the pinned template and prompt files byte-identical. The
+  extracted installed-wheel step ran in a fresh environment outside the checkout (hashed offline
+  requirements, wheel with `--no-deps`), once for a preliminary build and again for the wheel
+  rebuilt after the last README edit: exit 0 both times with all ten lines, including the new
+  review-migration line.
+- **PostgreSQL: not run** (no `EG_TEST_DATABASE_URL`); the 23 new integration tests and every M5d
+  database behaviour await exact-commit CI.
+- The final scope, link, table, encoding, privacy and Gitleaks checks and the export follow and
+  are reported in the handoff.
+
+### Prompt 189 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 189 handoff: M5d is implemented and staged for review, with one out-of-scope blocker
+
+M5d is implemented and staged on `feat/review-creation`. Nothing is committed, pushed or merged, and no remote operation was run. One problem needs your decision: the new migration breaks four existing tests in files this prompt did not authorize me to change. Details are under "Needs your decision" below.
+
+**Recovery**
+- **What I found:** the branch `feat/review-creation` at `76f0b2c0`, with a clean index. Two untracked files had been written before the interruption: `evidenceguard_domain/reviews.py` and `database_failures.py`. No check had completed, no task was still running, and `prompts.md` was unchanged.
+- **First unfinished step:** the rest of the implementation (capture extraction, models, migration `0006`, creation and reload, the worker seams), then every test, document and check.
+- **Reused versus rerun:** I kept and completed the two pre-interruption files. No check result was reused, because none had finished; every check below ran after recovery on the final inputs. I also re-verified the Prompt 188 export: 61,261 bytes, 390 lines, SHA-256 `b2895d3d…a2c3`, byte-identical to `git diff --full-index 9a7f1714 76f0b2c0` excluding `prompts.md`.
+- **Checkpoints:** `.local/p189/checkpoint.md` (original start) and `.local/p189/recovery-checkpoint.md`.
+
+**Final state**
+- Branch `feat/review-creation`; HEAD `76f0b2c0`; staged tree `0090ecdf6703ebd0a247e0bf956f29e2a21c2272`.
+- `main` and `origin/main` are still at `e8d1033c`.
+- No unstaged or untracked files.
+- 19 staged paths, all authorized:
+  - **New:** `domain/reviews.py`, `persistence/database_failures.py`, `persistence/reviews.py`, `migrations/versions/v0006_reviews.py`, `worker/review_seams.py`, four test modules, ADR-0022.
+  - **Changed:** `retrieval.py`, `models.py`, `tests/test_packaging.py`, `tests/test_retrieval_postgres.py` (one equivalence test added; existing tests untouched), `ci.yml` (one added wheel line), README, plan, threat model, `prompts.md`.
+- The other 217 tracked files are identical to the baseline.
+
+**What was implemented**
+- **Review values:** the review values, plus both canonical encodings with the tenant-bound `request_sha256(request, *, tenant_id)`.
+- **Failure classifiers:** guarded classifiers for database and `COMMIT` failures. Only exact `40001`/`40P01` during `COMMIT` counts as retryable.
+- **Composable capture:** a public `capture_in_transaction`, with `capture_snapshot`'s M4d behaviour kept.
+- **Schema:** migration `0006` and matching models. All 49 constraint names match between the rendered migration SQL and the model DDL.
+- **Atomic creation:** one transaction with replay or conflict on the client key and a validated `run_review` job. Commit state and cleanup follow the Prompt 188 clarification, with at most three attempts.
+- **Trusted reload:** rebuilds every stored value and recomputes the digests.
+- **Worker seams:** `review_seams` uses the pinned M5c loaders.
+- **No production path:** no endpoint, CLI command, handler, enqueue path or registry entry was added, and `run_review` stays unregistered.
+
+**Choices for review** (full list in ADR-0022)
+- Creation steps are module functions so tests can replace them.
+- A private `_Refusal` carries module-decided errors.
+- Replay checks the digest and job link but does not rebuild the full snapshot.
+- A process-control interrupt first seen during cleanup after a commit is re-raised, so the `CreatedReview` is not returned in that case.
+- If the session factory itself fails, there is no cleanup and no retry.
+- Reload wraps the session so an interrupt survives a failing cleanup.
+
+**Needs your decision: out-of-scope head pins**
+Migration `0006` changes the Alembic head and table set. These existing tests still expect head `0005`:
+- `tests/test_persistence.py`: 2 tests, failing locally.
+- `tests/test_readiness.py`: 2 tests, failing locally.
+- `tests/test_persistence_postgres.py`: `_version` and `HEAD_TABLES`, integration only.
+
+I did not edit them. A proposed patch is at `.local/p189/proposed-head-pins.diff` (4,698 bytes, 97 lines, SHA-256 `aa348712…9ddf0`). On scratch copies, the two non-integration modules pass with it (51 passed); it is not applied.
+
+**Checks run** (locked offline environment, no database URL)
+
+| Check | Result |
+|---|---|
+| `ruff check .` | clean |
+| `ruff format --check .` | 211 files formatted |
+| `mypy` (strict) | no issues in 168 files |
+| Three new non-integration test modules | 172 passed |
+| Focused set of 12 modules | 4 failed, 659 passed, 62 skipped |
+| Full suite | 4 failed, 3600 passed, 333 skipped |
+| Collection | 331 integration, 3,606 non-integration |
+
+- The 4 failures in both test runs are the head pins above.
+- The full-suite skips are 331 PostgreSQL tests, one symbolic-link test and one POSIX-only signal test.
+- Expected canonical bytes and digests in the tests are hand-written literals checked with the standard library, not computed by the code under test.
+
+**PostgreSQL: not run.** No test database is configured. The 23 new integration tests, and with them atomicity, replay, concurrency, races, tampered rows and the migration up/down/check, still need exact-commit CI.
+
+**Build and installed wheel**
+- Offline build of the staged tree compared with a `git archive` build of `76f0b2c0`:
+  - Wheel: 104 → 109 members.
+  - Sdist: 211 → 221 members.
+  - Only M5d additions and changes; nothing removed. All 16 sample files and the pinned template and prompt files are byte-identical.
+- The full installed-wheel step from `ci.yml` ran in a fresh environment outside the checkout, with hashed offline requirements and the wheel installed with `--no-deps`:
+  - Exit 0, all ten lines printed, including "offline review migration SQL rendered from the installed wheel".
+  - The production registry is still exactly `ingest_revision` and `index_revision`.
+  - The final wheel (`af180272…`) is the one tested.
+
+**Final checks**
+- Links: 382, 0 problems. Tables: 68, 0 problems.
+- 19 files: UTF-8, no BOM, LF only, no U+FFFD.
+- `git diff --cached --check`: clean.
+- Gitleaks 8.30.1, staged and unsuppressed, in both forms: no leaks.
+- Privacy scan: the only hit is the established noreply identity, inside the verbatim Prompt 188 handoff (it already appears 84 times in `prompts.md`).
+- `prompts.md`:
+  - Its 2,069,547-byte prefix is preserved.
+  - Appended verbatim, each once: the Prompt 188 handoff, Prompt 189, an interruption and recovery note, the continuation prompt (it arrived twice, byte-identical) and an outcome note.
+
+**Export: `.local/p189/m5d-implementation.diff`**
+- Baseline `76f0b2c0`; final tree `0090ecdf`; `prompts.md` excluded.
+- 240,368 bytes, 4,995 lines, 18 files, 4,761 insertions and 33 deletions.
+- SHA-256 `e7c61a7c29fae1563e6c4f1e1a00a30c44213525027c01775addc3a754ed2074`.
+- UTF-8, LF only.
+- Byte-identical to both the staged and the tree comparisons.
+
+**Remaining limitations**
+- The four pin failures stand until a patch is authorized.
+- PostgreSQL and CI evidence is missing.
+- Nothing in the application uses M5d, and the M4d trusted-snapshot limitation is not closed.
+- `invalidate()` does not prove the original connection was discarded.
+- An unknown `COMMIT` outcome is only resolved by the caller repeating the request.
+
+Start a new Claude session before the next task. This session covers Prompts 180–189 and has been summarized once; the `.local/p189/` checkpoints and this handoff are enough to recover.
+
+**Next step:** please return **output plus the diff file** `.local/p189/m5d-implementation.diff`, and say whether the proposed head-pin patch is authorized.
+
+### External review of the Prompt 189 implementation and scope authorization (Prompt 190)
+
+M5d implementation is not yet accepted. The external reviewer verified the Prompt 189 export
+(`.local/p189/m5d-implementation.diff`, 240,368 bytes, 4,995 lines, SHA-256
+`e7c61a7c29fae1563e6c4f1e1a00a30c44213525027c01775addc3a754ed2074`), inspected the implementation
+and relevant tests, and inspected the published source of the public `read_snapshot` helper and
+the existing migration-head tests. The reviewer's probes used extracted submitted functions with
+simulated collaborators, not imports of the complete project or execution of SQLAlchemy,
+PostgreSQL, the project suite, builds or installed wheels. Findings: (A) `load_review` did not
+record process control raised while `read_snapshot` consumed its clock result with `scalar_one()`,
+so an ordinary cleanup failure turned it into `ReviewDatabaseError` and a later cleanup interrupt
+replaced it (isolated probe over `KeyboardInterrupt`, `SystemExit` and `GeneratorExit`: 3 passed,
+6 failed); (B) `capture_in_transaction` called `captured_at.utcoffset()` outside its guard, so a
+`tzinfo` raising an ordinary exception leaked it with the sentinel text `PRIVATE_CLOCK_MARKER`.
+The reviewer also required stronger PostgreSQL tests (established same-key concurrency, distinct
+insert-boundary atomicity, a real-database pre-existing job refusal, and a connection-default test
+that proves reuse). Prompt 190 additionally authorized `tests/test_persistence.py`,
+`tests/test_readiness.py` and `tests/test_persistence_postgres.py`, only for migration `0006`
+packaging, current-head expectations and the new table set; the reviewer authorized the purpose of
+`.local/p189/proposed-head-pins.diff`, not its exact bytes. No commit, push, merge or remote
+operation is authorized.
+
+### Prompt 190 (verbatim)
+
+Written for: Claude Code.
+Prompt 190 — correct M5d boundaries, update migration-head tests and strengthen database coverage; stage only.
+
+Continue from the submitted Prompt 189 implementation. Do not commit, push, merge or start M5e.
+
+1. Verify and checkpoint
+
+Read the applicable repository instructions, the accepted M5d specification including the Prompt 188 clarification, and the supplied Prompt 189 handoff.
+
+Expected state:
+- Branch: feat/review-creation.
+- HEAD:
+  76f0b2c0523d6ad8eca04c15badb30948d2f5347
+- Staged tree:
+  0090ecdf6703ebd0a247e0bf956f29e2a21c2272
+- Exactly the 19 Prompt 189 paths staged.
+- Nothing unstaged or untracked.
+- main and origin/main:
+  e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3
+- Origin and noreply identity unchanged.
+
+Verify:
+.local/p189/m5d-implementation.diff
+
+Expected:
+- 240,368 bytes.
+- 4,995 lines.
+- SHA-256:
+  e7c61a7c29fae1563e6c4f1e1a00a30c44213525027c01775addc3a754ed2074
+- Byte-identical to the full-index Git comparison from HEAD to the submitted staged tree, excluding prompts.md.
+
+Save .local/p190/ checkpoint evidence, including the submitted tree, paths, blob hashes, prompts.md prefix and copies of the submitted implementation/test files needed for regression comparison.
+
+Stop on a material mismatch without resetting anything. No remote operation is authorized.
+
+2. Review disposition and additional scope authorization
+
+M5d implementation is not yet accepted.
+
+The external reviewer verified the export size, line count and SHA-256, inspected implementation and relevant tests, and inspected published baseline source for the public read_snapshot helper and existing migration-head tests.
+
+Reviewer probes used extracted submitted functions with simulated collaborators, not imports of the complete project or execution of SQLAlchemy, PostgreSQL, the project suite, builds or installed wheels.
+
+Additional authorized paths:
+- tests/test_persistence.py
+- tests/test_readiness.py
+- tests/test_persistence_postgres.py
+
+These may change only for migration 0006 packaging, current-head expectations and the new table set. The original 19 paths remain authorized for the corrections below. No dependency, lockfile, existing migration, Docker, settings, corpus or production-wiring change.
+
+3. Finding A: preserve process control from setup-result consumption
+
+Submitted behavior:
+- load_review uses the public read_snapshot helper.
+- _RecordingSession records exceptions from execute, rollback and close.
+- read_snapshot consumes the clock result using scalar_one() after execute has returned.
+- If scalar_one() raises process control before the context yields, the original object is not recorded.
+- An ordinary cleanup failure can replace it with ReviewDatabaseError.
+- A later cleanup interrupt can become the recorded object instead.
+
+Reviewer isolated probe:
+- Extracted submitted _Load, _RecordingSession, _recording and load_review.
+- Combined them with the published read_snapshot helper and simulated sessions/results.
+- For each of KeyboardInterrupt, SystemExit and GeneratorExit, the clock result raised one designated object.
+- With normal cleanup: all three preserved that object.
+- With an ordinary rollback failure: all three instead raised ReviewDatabaseError.
+- With a later cleanup process-control object: all three propagated the later object.
+- Total: 3 passed, 6 failed.
+
+Correct the reload boundary so process control from setup-result consumption is recorded before read_snapshot cleanup can replace it.
+
+Preserve:
+- The public read_snapshot helper and its signature.
+- The first process-control object by identity.
+- Fixed ordinary review errors.
+- Existing reload result/error precedence.
+- No private-helper access and no logging.
+
+Cover relevant result-consumption boundaries without changing SQL semantics or suppressing ordinary database failures incorrectly.
+
+Add regression tests through public load_review for:
+- The setup clock result raising each of KeyboardInterrupt, SystemExit and GeneratorExit.
+- Normal cleanup, ordinary cleanup failure and a later cleanup interrupt.
+- The same first object propagating in every case.
+- Existing execute/body/cleanup interruption controls.
+
+4. Finding B: normalize timestamp-validation failures
+
+Submitted capture_in_transaction calls captured_at.utcoffset() before its operational guard.
+
+An exact datetime instance may have a tzinfo whose utcoffset() raises an ordinary exception. The reviewer supplied such a datetime and the submitted function raised the original RuntimeError with the sentinel text PRIVATE_CLOCK_MARKER.
+
+Correct the timestamp input-validation boundary:
+- An ordinary failure while checking the timestamp becomes a fresh InvalidRetrievalRequestError.
+- Raise it after leaving the handler, with no cause, context or original text.
+- Preserve actor, input and role precedence.
+- No SQL is executed for invalid timestamps.
+- Process control raised during validation propagates as the same object.
+- Preserve capture_snapshot behavior and valid timestamp handling.
+
+Add public-entry-point regression tests for the ordinary failure, privacy, no SQL, process-control identity and valid/naive timestamp controls.
+
+This is error normalization for supported inputs, not a sandbox claim.
+
+5. Apply the authorized migration-head updates
+
+Inspect .local/p189/proposed-head-pins.diff before applying it. The reviewer has authorized its purpose, not independently verified that file's bytes or exact patch.
+
+Update only expectations that mean “current packaged head” or “current complete schema”:
+- Current head becomes 0006.
+- Assert migration 0006 is packaged and follows 0005.
+- Current table sets gain reviews, review_bindings and review_excluded_revisions.
+- Readiness fixtures and cases use the new current head consistently.
+- Keep explicit previous, future, missing and multiple-head refusal cases meaningful.
+
+Preserve tests specifically exercising historical migration 0005 and older downgrade ranges. Do not globally replace every 0005 occurrence.
+
+Do not change readiness production code to accommodate stale tests.
+
+6. Strengthen the new PostgreSQL tests
+
+These tests remain subject to actual PostgreSQL execution later if no local test database is configured.
+
+A. Concurrent same-key creation
+
+The submitted test submits the second task and immediately releases the first. It does not establish that the second transaction reached the conflicting path before the first committed.
+
+Use bounded event/barrier coordination that establishes both transactions' relevant progress before release. Assert the conflict/retry path was actually exercised, followed by one committed review, one job and a matching replay.
+
+Do not use sleeps as synchronization or require privileged database inspection.
+
+B. Atomicity at distinct insert boundaries
+
+The submitted test named “failure after the job insert” calls the complete _insert first, so the injected failure actually occurs after all inserts.
+
+Keep that coverage accurately named and add distinct coverage for:
+- Failure after job insertion but before review insertion.
+- Failure after review insertion before all child rows are complete.
+
+Verify no review, binding, exclusion or run_review job remains after each failed creation.
+
+C. Pre-existing job refusal
+
+Add the accepted real-database case where a test fixes the generated review ID and an existing run_review job already uses its tenant/kind/key. Assert ReviewJobConflictError and no new review or unintended job mutation.
+
+D. Connection-default test scope
+
+The submitted “pooled connection defaults” test uses NullPool, so it opens a fresh connection and cannot prove reuse of the creation connection.
+
+Either change it to a bounded reusable pool and establish actual connection reuse, or rename/narrow its claim and add the intended reuse check separately. Keep all engines test-owned and bounded.
+
+Do not claim these tests have passed without database execution.
+
+7. Regression evidence and checks
+
+Run the new finding-specific regressions against:
+- Isolated copies of the submitted modules.
+- Corrected modules.
+
+Confirm import locations. Classify failures that genuinely reproduce the findings separately from new coverage or controls. Do not claim the reviewer's extracted-function probe was a project test.
+
+Run the established locked offline checks:
+- Ruff lint and format.
+- Strict mypy.
+- Focused new and affected tests, including the three newly authorized modules.
+- Full suite and collection counts.
+- Offline build and packaging comparison.
+- Full installed-wheel step outside the checkout.
+- Direct installed-wheel probes for the corrected boundaries where practicable.
+
+Re-run checks only when changes invalidate their results.
+
+Use the existing guarded dedicated PostgreSQL test configuration if already available. Otherwise report PostgreSQL as unrun/skipped. Do not provision services, start Docker, install dependencies, change authentication, call providers or use the network.
+
+The four known stale-head failures must be resolved. Report any other failure accurately.
+
+8. Documentation and history
+
+Update ADR-0022 with:
+- Both findings and corrections.
+- Accurate reviewer evidence attribution.
+- Submitted-versus-corrected regression results.
+- Updated verification results and remaining limitations.
+- The migration-pin blocker resolved by this explicit authorization.
+- Accurate descriptions of database-test coverage and whether it executed.
+
+Mark Prompt 189 results historical rather than rewriting them as passing results.
+
+Keep implementation staged for review, with acceptance, publication and current-version CI pending. Preserve the accepted specification heading, M5c evidence and all existing limitations.
+
+Append to prompts.md:
+- The supplied Prompt 189 handoff.
+- This review and authorization.
+- Prompt 190 verbatim.
+- An outcome note containing completed checks only.
+
+Preserve the earlier bytes and fidelity disclosures.
+
+9. Final scope and export
+
+Stage only the original 19 paths plus the three newly authorized test modules: 22 authorized paths in total.
+
+Verify:
+- Every other tracked blob unchanged.
+- No tracked .local file or artifact.
+- Links, anchors and tables.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --cached --check.
+- Privacy and unsuppressed staged Gitleaks.
+- Prompt-history prefix preservation.
+- Build/wheel identity after the final relevant changes.
+
+Export:
+.local/p190/m5d-boundary-corrections-and-head-pins.diff
+
+Baseline:
+0090ecdf6703ebd0a247e0bf956f29e2a21c2272
+
+Final:
+the final staged tree.
+
+Use --full-index and exclude prompts.md. Verify byte identity against the exact Git comparison.
+
+Return a complete handoff with:
+- Final branch, HEAD, staged tree and changed paths.
+- Corrections and any remaining choices requiring review.
+- Regression classification.
+- Actual commands, results, counts and skips.
+- Explicit PostgreSQL execution status.
+- Export statistics, bytes, lines and SHA-256.
+- Remaining limitations.
+
+Nothing is authorized for commit, push or merge.
+
+Mathew should return the handoff plus:
+.local/p190/m5d-boundary-corrections-and-head-pins.diff
+
+### Prompt 190 outcome (Claude Code; staged, awaiting review)
+
+Completed checks only. Starting state matched: branch `feat/review-creation`, HEAD `76f0b2c0`,
+staged tree `0090ecdf` with the 19 Prompt 189 paths, nothing unstaged or untracked, `main` and
+`origin/main` at `e8d1033c`, origin and noreply identity unchanged; the Prompt 189 export matched
+240,368 bytes, 4,995 lines, its SHA-256 and the full-index comparison from HEAD to `0090ecdf`
+excluding prompts.md. Checkpoint, submitted tree listing, paths, prompts.md prefix and copies of the
+submitted files under `.local/p190/`. No remote operation.
+
+- **Corrections.** Finding A: `load_review`'s recording session now also wraps each returned
+  result (`_RecordingResult`) so process control raised while consuming it, including
+  `read_snapshot`'s clock `scalar_one()`, is recorded first. Finding B: `capture_in_transaction`
+  checks the timestamp in a guard and raises a fresh `InvalidRetrievalRequestError` outside it.
+  The three newly authorized test modules now expect head `0006` (packaged, following `0005`) and
+  the three review tables, with readiness refusal cases kept meaningful; historical `0005` tests
+  unchanged; readiness production code unchanged. PostgreSQL tests strengthened (established
+  concurrency conflict and retry, three atomicity boundaries, pre-existing job refusal, pooled
+  connection reuse). ADR-0022, plan, README and threat-model status updated; Prompt 189
+  verification marked historical.
+- **Regressions.** The 21 finding-specific tests against isolated copies of the submitted
+  `reviews.py` and `retrieval.py` (exact `0090ecdf` blobs, first on `PYTHONPATH`, import locations
+  confirmed): 7 failed (6 Finding A, 1 Finding B), 14 passed (controls and new coverage); against
+  the corrected modules: 21 passed.
+- **Checks** (locked offline, no database URL): Ruff clean, 211 files formatted; strict mypy no
+  issues in 168 files; focused thirteen-module command 685 passed, 87 skipped; full suite 3626
+  passed, 337 skipped, 0 failed (335 PostgreSQL, one symbolic-link, one POSIX-only signal test);
+  collection 335 integration and 3,628 non-integration (3,963). Offline build of the staged tree
+  against `76f0b2c0`: wheel 104 → 109, sdist 211 → 221, only M5d additions and changes, 16 sample
+  files byte-identical; the installed-wheel step in a fresh environment outside the checkout exit 0
+  with all ten lines, and a direct installed-wheel probe of both corrected boundaries passed. The
+  final wheel is byte-identical to the one tested. Links 385 and tables 68 without problems.
+- **PostgreSQL: not run** (no `EG_TEST_DATABASE_URL`); all M5d database tests await exact-commit CI.
+- The final scope, encoding, privacy and Gitleaks checks and the export follow and are reported in
+  the handoff.
+
+### Prompt 190 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 190 handoff: both M5d findings fixed, migration-head tests updated, PostgreSQL tests strengthened
+
+Everything is staged, not committed. Nothing was pushed or merged, and no remote operation ran. M5d is still not accepted.
+
+**Starting state.** Everything matched what you expected:
+- Branch `feat/review-creation`, HEAD `76f0b2c0`, staged tree `0090ecdf` with the 19 paths, nothing unstaged or untracked.
+- `main` and `origin/main` at `e8d1033c`; origin and noreply identity unchanged.
+- The Prompt 189 export matched: 240,368 bytes, 4,995 lines, its SHA-256, and byte-identical to the full-index comparison from HEAD to `0090ecdf` excluding `prompts.md`.
+- Checkpoint, tree listing, paths, `prompts.md` prefix and copies of the submitted files are saved under `.local/p190/`.
+
+**Final state.**
+- Branch `feat/review-creation`; HEAD `76f0b2c0`; staged tree `2fbb2fd59b0658563de6d990722b51d1018b748f`.
+- 22 paths staged: the original 19 plus `tests/test_persistence.py`, `tests/test_readiness.py` and `tests/test_persistence_postgres.py`.
+- The other 214 tracked files are identical to `76f0b2c0`, and no `.local` file is tracked.
+- Files changed since `0090ecdf`:
+  - Code: `retrieval.py`, `reviews.py`.
+  - Tests: `test_review_creation.py`, `test_reviews_postgres.py`, plus the three head-pin modules.
+  - Docs: ADR-0022, plan, README, threat model, and `prompts.md`.
+
+**Corrections.**
+- **Finding A (reload).** Process control raised while a query result is being read is now recorded first. This includes `read_snapshot`'s `scalar_one()` on the clock read. The recording session now wraps each result that `execute` returns in a private `_RecordingResult`. That wrapper records process control from attribute access, method calls and iteration, and lets ordinary exceptions through unchanged. `read_snapshot`, the SQL and the error precedence are unchanged.
+- **Finding B (timestamp).** `capture_in_transaction` now checks the timestamp inside a guard (`_is_aware_datetime`). An ordinary failure there becomes a fresh `InvalidRetrievalRequestError`, raised after the guard with no cause, context or original text. Actor, input and role precedence are unchanged, and no SQL runs for an invalid timestamp. Process control passes through as the same object.
+- **Head pins.** I inspected the Prompt 189 proposal before applying it, and added the missing `v0006_reviews.py` packaging assertion:
+  - The current head is `0006`, which follows `0005`.
+  - Current table sets now include the three review tables.
+  - Readiness treats `0005` as a previous head, `0007` as a future head and `("0005", "0006")` as multiple heads, so those refusal cases stay meaningful.
+  - Tests of historical migration `0005` and older downgrades are unchanged, and so is readiness production code.
+- **PostgreSQL tests (written, not run).**
+  - **Concurrency:** the second creation is confirmed to reach its own review insert while the first creation's row is inserted but uncommitted. The test then requires exactly two attempts, one review insert and a replay.
+  - **Atomicity:** the existing test is renamed to "after every insert". New cases fail after the job insert but before the review insert, and after the review insert but before the binding or exclusion rows.
+  - **Existing job:** a test fixes the generated review ID, pre-creates a job for its key, and expects `ReviewJobConflictError` with no row changes.
+  - **Connection defaults:** the test now uses a one-connection pool and checks that the same backend served the creation before reading the defaults.
+
+**For your review.** Choice 8 in ADR-0022 now covers the result wrapper. One known gap: a process-control object raised while reading a *row* attribute inside the reload body is caught by the body's own handler, which records it the same way, but no test isolates that row-access case.
+
+**Regression results.** I ran the 21 finding-specific tests in `tests/test_review_creation.py` against isolated copies of the submitted `reviews.py` and `retrieval.py`. These were the exact `0090ecdf` blobs, placed first on `PYTHONPATH`; I confirmed they were the modules imported.
+
+| Version | Result |
+|---|---|
+| Submitted copies | 7 failed, 14 passed |
+| Corrected modules | 21 passed |
+
+- 6 of the 7 failures reproduce Finding A: each of the three interrupt kinds with an ordinary or an interrupting cleanup failure. The three normal-cleanup cases passed, which matches your probe's 3 passed and 6 failed.
+- The 7th failure reproduces Finding B.
+- The 14 passes are controls and new coverage. The reviewer's extracted-function probe was not a project test, and I have not presented it as one.
+
+**Checks run** (locked offline environment, no database URL):
+
+| Check | Result |
+|---|---|
+| `ruff check .` | clean |
+| `ruff format --check .` | 211 files formatted |
+| `mypy` (strict) | no issues in 168 files |
+| Focused 13-module command | 685 passed, 87 skipped (all PostgreSQL) |
+| Full suite | 3626 passed, 337 skipped, 0 failed |
+| Collection | 335 integration, 3,628 non-integration (3,963) |
+
+- The full-suite skips are 335 PostgreSQL tests, one symbolic-link test and one POSIX-only signal test.
+- The four stale-head failures from Prompt 189 are gone.
+
+**PostgreSQL: not run.** No test database is configured. All M5d database tests, including the strengthened ones and the updated `test_persistence_postgres.py` expectations, still need exact-commit CI.
+
+**Build and wheel.**
+- Offline build compared with a `git archive` build of `76f0b2c0`: wheel 104 → 109 members, sdist 211 → 221. Only M5d additions and changes, and all 16 sample files are byte-identical.
+- Compared with the submitted Prompt 189 build, the wheel changes only `retrieval.py`, `reviews.py`, `METADATA` and `RECORD`.
+- The full installed-wheel step ran in a fresh environment outside the checkout: exit 0 with all ten lines.
+- A direct probe using the installed wheel's interpreter passed. All nine combinations of interrupt kind and cleanup mode were preserved by identity, and the three controls (timestamp ordinary failure, timestamp interrupt, ordinary setup failure) behaved correctly.
+- The final wheel (`0e74f584…`) is byte-identical to the one tested.
+
+**Final checks.**
+- Links: 385, 0 problems. Tables: 68, 0 problems.
+- All 22 files are UTF-8, no BOM, LF only, no U+FFFD; `git diff --cached --check` is clean.
+- Gitleaks 8.30.1, staged and unsuppressed: no leaks.
+- Privacy scan: the only hit is the existing noreply identity, in an earlier verbatim history entry.
+- `prompts.md`: its 2,099,613-byte prefix is preserved. Appended: the Prompt 189 handoff (verbatim), the review and authorization record, Prompt 190 (verbatim) and an outcome note with completed checks only.
+
+**Export: `.local/p190/m5d-boundary-corrections-and-head-pins.diff`**
+- Baseline `0090ecdf`, final `2fbb2fd5`, `prompts.md` excluded.
+- 79,170 bytes, 970 lines, 11 files, 587 insertions and 79 deletions.
+- SHA-256 `4333e9ca79be20111580638d76b22cee47ca165b6b1d17d8067848072fdb02f8`.
+- UTF-8, LF only; byte-identical to both the staged and the tree comparisons.
+
+**Remaining limitations.**
+- No PostgreSQL or CI evidence for M5d yet.
+- Nothing in the application uses M5d, and the M4d trusted-snapshot limitation is not closed.
+- `invalidate()` does not prove the original connection was discarded.
+- The guards make errors consistent for supported inputs; they are not a sandbox against hostile in-process code.
+
+Start a new Claude session before the next task: this session now spans Prompts 180–190 and has been summarized once. The `.local/p190/` checkpoint and this handoff are enough to recover.
+
+**Next step:** please return **output plus the diff file** `.local/p190/m5d-boundary-corrections-and-head-pins.diff`.
+
+### External review acceptance of the corrected M5d implementation (Prompt 191)
+
+The external reviewer accepted the corrected M5d implementation in Prompt 191 for a local commit
+only, subject to a binding PostgreSQL test correction: in
+`test_concurrent_creations_with_one_key_produce_one_review` the statement counter runs after
+successful execution, while the second creation's conflicting review INSERT is rejected and its
+replay inserts no review, so the test must distinguish two transactions, one attempted review
+INSERT (before execution) and zero successfully executed review INSERTs on the second engine, with
+one review, one `run_review` job and a matching replay. Prompt 191 also requires a public
+`load_review` regression for process control raised by a row attribute read in the reload body.
+The ADR-0022 implementation choices are approved within the documented scope (replay depth,
+module-level test seams, private refusals, session-factory failure handling and the recording
+session and result wrappers). Acceptance does not establish PostgreSQL execution, Linux
+verification, current-version CI, production use or overall M5 acceptance; publication and merge
+are not authorized. Evidence: the reviewer independently verified the Prompt 190 export (79,170
+bytes, 970 lines, SHA-256 `4333e9ca79be20111580638d76b22cee47ca165b6b1d17d8067848072fdb02f8`,
+eleven files, +587/−79, UTF-8 and LF), inspected the corrections, migration-head updates and
+strengthened database tests, inspected the SQLAlchemy 2.1.1 execution source (a rejected INSERT
+does not reach `after_cursor_execute`), and ran 26 isolated checks with extracted corrected
+functions, the published `read_snapshot` helper and simulated collaborators (20 reload checks over
+clock-result and row-attribute process control with three cleanup modes plus two ordinary
+setup-failure controls; 6 capture timestamp checks), all passing. These were extracted-function
+checks with simulated collaborators, not imports or execution of the complete project,
+SQLAlchemy or a database; the reviewer ran no project suite, build, installed-wheel check,
+PostgreSQL, Docker or provider call. Claude Code's Prompt 190 project checks remain separately
+attributed historical local evidence.
+
+### Prompt 191 (verbatim)
+
+Written for: Claude Code.
+Prompt 191 — correct the concurrency assertion, record M5d implementation acceptance and commit locally only.
+
+Do not push, merge, run remote operations or start M5e.
+
+1. Verify and checkpoint
+
+Read the applicable repository instructions, accepted M5d specification and supplied Prompt 190 handoff.
+
+Expected:
+- Branch: feat/review-creation.
+- HEAD:
+  76f0b2c0523d6ad8eca04c15badb30948d2f5347
+- Staged tree:
+  2fbb2fd59b0658563de6d990722b51d1018b748f
+- Exactly the 22 authorized paths staged.
+- Nothing unstaged or untracked.
+- main and origin/main:
+  e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3
+- Origin and noreply identity unchanged.
+
+Verify:
+.local/p190/m5d-boundary-corrections-and-head-pins.diff
+
+Expected:
+- 79,170 bytes.
+- 970 lines.
+- SHA-256:
+  4333e9ca79be20111580638d76b22cee47ca165b6b1d17d8067848072fdb02f8
+- Byte-identical to the full-index Git comparison between:
+  0090ecdf6703ebd0a247e0bf956f29e2a21c2272
+  2fbb2fd59b0658563de6d990722b51d1018b748f
+  excluding prompts.md.
+
+Save .local/p191/ checkpoint evidence: refs, status, staged tree, paths, blob hashes and exact prompts.md prefix and checksum.
+
+Stop on a material mismatch without resetting anything.
+
+2. Review decision and evidence
+
+The external reviewer accepts the corrected M5d implementation for a local commit only, subject to the binding PostgreSQL test correction in section 3.
+
+The implementation choices in ADR-0022 are approved within the documented scope, including replay depth, module-level test seams, private refusals, session-factory failure handling and the recording session/result wrappers.
+
+Acceptance does not establish PostgreSQL execution, Linux verification, current-version CI, production use or overall M5 acceptance. Publication and merge are not authorized.
+
+Reviewer evidence:
+- Independently verified the Prompt 190 export's size, line count, checksum, eleven-file scope, +587/-79 statistics and UTF-8/LF encoding.
+- Inspected the corrections, migration-head updates and strengthened database tests.
+- Inspected SQLAlchemy 2.1.1 execution source to confirm that after_cursor_execute follows successful cursor execution; a rejected INSERT does not reach that event.
+- Ran 26 isolated checks using extracted corrected functions, the published read_snapshot helper and simulated collaborators:
+  - 20 reload checks: clock-result and row-attribute process control for KeyboardInterrupt, SystemExit and GeneratorExit with normal, ordinary-failure and interrupting cleanup; plus two ordinary setup-failure controls.
+  - 6 capture checks: ordinary timestamp-validation failure and privacy, three process-control identities, naive timestamp rejection and valid timestamp acceptance.
+- All 26 passed.
+- These were extracted-function checks with simulated collaborators, not imports/execution of the complete project, SQLAlchemy or a database.
+- The reviewer ran no project suite, build, installed-wheel check, PostgreSQL, Docker or provider call.
+
+Claude Code's Prompt 190 project checks remain separately attributed historical local evidence.
+
+3. Binding correction: attempted versus successful conflicting inserts
+
+In test_concurrent_creations_with_one_key_produce_one_review:
+
+The submitted _record_statements helper counts after_cursor_execute events. The second creation's conflicting review INSERT raises, so it is not counted there. The replay transaction does not insert a review either.
+
+Correct the test to distinguish:
+- Transactions/attempts: exactly 2 on the second creation's engine.
+- Attempted review INSERTs: exactly 1, counted by its before_cursor_execute listener.
+- Successfully executed review INSERTs: exactly 0 on that second engine, counted by after_cursor_execute.
+- Final database state: exactly one review and one run_review job.
+- First result is creation; second is matching replay with the same review and job IDs.
+
+Keep the bounded synchronization that establishes the second reaches its conflicting INSERT before releasing the first.
+
+Use clearly named counters or assertions. Do not change the expected successful-insert count to 1 merely by moving all counters to a different event without distinguishing what they measure.
+
+Update ADR-0022 and other affected explanatory text so “one review insert” explicitly means one attempted, rejected INSERT on the second creation, not a successful insertion.
+
+This is a test correction. Do not change production transaction, retry or SQL behavior.
+
+4. Add the row-access regression
+
+Add a focused public load_review regression for the gap identified in the Prompt 190 handoff:
+- A row attribute read in the reload body raises a designated process-control object.
+- Cover KeyboardInterrupt, SystemExit and GeneratorExit.
+- Cover normal cleanup, ordinary cleanup failure and a later cleanup interrupt.
+- The first object must propagate by identity in every case.
+
+Use recording fakes and the public seam. No production change is expected.
+
+5. Scope and verification
+
+Against the starting staged tree, only these files may change:
+- tests/test_reviews_postgres.py
+- tests/test_review_creation.py
+- docs/decisions/0022-review-creation.md
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+All production code, migration, model, packaging, workflow and head-pin-test blobs must remain identical to 2fbb2fd5.
+
+Run:
+- Ruff lint and format checks.
+- The new row-access regressions and affected non-integration tests.
+- Full suite and collection, reporting exact results and skips.
+
+Use an existing guarded dedicated PostgreSQL test database only if already configured. Otherwise explicitly report all PostgreSQL tests as unrun/skipped. Do not start Docker, provision services, install dependencies, change authentication or access the network.
+
+Do not repeat builds or installed-wheel checks solely for documentation/test changes. Cite Prompt 190's results as historical local evidence with unchanged production blobs, not exact-commit CI.
+
+If a production-code change or substantive new failure becomes necessary, stop before committing and report it for review.
+
+6. Record acceptance
+
+ADR-0022:
+- Record acceptance at external review in Prompt 191 for a local implementation commit only.
+- Add an External review (Prompt 191) section with the scope and evidence above.
+- Record the concurrency-counter correction and row-access regression results.
+- Preserve all historical results and limitations.
+- State that PostgreSQL execution, Linux verification and current-version CI remain pending.
+- Mark implementation choices approved at review.
+
+README, plan and threat model:
+- Record implemented in Prompt 189, corrected in Prompt 190, test correction and local-commit acceptance in Prompt 191.
+- Keep publication, merge, PostgreSQL and current-version CI pending.
+- No production path uses M5d.
+- The trusted-snapshot limitation is not closed by this slice.
+- Overall M5 acceptance remains pending.
+
+Rename only the separate implementation-status heading to reflect acceptance for a local commit and pending CI, updating all links to it. Keep the accepted specification heading and anchor unchanged.
+
+7. History and final checks
+
+Append to prompts.md:
+- The supplied Prompt 190 handoff.
+- This review decision and evidence.
+- Prompt 191 verbatim.
+- A pre-commit note listing completed checks only.
+
+Preserve the exact earlier prefix and existing fidelity disclosures.
+
+Verify:
+- Exactly the same 22 authorized paths staged against HEAD.
+- Only the seven permitted files differ from the starting staged tree.
+- All other tracked blobs unchanged.
+- No tracked .local files or artifacts.
+- Links, anchors and tables.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --cached --check.
+- Privacy scan and unsuppressed staged Gitleaks.
+- Accurate status and evidence attribution.
+
+8. Local commit and export
+
+After the required checks pass, commit locally using the established noreply identity and attribution conventions.
+
+Suggested subject:
+feat: add atomic review creation and persisted snapshots
+
+Write the commit message from a file. Credit Claude Code's implementation, corrections and documentation, preserve earlier attribution, and retain the repository's Co-Authored-By trailer.
+
+Do not push or merge.
+
+Verify afterward:
+- Parent is 76f0b2c0523d6ad8eca04c15badb30948d2f5347.
+- Commit contains exactly the 22 authorized paths.
+- Production blobs match the accepted starting staged tree.
+- Working tree is clean.
+- main and origin/main remain unchanged.
+- Full-history unsuppressed Gitleaks passes.
+
+Export:
+.local/p191/m5d-commit-incremental.diff
+
+Baseline:
+2fbb2fd59b0658563de6d990722b51d1018b748f
+
+Final:
+the new local commit.
+
+Use --full-index and exclude prompts.md. Verify byte identity against the exact Git comparison.
+
+Return a self-contained handoff with:
+- Commit SHA, parent, tree, subject and identity.
+- Scope and production-blob identity checks.
+- Test correction and regression results.
+- Exact checks run, counts and skips.
+- PostgreSQL execution status explicitly.
+- Export statistics, lines, bytes, SHA-256 and encoding.
+- Remaining limitations.
+
+Mathew should return the handoff plus:
+.local/p191/m5d-commit-incremental.diff
+
+### Prompt 191 pre-commit note (Claude Code; before the local implementation commit)
+
+Completed checks only. Starting state matched: branch `feat/review-creation`, HEAD `76f0b2c0`,
+staged tree `2fbb2fd5` with the 22 authorized paths, nothing unstaged or untracked, `main` and
+`origin/main` at `e8d1033c`, origin and noreply identity unchanged; the Prompt 190 export matched
+79,170 bytes, 970 lines, its SHA-256 and the full-index comparison `0090ecdf`..`2fbb2fd5`
+excluding prompts.md. Checkpoint (refs, status, staged tree, paths, blob hashes, prompts.md prefix
+and checksum) under `.local/p191/`. No remote operation.
+
+- **Test correction.** The concurrency test now asserts two transactions, one attempted review
+  INSERT (`before_cursor_execute`) and zero successfully executed review INSERTs
+  (`after_cursor_execute`) on the second engine, plus one review, one job and a matching replay;
+  synchronization unchanged. Not executed (no PostgreSQL).
+- **Row-access regression.** Nine public `load_review` cases (three interrupt kinds × normal,
+  ordinary-failure and interrupting cleanup): 9 passed; also 9 passed against the Prompt 189
+  modules, so it is new coverage rather than a reproduced defect.
+- **Scope.** Against `2fbb2fd5` only `tests/test_reviews_postgres.py`,
+  `tests/test_review_creation.py`, ADR-0022, README, plan and threat model changed (plus this
+  prompts.md entry); all production, migration, model, packaging, workflow and head-pin-test blobs
+  are identical. The implementation-status heading was renamed to "accepted for a local commit,
+  Prompt 191; CI pending" with its links updated; the specification heading is unchanged.
+- **Checks** (locked offline, no database URL): Ruff clean, 211 files formatted; strict mypy no
+  issues in 168 files; focused seven-module command 298 passed, 26 skipped; full suite 3635
+  passed, 337 skipped, 0 failed (335 PostgreSQL, one symbolic-link, one POSIX-only signal test);
+  collection 335 integration and 3,637 non-integration (3,972); links 387 and tables 68 without
+  problems. No build or installed-wheel check was repeated (production blobs unchanged; the
+  Prompt 190 results are historical local evidence, not exact-commit CI).
+- **PostgreSQL: not run.**
+- The final scope, encoding, privacy and Gitleaks checks, the commit and the export follow and
+  are reported in the handoff.

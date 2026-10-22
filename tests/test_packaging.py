@@ -294,7 +294,8 @@ def test_m5a_agents_package_contains_only_the_accepted_modules() -> None:
 
 def test_m5a_is_not_imported_by_other_packages_or_registered() -> None:
     """Only the apps (and later evaluation) may import ``evidenceguard_agents``; M5a adds no
-    handler, command or production wiring, so no app imports it yet either."""
+    handler, command or production wiring. The accepted M5d composition module
+    (``evidenceguard_worker/review_seams.py``, D2) is the only exception."""
     from evidenceguard_worker.handlers import production_registry
 
     for package in (
@@ -306,7 +307,10 @@ def test_m5a_is_not_imported_by_other_packages_or_registered() -> None:
         evidenceguard_worker,
     ):
         assert package.__file__ is not None
-        assert "evidenceguard_agents" not in _top_level_imports(Path(package.__file__).parent)
+        for source in Path(package.__file__).parent.rglob("*.py"):
+            if package is evidenceguard_worker and source.name == "review_seams.py":
+                continue
+            assert "evidenceguard_agents" not in _module_imports(source), source.name
     assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
 
 
@@ -433,3 +437,75 @@ def test_m5c_resources_are_readable_through_the_package() -> None:
     root = files("evidenceguard_agents").joinpath("data")
     for name in M5C_DATA_FILES:
         assert root.joinpath(*name.split("/")).is_file(), name
+
+
+# --- M5d (ADR-0022) ------------------------------------------------------------------------------
+
+
+def _source(package: ModuleType, name: str) -> Path:
+    assert package.__file__ is not None
+    return Path(package.__file__).parent / name
+
+
+def test_m5d_domain_values_use_only_the_domain_and_the_standard_library() -> None:
+    imported = _module_imports(_source(evidenceguard_domain, "reviews.py"))
+    assert imported - set(sys.stdlib_module_names) == {"evidenceguard_domain"}
+    assert not imported & {"os", "pathlib", "io", "socket", "logging", "sqlalchemy", "pydantic"}
+
+
+def test_m5d_database_failure_classifier_imports_only_sqlalchemy_errors() -> None:
+    path = _source(evidenceguard_persistence, "database_failures.py")
+    imported = _module_imports(path)
+    assert imported - set(sys.stdlib_module_names) == {"sqlalchemy"}
+    modules = {
+        node.module
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8")))
+        if isinstance(node, ast.ImportFrom) and node.module
+    }
+    assert modules == {"enum", "sqlalchemy.exc"}
+
+
+def test_m5d_persistence_reviews_keep_the_accepted_boundaries() -> None:
+    imported = _module_imports(_source(evidenceguard_persistence, "reviews.py"))
+    assert imported - set(sys.stdlib_module_names) == {
+        "evidenceguard_domain",
+        "evidenceguard_persistence",
+        "sqlalchemy",
+    }
+    assert not imported & {"evidenceguard_agents", "logging", "os", "socket", "time"}
+
+
+def test_m5d_review_seams_are_the_only_worker_module_importing_agents() -> None:
+    importing = {
+        source.name
+        for source in _source(evidenceguard_worker, "__init__.py").parent.rglob("*.py")
+        if "evidenceguard_agents" in _module_imports(source)
+    }
+    assert importing == {"review_seams.py"}
+    imported = _module_imports(_source(evidenceguard_worker, "review_seams.py"))
+    assert imported - set(sys.stdlib_module_names) == {
+        "evidenceguard_agents",
+        "evidenceguard_domain",
+        "evidenceguard_persistence",
+        "sqlalchemy",
+    }
+
+
+def test_m5d_creation_is_not_wired_into_any_route_command_or_runtime_path() -> None:
+    """W8: creation and reload stay internal or test-only; ``run_review`` stays unregistered."""
+    from evidenceguard_worker.handlers import production_registry
+
+    for package in (evidenceguard_api, evidenceguard_observability, evidenceguard_retrieval):
+        assert package.__file__ is not None
+        for source in Path(package.__file__).parent.rglob("*.py"):
+            text = source.read_text(encoding="utf-8")
+            assert "review_seams" not in text and "persistence.reviews" not in text, source.name
+            assert "run_review" not in text, source.name
+    assert evidenceguard_worker.__file__ is not None
+    for source in Path(evidenceguard_worker.__file__).parent.rglob("*.py"):
+        if source.name == "review_seams.py":
+            continue
+        text = source.read_text(encoding="utf-8")
+        assert "review_seams" not in text and "persistence.reviews" not in text, source.name
+        assert "run_review" not in text, source.name
+    assert "run_review" not in production_registry().kinds

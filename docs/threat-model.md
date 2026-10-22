@@ -391,7 +391,7 @@ acceptance. Residual risks once implemented:
 
 The settled decisions, details and the unresolved external API facts are listed in the plan.
 
-## Review workflow (M5: sequence and M5a–M5d specifications accepted; M5a, M5b and M5c on main; M5d implementation pending)
+## Review workflow (M5: sequence and M5a–M5d specifications accepted; M5a, M5b and M5c on main; M5d accepted for a local commit, CI pending)
 
 The [M5 implementation sequence](plan.md#m5-implementation-sequence-accepted-at-review-prompt-170)
 and the [M5a specification](plan.md#m5a-model-call-contracts-and-scripted-fake-provider-accepted-at-review-prompt-170-implementation-pending)
@@ -485,8 +485,12 @@ or review; and assembly cannot prove that its evidence or Verifier inputs came f
 which remains M5g's obligation.
 
 **Specified M5d controls (proposed in Prompt 185, revised in Prompts 186–187, specification
-accepted at external review in Prompt 188 with a binding cleanup clarification; implementation
-pending; none operates).** The
+accepted at external review in Prompt 188 with a binding cleanup clarification; implemented
+in Prompt 189, corrected in Prompt 190 after external review, test-corrected and accepted at
+external review in Prompt 191 for a local commit only, with publication, CI and PostgreSQL
+execution pending; no production path uses them, so none operates in the application).** See
+[ADR-0022](decisions/0022-review-creation.md) and the
+[implementation status](plan.md#m5d-implementation-status-accepted-for-a-local-commit-prompt-191-ci-pending). The
 [M5d specification](plan.md#m5d-composable-capture-and-atomic-review-creation-specification-accepted-at-review-prompt-188-implementation-pending)
 specifies one REPEATABLE READ, READ WRITE creation transaction whose visibility follows the MVCC
 snapshot established by its first data statement (the `clock_timestamp()` read, whose value is

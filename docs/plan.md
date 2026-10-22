@@ -6829,8 +6829,11 @@ recorded in Prompt 180). The [M5c specification](#m5c-review-template-planner-pr
 status](#m5c-implementation-status-accepted-for-a-local-commit-prompt-184-ci-pending)). The
 [M5d specification](#m5d-composable-capture-and-atomic-review-creation-specification-accepted-at-review-prompt-188-implementation-pending)
 (proposed in Prompt 185, revised in Prompts 186–187) was **accepted at external review in Prompt
-188**; its implementation is pending. M5d–M5h are not implemented; no review path, persisted snapshot or orchestration
-exists, no M5b or M5c control is used by any review path, and overall M5 acceptance is pending.** The M5 milestone text above is the controlling requirement and is unchanged; this
+188**; its implementation (Prompt 189, corrected in Prompts 190–191) was accepted at external review in
+Prompt 191 for a local commit only, with PostgreSQL and current-version CI pending ([implementation
+status](#m5d-implementation-status-accepted-for-a-local-commit-prompt-191-ci-pending)). M5e–M5h are not
+implemented; no review path or orchestration exists, the M5d persistence is used only by tests,
+no M5b or M5c control is used by any review path, and overall M5 acceptance is pending.** The M5 milestone text above is the controlling requirement and is unchanged; this
 sequence only orders it into slices. Labels: **[DECISION]** already accepted; **[FACT]** current
 code at `46c02257`; **[REC]** recommendation (for M5a and the sequence-level choices, accepted in
 Prompt 170 as recommended); **[OPEN]** a detail left to a later slice's review. Earlier sketches in
@@ -9414,8 +9417,8 @@ test).
 in Prompt 188 with a binding cleanup clarification (recorded in M5d-B1) and is the M5d
 implementation contract; implementation is pending.** It was proposed by Claude Code in Prompt 185
 and revised in Prompts 186 and 187 after external review (historical: in Prompts 186 and 187 the
-reviewer supported directions only). No M5d module, migration, test, ADR-0022 or workflow change
-exists, and none of the controls below operates. Labels: **[DECISION]** already accepted (the M5
+reviewer supported directions only). At acceptance no M5d module, migration, test, ADR-0022 or
+workflow change existed (historical; see the [implementation status](#m5d-implementation-status-accepted-for-a-local-commit-prompt-191-ci-pending)). Labels: **[DECISION]** already accepted (the M5
 sequence with Correction A, W5, W8 and W15, the M4d capture and race rules, the accepted M5a–M5c
 contracts); **[FACT]** current source at `e8d1033c`; **[REC]** Claude Code's proposal, **accepted
 as specified (with the clarification) in Prompt 188**; **[OPEN]** none remains (M5d-H). M5d
@@ -10139,6 +10142,40 @@ D12 was open and D15–D17 were proposed until Prompt 188.
     retry only when both normal calls returned, never restored by a later `invalidate()`; no claim
     of physical disposal or pool quarantine. *Tradeoff:* abandoning some retries versus reusing a
     connection whose cleanup failed.
+
+#### M5d implementation status (accepted for a local commit, Prompt 191; CI pending)
+
+**Status.** Claude Code implemented the accepted M5d specification in Prompt 189 and corrected it
+in Prompt 190 after external review (process control while `read_snapshot` consumes its setup
+result, and normalization of timestamp-validation failures; the migration-head test pins updated
+under explicit authorization; PostgreSQL tests strengthened); in Prompt 191 a concurrency-test
+counter was corrected and a row-access regression added, and the implementation was **accepted at
+external review in Prompt 191 for a local implementation commit only**
+([ADR-0022](decisions/0022-review-creation.md#external-review-prompt-191)). Publication, merge,
+PostgreSQL execution, Linux verification and current-version CI are pending, and overall M5
+acceptance is pending. (Historical: until Prompt 191 it was staged and implementation acceptance
+was pending.) No endpoint, CLI command, handler, setting, production registry entry or
+production enqueue path uses it; `run_review` stays out of `production_registry()`, so none of
+its controls operates in the application. The M4d trusted-snapshot limitation is **not** closed:
+it closes for review paths only once M5g obtains its snapshot solely through the trusted reload.
+
+- *Added:* `evidenceguard_domain.reviews`, `evidenceguard_persistence.database_failures`,
+  `evidenceguard_persistence.reviews`, migration `0006` (`reviews`, `review_bindings`,
+  `review_excluded_revisions`), `evidenceguard_worker.review_seams`, the public
+  `capture_in_transaction` and the review models; four new test modules, an equivalence test in
+  `tests/test_retrieval_postgres.py`, M5d packaging-boundary tests and one additive
+  installed-wheel assertion (`CREATE TABLE reviews` in the offline migration SQL).
+- *Implementation choices for review:* listed in
+  [ADR-0022](decisions/0022-review-creation.md#implementation-choices-and-deviations).
+- *Migration-head pins:* in Prompt 189 `tests/test_persistence.py` and `tests/test_readiness.py`
+  (two tests each failed locally) and `tests/test_persistence_postgres.py` still pinned head
+  `0005` (historical); Prompt 190 authorized and applied the update to head `0006` and the new
+  table set.
+- *Local verification:* see
+  [ADR-0022](decisions/0022-review-creation.md#verification-prompt-190-local-windows-claude-code-historical-local-evidence)
+  (the [Prompt 189 results](decisions/0022-review-creation.md#verification-prompt-189-local-windows-claude-code-historical)
+  are historical).
+  PostgreSQL tests were skipped (no `EG_TEST_DATABASE_URL`) and are unrun evidence.
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.

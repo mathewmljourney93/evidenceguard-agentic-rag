@@ -253,6 +253,7 @@ jobs:
           print("review template, prompts and request assembly ran from the installed wheel")
           PY
           "${bin}/python" -I -c "import io; from alembic import command; from evidenceguard_persistence.migration_config import alembic_config; buf = io.StringIO(); command.upgrade(alembic_config(output_buffer=buf), 'head', sql=True); assert 'CREATE TABLE api_keys' in buf.getvalue(); print('offline migration SQL rendered from the installed wheel')"
+          "${bin}/python" -I -c "import io; from alembic import command; from evidenceguard_persistence.migration_config import alembic_config; buf = io.StringIO(); command.upgrade(alembic_config(output_buffer=buf), 'head', sql=True); assert 'CREATE TABLE reviews' in buf.getvalue(); print('offline review migration SQL rendered from the installed wheel')"
 
   integration:
     # PostgreSQL integration tests. Service containers run only on Linux runners, so this job

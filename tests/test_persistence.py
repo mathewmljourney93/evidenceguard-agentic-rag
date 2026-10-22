@@ -240,12 +240,14 @@ def test_migration_resources_are_packaged() -> None:
     assert (migrations / "versions" / "v0003_documents.py").is_file()
     assert (migrations / "versions" / "v0004_chunks.py").is_file()
     assert (migrations / "versions" / "v0005_embeddings.py").is_file()
+    assert (migrations / "versions" / "v0006_reviews.py").is_file()
 
 
 def test_migration_history_has_one_head() -> None:
     script = ScriptDirectory.from_config(alembic_config())
 
-    assert script.get_heads() == ["0005"]
+    assert script.get_heads() == ["0006"]
+    assert script.get_revision("0006").down_revision == "0005"
     assert script.get_revision("0005").down_revision == "0004"
     assert script.get_revision("0004").down_revision == "0003"
     assert script.get_revision("0003").down_revision == "0002"
@@ -267,6 +269,9 @@ def test_schema_tables_are_m2a_jobs_documents_chunks_and_embeddings() -> None:
         "embedding_profiles",
         "embedding_indexes",
         "chunk_embeddings",
+        "reviews",
+        "review_bindings",
+        "review_excluded_revisions",
     }
     assert {role.value for role in UserRole} == {"reviewer", "approver", "admin"}
 
