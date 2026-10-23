@@ -41826,3 +41826,1984 @@ excluding prompts.md. Checkpoint under `.local/p194/`.
   local checks are historical local evidence.
 - The scope, blob, encoding, whitespace, privacy and Gitleaks checks, the commit, the export, the
   publication preflight and push and the CI observations follow and are reported in the handoff.
+
+### Prompt 194 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 194 handoff: corrective commit published; all five CI jobs passed
+
+The corrective commit is committed and pushed to `feat/review-creation`, and all five required jobs passed for that exact commit. Every job-log download returned HTTP 403, so I have job and step conclusions only, with no pytest counts or test names. Nothing was merged and nothing was pushed to `main`.
+
+**Starting state.** Everything matched:
+- HEAD and upstream `1bea3731` (parent `755c13a7`, tree `476237ea`); `main` and `origin/main` at `e8d1033c`.
+- Staged tree `bd5a38df` with exactly the six paths, nothing unstaged or untracked; staged test file `981d7f20…` (the reviewed version).
+- The Prompt 193 export matched 63,687 bytes, 552 lines, its SHA-256, and was byte-identical to the comparison from HEAD to `bd5a38df`.
+- Checkpoint saved in `.local/p194/`.
+
+**Documentation adjustments (test file unchanged)**
+- **Status sequence.** ADR-0022, the plan, README and threat model now give the actual sequence:
+  1. `1bea3731` was published.
+  2. Ubuntu and Windows verify passed.
+  3. PostgreSQL ran and failed three tests.
+  4. The test corrections were accepted for a corrective commit.
+  5. Their PostgreSQL and CI verification was pending, and main publication was blocked.
+- **History kept historical.** The Prompt 191 statements are marked historical, not rewritten.
+- **New ADR section.** "External review (Prompt 194)" records your evidence and its limits.
+- **Helper description corrected.** `_complete` counts *all* other queued jobs of registered kinds, without proving they are ahead of the target. Its loop bound is that count plus one, and the caller limits the permitted other work.
+- **`prompts.md`.** The 2,192,570-byte prefix is preserved. Appended: the Prompt 193 handoff (verbatim, checked as raw bytes), your review decision, Prompt 194 (verbatim) and a pre-commit note.
+
+**Checks before the commit**
+- Links: 391, 0 problems. Tables: 69, 0 problems.
+- Exactly the six paths differ from HEAD; the other 230 files are identical; no `.local` file is tracked.
+- UTF-8, no BOM, LF only, no U+FFFD.
+- `git diff --check` and `git diff --cached --check`: clean.
+- Privacy scan: no hits. Staged Gitleaks: no leaks.
+- I did not repeat application tests, builds or wheel checks. The Prompt 193 local results stay historical local evidence.
+
+**Commit**
+- `1efe3ed3f0aa9697ce4e71cee295293a89c94909`, parent `1bea3731`, tree `472cfc217c34b05e129d652c6649498a3118d0b6`.
+- Subject: `test: correct review creation PostgreSQL fixtures and race assertions`.
+- Author and committer are the noreply identity; the message was written from a file and ends with the Co-Authored-By trailer.
+- Exactly the six paths changed; the test file is still `981d7f20…`; every production file matches `1bea3731`.
+- Working tree clean; full-history Gitleaks found no leaks in 84 commits.
+
+**Export: `.local/p194/m5d-postgres-test-correction-acceptance.diff`**
+- Baseline `bd5a38df`, final `1efe3ed3`, `prompts.md` excluded.
+- 44,852 bytes, 150 lines, 4 files, 51 insertions and 24 deletions. The test file is not in the diff because it is unchanged.
+- SHA-256 `dc7811a2f1b1f870ecd2ce479e7803785c846f68f8f4f55cc802ced415948b97`.
+- UTF-8, LF only; byte-identical to `git diff --full-index bd5a38df 1efe3ed3` excluding `prompts.md`.
+
+**Publication**
+- **Preflight:** `fetch --no-tags` succeeded.
+  - Remote `feat/review-creation` was `1bea3731` and remote `main` was `e8d1033c`; local `main` equals `origin/main`.
+  - The range from upstream was exactly `1efe3ed3`, a direct child of `1bea3731`.
+  - The working tree was clean, the workflows were unchanged (all five jobs present) and the identity was the noreply one.
+- **Push:** `git push origin refs/heads/feat/review-creation:refs/heads/feat/review-creation` ran once, exit 0 (`1bea373..1efe3ed`), with no sign-in prompt.
+- **Afterwards:** remote `feat/review-creation`, local HEAD and upstream are all `1efe3ed3`. Remote `main` is unchanged at `e8d1033c`.
+
+**Exact-commit CI for `1efe3ed3`** (both runs on `feat/review-creation`, triggered by the push, attempt 1; about 4 minutes of a 25-minute bound)
+- `ci` run [39820256668](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256668): **success**.
+- `secret-scan` run [39820256982](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256982): **success**.
+
+| Job | Conclusion | Steps |
+|---|---|---|
+| [verify (ubuntu-24.04)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256668/job/119969360247) | success | 13/13 succeeded |
+| [verify (windows-2025)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256668/job/119969360432) | success | 13/13 succeeded |
+| [integration (PostgreSQL 17 + pgvector)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256668/job/119969360046) | success | 11/11 succeeded, including "Run integration tests" |
+| [container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256668/job/119969360253) | success | 10/10 succeeded |
+| [Gitleaks (full history)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256982/job/119969360933) | success | 6/6 succeeded |
+
+The failed `1bea3731` evidence stays separate in ADR-0022 and is unchanged.
+
+**Limits of this CI evidence**
+- All five log downloads returned HTTP 403 ("Must have admin rights to Repository."). I did not change authentication to get them.
+- So I have **no** pytest summaries or counts, no per-test results, and no wheel, container or Gitleaks output for this SHA. I am not inferring any of them.
+- **PostgreSQL:** the integration step "Run integration tests" ran and succeeded for `1efe3ed3`. That job requires integration tests to have run (`EG_REQUIRE_INTEGRATION=1`), but I can't see whether the three corrected tests and the new race tests ran or passed individually. Confirming that needs the job log.
+
+**Final state**
+- Working tree clean; local and remote `feat/review-creation` at `1efe3ed3`; `main` and `origin/main` unchanged at `e8d1033c`.
+- No monitor, push or credential process is still running.
+- No production file changed, no CI rerun, no merge or push to `main`, no M5e work. Main publication and M5e remain unauthorized.
+- Evidence is in `.local/p194/`: `runs.json`, both `jobs-*.json` files, the 403 responses and the checkpoint.
+
+**Next step:** please return **output plus the diff file** `.local/p194/m5d-postgres-test-correction-acceptance.diff`. If you can retrieve the integration job log, it would confirm the per-test PostgreSQL results.
+
+### Prompt 195 (verbatim)
+
+Prompt 195 — Publish verified M5d to main, then propose the M5e persistence contract
+
+Written for: Claude Code, Mathew and the external reviewer.
+
+Recover the EvidenceGuard checkout using .local/p194/ and the Prompt 194 handoff. Read repository instructions first.
+
+The external reviewer accepts the corrected M5d implementation and its successful exact-commit feature CI for fast-forward publication to main.
+
+This prompt authorizes:
+1. Fast-forwarding main to the existing verified commit 1efe3ed3.
+2. One push of main and bounded observation of its CI.
+3. Only after all five main jobs pass, documentation updates and a proposed M5e specification, staged uncommitted on a new documentation branch.
+
+No implementation, dependency, migration, workflow or test change is authorized. No M5e implementation is authorized.
+
+1. Verify and checkpoint
+
+Expected:
+- Branch feat/review-creation.
+- HEAD and upstream:
+  1efe3ed3f0aa9697ce4e71cee295293a89c94909
+- Parent:
+  1bea3731f965c4555b9dc6bf0d9fa64447bf3789
+- Tree:
+  472cfc217c34b05e129d652c6649498a3118d0b6
+- main and origin/main:
+  e8d1033c02cd43fd26086dcf4a6a1ac6fb66fdb3
+- Clean index and working tree.
+- Origin and established noreply identity unchanged.
+
+Verify .local/p194/m5d-postgres-test-correction-acceptance.diff:
+- 44,852 bytes
+- 150 lines
+- SHA-256:
+  dc7811a2f1b1f870ecd2ce479e7803785c846f68f8f4f55cc802ced415948b97
+- Identical to the full-index comparison from staged tree bd5a38dfb2548f83a159ef9df18e55b0e171d652 to 1efe3ed3, excluding prompts.md.
+
+Verify the published review-test blob:
+981d7f209967dd340a44cfe5417eea1aa2db34ec
+
+Save refs, status, tree, relevant blob hashes and the prompts.md prefix with its checksum under .local/p195/.
+
+Stop before dependent actions if the state differs materially.
+
+2. External reviewer evidence
+
+The reviewer independently retrieved:
+- Both run records.
+- All five jobs’ metadata and logs.
+- The published corrective commit, its six changed paths and blob hashes.
+- Remote main and feature refs.
+
+Both runs were push runs on feat/review-creation, attempt 1, for:
+1efe3ed3f0aa9697ce4e71cee295293a89c94909
+
+CI:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256668
+
+Secret scan:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256982
+
+Reviewer-observed results:
+- Ubuntu job 119969360247:
+  3637 passed, 337 skipped.
+- Windows job 119969360432:
+  3636 passed, 338 skipped.
+- PostgreSQL job 119969360046:
+  337 passed, 3637 deselected.
+  tests/test_reviews_postgres.py shows all 28 cases passing.
+  This includes tenant isolation, both concurrent-replacement outcomes, the committed-review preservation case and pooled-connection defaults.
+- Container job 119969360253:
+  success.
+- Gitleaks job 119969360933:
+  84 commits scanned, no leaks.
+
+All required steps succeeded.
+
+Both verify logs printed:
+- production registry: ingest_revision, index_revision
+- The nine installed-wheel result lines already listed in ADR-0022, including offline review migration SQL rendering.
+
+The container log reported:
+- Context: 109 files; 19 planted fixtures excluded.
+- Database healthy, migrations completed, API healthy.
+- CI-built image used by migration, API and worker.
+- Upload 202; ingestion succeeded; active revision with two verified chunks.
+- Duplicate upload 200 with the existing revision.
+- One offline backfill job; ready index with two embeddings.
+- Idle worker exit 0 without OOM; smoke succeeded.
+
+These are the smoke’s reported checks. It does not exercise M5d review creation. Recall is arithmetic, Voyage is mocked, and no live-model quality or injection-resistance claim follows.
+
+Keep attribution separate:
+- Claude Code observed API conclusions and received HTTP 403 for logs.
+- The external reviewer subsequently retrieved the logs.
+- The reviewer did not run project tests, PostgreSQL, Docker, a build or an installed-wheel check locally.
+
+The failed 1bea3731 evidence remains historical and must be preserved.
+
+3. Main publication preflight
+
+Do not edit tracked files or create a new commit before publishing the already verified SHA.
+
+Fetch without tags and inspect remote refs.
+
+Require:
+- Remote feature is exactly 1efe3ed3.
+- Remote main is exactly e8d1033c.
+- Local main equals origin/main.
+- main is an ancestor of 1efe3ed3.
+- The range is exactly:
+  76f0b2c0
+  755c13a7
+  1bea3731
+  1efe3ed3
+- The path union is the 23 reviewed paths: the 22 M5d implementation paths plus ADR-0021 from the specification/documentation commit.
+- No unreviewed production change.
+- The corrective commit changes only the six reviewed paths.
+- Workflows and production blobs are unchanged from the reviewed implementation.
+- Working tree clean.
+- Range Gitleaks clean.
+
+If remote state differs, stop and report it. Do not reset, rebase, force-push or overwrite another change.
+
+Then:
+- Switch to main.
+- Fast-forward only to the full verified SHA.
+- Recheck remote main immediately before pushing.
+- Push main once using normal authentication.
+
+Do not modify credentials, Git configuration or account setup. Do not delete either branch.
+
+If the push fails or authentication blocks, do not retry automatically. Inspect remote refs read-only to establish what occurred, save a resume note and stop.
+
+After success, verify local main, origin/main and remote main equal the full verified SHA.
+
+4. Main CI gate
+
+Observe the main push runs for that exact SHA for at most 25 minutes total.
+
+Require:
+- Ubuntu verify.
+- Windows verify.
+- PostgreSQL integration.
+- Container.
+- Gitleaks.
+
+Verify branch main, event push, SHA and attempt.
+
+Collect run, job and step conclusions. Retrieve logs using existing authorized access where possible. Do not change authentication to obtain them.
+
+Do not reuse feature counts as though observed on main. If logs are unavailable, say so and record only what was actually observed.
+
+If any job fails:
+- Stop without edits, reruns or further pushes.
+- Report links and available failure evidence.
+- Do not proceed to the documentation or M5e proposal.
+
+If the time bound expires, save observations and stop. Leave no monitor process running.
+
+Only if all five main jobs pass, continue below.
+
+5. Documentation branch and authorized files
+
+Create a new branch from the verified main:
+docs/review-stages-plan
+
+Check first that it does not already exist. If it exists, inspect and report its state rather than overwriting it.
+
+Only these five paths may change:
+- README.md
+- docs/decisions/0022-review-creation.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+No other tracked path may change.
+
+6. Record M5d publication and evidence
+
+In ADR-0022:
+- Add the successful feature evidence above with run and job links.
+- Record main publication and the main results actually observed.
+- Preserve the failed first CI run and its diagnoses.
+- Keep Claude Code’s observations separate from the reviewer’s.
+- Mark earlier “pending” statements historical where appropriate.
+
+Update short linked summaries in README, plan and threat model:
+- M5d reviewed, verified in CI and on main at 1efe3ed3.
+- No production review path uses it.
+- run_review remains unregistered.
+- The M4d trusted-snapshot limitation remains open until the later orchestration uses the trusted reload exclusively.
+- Cleanup/invalidation and unknown-COMMIT limitations remain.
+- Overall M5 acceptance is pending.
+
+Preserve accepted specification headings and anchors. A separate implementation-status heading may be renamed if every link is updated.
+
+7. Propose M5e in docs/plan.md
+
+Add a substantial specification headed:
+M5e stage, call-reservation and output persistence specification (PROPOSED, Prompt 195; not implemented)
+
+Read the accepted M5 sequence, Correction D, W4–W8, report-integrity invariant, and the existing M3 fencing, M5a–M5d contracts before designing it.
+
+This is a proposal for review, not an accepted design or implementation.
+
+Placement:
+- Proposed persistence module: evidenceguard_persistence.review_stages.
+- Proposed migration: 0007.
+- Do not rewrite the published 0006 migration.
+- Add domain values only where dependency direction requires them.
+- No provider calls, handler registration, endpoints, orchestration or new settings.
+
+Provide concrete contracts, not just an outline:
+
+A. Values and public APIs
+Specify every proposed field, exact type, bound, default, invariant, return value and fixed error.
+Distinguish constructor validation from checks requiring trusted evidence or database state.
+Define input precedence, ordinary-error normalization and process-control behavior.
+State which APIs own transactions and which compose into a caller-owned fenced transaction.
+
+B. Stage identity and replay
+Define keys scoped by tenant, review, question and stage.
+Bind reusable results to the trusted snapshot, request digest, pinned configuration and stage dependencies.
+A committed stage is the only reusable success.
+Identical replay is a no-op; differing replay is a fixed conflict, never an overwrite.
+Define equality/canonicalization precisely.
+
+C. Reservations and budgets
+A started reservation must commit before dispatch.
+At most three reservations per question/stage across all job attempts.
+Abandoned started rows consume budget.
+At most one repair reservation across the whole stage.
+Specify race-safe allocation, sequence numbers, uniqueness and how abandoned reservations are represented.
+Distinguish job attempts from provider-call reservations.
+
+D. Call completion and stage commits
+Define metadata stored for each outcome, including model used, usage, latency, request identity and call kind.
+No raw provider output, prompt text or raw error text in call records.
+Validated content is stored only in committed stage values.
+Completion of a reservation and a successful stage output must be atomic.
+Define failure completion, unresolved-stage commits and dependency rules.
+An Analysis failure must preserve the committed Verification.
+
+E. Retry and repair
+Retain the accepted policy:
+- invalid_output permits one repair.
+- timeout and provider_failed retry the same request.
+- refusal, max_tokens, unexpected_stop and model_mismatch are terminal.
+- A started or completed repair consumes the repair allowance.
+- An abandoned repair may be re-dispatched once as a retry of that repair request if budget remains.
+Specify the durable data needed to reconstruct the permitted repair request without storing raw failed output.
+Do not silently reset budgets or derive success from a call record.
+
+F. Fencing and cleanup
+Every reservation, call completion, stage, output and final-completion write must use the existing fence.
+Specify stale-token, cancellation, lease-expiry and ownership checks and their precedence.
+No compensating write after lease loss.
+Preserve first process-control exceptions.
+Keep M5g’s required ctx.check boundaries explicit as later orchestration obligations.
+Specify transaction failure, cleanup and replay behavior without importing M5d retry rules blindly.
+
+G. Trusted reload
+Rebuild persisted values and validate complete identities and digests.
+Honor M5b’s recheck_verified and recheck_analyzed obligations with trusted evidence.
+Define how the loader obtains that evidence and what this slice does versus M5g.
+Do not treat deserialized JSON or matching chunk/quote keys alone as trusted provenance.
+
+H. Stored output and report boundary
+Cover the sequence’s stored-output requirement, but do not invent or accept M5f’s report-content schema here.
+State the exact boundary needed for M5g’s final atomic output-plus-job-success transaction.
+Keep the M1 hash schema unchanged.
+Every displayed conclusion must be hash-covered or derived solely from hashed content.
+Make any unresolved M5f representation dependency an explicit review obligation.
+
+I. Schema
+Give implementable proposed SQL types, nullability, keys, unique constraints, checks, tenant-scoped foreign keys and deletion behavior.
+Separate PostgreSQL-enforced rules from reload checks.
+Define bounded JSON/storage shapes and counts.
+Explain lock ordering and concurrent allocation/replay races.
+
+J. Planned tests
+Map each contract to meaningful unit or PostgreSQL tests.
+Include stale fences for every write class, conflicting replay, concurrent reservation allocation, budget exhaustion, abandoned repair, process-control and cleanup failures, tampered rows, preserved Verification after Analysis failure, and atomic completion.
+Keep controlled crash scenarios distinct from exactly-once claims.
+Specify an additive offline installed-wheel assertion without writing it.
+
+End with a numbered reviewer-decision list, recommendations, alternatives and material tradeoffs.
+
+Do not write implementation, tests, migration SQL files or ADR-0023. No M5e control operates yet.
+
+8. History and checks
+
+Append to prompts.md:
+- The Prompt 194 handoff verbatim.
+- This external review, evidence and authorization.
+- Prompt 195 verbatim.
+- An outcome note containing completed actions only.
+
+Preserve the existing bytes as an identical prefix. Keep existing fidelity disclosures and verify new verbatim entries as raw bytes.
+
+Check:
+- Exactly the five authorized paths changed.
+- Every other blob equals the verified main baseline.
+- No tracked .local file or artifact.
+- Links, anchors and tables.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --check and git diff --cached --check.
+- Privacy scan.
+- Unsuppressed staged Gitleaks.
+
+No application tests, build, wheel, database or Docker run is needed for these documentation-only changes.
+
+Stage the result, uncommitted. Do not publish the documentation branch.
+
+9. Export and handoff
+
+Create:
+.local/p195/m5d-main-evidence-and-m5e-spec.diff
+
+Baseline:
+1efe3ed3f0aa9697ce4e71cee295293a89c94909
+
+Final:
+the new staged tree
+
+Use full-index output, excluding prompts.md.
+
+Report size, line count, file statistics, SHA-256, encoding and byte identity with the Git comparison.
+
+The handoff must separate:
+- Reviewer-retrieved feature logs.
+- Main CI evidence actually observed by Claude Code.
+- Completed M5d publication.
+- Proposed, unaccepted and unimplemented M5e text.
+- Remaining M5f–M5h and overall M5 obligations.
+
+Report final refs, branch, staged tree, clean/unstaged status and process state.
+
+Return the handoff plus:
+.local/p195/m5d-main-evidence-and-m5e-spec.diff
+
+### Prompt 195 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 195 handoff: M5d is on main, but the main CI gate is unconfirmed, so I stopped before the docs and the M5e proposal
+
+`main` is fast-forwarded and pushed to the verified commit `1efe3ed3`. Four of the five required main-CI jobs report success. The PostgreSQL integration job never received a final conclusion within the 25-minute bound, so I could not confirm that all five passed. As the prompt instructs, I stopped there. I did not create the documentation branch, edit any docs, or write the M5e proposal, and there is no diff to export.
+
+**Starting state.** Everything matched:
+- Branch `feat/review-creation`; HEAD and upstream `1efe3ed3` (parent `1bea3731`, tree `472cfc21`); clean.
+- `main` and `origin/main` at `e8d1033c`; origin and noreply identity unchanged.
+- The Prompt 194 export matched: 44,852 bytes, 150 lines, SHA-256 `dc7811a2…8b97`, byte-identical to `bd5a38df..1efe3ed3` excluding `prompts.md`.
+- The test file is the reviewed version, `981d7f20…`.
+- Checkpoint saved in `.local/p195/`.
+
+**Main publication preflight** (all passed):
+- `fetch --no-tags` succeeded. Remote `feat/review-creation` was `1efe3ed3`, remote `main` was `e8d1033c`, and local `main` equalled `origin/main` and was an ancestor of `1efe3ed3`.
+- The range was exactly `76f0b2c0`, `755c13a7`, `1bea3731`, `1efe3ed3`, all with the noreply identity.
+- The path union was the same 23 reviewed paths. The corrective commit changed only its six reviewed paths, and production, workflow and lockfile files are unchanged since `755c13a7`.
+- Working tree clean; range Gitleaks: 4 commits, no leaks.
+- `docs/review-stages-plan` does not exist locally or remotely.
+
+**Publication**
+- `git switch main`, then `git merge --ff-only 1efe3ed3…`. Remote `main` was rechecked at `e8d1033c` immediately before the push.
+- `git push origin refs/heads/main:refs/heads/main` ran once and exited 0 (`e8d1033..1efe3ed`), with no sign-in prompt.
+- Local `main`, `origin/main`, remote `main` and remote `feat/review-creation` are all `1efe3ed3f0aa9697ce4e71cee295293a89c94909`.
+
+**Main CI for `1efe3ed3` that I observed** (branch `main`, triggered by the push, attempt 1). This is API data only; all five log downloads returned HTTP 403.
+- `ci` run [39829966665](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966665): **completed / success** (updated 18:21:04Z).
+- `secret-scan` run [39829966442](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966442): completed / success.
+
+| Job | Observed |
+|---|---|
+| [verify (ubuntu)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966665/job/120003190220) | success, 13/13 steps succeeded |
+| [verify (windows)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966665/job/120003190187) | success, 13/13 steps succeeded |
+| [container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966665/job/120003190427) | success, 10/10 steps succeeded |
+| [Gitleaks](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966442/job/120003188646) | success, 6/6 steps succeeded |
+| [integration (PostgreSQL)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966665/job/120003190247) | **all 11 steps completed/success, including "Run integration tests", but the job and its check run still show `status: in_progress`, `conclusion: null`, `completed_at: null`** |
+
+- **The anomaly.** The integration job's state was the same on every check from about 18:22Z to 18:41:37Z, through the jobs API and the check-runs API, while the parent run reported success. That points to a GitHub status-reporting lag, not a failure. Still, I have no recorded conclusion for that job, so I can't say all five main jobs passed.
+- **No counts.** I have no pytest counts or any log output for these main runs, and I have not reused the feature-branch counts.
+
+**Where I stopped.** The 25-minute bound was reached, so I stopped under section 4. Specifically:
+- I did not create `docs/review-stages-plan`.
+- I changed no README, ADR-0022, plan, threat-model or `prompts.md` content.
+- I did not record the M5d publication evidence.
+- I did not write the M5e proposal.
+- There is no `.local/p195/m5d-main-evidence-and-m5e-spec.diff`.
+
+I read the M5 sequence, Correction D, W4–W8, the report-integrity invariant and the M3 fence / M5a–M5c contracts in preparation, but nothing was written from that.
+
+**What is complete versus pending**
+- **Complete:** M5d is published on `main` at `1efe3ed3`.
+- **Feature CI evidence:** the reviewer-retrieved feature-branch logs (supplied in this prompt) stay attributed to you and are not yet recorded in the repository.
+- **Pending:**
+  - the main CI gate (the integration conclusion);
+  - recording the publication;
+  - the M5e proposal (proposed and unwritten; no M5e control exists);
+  - M5f–M5h;
+  - overall M5 acceptance.
+- **Limits that remain:** no production review path, `run_review` unregistered, the M4d trusted-snapshot limitation and the cleanup and unknown-`COMMIT` limitations.
+
+**Final state**
+- Current branch is `main` at `1efe3ed3`; the working tree and index are clean and nothing is staged.
+- No monitor, push or credential process is still running.
+- Nothing merged beyond the authorized fast-forward; no CI rerun; no M5e implementation.
+- Evidence and a resume note are in `.local/p195/` (`resume-note.md`, run, job and check-run JSON, and the 403 log responses).
+
+**Next step:** please return **output only**. There is no diff file. To continue, either:
+1. confirm the integration job's final conclusion (from the job page or its log), or
+2. authorize one more bounded status check.
+
+Once you confirm the main gate, I'll create the documentation branch, record the evidence and write the M5e proposal as Prompt 195 specifies.
+
+### External review of the M5d feature and main CI evidence and authorization to resume (Prompts 195–196)
+
+Prompt 195 (recorded above) carried the external reviewer's acceptance of the corrected M5d
+implementation and its successful exact-commit feature CI for fast-forward publication to `main`,
+with independently retrieved feature logs for `1efe3ed3` (ci run 39820256668, secret-scan run
+39820256982; push, `feat/review-creation`, attempt 1): Ubuntu job 119969360247 3637 passed, 337
+skipped; Windows job 119969360432 3636 passed, 338 skipped; PostgreSQL job 119969360046 337 passed,
+3637 deselected with all 28 `tests/test_reviews_postgres.py` cases passing; container job
+119969360253 success; Gitleaks job 119969360933 84 commits, no leaks. In Prompt 196 the reviewer
+independently retrieved both main run records (ci 39829966665, secret-scan 39829966442; push,
+`main`, attempt 1), all five jobs' metadata and logs and the remote refs: Ubuntu job 120003190220
+3637 passed, 337 skipped; Windows job 120003190187 3636 passed, 338 skipped; PostgreSQL job
+120003190247 337 passed, 3637 deselected in 212.47s with all 28 review-creation cases passing;
+container job 120003190427 smoke succeeded; Gitleaks job 120003188646 84 commits, no leaks. Both
+verify logs printed the production registry (`ingest_revision`, `index_revision`) and the nine
+installed-wheel result lines, and the container log reported its smoke checks. The integration
+job's API status remained inconsistent (job `in_progress`, conclusion null; every step
+`completed/success`; parent workflow `completed/success`; complete log successful). **Decision:**
+the successful complete log, steps and parent workflow are sufficient evidence to proceed with
+Prompt 195's documentation and M5e proposal, superseding the requirement to wait for the job's
+top-level API conclusion; the inconsistency is preserved and the API conclusion is not claimed as
+success. Claude Code had observed API conclusions only (HTTP 403 for logs); the reviewer ran no
+local project suite, PostgreSQL, Docker, build or installed-wheel check. Prompt 196 authorizes the
+five documentation paths and the proposed M5e specification, staged uncommitted; no commit, push,
+CI rerun or M5e implementation.
+
+### Prompt 196 (verbatim)
+
+Prompt 196 — Resume the documentation and M5e proposal after independent main-CI verification
+
+Written for: Claude Code, Mathew and the external reviewer.
+
+Resume the unfinished documentation and specification work from Prompt 195. Read repository instructions and .local/p195/resume-note.md first.
+
+The external reviewer independently retrieved both main run records, all five jobs’ metadata and logs, and the remote refs.
+
+The main PostgreSQL log confirms:
+337 passed, 3637 deselected in 212.47s.
+tests/test_reviews_postgres.py shows all 28 cases passing.
+
+The integration job’s API status remains inconsistent:
+- Job: in_progress, conclusion null.
+- Every listed step: completed/success.
+- Parent workflow: completed/success.
+- Complete integration log: successful pytest summary and container cleanup.
+
+Reviewer decision:
+The successful complete log, successful steps and successful parent workflow are sufficient evidence to proceed with Prompt 195’s documentation and M5e proposal. This explicitly supersedes the requirement to wait for the integration job’s top-level API conclusion. Preserve the inconsistency in the evidence record; do not claim the API job conclusion became success.
+
+No additional polling, CI rerun, push or authentication change is needed.
+
+1. Recover and checkpoint
+
+Expected:
+- Current branch main.
+- HEAD, local main, origin/main and remote main:
+  1efe3ed3f0aa9697ce4e71cee295293a89c94909
+- Remote feat/review-creation is also at that SHA.
+- Tree:
+  472cfc217c34b05e129d652c6649498a3118d0b6
+- Clean index and working tree.
+- No documentation branch or M5e proposal created.
+- Origin and established noreply identity unchanged.
+
+Verify locally. Stop if the state differs materially. No fetch, push or other remote operation is required.
+
+Save refs, status, tracked blob hashes and the prompts.md prefix with its checksum under .local/p196/.
+
+Create docs/review-stages-plan from HEAD after checking it does not already exist. Do not overwrite an existing branch.
+
+2. Main evidence to record
+
+Exact SHA:
+1efe3ed3f0aa9697ce4e71cee295293a89c94909
+
+Both runs: branch main, event push, attempt 1.
+
+CI:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966665
+
+Secret scan:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966442
+
+Reviewer-observed logs:
+- Ubuntu job 120003190220:
+  3637 passed, 337 skipped.
+- Windows job 120003190187:
+  3636 passed, 338 skipped.
+- PostgreSQL job 120003190247:
+  337 passed, 3637 deselected.
+  All 28 review-creation PostgreSQL cases passed.
+- Container job 120003190427:
+  smoke succeeded.
+- Gitleaks job 120003188646:
+  84 commits scanned, no leaks.
+
+Both verify logs printed the production registry:
+ingest_revision, index_revision
+
+Both printed all nine installed-wheel result lines already recorded for the successful feature push, including offline review migration SQL rendering.
+
+The main container log reported:
+- Context: 109 files; 19 planted fixtures excluded.
+- Database healthy, migration completed, API healthy.
+- Migration, API and worker used the CI-built image.
+- Upload 202; ingestion succeeded; active revision with two verified chunks.
+- Duplicate upload 200 with the existing revision.
+- One offline backfill indexing job; ready index with two embeddings.
+- Idle worker exit 0 without OOM; smoke succeeded.
+
+Label these as the smoke’s reported checks. The smoke does not exercise M5d review creation. Recall is arithmetic and Voyage is mocked.
+
+Keep attribution separate:
+- Claude Code observed API conclusions and received HTTP 403 for logs.
+- The external reviewer subsequently retrieved all five logs.
+- The reviewer ran no local project suite, PostgreSQL, Docker, build or installed-wheel check.
+
+Also record the successful feature evidence supplied in Prompt 195:
+- CI run 39820256668; secret scan 39820256982.
+- Ubuntu job 119969360247: 3637 passed, 337 skipped.
+- Windows job 119969360432: 3636 passed, 338 skipped.
+- PostgreSQL job 119969360046: 337 passed, 3637 deselected; all 28 review cases passed.
+- Container job 119969360253: success.
+- Gitleaks job 119969360933: 84 commits, no leaks.
+
+Keep each job under its own run and link. Preserve the failed 1bea3731 evidence separately.
+
+3. Authorized changes
+
+Only:
+- README.md
+- docs/decisions/0022-review-creation.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Update M5d publication and evidence in ADR-0022, with linked status summaries in the other documents.
+
+State:
+- M5d is reviewed and on main at 1efe3ed3.
+- Successful feature and main execution evidence is independently confirmed.
+- Main integration has the documented top-level API status inconsistency.
+- No application review path uses M5d.
+- run_review remains unregistered.
+- The M4d trusted-snapshot limitation, cleanup/invalidation limitations and unknown-COMMIT limitations remain.
+- Overall M5 acceptance is pending.
+
+Mark superseded pending statements historical. Preserve accepted specification headings and anchors. If renaming a separate status heading, update all links.
+
+4. Write the proposed M5e specification
+
+In docs/plan.md add:
+M5e stage, call-reservation and output persistence specification (PROPOSED, Prompt 196; not implemented)
+
+Read the accepted sequence, Correction D, W4–W8, report-integrity invariant, M3 fencing and M5a–M5d contracts before designing it.
+
+Propose evidenceguard_persistence.review_stages and migration 0007. Do not rewrite 0006.
+
+Provide a complete reviewable contract covering:
+
+- Values and APIs:
+  exact fields, types, bounds, defaults, invariants, signatures, results, fixed errors, input precedence, transaction ownership and process-control behavior.
+  Separate constructor validation from trusted-evidence and database checks.
+
+- Stage identity:
+  tenant/review/question/stage keys and bindings to snapshot, configuration, request digest and dependencies.
+  Only committed stages are reusable success.
+  Identical replay is a no-op; differing replay is a fixed conflict, never an overwrite.
+  Define equality and canonicalization.
+
+- Reservations:
+  commit started before dispatch.
+  Three reservations per question/stage across all job attempts.
+  Abandoned started rows consume budget.
+  At most one repair reservation for the whole stage.
+  Define race-safe allocation, sequence numbers, uniqueness and restart behavior.
+
+- Completion:
+  bounded outcome metadata, model used, usage, latency, request identity and call kind.
+  No raw provider output, prompt text or raw error text in call records.
+  Validated content belongs only in committed stage values.
+  Complete a successful reservation and stage atomically.
+  Define unresolved-stage writes and preserve Verification after Analysis failure.
+
+- Repair and retry:
+  invalid_output permits one repair.
+  timeout/provider_failed retry the same request.
+  refusal/max_tokens/unexpected_stop/model_mismatch are terminal.
+  Started or completed repair consumes the repair allowance.
+  An abandoned repair may be re-dispatched once as a retry if budget remains.
+  Specify durable repair reconstruction without storing raw failed output.
+
+- Fencing:
+  every reservation, completion, stage, output and final-completion write uses the existing fence.
+  Define cancellation, lease loss, stale tokens and ownership precedence.
+  No compensating write after fence loss.
+  Preserve first process-control exceptions.
+  Keep M5g’s required ctx.check boundaries explicit.
+  Specify transaction and cleanup behavior without blindly copying M5d retries.
+
+- Trusted reload:
+  rebuild values and validate complete identities/digests.
+  Honor recheck_verified and recheck_analyzed using trusted evidence.
+  Explain how evidence is obtained and what remains M5g’s responsibility.
+  Deserialized JSON and matching chunk/quote keys alone do not prove provenance.
+
+- Output boundary:
+  cover stored-output persistence and composition into M5g’s atomic output-plus-job-success transaction.
+  Do not settle M5f’s report-content schema here.
+  Preserve M1’s hash schema and the hash-covered-conclusions invariant.
+  Identify unresolved M5f dependencies explicitly.
+
+- Schema:
+  implementable proposed SQL types, nullability, keys, named constraints, tenant-scoped foreign keys, deletion behavior, JSON bounds and counts.
+  Separate database enforcement from reload checks.
+  Explain lock ordering and concurrent allocation/replay races.
+
+- Planned tests:
+  stale fences for every write class, conflicting replay, concurrent allocation, exhausted budgets, abandoned repair, process-control/cleanup failures, tampered records, retained Verification and atomic completion.
+  Controlled crash scenarios are not exactly-once guarantees.
+  Propose an additive offline wheel assertion without implementing it.
+
+Finish with numbered reviewer decisions, recommendations, alternatives and material tradeoffs.
+
+M5e remains proposed, unaccepted, unimplemented and untested. Do not create ADR-0023, implementation, tests, migrations, settings, endpoints or registry entries.
+
+5. History and checks
+
+Append:
+- Prompt 195 handoff verbatim.
+- This review decision and independently retrieved evidence.
+- Prompt 196 verbatim.
+- Completed outcome note.
+
+Preserve the existing prompts.md bytes as an identical prefix and keep fidelity disclosures. Record any unavailable original text honestly rather than reconstructing it as verbatim.
+
+Check:
+- Exactly the five authorized paths changed.
+- Every other tracked blob matches 1efe3ed3.
+- No tracked .local files or artifacts.
+- Links, anchors and tables.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --check and git diff --cached --check.
+- Privacy scan.
+- Unsuppressed staged Gitleaks.
+
+No application tests, build, wheel, database, Docker or provider calls are required.
+
+6. Stage and export
+
+Stage the documentation, uncommitted.
+
+Create:
+.local/p196/m5d-main-evidence-and-m5e-spec.diff
+
+Baseline:
+1efe3ed3f0aa9697ce4e71cee295293a89c94909
+
+Final:
+the new staged tree
+
+Full-index diff, prompts.md excluded.
+
+Report byte size, line count, file statistics, SHA-256, encoding and byte identity against Git.
+
+Return the handoff plus the diff. Distinguish confirmed execution evidence from the unresolved API status field.
+
+No commit, push, CI rerun or M5e implementation is authorized.
+
+### Prompt 196 outcome (Claude Code; staged, awaiting review)
+
+Completed actions only. Prompt 195 (actions by Claude Code): the starting state and the Prompt 194
+export were verified; the publication preflight passed (remote feature `1efe3ed3`, remote main
+`e8d1033c`, range `76f0b2c0`, `755c13a7`, `1bea3731`, `1efe3ed3`, the 23 reviewed paths, range
+Gitleaks 4 commits with no leaks); `main` was fast-forwarded to `1efe3ed3` and pushed once (exit
+0); the main runs were observed through the API only (logs HTTP 403) until the 25-minute bound,
+with the integration job reporting `in_progress` and no conclusion; work stopped before any
+documentation or proposal edit. Prompt 196: the state matched (branch `main`, HEAD, `main`,
+`origin/main` and remote refs at `1efe3ed3`, tree `472cfc21`, clean); checkpoint under
+`.local/p196/`; branch `docs/review-stages-plan` created from HEAD (it did not exist). No remote
+operation.
+
+- **Documentation.** ADR-0022 gains "Feature and main CI evidence at `1efe3ed3` (Prompts
+  194–196)" with both runs and all ten jobs linked, the reviewer-observed results, the unresolved
+  main integration API status and separate attribution; its status and the plan, README and
+  threat-model summaries record M5d as reviewed, verified in CI and on `main` at `1efe3ed3`, with
+  superseded pending statements marked historical, and the separate implementation-status heading
+  renamed (all links updated). The failed `1bea3731` evidence is unchanged.
+- **Proposal.** `docs/plan.md` gains "M5e stage, call-reservation and output persistence
+  specification (PROPOSED, Prompt 196; not implemented)" (M5e-A0 to M5e-M, decisions E1–E12). It
+  is proposed, unaccepted, unimplemented and untested.
+- **History.** The Prompt 194 handoff, Prompt 195, the Prompt 195 handoff and Prompt 196 above
+  were extracted by script from the session transcript (content inside the paste markers) and
+  checked as raw bytes; Prompt 195 and the Prompt 194 handoff had not been recorded because
+  Prompt 195 stopped before its history step. Earlier text-fidelity disclosures stand.
+- **Checks before this note:** relative links 396 and tables 73 without problems. No
+  application test, build, wheel, database, Docker or provider call was run.
+- The scope, encoding, whitespace, privacy and Gitleaks checks and the export follow and are
+  reported in the handoff.
+
+### Prompt 196 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 196 handoff: M5d's main evidence recorded and the M5e persistence specification proposed (staged)
+
+Both pieces are staged and uncommitted on `docs/review-stages-plan`: the M5d publication evidence and the proposed M5e specification. Documentation only. Nothing was committed or pushed, no CI was rerun, and nothing remote was touched.
+
+**Starting state.** Everything matched:
+- Current branch `main`; HEAD, local `main`, `origin/main` and the recorded remote `main` and `feat/review-creation` all at `1efe3ed3`; tree `472cfc21`; clean.
+- No documentation branch existed; origin and noreply identity unchanged.
+- Checkpoint saved in `.local/p196/`. `docs/review-stages-plan` was created from HEAD.
+
+**1. Main CI evidence: what is confirmed and what is not**
+- **Confirmed by your log retrieval** (recorded in ADR-0022 as yours, with each job under its own run and link):
+  - **Feature push** (ci 39820256668, secret-scan 39820256982):
+    - Ubuntu 3637 passed, 337 skipped.
+    - Windows 3636 passed, 338 skipped.
+    - PostgreSQL 337 passed, 3637 deselected, with all 28 review cases passing.
+    - Container success; Gitleaks 84 commits, no leaks.
+  - **Main push** (ci 39829966665, secret-scan 39829966442):
+    - Ubuntu 3637 passed, 337 skipped.
+    - Windows 3636 passed, 338 skipped.
+    - PostgreSQL 337 passed, 3637 deselected in 212.47s, with all 28 review-creation cases passing.
+    - Container smoke succeeded; Gitleaks 84 commits, no leaks.
+  - **Logs:** both verify logs printed the production registry and the nine installed-wheel lines. The container smoke's reported checks are recorded and labelled as not exercising M5d; Recall is arithmetic and Voyage is mocked.
+- **Observed by me:** API conclusions only. Every log download returned HTTP 403.
+- **Not resolved:** the main integration job's top-level API status stayed `in_progress` with conclusion `null`, while every step, the full log and the parent run succeeded. It is recorded as unresolved and is **not** claimed as success. Your Prompt 196 decision to proceed on the log, step and run evidence is recorded.
+- The failed `1bea3731` evidence is preserved unchanged.
+
+**2. M5d status updates**
+- ADR-0022 status, the plan, README and threat model now say: M5d is **reviewed, verified in CI and on `main` at `1efe3ed3`**. No application review path uses it and `run_review` stays unregistered. The M4d trusted-snapshot, cleanup/invalidation and unknown-`COMMIT` limitations remain, and overall M5 acceptance is pending.
+- Superseded "pending" statements are marked historical.
+- The plan's implementation-status heading is renamed to "M5d implementation status (reviewed, verified in CI and on main at 1efe3ed3)", and every link to it was updated. Specification headings and anchors are unchanged.
+
+**3. Proposed M5e specification (not accepted, implemented or tested)**
+The plan now contains "M5e stage, call-reservation and output persistence specification (PROPOSED, Prompt 196; not implemented)", in sections M5e-A0 to M5e-M:
+- **Placement:** a pure domain module, `evidenceguard_domain.review_stages`, and a persistence module, `evidenceguard_persistence.review_stages`, plus proposed migration `0007` with four tables (`review_question_evidence`, `review_stage_calls`, `review_stage_results`, `review_outputs`). `0006` is untouched.
+- **Fenced writes:** every write API composes into the caller's fenced transaction, never commits or retries, and follows a fixed input precedence. M3's lease errors pass through unchanged; everything else is a fixed error. Process control propagates as the same object.
+- **Budget planning:** a pure `plan_next_call` encodes the Correction D budget. "Abandoned" is worked out from the job attempt number rather than stored. A database index allows only one repair per stage. Allocation is made race-safe by the job-row lock that every writer must hold.
+- **Atomicity and replay:** a successful call's reservation completion and its stage insert commit together. An Analysis failure never touches a committed Verification. Identical replay is a no-op and a differing one is a conflict.
+- **Repair reconstruction:** a repair request is rebuilt from trusted inputs plus a stored, text-free rejection reason and positions. No raw output is ever stored.
+- **Trusted reload:** stored evidence is re-proved against database chunks inside the snapshot before `recheck_verified` and `recheck_analyzed` run.
+- **Output boundary:** an output envelope is stored inside M5g's `fenced(finish=True)` transaction. The M5f content schema is left open as a decision.
+- **Also covered:** a planned test map and a proposed installed-wheel assertion (not written).
+- **Reviewer decisions E1–E12.** The most material:
+  - **E4:** whether an M5b `citation_rejected` output may use the one repair.
+  - **E5:** persisting each question's evidence and re-proving it against the database.
+  - **E7:** whether the output table ships in `0007` or is deferred to M5f/M5g.
+
+**History.** The `prompts.md` prefix (2,212,655 bytes) is preserved. Appended, each verbatim and checked as raw bytes:
+- the Prompt 194 handoff;
+- Prompt 195;
+- the Prompt 195 handoff;
+- Prompt 196.
+
+The Prompt 194 handoff and Prompt 195 had never been recorded, because Prompt 195 stopped before its history step. I added them so the record is complete. Your review and decision and an outcome note are also appended.
+
+**Checks.** No application tests, build, wheel, database, Docker or provider calls were run (none were needed).
+
+| Check | Result |
+|---|---|
+| Changed paths | exactly the five authorized ones; the other 231 files identical to `1efe3ed3` |
+| Tracked `.local` files | none |
+| Links / tables | 396 links, 73 tables, 0 problems |
+| Encoding | UTF-8, no BOM, LF only, no U+FFFD |
+| `git diff --check` and `git diff --cached --check` | clean |
+| Privacy scan | no hits |
+| Gitleaks, staged and unsuppressed | no leaks |
+
+**Export: `.local/p196/m5d-main-evidence-and-m5e-spec.diff`**
+- Baseline `1efe3ed3`, final staged tree `86a3b32a6f03460bcb70207787cc6492cfea492d`, `prompts.md` excluded.
+- 90,015 bytes, 662 lines, 4 files, 549 insertions and 18 deletions.
+- SHA-256 `73b0032ef367374509a63f5dfbcfb8632f54aa8f139e8c7c917873b57d5bb1fb`.
+- UTF-8, LF only; byte-identical to both the staged and the tree comparisons.
+
+**Final state**
+- Branch `docs/review-stages-plan`, HEAD `1efe3ed3`, staged tree `86a3b32a`, nothing unstaged or untracked. `main` and `origin/main` at `1efe3ed3`.
+- No background processes are running.
+
+**Still outstanding:** M5e's review and implementation, M5f–M5h, the overall M5 acceptance assessment, and the M4d trusted-snapshot limitation (open until M5g uses the trusted reload exclusively).
+
+Start a new Claude session before the next task: this session spans Prompts 180–196 and has been summarized once. The `.local/p196/` checkpoint and this handoff are enough to recover.
+
+**Next step:** please return **output plus the diff file** `.local/p196/m5d-main-evidence-and-m5e-spec.diff`.
+
+### External review of the Prompt 196 M5e proposal and disposition (Prompt 197)
+
+The external reviewer checked the bytes, checksum and contents of
+`.local/p196/m5d-main-evidence-and-m5e-spec.diff` and compared the proposed M5e contracts with the
+published M3 and M5a–M5d source. **M5d evidence record:** acceptable; its attribution, the failed
+first CI evidence at `1bea3731` and the unresolved main integration API status are to be preserved.
+**Supported M5e directions**, subject to review of corrected text: the domain/persistence split;
+caller-owned fenced writes without internal retries; abandonment derived from earlier job attempts;
+persisted question evidence with a database provenance recheck; canonical text storage; analysis
+dependency digests; serialization through the review's canonical job fence. **E4:** an M5b
+provenance rejection may use the same single repair allowance as `invalid_output`, creating no other
+allowance and not resetting the three-reservation budget. **E7:** defer the concrete output table
+and writer until M5f settles the content representation, keeping an explicit M5e-to-M5f/M5g
+integration contract; recorded as a proposed scope allocation, not an accepted change.
+**Defects to correct:** the planner signature lacked the current attempt, defined return values,
+whole-history validation and a transition table; the reload rule required a successful completed
+call for every committed stage, contradicting unresolved stages; M5c `RequestTooLargeError` had no
+durable representation; equal replay contradicted the "started by the current attempt" completion
+precondition and reservation replay was undefined; values, results and canonical objects were not
+fully enumerated and the float rule was inexact; question, configuration and dependency binding was
+incomplete and the text wrongly said the M5a request digest covers all limits (`timeout_ms` is
+excluded); storage overflow of legitimate values was unspecified; holding the job row lock was
+described as stopping lease expiry, and the text assumed `HandlerFence` attributes that do not exist;
+the W7 wording for returned outcomes, ordinary exceptions and process control needed correction; the
+proposed `0007` schema contained alternatives and an inferred 100-row bound. **Decision:** Prompt 197
+authorizes documentation corrections only, in the same five paths, staged uncommitted; M5e remains
+proposed, unaccepted, unimplemented and untested; no commit, push, CI rerun, implementation or other
+slice.
+
+### Prompt 197 (verbatim)
+
+Prompt 197 — Correct the M5e state machine, persistence and reload contracts
+
+Written for: Claude Code, Mathew and the external reviewer.
+
+Read repository instructions and recover from .local/p196/ and the Prompt 196 handoff.
+
+This is documentation only. M5e remains proposed, unaccepted, unimplemented and untested.
+
+Do not commit, push, merge, rerun CI, change implementation or start another slice.
+
+1. Starting state and checkpoint
+
+Expected:
+- Branch docs/review-stages-plan.
+- HEAD, main and origin/main:
+  1efe3ed3f0aa9697ce4e71cee295293a89c94909
+- HEAD tree:
+  472cfc217c34b05e129d652c6649498a3118d0b6
+- Staged tree:
+  86a3b32a6f03460bcb70207787cc6492cfea492d
+- Exactly five staged paths:
+  README.md
+  docs/decisions/0022-review-creation.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Origin and established noreply identity unchanged.
+
+Verify .local/p196/m5d-main-evidence-and-m5e-spec.diff:
+- 90,015 bytes
+- 662 lines
+- SHA-256:
+  73b0032ef367374509a63f5dfbcfb8632f54aa8f139e8c7c917873b57d5bb1fb
+- Identical to the full-index comparison from HEAD to the starting staged tree, excluding prompts.md.
+
+Save the starting tree, paths, blob hashes and prompts.md prefix with its checksum under .local/p197/.
+
+No remote operation is needed. Stop before dependent edits if the expected state differs materially.
+
+2. Review disposition
+
+The external reviewer checked the export’s bytes, checksum and contents and compared the proposed contracts with the published M3 and M5a–M5d source.
+
+M5d’s evidence record is acceptable. Preserve its attribution, failed first CI evidence and unresolved main integration API-status inconsistency.
+
+Supported M5e directions, subject to review of corrected text:
+- Domain/persistence split.
+- Caller-owned fenced writes without internal retries.
+- Abandonment derived from earlier job attempts.
+- Persisted question evidence with a database provenance recheck.
+- Canonical text storage.
+- Analysis dependency digests.
+- Serialization through the review’s canonical job fence.
+
+For E4, the reviewer supports allowing an M5b provenance rejection to use the same single repair allowance as invalid_output. This must not create another repair allowance or reset the three-reservation budget.
+
+For E7, the reviewer recommends deferring the concrete output table and writer until M5f settles the content representation. Keep an explicit M5e-to-M5f/M5g integration contract so the sequence’s output requirement is not dropped. Record this as a proposed scope allocation for review, not an already accepted change.
+
+No M5e implementation is authorized.
+
+3. Correct the planner contract
+
+The current signature lacks information required by its rules:
+plan_next_call(records, committed)
+
+The same started reservation from attempt 1 must mean:
+- in-flight when the current attempt is 1;
+- abandoned when the current attempt is 2.
+
+Add an explicit current-attempt input and define its exact type, bounds and relationship to the canonical job.
+
+Define all planner return values, including what happens when a stage is already committed. Do not mix “no call,” a return value and an exception without specifying which API does which.
+
+Specify validation of the entire history before planning:
+- Common tenant/review/question/stage/job identity.
+- Contiguous sequence numbers.
+- Attempt ordering and no future attempt.
+- Initial/repair/retry kinds and request bases.
+- At most one repair and three reservations.
+- Digest equality for retries of the same request.
+- How a repaired retry identifies the earlier triggering rejection.
+- Impossible histories and their fixed error.
+
+Give an ordered transition table, including third-reservation outcomes, abandoned calls, abandoned repairs and terminal outcomes. Distinguish planning from allocating a reservation.
+
+4. Correct unresolved-stage contracts and reload
+
+The current reload rule requires every committed stage’s call to have outcome completed with no rejection. That contradicts unresolved stages caused by refusal, exhausted timeout/provider failures, invalid output, provenance rejection or an unresolved Verification dependency.
+
+Define a complete stage-shape table:
+- Successful Verification.
+- Successful Analysis.
+- Unresolved after a completed failed/rejected call.
+- Unresolved after exhausted abandoned reservations.
+- Analysis unresolved because a dependency is unresolved.
+- Any permitted pre-dispatch refusal.
+
+For each, state exactly which call reference, request digest, evidence digest, dependency digest, content and reason fields are required, absent or derived.
+
+Make constructors, SQL checks, write APIs and reload use the same table.
+
+Address M5c RequestTooLargeError explicitly. The accepted M5c plan maps oversized assembly to an unresolved question without a provider call or reservation. Define the durable representation and fixed reason, including an oversized repair request after a previous call.
+
+Distinguish invalid trusted/caller input from a legitimate unresolved outcome.
+
+Reload must validate unresolved rows against their actual terminal history or dependency. It must not demand a successful provider result for them.
+
+5. Resolve replay versus mutation preconditions
+
+Currently:
+- Equal replay is promised as a no-op.
+- Completion APIs require a started reservation belonging to the current attempt.
+
+After a successful commit, the reservation is completed and may belong to an earlier attempt. Specify how identical replay is recognized before applying mutation-only preconditions.
+
+Define replay separately for:
+- Evidence insertion.
+- Reservation allocation.
+- Failed-call completion.
+- Successful call plus stage completion.
+- Unresolved-stage insertion.
+
+Clarify whether reservation allocation itself is replayable. A retry can legitimately use the same request digest, so that digest alone is not an idempotency key for a dispatch.
+
+Do not add an idempotency mechanism casually. Either specify its complete identity contract or narrow the replay promise precisely.
+
+State which audit fields remain immutable on replay. Do not blanket-exclude job_attempt from equality for every record without explaining the consequences.
+
+Specify that a failed API operation must escape the caller’s fence for rollback; the API does not itself own rollback. Do not claim merely raising an exception always rolls back a caller-owned transaction if the caller suppresses it.
+
+6. Complete values, canonical encodings and bindings
+
+The current text names StageState, TrustedStages and StageExhausted without complete contracts, and says canonical objects have enumerated fields without actually enumerating them.
+
+Add:
+- Exact contracts for every public value and result.
+- Exact types, defaults, bounds and cross-field rules for every field.
+- Explicit canonical object schemas for evidence, successful stage content and dependency digests.
+- Enum, UUID, float, optional-field and tuple/list encoding.
+- An exact finite-float rule rather than “repr-exact or rejected.”
+- Bounded decoding, duplicate-key rejection, unknown-field rejection and digest validation rules.
+- Required checks at write time versus reload time.
+
+Question and configuration binding:
+- Explain how question IDs and the planned question set are checked against the pinned template.
+- Define where exact question text, queries and documentary flags come from.
+- Define all Analysis dependencies before reservation, how their identities are persisted and how the same inputs are reconstructed on resume.
+- Ensure supplied owner/shared records agree with committed database stages.
+- Reject missing, duplicate, foreign or inconsistent dependencies.
+
+Correct the claim that the M5a request digest covers all limits:
+timeout_ms is deliberately excluded from that digest.
+
+Explicitly bind and validate the pinned review configuration, including timeout, retrieval configuration, template and prompts. Do not describe an opaque matching request digest as proof that the request used the pinned inputs.
+
+Keep persistence independent of agents. State precisely which checks persistence can perform and which request reassembly checks belong to the trusted worker composition.
+
+Define behavior when evidence or stage serialization exceeds the proposed storage bounds. A legitimate value that exceeds a storage cap must have a specified outcome; do not leave it as an accidental SQL or constructor failure.
+
+7. Correct fencing and process-control statements
+
+Holding the job row lock prevents reassignment while held; it does not stop the lease clock from expiring.
+
+Use the existing recheck_ownership contract accurately:
+- Identify how the API obtains the JobLeaseToken from its accepted fence/job inputs.
+- Specify checks after possible lock waits and before committing effects.
+- Preserve the accepted M3 limitation that a check just before expiry can be followed by commit shortly afterwards.
+- Do not claim a universal guarantee that no statement can execute after expiry.
+
+The existing HandlerFence exposes session and job, not token or a finish flag. Use existing public capabilities or explicitly propose and justify a new seam. Do not silently assume unavailable attributes.
+
+Correct W7 wording:
+- After a returned outcome or an ordinary exception, ctx.check precedes classification.
+- Process-control exceptions propagate as the same object and must not be replaced by cancellation or lease errors.
+
+Keep cancellation at explicit boundaries; do not claim atomic cancellation checks around every statement.
+
+Clarify finish-only output composition as a later M5g obligation if the concrete output writer is deferred.
+
+8. Make the schema implementable
+
+Revise the proposed 0007 schema to match the corrected contracts.
+
+Provide exact:
+- Column types and nullability.
+- Primary and unique keys.
+- Constraint and index names.
+- Foreign-key columns and targets.
+- Conditional evidence/call references.
+- CHECK expressions for success and each unresolved shape.
+- Started/completed metadata combinations.
+- Digest patterns and byte/count bounds.
+- Deletion behavior.
+
+Do not leave “a mirror column if needed” or equivalent alternatives in the normative schema.
+
+Separate:
+- Database guarantees.
+- Write-time checks.
+- Reload checks.
+- Trusted-caller preconditions.
+
+Explain how the planned-question bound is enforced or checked. Do not infer a maximum of 100 evidence rows solely from the fact that a report permits 100 questions.
+
+If the output table is deferred, remove its concrete schema from 0007 and state exactly where its schema, content validation and atomic writer must be reviewed later.
+
+9. Planned verification and decisions
+
+Update the planned tests to cover every correction, especially:
+- Same started history under current versus later attempt.
+- Invalid histories and all budget boundaries.
+- Every unresolved shape and reload.
+- Pre-dispatch oversized requests and oversized repair.
+- Identical completion replay after reclaim.
+- Different completion replay conflict.
+- Reservation allocation identity.
+- Dependency and configuration mismatch.
+- Timeout binding despite equal M5a request digest.
+- Lease expiry during a later lock wait.
+- Process control versus cancellation.
+- Canonical decoding and storage overflows.
+
+Write planned tests only as specification text. Do not implement or run them.
+
+Update E1–E12 and add numbered decisions where necessary. Keep supported directions distinct from full specification acceptance.
+
+10. Scope, history and checks
+
+Only the same five documentation/history paths may change.
+
+Append:
+- Prompt 196 handoff verbatim.
+- This review and disposition.
+- Prompt 197 verbatim.
+- Completed outcome note.
+
+Preserve the prior prompts.md bytes as an identical prefix and retain existing fidelity disclosures.
+
+Check:
+- Only the five authorized paths differ from HEAD and the starting staged tree.
+- Every other blob is unchanged.
+- No tracked .local files or artifacts.
+- Links, anchors and tables.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --check and git diff --cached --check.
+- Privacy scan.
+- Unsuppressed staged Gitleaks.
+
+No application tests, build, wheel, PostgreSQL, Docker or provider calls are required.
+
+11. Stage and export
+
+Stage the corrected proposal, uncommitted.
+
+Export:
+.local/p197/m5e-contract-corrections.diff
+
+Baseline:
+86a3b32a6f03460bcb70207787cc6492cfea492d
+
+Final:
+the new staged tree
+
+Use full-index output, excluding prompts.md.
+
+Report size, line count, file statistics, SHA-256, encoding and byte identity with Git.
+
+Return the handoff plus the diff.
+
+M5e remains proposed and awaits review. No commit, push, CI rerun or implementation is authorized.
+
+### Prompt 197 outcome (Claude Code; staged, awaiting review)
+
+Completed actions only. The starting state matched (branch `docs/review-stages-plan`; HEAD, `main`
+and `origin/main` at `1efe3ed3`; HEAD tree `472cfc21`; staged tree `86a3b32a` with the five
+documentation and history paths; nothing unstaged or untracked); the Prompt 196 export matched
+(90,015 bytes, 662 lines, SHA-256 `73b0032e…1fb`, byte-identical to the full-index comparison
+from HEAD to the staged tree excluding `prompts.md`). Checkpoint under `.local/p197/`. No remote
+operation.
+
+- **Proposal corrected.** The `docs/plan.md` section is renamed "M5e stage and call-reservation
+  persistence specification (PROPOSED, Prompt 196, corrected in Prompt 197; not implemented)" with
+  sections M5e-R (review disposition) and M5e-A0 to M5e-N: an explicit `StageHistory` with
+  `current_attempt`, whole-history rules V1–V12, a total `plan_stage` with four return variants and
+  the ordered transition table T0–T9; one stage-shape table (S1, S2, U1–U6) used by constructors, SQL,
+  write APIs and reload, including the M5c oversized request, oversized repair and oversized
+  evidence; replay decided before mutation preconditions, with allocation not replayable; complete
+  value contracts, five canonical schemas, a bit-exact float rule, bounded decoding and derived byte
+  caps; question, configuration (including `timeout_ms`) and dependency binding with the
+  persistence/worker split; fencing through `fence.job.lease_token()` and `recheck_ownership` with
+  the accepted M3 limit; corrected W7 wording; an implementable four-table `0007` (plan, evidence,
+  calls, results) with guarantee layers; the output table and writer moved out of M5e as a proposed
+  M5f/M5g allocation (E7); planned tests; decisions E1–E16 marked supported or open.
+- **Links.** The README and threat-model links to the renamed heading, and their status wording, are
+  updated; the plan's M5 status line notes the correction. ADR-0022 is unchanged in this prompt.
+- **History.** The Prompt 196 handoff (extracted by script from the previous session log), the
+  review and disposition above and Prompt 197 (extracted from this session's log, content inside the
+  paste markers) are appended and were checked as raw bytes. Earlier text-fidelity disclosures stand.
+- **Checks before this note:** relative links 372 and tables 83 in the four documentation files
+  without problems. No application test, build, wheel, database, Docker or provider call was run.
+- The scope, encoding, whitespace, privacy and Gitleaks checks and the export follow and are
+  reported in the handoff.
+
+### Prompt 197 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 197 handoff: M5e contracts corrected (staged, uncommitted)
+
+The corrected M5e proposal is staged on `docs/review-stages-plan`. This was documentation only. Nothing was committed or pushed, no CI was rerun and nothing remote was touched. M5e is still proposed, unaccepted, unimplemented and untested.
+
+**Starting state.** Everything matched what the prompt expected:
+- branch `docs/review-stages-plan`;
+- HEAD, `main` and `origin/main` at `1efe3ed3`, HEAD tree `472cfc21`;
+- staged tree `86a3b32a` with the five paths, nothing unstaged or untracked;
+- origin and the noreply identity unchanged.
+
+The Prompt 196 export also matched: 90,015 bytes, 662 lines, SHA-256 `73b0032e…1fb`, and byte-identical to the full-index comparison from HEAD to the staged tree. The checkpoint (tree, paths, blob list, `prompts.md` prefix and checksum) is in `.local/p197/`.
+
+**What changed in the proposal** ([docs/plan.md](docs/plan.md), section renamed to "M5e stage and call-reservation persistence specification (PROPOSED, Prompt 196, corrected in Prompt 197; not implemented)"):
+- **Review disposition (M5e-R):** records your review and maps each finding to the section that fixes it. The supported directions are labelled as supported, not accepted.
+- **Planner (M5e-D):**
+  - `StageHistory` now has an explicit `current_attempt`. It is 1–10 and always equals the canonical job's attempt: `fence.job.attempt` in writes, the job row in the reload.
+  - Whole-history validation rules V1–V12 run before planning; invalid history raises `InvalidStageHistoryError`.
+  - `plan_stage` never raises for a valid history and returns one of four values: reuse, dispatch, in-flight or exhausted.
+  - An ordered transition table T0–T9 covers third reservations and abandoned repairs.
+  - E4 follows your direction: a rejection uses the same single repair, and nothing resets the budget.
+- **One stage-shape table (M5e-C):** two success shapes and six unresolved shapes, U1–U6. They cover:
+  - a completed failure;
+  - exhausted abandoned calls;
+  - an unresolved Verification dependency;
+  - oversized evidence, an oversized request (M5c `RequestTooLargeError`) and an oversized repair request.
+
+  Constructors, the SQL checks, the write APIs and the reload all use this table. The reload checks unresolved rows against their actual history; it no longer demands a successful call.
+- **Replay (M5e-F):** a write first checks whether its record already exists, and replay is decided before any mutation precondition. This is defined separately for each operation. Reservation allocation is explicitly not replayable, because a retry legitimately reuses its predecessor's request digest. The audit fields kept on replay, and why `job_attempt` is not compared, are explained. A failed operation must escape the caller's fence for rollback.
+- **Values and encodings (M5e-B1, M5e-B2):** every value and field is listed with its type and bounds. There are five explicit canonical schemas. Floats use a bit-exact rule: finite values only, stored as `float.hex()` and required to round-trip. Decoding is bounded and strict, and size caps are derived from the largest valid values. Oversized evidence is a valid outcome (`evidence_too_large`).
+- **Binding (M5e-G):** a new planned-question table, a request check against the review row (which includes `timeout_ms`, since the M5a digest excludes it), and an owner-only Analysis dependency, following the accepted P9 decision that `shared` is empty. It states what persistence can check and what only the worker composition can.
+- **Fencing (M5e-E, M5e-I):** the token comes from the existing public `fence.job.lease_token()`, so no new seam is needed. `recheck_ownership` runs at entry and after the last write. The text now says holding the lock does not stop the lease clock, keeps the accepted M3 commit window, and uses corrected W7 wording.
+- **Schema (M5e-K):** migration `0007` now has four tables: plan, evidence, calls and results. Every name, type, key, foreign key and CHECK is exact, and guarantees are split into four layers: database, write time, reload and trusted caller.
+- **Output (M5e-L, E7):** the output table and writer are removed from `0007`. They are recorded as a proposed M5f/M5g scope allocation with an explicit handover contract.
+- **Planned tests and decisions (M5e-M, M5e-N):** planned tests (specification text only) cover every correction you listed. Decisions run E1–E16; four are new (E13–E16), and each is marked supported or open.
+
+The README and threat-model links to the renamed heading are updated, and the plan's status line notes the correction. ADR-0022 is unchanged in this prompt.
+
+**History.** The `prompts.md` prefix (2,254,782 bytes) is preserved byte-for-byte. Appended:
+- the Prompt 196 handoff, verbatim, extracted from the previous session log;
+- your review and disposition;
+- Prompt 197, verbatim, extracted from this session's log;
+- an outcome note.
+
+Each verbatim text appears exactly once, checked as raw bytes.
+
+**Checks run.** No application tests, build, wheel, PostgreSQL, Docker or provider calls were run (none were required).
+
+| Check | Result |
+|---|---|
+| Paths changed vs HEAD | the five authorized paths only |
+| Paths changed vs the starting staged tree | README, plan, threat model, `prompts.md` |
+| All other blobs | 231 unchanged |
+| Tracked `.local` files | none |
+| Links and tables (4 docs) | 372 links, 83 tables, 0 problems |
+| Encoding (5 staged files) | UTF-8, no BOM, LF only, no U+FFFD |
+| `git diff --check` and `git diff --cached --check` | clean |
+| Privacy scan of 1,313 added lines | no hits |
+| Gitleaks 8.30.1, staged, `--ignore-gitleaks-allow` | no leaks (no ignore or config files exist) |
+
+**Export: `.local/p197/m5e-contract-corrections.diff`**
+- Baseline `86a3b32a6f03460bcb70207787cc6492cfea492d`; final staged tree `c4c8f6541e72c2233a678db7100f56debe2b7598`; full-index; `prompts.md` excluded.
+- 152,594 bytes, 1,406 lines; 3 files, 892 insertions and 437 deletions.
+- SHA-256 `e6680236812f26cb959419cb96f8629223c61432d4c9d876cb44416352075fae`.
+- UTF-8 with no BOM, LF only; byte-identical to the staged comparison.
+
+**Final state:** branch `docs/review-stages-plan`, HEAD `1efe3ed3`, staged tree `c4c8f654`, nothing unstaged or untracked. No background process is running.
+
+**Still open:**
+- your review of the corrected text and decisions E5 (helper extraction), E7, E10, E11 and E13–E16;
+- the M5e implementation;
+- M5f–M5h and the overall M5 acceptance;
+- the M4d trusted-snapshot limitation.
+
+**Next step:** please return **output plus the diff file** `.local/p197/m5e-contract-corrections.diff`.
+
+### External review of the Prompt 197 M5e corrections and disposition (Prompt 198)
+
+The external reviewer verified `.local/p197/m5e-contract-corrections.diff` and inspected the
+corrected contracts against the published source. The explicit current attempt, the planner
+transitions, the unresolved-stage shapes, the owner-only Analysis dependency, the request-value
+checks and the final ownership recheck address the corresponding earlier findings. **Supported
+directions**, subject to review of the final consistent text: E10 (the thirteen fixed unresolved
+reasons), E13 (persisted planned-question membership and digests), E14 (explicit pre-dispatch
+refusal shapes), E15 (request-value binding including the timeout) and E16 (reservation allocation
+not replayable). **Approved scope decision (E7):** no output table or writer in M5e or `0007`; the
+output requirement remains binding; M5f/M5g must review its schema and the atomic
+output-plus-job-success writer before completion is enabled; the sequence row and explanatory text
+are to record this specific decision without claiming the whole M5e specification is accepted.
+**E5:** use an extracted public evidence-recheck helper rather than duplicating M4d's checks, with
+its exact contract specified. The byte caps remain proposed engineering limits, and any maximum-size
+derivation must account for every admitted field and numeric representation. **Defects to
+correct:** `CallRejection.repair_reason` returned the M5c `RepairReason` from the domain, an
+upward dependency on `evidenceguard_agents`; completion replay compared digest, model and purpose
+but not the result's question, and the supplied rejection's question was not checked before
+conversion; the evidence-recheck helper had no contract; the U4 oversized-evidence path bypassed the
+snapshot and retrieval binding applied to normal evidence; the canonical integer decoder's 16-digit
+rule admitted values outside the stated ±(2⁵³−1) range, and inherited integers (source offsets,
+revision numbers) have no upper bound in their constructors; `completed_at >= started_at` treated
+the wall-clock `clock_timestamp()` as monotonic. **Decision:** Prompt 198 authorizes documentation
+corrections only, in the same five paths, staged uncommitted; M5e remains proposed, unaccepted,
+unimplemented and untested; M5d evidence, its attribution and the main-CI API inconsistency are
+unchanged; no commit, push, CI rerun or implementation.
+
+### Prompt 198 (verbatim)
+
+Prompt 198 — Finish the remaining M5e dependency, replay and validation contracts
+
+Written for: Claude Code, Mathew and the external reviewer.
+
+Read repository instructions and recover from .local/p197/ and the Prompt 197 handoff.
+
+Documentation only. M5e remains proposed, unaccepted, unimplemented and untested. Do not commit, push, merge, rerun CI or change implementation.
+
+1. Starting state
+
+Expected:
+- Branch docs/review-stages-plan.
+- HEAD, main and origin/main:
+  1efe3ed3f0aa9697ce4e71cee295293a89c94909
+- HEAD tree:
+  472cfc217c34b05e129d652c6649498a3118d0b6
+- Staged tree:
+  c4c8f6541e72c2233a678db7100f56debe2b7598
+- The same five staged paths:
+  README.md
+  docs/decisions/0022-review-creation.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Origin and established noreply identity unchanged.
+
+Verify .local/p197/m5e-contract-corrections.diff:
+- 152,594 bytes
+- 1,406 lines
+- SHA-256:
+  e6680236812f26cb959419cb96f8629223c61432d4c9d876cb44416352075fae
+- Identical to the full-index comparison between the recorded trees, excluding prompts.md.
+
+Save a checkpoint under .local/p198/: starting tree, paths, blob hashes and prompts.md prefix with checksum.
+
+No remote operation is required. Stop before dependent edits if the state differs materially.
+
+2. External review disposition
+
+The reviewer verified the export and inspected the corrected contracts against the published source.
+
+The explicit current attempt, planner transitions, unresolved-stage shapes, owner-only Analysis dependency, request-value checks and final ownership recheck address the corresponding earlier findings.
+
+The following directions are supported, subject to review of the final consistent text:
+- E10: the thirteen fixed unresolved reasons.
+- E13: persisted planned-question membership and digests.
+- E14: explicit pre-dispatch refusal shapes.
+- E15: request-value binding, including timeout.
+- E16: reservation allocation is not replayable.
+
+The reviewer approves E7’s scope allocation:
+- No output table or writer in M5e/0007.
+- The output requirement remains binding.
+- M5f/M5g must review its schema and atomic output-plus-job-success writer before completion is enabled.
+Update the sequence row and explanatory text consistently, recording this specific scope decision without claiming the whole M5e specification is accepted.
+
+For E5, use an extracted public evidence-recheck helper rather than duplicating M4d’s checks. Its exact contract still needs to be specified below.
+
+The byte caps remain proposed engineering limits. Any maximum-size derivation must account for every admitted field and numeric representation.
+
+3. Remove the upward dependency from the domain
+
+M5e-B1 currently gives CallRejection.repair_reason(question_id) a return type of the M5c RepairReason, which lives in evidenceguard_agents. The domain module is forbidden from importing agents, including through local imports.
+
+Correct the contract:
+- CallRejection remains a pure domain value.
+- It exposes its validated stage, reason, positions and count.
+- The worker composition constructs the M5c RepairReason from those fields.
+- No domain method constructs or returns an agents-package value.
+- Preserve the exact mapping of stage/purpose, question ID and repair positions.
+- Update M5e-H, API examples, planned tests and decisions to match.
+
+Use the actual public M5c constructor or factories when describing worker composition.
+
+4. Apply full binding checks to completion replay
+
+Replay may bypass mutation-only checks such as “still started by the current attempt.” It must not bypass identity or value validation.
+
+The current replay table compares digest, model and purpose but omits the result’s question_id. It also needs an explicit check of the supplied ProvenanceRejection.question_id before converting that rejection to CallRejection.
+
+Specify a shared binding rule used on both replay and first completion:
+- Selected row identity and canonical job association.
+- StructuredResult.question_id equals the selected call’s question.
+- Purpose matches the selected stage.
+- Request digest and requested model match the reservation.
+- Supplied rejection has the same question and matching rejection stage.
+- Successful content has the same tenant, review, question and request identity.
+- All compared completion metadata and content are validated before equality is accepted.
+
+A valid StructuredResult can carry an arbitrary well-formed digest string; equal digest fields alone do not establish the other identities.
+
+Keep:
+- Identical valid completion replay after reclaim is a no-op.
+- Different completion is a conflict.
+- Audit fields remain from the first write.
+- Allocation remains non-replayable.
+
+Define the exact fixed error and precedence for:
+a. A replay result naming another question but retaining the original digest.
+b. A replay rejection naming another question with otherwise identical fields.
+c. An invalid owner or content identity supplied during success replay.
+
+Add these to the planned tests. Do not implement them.
+
+5. Complete the trusted-evidence boundary
+
+Specify the extracted public helper precisely:
+- Module and name.
+- Full signature and accepted input types.
+- Return type.
+- Whether it accepts a caller-owned Session or FencedSession.
+- Transaction ownership and isolation preconditions.
+- Tenant, review snapshot, binding/index and profile checks.
+- Chunk text, digest, spans and metadata checks.
+- Fixed error categories and precedence.
+- Ordinary-error normalization and process-control propagation.
+- No logging.
+- No commit, rollback or close.
+
+State exactly how M4d retrieval reuses the extracted checks while keeping its existing public behavior and errors unchanged.
+
+State how load_trusted_stages uses the helper inside its one read-only snapshot. Do not leave “the same check as M4d” as the entire implementation contract.
+
+The helper proves consistency with trusted database evidence. It does not prove retrieval relevance, original query execution, entailment, authenticity or injection resistance.
+
+6. Bind oversized evidence before accepting U4
+
+The normal record_evidence path checks snapshot and retrieval settings. The U4 path currently lists question and plan checks only.
+
+An oversized value must not bypass common binding validation merely because it will not be stored.
+
+Specify a shared validation sequence for both normal evidence and U4:
+- Tenant and review.
+- Planned question and question digest.
+- Result snapshot identity against the trusted review.
+- Vendor/profile/retrieval identity and configuration, as required by the existing M4d/M5d values.
+- k and query_count consistency with the planned inputs.
+- Then the storage-size decision.
+
+For U4, the supplied oversized record must belong to that same review and question. Record exactly which checks remain possible at write time and which cannot be repeated later because the evidence bytes were deliberately not persisted.
+
+Preserve:
+- U4 has no evidence row, call or request reference.
+- Persistence does not claim it can prove template origin or original retrieval execution.
+- No truncation or silent evidence substitution.
+
+7. Make numeric and timestamp policies exact
+
+Canonical integers:
+- The normative encoding allows only integers within ±(2**53 - 1).
+- The decoder currently mentions only rejecting integers longer than 16 digits.
+- That digit rule alone accepts 9007199254740992, which is outside the stated range.
+
+Require the actual magnitude check as well as the lexical bound.
+
+Review inherited numeric fields, including source offsets and revision numbers. Some existing domain constructors have no corresponding upper bound.
+
+Choose and state a complete policy:
+- Either a lossless canonical representation supports those admitted values, or
+- M5e explicitly narrows its admission contract with a fixed error and explains why trusted persisted inputs satisfy it.
+
+Do not claim that all existing domain-valid values are encodable if the new format refuses some of them. Update the size derivations and planned boundary tests accordingly.
+
+Timestamps:
+- clock_timestamp is wall-clock time and can move backwards.
+- completed_at >= started_at is therefore an additional policy, not a property guaranteed by PostgreSQL.
+
+Prefer treating these timestamps as audit values without using their ordering as an admission requirement. If retaining another policy, specify how it handles clock regression without accidentally turning a valid provider completion into an unexplained database failure.
+
+Keep reservation sequence and job attempts authoritative for ordering and abandonment.
+
+8. Keep the contract consistent
+
+Update all affected sections together:
+- Value table.
+- Canonical schemas and decoding.
+- Stage/history validation.
+- Persistence and replay rules.
+- Trusted reload.
+- Exact SQL constraints.
+- Guarantee-layer table.
+- Planned tests.
+- Reviewer decisions and disposition record.
+
+Preserve the supported corrections already made. Do not rewrite unrelated contracts or add implementation.
+
+M5e’s status remains proposed and awaiting review of the full corrected text. M5d evidence, its attribution and the main-CI API inconsistency remain unchanged.
+
+9. History and checks
+
+Only the same five documentation/history paths may change.
+
+Append to prompts.md:
+- Prompt 197 handoff verbatim.
+- This review and disposition.
+- Prompt 198 verbatim.
+- A completed outcome note.
+
+Preserve the earlier bytes as an identical prefix and retain existing fidelity disclosures.
+
+Check:
+- Scope against both HEAD and the starting staged tree.
+- Every other tracked blob unchanged.
+- No tracked .local files or artifacts.
+- Links, anchors and tables.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --check and git diff --cached --check.
+- Privacy scan.
+- Unsuppressed staged Gitleaks.
+
+No application tests, build, wheel, PostgreSQL, Docker or provider calls are required.
+
+10. Stage and export
+
+Stage uncommitted.
+
+Export:
+.local/p198/m5e-final-contract-corrections.diff
+
+Baseline:
+c4c8f6541e72c2233a678db7100f56debe2b7598
+
+Final:
+the new staged tree
+
+Use full-index output, excluding prompts.md.
+
+Report byte size, line count, statistics, SHA-256, encoding and byte identity against Git.
+
+Return the handoff plus the diff.
+
+No commit, push, CI rerun or M5e implementation is authorized.
+
+### Prompt 198 outcome (Claude Code; staged, awaiting review)
+
+Completed actions only. The starting state matched (branch `docs/review-stages-plan`; HEAD, `main`
+and `origin/main` at `1efe3ed3`; HEAD tree `472cfc21`; staged tree `c4c8f654` with the five
+documentation and history paths; nothing unstaged or untracked); the Prompt 197 export matched
+(152,594 bytes, 1,406 lines, SHA-256 `e6680236…0fae`, byte-identical to the full-index comparison
+between the recorded trees excluding `prompts.md`). Checkpoint under `.local/p198/`. No remote
+operation.
+
+- **Proposal completed.** In the M5e section of `docs/plan.md` (heading and anchor unchanged):
+  the Prompt 198 disposition in M5e-R; `CallRejection` made a pure domain value with
+  `from_rejection`/`to_rejection`, the worker building M5c's `RepairReason` with
+  `RepairReason.from_rejection` or `RepairReason.invalid_output`; one completion binding rule B1–B9
+  applied on first completion and on replay, mutation preconditions M1–M3 and fixed outcomes for the
+  three named cases; one evidence sequence E1–E8 shared by `record_evidence` and U4, with what U4
+  cannot re-check later; the extracted `recheck_evidence_in_transaction` contract (M5e-J1) and its
+  use by the reload and by unchanged M4d retrieval; an exact integer policy (0…2,147,483,647 with
+  lexical and magnitude checks) and an explicit admission narrowing for unbounded inherited
+  integers; exact maximal-object size bounds (1,135,720 and 3,090,153 bytes, computed by encoding
+  maximal objects); timestamps as audit values only, with the SQL ordering check removed; updated
+  guarantee layers, planned tests and decisions E1–E20 (E7 approved; E5, E10, E13–E16 supported;
+  E11 and E17–E20 open).
+- **Sequence and links.** The M5 sequence rows for M5e, M5f and M5g and the Correction D completion
+  bullet record the approved E7 scope decision; the plan status line, README and threat model note
+  the Prompt 198 correction. ADR-0022 is unchanged in this prompt.
+- **History.** The Prompt 197 handoff and Prompt 198 (both extracted by script from this session's
+  log, the prompt from inside the paste markers) and the review and disposition above are appended
+  and were checked as raw bytes. Earlier text-fidelity disclosures stand.
+- **Checks before this note:** relative links 372 and tables 85 in the four documentation files
+  without problems. No application test, build, wheel, database, Docker or provider call was run.
+- The scope, encoding, whitespace, privacy and Gitleaks checks and the export follow and are
+  reported in the handoff.
+
+### Prompt 198 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 198 handoff: remaining M5e contracts finished (staged, uncommitted)
+
+The final M5e corrections are staged on `docs/review-stages-plan`. This was documentation only: nothing was committed or pushed, no CI was rerun and nothing remote was touched. M5e as a whole is still proposed, unaccepted, unimplemented and untested. Only the E7 scope decision is recorded as approved.
+
+**Starting state.** Everything matched what the prompt expected:
+- branch, HEAD, `main` and `origin/main` at `1efe3ed3`, HEAD tree `472cfc21`;
+- staged tree `c4c8f654` with the five paths, nothing unstaged or untracked;
+- the Prompt 197 export: 152,594 bytes, 1,406 lines, SHA-256 `e6680236…0fae`, byte-identical to the comparison between the recorded trees.
+
+The checkpoint is in `.local/p198/`.
+
+**What changed in [docs/plan.md](docs/plan.md).** I kept the M5e heading and its anchor so existing links still work, so the heading still reads "corrected in Prompt 197". The status text names Prompts 197–198.
+
+- **Domain boundary (E20):**
+  - `CallRejection` is now a pure domain value. It exposes its stage, reason, positions and count, plus `from_rejection` and `to_rejection(question_id)`, which returns the M5b `ProvenanceRejection`.
+  - The worker builds the M5c reason itself, using the public factories `RepairReason.from_rejection(...)` or `RepairReason.invalid_output(purpose=..., question_id=...)`. The exact purpose, question and position mapping is spelled out.
+  - No domain code imports or returns an `evidenceguard_agents` value, including through deferred imports.
+- **Completion binding (E17):** one rule, B1–B9, runs on both first completion and replay, and replay skips only the mutation preconditions M1–M3. B1–B9 checks:
+  - the selected row and its canonical job;
+  - the result's question ID, purpose, request digest and requested model;
+  - the rejection's question and stage, before it is converted;
+  - the content's tenant, review, question, request and snapshot;
+  - the owner's identity and its committed content digest.
+
+  The three cases you named now have fixed outcomes:
+
+  | Case | Check | Error |
+  |---|---|---|
+  | (a) result names another question, original digest kept | B4 | `StageBindingError` |
+  | (b) rejection names another question, other fields identical | B6 | `StageBindingError` |
+  | (c) content of another tenant, review, question, request or snapshot | B7 | `StageBindingError` |
+  | (c) owner of another identity, or not matching the committed verification | B8 | `StageDependencyError` |
+  | (c) malformed content or owner value | B1 | `InvalidStageRequestError` |
+
+  Identical replay after reclaim is still a no-op, a different completion is still a conflict, audit fields still come from the first write, and allocation is still not replayable.
+- **Evidence helper (E5, new section M5e-J1):** the extracted `evidenceguard_persistence.retrieval.recheck_evidence_in_transaction(session, actor, snapshot, items)`. The section defines:
+  - the full signature and return type: the rebuilt items, an M4d `SemanticOutcome`, or a new `EvidenceRecheckFailure` carrying only a fixed category;
+  - a caller-owned plain `Session` (not a `FencedSession`) and the REPEATABLE READ precondition;
+  - the precedence of pure checks before any SQL;
+  - the binding/profile recheck, the chunk recheck and a field-by-field comparison;
+  - failure normalization, process-control propagation, no logging and no commit, rollback or close.
+
+  M4d retrieval reuses the two extracted steps with identical SQL, statement order and errors, so `retrieve_with_vectors` behaves exactly as before. The reload calls the helper per question inside its one snapshot. The section also states what the helper does not prove: relevance, original query execution, entailment, authenticity or injection resistance.
+- **Oversized evidence (U4):** `record_evidence` and the U4 path now share one check sequence, E1–E8, and the size decision comes last. The sequence covers:
+  - tenant and review;
+  - planned question and its digest;
+  - snapshot, vendor, profile and retrieval-configuration identity;
+  - `k` and `query_count`.
+
+  `EvidenceRecord` now carries the `EvidenceQuestion`, so `query_count` can be checked. The spec records that the U4 binding checks run once at write time and cannot be repeated at reload, because the oversized bytes are never stored.
+- **Integers (E18):** canonical integers are limited to 0…2,147,483,647. The decoder applies both a digit limit and an actual magnitude check, so 2,147,483,648 and 9,007,199,254,740,992 are rejected.
+  - **Narrower admission:** M5e refuses some values that existing constructors accept. Inherited source offsets, line numbers and revision numbers have no upper bound in their constructors. M5e now refuses values above 2,147,483,647 with `InvalidStageValueError`, which the write APIs report as `InvalidStageRequestError`. This is safe for trusted data because those values come from PostgreSQL `integer` columns.
+- **Size bounds:** exact upper bounds now come from encoding maximal objects, with every field, longest enum value, full-length identifier and largest integer accounted for: 1,135,720 bytes for verified content and 3,090,153 for analyzed content. The caps stay proposed engineering limits (E11).
+- **Timestamps (E19):** they are audit values only. The `completed_at >= started_at` rule is removed from the constructors, the SQL and the reload. Sequence number and job attempt alone decide ordering and abandonment.
+- **E7, sequence and status lines:** the M5e, M5f and M5g sequence rows and the Correction D completion bullet record the approved scope decision. The README, threat-model and plan status lines note the Prompt 198 correction. ADR-0022 is unchanged.
+- **Tests and decisions:**
+  - The planned tests cover every point above. They are specification text only; none was written or run.
+  - Decision statuses: E7 approved; E5, E10 and E13–E16 supported; E11 and E17–E20 open.
+
+**History.** The `prompts.md` prefix (2,279,753 bytes) is preserved byte-for-byte. Appended:
+- the Prompt 197 handoff, verbatim;
+- your review and disposition;
+- Prompt 198, verbatim;
+- an outcome note.
+
+Both verbatim texts were extracted from this session's log and appear exactly once.
+
+**Checks run.** No application tests, build, wheel, PostgreSQL, Docker or provider calls were run (none were required).
+
+| Check | Result |
+|---|---|
+| Paths changed vs HEAD | the five authorized paths only |
+| Paths changed vs the starting staged tree | README, plan, threat model, `prompts.md` |
+| All other blobs | 231 unchanged |
+| Tracked `.local` files | none |
+| Links and tables (4 docs) | 372 links, 85 tables, 0 problems |
+| Encoding (5 staged files) | UTF-8, no BOM, LF only, no U+FFFD |
+| `git diff --check` and `git diff --cached --check` | clean |
+| Privacy scan of 782 added lines | no hits |
+| Gitleaks 8.30.1, staged, `--ignore-gitleaks-allow` | no leaks |
+
+**Export: `.local/p198/m5e-final-contract-corrections.diff`**
+- Baseline `c4c8f6541e72c2233a678db7100f56debe2b7598`; final staged tree `d9419cde0ce1180e1f0d401a2072b2ded1efd27d`; full-index; `prompts.md` excluded.
+- 110,919 bytes, 777 lines; 3 files, 406 insertions and 128 deletions.
+- SHA-256 `7b09f1591aa2d48fd75c040c8e814b1d39398c23a055c6550416ec896e9755c7`.
+- UTF-8 with no BOM, LF only; byte-identical to the staged comparison.
+
+**Final state:** branch `docs/review-stages-plan`, HEAD `1efe3ed3`, staged tree `d9419cde`, nothing unstaged or untracked. No background process is running.
+
+**Still open:**
+- your review of the full corrected text and decisions E11 and E17–E20;
+- the M5e implementation;
+- M5f–M5h, including the output slice, which must be reviewed before completion is enabled;
+- the overall M5 acceptance;
+- the M4d trusted-snapshot limitation.
+
+**Next step:** please return **output plus the diff file** `.local/p198/m5e-final-contract-corrections.diff`.
+
+### External review of the Prompt 198 M5e corrections: specification accepted with binding clarifications (Prompt 199)
+
+The external reviewer checked the supplied correction exports and inspected their text. For
+Prompt 198 the reviewer verified `.local/p198/m5e-final-contract-corrections.diff` at 110,919
+bytes, 777 lines and SHA-256 `7b09f1591aa2d48fd75c040c8e814b1d39398c23a055c6550416ec896e9755c7`,
+and compared the extraction contract and the integer-source assumptions with the published
+persistence source at `1efe3ed3`. The reviewer ran no M5e implementation test, PostgreSQL, build,
+Docker or installed-wheel check; M5e does not exist yet. The byte caps are accepted engineering
+limits, not measured performance or memory guarantees, and the proposed maximum-size literals still
+require independent implementation tests.
+
+**Decision.** The corrected M5e specification is **accepted**, including E1–E20, with two binding
+clarifications. E1–E20, the value contracts, canonical encodings, planner and history rules, replay
+rules, schema and trusted-reload contract form the implementation contract; no M5e specification
+decision remains open; E7's approved output-scope allocation remains binding on M5f/M5g.
+Implementation and every M5e implementation check remain pending.
+
+**Binding clarification A (explicit completion identity).** The success APIs take an explicit
+`question_id` independent of the result and content:
+`commit_verified(fence, review_id, question_id, *, sequence, result, verified)` and
+`commit_analyzed(fence, review_id, question_id, *, sequence, result, analyzed, owner)`, with stages
+fixed by the API (verification and analysis). B3 selects the call by
+`(job.tenant_id, review_id, question_id, fixed stage, sequence)`, never from `result.question_id`,
+`verified.question_id` or `analyzed.question_id`. B4 checks the result's question against the
+selected call, B7 the content's question and other identity fields, B8 the owner: a wrong result
+question with an otherwise retained digest is `StageBindingError` at B4, a wrong content question
+`StageBindingError` at B7 and a wrong owner identity `StageDependencyError` at B8. No new value or
+production seam.
+
+**Binding clarification B (U4 replay and evidence-state checks).** A committed verification stage
+with reason `evidence_too_large` (U4) legitimately has no evidence row and no calls, and E7 must not
+classify it as inconsistent. Verification calls without an evidence row, and a non-U4 verification
+stage without an evidence row, are inconsistent; a well-formed U4 with no evidence row and no calls
+is valid; `commit_unresolved` for U4 runs the common argument and binding checks and the size check,
+then permits identical stage replay as a no-op; a different requested outcome or reason conflicts;
+`record_evidence` after a committed U4 raises `StageConflictError` and neither adds evidence to nor
+reopens the closed stage; a purported U4 with calls or an evidence row is inconsistent. The
+limitation that oversized evidence bytes and their original binding assertion cannot be re-proved
+at reload is preserved.
+
+**Authorization.** Documentation changes in the same five paths and one local documentation
+commit only; no push, merge, CI rerun or M5e implementation; no ADR-0023, implementation files,
+tests or migration `0007`.
+
+### Prompt 199 (verbatim)
+
+Prompt 199 — Record accepted M5e specification with two binding clarifications and commit locally
+
+Written for: Claude Code, Mathew and the external reviewer.
+
+Read repository instructions and recover from .local/p198/ and the Prompt 198 handoff.
+
+The external reviewer accepts the corrected M5e specification, including E1–E20, with the two binding clarifications below.
+
+This authorizes documentation changes and one local documentation commit only. Do not push, merge, rerun CI or implement M5e.
+
+1. Verify and checkpoint
+
+Expected:
+- Branch docs/review-stages-plan.
+- HEAD, main and origin/main:
+  1efe3ed3f0aa9697ce4e71cee295293a89c94909
+- HEAD tree:
+  472cfc217c34b05e129d652c6649498a3118d0b6
+- Staged tree:
+  d9419cde0ce1180e1f0d401a2072b2ded1efd27d
+- Exactly five staged paths:
+  README.md
+  docs/decisions/0022-review-creation.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or untracked.
+- Origin and established noreply identity unchanged.
+
+Verify .local/p198/m5e-final-contract-corrections.diff:
+- 110,919 bytes
+- 777 lines
+- SHA-256:
+  7b09f1591aa2d48fd75c040c8e814b1d39398c23a055c6550416ec896e9755c7
+- Identical to the full-index comparison between the recorded trees, excluding prompts.md.
+
+Save the starting tree, five blob hashes, refs, status and prompts.md prefix with checksum under .local/p199/.
+
+No remote operation is required. Stop before dependent work if the expected state differs materially.
+
+2. Binding clarification A: explicit completion identity
+
+The successful-completion APIs must take an explicit question_id independently of the result and content.
+
+Use:
+- commit_verified(fence, review_id, question_id, *, sequence, result, verified)
+- commit_analyzed(fence, review_id, question_id, *, sequence, result, analyzed, owner)
+
+Their stages are fixed by the API: verification and analysis respectively.
+
+B3 selects the call using:
+(job.tenant_id, review_id, question_id, fixed stage, sequence)
+
+Do not derive that selection key from result.question_id, verified.question_id or analyzed.question_id.
+
+Then:
+- B4 checks the result’s question against the selected call.
+- B7 checks the content’s question and other identity fields.
+- B8 checks the owner.
+
+This makes the stated error precedence possible:
+- Wrong result question with otherwise retained digest: StageBindingError at B4.
+- Wrong content question: StageBindingError at B7.
+- Wrong owner identity: StageDependencyError at B8.
+
+Update signatures, B3 wording, replay descriptions, examples and planned tests consistently. No new value or production seam is required.
+
+3. Binding clarification B: U4 replay and evidence-state checks
+
+A committed verification stage with reason evidence_too_large (U4) legitimately has no evidence row and no calls.
+
+The shared evidence sequence E7 must not classify that valid state as inconsistent before replay.
+
+Specify:
+- Verification calls without an evidence row are inconsistent.
+- A non-U4 verification stage without an evidence row is inconsistent.
+- A well-formed U4 stage with no evidence row and no calls is valid.
+- commit_unresolved for U4 runs the common argument/binding checks and size check, then permits identical stage replay as a no-op.
+- A different requested stage outcome/reason conflicts.
+- record_evidence after a committed U4 stage raises StageConflictError; it does not add evidence to or reopen that closed stage.
+- A purported U4 with calls or an evidence row is inconsistent.
+
+Preserve the explicit limitation that oversized evidence bytes and their original binding assertion cannot be re-proved at reload because they were not persisted.
+
+Update E7, U4 write/replay rules, reload wording and planned tests together.
+
+4. Acceptance record
+
+Rename the M5e specification heading to:
+M5e stage and call-reservation persistence specification (ACCEPTED at review, Prompt 199; implementation pending)
+
+Update every link to the renamed anchor.
+
+Add an M5e acceptance subsection recording:
+- Proposed in Prompt 196.
+- Corrected in Prompts 197 and 198.
+- Accepted at external review in Prompt 199 with clarifications A and B.
+- E1–E20, the value contracts, canonical encodings, planner/history rules, replay rules, schema and trusted-reload contract form the implementation contract.
+- No M5e specification decision remains open.
+- Implementation and every M5e implementation check remain pending.
+- E7’s previously approved output-scope allocation remains binding on M5f/M5g.
+
+Mark earlier supported/open/proposed states historical where necessary. Do not erase review history.
+
+Record reviewer evidence accurately:
+- The reviewer checked the supplied correction exports and inspected their text.
+- For Prompt 198, the reviewer verified 110,919 bytes, 777 lines and the full SHA-256 above.
+- The reviewer compared the extraction contract and integer-source assumptions with the published persistence source at 1efe3ed3.
+- The reviewer did not run M5e implementation tests, PostgreSQL, a build, Docker or an installed-wheel check. M5e does not exist yet.
+- The byte caps are accepted engineering limits, not measured performance or memory guarantees.
+- The proposed maximum-size literals still require independent implementation tests.
+
+Update README and threat model with short linked statements:
+- M5d remains reviewed, verified in CI and on main at 1efe3ed3.
+- M5e specification accepted in Prompt 199; implementation pending.
+- No M5e control operates.
+- No application review path, run_review registration or live provider is added.
+- M5f–M5h and overall M5 acceptance remain pending.
+
+Preserve M5d’s evidence, attribution, the API-status inconsistency, all existing limitations and accepted M5a–M5d headings.
+
+Do not create ADR-0023, implementation files, tests or migration 0007.
+
+5. History
+
+Append to prompts.md:
+- Prompt 198 handoff verbatim.
+- This acceptance decision and its binding clarifications.
+- Prompt 199 verbatim.
+- A pre-commit note listing completed checks only.
+
+Preserve the earlier bytes as an identical prefix. Keep existing fidelity disclosures and check new verbatim entries as raw bytes.
+
+Do not record a prospective commit SHA.
+
+6. Checks
+
+Only the same five documentation/history paths may differ from HEAD.
+
+Verify:
+- Every other tracked blob is identical to HEAD.
+- No tracked .local files or artifacts.
+- Links, anchors and tables.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --check and git diff --cached --check.
+- Privacy scan.
+- Unsuppressed staged Gitleaks.
+
+No application tests, build, wheel, PostgreSQL, Docker or provider calls are needed.
+
+7. Local commit
+
+Commit the five-path documentation result:
+docs: record accepted M5e stage persistence specification
+
+Use the established noreply author and committer. Write the commit message from a file and preserve the project’s assistance attribution and Co-Authored-By convention.
+
+After committing, verify:
+- Parent is exactly 1efe3ed3.
+- Exactly the five authorized paths changed.
+- All other blobs match the parent.
+- Working tree clean.
+- main and origin/main remain at 1efe3ed3.
+- No .local file is tracked.
+- Full-history Gitleaks is clean.
+
+Do not push.
+
+8. Export and handoff
+
+Create:
+.local/p199/m5e-spec-acceptance.diff
+
+Baseline:
+d9419cde0ce1180e1f0d401a2072b2ded1efd27d
+
+Final:
+the actual local commit
+
+Use full-index output, excluding prompts.md.
+
+Report:
+- Commit SHA, parent, tree, subject and identity.
+- Changed paths and unchanged implementation blobs.
+- Export size, line count, statistics, SHA-256 and encoding.
+- Byte identity against Git.
+- Final refs and clean working-tree state.
+- That M5e implementation, its tests, migration 0007, ADR-0023, publication and CI remain pending.
+
+Return the handoff plus:
+.local/p199/m5e-spec-acceptance.diff
+
+No push or implementation is authorized by this prompt.
+
+### Prompt 199 outcome (Claude Code; pre-commit note)
+
+Completed actions and checks only. The starting state matched (branch `docs/review-stages-plan`;
+HEAD, `main` and `origin/main` at `1efe3ed3`; HEAD tree `472cfc21`; staged tree `d9419cde` with the
+five documentation and history paths; nothing unstaged or untracked; origin and the noreply
+identity unchanged). The Prompt 198 export matched (110,919 bytes, 777 lines, SHA-256
+`7b09f159…55c7`) and is byte-identical to the full-index comparison between its recorded trees
+(`c4c8f654` to `d9419cde`) excluding `prompts.md`. Checkpoint under `.local/p199/`. No remote
+operation.
+
+- **Acceptance recorded in `docs/plan.md`.** The M5e heading now reads "ACCEPTED at review, Prompt
+  199; implementation pending" and every link to it was updated; a new "M5e acceptance (Prompt
+  199)" subsection records the decision, both clarifications and the reviewer's evidence and scope;
+  earlier proposed, supported and open states are kept and marked historical (status paragraph,
+  M5e-R, M5e-L, the M5 sequence row, the M5 summary line and the M5e-N decision statuses, now all
+  accepted). The byte caps are recorded as accepted engineering limits whose maximum-size literals
+  still need implementation tests.
+- **Clarification A.** `commit_verified` and `commit_analyzed` take an explicit `question_id` with
+  a fixed stage; B1 and B3 select the call from those arguments, never from the result or content;
+  B4, B7 and B8 then decide the named cases; the replay table, the reclaim example and the planned
+  tests were updated.
+- **Clarification B.** E7 distinguishes a well-formed U4 (valid, closed) from inconsistent states;
+  the U4 rules of `commit_unresolved` permit identical replay after E1–E8 and conflict otherwise;
+  `record_evidence` after U4 is `StageConflictError`; M5e-F, M5e-H, the reload (M5e-J) and the
+  planned tests were updated, and the limitation that U4 bytes and their binding cannot be
+  re-proved at reload is kept.
+- **README and threat model.** Short linked statements that the M5e specification was accepted in
+  Prompt 199 and is unimplemented, that no M5e control operates and no review path, `run_review`
+  registration or live provider is added, and that M5f–M5h and overall M5 acceptance remain pending;
+  M5d's evidence, attribution, the API-status inconsistency and accepted M5a–M5d headings are
+  unchanged. ADR-0022 is unchanged in this prompt; no ADR-0023, implementation file, test or
+  migration `0007` was created.
+- **History.** The Prompt 198 handoff and Prompt 199 (both extracted by script from this
+  session's logs, the prompt from inside the paste markers) and the acceptance record above are
+  appended after the unchanged prefix. Earlier text-fidelity disclosures stand.
+- **Checks completed before this note:** relative links 377 and tables 85 in the four
+  documentation files with no problems; those four files are UTF-8 without BOM, LF only, without
+  U+FFFD; `git diff --check` clean. No application test, build, wheel, PostgreSQL, Docker or
+  provider call was run.
+- The scope, raw-byte history, encoding, privacy and Gitleaks checks, the local commit and the
+  export follow and are reported in the handoff. No commit SHA is recorded here.

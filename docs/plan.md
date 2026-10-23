@@ -6830,11 +6830,11 @@ status](#m5c-implementation-status-accepted-for-a-local-commit-prompt-184-ci-pen
 [M5d specification](#m5d-composable-capture-and-atomic-review-creation-specification-accepted-at-review-prompt-188-implementation-pending)
 (proposed in Prompt 185, revised in Prompts 186–187) was **accepted at external review in Prompt
 188**; its implementation (Prompt 189, corrected in Prompts 190–191) was accepted at external review in
-Prompt 191 for a local commit only; feature CI at `1bea3731` then failed three PostgreSQL tests, and
-test-only corrections were accepted for a corrective commit in Prompt 194, with their PostgreSQL and
-CI verification pending ([implementation
-status](#m5d-implementation-status-accepted-for-a-local-commit-prompt-191-ci-pending)). M5e–M5h are not
-implemented; no review path or orchestration exists, the M5d persistence is used only by tests,
+Prompt 191 for a local commit only; after feature CI at `1bea3731` failed three PostgreSQL tests and
+test-only corrections followed, M5d is **reviewed, verified in CI and on `main` at `1efe3ed3`**
+(Prompts 194–196) ([implementation
+status](#m5d-implementation-status-reviewed-verified-in-ci-and-on-main-at-1efe3ed3)). M5e–M5h are not
+implemented (the [M5e specification](#m5e-stage-and-call-reservation-persistence-specification-accepted-at-review-prompt-199-implementation-pending), proposed in Prompt 196 and corrected in Prompts 197–198, was accepted at external review in Prompt 199 with two binding clarifications, its E7 output-scope decision having been approved in Prompt 198; M5e implementation is pending); no review path or orchestration exists, the M5d persistence is used only by tests,
 no M5b or M5c control is used by any review path, and overall M5 acceptance is pending.** The M5 milestone text above is the controlling requirement and is unchanged; this
 sequence only orders it into slices. Labels: **[DECISION]** already accepted; **[FACT]** current
 code at `46c02257`; **[REC]** recommendation (for M5a and the sequence-level choices, accepted in
@@ -7026,9 +7026,9 @@ renderer exists before the handler's atomic final commit needs it.
 | **M5b** | Provenance checks and status derivation (pure): Verifier output plus the question's retrieved evidence → `Verification` with derived status and trusted citation metadata, or `citation_rejected`; analyst findings restricted to already validated citations; the `requires_documentary_support` finding rule; exact quote-matching rules (W12) | M5a, M4d values | `evidenceguard_domain.provenance` | None |
 | **M5c** | Versioned artifacts: TOML review template, deterministic Planner, `prompts/verifier/v1.md` and `prompts/risk_analyst/v1.md` as packaged data with pinned SHA-256, and request assembly that places evidence only inside delimited blocks with **safe encoding** of document text (Correction E) | M5a, M5b | `evidenceguard_agents` (`planner`, `prompts`, `assembly`); packaged data | None |
 | **M5d** | Composable capture and review creation (Correction A): a public capture operation for a caller-owned transaction, extracted from the M4d capture phases with `capture_snapshot` unchanged; one creation transaction storing the review, every binding, the exclusions record, the pinned configuration and, through the same transaction, the `run_review` job; a trusted loader that rebuilds and revalidates the snapshot. Internal seams only (W8) | M4d, M5c | `evidenceguard_persistence.retrieval` (capture extraction), `evidenceguard_persistence.reviews`; migration `0006` | Yes |
-| **M5e** | Stage, call-reservation and output records (Correction D): per-question stage rows unique on `(tenant_id, review_id, question_id, stage)`, persisted call reservations and provider-call records and spans, the stored report output, all through fenced writes; identical replay is a no-op and a differing replay is a fixed conflict, never an overwrite | M5a, M5b, M5d | `evidenceguard_persistence.review_stages`; migration `0007` (or merged into `0006`) | Yes |
-| **M5f** | Report content and renderer (pure): settles the hash-covered report-content representation under the report-integrity invariant (a versioned wrapper around `ReportContent`, or omission of conclusions it cannot hold), builds that content from committed stage values, and renders Markdown solely from the hashed content, including unresolved questions, authenticity labels and the contract-mode stamp | M5b, M5e values, M1 report contracts | `evidenceguard_agents.report` | None (stored by M5g) |
-| **M5g** | `run_review` handler factory and bounded orchestration: plan → retrieve (M4d `search_snapshot` over the loaded snapshot) → verify (with repair) → analyze → render → one atomic final commit; resume, reservations and budgets, cancellation, lease-loss and failure precedence; fake-provider controlled crash tests. Not registered in production (W8) | M5a–M5f, M3b runtime | `evidenceguard_worker.review` | Uses M5d/M5e |
+| **M5e** | Stage and call-reservation records (Correction D): per-question stage rows unique on `(tenant_id, review_id, question_id, stage)`, persisted call reservations and provider-call records and spans, all through fenced writes; identical replay is a no-op and a differing replay is a fixed conflict, never an overwrite. *Amended by the E7 scope decision approved at review in Prompt 198:* the stored report output is not part of M5e and moves to M5f/M5g (the M5e specification as a whole was accepted at review in Prompt 199; historically, until then the rest remained proposed) | M5a, M5b, M5d | `evidenceguard_persistence.review_stages`; migration `0007` (no output table) | Yes |
+| **M5f** | Report content and renderer (pure): settles the hash-covered report-content representation under the report-integrity invariant (a versioned wrapper around `ReportContent`, or omission of conclusions it cannot hold), builds that content from committed stage values, and renders Markdown solely from the hashed content, including unresolved questions, authenticity labels and the contract-mode stamp | M5b, M5e values, M1 report contracts | `evidenceguard_agents.report` | None (stored by M5g; E7: M5f reviews the content representation and validation the output stores) |
+| **M5g** | `run_review` handler factory and bounded orchestration: plan → retrieve (M4d `search_snapshot` over the loaded snapshot) → verify (with repair) → analyze → render → one atomic final commit; resume, reservations and budgets, cancellation, lease-loss and failure precedence; fake-provider controlled crash tests. Not registered in production (W8) | M5a–M5f, M3b runtime | `evidenceguard_worker.review` | Uses M5d/M5e; E7 (Prompt 198): the output table in a later additive migration and its atomic output-plus-job-success writer, reviewed with M5f/M5g before completion is enabled |
 | **M5h** | Anthropic adapter behind the M5a protocol, tested only with an injected or mocked transport; not registered, no settings, no live call (W9) | M5a | `evidenceguard_agents.anthropic` (adapter) and, if a transport is needed, the worker | None |
 
 After M5h, an overall M5 acceptance assessment maps every criterion to evidence, as for M3 and M4.
@@ -7160,7 +7160,9 @@ details.
   writes nothing (W15).
 - **Completion after rendering.** The final step renders (M5f) and stores the report output, marks
   the review complete and records job success in **one** `fenced(finish=True)` transaction, so a
-  review is never complete without its output.
+  review is never complete without its output. (E7 scope decision, approved in Prompt 198: the
+  output table and this writer are reviewed with M5f/M5g, not M5e, before completion is enabled;
+  the requirement itself is unchanged.)
 
 ##### Report integrity (Prompt 169)
 
@@ -9420,7 +9422,7 @@ in Prompt 188 with a binding cleanup clarification (recorded in M5d-B1) and is t
 implementation contract; implementation is pending.** It was proposed by Claude Code in Prompt 185
 and revised in Prompts 186 and 187 after external review (historical: in Prompts 186 and 187 the
 reviewer supported directions only). At acceptance no M5d module, migration, test, ADR-0022 or
-workflow change existed (historical; see the [implementation status](#m5d-implementation-status-accepted-for-a-local-commit-prompt-191-ci-pending)). Labels: **[DECISION]** already accepted (the M5
+workflow change existed (historical; see the [implementation status](#m5d-implementation-status-reviewed-verified-in-ci-and-on-main-at-1efe3ed3)). Labels: **[DECISION]** already accepted (the M5
 sequence with Correction A, W5, W8 and W15, the M4d capture and race rules, the accepted M5a–M5c
 contracts); **[FACT]** current source at `e8d1033c`; **[REC]** Claude Code's proposal, **accepted
 as specified (with the clarification) in Prompt 188**; **[OPEN]** none remains (M5d-H). M5d
@@ -10153,7 +10155,7 @@ D12 was open and D15–D17 were proposed until Prompt 188.
     of physical disposal or pool quarantine. *Tradeoff:* abandoning some retries versus reusing a
     connection whose cleanup failed.
 
-#### M5d implementation status (accepted for a local commit, Prompt 191; CI pending)
+#### M5d implementation status (reviewed, verified in CI and on main at 1efe3ed3)
 
 **Status.** Claude Code implemented the accepted M5d specification in Prompt 189 and corrected it
 in Prompt 190 after external review (process control while `read_snapshot` consumes its setup
@@ -10164,9 +10166,10 @@ external review in Prompt 191 for a local implementation commit only**
 ([ADR-0022](decisions/0022-review-creation.md#external-review-prompt-191)). (Historical: at that
 acceptance publication, PostgreSQL execution, Linux verification and current-version CI were
 pending; until Prompt 191 it was staged and implementation acceptance was pending.)
-**Since then:** feature branch `1bea3731` was published (Prompt 192); Ubuntu and Windows verify passed; PostgreSQL executed and failed three tests; the test corrections were staged (Prompt 193) and accepted for a corrective commit and feature publication (Prompt 194); their PostgreSQL and CI verification remain pending, and main publication remains blocked; the failed-CI logs were independently
+**Since then:** feature branch `1bea3731` was published (Prompt 192); Ubuntu and Windows verify passed; PostgreSQL executed and failed three tests; the test corrections were staged (Prompt 193), committed as `1efe3ed3` and published to the feature branch (Prompt 194), where all five jobs passed; `main` was fast-forwarded to `1efe3ed3` (Prompt 195), and M5d is **reviewed, verified in CI and on `main` at `1efe3ed3`** (feature and main execution evidence independently retrieved by the external reviewer; the main integration job's top-level API status stayed `in_progress` with no conclusion although its steps, its complete log and its parent run succeeded). Historical: until Prompt 196 the corrections' PostgreSQL and CI verification were pending and main publication was blocked; the failed-CI logs were independently
 retrieved by the external reviewer and recorded in Prompt 193
-([ADR-0022](decisions/0022-review-creation.md#exact-commit-ci-at-1bea3731-and-postgresql-test-corrections-prompts-192193)).
+([ADR-0022](decisions/0022-review-creation.md#exact-commit-ci-at-1bea3731-and-postgresql-test-corrections-prompts-192193);
+successful feature and main evidence in [ADR-0022](decisions/0022-review-creation.md#feature-and-main-ci-evidence-at-1efe3ed3-prompts-194196)).
 Overall M5 acceptance is pending. No endpoint, CLI command, handler, setting, production registry entry or
 production enqueue path uses it; `run_review` stays out of `production_registry()`, so none of
 its controls operates in the application. The M4d trusted-snapshot limitation is **not** closed:
@@ -10189,6 +10192,1325 @@ it closes for review paths only once M5g obtains its snapshot solely through the
   (the [Prompt 189 results](decisions/0022-review-creation.md#verification-prompt-189-local-windows-claude-code-historical)
   are historical).
   PostgreSQL tests were skipped (no `EG_TEST_DATABASE_URL`) and are unrun evidence.
+
+#### M5e stage and call-reservation persistence specification (ACCEPTED at review, Prompt 199; implementation pending)
+
+**Status.** **The complete M5e specification, including E1–E20, was accepted at external review
+in Prompt 199 with two binding clarifications (A: explicit completion identity; B: U4 replay and
+evidence-state checks), both incorporated below, and is the M5e implementation contract;
+implementation is pending.** It was proposed by Claude Code in Prompt 196 and corrected in Prompts
+197 and 198 after external review (historical: until Prompt 199 it was proposed and unaccepted, the
+reviewer had supported directions only, and only the E7 scope decision was approved, in Prompt 198).
+No M5e module, migration, test, ADR or workflow change exists, and none of the controls below
+operates. The E7 scope decision moves the output table and writer out of M5e and `0007` (M5e-L) and
+remains binding on M5f/M5g. It builds on the accepted M5 sequence (Correction D, W4–W8, W13–W15 and
+the report-integrity invariant), the M3 fence and the published M5a–M5d contracts. Labels:
+**[DECISION]** already accepted; **[FACT]** current source at `1efe3ed3`; **[REC]** Claude Code's
+proposal, **accepted as specified (with clarifications A and B) in Prompt 199**; **[OPEN]** none
+remains (M5e-N). Nothing here adds a provider call, handler registration, endpoint, orchestration,
+setting or dependency, and nothing changes the published migration `0006`, the M1 hash schema or an
+accepted M5a–M5d contract.
+
+##### M5e acceptance (Prompt 199)
+
+**Decision.** The external reviewer accepted the corrected M5e specification in Prompt 199,
+including E1–E20, with two binding clarifications. Proposed in Prompt 196 and corrected in Prompts
+197 and 198, it is now the implementation contract: E1–E20, the value contracts (M5e-B1), the
+canonical encodings (M5e-B2), the planner and history rules (M5e-D), the persistence, binding and
+replay rules (M5e-E, M5e-F, M5e-G, M5e-H), the schema (M5e-K) and the trusted-reload contract
+(M5e-J, M5e-J1). No M5e specification decision remains open. E7's output-scope allocation, approved
+in Prompt 198, remains binding on M5f/M5g (M5e-L). Implementation, migration `0007`, the M5e tests,
+an M5e ADR, implementation acceptance, publication and CI, M5f–M5h and overall M5 acceptance remain
+pending, and no M5e control operates.
+
+**Binding clarification A: explicit completion identity** (recorded in M5e-E and M5e-F). The
+success APIs take an explicit `question_id` independent of the result and the content:
+`commit_verified(fence, review_id, question_id, *, sequence, result, verified)` and
+`commit_analyzed(fence, review_id, question_id, *, sequence, result, analyzed, owner)`; their stages
+are fixed by the API (verification and analysis). B3 selects the call by
+`(job.tenant_id, review_id, question_id, fixed stage, sequence)` and never derives that key from
+`result.question_id`, `verified.question_id` or `analyzed.question_id`. B4 then checks the result's
+question against the selected call, B7 the content's question and other identity fields, and B8 the
+owner, so a wrong result question with an otherwise retained digest fails at B4
+(`StageBindingError`), a wrong content question at B7 (`StageBindingError`) and a wrong owner
+identity at B8 (`StageDependencyError`). No new value or production seam is added.
+
+**Binding clarification B: U4 replay and evidence-state checks** (recorded in E7 of the shared
+evidence sequence, the `commit_unresolved` rules, M5e-F, M5e-H and M5e-J). A committed verification
+stage with reason `evidence_too_large` (U4) legitimately has no evidence row and no calls, and E7
+does not classify that state as inconsistent. Verification calls without an evidence row, a non-U4
+verification stage without an evidence row, and a purported U4 with calls or an evidence row are
+inconsistent. `commit_unresolved` for U4 runs the common argument and binding checks and the size
+check, then permits identical stage replay as a no-op; a different requested outcome or reason
+conflicts; `record_evidence` after a committed U4 raises `StageConflictError` and neither adds
+evidence to nor reopens the closed stage. The oversized bytes and their original binding assertion
+still cannot be re-proved at reload, because they were not persisted.
+
+**Reviewer evidence and scope.** The reviewer checked the supplied correction exports and inspected
+their text; for Prompt 198 the reviewer verified
+`.local/p198/m5e-final-contract-corrections.diff` at 110,919 bytes, 777 lines and SHA-256
+`7b09f1591aa2d48fd75c040c8e814b1d39398c23a055c6550416ec896e9755c7`, and compared the extraction
+contract (M5e-J1) and the integer-source assumptions (E18) with the published persistence source
+at `1efe3ed3`. The reviewer ran no M5e implementation test, PostgreSQL, build, Docker or
+installed-wheel check; M5e does not exist yet. The byte caps (E11) are accepted engineering limits,
+not measured performance or memory guarantees, and the proposed maximum-size literals (1,135,720 and
+3,090,153 bytes) still require independent implementation tests.
+
+##### M5e-R. Prompt 197 review disposition and where each correction lives
+
+(Historical review record: the statuses below were current before acceptance in Prompt 199; see
+[M5e acceptance](#m5e-acceptance-prompt-199).) The external reviewer checked the Prompt 196 export's bytes, checksum and contents and compared the
+proposed contracts with the published M3 and M5a–M5d source. **Supported directions** (subject to
+review of this corrected text): the domain/persistence split (E1); caller-owned fenced writes
+without internal retries (E2, E8); abandonment derived from earlier job attempts (E3); persisted
+question evidence with a database provenance recheck (E5); canonical text storage (E6); analysis
+dependency digests (E9); serialization through the review's canonical job fence (E12). For **E4**
+the reviewer supports letting an M5b provenance rejection use the **same single** repair allowance
+as `invalid_output`, without another allowance and without resetting the three-reservation budget.
+For **E7** the reviewer recommends deferring the concrete output table and writer until M5f settles
+the content representation, keeping an explicit M5e-to-M5f/M5g contract; this is recorded as a
+**proposed scope allocation**, not an accepted change. No M5e implementation is authorized.
+
+| Review finding (Prompt 197) | Corrected in |
+| --- | --- |
+| Planner lacked the current attempt, return values, history validation and a transition table | M5e-B1 (`StageHistory`, `StagePlan`), M5e-D |
+| Reload demanded a successful call for every committed stage | M5e-C (one shape table), M5e-J |
+| M5c `RequestTooLargeError` had no durable representation | M5e-C, M5e-H |
+| Equal replay contradicted the "started by the current attempt" precondition | M5e-F |
+| Values, results and canonical objects not fully enumerated; float rule inexact | M5e-B, M5e-B1, M5e-B2 |
+| Question, configuration and dependency binding; `timeout_ms` excluded from the M5a digest | M5e-G |
+| Storage overflow of legitimate values | M5e-B2 (bounds), M5e-C, M5e-H |
+| Lock-holding misdescribed as stopping the lease clock; unavailable `HandlerFence` attributes | M5e-A0, M5e-E, M5e-I |
+| W7 wording for returned outcomes, ordinary exceptions and process control | M5e-I |
+| Schema alternatives and inferred bounds | M5e-K |
+| Output table and writer | removed from `0007`; M5e-L |
+
+**Prompt 198 review.** The reviewer verified the Prompt 197 export and found that the explicit
+current attempt, the planner transitions, the unresolved shapes, the owner-only Analysis
+dependency, the request-value checks and the final ownership recheck address the earlier findings.
+**Supported directions** (subject to review of the final text): E10 (the thirteen reasons), E13
+(persisted planned-question membership and digests), E14 (explicit pre-dispatch refusal shapes),
+E15 (request-value binding including the timeout) and E16 (allocation not replayable). **Approved
+scope decision:** E7 — no output table or writer in M5e or `0007`; the output requirement stays
+binding; M5f/M5g must review its schema and its atomic output-plus-job-success writer before
+completion is enabled. **E5:** use an extracted public evidence-recheck helper, not duplicated M4d
+checks. The byte caps remain proposed engineering limits.
+
+| Review finding (Prompt 198) | Corrected in |
+| --- | --- |
+| `CallRejection` returned an `evidenceguard_agents` value from the domain | M5e-B1, M5e-H |
+| Completion replay skipped the result's question and the rejection's question | M5e-E (binding rule B1–B9), M5e-F |
+| The evidence-recheck helper had no contract | M5e-J1 |
+| Oversized evidence (U4) bypassed the common evidence binding | M5e-E (evidence sequence E1–E8), M5e-H |
+| The integer rule admitted values outside the stated range; inherited unbounded integers | M5e-B1, M5e-B2 |
+| `completed_at >= started_at` assumed a monotonic wall clock | M5e-B1, M5e-D (V12), M5e-K |
+| The M5 sequence row still placed the output in M5e | the sequence table and Correction D (E7) |
+
+##### M5e-A0. Inputs and current-source facts
+
+- [DECISION] Sequence row M5e: per-question stage rows unique on
+  `(tenant_id, review_id, question_id, stage)`, persisted call reservations and provider-call
+  records, the stored report output, all through fenced writes; identical replay is a no-op and a
+  differing replay a fixed conflict, never an overwrite. Placement
+  `evidenceguard_persistence.review_stages`, migration `0007`. **Amended by the E7 scope decision
+  (approved, Prompt 198):** the stored report output is reviewed and implemented by M5f/M5g, not M5e
+  (M5e-L); the sequence table records this.
+- [DECISION] Correction D: a `started` reservation is committed before each dispatch; at most 3
+  reservations per `(review, question, stage)` across all job attempts, at most one of them a
+  repair, never reset; `invalid_output` permits one repair; `timeout` and `provider_failed` retry
+  the same request; `refusal`, `max_tokens`, `unexpected_stop` and `model_mismatch` are terminal;
+  an abandoned repair may be re-dispatched once as a retry of that repair request if budget
+  remains; a committed stage row is the only reusable success; raw model output is never stored
+  in call records; an Analysis failure never alters a committed Verification; completion stores
+  the output, marks the review complete and records job success in one `fenced(finish=True)`
+  transaction; review status is a read-time projection (W15).
+- [DECISION] M5b P8: a `ProvenanceRejection` is eligible for the stage's single repair within the
+  three-reservation budget, built from the fixed reason and positions only. M5b-F maps each
+  rejection reason to the §4 `provenance_check` value: phase 1 and 2 verification reasons and the
+  two analysis citation reasons → `citation_rejected`; phase 3 verification reasons and the other
+  analysis reasons → `invalid_output`. M5b P9: the per-question Analysis stage passes an **empty
+  `shared`**.
+- [DECISION] M5c-F4: an oversized assembly raises `RequestTooLargeError` before any request exists;
+  M5g maps it to an unresolved question with a fixed reason, **no provider call and no
+  reservation**. M5c-D: M5g calls `plan_review(template, k=...)` again on the reloaded pinned
+  template instead of storing a second copy of the questions.
+- [DECISION] W5 (no exactly-once claim), W6 (reservation before dispatch), W7 (M5e-I), W8
+  (internal and test-only seams; `run_review` unregistered).
+- [FACT] M3 `fenced_transaction(session_factory, token)` sets `lock_timeout` (5 s), locks the job
+  row `FOR UPDATE`, then in a separate statement re-reads it with a fresh `clock_timestamp()` and
+  requires the token and an unexpired lease (`LeaseLostError`, `JobLockTimeoutError`). While the
+  row lock is held no claimant can reclaim the job (claims use `SKIP LOCKED`), but **the lease
+  clock keeps running**: holding the lock does not stop expiry. A transaction that passed its check
+  just before expiry may commit shortly after it (the accepted M3a limit).
+  `recheck_ownership(session: FencedSession, token: JobLeaseToken)` re-reads the locked row with
+  fresh time, raises `LeaseLostError` unless the token, status `running` and an unexpired lease
+  hold, returns `(JobSnapshot, datetime)`, and never commits or rolls back.
+- [FACT] The worker's `HandlerFence` exposes only `.session` (`FencedSession`) and `.job`
+  (`JobSnapshot` as of the fence's ownership check). It has **no** token, `succeed` or finish flag.
+  `JobSnapshot.lease_token()` is public and returns `JobLeaseToken(job_id=id, worker_id=locked_by,
+  attempt=attempt)` for a running job (else `InvalidJobTransitionError`). `JobContext.fenced()`
+  calls `check()` before opening the fence and after the lock; with `finish=True` once more before
+  `succeeded` is recorded; these are explicit boundaries, not atomic with every statement.
+  `FencedSession` offers `execute`, `scalar`, `scalars`, `add` and `flush` and raises
+  `FenceClosedError` after the fence closes. Isolation is the default READ COMMITTED.
+- [FACT] M5a `StructuredRequest.request_sha256` covers purpose, output schema, prompt reference,
+  model ID, question ID, `max_output_tokens` and the SHA-256 of the system and user texts;
+  **`timeout_ms` is deliberately excluded**. `StructuredResult` fields and their combinations follow
+  the ADR-0019 table: `output` only for `completed`; `model_used` and `usage` together, present for
+  the five response outcomes (equal to `model_requested`) and `model_mismatch` (different);
+  `timeout` dispatched without a response; `provider_failed` without a response and with
+  `latency_ms` absent unless dispatched.
+- [FACT] M5b values: `VerifiedQuestion` (tenant, review, question, `snapshot_sha256`,
+  `request_sha256`, `match_rules`, `Verification`, claims, provenance), `AnalyzedQuestion`
+  (tenant, review, question, `request_sha256`, findings, follow-ups), `ProvenanceRejection`
+  (stage, question, reason, `item_index`, `citation_index`, `rejected_count`),
+  `recheck_verified(verified, evidence)` and `recheck_analyzed(analyzed, owner, question, *,
+  shared=())`. M5c `RepairReason` carries purpose, question, code and positions (no count);
+  `AnalystRequestInputs` holds only the owner `VerifiedQuestion` and the question.
+- [FACT] M5c templates hold 1–100 questions (`MAX_QUESTIONS = 100`); each `EvidenceQuestion` has
+  `question_id`, `text` (1–500), `search_queries` (1–5 of 1–200) and
+  `requires_documentary_support`. M5d `ReviewConfiguration` pins template ID, version and SHA-256,
+  both prompt references, `model_id`, `max_output_tokens`, `timeout_ms` and `retrieval_k`; the
+  `reviews` row stores each as a column; `TrustedReview` carries the request, snapshot and
+  `job_id`; the worker's `load_trusted_review` returns a `ResolvedReview` with the pinned template
+  and prompts.
+- [FACT] M4d `ChannelHit.score` is a finite `float`; `RetrievedChunk.fused_score` is a `Fraction`
+  that its constructor requires to equal the sum of `1/(60 + rank)` over the hits;
+  `ChunkEvidence.title`, `section_path` parts, `version_label` and `document_key` have no length
+  bound, so a retrieval result has no byte bound. Several inherited integers have **no upper bound**
+  in their constructors: `SourceSpan.line_start`, `line_end`, `char_start`, `char_end`,
+  `ChunkEvidence.revision_no` and `QuoteMatch.source_char_start`/`source_char_end`. The database
+  columns they are read from (`chunks.line_*`, `chunks.char_*`, `chunks.header_*`,
+  `document_revisions.revision_no`) are PostgreSQL `integer`, at most 2,147,483,647.
+- [FACT] M4d `retrieve_with_vectors` runs, in one REPEATABLE READ, READ ONLY transaction,
+  `BINDING_RECHECK_SQL` (every binding's vendor, document, activated revision, chunk set and
+  manifest, ready index with the pinned profile and vector manifest, and the profile's identity
+  fields; the count must equal the number of bindings), the channel statements, and `EVIDENCE_SQL`
+  (each final chunk through the snapshot eligibility joins, with `content_sha256` equal to the
+  embedding row's), then requires one row per chunk, a text digest equal to `content_sha256`, and
+  a constructible `ChunkEvidence`; any mismatch is the semantic `snapshot_inconsistent` outcome.
+  M5d already extracted capture as the public `capture_in_transaction`, returning a value, a
+  `SemanticOutcome` or a `CaptureFailure`.
+- [FACT] `clock_timestamp()` is wall-clock time and can move backwards; PostgreSQL does not
+  guarantee ordering between two readings.
+
+##### M5e-A. Placement and public contract
+
+| Path | Contents |
+| --- | --- |
+| `packages/domain/evidenceguard_domain/review_stages.py` (new, pure) | enumerations, values (M5e-B1), canonical encodings and bounded decoders (M5e-B2), `StageHistory`, `plan_stage` and fixed domain errors |
+| `packages/persistence/evidenceguard_persistence/review_stages.py` (new) | the fenced write APIs, the in-run read and the trusted reload (M5e-E, M5e-J) |
+| `packages/persistence/evidenceguard_persistence/retrieval.py` (changed) | the extracted public `recheck_evidence_in_transaction` and its two shared steps, reused unchanged in behaviour by `retrieve_with_vectors` (M5e-J1) |
+| `packages/persistence/evidenceguard_persistence/models.py` (changed) | four tables (M5e-K) |
+| `packages/persistence/evidenceguard_persistence/migrations/versions/v0007_review_stages.py` (new) | migration `0007` (down revision `0006`) |
+
+[REC] The domain module imports only the standard library and the domain (`model_calls`,
+`provenance`, `retrieval`, `evidence`, `jobs`), never `evidenceguard_agents`, also not through a
+local or deferred import, and no domain function constructs or returns an `evidenceguard_agents`
+value (M5c's `RepairReason` is built by the worker composition, M5e-H). The persistence module imports the domain,
+`evidenceguard_persistence.jobs` (`FencedSession`, `recheck_ownership`, M3 errors), `reviews`,
+`retrieval` (the evidence recheck, E5) and `sqlalchemy`; never `evidenceguard_agents`, the worker or
+a provider. Template loading, planning and request assembly stay in M5g's worker composition, as in
+M5d's `review_seams`. No output table, value or writer is part of M5e (M5e-L).
+
+##### M5e-B. Enumerations and fixed codes
+
+All are `StrEnum`s; stored and encoded by `.value`.
+
+| Enumeration | Values |
+| --- | --- |
+| `StageKind` | `verification` (purpose `verifier`, rejection stage `verification`), `analysis` (purpose `risk_analyst`, rejection stage `analysis`) |
+| `CallKind` | `initial`, `retry`, `repair` |
+| `RequestBasis` | `original`, `repaired` |
+| `ReservationState` | `started`, `completed` |
+| `StageOutcome` | `verified` (verification only), `analyzed` (analysis only), `unresolved` |
+| `UnresolvedReason` (13) | after a completed call: `refusal`, `max_tokens`, `unexpected_stop`, `model_mismatch`, `invalid_output`, `citation_rejected`, `timeout`, `provider_failed`; after abandoned calls: `call_abandoned`; pre-dispatch: `request_too_large`, `repair_request_too_large`, `evidence_too_large` (verification only); dependency: `verification_unresolved` (analysis only) |
+
+[REC] `invalid_output` and `citation_rejected` as stage reasons follow M5b-F: an M5a
+`invalid_output` call, or a rejection whose reason maps to `invalid_output`, gives
+`invalid_output`; a rejection mapping to `citation_rejected` gives `citation_rejected`. The
+specific M5b reason stays on the call record.
+
+##### M5e-B1. Value contracts
+
+Common rules (all values): frozen dataclasses with keyword-only validating constructors; exact types
+(`type(x) is …`; `bool` is never `int`; tuples only; `UUID` objects only); unknown keywords refused;
+nested values rebuilt through their own constructors; `dataclasses.replace` runs the constructor;
+derived fields computed and never accepted; datetimes timezone-aware and normalized to UTC; failures
+raised as a fresh fixed `InvalidStageValueError` outside the handler (no cause or context);
+process control propagates as the same object; `repr`/`str` show identifiers, enumerations,
+sequence numbers, counts and digests only (never question text, evidence text, quotes, claims,
+rationales, findings or prompts). No field has a default unless stated. Constructors check shape
+and internal consistency only; database and provenance checks are named in M5e-G and M5e-J.
+
+| Value | Fields (type, bounds) | Cross-field rules |
+| --- | --- | --- |
+| `PlannedQuestionSet` | `tenant_id`, `review_id`: `UUID`; `questions`: tuple of `EvidenceQuestion`, 1–100; derived `question_sha256s`: tuple of 64-hex, one per question | question IDs unique; position = tuple index (0–99); each digest is the `eg-review-plan-question-v1` digest (M5e-B2) |
+| `EvidenceRecord` | `tenant_id`, `review_id`: `UUID`; `question`: `EvidenceQuestion`; `result`: `RetrievalResult`; derived `question_id`, `question_sha256` (the `eg-review-plan-question-v1` digest of `question`), `snapshot_sha256` (= `result.snapshot_sha256`), `item_count` (0–20), `canonical`: `bytes`, `evidence_sha256`, `fits_storage`: `bool` | `result.tenant_id == tenant_id`; `result.query_count == len(question.search_queries)`; every inherited integer within the admission range (M5e-B2); `canonical` is the `eg-review-question-evidence-v1` encoding; `fits_storage` iff `len(canonical) <= MAX_EVIDENCE_BYTES` (4,194,304). An oversized record is a **valid value**; it simply cannot be stored (M5e-H) |
+| `CallRejection` | `stage`: `StageKind`; `reason`: M5b `RejectionReason`; `item_index`, `citation_index`: `int` or `None`; `rejected_count`: `int` | valid iff `ProvenanceRejection(stage=<matching RejectionStage>, question_id=<any valid>, reason, item_index, citation_index, rejected_count)` is valid. A **pure domain value**: it exposes only these validated fields. `CallRejection.from_rejection(rejection: ProvenanceRejection)` takes the stage (`verification`/`analysis` from `RejectionStage`), reason, positions and count and drops the question ID, which the caller must already have checked (binding rule B6, M5e-E); `to_rejection(question_id: str) -> ProvenanceRejection` rebuilds the M5b value (domain to domain). No method constructs or returns an `evidenceguard_agents` value |
+| `CallRecord` | `tenant_id`, `review_id`, `job_id`: `UUID`; `question_id`; `stage`; `sequence`: 1–3; `call_kind`; `request_basis`; `request_sha256`, `prompt_sha256`: 64-hex; `model_requested`: M5a model-ID pattern; `max_output_tokens`: 1–8,192; `timeout_ms`: 1,000–120,000; `evidence_sha256`, `dependency_sha256`: 64-hex or `None`; `job_attempt`: 1–10; `state`; `started_at`: datetime; completion fields, each defaulting to `None`: `completed_at`, `outcome`: `CallOutcome`, `dispatched`: `bool`, `model_used`: model ID, `usage`: `ModelUsage`, `latency_ms`: 0–86,400,000, `rejection`: `CallRejection` | `sequence == 1` iff `initial`; `initial` → `original`; `repair` → `repaired`; `evidence_sha256` present iff `verification`, `dependency_sha256` present iff `analysis`; `started` → every completion field `None`; `completed` → `completed_at`, `outcome` and `dispatched` present (no ordering between `completed_at` and `started_at` is required: both are audit wall-clock readings, M5e-D V12), and `outcome`, `dispatched`, `model_used`, `usage`, `latency_ms` satisfy the ADR-0019 row for that outcome (output aside); `rejection` only with outcome `completed`, with `rejection.stage == stage` |
+| `StageRecord` | `tenant_id`, `review_id`, `job_id`: `UUID`; `question_id`; `stage`; `outcome`: `StageOutcome`; `unresolved_reason`: `UnresolvedReason` or `None`; `call_sequence`: 1–3 or `None`; `request_sha256`, `evidence_sha256`, `dependency_sha256`: 64-hex or `None`; `content`: `VerifiedQuestion`, `AnalyzedQuestion` or `None`; `job_attempt`: 1–10; `committed_at`: datetime; derived `content_canonical`: `bytes` or `None`, `content_sha256` | the field presence of exactly one shape in M5e-C; content tenant, review and question equal the record's and `content.request_sha256 == request_sha256`; every inherited integer in the content within the admission range (M5e-B2); `content_canonical` within its cap (M5e-B2; unreachable for admitted content) |
+| `StageHistory` | `tenant_id`, `review_id`, `job_id`: `UUID`; `question_id`; `stage`; `current_attempt`: 1–10; `calls`: tuple of `CallRecord`, 0–3; `committed`: `StageRecord` or `None` | the whole-history rules V1–V12 (M5e-D); failure is `InvalidStageHistoryError` (fixed, domain) |
+| `StagePlan` | one of the four variants below | returned by `plan_stage` |
+| `PlanReuse` | `stage`: `StageRecord` | the committed stage; no call |
+| `PlanDispatch` | `sequence`: 1–3; `call_kind`; `request_basis`; `predecessor`: 1–2 or `None`; `trigger`: 1–2 or `None`; `required_request_sha256`: 64-hex or `None`; `original_request_sha256`: 64-hex or `None` | `initial` → sequence 1, no predecessor, trigger or digests; `retry` → `predecessor = sequence - 1`, `required_request_sha256` = the predecessor's digest; `repair` → `predecessor = trigger = sequence - 1`, `original_request_sha256` set (the repair digest must differ from it); a `retry` with basis `repaired` carries the repair record's trigger |
+| `PlanInFlight` | `sequence`: 1–3; `request_sha256` | the last call is `started` by the current attempt |
+| `PlanExhausted` | `reason`: one of the nine after-call reasons; `sequence`: 1–3; `request_sha256` | the stage must be committed `unresolved` with this reason |
+| `StageState` | `history`: `StageHistory`; `plan`: `StagePlan`; `evidence_sha256`: 64-hex or `None` (verification: the stored evidence); `dependency_sha256`: 64-hex or `None` (analysis: computed from the owner's committed verification, `None` if it is not committed) | in-run read result; constructor-validated and digest-checked, **not** provenance-trusted |
+| `TrustedQuestionStages` | `question`: `EvidenceQuestion`; `evidence`: `QuestionEvidence` or `None`; `verification`, `analysis`: `StageRecord` or `None`; `verification_history`, `analysis_history`: `StageHistory` | stored content replaced by the `recheck_verified` / `recheck_analyzed` results |
+| `TrustedStages` | `tenant_id`, `review_id`, `job_id`: `UUID`; `job_attempt`: 0–10 (the canonical job's attempt in the reload snapshot); `questions`: tuple of `TrustedQuestionStages` in plan order, or empty if no plan is stored | built only by `load_trusted_stages` (the constructor cannot prove that) |
+
+##### M5e-B2. Canonical encodings, bounds and decoding
+
+**Encoding.** [REC] Each stored object has an explicit schema below, serialized with
+`json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False)` and
+encoded as ASCII; its digest is the lower-case SHA-256 of those bytes. Allowed JSON types: objects
+with string keys, arrays, strings, integers and booleans, and `null` only where a schema says so.
+
+- **Integer** (exact policy): every integer in every M5e schema is a Python `int` (never `bool`)
+  in **0 … 2,147,483,647** (`MAX_CANONICAL_INT`, the PostgreSQL `integer` maximum), written in
+  decimal without sign or leading zeros. No schema field is negative. Decoding applies a lexical
+  bound (1–10 digits, no `-`) **and** the magnitude check `value <= 2147483647`; both are required,
+  because ten digits alone admit values up to 9,999,999,999.
+- **Admission narrowing** (with a fixed error). The format cannot represent every domain-valid
+  value: `SourceSpan` line and character fields, `ChunkEvidence.revision_no` and
+  `QuoteMatch.source_char_start`/`source_char_end` are unbounded above in their constructors. M5e
+  therefore **narrows its admission contract**: `EvidenceRecord` and `StageRecord` (with its content)
+  refuse any inherited integer above 2,147,483,647 with `InvalidStageValueError`, and the write APIs
+  map that to `InvalidStageRequestError`. Trusted persisted inputs satisfy the bound: every such
+  value is read from, or (for quote source offsets, `chunk.char_start` plus an offset bounded by
+  `char_end`) derived within, a PostgreSQL `integer` column, so a value above it cannot come from
+  the database. M5e does **not** claim that every domain-valid value is encodable. Bounded fields
+  (ranks, positions, counts, `k`, ordinals, text offsets ≤ 4,000, occurrences ≤ 64) are far inside
+  the range.
+
+- **UUID**: `str(uuid)` (36 lower-case characters with hyphens); decoding requires
+  `str(UUID(s)) == s`.
+- **Enumeration**: its `.value`; decoding requires membership.
+- **Optional field**: the key is always present, `null` when absent; no key is ever omitted.
+- **Tuple**: an array in value order; order is significant and never re-sorted.
+- **Date**: `date.isoformat()`; decoding requires `date.fromisoformat(s).isoformat() == s`.
+- **Float**: never a JSON number. A finite binary64 value is the string `x.hex()` (for example
+  `"0x1.8000000000000p+1"`; `-0.0` is `"-0x0.0p+0"`); decoding requires the pattern
+  `^-?0x[01]\.[0-9a-f]+p[+-][0-9]+$`, `math.isfinite(float.fromhex(s))` and
+  `float.fromhex(s).hex() == s`. This is bit-exact; NaN and infinities cannot be encoded.
+- **Fraction**: not encoded; `fused_score` is recomputed from the hits on decoding and rechecked by
+  the M4d constructor.
+- **Text**: the exact Python `str` (no normalization or stripping); `ensure_ascii` escapes
+  non-ASCII code points (astral ones as a surrogate pair), and lone surrogates round-trip.
+
+**Schemas** (every key listed is required; `canonical` is the schema ID):
+
+- `eg-review-plan-question-v1`: `canonical`, `question_id`, `text`, `search_queries` (array of
+  strings), `requires_documentary_support` (bool).
+- `eg-review-question-evidence-v1`: `canonical`, `tenant_id`, `review_id`, `question_id`,
+  `question_sha256`, `snapshot_sha256`, `query_count`, `k`, `vector_skipped` (array of int),
+  `items` (array). Each item: `chunk_id`, `revision_id`, `document_id`, `fused_rank`, `hits` (array
+  of `{channel, query_position, rank, score}` with `score` a float string) and `evidence`:
+  `{text, content_sha256, ordinal, section_path (array), is_table, body, header, document_key,
+  title, revision_no, version_label (string or null), effective_date (date or null), source_type,
+  authenticity}`, where `body` is `{line_start, line_end, char_start, char_end}` and `header` the same
+  or `null`. The snapshot is **not** encoded: decoding takes it from the `TrustedReview` and requires
+  `snapshot.sha256 == snapshot_sha256`; `ChunkEvidence.chunk_id` is the item's `chunk_id`.
+- `eg-review-stage-verified-v1`: `canonical`, `tenant_id`, `review_id`, `question_id`,
+  `snapshot_sha256`, `request_sha256`, `match_rules`, `verification` (`{verdict, evidence_status,
+  rationale}`), `claims` (array of `{text, citation_indexes}`), `citations` (array of
+  `{document_revision_id, chunk_id, source_type, quote, authenticity, document_id, match}` with
+  `match` `{kind, text_start, text_end, source_char_start, source_char_end, occurrences}`).
+  Decoding sets every `Citation.tenant_id` and the `Verification` tenant and question from the outer
+  fields and each `QuoteMatch.quote` from its citation's `quote`, so the quote is stored once.
+- `eg-review-stage-analyzed-v1`: `canonical`, `tenant_id`, `review_id`, `question_id`,
+  `request_sha256`, `findings` (array of `{finding_id, question_ids, title, severity, statement,
+  evidence_status, citations, follow_up_questions}` with citations as `{document_revision_id,
+  chunk_id, source_type, quote, authenticity}` and `follow_up_questions` an array of strings).
+  `Finding.tenant_id` and every citation tenant come from the outer `tenant_id`.
+- `eg-review-stage-dependency-v1`: `canonical`, `tenant_id`, `review_id`, `question_id`,
+  `question_sha256`, `owner` (`{outcome, content_sha256, unresolved_reason}`: `verified` with a
+  digest and `null` reason, or `unresolved` with `null` digest and the reason), `shared` (always the
+  empty array in v1, P9).
+
+**Byte caps (accepted engineering limits, Prompt 199; historically proposed) and why admitted
+values fit.** [REC] The caps are not measured performance or memory guarantees, and the
+maximum-size literals below still require independent implementation tests. The bound is an
+exact upper bound computed by **encoding a maximal object**, not an estimate: every string at its
+maximum length in code points, each an astral code point (12 ASCII bytes, the most any code point
+costs under `ensure_ascii`); every enumeration at its longest value (`insufficient_evidence`,
+`documentary_support`, `third_party_report`, `not_established`, `header`, `medium`); every UUID
+(36), digest (64) and question ID (14 characters, the pattern maximum) at full length; every
+integer at its largest admitted value (`source_char_*` 2,147,483,647, `text_end` 4,000,
+`text_start` 3,999, `occurrences` 64, citation indexes 79); every array at its maximum count
+(80 citations, 10 claims of 8 indexes; 20 findings, each with 20 question IDs, 8 citations and 5
+follow-ups); and every key and separator of the schema. Some combinations are not jointly valid,
+so the true maximum is lower. A unit test pins these two numbers by building the same maximal
+objects.
+
+| Object | Cap | Exact upper bound of an admitted value | Outcome above the cap |
+| --- | --- | --- | --- |
+| verified content | 2,097,152 | 1,135,720 bytes | unreachable for admitted content; defensive `InvalidStageValueError` |
+| analyzed content | 4,194,304 | 3,090,153 bytes | unreachable for admitted content; defensive `InvalidStageValueError` |
+| evidence | 4,194,304 (`MAX_EVIDENCE_BYTES`) | unbounded (M4d metadata has no length bound) | **legitimate**: `evidence_too_large` (M5e-H) |
+| plan question | none stored (digest only) | n/a | n/a |
+
+**Decoding.** [REC] Decoders take `bytes` and run in this order, any failure being the caller's
+fixed inconsistency error: (1) the length is checked against the cap **before parsing**; (2) every
+byte is printable ASCII (0x20–0x7E); (3) `json.loads` with an `object_pairs_hook` that rejects
+duplicate keys, `parse_constant` rejecting `NaN`/`Infinity`, `parse_float` rejecting every JSON
+float and a `parse_int` that rejects a sign or more than 10 digits **and** any value above
+2,147,483,647 (a `RecursionError` or any other parse failure is the same fixed error); (4) every object's key set equals its schema's exactly (unknown or missing
+keys rejected) and every value has the schema type; (5) the domain values are rebuilt through their
+constructors; (6) the rebuilt value is re-encoded and must be **byte-identical** to the input;
+(7) the stored digest must equal the SHA-256 of the input. Write paths encode from values and never
+decode caller bytes; reload decodes every stored object.
+
+**Equality.** Two encoded objects are equal iff their bytes are identical. Record equality for
+replay is defined per operation in M5e-F.
+
+##### M5e-C. Stage shapes (one table for constructors, SQL, write APIs and reload)
+
+`n` is the number of calls for the stage and `L` the last call. "Ref" columns are the stage row's
+`call_sequence` and `request_sha256`. "Evid." is `evidence_sha256` (verification) and "Dep." is
+`dependency_sha256` (analysis). **Derived** means persistence computes the value from stored rows;
+the caller never supplies it.
+
+| Shape | Stage, outcome, reason | Required history | Ref | Evid. / Dep. | Content |
+| --- | --- | --- | --- | --- | --- |
+| S1 success | verification, `verified` | `L` completed `completed`, no rejection | `L.sequence`, `L.request_sha256` (derived) | evidence digest (derived; must equal `L`'s); Dep. absent | verified content required |
+| S2 success | analysis, `analyzed` | as S1 | as S1 | Evid. absent; dependency digest (derived; must equal `L`'s) | analyzed content required |
+| U1 after a completed failure | either stage, `unresolved`, one of the eight after-call reasons | `plan_stage` without the stage returns `PlanExhausted(reason)` with `L` completed | `L` (derived) | verification: evidence (derived); analysis: dependency (derived) | absent |
+| U2 after abandoned calls | either stage, `unresolved`, `call_abandoned` | `n = 3`, `L` started with `L.job_attempt` below the committing attempt | `L` (derived) | as U1 | absent |
+| U3 dependency | analysis, `unresolved`, `verification_unresolved` | `n = 0`; the owner verification committed `unresolved` | absent | Evid. absent; dependency digest of the unresolved owner (derived) | absent |
+| U4 oversized evidence | verification, `unresolved`, `evidence_too_large` | `n = 0`; no evidence row | absent | both absent | absent |
+| U5 oversized request | either stage, `unresolved`, `request_too_large` | `n = 0` | absent | verification: evidence (derived, row exists); analysis: dependency of the verified owner (derived) | absent |
+| U6 oversized repair | either stage, `unresolved`, `repair_request_too_large` | `plan_stage` without the stage returns `PlanDispatch(call_kind=repair)`; the trigger is `L` | `L` (derived; the trigger) | as U1 | absent |
+
+[REC] **Unresolved versus invalid input.** The shapes above are legitimate outcomes and are stored.
+Everything else is invalid trusted or caller input and raises a fixed error with nothing written:
+a malformed value or argument (`InvalidStageRequestError`), a reason that does not match the
+derived history (`StagePlanMismatchError`), a configuration or request mismatch
+(`StageBindingError`), an unplanned question (`StageNotPlannedError`), a missing dependency
+(`StageDependencyError`), retrieval failures, `InvalidAssemblyInputError` and every other M5c
+caller error (these never become an unresolved stage; M5g treats them as job-level failures).
+
+##### M5e-D. Planner: `StageHistory` validation and `plan_stage`
+
+[REC] `plan_stage(history: StageHistory) -> PlanReuse | PlanDispatch | PlanInFlight |
+PlanExhausted` is pure and **total over valid histories**: it never raises for a valid
+`StageHistory`, and an argument that is not exactly a `StageHistory` is `InvalidStageHistoryError`.
+All validation happens in the `StageHistory` constructor; planning never allocates. Allocation is
+the persistence API `reserve_call` (M5e-E), which plans under the job lock and inserts only what
+the plan permits.
+
+**`current_attempt`.** An `int` 1–10 (`MAX_MAX_ATTEMPTS`) equal to the `attempt` of the review's
+canonical `run_review` job (`reviews.run_review_job_id`). In a write API it is always
+`fence.job.attempt`, never a caller argument; in the reload it is the job row's `attempt` read in the
+same snapshot (a reload with `attempt = 0`, a job never claimed, requires no M5e rows). The same
+`started` call from attempt 1 is therefore `PlanInFlight` when `current_attempt = 1` and abandoned
+(`PlanDispatch(retry)` or `PlanExhausted(call_abandoned)`) when `current_attempt = 2`.
+
+**Validation (V1–V12, all in the constructor; any failure is `InvalidStageHistoryError`).**
+
+1. **V1 Values.** Every call and the committed stage are rebuilt; `calls` has 0–3 entries.
+2. **V2 Identity.** Every call and the committed stage have the history's tenant, review,
+   question, stage and `job_id`.
+3. **V3 Sequences.** The call sequences are exactly `1 … n`, in order.
+4. **V4 Attempts.** Every `job_attempt` ≤ `current_attempt`; attempts are non-decreasing by
+   sequence; a `started` call that is not last has a strictly lower attempt than the next call (it
+   was abandoned before the next was allocated); the committed stage's attempt is ≥ every call's
+   attempt and ≤ `current_attempt`.
+5. **V5 Kinds and bases.** Call 1 is `initial`/`original`. For call `i ≥ 2` with predecessor
+   `P = call i−1`: if `P` is `started` (abandoned) or completed `timeout`/`provider_failed`, call `i`
+   is a `retry` with `P`'s basis and digest; if `P` is completed `invalid_output` or completed with a
+   rejection and no earlier call is a `repair`, call `i` is a `repair`/`repaired`; any other `P`
+   (a terminal outcome, a success, or an invalid output after a repair) has no successor.
+6. **V6 Repair.** At most one `repair` (implied by V5); a repair's trigger is its predecessor; a
+   `retry` with basis `repaired` inherits the trigger of the repair it repeats.
+7. **V7 Digests.** All `original` calls share one `request_sha256`; all `repaired` calls share one;
+   the repaired digest differs from the original.
+8. **V8 Pinned settings.** `model_requested`, `max_output_tokens`, `timeout_ms` and
+   `prompt_sha256` are equal across the calls; verification calls share one `evidence_sha256` and
+   analysis calls one `dependency_sha256`.
+9. **V9 Success placement.** A call completed `completed` without a rejection must be last, and
+   then the committed stage must exist with shape S1/S2 referencing it; a success shape requires
+   exactly that call.
+10. **V10 Rejections.** A rejection appears only on outcome `completed`, with the stage's
+    rejection stage.
+11. **V11 Committed unresolved.** The committed stage satisfies its M5e-C shape, evaluated against
+    the plan of the same history without the committed stage: U1 equals that plan's
+    `PlanExhausted.reason` and `L`; U2 requires `n = 3`, `L` started and the committed attempt above
+    `L.job_attempt`; U6 requires that plan to be `PlanDispatch(repair)` with trigger `L`; U3, U4 and
+    U5 require `n = 0`. The stage's digest references equal the calls' (V8).
+12. **V12 Timestamps.** `started_at`, `completed_at`, `created_at` and `committed_at` are
+    `clock_timestamp()` wall-clock readings and **audit values only**. No ordering between them,
+    within a call or across rows, is an admission requirement anywhere (constructors, SQL, write
+    APIs, reload), so a clock that moved backwards cannot turn a valid provider completion into an
+    error. Ordering and abandonment are decided solely by `sequence` and `job_attempt`.
+
+**Transition table** (`L` the last call, `n` the call count; the first matching row applies):
+
+| # | Condition | Result |
+| --- | --- | --- |
+| T0 | a committed stage exists | `PlanReuse(stage)` |
+| T1 | `n = 0` | `PlanDispatch(1, initial, original)` |
+| T2 | `L` started, `L.job_attempt = current_attempt` | `PlanInFlight(L.sequence)` |
+| T3 | `L` started, `L.job_attempt < current_attempt`, `n < 3` | `PlanDispatch(n+1, retry, L.basis, required = L.digest)` (an abandoned repair is retried once here) |
+| T4 | `L` started, `L.job_attempt < current_attempt`, `n = 3` | `PlanExhausted(call_abandoned)` |
+| T5 | `L` completed `timeout` or `provider_failed`, `n < 3` | `PlanDispatch(n+1, retry, L.basis, required = L.digest)` |
+| T6 | `L` completed `timeout` or `provider_failed`, `n = 3` | `PlanExhausted(L.outcome)` |
+| T7 | `L` completed `invalid_output` or with a rejection, no repair among the calls, `n < 3` | `PlanDispatch(n+1, repair, repaired, trigger = L.sequence)` |
+| T8 | `L` completed `invalid_output` or with a rejection, and a repair exists or `n = 3` | `PlanExhausted(invalid_output or citation_rejected per M5e-B)` |
+| T9 | `L` completed `refusal`, `max_tokens`, `unexpected_stop` or `model_mismatch` | `PlanExhausted(L.outcome)` |
+
+A success without a committed stage cannot reach the table (V9). **E4 as supported:** a rejection
+reaches T7 exactly like `invalid_output`, so it uses the single repair allowance; T8 shows that a
+second rejection or invalid output after the repair is terminal and nothing resets the budget.
+Third-reservation outcomes are T4, T6, T8 and T9; an abandoned repair at sequence 2 is retried at
+sequence 3 (T3), and one at sequence 3 ends `call_abandoned` (T4).
+
+##### M5e-E. Persistence APIs, fencing and errors
+
+**Transaction ownership.** [REC] Every write API composes into a **caller-owned fenced
+transaction**. Its first argument is a `StageFence`, a structural protocol with only the
+attributes the existing `HandlerFence` and M3 `Fence` already expose: `session: FencedSession` and
+`job: JobSnapshot`. No new seam is needed. An API never commits, rolls back, closes, sets isolation,
+uses savepoints or retries. **Rollback belongs to the caller's fence:** an API may already have
+executed statements when it raises (for example the call update before a failed stage insert), so a
+failed operation must **escape** the caller's `with ctx.fenced()` block, whose fence then rolls
+back. If a caller suppresses the error inside the block, partial or unchecked effects may commit;
+M5g must not catch M5e errors inside a fenced block. Only `load_trusted_stages` owns a (read-only)
+transaction.
+
+**Fence association and ownership checks** (every write API, in this order, after argument checks):
+
+1. `job = fence.job`; require `job.kind == "run_review"` and `job.idempotency_key == str(review_id)`
+   (`StageFenceMismatchError`); the tenant is `job.tenant_id`, never an argument.
+2. `token = job.lease_token()` (an `InvalidJobTransitionError` from a non-running snapshot is
+   `StageFenceMismatchError`); `current_attempt = token.attempt`.
+3. `recheck_ownership(fence.session, token)` (`LeaseLostError` passes through; a closed fence raises
+   `FenceClosedError`, which passes through); the returned job must have the same tenant.
+4. Read the review row by `(job.tenant_id, review_id)` and require
+   `run_review_job_id == job.id` (`StageFenceMismatchError`; a missing review is the same error).
+5. The operation's reads, rules and writes (below).
+6. `recheck_ownership(fence.session, token)` **again after the last write**, because the inserts,
+   the update and their foreign-key checks (`FOR KEY SHARE` on referenced rows) can wait on locks
+   while the lease clock runs; a `LeaseLostError` here must escape so the fence rolls back.
+
+This narrows but does not remove the accepted M3 window: a check that passes just before expiry can
+be followed by the caller's commit shortly after. No universal guarantee that no statement runs after
+expiry is claimed; statements may execute after expiry and are rolled back when the final check
+fails and its error escapes.
+
+| API | Purpose |
+| --- | --- |
+| `record_planned_questions(fence, planned: PlannedQuestionSet) -> PlannedQuestionSet` | stores the plan's question IDs, positions and digests once per review (replay M5e-F) |
+| `read_stage_state(fence, review_id, question_id, stage) -> StageState` | the history (with `current_attempt` from the fence), its plan and the digest references, for M5g's in-run decisions |
+| `record_evidence(fence, evidence: EvidenceRecord) -> EvidenceRecord` | stores a question's evidence before its first verification reservation |
+| `reserve_call(fence, review_id, question_id, stage, *, sequence, call_kind, request_basis, request: StructuredRequest) -> CallRecord` | plans under the lock and inserts the `started` reservation only if it equals `PlanDispatch` |
+| `complete_failed_call(fence, review_id, question_id, stage, *, sequence, result: StructuredResult, rejection: ProvenanceRejection \| None) -> CallRecord` | completes a reservation with a non-success; writes no stage |
+| `commit_verified(fence, review_id, question_id, *, sequence, result, verified: VerifiedQuestion) -> StageRecord` | completes the reservation and inserts the S1 stage atomically; the stage is fixed as verification and `question_id` is explicit (clarification A) |
+| `commit_analyzed(fence, review_id, question_id, *, sequence, result, analyzed: AnalyzedQuestion, owner: VerifiedQuestion) -> StageRecord` | completes the reservation and inserts the S2 stage atomically; the stage is fixed as analysis and `question_id` is explicit (clarification A); no `shared` parameter (P9) |
+| `commit_unresolved(fence, review_id, question_id, stage, *, reason: UnresolvedReason, evidence: EvidenceRecord \| None = None) -> StageRecord` | inserts a U1–U6 stage; every reference is derived from the stored history; `evidence` is required for, and only for, `evidence_too_large` |
+| `load_trusted_stages(session_factory, actor, review: TrustedReview, planned: PlannedQuestionSet) -> TrustedStages` | the trusted reload (M5e-J) |
+
+**Rules per API** (step 5 above):
+
+- `record_planned_questions`: `planned.review_id == review_id` of the fence association and its
+  tenant equals the job's; inserts one row per question.
+- `record_evidence`: the shared evidence sequence E1–E8 below, with E8 requiring
+  `fits_storage` (`EvidenceTooLargeError` otherwise, M5e-H).
+- `reserve_call`: history built and validated (`StageRecordInconsistentError` for stored data that
+  fails V1–V12); plan `PlanReuse` → `StageConflictError`, `PlanInFlight` → `StageCallInFlightError`,
+  `PlanExhausted` → `StageBudgetExhaustedError`; `PlanDispatch` must equal the caller's `sequence`,
+  `call_kind` and `request_basis`, and `request.request_sha256` must equal
+  `required_request_sha256` (retry) or differ from `original_request_sha256` (repair)
+  (`StagePlanMismatchError`); configuration binding (M5e-G, `StageBindingError`); verification
+  requires the evidence row (its digest is stored on the call); analysis requires the owner
+  verification committed `verified` (`StageDependencyError`; the dependency digest is derived and
+  stored on the call).
+- `complete_failed_call`, `commit_verified`, `commit_analyzed`: the shared completion binding rule
+  B1–B9 below, then replay (M5e-F), then the mutation preconditions M1–M3. The call update and, for
+  a success, the stage insert are in the same transaction (the caller's fence).
+- `commit_unresolved`: replay is decided after the checks that apply to the reason; the derived
+  shape for `reason` (M5e-C) must hold against the stored history (`StagePlanMismatchError`); U3
+  requires the owner verification committed `unresolved` (`StageDependencyError` otherwise); U5 and
+  U6 are trusted-caller assertions (M5e-H). **U4** (clarification B) runs the shared evidence
+  sequence E1–E8 on the supplied record, with E8 requiring `fits_storage` to be **false**
+  (`StagePlanMismatchError` otherwise), and then:
+  - a committed, well-formed U4 stage for the key (E7) is an **identical replay**, returned with
+    nothing written;
+  - any other committed verification stage (a different outcome or reason) is
+    `StageConflictError` (M5e-F);
+  - with no stage committed, an existing evidence row for the question is `StageConflictError`
+    (evidence was stored, so the stage cannot be U4); calls without an evidence row never reach this
+    point (E7, `StageRecordInconsistentError`).
+
+**Shared evidence sequence (E1–E8)**, identical for `record_evidence` and the U4 path of
+`commit_unresolved`, in this order (an oversized value never skips a binding check because it will
+not be stored):
+
+1. **E1** The argument is exactly an `EvidenceRecord`, rebuilt (`InvalidStageRequestError`,
+   including an inherited integer outside the admission range).
+2. **E2** Fence association and the first ownership recheck (steps 1–4).
+3. **E3** Tenant and review: `evidence.tenant_id == job.tenant_id` and `evidence.review_id ==
+   review_id` (`StageBindingError`).
+4. **E4** Planned question: a `review_plan_questions` row exists for `evidence.question_id`
+   (`StageNotPlannedError`) and its `question_sha256` equals `evidence.question_sha256`
+   (`StageBindingError`).
+5. **E5** Snapshot identity against the trusted review row: `result.snapshot_sha256 ==
+   reviews.snapshot_sha256` (the snapshot digest covers the bindings, exclusions, identity,
+   configuration and capture time) and, field by field, `result.tenant_id == reviews.tenant_id`,
+   `result.vendor_id == reviews.vendor_id`, `result.snapshot.profile_id == reviews.profile_id`,
+   `result.profile_fingerprint == reviews.fingerprint` and `result.config_sha256 ==
+   reviews.retrieval_config_sha256` (`StageBindingError`).
+6. **E6** Planned retrieval inputs: `result.k == reviews.retrieval_k` and `result.query_count ==
+   len(question.search_queries)` (the latter also a constructor rule) (`StageBindingError`).
+7. **E7** Stage state (clarification B), read for the question's verification stage under the job
+   lock. A **well-formed U4** is a committed verification stage with outcome `unresolved`, reason
+   `evidence_too_large`, no call, request, evidence or dependency reference, **no verification calls
+   and no evidence row**; it is a valid, closed state. Inconsistent, `StageRecordInconsistentError`:
+   - verification calls without an evidence row;
+   - a non-U4 verification stage without an evidence row;
+   - a purported U4 (reason `evidence_too_large`) with any verification call or with an evidence
+     row.
+
+   Otherwise, for `record_evidence`: an existing evidence row is a replay (M5e-F); a committed
+   well-formed U4 is `StageConflictError`, so evidence is never added to, and never reopens, the
+   closed stage. For U4 through `commit_unresolved`, the state is carried to the rules above
+   (identical replay, conflict or mutation) after E8.
+8. **E8** The storage-size decision on `fits_storage`, last.
+
+What these checks prove is consistency with the review's stored identity and plan. They do not
+prove that `result` came from executing the planned queries (original retrieval execution) or that
+the plan came from the pinned template. **For U4 only**, E3–E6 run once at write time and **cannot
+be repeated later**, because the oversized bytes are deliberately not persisted: the reload sees
+only the U4 shape (no evidence row, call or request reference) and the planned question. There is
+no truncation, no substitute evidence and no stored digest of the oversized record.
+
+**Shared completion binding rule (B1–B9)**, applied identically on first completion and on replay,
+before any replay comparison (replay may skip mutation-only preconditions, never identity or value
+validation):
+
+1. **B1** Argument shapes (`InvalidStageRequestError`): exact types and rebuilt values for
+   `review_id`, the explicit `question_id`, the result, the rejection, the content and the owner (and
+   for `complete_failed_call` the `stage`); `complete_failed_call` requires a failure
+   (outcome other than `completed`, or `completed` with a rejection) with `rejection` present iff
+   the outcome is `completed`; `commit_verified`/`commit_analyzed` require outcome `completed` and
+   no rejection. A malformed or wrongly typed content or owner value fails here.
+2. **B2** Fence association and the first ownership recheck (steps 1–4).
+3. **B3** Selected row (clarification A): the call row
+   `(job.tenant_id, review_id, question_id, stage, sequence)` must exist
+   (`StagePlanMismatchError`), where `question_id` is the **explicit argument** of every completion
+   API and `stage` is the `stage` argument of `complete_failed_call` or the stage **fixed by the
+   API** (`commit_verified`: verification; `commit_analyzed`: analysis). The selection key is never
+   derived from `result.question_id`, `verified.question_id`, `analyzed.question_id` or any other
+   content. The row's `job_id` must be the canonical job and its stage history must satisfy V1–V12
+   (`StageRecordInconsistentError`).
+4. **B4** `result.question_id == row.question_id` (`StageBindingError`); because the row was
+   selected independently of the result, a result naming another question fails here even when its
+   digest, purpose and model are the row's.
+5. **B5** `result.purpose` is the selected stage's purpose; `result.request_sha256 ==
+   row.request_sha256`; `result.model_requested == row.model_requested` (`StageBindingError`). A
+   well-formed `StructuredResult` can carry any digest string, so B5 never substitutes for B4.
+6. **B6** Rejection: `rejection.question_id == row.question_id` and `rejection.stage` is the
+   selected stage's rejection stage (`StageBindingError`); only then is it converted with
+   `CallRejection.from_rejection`.
+7. **B7** Content (success): `content.tenant_id == job.tenant_id`, `content.review_id ==
+   review_id`, `content.question_id == row.question_id` (the explicit `question_id`),
+   `content.request_sha256 ==
+   row.request_sha256`, and for verification `content.snapshot_sha256 == reviews.snapshot_sha256`
+   (`StageBindingError`).
+8. **B8** Owner (analysis): the owner's tenant, review and question equal the content's, it encodes
+   to the committed verification's `content_sha256`, and the dependency digest derived from that
+   committed verification equals the call's (`StageDependencyError`).
+9. **B9** The completion metadata (outcome, `dispatched`, `model_used`, usage, `latency_ms`,
+   rejection columns) and, for a success, the canonical content are derived from the values
+   validated in B1–B8; only these derived values are compared on replay or written.
+
+**Mutation preconditions** (only when no completed call or stage exists for the identity): **M1**
+the call is `started` (a completed call without a stage, for a success API, is
+`StageConflictError`); **M2** its `job_attempt == current_attempt` (`StageCallAbandonedError`);
+**M3** no stage is committed for the key (`StageConflictError`). The update is guarded by key,
+`state = 'started'` and `job_attempt = current_attempt`.
+
+**Fixed outcomes for the cases the review named** (each wins over any replay comparison):
+
+| Case | First failing check | Error |
+| --- | --- | --- |
+| (a) a replayed result names another question but keeps the original digest | B4 | `StageBindingError` |
+| (b) a replayed rejection names another question, all other fields identical | B6 | `StageBindingError` |
+| (c) success replay with content of another tenant, review, question, request or snapshot | B7 | `StageBindingError` |
+| (c) success replay with an owner of another identity, or not matching the committed verification | B8 | `StageDependencyError` |
+| (c) success replay with a malformed content or owner value | B1 | `InvalidStageRequestError` |
+
+These outcomes depend on clarification A: because B3 selects the row from the explicit
+`question_id` and the API's fixed stage, a wrong result question, a wrong content question and a
+wrong owner identity each reach their own check (B4, B7, B8) instead of selecting another question's
+row or failing earlier at B3. They apply identically on a first completion.
+
+**Input precedence.** Argument types and value shapes (`InvalidStageRequestError`); fence association
+(steps 1–4); then the operation's ordered checks (E1–E8, B3–B9 or the per-API rules); then replay;
+then mutation preconditions; then writes; then the final ownership check. The first failing check
+decides.
+
+**Errors.** [REC] Fixed, fresh, text-free, raised outside handlers. Domain:
+`InvalidStageValueError`, `InvalidStageHistoryError`. Persistence: `InvalidStageRequestError`,
+`StageFenceMismatchError`, `StageNotPlannedError`, `StageBindingError`, `StageDependencyError`,
+`StagePlanMismatchError`, `StageCallInFlightError`, `StageCallAbandonedError`,
+`StageBudgetExhaustedError`, `StageConflictError`, `EvidenceTooLargeError`,
+`StageRecordInconsistentError`, `StageDatabaseError`. `LeaseLostError`, `FenceClosedError` and
+`JobLockTimeoutError` pass through unchanged because the M3 runtime interprets them. A primary-key,
+unique or one-repair index violation (possible only through a fence bypass) is
+`StageConflictError`; every other ordinary database failure, including a `lock_timeout` on an M5e
+statement, is `StageDatabaseError`. Process control propagates as the same object; M5e never
+catches it except to re-raise. Nothing logs.
+
+**No internal retry.** [REC] Writes run in the fence's READ COMMITTED transaction serialized by the
+job row lock, so serialization failures are not expected, and a retry inside a caller-owned
+transaction is impossible without the caller. Failures propagate; M5g maps them to the job-level
+retry (bounded by the job's `max_attempts = 3`).
+
+##### M5e-F. Replay versus mutation preconditions
+
+[REC] Each API first runs its identity and value checks (E1–E7 for evidence, E1–E8 including the
+size check for U4, B1–B9 for completions, the per-API rules otherwise), then looks for the record
+its call would create, by its
+identity, under the held job lock. If it exists, **replay is decided before any mutation-only
+precondition** (such as "started by the current attempt"): equal → the stored record is returned
+and nothing is written; different → `StageConflictError`. Only when no such record exists do the
+mutation preconditions apply. Replay never bypasses identity or value validation.
+
+| Operation | Identity | Compared on replay | Kept from the first write (not compared) |
+| --- | --- | --- | --- |
+| planned questions | `(tenant, review)` | the full set of `(position, question_id, question_sha256)` | `job_attempt`, `created_at` |
+| evidence | `(tenant, review, question)` | canonical bytes (hence digest, item count, question and snapshot digests) | `job_attempt`, `created_at` |
+| reservation allocation | — | **not replayable** | — |
+| failed-call completion | `(tenant, review, question, stage, sequence)` from the arguments (B3), call `completed` | after B1–B9 have bound the result's question, purpose, digest and model and the rejection's question and stage to the row: `outcome`, `dispatched`, `model_used`, usage, `latency_ms` and every rejection column against the derived values | the call's `job_attempt` (the allocating attempt), `started_at`, `completed_at` |
+| success plus stage | the stage key from the explicit `question_id` and the API's fixed stage (B3), stage present | the stage's outcome, `call_sequence`, `request_sha256`, evidence or dependency digest and content bytes, **and** the referenced call's completion as above | the stage's `job_attempt`, `committed_at`; the call's audit fields |
+| unresolved stage | the stage key, stage present | outcome, reason and every derived reference (call, request, evidence, dependency); for U4, after E1–E8 including the size check, a well-formed U4 (E7) is equal and any other stage outcome or reason conflicts | `job_attempt`, `committed_at` |
+
+- **Why allocation is not replayable.** A retry legitimately repeats its predecessor's request
+  digest, so the digest cannot identify a dispatch, and adding an idempotency key would need its own
+  identity contract. Instead `reserve_call` requires the caller's `sequence` to equal the plan: if a
+  record already exists at that sequence the plan is no longer `PlanDispatch(sequence)` and the call
+  fails (`StageCallInFlightError`, `StageConflictError` or `StageBudgetExhaustedError`). A
+  reservation commit whose outcome is unknown is resolved by reading state on a later attempt, where
+  the row (if it exists) is abandoned; M5g never dispatches after a reservation commit raised.
+- **Replay after reclaim.** If attempt 1 committed a success but did not learn the outcome, attempt 2
+  reads `PlanReuse` and normally does not call again; an identical
+  `commit_verified(fence, review_id, question_id, sequence=s, result=r, verified=v)` from attempt 2
+  is still a no-op although the call's `job_attempt` is 1 and no longer current, because replay is
+  checked first. A different result for the same key is a conflict. The key comes from the explicit
+  `question_id` (clarification A), so a replay whose result or content names another question is
+  refused at B4 or B7 before any comparison.
+- **U4 replay** (clarification B). A U4 stage closes verification without evidence or calls. An
+  identical `commit_unresolved(..., reason=evidence_too_large, evidence=record)` after it re-runs
+  E1–E8, including the size check on the supplied record, and is a no-op; it cannot compare the
+  record with anything stored, because nothing of it was stored. `record_evidence` after a U4 is
+  `StageConflictError` (E7), and so is a U4 request against a stage with another outcome or reason.
+- **Consequences of not comparing `job_attempt`.** `job_id` is always compared (it is the canonical
+  job). The attempt that performed the first write is immutable audit; a replay from a later attempt
+  leaves no trace of itself. For call records the allocating `job_attempt` is part of the history
+  semantics (abandonment) and is never supplied by a caller, so it cannot differ on replay; it is
+  excluded from comparison only because the replaying attempt may legitimately be later.
+
+##### M5e-G. Question, configuration and dependency binding
+
+**Questions.** [REC] The exact question text, queries and documentary flag come only from the
+pinned template: M5g calls the worker's `load_trusted_review`, then `plan_review(template,
+k=configuration.retrieval_k)`, and builds `PlannedQuestionSet` from the planned questions in
+template order. Persistence cannot load templates (no `evidenceguard_agents` import) and therefore
+**cannot prove** that a supplied set came from the template; it checks instead that every later
+write and the reload use the **same** set as the first write (`review_plan_questions` digests), that
+every stage, call and evidence row names a planned question (foreign keys), and that the set has
+1–100 questions (constructor and `position` 0–99). Proving template origin is the worker
+composition's obligation (M5c `load_pinned_template` checks the template digest against the pinned
+reference).
+
+**Configuration.** [REC] An equal M5a request digest is **not** proof that the pinned inputs were
+used, and it does not cover `timeout_ms`. `reserve_call` therefore checks the `StructuredRequest`
+itself against the `reviews` row: purpose matches the stage; `question_id` matches;
+`model_id == reviews.model_id`; `max_output_tokens == reviews.max_output_tokens`;
+`timeout_ms == reviews.timeout_ms`; `prompt` equals the pinned verifier or analyst reference
+(ID, version, SHA-256); and `sha256(system_text) == prompt.sha256`. The call row stores
+`model_requested`, `max_output_tokens`, `timeout_ms` and `prompt_sha256`, so the reload rechecks
+them against the review (V8 and M5e-J). Retrieval configuration and `k` are bound through the
+evidence: `RetrievalResult.k` must equal `reviews.retrieval_k` and its snapshot digest the review's
+(write and reload). What persistence cannot check: that `user_text` is the assembly of the stored
+evidence or owner, which needs M5c; the worker composition reassembles the request from rechecked
+inputs and requires its digest to equal the stored `request_sha256` before any dispatch or retry on
+resume.
+
+**Analysis dependencies.** [REC] With P9 the only dependency is the owner question's committed
+verification; `shared` is always empty and a non-empty `shared` would need a reviewed change. Before
+an analysis reservation, persistence reads the owner's verification stage and the plan digest and
+derives the `eg-review-stage-dependency-v1` digest, which it stores on every analysis call and on
+the analysis stage. On resume M5g obtains the owner `VerifiedQuestion` through
+`load_trusted_stages` (or the same attempt's `verify_question` result), reassembles the Analyst
+request from it and the planned question, and checks the request digest against the stored calls;
+`commit_analyzed` requires the supplied owner to encode to the committed `content_sha256`. A missing
+owner stage is `StageDependencyError`; a duplicate is impossible by key; a foreign owner (another
+tenant, review or question) is `StageDependencyError`; a mismatched digest is
+`StageDependencyError` at write time and `StageRecordInconsistentError` at reload.
+
+##### M5e-H. Repair, retry and pre-dispatch refusals
+
+- [REC] **Retry** reuses the exact request of its basis: for `original` M5g reassembles from the
+  trusted review, the pinned prompt and the stored evidence (or owner) and the digest must equal the
+  initial call's; for `repaired`, the repair request rebuilt as below.
+- [REC] **Repair reconstruction.** The repair request is rebuilt, never stored: M5g reassembles the
+  original, takes the trigger call from the plan (`PlanDispatch.trigger`, or the trigger of the
+  repair a repaired retry repeats) and builds the M5c reason itself from the trigger's stored,
+  domain-validated fields, using only public M5c factories:
+  - an `invalid_output` trigger → `RepairReason.invalid_output(purpose=<stage purpose>,
+    question_id=<trigger.question_id>)`;
+  - a rejected trigger (`trigger.rejection` is a `CallRejection`) →
+    `RepairReason.from_rejection(trigger.rejection.to_rejection(trigger.question_id))`.
+
+  The mapping is exact: the stage gives the purpose (`verification` → `verifier`, `analysis` →
+  `risk_analyst`, which `from_rejection` derives from the rejection stage), the question ID is the
+  trigger call's, the reason code is the stored M5b `RejectionReason`, and `item_index` and
+  `citation_index` are the stored positions; `rejected_count` is kept on the call record and, as in
+  M5c, not carried into the repair. M5g then calls `assemble_repair_request(original, inputs,
+  reason)`. For a repaired retry the digest must equal the repair call's. A mismatch, or an M5c
+  `InvalidAgentValueError` or `InvalidAssemblyInputError`, is a worker-composition inconsistency
+  (fixed error, no dispatch); nothing falls back to a fresh plan and no raw output is needed or kept.
+  The domain module never builds the `RepairReason`.
+- [REC] **Evidence too large (U4).** M5g builds the `EvidenceRecord`; if `fits_storage` is false it
+  calls `commit_unresolved(..., reason=evidence_too_large, evidence=record)`, which runs the full
+  shared evidence sequence E1–E8 (tenant, review, planned question and digest, snapshot, vendor,
+  profile and retrieval-configuration identity, `k` and `query_count`, stage state, then the size
+  decision from the record's own canonical encoding) and stores a stage with no evidence, call or
+  request reference. `record_evidence` with such a record raises `EvidenceTooLargeError` at E8 (a
+  sequencing error, not a database failure), after the same binding checks. After a committed U4,
+  an identical U4 request is a no-op replay once E1–E8 pass, `record_evidence` is
+  `StageConflictError` and the closed stage is never reopened (E7, clarification B). Limitation: the
+  oversized bytes are not stored, so neither they nor their original E3–E6 binding assertion can be
+  re-proved at reload, which checks only the shape and the planned question.
+- [REC] **Request too large (U5).** After storing evidence (verification) or confirming the owner
+  (analysis), M5g assembles the initial request; `RequestTooLargeError` → `commit_unresolved(...,
+  reason=request_too_large)` with no reservation and no provider call (M5c-F4). Persistence records
+  the derived evidence or dependency digest; it cannot assemble, so on resume and in M5g's reload
+  composition the worker reassembles from the trusted inputs and requires `RequestTooLargeError`
+  again.
+- [REC] **Repair request too large (U6).** When the plan is `PlanDispatch(repair)` and
+  `assemble_repair_request` raises `RequestTooLargeError`, no repair reservation is made; M5g calls
+  `commit_unresolved(..., reason=repair_request_too_large)`, which requires that plan and references
+  the trigger call. The repair allowance is not consumed (no repair row exists) but the stage is
+  closed; the same reassembly recheck applies on resume.
+- [REC] No budget is reset, and no success is derived from a call record.
+
+##### M5e-I. Cancellation, process control and cleanup (obligations on M5g restated)
+
+- [REC] Every plan, evidence, reservation, completion and stage write runs in a fenced transaction of
+  the review's `run_review` job; a stale token fails when the fence opens (`LeaseLostError`) or at an
+  M5e ownership recheck, and the error escapes so nothing commits.
+- [REC] **W7, corrected wording.** After `call_validated` **returns** an outcome, or **raises an
+  ordinary exception** (an `Exception`), M5g calls `ctx.check()` before classifying it, completing
+  the reservation or writing a stage, so latched cancellation or lease loss takes precedence. A
+  **process-control exception** (a `BaseException` that is not an `Exception`) propagates as the
+  same object: no `ctx.check()` or other call runs on that path that could replace it with
+  `JobCancelledError`, `LeaseLostError` or `FenceClosedError`.
+- [REC] Cancellation is checked only at explicit boundaries: before each fence opens and after it
+  acquires its lock (`JobContext.fenced`), after each `call_validated`, and before `succeeded` in a
+  finish block. It is not checked atomically around every statement.
+- [REC] After fence loss the worker performs no completion, stage, compensating or output write; a
+  committed `started` reservation stays as audit and budget evidence.
+- [REC] Cleanup: M5e owns no session in write paths. The reload uses M5d's read-boundary pattern
+  (the public `read_snapshot` with recording wrappers), so the first process-control object raised
+  while executing, consuming a result or cleaning up is re-raised unchanged.
+- [REC] Unknown commit outcomes: a reservation commit that raises → no dispatch; a stage commit that
+  raises → the next attempt reads either the committed stage (`PlanReuse`) or the still-`started`
+  reservation (abandoned, budget consumed). None is retried inside M5e.
+- [REC] The finish-only output composition (output, review completion and job success in one
+  `fenced(finish=True)` transaction) is an M5g obligation (M5e-L). `HandlerFence` cannot tell a
+  writer that it runs inside a finish block; any seam for that is for M5g to propose and justify.
+
+##### M5e-J. Trusted reload
+
+[REC] `load_trusted_stages(session_factory, actor, review, planned)`: actor and argument types
+(`InvalidStageRequestError`), role reviewer or approver (`PermissionDeniedError`), `review.tenant_id
+== actor.tenant_id` and `planned` naming the same tenant and review (`InvalidStageRequestError`).
+Then one read-only REPEATABLE READ transaction through `read_snapshot`:
+
+1. Read the canonical job row `(tenant, review.job_id)`; `kind`, idempotency key and the review row's
+   `run_review_job_id` must match; its `attempt` is the reload's `current_attempt`.
+2. Read every plan, evidence, call and stage row of the review for the tenant. If there are no plan
+   rows, every other M5e row must be absent and the result has no questions.
+3. Plan rows: positions exactly `0 … m−1` with `m = len(planned.questions)`, IDs and digests equal to
+   `planned`.
+4. Every row's question is planned and its `job_id` is the canonical job.
+5. Per question and stage: decode and rebuild every `CallRecord` and the `StageRecord` (M5e-B2);
+   build `StageHistory` (V1–V12) with `current_attempt`; check the M5e-C shape, including **U1–U6
+   against the actual terminal history or dependency** (no successful provider result is required
+   for an unresolved stage); check every call's `model_requested`, `max_output_tokens`, `timeout_ms`
+   and `prompt_sha256` against the review's pinned configuration.
+6. Evidence state per question, as in E7 (clarification B): verification calls without an evidence
+   row, a non-U4 verification stage without an evidence row, and a purported U4 with calls or an
+   evidence row are `StageRecordInconsistentError`; a well-formed U4 with no evidence row and no
+   calls is valid and needs no evidence recheck. Then, for each evidence row, decode with the
+   review's snapshot and the planned question; the E3–E6 identities
+   (tenant, review, plan digest, snapshot, vendor, profile, configuration, `k`, `query_count`)
+   hold; the evidence digest equals every verification call's and the stage's.
+7. **Trusted evidence.** For each question with an evidence row, call
+   `recheck_evidence_in_transaction(session, actor, review.snapshot, result.items)` (M5e-J1) on the
+   reload's own session, inside the same read-only snapshot: a returned tuple equal to the decoded
+   items is success; a returned `SemanticOutcome` (`snapshot_inconsistent`) is
+   `StageRecordInconsistentError`; an `EvidenceRecheckFailure` is `StageDatabaseError`; a raised
+   `InvalidRetrievalRequestError` or `RetrievalScopeError` (impossible after decoding and the
+   reload's own tenant check) is `StageRecordInconsistentError`, and `PermissionDeniedError` cannot
+   occur because the role was checked first; process control propagates as the same object.
+8. Verification content: build `QuestionEvidence(tenant, review, snapshot_sha256, question,
+   result)` and call `recheck_verified(verified, evidence)`.
+9. Analysis: recompute the dependency digest from the owner stage row and plan digest and require
+   it on every analysis call and the stage; for S2 call `recheck_analyzed(analyzed, owner_rechecked,
+   question, shared=())`; U3 requires the owner `unresolved`.
+
+Any failure in 3–9 is `StageRecordInconsistentError`; database or session failures
+`StageDatabaseError`. **Not checked by persistence** (worker composition): template origin of
+`planned`, the request digests against reassembled requests, and the U5/U6 size assertions. **Not
+checkable at all after the fact:** the U4 oversized evidence bytes and their original binding
+assertion (E3–E6 at write time), because they were not persisted; the reload proves only the
+well-formed U4 shape and the planned question.
+
+##### M5e-J1. Extracted evidence-recheck helper (E5)
+
+[REC] **Module and name.** `evidenceguard_persistence.retrieval.recheck_evidence_in_transaction`,
+public, next to M5d's `capture_in_transaction`.
+
+```python
+def recheck_evidence_in_transaction(
+    session: Session,
+    actor: ActorContext,
+    snapshot: RetrievalSnapshot,
+    items: tuple[RetrievedChunk, ...],
+) -> tuple[RetrievedChunk, ...] | SemanticOutcome | EvidenceRecheckFailure: ...
+```
+
+- **Inputs.** `session` is a caller-owned SQLAlchemy `Session` (not a `FencedSession`; the reload is
+  not fenced). `actor` is an `ActorContext`; `snapshot` a `RetrievalSnapshot`; `items` a tuple of
+  0–20 (`MAX_K`) `RetrievedChunk` values with distinct chunk IDs, each item's `(revision_id,
+  document_id)` belonging to one snapshot binding.
+- **Return.** On success, the items rebuilt (each equal to its input); a `SemanticOutcome` (the
+  existing M4d value) for a semantic refusal; or `EvidenceRecheckFailure(category:
+  DatabaseFailureCategory)`, a new frozen value mirroring `CaptureFailure`, for an ordinary
+  operational failure (fixed category only; no exception, message, SQL, parameter or chain).
+- **Transaction ownership and preconditions.** The helper runs only `SELECT` statements through
+  `session.execute`; it never commits, rolls back, closes the session, sets isolation or sets a
+  timeout. Trusted preconditions it cannot verify: an active transaction at REPEATABLE READ whose
+  snapshot is already established, so its two statements read one snapshot (the reload's
+  `read_snapshot` transaction is REPEATABLE READ, READ ONLY with `statement_timeout` set by the
+  caller); the caller ends the transaction.
+- **Precedence (pure checks first, before any statement).** (1) actor type (`TypeError`, as every
+  M4d seam); (2) `snapshot` revalidated through `revalidate_snapshot` and `items` checked as above,
+  each rebuilt through the M4d revalidation (`InvalidRetrievalRequestError`); (3) role reviewer or
+  approver (`PermissionDeniedError`); (4) `actor.tenant_id == snapshot.tenant_id`
+  (`RetrievalScopeError`). These raise; they are not returned.
+- **Database checks, in order.** (5) **Bindings and profile:** the extracted step
+  `recheck_bindings(session, snapshot) -> None | SemanticOutcome` executes the existing
+  `BINDING_RECHECK_SQL` with `binding_parameters(snapshot)`: the tenant's vendor; each binding's
+  document of that vendor, activated revision, chunk set with the stored chunker version, chunk
+  count and manifest, ready index for the pinned profile with matching manifests, and the profile's
+  provider, model, algorithm version, dimensions, normalization and fingerprint. A count other than
+  the number of bindings is `snapshot_inconsistent`. (6) If `items` is empty, success. (7)
+  **Chunks:** the extracted step `load_snapshot_evidence(session, snapshot, chunk_ids) ->
+  dict[UUID, RetrievedEvidenceRow] | SemanticOutcome` executes the existing `EVIDENCE_SQL` (each
+  chunk through the full eligibility joins: tenant, vendor, bound revision, that binding's index
+  and chunker version, the embedding row, and a chunk whose `content_sha256` equals the embedding
+  row's) and requires exactly one row per requested ID, `sha256(text) == content_sha256`, and a
+  constructible `ChunkEvidence`; otherwise `snapshot_inconsistent`. `RetrievedEvidenceRow` holds
+  `revision_id`, `document_id` and the database-built `ChunkEvidence`. (8) **Comparison:** for every
+  item, `revision_id` and `document_id` equal the row's and `item.evidence == row.evidence`
+  (dataclass equality over text, content digest, ordinal, section path, table flag, body and header
+  spans, document key, title, revision number, version label, effective date, source type and
+  authenticity); any difference is `snapshot_inconsistent`. Ranks, hits, scores and `fused_score`
+  are not compared (they cannot be re-derived without re-running the queries).
+- **Failure normalization.** Any ordinary `Exception` during steps 5–8 (execute, fetch, iteration,
+  row access, value construction other than the M4d fixed error) is classified with the existing
+  `classify_database_failure` and returned as `EvidenceRecheckFailure`; the exception is not kept.
+  A fixed M4d `RetrievalError` from building a value is `snapshot_inconsistent`, as in M4d's
+  `_build`. Process control propagates as the same object. Nothing logs.
+- **M4d reuse with unchanged behaviour.** `_retrieval_body` replaces its inline binding statement
+  with `recheck_bindings` and its evidence statement and `_items` row checks with
+  `load_snapshot_evidence`; the SQL text, parameters, statement order (binding recheck, channels,
+  evidence), the `snapshot_inconsistent` outcomes and `run_read`'s failure boundary are unchanged, so
+  `retrieve_with_vectors`'s public signature, results and errors are unchanged. The existing M4d
+  tests run unmodified, and a statement-recording test pins the order.
+- **What it proves.** Consistency of the supplied evidence with trusted database rows within the
+  snapshot: the chunk exists in a bound, activated, indexed revision of the review's vendor under
+  the pinned profile, and its text and metadata equal the stored row. It does **not** prove
+  retrieval relevance, that the original queries were executed or produced this ranking,
+  entailment, document authenticity or injection resistance.
+
+##### M5e-K. Schema (migration `0007`, specified; not created)
+
+[REC] Four tables, all tenant-scoped. Types follow `0006`: `uuid`, `varchar(64)` digests with
+`~ '^[0-9a-f]{64}$'`, `varchar(14)` question IDs with `~ '^[A-Z][A-Z0-9]{1,9}-[0-9]{2,3}$'`,
+`varchar(64)` model IDs with `~ '^[a-z0-9][a-z0-9.-]{0,63}$'`, `timestamptz` defaulting to
+`clock_timestamp()`. Check names below are the suffixes after `ck_<table>_` (the naming
+convention). Foreign keys use the default `MATCH SIMPLE` (a composite reference with a null column
+is not checked) and no `ON DELETE` action (`NO ACTION`, as in `0006`); M5e has no delete path and
+no update other than the guarded call completion. The downgrade drops the four tables in reverse
+order.
+
+**`review_plan_questions`**
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `tenant_id`, `review_id`, `job_id` | `uuid` | not null |
+| `question_id` | `varchar(14)` | not null |
+| `position` | `smallint` | not null |
+| `question_sha256` | `varchar(64)` | not null |
+| `job_attempt` | `smallint` | not null |
+| `created_at` | `timestamptz` default `clock_timestamp()` | not null |
+
+- `pk_review_plan_questions (tenant_id, review_id, question_id)`;
+  `uq_review_plan_questions_position (tenant_id, review_id, position)`.
+- `fk_review_plan_questions_review (tenant_id, review_id) → reviews (tenant_id, id)`;
+  `fk_review_plan_questions_job (tenant_id, job_id) → jobs (tenant_id, id)`.
+- Checks: `question_id` (pattern); `position` `BETWEEN 0 AND 99`; `question_sha256` (hex);
+  `job_attempt` `BETWEEN 1 AND 10`.
+
+**`review_question_evidence`**
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `tenant_id`, `review_id`, `job_id` | `uuid` | not null |
+| `question_id` | `varchar(14)` | not null |
+| `question_sha256`, `snapshot_sha256`, `evidence_sha256` | `varchar(64)` | not null |
+| `evidence_canonical` | `text` | not null |
+| `item_count` | `smallint` | not null |
+| `job_attempt` | `smallint` | not null |
+| `created_at` | `timestamptz` default `clock_timestamp()` | not null |
+
+- `pk_review_question_evidence (tenant_id, review_id, question_id)`;
+  `uq_review_question_evidence_digest (tenant_id, review_id, question_id, evidence_sha256)`.
+- `fk_review_question_evidence_plan (tenant_id, review_id, question_id) → review_plan_questions`;
+  `fk_review_question_evidence_job (tenant_id, job_id) → jobs (tenant_id, id)`.
+- Checks: `question_sha256`, `snapshot_sha256`, `evidence_sha256` (hex); `item_count`
+  `BETWEEN 0 AND 20`; `evidence_ascii`
+  `octet_length(evidence_canonical) = char_length(evidence_canonical)`; `evidence_size`
+  `octet_length(evidence_canonical) BETWEEN 2 AND 4194304`; `job_attempt` `BETWEEN 1 AND 10`.
+
+**`review_stage_calls`**
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `tenant_id`, `review_id`, `job_id` | `uuid` | not null |
+| `question_id` | `varchar(14)` | not null |
+| `stage`, `call_kind`, `request_basis`, `state` | `varchar(16)` | not null |
+| `sequence` | `smallint` | not null |
+| `request_sha256`, `prompt_sha256` | `varchar(64)` | not null |
+| `model_requested` | `varchar(64)` | not null |
+| `max_output_tokens`, `timeout_ms` | `integer` | not null |
+| `job_attempt` | `smallint` | not null |
+| `started_at` | `timestamptz` default `clock_timestamp()` | not null |
+| `evidence_sha256`, `dependency_sha256` | `varchar(64)` | nullable |
+| `completed_at` | `timestamptz` | nullable |
+| `outcome`, `rejection_reason` | `varchar(32)` | nullable |
+| `dispatched` | `boolean` | nullable |
+| `model_used` | `varchar(64)` | nullable |
+| `input_tokens`, `output_tokens`, `latency_ms` | `integer` | nullable |
+| `rejection_item_index`, `rejection_citation_index`, `rejection_count` | `smallint` | nullable |
+
+- `pk_review_stage_calls (tenant_id, review_id, question_id, stage, sequence)`;
+  `uq_review_stage_calls_request (tenant_id, review_id, question_id, stage, sequence,
+  request_sha256)`; partial unique index `uq_review_stage_calls_one_repair` on
+  `(tenant_id, review_id, question_id, stage) WHERE call_kind = 'repair'`.
+- `fk_review_stage_calls_plan (tenant_id, review_id, question_id) → review_plan_questions`;
+  `fk_review_stage_calls_evidence (tenant_id, review_id, question_id, evidence_sha256) →
+  review_question_evidence (tenant_id, review_id, question_id, evidence_sha256)`;
+  `fk_review_stage_calls_job (tenant_id, job_id) → jobs (tenant_id, id)`.
+- Enumeration checks: `stage IN ('verification','analysis')`; `call_kind IN
+  ('initial','retry','repair')`; `request_basis IN ('original','repaired')`; `state IN
+  ('started','completed')`; `outcome` null or one of the eight `CallOutcome` values;
+  `rejection_reason` null or one of the fourteen `RejectionReason` values.
+- Pattern and range checks: `question_id`, `model_requested`, `model_used` (null or pattern);
+  `request_sha256`, `prompt_sha256`, `evidence_sha256`, `dependency_sha256` (null or hex);
+  `sequence BETWEEN 1 AND 3`; `max_output_tokens BETWEEN 1 AND 8192`; `timeout_ms BETWEEN 1000 AND
+  120000`; `job_attempt BETWEEN 1 AND 10`; `input_tokens`, `output_tokens` `BETWEEN 0 AND
+  10000000`; `latency_ms BETWEEN 0 AND 86400000`; `rejection_item_index BETWEEN 0 AND 19`;
+  `rejection_citation_index BETWEEN 0 AND 7`; `rejection_count BETWEEN 1 AND 80`.
+- `initial_sequence`: `(sequence = 1) = (call_kind = 'initial')`. `initial_basis`:
+  `call_kind <> 'initial' OR request_basis = 'original'`. `repair_basis`:
+  `call_kind <> 'repair' OR request_basis = 'repaired'`.
+- `stage_refs`: `(evidence_sha256 IS NOT NULL) = (stage = 'verification') AND
+  (dependency_sha256 IS NOT NULL) = (stage = 'analysis')`.
+- `started_shape`: `state <> 'started' OR (completed_at IS NULL AND outcome IS NULL AND dispatched
+  IS NULL AND model_used IS NULL AND input_tokens IS NULL AND output_tokens IS NULL AND latency_ms
+  IS NULL AND rejection_reason IS NULL AND rejection_item_index IS NULL AND
+  rejection_citation_index IS NULL AND rejection_count IS NULL)`.
+- `completed_shape`: `state <> 'completed' OR (completed_at IS NOT NULL AND outcome IS NOT NULL AND
+  dispatched IS NOT NULL)`. No check compares `completed_at` with `started_at` or any other
+  timestamp: they are wall-clock audit values (V12), and the completion update sets `completed_at
+  = clock_timestamp()` whatever the clock reads.
+- `response_pair`: `(model_used IS NULL) = (input_tokens IS NULL) AND (model_used IS NULL) =
+  (output_tokens IS NULL)`.
+- `outcome_shape`: `outcome IS NULL OR (outcome IN ('completed','refusal','max_tokens',
+  'unexpected_stop','invalid_output') AND dispatched AND model_used IS NOT NULL AND model_used =
+  model_requested) OR (outcome = 'model_mismatch' AND dispatched AND model_used IS NOT NULL AND
+  model_used <> model_requested) OR (outcome = 'timeout' AND dispatched AND model_used IS NULL) OR
+  (outcome = 'provider_failed' AND model_used IS NULL AND (dispatched OR latency_ms IS NULL))`.
+- `rejection_shape`: `(rejection_reason IS NULL) = (rejection_count IS NULL) AND (rejection_reason
+  IS NULL OR outcome = 'completed') AND (rejection_reason IS NOT NULL OR (rejection_item_index IS
+  NULL AND rejection_citation_index IS NULL))`.
+- `rejection_stage`: `rejection_reason IS NULL OR (stage = 'verification') = (rejection_reason IN
+  ('chunk_not_retrieved','quote_blank','quote_not_found','quote_too_long','quote_not_exact',
+  'claim_uncited','verdict_unsupported','rationale_blank'))`.
+
+**`review_stage_results`**
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `tenant_id`, `review_id`, `job_id` | `uuid` | not null |
+| `question_id` | `varchar(14)` | not null |
+| `stage` | `varchar(16)` | not null |
+| `outcome` | `varchar(16)` | not null |
+| `job_attempt` | `smallint` | not null |
+| `committed_at` | `timestamptz` default `clock_timestamp()` | not null |
+| `unresolved_reason` | `varchar(32)` | nullable |
+| `call_sequence` | `smallint` | nullable |
+| `request_sha256`, `evidence_sha256`, `dependency_sha256`, `content_sha256` | `varchar(64)` | nullable |
+| `content_canonical` | `text` | nullable |
+
+- `pk_review_stage_results (tenant_id, review_id, question_id, stage)`.
+- `fk_review_stage_results_plan (tenant_id, review_id, question_id) → review_plan_questions`;
+  `fk_review_stage_results_call (tenant_id, review_id, question_id, stage, call_sequence,
+  request_sha256) → review_stage_calls (… uq_review_stage_calls_request)`;
+  `fk_review_stage_results_evidence (tenant_id, review_id, question_id, evidence_sha256) →
+  review_question_evidence (tenant_id, review_id, question_id, evidence_sha256)`;
+  `fk_review_stage_results_job (tenant_id, job_id) → jobs (tenant_id, id)`.
+- Enumeration and range checks: `stage` as above; `outcome IN ('verified','analyzed',
+  'unresolved')`; `unresolved_reason` null or one of the thirteen `UnresolvedReason` values;
+  `call_sequence BETWEEN 1 AND 3`; digests (null or hex); `question_id` (pattern); `job_attempt
+  BETWEEN 1 AND 10`.
+- `stage_outcome`: `(stage = 'verification' AND outcome IN ('verified','unresolved')) OR
+  (stage = 'analysis' AND outcome IN ('analyzed','unresolved'))`.
+- `reason_present`: `(outcome = 'unresolved') = (unresolved_reason IS NOT NULL)`.
+- `content`: `(outcome <> 'unresolved') = (content_canonical IS NOT NULL) AND
+  (content_canonical IS NULL) = (content_sha256 IS NULL)`.
+- `call_ref`: `(call_sequence IS NULL) = (request_sha256 IS NULL) AND (call_sequence IS NULL) =
+  (outcome = 'unresolved' AND unresolved_reason IN ('request_too_large','evidence_too_large',
+  'verification_unresolved'))`.
+- `evidence_ref`: `(evidence_sha256 IS NOT NULL) = (stage = 'verification' AND
+  coalesce(unresolved_reason, '') <> 'evidence_too_large')`.
+- `dependency_ref`: `(dependency_sha256 IS NOT NULL) = (stage = 'analysis')`.
+- `stage_reason`: `coalesce(unresolved_reason, '') NOT IN ('evidence_too_large') OR stage =
+  'verification'` and `coalesce(unresolved_reason, '') NOT IN ('verification_unresolved') OR stage
+  = 'analysis'`.
+- `content_ascii`: `content_canonical IS NULL OR octet_length(content_canonical) =
+  char_length(content_canonical)`. `content_size`: `content_canonical IS NULL OR (stage =
+  'verification' AND octet_length(content_canonical) <= 2097152) OR (stage = 'analysis' AND
+  octet_length(content_canonical) <= 4194304)`.
+
+**Guarantee layers.**
+
+| Layer | What it covers |
+| --- | --- |
+| Database | keys and uniqueness; at most 100 planned questions per review (`position` 0–99, unique) and therefore at most 100 evidence rows, 200 stage rows and 600 call rows (every row references a planned question; at most 3 sequences and one repair per stage); planned-question membership; the stage's call reference including its request digest; verification evidence references; enumerations, patterns, ranges, ASCII and size caps; started/completed and ADR-0019 field combinations; the shape columns of M5e-C. **Not** timestamp ordering (V12) |
+| Write time | fence association and the two ownership rechecks; `StageHistory` V1–V12 and the plan; the shared evidence sequence E1–E8 (also for U4); the shared completion binding rule B1–B9, applied on first completion and on replay; the mutation preconditions M1–M3; configuration binding against the review row; dependency derivation; replay comparison; the integer admission range; content encoding |
+| Reload | everything in M5e-J: bounded decoding with the integer magnitude check and digests, V1–V12 with the job's attempt, shapes against history and dependencies, pinned settings, the E3–E6 identities of stored evidence, `recheck_evidence_in_transaction` (M5e-J1), `recheck_verified` and `recheck_analyzed` |
+| Trusted caller (M5g worker composition) | template origin of the planned set; request reassembly and digest equality before every dispatch or retry; the M5c `RepairReason` built from stored fields with public factories; the U5/U6 size assertions; owner values from a trusted path; the output slice (M5e-L) |
+| Not checkable after the write | the U4 binding (oversized evidence is not stored); original retrieval execution, relevance and ranking; template origin |
+
+**Locks and races.** Lock order: the fence's job row (`FOR UPDATE`, `lock_timeout`), then only M5e
+rows read or inserted and the `FOR KEY SHARE` locks of foreign-key checks; no M5e statement locks
+`reviews`, revisions or chunks for update. Concurrent allocation and replay are serialized by the
+single job row lock (E12); a writer that bypassed the fence would meet the keys or the one-repair
+index (`StageConflictError`). The reload takes no locks beyond its reads.
+
+##### M5e-L. Output requirement carried to M5f and M5g (E7 scope decision, approved in Prompt 198)
+
+[DECISION] (scope only, approved at external review in Prompt 198; accepted with the whole M5e
+specification in Prompt 199, and binding on M5f/M5g; historically, until Prompt 199 the rest of M5e
+remained proposed) **M5e defines no output table, value or writer**, and `0007` contains none. The
+Correction D output requirement **remains binding**, and M5f/M5g must review the output schema and
+its atomic output-plus-job-success writer **before completion is enabled**. It is allocated as
+follows:
+
+- **M5f** reviews the report-content representation required by the report-integrity invariant
+  (preserved Verification statuses, accepted quotes and unresolved reasons, the M1
+  `evidenceguard.report-content.v1` schema unchanged and any wrapper versioned), its canonical
+  encoding, its validation and its construction from `TrustedStages`.
+- **M5g** (or M5f if it is reviewed together) reviews the concrete output table in a later additive
+  migration (never by changing `0007`), its bounded columns and digests, its atomic writer inside
+  `fenced(finish=True)` with M3 recording `succeeded` in the same transaction, the completeness rule
+  (every planned question has a committed verification stage and an analysis stage, S1/S2 or
+  U1–U6), its replay rules, and the read-time review status projection (W15: `completed` iff the
+  output row exists).
+- **M5e provides** to that work: `TrustedStages`, the stage records and their canonical digests, the
+  plan digests and the fixed unresolved reasons. Until the output slice exists, no review can become
+  `completed`.
+
+##### M5e-M. Planned verification (specification only; not written or run)
+
+- **Planner (unit, no database):** exhaustive enumeration of every call sequence up to 3 over all
+  kinds, outcomes, rejection mappings, states and attempt assignments, checking each result against
+  T0–T9; the **same started history** yielding `PlanInFlight` at `current_attempt = 1` and a retry
+  at `current_attempt = 2` (and `call_abandoned` at sequence 3); every budget boundary (third
+  reservation after `timeout`, `provider_failed`, `invalid_output`, rejection and abandonment; a
+  rejection then an invalid output after the repair; an abandoned repair at sequences 2 and 3);
+  every invalid history (each of V1–V12 violated alone: mixed identity, a gap, a future attempt,
+  decreasing attempts, a `started` non-last call from the same attempt as its successor, a wrong
+  kind or basis, two repairs, a retry with a different digest, a repaired digest equal to the
+  original, mixed settings, a success not last or uncommitted, a rejection on another outcome, each
+  unresolved shape with an incompatible history) raising `InvalidStageHistoryError`.
+- **Values and encodings (unit):** every field bound, exact type and cross-field rule; each M5e-C
+  shape constructed and every one-field deviation refused; canonical bytes and digests pinned with
+  independently computed literals for all five schemas; float strings for ordinary, subnormal,
+  `-0.0` and extreme finite values, and non-canonical spellings refused; decoding refuses
+  oversize input before parsing, non-ASCII bytes, duplicate keys, unknown and missing keys, JSON
+  floats and constants, a sign, 11-digit integers, **2,147,483,648 and 9,007,199,254,740,992
+  (ten and sixteen digits, rejected by magnitude)**, deep nesting, non-canonical bytes and a wrong
+  digest; integer boundaries 0 and 2,147,483,647 accepted for every integer field; an
+  `EvidenceRecord` or `StageRecord` holding an inherited `SourceSpan` field, `revision_no` or quote
+  source offset of 2,147,483,648 refused with `InvalidStageValueError` (and
+  `InvalidStageRequestError` at the write API) although the M4d/M5b constructors accept it; the
+  maximal verified and analyzed objects of M5e-B2 encoding to exactly 1,135,720 and 3,090,153 bytes;
+  an oversized `EvidenceRecord` is valid with `fits_storage` false; a `CallRecord` whose
+  `completed_at` is earlier than its `started_at` is accepted (clock regression).
+- **Domain boundary (unit):** an import-graph test that `evidenceguard_domain.review_stages` imports
+  no `evidenceguard_agents` module, also lazily; `CallRejection` exposes only its fields,
+  `from_rejection` and `to_rejection`, and `to_rejection` round-trips each M5b reason with its
+  positions and count; in the worker composition (later M5g test), `RepairReason.from_rejection` and
+  `RepairReason.invalid_output` built from stored calls equal the reasons M5c builds from the
+  original `ProvenanceRejection`, for both stages.
+- **PostgreSQL:** a stale token for each write class (plan, evidence, reservation, failed completion,
+  verified commit, analyzed commit, unresolved commit) changes nothing; **lease expiry during a lock
+  wait** (a second transaction holding a conflicting lock on a referenced row past the lease, so the
+  final `recheck_ownership` raises `LeaseLostError` and nothing commits); reservation allocation
+  identity (a second `reserve_call` for the same sequence refused, a retry with the predecessor's
+  digest accepted at the next sequence, a mismatched kind, basis or digest refused); **identical
+  completion replay after reclaim** (attempt 2 replays attempt 1's committed success and failed
+  completion as no-ops) and **different completion replay** refused with `StageConflictError`;
+  completion of an abandoned call refused; the review's named binding cases on both first
+  completion and replay — (a) a result naming another question with the original digest →
+  `StageBindingError` at B4, (b) a rejection naming another question with otherwise identical fields
+  → `StageBindingError` at B6, (c) success replay with content of another tenant, review, question,
+  request or snapshot → `StageBindingError` at B7, with a foreign or non-matching owner →
+  `StageDependencyError` at B8, with a malformed value → `InvalidStageRequestError` at B1 — each
+  leaving the stored rows byte-identical; **explicit completion identity (clarification A)**:
+  `commit_verified` and `commit_analyzed` called with the explicit `question_id` of an existing
+  reservation select that row, and a result whose `question_id` names another planned question that
+  itself has a matching reservation at the same sequence still fails at B4 (never selecting the
+  other row), content naming another question fails at B7 and an owner naming another question fails
+  at B8, with an unknown explicit `question_id` refused at B3 (`StagePlanMismatchError`); a
+  rejection whose stage does not match the call refused at B6; the shared evidence sequence for `record_evidence` and U4 alike (wrong tenant or review,
+  unplanned question, changed question digest, another snapshot, vendor, profile or retrieval
+  configuration, wrong `k`, wrong `query_count`), with an oversized record refused at the same check
+  as a storable one and U4 refused for a storable record; **U4 replay and evidence state
+  (clarification B)**: a committed U4 reloads as valid with no evidence row and no calls, an
+  identical U4 request is a no-op that writes nothing, a U4 request against a stage with another
+  outcome or reason is `StageConflictError`, `record_evidence` after U4 is `StageConflictError` and
+  leaves no evidence row, and tampered rows (verification calls without evidence, a non-U4
+  verification stage without evidence, a U4 with a call or an evidence row) are
+  `StageRecordInconsistentError` both at E7 in the write APIs and in the reload; each unresolved shape U1–U6 committed and reloaded, and
+  each refused against an incompatible history; pre-dispatch oversized evidence, request and repair
+  request (no reservation, no repair row); dependency mismatch (missing, unresolved, foreign or
+  digest-changed owner); configuration mismatch for model, prompt, `max_output_tokens`, system text
+  and **`timeout_ms` with an otherwise equal M5a request digest**; storage overflow refused by the
+  database checks with hand-written rows; a failed analysis leaving the committed verification
+  byte-identical; atomic success (an injected failure after the call update leaves the call
+  `started` once the error escapes the fence); a suppressed error inside the fence documented by a
+  test that shows the partial effect, as the caller-obligation warning; tampered rows for each table
+  and each reload check; `recheck_evidence_in_transaction` precedence (actor type, invalid snapshot
+  or items, role, tenant) before any statement, `snapshot_inconsistent` for a binding no longer
+  matching, a missing chunk, a chunk outside the snapshot or another binding's index, a changed text,
+  digest, span, ordinal, section path, title, document key, revision number, version label,
+  effective date, source type or authenticity, and a changed revision or document ID; an
+  `EvidenceRecheckFailure` for an injected statement failure; process-control identity; no
+  commit, rollback or close on the caller's session; the M4d retrieval suite unchanged and a
+  statement-order pin for `retrieve_with_vectors` after the extraction; migration `0007` upgrade, downgrade, `alembic check` and every constraint name; production
+  isolation (`run_review` still unregistered).
+- **Process control (unit and PostgreSQL):** a process-control exception from `call_validated` in a
+  scripted M5g-shaped harness propagates as the same object without a `ctx.check()` replacing it;
+  cancellation latched before a returned outcome or an ordinary exception wins over classification;
+  first process-control identity through reload cleanup.
+- **Installed wheel (proposed, not written):** one additive line asserting that the offline
+  migration SQL contains `CREATE TABLE review_stage_calls` and that `plan_stage` on a scripted
+  history (initial `invalid_output`, then a `started` repair from attempt 1 with
+  `current_attempt = 2`) returns `PlanDispatch` with `call_kind = retry`, basis `repaired` and
+  sequence 3.
+- Controlled crash scenarios (with M5g's later test-only hooks) are single scenarios, not
+  exactly-once guarantees (W5).
+
+##### M5e-N. Reviewer decisions
+
+**All twenty decisions were accepted at external review in Prompt 199** with the M5e
+specification as a whole, under clarifications A and B ([M5e acceptance](#m5e-acceptance-prompt-199));
+no decision remains open. Historical status words, kept as review history: *supported* = direction
+supported by the reviewer (Prompt 197 or 198) while the text was under review; *approved* = a
+specific scope decision approved at review (E7, Prompt 198); *open* = awaiting a decision until
+Prompt 199. None of those earlier states accepted the specification as a whole.
+
+1. **E1 Domain plus persistence split** (*accepted*, Prompt 199; historically *supported*, Prompt 197). Values, encodings, `StageHistory` and
+   `plan_stage` in a pure domain module; SQL in persistence. *Tradeoff:* a pure, exhaustively
+   testable budget rule versus one more module.
+2. **E2 Caller-owned fenced writes** (*accepted*, Prompt 199; historically *supported*, Prompt 197). Writes compose into the caller's fence through
+   the existing `HandlerFence`/`Fence` attributes and never commit, roll back or retry; failed
+   operations must escape the fence. *Tradeoff:* M5g controls the transaction boundaries versus a
+   caller obligation not to suppress errors.
+3. **E3 Abandonment by attempt number** (*accepted*, Prompt 199; historically *supported*, Prompt 197). Derived from `job_attempt` below the canonical
+   job's current attempt, with `current_attempt` an explicit `StageHistory` field. *Tradeoff:* no
+   write on a dead attempt's row versus an explicit state.
+4. **E4 Provenance rejections and the repair** (*accepted*, Prompt 199; historically *supported*, Prompt 197). A rejection uses the same single
+   repair as `invalid_output` (T7/T8, M5b P8); no extra allowance and no budget reset.
+5. **E5 Persisted evidence with a database recheck** (*accepted*, Prompt 199; historically *supported*, with the
+   extraction chosen by the reviewer in Prompt 198). Store each question's evidence canonically and re-prove it in the reload
+   snapshot through the extracted public `recheck_evidence_in_transaction` (M5e-J1), which M4d
+   retrieval reuses without behaviour change; no duplicated checks. Its exact contract (M5e-J1) is
+   accepted.
+6. **E6 Canonical text storage** (*accepted*, Prompt 199; historically *supported*, Prompt 197). ASCII `text` with recomputed digests and exact
+   decoding rules (M5e-B2). *Tradeoff:* exact bytes versus database-side querying.
+7. **E7 Output table and writer deferred** (*approved*, Prompt 198, as a scope decision; accepted with
+   the specification in Prompt 199 and binding on M5f/M5g). No output
+   in M5e or `0007`; the requirement stays binding; M5f/M5g review the schema and the atomic
+   output-plus-job-success writer before completion is enabled (M5e-L). The M5 sequence row and
+   Correction D record the amendment.
+8. **E8 No internal retry** (*accepted*, Prompt 199; historically *supported*, Prompt 197). Failures propagate to M5g's job-level retry.
+9. **E9 Dependency digest** (*accepted*, Prompt 199; historically *supported*, Prompt 197). Analysis binds the owner verification's outcome, content
+   digest and plan digest (`shared` empty, P9), stored on analysis calls and stages.
+10. **E10 Unresolved reasons** (*accepted*, Prompt 199; historically *supported*, Prompt 198). The thirteen codes in M5e-B, including
+    the three pre-dispatch reasons and the M5b-F mapping for rejections; the call record keeps the
+    exact M5b reason.
+11. **E11 Limits** (*accepted*, Prompt 199, as engineering limits; historically *open*). Caps 2 MiB verified, 4 MiB analyzed and
+    4 MiB evidence, with exact upper bounds of admitted content (1,135,720 and 3,090,153 bytes) in
+    M5e-B2 and `evidence_too_large` for legitimate oversize; `job_attempt` ≤ 10
+    (`MAX_MAX_ATTEMPTS`). *Tradeoff:* bounded rows versus large worst-case rows. The caps are
+    accepted engineering limits, not measured performance or memory guarantees, and the
+    maximum-size literals still require independent implementation tests.
+12. **E12 Single-job serialization** (*accepted*, Prompt 199; historically *supported*, Prompt 197). The fence's job lock plus keys, with no review row
+    lock. *Tradeoff:* fewer locks versus defence-in-depth against a fence bypass.
+13. **E13 Stored plan binding** (*accepted*, Prompt 199; historically *supported*, Prompt 198). `review_plan_questions` stores question
+    IDs, positions and digests once, giving a database bound of 100 questions and cross-attempt
+    consistency; template origin stays a worker obligation.
+14. **E14 Pre-dispatch refusal shapes** (*accepted*, Prompt 199; historically *supported*, Prompt 198). `request_too_large`,
+    `repair_request_too_large` and `evidence_too_large` as unresolved shapes U4–U6 without
+    reservations; U4 now runs the full shared evidence binding before the size decision.
+    **Clarification B (Prompt 199):** a well-formed U4 has no evidence row and no calls, is
+    valid at E7 and in the reload, replays identically as a no-op and is closed to
+    `record_evidence` (`StageConflictError`); a U4 with calls or an evidence row is inconsistent.
+15. **E15 Request binding by value** (*accepted*, Prompt 199; historically *supported*, Prompt 198). `reserve_call` takes the
+    `StructuredRequest` and checks model, prompt, system-text digest, `max_output_tokens` and
+    `timeout_ms` against the review row, storing the settings on the call.
+16. **E16 Allocation not replayable** (*accepted*, Prompt 199; historically *supported*, Prompt 198). Allocation identity is the planned
+    sequence; no idempotency key.
+17. **E17 Completion binding on replay** (*accepted*, Prompt 199; historically *open*, new in Prompt 198). One binding rule B1–B9 for first completion
+    and replay, so replay skips only mutation preconditions, with the fixed outcomes in M5e-E.
+    **Clarification A (Prompt 199):** the success APIs take an explicit `question_id` and a
+    fixed stage, and B3 selects the call from them, never from the result or the content.
+    *Tradeoff:* a few extra comparisons on replay versus a replay that could accept another
+    question's result.
+18. **E18 Integer admission range** (*accepted*, Prompt 199; historically *open*, new in Prompt 198). Canonical integers 0…2,147,483,647 with lexical
+    and magnitude checks; inherited unbounded integers above that are refused
+    (`InvalidStageValueError`), justified by their PostgreSQL `integer` sources. *Alternative:* a
+    string encoding for arbitrary integers. *Tradeoff:* a narrower admission contract versus a
+    lossless but more complex format for values the database cannot hold.
+19. **E19 Timestamps as audit values** (*accepted*, Prompt 199; historically *open*, new in Prompt 198). No ordering of `clock_timestamp()` readings is
+    an admission requirement; `sequence` and `job_attempt` alone order calls and decide abandonment.
+    *Tradeoff:* no detection of clock anomalies versus no spurious failure of a valid completion.
+20. **E20 Domain/agents boundary** (*accepted*, Prompt 199; historically *open*, new in Prompt 198). `CallRejection` is a pure domain value with
+    `from_rejection`/`to_rejection`; the worker builds M5c's `RepairReason` with
+    `RepairReason.from_rejection` or `RepairReason.invalid_output`. *Tradeoff:* one more composition
+    step in M5g versus a forbidden upward import.
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.

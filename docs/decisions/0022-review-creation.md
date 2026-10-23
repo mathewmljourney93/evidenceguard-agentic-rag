@@ -6,7 +6,8 @@
   [External review (Prompt 191)](#external-review-prompt-191)). Historical: until Prompt 191 the
   implementation was staged and implementation acceptance was pending, and at that acceptance
   publication, Linux verification, PostgreSQL execution and current-version CI were pending.
-  **Since then:** feature branch `1bea3731` was published (Prompt 192); Ubuntu and Windows verify passed; PostgreSQL executed and failed three tests; the test corrections were staged (Prompt 193) and accepted for a corrective commit and feature publication (Prompt 194); their PostgreSQL and CI verification remain pending, and main publication remains blocked (see
+  **Since then:** feature branch `1bea3731` was published (Prompt 192); Ubuntu and Windows verify passed; PostgreSQL executed and failed three tests; the test corrections were staged (Prompt 193), committed as `1efe3ed3` and published to the feature branch (Prompt 194), where all five jobs passed; `main` was fast-forwarded to `1efe3ed3` (Prompt 195), and M5d is **reviewed, verified in CI and on `main` at `1efe3ed3`** (feature and main execution evidence independently retrieved by the external reviewer; the main integration job's top-level API status stayed `in_progress` with no conclusion although its steps, its complete log and its parent run succeeded). Historical: until Prompt 196 the corrections' PostgreSQL and CI verification were pending and main publication was blocked (see
+  [Feature and main CI evidence](#feature-and-main-ci-evidence-at-1efe3ed3-prompts-194196),
   [Exact-commit CI and PostgreSQL test corrections](#exact-commit-ci-at-1bea3731-and-postgresql-test-corrections-prompts-192193) and
   [External review (Prompt 194)](#external-review-prompt-194)). No endpoint, CLI command, handler,
   setting, production registry entry or production enqueue path uses M5d: creation and reload are
@@ -336,6 +337,67 @@ by three) and 3,637 non-integration tests (3,974). **PostgreSQL: not run** — t
 new database tests are written but unexecuted; local skips prove nothing about them. No build or
 installed-wheel check was repeated: production and packaging blobs are unchanged, and the passing
 `1bea3731` verify jobs remain the exact-commit evidence for that published version.
+
+## Feature and main CI evidence at `1efe3ed3` (Prompts 194–196)
+
+**Commit and publication.** The Prompt 193 test corrections were committed as
+`1efe3ed3f0aa9697ce4e71cee295293a89c94909` (parent `1bea3731`, test and documentation paths only;
+production blobs unchanged from `755c13a7`) and pushed to `feat/review-creation` in Prompt 194. In
+Prompt 195 `main` was fast-forwarded from `e8d1033c` to that exact commit and pushed once; local
+`main`, `origin/main`, remote `main` and remote `feat/review-creation` all equal `1efe3ed3`.
+
+**Attribution.** Claude Code observed only the API run, job and step conclusions (Prompts 194 and
+195); every job-log download returned HTTP 403. The external reviewer independently retrieved
+both runs' records, all five jobs' metadata and logs for each push, and the remote refs (recorded
+in Prompts 195 and 196). The counts and log contents below are the reviewer's; the reviewer ran no
+local project suite, PostgreSQL, Docker, build or installed-wheel check.
+
+**Feature push** (branch `feat/review-creation`, event `push`, attempt 1): [ci 39820256668](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256668)
+and [secret-scan 39820256982](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256982), both success.
+
+| Job | Reviewer-observed result |
+| --- | --- |
+| [verify (ubuntu-24.04)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256668/job/119969360247) | 3637 passed, 337 skipped; all required steps succeeded |
+| [verify (windows-2025)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256668/job/119969360432) | 3636 passed, 338 skipped; all required steps succeeded |
+| [integration (PostgreSQL 17 + pgvector)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256668/job/119969360046) | 337 passed, 3637 deselected; all 28 `tests/test_reviews_postgres.py` cases passed (including tenant isolation, both concurrent-replacement outcomes, committed-review preservation and pooled-connection defaults) |
+| [container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256668/job/119969360253) | success |
+| [Gitleaks](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39820256982/job/119969360933) | 84 commits scanned, no leaks |
+
+**Main push** (branch `main`, event `push`, attempt 1): [ci 39829966665](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966665)
+(completed, success) and [secret-scan 39829966442](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966442) (completed, success).
+
+| Job | Reviewer-observed result |
+| --- | --- |
+| [verify (ubuntu-24.04)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966665/job/120003190220) | 3637 passed, 337 skipped |
+| [verify (windows-2025)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966665/job/120003190187) | 3636 passed, 338 skipped |
+| [integration (PostgreSQL 17 + pgvector)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966665/job/120003190247) | 337 passed, 3637 deselected in 212.47s; all 28 review-creation PostgreSQL cases passed; container cleanup completed |
+| [container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966665/job/120003190427) | smoke succeeded |
+| [Gitleaks](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/39829966442/job/120003188646) | 84 commits scanned, no leaks |
+
+**Main integration API status inconsistency (unresolved).** Through Claude Code's last check
+(18:41:37Z on 2026-10-22) and in the reviewer's retrieval, the main integration job and its check
+run reported `status: in_progress`, `conclusion: null` and no completion time, while every listed
+step was `completed/success`, the parent workflow run was `completed/success` and the complete log
+showed the successful pytest summary and container cleanup. The reviewer decided in Prompt 196
+that the successful log, steps and parent run are sufficient execution evidence; the top-level API
+conclusion is **not** recorded as success.
+
+**Logs (both verify jobs, both pushes, reviewer-observed).** Each printed
+`production registry: ingest_revision, index_revision` and the nine installed-wheel result lines
+listed in the 1bea3731 section above, including "offline review migration SQL rendered from the
+installed wheel". The main container log reported: effective build context 109 files with 19
+planted fixtures excluded; database healthy, migration completed and API healthy; migration, API
+and worker used the CI-built image; upload 202, ingestion succeeded with an active revision and two
+verified chunks; duplicate upload 200 with the existing revision; one offline backfill indexing
+job and a ready index with two embeddings; idle worker exit 0 without OOM; smoke succeeded. These
+are the smoke's reported checks; it does not exercise M5d review creation. The Recall line is
+arithmetic and the Voyage line mocked; nothing here establishes live-model quality, injection
+resistance or production readiness.
+
+**Status.** M5d is reviewed, verified in CI and on `main` at `1efe3ed3`. No application review
+path uses it and `run_review` remains unregistered. The M4d trusted-snapshot limitation stays open
+until the later orchestration (M5g) obtains its snapshot solely through the trusted reload; the
+cleanup/invalidation and unknown-`COMMIT` limitations remain; overall M5 acceptance is pending.
 
 ## External review (Prompt 194)
 

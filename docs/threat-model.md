@@ -391,7 +391,7 @@ acceptance. Residual risks once implemented:
 
 The settled decisions, details and the unresolved external API facts are listed in the plan.
 
-## Review workflow (M5: sequence and M5a–M5d specifications accepted; M5a, M5b and M5c on main; M5d accepted for a local commit, CI pending)
+## Review workflow (M5: sequence and M5a–M5e specifications accepted; M5a, M5b and M5c on main; M5d on main; M5e implementation pending)
 
 The [M5 implementation sequence](plan.md#m5-implementation-sequence-accepted-at-review-prompt-170)
 and the [M5a specification](plan.md#m5a-model-call-contracts-and-scripted-fake-provider-accepted-at-review-prompt-170-implementation-pending)
@@ -487,12 +487,19 @@ which remains M5g's obligation.
 **Specified M5d controls (proposed in Prompt 185, revised in Prompts 186–187, specification
 accepted at external review in Prompt 188 with a binding cleanup clarification; implemented
 in Prompt 189, corrected in Prompt 190 after external review, test-corrected and accepted at
-external review in Prompt 191 for a local commit only; feature CI at `1bea3731` failed on three
-PostgreSQL tests, and test-only corrections were accepted for a corrective commit and feature
-publication (Prompts 192–194), with their PostgreSQL and CI verification and main publication
-pending; no production path uses them, so none operates in the application).** See
+external review in Prompt 191 for a local commit only; after feature CI at `1bea3731` failed on
+three PostgreSQL tests and test-only corrections followed, reviewed, verified in CI and on `main`
+at `1efe3ed3` (Prompts 194–196; the main integration job's top-level API status remained
+unresolved although its steps, log and parent run succeeded); no production path uses them, so
+none operates in the application).** The M5e persistence controls are
+[specified and accepted](plan.md#m5e-stage-and-call-reservation-persistence-specification-accepted-at-review-prompt-199-implementation-pending)
+(proposed in Prompt 196, corrected in Prompts 197–198, accepted at external review in Prompt 199
+with two binding clarifications; [acceptance record](plan.md#m5e-acceptance-prompt-199)), but
+their implementation is pending and none exists or operates; no application review path,
+`run_review` registration or live provider is added, and M5f–M5h and overall M5 acceptance remain
+pending. See
 [ADR-0022](decisions/0022-review-creation.md) and the
-[implementation status](plan.md#m5d-implementation-status-accepted-for-a-local-commit-prompt-191-ci-pending). The
+[implementation status](plan.md#m5d-implementation-status-reviewed-verified-in-ci-and-on-main-at-1efe3ed3). The
 [M5d specification](plan.md#m5d-composable-capture-and-atomic-review-creation-specification-accepted-at-review-prompt-188-implementation-pending)
 specifies one REPEATABLE READ, READ WRITE creation transaction whose visibility follows the MVCC
 snapshot established by its first data statement (the `clock_timestamp()` read, whose value is
