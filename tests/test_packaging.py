@@ -341,7 +341,12 @@ def test_m5b_provenance_uses_only_the_domain_and_the_standard_library() -> None:
 
 def test_m5b_is_not_wired_into_any_application_or_handler() -> None:
     """M5b adds no handler, endpoint, command or persistence use; later slices own that. The
-    accepted M5c request assembly (M5c-B) is the only agents module that may use its values."""
+    accepted M5c request assembly (M5c-B) is the only agents module that may use its values,
+    and the accepted M5e stage persistence (M5e-A) the only persistence module."""
+    allowed = {
+        (evidenceguard_agents, "assembly.py"),
+        (evidenceguard_persistence, "review_stages.py"),
+    }
     for package in (
         evidenceguard_agents,
         evidenceguard_api,
@@ -352,7 +357,7 @@ def test_m5b_is_not_wired_into_any_application_or_handler() -> None:
     ):
         assert package.__file__ is not None
         for source in Path(package.__file__).parent.rglob("*.py"):
-            if package is evidenceguard_agents and source.name == "assembly.py":
+            if (package, source.name) in allowed:
                 continue
             assert "provenance" not in source.read_text(encoding="utf-8"), source.name
 
@@ -509,3 +514,98 @@ def test_m5d_creation_is_not_wired_into_any_route_command_or_runtime_path() -> N
         assert "review_seams" not in text and "persistence.reviews" not in text, source.name
         assert "run_review" not in text, source.name
     assert "run_review" not in production_registry().kinds
+
+
+# --- M5e (ADR-0023) ------------------------------------------------------------------------------
+
+M5E_FORBIDDEN = {"os", "pathlib", "io", "socket", "ssl", "http", "urllib", "logging", "time"}
+
+
+def _domain_imports(path: Path) -> set[str]:
+    """Every ``evidenceguard_domain`` module imported anywhere in ``path``, including local or
+    deferred imports inside functions (``ast.walk`` visits every node)."""
+    return {
+        node.module
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8")))
+        if isinstance(node, ast.ImportFrom)
+        and node.module
+        and node.module.startswith("evidenceguard_domain")
+    }
+
+
+def test_m5e_domain_module_imports_only_the_accepted_domain_modules() -> None:
+    """M5e-A: the pure module imports only the standard library and the domain (``model_calls``,
+    ``provenance``, ``retrieval``, ``evidence``, ``jobs``), never ``evidenceguard_agents``, also
+    not through a local or deferred import, and no third-party package of its own."""
+    path = _source(evidenceguard_domain, "review_stages.py")
+    imported = _module_imports(path)
+    assert imported - set(sys.stdlib_module_names) == {"evidenceguard_domain"}
+    assert not imported & (M5E_FORBIDDEN | {"pydantic", "sqlalchemy", "evidenceguard_agents"})
+    assert _domain_imports(path) == {
+        "evidenceguard_domain.evidence",
+        "evidenceguard_domain.jobs",
+        "evidenceguard_domain.model_calls",
+        "evidenceguard_domain.provenance",
+        "evidenceguard_domain.retrieval",
+    }
+
+
+def test_m5e_persistence_module_keeps_the_accepted_boundaries() -> None:
+    """M5e-A: the domain, persistence (jobs, reviews' values, retrieval) and SQLAlchemy only;
+    never the agents, the worker or a provider."""
+    path = _source(evidenceguard_persistence, "review_stages.py")
+    imported = _module_imports(path)
+    assert imported - set(sys.stdlib_module_names) == {
+        "evidenceguard_domain",
+        "evidenceguard_persistence",
+        "sqlalchemy",
+    }
+    assert not imported & (M5E_FORBIDDEN | {"evidenceguard_agents", "evidenceguard_worker"})
+    modules = {
+        node.module
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8")))
+        if isinstance(node, ast.ImportFrom)
+        and node.module
+        and node.module.startswith("evidenceguard_persistence")
+    }
+    assert modules == {
+        "evidenceguard_persistence.document_views",
+        "evidenceguard_persistence.jobs",
+        "evidenceguard_persistence.models",
+        "evidenceguard_persistence.retrieval",
+    }
+
+
+def test_m5e_migration_and_modules_are_packaged() -> None:
+    assert _source(evidenceguard_domain, "review_stages.py").is_file()
+    assert _source(evidenceguard_persistence, "review_stages.py").is_file()
+    migration = _source(evidenceguard_persistence, "migrations/versions/v0007_review_stages.py")
+    assert migration.is_file()
+    assert not _module_imports(migration) & {"evidenceguard_persistence", "evidenceguard_domain"}
+
+
+def test_m5e_is_not_wired_into_any_route_command_handler_or_registry() -> None:
+    """W8: M5e is an internal persistence seam; no application, worker, agents or observability
+    module uses it, no output table or writer exists (E7), and ``run_review`` stays
+    unregistered."""
+    from evidenceguard_worker.handlers import production_registry
+
+    for package in (
+        evidenceguard_agents,
+        evidenceguard_api,
+        evidenceguard_observability,
+        evidenceguard_retrieval,
+        evidenceguard_worker,
+    ):
+        assert package.__file__ is not None
+        for source in Path(package.__file__).parent.rglob("*.py"):
+            assert "review_stages" not in source.read_text(encoding="utf-8"), source.name
+    persistence = _source(evidenceguard_persistence, "__init__.py").parent
+    users = {
+        source.name
+        for source in persistence.rglob("*.py")
+        if "review_stages" in source.read_text(encoding="utf-8")
+    }
+    assert users == {"review_stages.py"}
+    assert "run_review" not in production_registry().kinds
+    assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})

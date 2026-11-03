@@ -43807,3 +43807,1196 @@ operation.
   provider call was run.
 - The scope, raw-byte history, encoding, privacy and Gitleaks checks, the local commit and the
   export follow and are reported in the handoff. No commit SHA is recorded here.
+
+### Prompt 199 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 199 handoff: M5e specification accepted and committed locally (not pushed)
+
+The accepted M5e specification and both binding clarifications are recorded and committed locally. Nothing was pushed or merged, no CI was rerun and nothing remote was touched.
+
+**Starting state.** Everything matched what the prompt expected:
+- branch, HEAD, `main` and `origin/main` at `1efe3ed3`;
+- HEAD tree `472cfc21` and staged tree `d9419cde`, with the five paths staged and nothing unstaged or untracked;
+- origin and the noreply identity unchanged.
+
+The Prompt 198 export was 110,919 bytes, 777 lines, SHA-256 `7b09f159…55c7`. It is byte-identical to Git's full-index diff between its recorded trees (`c4c8f654` → `d9419cde`), excluding `prompts.md`. That baseline is the Prompt 197 tree, not HEAD. The checkpoint is in `.local/p199/`.
+
+**Changes in [docs/plan.md](docs/plan.md):**
+- **Heading:** now "M5e stage and call-reservation persistence specification (ACCEPTED at review, Prompt 199; implementation pending)". Every link to it was updated: the plan's summary line, the README and the threat model.
+- **New acceptance subsection, "M5e acceptance (Prompt 199)":** records:
+  - the history (proposed in 196, corrected in 197 and 198, accepted in 199);
+  - what forms the implementation contract;
+  - that no decision remains open;
+  - that E7 stays binding on M5f/M5g;
+  - the reviewer's evidence and limits, exactly as you stated them.
+- **Earlier states kept as history:** the status paragraph, M5e-R, M5e-L, the sequence row and M5e-N now mark the old "proposed", "supported" and "open" states as historical. All of E1–E20 now read accepted.
+- **Byte caps:** recorded as accepted engineering limits, not measured guarantees. The maximum-size literals still need implementation tests.
+- **Clarification A (explicit completion identity):**
+  - New signatures: `commit_verified(fence, review_id, question_id, *, …)` and `commit_analyzed(fence, review_id, question_id, *, …)`, each with its stage fixed by the API.
+  - B1 now validates the explicit `question_id`.
+  - B3 selects the call by `(job.tenant_id, review_id, question_id, fixed stage, sequence)` and never uses the result's or content's question ID.
+  - B4, B7 and B8 then decide the named cases, with a note explaining why that order works.
+  - The replay-table identities, the reclaim example and the planned tests were updated to match.
+- **Clarification B (U4 replay and evidence state):**
+  - E7 now defines a well-formed U4 as valid and closed.
+  - Three states are inconsistent: verification calls without evidence, a non-U4 stage without evidence, and a U4 with calls or evidence.
+  - `commit_unresolved` for U4 runs E1–E8, including the size check, then treats an identical request as a no-op. A different outcome or reason conflicts.
+  - `record_evidence` after a U4 raises `StageConflictError` and does not reopen the stage.
+  - M5e-F, M5e-H, the reload step and the planned tests were updated together.
+  - The limitation that U4's bytes and original binding cannot be re-proved at reload is kept.
+- **Two small consistency fixes:** the byte-cap paragraph's label, and the M5e-K heading, now "(migration `0007`, specified; not created)". Nothing links to that heading.
+
+**README and threat model:** short linked statements that:
+- M5e is accepted and unimplemented, and no M5e control operates;
+- no application review path, `run_review` registration or live provider is added;
+- M5f–M5h and overall M5 acceptance are pending.
+
+M5d's evidence, attribution and API-status inconsistency are unchanged. ADR-0022 is unchanged. No ADR-0023, implementation file, test or `0007` was created.
+
+**History in `prompts.md`.** The 2,301,953-byte prefix is preserved exactly. Appended:
+- the Prompt 198 handoff, verbatim;
+- the acceptance record with both clarifications;
+- Prompt 199, verbatim;
+- a pre-commit note listing completed checks only.
+
+Both verbatim texts were extracted by script from the session logs. Each appears exactly once, checked as raw bytes.
+
+**Checks run.** No application tests, build, wheel, PostgreSQL, Docker or provider calls were run (none were required).
+
+| Check | Result |
+|---|---|
+| Paths changed vs parent | the five authorized paths only |
+| Other blobs | 231 of 236 identical to the parent |
+| Tracked `.local` files | none |
+| Links and tables (4 docs) | 377 links, 85 tables, 0 problems |
+| Encoding (5 files) | UTF-8, no BOM, LF only, no U+FFFD |
+| `git diff --check` and `git diff --cached --check` | clean |
+| Privacy scan (501 added lines) | no hits |
+| Gitleaks 8.30.1, staged, `--ignore-gitleaks-allow` | no leaks |
+| Gitleaks, full history | 85 commits, no leaks |
+
+**Commit**
+- SHA `313b523d052a9dbd49f3dbd53e5f0af835ccfe1f`, tree `a6f2a1b72e8cb1be344cb1ca6126c3ab10ac8ef7`.
+- Parent `1efe3ed3f0aa9697ce4e71cee295293a89c94909`.
+- Subject: "docs: record accepted M5e stage persistence specification".
+- Author and committer: `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>`. The message was written from a file and ends with the Assistance paragraph and `Co-Authored-By`.
+- Against its parent: 5 files, 3,394 insertions and 22 deletions. This includes the earlier staged Prompt 196–198 work.
+
+**Export: `.local/p199/m5e-spec-acceptance.diff`**
+- Baseline `d9419cde0ce1180e1f0d401a2072b2ded1efd27d`; final commit `313b523d`; full-index; `prompts.md` excluded.
+- 85,441 bytes, 521 lines; 3 files (README, plan, threat model), 211 insertions and 84 deletions.
+- SHA-256 `ac96c75a39a402861810c41e59b358896dce6d749422e8d4f844e274f39b002b`.
+- UTF-8 with no BOM, LF only; byte-identical to Git's output.
+
+**Final state:**
+- HEAD is `313b523d` on `docs/review-stages-plan`, which is not pushed.
+- `main` and `origin/main` are still at `1efe3ed3`.
+- The working tree is clean.
+
+**Still pending:**
+- the M5e implementation, its tests, migration `0007`, an M5e ADR (ADR-0023), implementation acceptance, publication and CI;
+- M5f–M5h and overall M5 acceptance;
+- the M4d trusted-snapshot limitation.
+
+ADR-0022's published line "M5e stores stage calls and outputs" (at line 514) still uses wording from before E7. It was left unchanged because this prompt authorized no ADR change.
+
+**Next step:** please return **output plus the diff file** `.local/p199/m5e-spec-acceptance.diff`.
+
+### Authorization for the M5e implementation (Prompt 200)
+
+Mathew authorized implementing the complete accepted M5e slice (the specification accepted in
+Prompt 199, E1–E20 with clarifications A and B), verifying it and staging it, uncommitted, for
+external review on a new branch `feat/review-stage-persistence` created from `313b523d`. The
+authorized paths are the three new production files, `models.py`, `retrieval.py`, five new test
+modules, six existing test modules (including the `0006` migration test in
+`tests/test_reviews_postgres.py`, to be converted to explicit migration targets), `ci.yml`
+(additive installed-wheel assertion only), ADR-0023, ADR-0022 (correcting the stale M5e line),
+README, plan, threat model and `prompts.md`. No dependency or lockfile change, commit, push,
+merge, CI rerun, M5f/M5g implementation, production review path, provider call or handler
+registration is authorized. PostgreSQL tests are run only against an already configured
+disposable database; none is provisioned.
+
+### Prompt 200 (verbatim)
+
+Prompt 200 — Implement the accepted M5e stage and call-reservation persistence contract
+
+Written for: Claude Code, Mathew and the external reviewer.
+
+Continue in this Claude Code session. Read repository instructions and the accepted M5e specification before editing.
+
+Implement the complete accepted M5e slice, verify it and stage it for external review. Work through the authorized task to completion.
+
+Do not commit, push, merge, rerun CI or implement M5f/M5g. No production review path, provider call or handler registration is authorized.
+
+1. Verify and checkpoint
+
+Expected:
+- Branch docs/review-stages-plan.
+- HEAD:
+  313b523d052a9dbd49f3dbd53e5f0af835ccfe1f
+- Parent:
+  1efe3ed3f0aa9697ce4e71cee295293a89c94909
+- Tree:
+  a6f2a1b72e8cb1be344cb1ca6126c3ab10ac8ef7
+- main and origin/main:
+  1efe3ed3f0aa9697ce4e71cee295293a89c94909
+- Clean index and working tree.
+- Origin and established noreply identity unchanged.
+
+Verify .local/p199/m5e-spec-acceptance.diff:
+- 85,441 bytes
+- 521 lines
+- SHA-256:
+  ac96c75a39a402861810c41e59b358896dce6d749422e8d4f844e274f39b002b
+- Identical to the full-index comparison from d9419cde0ce1180e1f0d401a2072b2ded1efd27d to HEAD, excluding prompts.md.
+
+Save refs, status, tree, tracked blob hashes and prompts.md prefix with checksum under .local/p200/.
+
+Check that feat/review-stage-persistence does not exist, then create it from HEAD. Do not overwrite an existing branch.
+
+No remote operation is required.
+
+2. Implementation contract
+
+The controlling contract is the accepted M5e specification in docs/plan.md:
+- E1–E20.
+- Values and canonical encodings.
+- StageHistory V1–V12.
+- Planner T0–T9.
+- Shapes S1/S2 and U1–U6.
+- Evidence checks E1–E8.
+- Completion checks B1–B9.
+- Mutation preconditions M1–M3.
+- Replay and trusted-reload rules.
+- Exact migration schema.
+- Prompt 199 clarifications A and B.
+
+Read the current M3 fencing and M5a–M5d source alongside it.
+
+Do not reinterpret the accepted contracts to simplify implementation. Record routine implementation choices and any discovered discrepancy in ADR-0023 for review.
+
+3. Authorized paths
+
+New production files:
+- packages/domain/evidenceguard_domain/review_stages.py
+- packages/persistence/evidenceguard_persistence/review_stages.py
+- packages/persistence/evidenceguard_persistence/migrations/versions/v0007_review_stages.py
+
+Existing production files:
+- packages/persistence/evidenceguard_persistence/models.py
+- packages/persistence/evidenceguard_persistence/retrieval.py
+
+New tests:
+- tests/test_review_stage_values.py
+- tests/test_review_stage_planner.py
+- tests/test_review_stage_persistence.py
+- tests/test_evidence_recheck.py
+- tests/test_review_stages_postgres.py
+
+Existing tests:
+- tests/test_packaging.py
+- tests/test_persistence.py
+- tests/test_readiness.py
+- tests/test_persistence_postgres.py
+- tests/test_retrieval_postgres.py
+- tests/test_reviews_postgres.py
+
+Workflow:
+- .github/workflows/ci.yml
+
+Documentation/history:
+- docs/decisions/0023-review-stage-persistence.md
+- docs/decisions/0022-review-creation.md
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+No other tracked path may change. No dependency or lockfile change.
+
+If another path is genuinely necessary, finish independent authorized work and report the specific need before changing that path.
+
+4. Pure domain implementation
+
+Implement the accepted:
+- Enumerations and fixed errors.
+- PlannedQuestionSet, EvidenceRecord, CallRejection and stage/call values.
+- StageHistory, plan variants, StageState and trusted-result values.
+- Canonical encoders and bounded strict decoders.
+- Pure plan_stage.
+
+Requirements:
+- Exact types, frozen values, tuple-only collections and rebuilt nested values.
+- No silent normalization of identity-bearing input.
+- Fresh fixed ordinary errors without original text, cause or context.
+- Same-object process-control propagation.
+- Private representations and no logging.
+- No agents, worker, persistence or provider imports in the domain.
+- CallRejection converts only to/from domain ProvenanceRejection.
+- Integer admission range and strict decoding as accepted.
+- Finite float.hex representation and Fraction reconstruction.
+- Audit timestamps have no chronological admission requirement.
+
+Implement the planner as a total function over valid histories. Validate the complete history before planning.
+
+Independently compute canonical literals and maximum-size checks. Do not generate expected values by calling the implementation under test.
+
+If independent size calculations disagree with the recorded maximum-size literals, preserve the accepted schema and caps, report the discrepancy and its derivation in ADR-0023, and pin the independently verified values. Do not weaken validation or silently change the format.
+
+5. Extract the evidence-recheck helper
+
+Implement recheck_evidence_in_transaction and its shared internal steps exactly as M5e-J1 specifies.
+
+Preserve retrieve_with_vectors:
+- Public signature and behavior.
+- SQL and parameters.
+- Statement order.
+- Semantic outcomes and error precedence.
+- Existing transaction and timeout behavior.
+
+The new public helper:
+- Uses the caller’s plain Session.
+- Does not commit, roll back, close, retry or alter isolation/timeouts.
+- Validates pure arguments before SQL.
+- Returns rebuilt items, SemanticOutcome or fixed EvidenceRecheckFailure as specified.
+- Covers execute, result consumption, row access and comparison.
+- Preserves process control.
+- Logs nothing.
+
+Do not duplicate the M4d evidence checks. Existing M4d tests must retain their assertions.
+
+Add focused tests and a PostgreSQL equivalence/statement-order test.
+
+6. Schema and fenced persistence
+
+Implement migration 0007 and matching models:
+- review_plan_questions
+- review_question_evidence
+- review_stage_calls
+- review_stage_results
+
+No output table or writer.
+
+Use the accepted column types, keys, named constraints, partial unique index and no-cascade foreign keys. Check rendered migration SQL against model DDL and PostgreSQL identifier lengths.
+
+Implement every accepted persistence API:
+- record_planned_questions
+- read_stage_state
+- record_evidence
+- reserve_call
+- complete_failed_call
+- commit_verified
+- commit_analyzed
+- commit_unresolved
+- load_trusted_stages
+
+All writes compose into the caller’s fence:
+- No internal commit, rollback, close, savepoint or retry.
+- Canonical job association.
+- Token from fence.job.lease_token().
+- Ownership checks at entry and after the final write.
+- Errors escape so the caller’s fence rolls back.
+- No upward imports or provider dispatch.
+
+Preserve the three-reservation budget and single repair across job attempts. Abandoned started rows consume budget.
+
+Complete successful calls and stages atomically. Analysis failures never alter Verification.
+
+7. Binding clarifications and replay
+
+Successful-completion APIs take explicit question_id:
+- commit_verified(fence, review_id, question_id, *, sequence, result, verified)
+- commit_analyzed(fence, review_id, question_id, *, sequence, result, analyzed, owner)
+
+Select the call from explicit identity and the API’s fixed stage. Never select it from result or content identity.
+
+Run B1–B9 before replay comparison. Replay skips only mutation preconditions. Test wrong result, rejection, content and owner identities on both first completion and replay.
+
+Implement clarification B:
+- A well-formed U4 has no evidence row and no calls.
+- It reloads as valid.
+- Its identical replay is a no-op after the accepted checks.
+- record_evidence cannot reopen it.
+- Invalid U4 combinations are inconsistent.
+
+Allocation is not replayable. Do not add an undocumented dispatch idempotency key.
+
+8. Trusted reload
+
+Use one read-only snapshot and the accepted read-boundary cleanup pattern.
+
+Validate:
+- Canonical job and planned set.
+- All row identities, settings and digests.
+- Complete histories and every stage shape.
+- Evidence and dependency references.
+- Evidence bytes against trusted database chunks through the extracted helper.
+- recheck_verified and recheck_analyzed.
+- Owner-only Analysis dependencies.
+
+Preserve the documented boundaries:
+- Persistence cannot prove template origin or original retrieval execution.
+- Request reassembly remains a worker obligation.
+- U5/U6 require worker reassembly checks.
+- U4’s discarded bytes cannot be re-proved later.
+- No entailment, authenticity or injection-resistance guarantee.
+
+Test process control during queries, result consumption, row access and cleanup, including a later cleanup exception. The first process-control object must survive by identity.
+
+9. Migration-head and packaging tests
+
+Update current-head expectations to 0007 and the four new tables.
+
+Keep previous-head, future-head and multiple-head readiness refusals meaningful.
+
+Preserve historical migration tests:
+- Tests specifically exercising 0006 or older migrations must use explicit migration targets.
+- Restore the current head in cleanup.
+- Run alembic check against models at the current head.
+- Do not simply rename historical coverage or remove assertions.
+
+This authorization includes the affected migration test in tests/test_reviews_postgres.py, avoiding the out-of-scope head-pin blocker encountered in M5d.
+
+Extend packaging checks for:
+- New modules and migration.
+- Dependency boundaries.
+- No production wiring.
+- run_review still unregistered.
+
+10. Tests
+
+Implement the accepted planned verification with meaningful public-boundary coverage.
+
+Include:
+- Exhaustive bounded planner histories and invalid-history cases.
+- Same started history under current and later attempts.
+- Every reservation and repair boundary.
+- All stage shapes and reload.
+- Canonical literals, malformed decoding and integer/float edges.
+- Oversized evidence/request/repair representations.
+- Completion replay after reclaim and conflicting replay.
+- Explicit completion identity and U4 replay.
+- Configuration mismatch, including timeout with otherwise equal M5a digest.
+- Stale fences for every write class.
+- Lease expiry during a later lock wait.
+- Concurrent allocation.
+- Atomic completion rollback.
+- Retained Verification after Analysis failure.
+- Tampered rows and evidence outside the snapshot.
+- Migration upgrade/downgrade/check and constraint names.
+- Process-control and cleanup precedence.
+
+Use bounded event synchronization, finally-based release and listener cleanup. No timing sleeps or unbounded polling.
+
+Distinguish attempted statements from successful statements. Establish completion of the target fixture job rather than assuming one worker invocation processed it.
+
+Add the repository’s network guard to new database-independent modules as appropriate. No real provider or network use.
+
+11. Workflow and installed wheel
+
+Add the accepted offline installed-wheel assertion:
+- Migration SQL includes review_stage_calls.
+- The scripted abandoned-repair history plans retry/repaired/sequence 3.
+
+Keep all existing checks and production-registry assertions. The workflow change must be additive.
+
+Do not enable run_review or add a provider, endpoint, CLI command, setting or output writer.
+
+12. Documentation and history
+
+Write ADR-0023:
+- Accepted specification and implementation scope.
+- Values, state machine, persistence and reload.
+- Boundaries, choices and deviations.
+- Checks actually run.
+- PostgreSQL/CI status and remaining limitations.
+
+Update README, plan and threat model:
+- Specification accepted in Prompt 199.
+- Implemented and staged for review in Prompt 200.
+- Implementation acceptance and current-version CI pending.
+- No application use or production wiring.
+- Output remains allocated to M5f/M5g.
+- Overall M5 acceptance pending.
+
+Keep the accepted M5e heading unchanged. Add a separate implementation-status subsection.
+
+Correct ADR-0022’s stale “M5e stores stage calls and outputs” wording to reflect E7. Preserve its historical evidence and attribution.
+
+Append to prompts.md:
+- Prompt 199 handoff verbatim.
+- This authorization and Prompt 200 verbatim.
+- Outcome note listing completed work only.
+
+Preserve the previous bytes as an identical prefix and retain fidelity disclosures.
+
+13. Verification
+
+Use the existing locked offline environment.
+
+Run:
+- Ruff lint and format.
+- Strict mypy.
+- Focused new and affected tests.
+- Full suite.
+- Integration and non-integration collection.
+
+If an already configured disposable test PostgreSQL database exists, run affected and then full integration tests. Otherwise report them as written but not run.
+
+Do not provision PostgreSQL, start Docker or download dependencies.
+
+Run the offline build and compare wheel/sdist with a git-archive build of 313b523d:
+- Explain every added or changed member.
+- Nothing unexpectedly removed.
+- All 16 sample_data files unchanged.
+- Pinned template and prompt bytes unchanged.
+
+Run the complete installed-wheel step extracted from ci.yml in a fresh environment outside the checkout, using hashed offline dependencies and the wheel with --no-deps.
+
+Verify imports/resources come from site-packages and test the final wheel. Do not present the offline assertion as PostgreSQL execution.
+
+14. Final checks and export
+
+Verify:
+- Only authorized paths changed.
+- Every other tracked blob equals 313b523d.
+- No tracked .local file or artifact.
+- Links, anchors and tables.
+- UTF-8 without BOM, LF only, no replacement characters.
+- git diff --check and git diff --cached --check.
+- Privacy scan.
+- Unsuppressed staged Gitleaks.
+
+Stage uncommitted.
+
+Export:
+.local/p200/m5e-implementation.diff
+
+Baseline:
+313b523d052a9dbd49f3dbd53e5f0af835ccfe1f
+
+Final:
+the staged tree
+
+Full-index diff, prompts.md excluded.
+
+Report size, line count, statistics, SHA-256, encoding and byte identity with Git.
+
+The handoff must separate:
+- Implemented behavior.
+- Deviations needing review.
+- Checks actually run.
+- Database tests written but unrun.
+- Historical CI from current-version evidence.
+- Final refs and staged tree.
+
+Return the handoff plus the diff.
+
+If interrupted, save completed work, exact file hashes, completed check results and the first unfinished step under .local/p200/. Resume from that checkpoint; do not restart or recommend a new session merely because of prompt count.
+
+No commit, push, CI rerun, M5f/M5g implementation or production enablement is authorized.
+
+### Prompt 200 outcome (Claude Code; staged, awaiting review)
+
+Completed work and checks only. The starting state matched (HEAD `313b523d`, parent `1efe3ed3`,
+tree `a6f2a1b7`, `main` and `origin/main` at `1efe3ed3`, clean index and working tree, origin and
+the noreply identity unchanged); the Prompt 199 export matched (85,441 bytes, 521 lines, SHA-256
+`ac96c75a…002b`, byte-identical to the full-index comparison from `d9419cde` to HEAD excluding
+`prompts.md`). Checkpoint under `.local/p200/`. `feat/review-stage-persistence` did not exist and
+was created from HEAD. No remote operation.
+
+- **Implemented** the accepted M5e slice: the pure domain module (values, encodings, bounded
+  strict decoders, `StageHistory` V1–V12 and the total planner T0–T9), the fenced persistence APIs
+  with explicit completion identity (clarification A) and the U4 rules (clarification B), the
+  trusted reload, migration `0007` with the four tables and matching models, and the extracted
+  `recheck_evidence_in_transaction` with `retrieve_with_vectors` reusing its two steps. No output
+  table or writer, provider, handler registration, endpoint, setting or dependency was added.
+- **Size literals:** derived independently twice (encoding test-owned maximal dictionaries and byte
+  arithmetic): 1,135,720 and 3,090,153 bytes, matching the accepted values.
+- **Implementation choices and deviations** for review are listed in ADR-0023.
+- **Tests:** five new modules; migration-head expectations moved to `0007` with the `0006`
+  migration test converted to explicit targets; packaging boundaries; two PostgreSQL retrieval
+  tests; one additive installed-wheel assertion in `ci.yml`.
+- **Docs:** ADR-0023; ADR-0022's stale M5e line corrected; README, plan (new implementation-status
+  subsection; the accepted heading unchanged) and threat model updated.
+- **Checks run in this session:** `ruff format --check` (219 files formatted), `ruff check` (clean),
+  strict `mypy` (176 files, no issues); new and affected tests passed; full suite 3,901 passed and
+  387 skipped; collection 385 integration and 3,903 non-integration; relative links 394 and tables
+  87 with no problems; offline build of the staged tree and of `313b523d` compared (wheel 109 → 112,
+  sdist 221 → 230, nothing removed, 16 `sample_data` files and the template and prompt bytes
+  identical); the complete installed-wheel step ran in a fresh environment with hashed offline
+  dependencies and the wheel installed with `--no-deps`, exiting 0 from `site-packages`.
+- **Not run:** PostgreSQL tests (no `EG_TEST_DATABASE_URL`; written, collected and skipped), CI.
+- The history entries (the Prompt 199 handoff and Prompt 200, extracted by script from this
+  session's log, the prompt from inside the paste markers) are appended after the unchanged prefix.
+  The scope, encoding, whitespace, privacy and Gitleaks checks and the export follow and are
+  reported in the handoff. Nothing is committed.
+
+### Prompt 200 handoff (Claude Code's supplied output, verbatim)
+
+Written for: Mathew and the external reviewer.
+
+## Prompt 200 handoff: M5e implemented and staged for review (nothing committed)
+
+M5e is implemented, verified locally and staged on `feat/review-stage-persistence`. The PostgreSQL tests are written but were not run: no test database is configured here, so every database-backed behaviour is still unverified until CI's PostgreSQL job runs. Nothing was committed, pushed or merged, no CI was run, and nothing remote was touched.
+
+**Starting state.** Everything matched what the prompt expected:
+- HEAD `313b523d` (parent `1efe3ed3`, tree `a6f2a1b7`); `main` and `origin/main` at `1efe3ed3`;
+- clean index and working tree; origin and the noreply identity unchanged;
+- the Prompt 199 export: 85,441 bytes, 521 lines, SHA-256 `ac96c75a…002b`, byte-identical to Git's comparison.
+
+The new branch did not exist and was created from HEAD. The checkpoint is in `.local/p200/`.
+
+### Implemented behaviour
+- **Pure domain module, `evidenceguard_domain/review_stages.py`:**
+  - all the accepted values, with exact types and no silent normalization;
+  - the five canonical encodings and bounded strict decoders;
+  - `StageHistory` enforcing V1–V12, and a total `plan_stage` (T0–T9);
+  - `CallRejection` converts only to and from the M5b `ProvenanceRejection`;
+  - the integer admission narrowing, `float.hex()` scores and recomputed fused scores.
+- **Size literals:** derived independently twice, once by encoding test-owned maximal objects and once by plain byte arithmetic. Both give exactly the accepted 1,135,720 and 3,090,153 bytes, so there is no discrepancy.
+- **Persistence module, `evidenceguard_persistence/review_stages.py`:**
+  - all nine APIs write inside the caller's fence and never commit, roll back or retry;
+  - ownership is rechecked at entry and after the last write;
+  - checks run in the order B1–B9 or E1–E8, then replay, then M1–M3;
+  - clarification A: the success APIs take an explicit `question_id`, and the call is never selected from the result or content;
+  - clarification B: a well-formed U4 stage replays as a no-op and cannot be reopened.
+- **Trusted reload:** one read-only snapshot with M5d's recording pattern. It rechecks evidence against database chunks through the extracted helper, then runs `recheck_verified` and `recheck_analyzed`.
+- **Evidence helper:** `recheck_evidence_in_transaction` is extracted. `retrieve_with_vectors` keeps the same SQL, parameters and statement order; all 283 existing M4d unit tests pass unmodified.
+- **Migration `0007` and models:**
+  - four tables, 81 named constraints (the longest name is 46 characters) and the partial one-repair index;
+  - no cascades and no output table.
+
+### Deviations needing review
+These are listed with reasons in ADR-0023. No validation was weakened.
+- **Error choices the spec left open:**
+  - a missing evidence row on a reservation or U5 → `StageDependencyError`;
+  - a missing review, or a recheck returning another tenant's job → `StageFenceMismatchError`;
+  - a structurally invalid fence → `InvalidStageRequestError`.
+- **Recheck helper:** a structurally invalid snapshot raises `InvalidRetrievalRequestError`, following the J1 text. M4d raises `InvalidSnapshotError` in the same situation.
+- **`commit_unresolved`:** a committed stage with a different outcome or reason is rejected as a conflict before references are derived. A committed success would otherwise make the history check itself fail.
+- **Final ownership recheck:** it also runs on no-op replays, which is stricter than the spec.
+- **Unique violations:** detected with a small local reader, because `database_failures.py` was not an authorized path.
+- **Reload pattern:** M5d's private recording wrappers are duplicated rather than imported.
+- **Constraint text:** the `IN (…)` lists are alphabetical because the models' existing helper sorts them. The meaning is unchanged.
+- **Extra public helper names** in the domain module.
+
+### Checks actually run
+| Check | Result |
+|---|---|
+| `ruff format --check`, `ruff check`, strict `mypy` | clean (219 files formatted; 176 source files type-checked) |
+| New tests | values 107, planner 46 (142,692 histories against an independent oracle), evidence recheck 37, persistence 71: all pass |
+| Full suite | 3,901 passed, 387 skipped |
+| Collection | 385 integration, 3,903 non-integration |
+| Offline build vs `git archive` of 313b523d | wheel 109 → 112 members, sdist 221 → 230, nothing removed; all 16 `sample_data` files and the template/prompt bytes identical |
+| Installed-wheel step (all 227 lines from `ci.yml`) | exit 0 in a fresh environment outside the checkout; hashed offline dependencies, wheel `--no-deps`, imports from `site-packages`; the final tree's wheel is member-identical to the tested one |
+| Scope | exactly the 23 authorized paths; the other 222 blobs equal 313b523d; no tracked `.local` file |
+| Links and tables | 394 links, 87 tables, 0 problems |
+| Encoding | UTF-8, no BOM, LF only, no U+FFFD |
+| `git diff --check` and `git diff --cached --check` | clean |
+| Privacy scan | no real hits: the flags were `+@pytest…` decorators and the established noreply address |
+| Gitleaks 8.30.1, staged, `--ignore-gitleaks-allow` | no leaks |
+
+The installed-wheel assertion is an offline check, not PostgreSQL execution.
+
+### Database tests written but not run
+These were collected and skipped because `EG_TEST_DATABASE_URL` is not set:
+- the 46 tests in `test_review_stages_postgres.py`;
+- the two new tests in `test_retrieval_postgres.py`;
+- the updated migration tests in `test_reviews_postgres.py` and `test_persistence_postgres.py`.
+
+They cover migration up/down and `alembic check`, constraint names, stale fences for every write type, lease expiry during a lock wait, concurrent allocation, replay, binding, the U4 rules, tampered rows and isolation. All of this is unverified.
+
+### CI status
+Earlier CI evidence covers M5d at `1efe3ed3` only. There is no CI evidence for this change.
+
+### Export: `.local/p200/m5e-implementation.diff`
+- Baseline `313b523d052a9dbd49f3dbd53e5f0af835ccfe1f`; final staged tree `a5037d57047fa3933d02abd115c071dfcdbd3c92`; full-index; `prompts.md` excluded.
+- 493,975 bytes, 11,291 lines; 22 files, 10,838 insertions and 57 deletions.
+- SHA-256 `a25fad39469ca82301e4a01bf7b9b41c74ad54aa3b066e016c3118e8802f81c4`.
+- UTF-8 with no BOM, LF only; byte-identical to Git's output.
+
+### Final refs and state
+- Branch `feat/review-stage-persistence`; HEAD `313b523d`; staged tree `a5037d57`.
+- 23 paths staged; nothing unstaged or untracked.
+- `main` and `origin/main` are still at `1efe3ed3`.
+- `prompts.md`: the 2,324,422-byte prefix is preserved; the Prompt 199 handoff, the authorization, Prompt 200 and an outcome note are appended.
+
+**Still pending:** implementation acceptance, PostgreSQL execution, CI, the commit and publication; M5f–M5h, including the output slice; overall M5 acceptance; and the M4d trusted-snapshot limitation.
+
+**Next step:** please return **output plus the diff file** `.local/p200/m5e-implementation.diff`.
+
+### External review of the Prompt 200 M5e implementation and disposition (Prompt 201)
+
+The external reviewer probed the submitted M5e domain module's constructors in isolation (Python
+3.12.14, Pydantic 2.14.0) with `model_construct` questions and bypass-built dataclass instances.
+This was isolated constructor probing only, not a project-suite, installed-wheel, database or
+PostgreSQL run; it does not establish a database-reload defect or require protection against
+hostile in-process code. **Finding A:** `revalidated_question` and `PlannedQuestionSet` accepted a
+question whose documentary flag was the integer `1` and changed it to `True`; a question with list
+queries was refused, but `model_copy`/`model_dump` first emitted a Pydantic warning containing the
+query text; the `==` comparison treats differently typed values as equal. **Finding B:**
+`TrustedQuestionStages` accepted an exact `QuestionEvidence` whose `result` was a string when its
+directly inspected identity fields matched, and `TrustedStages` accepted an exact
+`TrustedQuestionStages` whose evidence was invalid; valid controls still constructed.
+**Disposition:** Prompt 201 authorizes correcting both findings in the domain module (exact field
+types checked before any normalization or serialization, rebuilding through the existing
+validation; nested aggregate values rebuilt, including `StageState`'s plan and any other
+demonstrated instance), with focused regressions classified against the exact submitted module,
+documentation and history updates, staged and uncommitted. Persistence production code,
+`retrieval.py`, models, migration `0007`, PostgreSQL tests, workflows, packaging, dependencies and
+pinned resources stay unchanged. No commit, push, merge, CI rerun or M5f work.
+
+### Prompt 201 (verbatim)
+
+Prompt 201 — Correct M5e question validation and nested aggregate construction
+
+Written for: Mathew and the external reviewer.
+
+Correct the two findings below, verify the corrections, and leave the result staged and uncommitted for external review.
+
+Continue in this session. Do not request a fresh session merely because of a prompt count.
+
+1. Recover and verify the starting state
+
+Read the repository instructions and the Prompt 200 checkpoint.
+
+Expected state:
+- Branch: feat/review-stage-persistence
+- HEAD: 313b523d052a9dbd49f3dbd53e5f0af835ccfe1f
+- main and origin/main: 1efe3ed3f0aa9697ce4e71cee295293a89c94909
+- Staged tree: a5037d57047fa3933d02abd115c071dfcdbd3c92
+- The same 23 Prompt 200 paths staged, with nothing unstaged or untracked.
+
+Verify .local/p200/m5e-implementation.diff:
+- 493,975 bytes
+- 11,291 lines
+- SHA-256:
+  a25fad39469ca82301e4a01bf7b9b41c74ad54aa3b066e016c3118e8802f81c4
+- Byte-identical to the full-index Git comparison from the recorded baseline to the staged tree, excluding prompts.md.
+
+Save a checkpoint under .local/p201/ containing the starting tree, staged paths, blob hashes, the prompts.md prefix and checksum, and exact submitted copies needed for regression comparisons.
+
+Do not overwrite unexpected work. If the state differs materially, report the difference before dependent changes.
+
+No remote operation, commit, push, merge, CI rerun or M5f work is authorized.
+
+2. Finding A — Exact question validation before normalization or serialization
+
+The reviewer reproduced the following with the submitted M5e domain module, Python 3.12.14 and Pydantic 2.14.0:
+
+    q = EvidenceQuestion.model_construct(
+        question_id="ENC-01",
+        text="Encrypted?",
+        search_queries=("encryption",),
+        requires_documentary_support=1,
+    )
+
+Both revalidated_question(q) and PlannedQuestionSet(..., questions=(q,)) accept it and change the integer flag to bool True.
+
+A second probe uses:
+
+    search_queries=["PRIVATE-CANARY-SEARCH"]
+
+PlannedQuestionSet rejects that value, but model_copy/model_dump emits a Pydantic warning containing the canary before rejection.
+
+The current _same comparison is insufficient: Python equality can consider differently typed values equal.
+
+Correct the M5e question boundary:
+- Check the exact types of every question field before any operation that can normalize or serialize them.
+- Require exact str ID and text, an exact tuple of exact str queries, and an exact bool documentary flag.
+- Rebuild through the existing EvidenceQuestion validation and require the fields to remain unchanged in both value and type.
+- Preserve the existing question constraints and fixed error mapping.
+- Refuse malformed values without warnings, stdout, stderr or logging.
+- Preserve process-control exceptions by identity.
+- Keep domain code independent of evidenceguard_agents; do not import M5c's private helper.
+
+Exercise the shared correction through the relevant public M5e entry points, including planned questions and evidence values. Add a persistence-boundary check that malformed planned questions are rejected before SQL.
+
+Include integer flags 0 and 1, list queries, str subclasses where relevant, padded text, and valid controls. Distinguish genuine reproductions from cases already rejected by the submitted code.
+
+3. Finding B — Rebuild nested aggregate values
+
+The accepted common value contract requires nested values to be rebuilt and checked.
+
+The reviewer reproduced:
+- TrustedQuestionStages accepts an exact QuestionEvidence instance whose result is an invalid string, provided its directly inspected identity fields match.
+- TrustedStages accepts an exact TrustedQuestionStages instance whose evidence field is invalid.
+- Valid controls still construct successfully.
+
+These probes used bypass-built instances to test the declared constructor boundary. They do not establish a database-reload defect or require protection against hostile in-process code.
+
+Correct the affected aggregate constructors:
+- TrustedQuestionStages must rebuild and validate its supplied QuestionEvidence, preserving exact field types and refusing silent normalization.
+- TrustedStages must rebuild and validate every supplied TrustedQuestionStages rather than retain it after an exact-class check.
+- Preserve the existing validated history, committed-stage and identity checks.
+- Apply the same stated nested-value rule to StageState's supplied plan; confirm that it is validated rather than merely accepted through equality.
+- Check the other new M5e aggregate constructors for this same omission and fix demonstrated instances within the authorized domain module.
+- Keep construction as a consistency check only. Do not claim that constructors prove database origin, authorization or provenance.
+
+Add focused regressions for malformed nested instances and valid controls, including replacement paths where applicable. Preserve fresh fixed errors without cause or context and process-control identity.
+
+Do not weaken the accepted constructor contract or change existing M5a–M5d contracts to accommodate these values.
+
+4. Authorized changes
+
+Changes against the starting staged tree are limited to:
+- packages/domain/evidenceguard_domain/review_stages.py
+- tests/test_review_stage_values.py
+- tests/test_review_stage_persistence.py
+- docs/decisions/0023-review-stage-persistence.md
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+The same 23 paths should remain staged against HEAD.
+
+Keep persistence production code, retrieval.py, models, migration 0007, PostgreSQL tests, workflows, packaging, dependencies, pinned resources and every other blob unchanged.
+
+If a necessary correction genuinely requires another path, explain the concrete dependency before changing it. Do not stop for routine implementation choices within this scope.
+
+5. Regression evidence
+
+Run the new finding-specific tests against:
+- exact isolated copies of the submitted domain module;
+- the corrected module.
+
+Confirm import locations.
+
+Report:
+- which failures genuinely reproduce the findings;
+- which tests add consistency coverage;
+- which controls already passed.
+
+Do not describe all old-code failures as reproductions automatically.
+
+The reviewer's evidence is isolated constructor probing only, not a project-suite, installed-wheel, database or PostgreSQL run. Attribute it accordingly.
+
+6. Verification
+
+Use the locked offline environment.
+
+Run:
+- Ruff check and format check;
+- strict mypy;
+- the focused M5e unit tests, including values, planner, persistence and evidence recheck;
+- affected packaging and existing M4d retrieval unit checks;
+- the full suite and collection.
+
+Report PostgreSQL skips explicitly. No database is configured; do not imply that collection or skips verify database behaviour.
+
+Rebuild and compare packaging against the preserved baseline. Confirm only the authorized new correction differences, unchanged sample data and unchanged pinned template/prompt bytes.
+
+Run the full installed-wheel step in a fresh environment outside the checkout with hashed offline dependencies and the wheel installed with --no-deps. Directly probe the corrected question and aggregate boundaries against that installed wheel.
+
+If documentation changes require a final rebuild, verify the final wheel's relationship to the tested artifact accurately.
+
+Do not alter authentication, obtain credentials, configure a database, use providers, or run network calls.
+
+7. Documentation and history
+
+Record in ADR-0023:
+- both findings and their corrections;
+- the reviewer's isolated evidence and its limits;
+- submitted-versus-corrected regression classification;
+- local checks actually completed;
+- PostgreSQL and exact-version CI still pending.
+
+Update current status summaries consistently without changing accepted specification headings or anchors.
+
+M5e remains implemented, corrected and staged for review. Implementation acceptance, commit, publication and CI remain pending.
+
+Preserve all existing limitations, including E7, U4's discarded evidence, worker composition obligations, the M3 lease window and the M4d trusted-snapshot limitation.
+
+Append the Prompt 200 handoff, this review disposition, Prompt 201 verbatim, and a completed-check outcome note to prompts.md. Preserve the previous bytes exactly as a prefix. Use a byte-safe method for literal backslashes and Unicode; do not reconstruct unavailable text and label it verbatim.
+
+8. Final checks and export
+
+Verify:
+- only authorized files differ from the starting staged tree;
+- all other blobs are unchanged;
+- no tracked .local files or build artifacts;
+- links and tables;
+- UTF-8 without BOM, LF only, no replacement characters;
+- git diff checks;
+- privacy and unsuppressed staged Gitleaks.
+
+Export:
+.local/p201/m5e-question-and-aggregate-boundary-corrections.diff
+
+Use the starting staged tree a5037d57047fa3933d02abd115c071dfcdbd3c92 as baseline, the final staged tree as destination, --full-index, and exclude prompts.md.
+
+Verify byte identity against Git. Report the full baseline and final tree IDs, changed paths, statistics, byte count, line count and full SHA-256.
+
+Finish with a self-contained handoff for Mathew and the external reviewer. Clearly distinguish completed local checks from unrun PostgreSQL and CI checks.
+
+Leave everything staged and uncommitted. Do not push, merge or start M5f.
+
+Mathew: return the handoff plus
+.local/p201/m5e-question-and-aggregate-boundary-corrections.diff
+to the external reviewer.
+
+### Prompt 201 outcome (Claude Code; staged, awaiting review)
+
+Completed work and checks only. The starting state matched (branch
+`feat/review-stage-persistence`, HEAD `313b523d`, `main` and `origin/main` at `1efe3ed3`, staged
+tree `a5037d57` with the 23 Prompt 200 paths, nothing unstaged or untracked); the Prompt 200 export
+matched (493,975 bytes, 11,291 lines, SHA-256 `a25fad39…81c4`, byte-identical to Git). Checkpoint
+and exact submitted copies under `.local/p201/`. No remote operation.
+
+- **Finding A corrected** in `review_stages.py`: the shared question boundary checks exact field
+  types (exact `str` ID and text, exact `tuple` of exact `str` queries, exact `bool` flag) before
+  any normalization or serialization, rebuilds through the `EvidenceQuestion` constructor (no
+  `model_copy`) and requires unchanged values and types; refusals are fixed and silent.
+- **Finding B corrected:** `TrustedQuestionStages` rebuilds its `QuestionEvidence` and any supplied
+  stages; `TrustedStages` rebuilds every question; `StageState` rebuilds its plan. The other M5e
+  aggregates already rebuilt their nested values.
+- **Regressions:** 65 finding-specific tests (values and persistence boundary). Against an isolated
+  overlay of the exact submitted module: 24 passed, 41 failed (20 genuine reproductions of the
+  reviewer's probes, 19 further instances of the same omissions, 2 corrected-path coverage tests);
+  against the corrected module: 65 passed. A fixture flaw that let one process-control test pass
+  vacuously on the submitted code was found and fixed before classification.
+- **Checks run in this session:** `ruff format --check` (220 files), `ruff check` (clean), strict
+  `mypy` (176 files, no issues); focused M5e, packaging and M4d retrieval unit tests 658 passed; full
+  suite 3,966 passed and 387 skipped (385 PostgreSQL tests without a database, 2 platform skips);
+  collection 385 integration and 3,968 non-integration; links 397 and tables 89 without problems;
+  offline build compared with the `313b523d` baseline and the submitted build (only the
+  correction differs; 16 `sample_data` files and the template and prompts identical); the complete
+  installed-wheel step exited 0 in a fresh environment (hashed offline dependencies, wheel
+  `--no-deps`); direct probes against the installed wheel refused the malformed questions without
+  warnings and rebuilt nested aggregates; the final wheel's members are byte-identical to the
+  tested wheel.
+- **Not run:** PostgreSQL tests (no `EG_TEST_DATABASE_URL`), CI.
+- The Prompt 200 handoff and Prompt 201 (extracted by script from this session's log, the prompt
+  from inside the paste markers) and the disposition above are appended after the unchanged
+  prefix. The scope, encoding, whitespace, privacy and Gitleaks checks and the export follow and
+  are reported in the handoff. Nothing is committed.
+
+### Prompt 201 handoff summary (OpenAI Codex recovery; not verbatim)
+
+The original final Prompt 201 handoff text is unavailable in the recovered `.local/p201/`
+checkpoints: `transcript/` contains the Prompt 200 handoff and Prompt 201 user prompt, not the
+Prompt 201 final handoff. This is an explicitly labelled summary based on `checkpoint.md`,
+`outcome.md`, the correction export and the recovered index; no missing text is reconstructed
+as verbatim. Claude Code implemented M5e in Prompt 200 and corrected exact question validation
+and nested aggregate rebuilding in Prompt 201. It left 23 paths staged and uncommitted on
+`feat/review-stage-persistence`, HEAD `313b523d052a9dbd49f3dbd53e5f0af835ccfe1f`,
+accepted staged tree `c6ca841a6c4e2c49e567d0557a17e42c6770ac60`, with nothing unstaged
+or untracked outside ignored artifacts. Local `main` and `origin/main` remained at
+`1efe3ed3f0aa9697ce4e71cee295293a89c94909`. Prompt 201's full-index correction export,
+excluding this history, compares tree `a5037d57047fa3933d02abd115c071dfcdbd3c92` to
+the accepted tree: 73,242 bytes, 682 lines, SHA-256
+`6fea269e5527b5d1d2e82d04413223e8c2ce5bfa985e607cfb813ddc1bb9a4b4`.
+Codex verified those export values and byte identity against Git during Prompt 202 recovery.
+Claude Code's Prompt 201 local results and their limits remain separately attributed in the
+preceding outcome and ADR-0023; they were not rerun by Codex. No publication or M5f work followed.
+
+### Prompt 202 external review decision and evidence (supplied by Mathew)
+
+**Decision.** The external reviewer accepted the corrected M5e implementation and the recorded
+implementation choices for a local implementation commit only. The specification was accepted
+in Prompt 199; Claude Code implemented it in Prompt 200 and corrected findings A and B in
+Prompt 201. OpenAI Codex performed this recovery, acceptance documentation and commit preparation
+in Prompt 202. Earlier reviewer and assistance attribution remains unchanged. Publication,
+PostgreSQL execution and exact-commit current-version CI remain pending.
+
+**Reviewer evidence (supplied decision, not checks run by Codex).** The reviewer independently
+verified the Prompt 201 export's size (73,242 bytes), line count (682), SHA-256
+`6fea269e5527b5d1d2e82d04413223e8c2ce5bfa985e607cfb813ddc1bb9a4b4`, paths and
+statistics; reconstructed the corrected domain module and confirmed Git blob
+`78f228c678f5f05e0e3ccfb5bd7431e2b1bf4461`; inspected the corrections and regression
+tests; and ran 59 isolated constructor check cases with Python 3.12.14 and Pydantic 2.14.0,
+all passing. These covered malformed questions, warning-free refusals, valid controls, invalid
+nested evidence and question entries, the equal-but-bool `StageState` plan, nested rebuilding,
+replacement and process-control identity.
+
+**Limits and attribution.** Those were isolated checks in a reconstructed review environment,
+not a project-suite, installed-wheel, database or PostgreSQL run; they did not byte-verify the
+entire staged repository. The bypass-built constructor probes neither demonstrate a
+database-reload bypass nor establish a defence against hostile in-process code. The note about
+M5b's accepted `model_copy` pattern is not a demonstrated new defect. The findings, corrections
+and regression classification above remain the historical record.
+
+Claude Code's separately attributed Prompt 201 Windows results below (658 focused passes;
+3,966 full-suite passes and 387 skips; collection of 385 integration and 3,968 non-integration
+tests; static checks, offline build, installed-wheel step and direct wheel probes) and the
+Prompt 200 results are historical local evidence, not exact-commit CI. Codex did not repeat
+application tests, builds or wheel checks: every implementation and test blob remains identical
+to accepted tree `c6ca841a6c4e2c49e567d0557a17e42c6770ac60`. All PostgreSQL-backed
+behaviour remains unverified; collection and skips verify none of it. All later-slice and
+runtime limitations below remain in force; M5f–M5h and overall M5 acceptance remain pending.
+
+
+### Prompt 202 (verbatim)
+
+Prompt 202 — Recover EvidenceGuard and commit the accepted M5e implementation locally
+
+Written for: Mathew and the external reviewer.
+
+You are working on EvidenceGuard in a fresh Codex session after a break. Claude Code performed the previous implementation work. Do not assume that its session context or background processes still exist.
+
+The external reviewer accepted the corrected M5e implementation for a local implementation commit only. That acceptance has already been given; you do not need to ask for it again.
+
+Recover the repository state, record that acceptance, complete the documentation checks and commit locally.
+
+No push, merge, remote operation or M5f work is authorized.
+
+1. Read the repository instructions and recover the state
+
+Read the applicable repository instructions, including AGENTS.md or CLAUDE.md if present, and the relevant checkpoints under:
+- .local/p200/
+- .local/p201/
+
+Read the M5e implementation-status section in docs/plan.md and ADR-0023.
+
+Use targeted reads of prompts.md for recent history rather than loading the entire file unnecessarily.
+
+Expected state from the last handoff:
+- Branch: feat/review-stage-persistence
+- HEAD:
+  313b523d052a9dbd49f3dbd53e5f0af835ccfe1f
+- main and origin/main:
+  1efe3ed3f0aa9697ce4e71cee295293a89c94909
+- Accepted staged tree:
+  c6ca841a6c4e2c49e567d0557a17e42c6770ac60
+- Exactly 23 paths staged against HEAD.
+- Nothing unstaged or untracked outside ignored local artifacts.
+- Origin and the established noreply identity unchanged.
+
+Inspect the actual state before making changes. Do not reset, clean, discard, stash or overwrite unexpected work.
+
+If it matches, continue. If it differs materially, report the precise discrepancy before making dependent changes. If this task has already been completed, identify the existing commit instead of creating a duplicate.
+
+Do not fetch or contact the remote. origin/main is a locally stored reference, not a fresh observation of GitHub.
+
+2. Verify the correction export and save a checkpoint
+
+Expected file:
+.local/p201/m5e-question-and-aggregate-boundary-corrections.diff
+
+Expected:
+- 73,242 bytes
+- 682 lines
+- SHA-256:
+  6fea269e5527b5d1d2e82d04413223e8c2ce5bfa985e607cfb813ddc1bb9a4b4
+- Full-index comparison from:
+  a5037d57047fa3933d02abd115c071dfcdbd3c92
+  to:
+  c6ca841a6c4e2c49e567d0557a17e42c6770ac60
+- prompts.md excluded.
+
+Verify the file against those values and Git's comparison.
+
+Save a recovery checkpoint under .local/p202/ containing:
+- refs and status;
+- accepted staged tree;
+- all 23 staged blob hashes;
+- prompts.md bytes or a recoverable prefix copy and its checksum.
+
+3. Understand the accepted implementation and evidence
+
+M5e implements:
+- pure review-stage values, canonical encodings and strict decoders;
+- the bounded call-reservation planner;
+- fenced persistence and replay;
+- trusted stage reload;
+- the extracted evidence-recheck helper;
+- migration 0007 with four tables.
+
+It adds no output table, production review path, live provider or run_review registration.
+
+Prompt 200 implemented it. Prompt 201 corrected:
+A. Exact question-field validation before normalization or serialization, including refusal without Pydantic warnings.
+B. Nested rebuilding in TrustedQuestionStages, TrustedStages and StageState.
+
+The external reviewer accepted these corrections and the recorded ADR-0023 implementation choices for a local implementation commit only.
+
+Reviewer evidence:
+- Independently verified the supplied Prompt 201 export's size, line count, SHA-256, paths and statistics.
+- Reconstructed the corrected domain module and confirmed Git blob:
+  78f228c678f5f05e0e3ccfb5bd7431e2b1bf4461
+- Inspected the corrections and regression tests.
+- Ran 59 isolated constructor check cases with Python 3.12.14 and Pydantic 2.14.0. All passed.
+
+Those checks covered malformed questions, warning-free refusals, valid controls, invalid nested evidence and question entries, the equal-but-bool StageState plan, nested rebuilding, replacement and process-control identity.
+
+They were isolated checks in a reconstructed review environment. They were not a project-suite, installed-wheel, database or PostgreSQL run, and did not byte-verify the entire staged repository.
+
+Claude Code's separately attributed Prompt 201 local Windows evidence:
+- Focused checks: 658 passed.
+- Full suite: 3,966 passed, 387 skipped.
+- Collection: 385 integration and 3,968 non-integration.
+- Static checks, offline build, installed-wheel step and direct wheel probes passed.
+
+These are historical local results, not exact-commit CI.
+
+All PostgreSQL-backed behaviour remains unverified. Collection and skips do not verify it.
+
+The bypass-built constructor probes do not demonstrate a database-reload bypass or establish a defence against hostile in-process code.
+
+The note about M5b's accepted model_copy pattern is not a demonstrated new defect.
+
+4. Record acceptance using documentation changes only
+
+Against the accepted staged tree, change only:
+- README.md
+- docs/decisions/0023-review-stage-persistence.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Every other blob must remain identical to the accepted staged tree, including production code, tests, migration, models, retrieval.py, packaging, workflows, dependencies, resources and ADR-0022.
+
+ADR-0023:
+- Record acceptance at external review for a local implementation commit in Prompt 202, pending PostgreSQL execution and exact-commit CI.
+- Add an External review (Prompt 202) section with the decision, evidence, attribution and limits.
+- Mark the recorded implementation choices approved within this scope.
+- Preserve the findings, corrections and regression classification.
+- Keep Prompt 200–201 checks as historical local evidence.
+
+README, plan and threat model:
+- Specification accepted in Prompt 199.
+- Implemented in Prompt 200.
+- Corrected in Prompt 201.
+- Accepted for a local implementation commit in Prompt 202.
+- Publication, PostgreSQL execution and current-version CI pending.
+
+Rename only the separate implementation-status heading if needed and update all links to it. Preserve the accepted specification heading and anchor.
+
+Preserve all limitations:
+- no M5e control operates in an application review path;
+- run_review remains unregistered;
+- E7 assigns the output table and atomic output writer to M5f/M5g;
+- discarded U4 evidence cannot be re-proved at reload;
+- worker composition obligations remain;
+- the accepted M3 lease window remains;
+- the M4d trusted-snapshot limitation remains open;
+- overall M5 acceptance remains pending.
+
+5. Preserve history and attribution accurately
+
+Append to prompts.md:
+- the Prompt 201 handoff, verbatim if its original text is available;
+- the review decision and evidence above;
+- this Prompt 202 verbatim;
+- a pre-commit note containing completed checks only.
+
+Preserve all previous bytes exactly as a prefix. Use a byte-safe method for backslashes and Unicode.
+
+Do not reconstruct missing text and label it verbatim. If the original handoff is unavailable, record an explicitly labelled summary referencing the checkpoint and explain that limitation.
+
+Attribute Prompt 200–201 implementation and corrections to Claude Code. Attribute this recovery, acceptance documentation and commit preparation to OpenAI Codex. Preserve earlier reviewer and assistance attribution.
+
+Do not write a prospective commit SHA into the pre-commit note.
+
+6. Check and commit locally
+
+This is documentation-only work against an already accepted implementation. Do not repeat application tests, builds or installed-wheel checks if all accepted implementation blobs remain identical.
+
+Complete the repository's required checks appropriate to these changes, including:
+- exactly the same 23 paths staged against HEAD;
+- only the five authorized files differ from the accepted staged tree;
+- every other blob identical;
+- no tracked .local files or build artifacts;
+- links, anchors and tables;
+- UTF-8 without BOM, LF only, no replacement characters;
+- git diff checks;
+- prompt-history prefix and text fidelity;
+- privacy scan;
+- unsuppressed staged Gitleaks;
+- required documentation formatting and lint.
+
+If a required tool is unavailable, report the specific limitation rather than silently bypassing the check or installing unrelated tooling.
+
+Once checks pass, commit locally on feat/review-stage-persistence.
+
+Suggested subject:
+feat: persist review stages and bounded call reservations
+
+Use the established noreply author and committer identity.
+
+Write the commit message from a file. Follow repository attribution conventions while accurately distinguishing Claude Code's earlier work, Codex's current work and the external review. Do not invent a model identity or misattribute the current work.
+
+Do not amend previous commits or rewrite history.
+
+After committing:
+- verify SHA, parent, tree, subject and identities;
+- verify the 23 changed paths;
+- verify all accepted implementation and test blobs remain identical;
+- confirm the working tree is clean;
+- run the required full-history unsuppressed Gitleaks check;
+- confirm main and origin/main remain unchanged.
+
+7. Export and handoff
+
+Export:
+.local/p202/m5e-commit-incremental.diff
+
+Baseline:
+c6ca841a6c4e2c49e567d0557a17e42c6770ac60
+
+Destination:
+the new local commit
+
+Use --full-index and exclude prompts.md.
+
+Verify byte identity against Git. Report:
+- full commit SHA, parent and tree;
+- changed paths and blob identity;
+- export baseline and destination;
+- statistics, bytes, lines and full SHA-256;
+- completed checks and limitations;
+- final branch and working-tree state.
+
+Finish with a self-contained handoff for Mathew and the external reviewer.
+
+State clearly:
+- accepted and committed locally only;
+- nothing pushed or merged;
+- PostgreSQL execution and exact-commit CI remain pending;
+- M5f–M5h and overall M5 acceptance remain pending.
+
+Do not proceed to publication or M5f.
+
+Mathew: return the handoff plus
+.local/p202/m5e-commit-incremental.diff
+to the external reviewer.
+
+### Prompt 202 pre-commit note (OpenAI Codex; completed checks only)
+
+Recovered the expected branch, HEAD, local main refs and accepted 23-path index; verified the
+Prompt 201 correction export's 73,242 bytes, 682 lines, full SHA-256 and byte identity against
+Git. Saved refs, status, accepted tree, all 23 staged blob hashes and the exact 2,370,432-byte
+prompt-history prefix with SHA-256
+`5e7c0decef4bba8e054aa74f1d72cf7a5d382471eb1fcf0c51001f039ac6b3cc` under `.local/p202/`.
+
+Recorded the supplied external acceptance for a local implementation commit only, preserving
+the findings, regression classification, evidence attribution and runtime limitations. The
+Prompt 201 final handoff was unavailable in the recovered checkpoints; appended an explicitly
+labelled summary, the review decision and evidence, and Prompt 202 verbatim after the unchanged
+prefix. Verified prompt inclusion and text fidelity using byte comparisons. No prospective
+commit identity is recorded here.
+
+Completed checks: exactly the same 23 staged paths against HEAD; exactly the five authorized
+documents differ from accepted tree `c6ca841a6c4e2c49e567d0557a17e42c6770ac60`; every other
+blob and mode identical, including all implementation, tests, ADR-0022, packaging, workflows,
+dependencies and resources. No tracked local or build artifacts; no unstaged or nonignored
+untracked files. All 23 staged files are UTF-8 without BOM, LF only, without replacement
+characters and byte-identical to their working files. `git diff --check`, staged checks against
+HEAD and the accepted tree passed. The local link, anchor and table checker reported 386 links,
+85 tables and no problems for the four current documentation files. Repository Ruff formatting
+(`.venv/Scripts/ruff.exe format --check .`: 220 files) and lint
+(`.venv/Scripts/ruff.exe check .`) passed. The staged privacy scan found only the established
+noreply email and no credential or personal-path patterns. Unsuppressed Gitleaks 8.30.1
+(`gitleaks git --pre-commit --staged --redact --verbose --ignore-gitleaks-allow --no-banner .`)
+reported no leaks. No scanner config, baseline, ignore file or environment override was used.
+Origin, noreply identity, branch and local main refs were verified unchanged.
+
+These are current recovery and documentation checks. Claude Code's Prompt 200–201 application,
+build and installed-wheel results remain historical and were not repeated because all accepted
+implementation and test blobs are unchanged. The reviewer's 59 isolated passes are separately
+attributed, not a project or database run. All PostgreSQL-backed behaviour and exact-commit CI
+remain unverified. No remote operation, push, merge, history rewrite or M5f work occurred.

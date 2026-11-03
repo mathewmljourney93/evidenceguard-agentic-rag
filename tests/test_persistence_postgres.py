@@ -41,7 +41,13 @@ M2A_TABLES = {"tenants", "users", "api_keys", "vendors"}
 M3C_TABLES = M2A_TABLES | {"jobs", "documents", "document_revisions"}
 M3D_TABLES = M3C_TABLES | {"chunk_sets", "chunks"}
 M4B_TABLES = M3D_TABLES | {"embedding_profiles", "embedding_indexes", "chunk_embeddings"}
-HEAD_TABLES = M4B_TABLES | {"reviews", "review_bindings", "review_excluded_revisions"}
+M5D_TABLES = M4B_TABLES | {"reviews", "review_bindings", "review_excluded_revisions"}
+HEAD_TABLES = M5D_TABLES | {
+    "review_plan_questions",
+    "review_question_evidence",
+    "review_stage_calls",
+    "review_stage_results",
+}
 FOREIGN_KEY_VIOLATION = "23503"
 UNIQUE_VIOLATION = "23505"
 CHECK_VIOLATION = "23514"
@@ -108,8 +114,12 @@ def test_upgrade_downgrade_upgrade_on_an_empty_database(
 
     command.upgrade(config, "head")
     assert _tables(empty_database) == HEAD_TABLES | {"alembic_version"}
-    assert _version(empty_database) == "0006"
+    assert _version(empty_database) == "0007"
     assert _extensions(empty_database) == {"plpgsql", "vector"}
+
+    command.downgrade(config, "0006")
+    assert _tables(empty_database) == M5D_TABLES | {"alembic_version"}
+    assert _version(empty_database) == "0006"
 
     command.downgrade(config, "0004")
     assert _tables(empty_database) == M3D_TABLES | {"alembic_version"}
@@ -134,7 +144,7 @@ def test_upgrade_downgrade_upgrade_on_an_empty_database(
 
     command.upgrade(config, "head")
     assert _tables(empty_database) == HEAD_TABLES | {"alembic_version"}
-    assert _version(empty_database) == "0006"
+    assert _version(empty_database) == "0007"
 
 
 def _version(engine: Engine) -> str | None:

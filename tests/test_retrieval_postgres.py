@@ -122,7 +122,7 @@ E0, E1 = _vector(1.0, 0.0), _vector(0.0, 1.0)
 NEAR_E0, NEAR_E1 = _vector(0.8, 0.6), _vector(0.6, 0.8)
 
 
-# --- engines and fixtures ------------------------------------------------------------------------
+# --- engines and fixtures -------------------------------------------------------------------------
 
 
 def _engine(url: URL, **options: Any) -> Engine:
@@ -159,7 +159,7 @@ def vendor(engine: Engine, actor: ActorContext) -> UUID:
     return _vendor(engine, actor.tenant_id, "lumenvale")
 
 
-# --- helpers -------------------------------------------------------------------------------------
+# --- helpers --------------------------------------------------------------------------------------
 
 
 def _tenant(engine: Engine, slug: str, role: Role = Role.REVIEWER) -> ActorContext:
@@ -391,7 +391,7 @@ def _hash_distance(query: str, chunk_text: str) -> float:
     return 1.0 - dot / (math.hypot(*a) * math.hypot(*b))
 
 
-# --- capture -------------------------------------------------------------------------------------
+# --- capture --------------------------------------------------------------------------------------
 
 
 def test_capture_binds_the_vendors_ready_active_revisions_exactly(
@@ -635,7 +635,7 @@ def test_an_inconsistent_pointer_takes_precedence_over_an_unready_revision(
         _capture(factory, actor, vendor)
 
 
-# --- snapshot-relative supersession --------------------------------------------------------------
+# --- snapshot-relative supersession ---------------------------------------------------------------
 
 
 def test_supersession_is_snapshot_relative(
@@ -659,7 +659,7 @@ def test_supersession_is_snapshot_relative(
     assert _revisions_of(_search(factory, actor, older_snapshot, "thirty")) == {old}
 
 
-# --- lexical semantics ---------------------------------------------------------------------------
+# --- lexical semantics ----------------------------------------------------------------------------
 
 
 @pytest.fixture
@@ -760,7 +760,7 @@ def test_vector_scores_are_exact_cosine_distances_of_the_float32_vectors(
     assert [vector[c].score for c in ordered] == sorted(vector[c].score for c in ordered)
 
 
-# --- exact cosine ordering, ties and fusion with hand-chosen vectors -----------------------------
+# --- exact cosine ordering, ties and fusion with hand-chosen vectors ------------------------------
 
 
 @pytest.fixture
@@ -850,7 +850,7 @@ def test_equal_lexical_scores_tie_by_ascending_uuid(
     assert (lexical[ids[0]].rank, lexical[ids[1]].rank) == (1, 2)
 
 
-# --- filters before limits, isolation and profiles ---------------------------------------------
+# --- filters before limits, isolation and profiles ------------------------------------------------
 
 
 def test_filters_apply_before_each_channel_limit(
@@ -988,7 +988,7 @@ def test_wrong_profile_and_building_index_candidates_never_displace_the_target(
     assert len({item.chunk_id for item in result.items}) == len(result.items)
 
 
-# --- binding recheck ---------------------------------------------------------------------------
+# --- binding recheck ------------------------------------------------------------------------------
 
 
 def test_forged_bindings_fail_the_database_recheck(
@@ -1071,7 +1071,7 @@ def test_the_recheck_cannot_prove_past_eligibility_the_accepted_limitation(
     assert _revisions_of(_search(factory, actor, forged, "retention")) == {old}
 
 
-# --- deterministic interleavings -----------------------------------------------------------------
+# --- deterministic interleavings ------------------------------------------------------------------
 
 
 def test_an_activation_committed_after_the_snapshot_is_established_is_invisible(
@@ -1201,7 +1201,7 @@ def test_indexing_completed_during_capture_is_invisible_to_that_capture(
     assert [b.revision_id for b in _capture(factory, actor, vendor).bindings] == [new]
 
 
-# --- transaction settings, timeouts and side effects ---------------------------------------------
+# --- transaction settings, timeouts and side effects ----------------------------------------------
 
 
 def test_pooled_connections_return_with_their_default_settings(
@@ -1295,7 +1295,7 @@ def test_no_approximate_vector_index_exists(engine: Engine) -> None:
     assert methods and not methods & {"hnsw", "ivfflat"}
 
 
-# --- evidence ------------------------------------------------------------------------------------
+# --- evidence -------------------------------------------------------------------------------------
 
 
 def test_evidence_matches_the_stored_rows_including_a_repeated_header(
@@ -1351,7 +1351,7 @@ def test_evidence_matches_the_stored_rows_including_a_repeated_header(
     assert result.snapshot_sha256 == snapshot.sha256
 
 
-# --- M5d composable capture equivalence (ADR-0022) -----------------------------------------------
+# --- M5d composable capture equivalence (ADR-0022) ------------------------------------------------
 
 
 def test_capture_in_transaction_matches_capture_snapshot_and_leaves_the_transaction_open(
@@ -1383,4 +1383,84 @@ def test_capture_in_transaction_matches_capture_snapshot_and_leaves_the_transact
     assert (composed.tenant_id, composed.vendor_id) == (reference.tenant_id, reference.vendor_id)
     assert (composed.identity, composed.config) == (reference.identity, reference.config)
     assert composed.profile_id == reference.profile_id
+    assert _rows(engine) == before
+
+
+# --- M5e extracted evidence recheck (ADR-0023) ----------------------------------------------------
+
+
+def _statement_kinds(engine: Engine) -> tuple[list[str], Any]:
+    """Successfully executed retrieval statements on ``engine``, by kind (test-owned listener)."""
+    kinds: list[str] = []
+    markers = (
+        ("AS verified", "recheck"),
+        ("websearch_to_tsquery", "lexical"),
+        ("<=>", "vector"),
+        ("ANY(CAST(", "evidence"),
+    )
+
+    def listener(*args: Any) -> None:
+        statement: str = args[2]
+        for marker, kind in markers:
+            if marker in statement:
+                kinds.append(kind)
+                return
+
+    event.listen(engine, "after_cursor_execute", listener)
+    return kinds, listener
+
+
+def test_retrieval_keeps_its_statement_order_after_the_extraction(
+    factory: sessionmaker[Session], engine: Engine, actor: ActorContext, vendor: UUID
+) -> None:
+    _ready(factory, engine, actor, vendor, "retention", "Retention is ninety days.\n")
+    snapshot = _capture(factory, actor, vendor)
+    kinds, listener = _statement_kinds(engine)
+    try:
+        result = _search(factory, actor, snapshot, "retention", "ninety days")
+    finally:
+        event.remove(engine, "after_cursor_execute", listener)
+    assert kinds == ["recheck", "lexical", "vector", "lexical", "vector", "evidence"]
+    assert result.items
+
+
+def test_recheck_evidence_in_transaction_matches_retrieval_and_refuses_differences(
+    factory: sessionmaker[Session], engine: Engine, actor: ActorContext, vendor: UUID
+) -> None:
+    from evidenceguard_persistence.retrieval import (
+        INCONSISTENT,
+        EvidenceRecheckFailure,
+        recheck_evidence_in_transaction,
+    )
+
+    _ready(factory, engine, actor, vendor, "retention", "Retention is ninety days.\n")
+    snapshot = _capture(factory, actor, vendor)
+    result = _search(factory, actor, snapshot, "retention")
+    item = result.items[0]
+    renamed = dataclasses.replace(
+        item, evidence=dataclasses.replace(item.evidence, title="Another title")
+    )
+    outside = uuid4()
+    foreign = dataclasses.replace(
+        item, chunk_id=outside, evidence=dataclasses.replace(item.evidence, chunk_id=outside)
+    )
+    before = _rows(engine)
+    kinds, listener = _statement_kinds(engine)
+    try:
+        with factory() as session:
+            session.execute(text("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY"))
+            session.execute(select(func.clock_timestamp())).scalar_one()
+            outcomes = [
+                recheck_evidence_in_transaction(session, actor, snapshot, items)
+                for items in (result.items, (), (renamed,), (foreign,))
+            ]
+            assert session.in_transaction()  # the caller still owns the transaction
+            session.rollback()
+    finally:
+        event.remove(engine, "after_cursor_execute", listener)
+    assert outcomes[0] == result.items and outcomes[1] == ()
+    assert outcomes[2] == INCONSISTENT and outcomes[3] == INCONSISTENT
+    assert not any(isinstance(outcome, EvidenceRecheckFailure) for outcome in outcomes)
+    # the same binding recheck and evidence statement as retrieval; no channel statement
+    assert kinds == ["recheck", "evidence", "recheck", "recheck", "evidence", "recheck", "evidence"]
     assert _rows(engine) == before

@@ -511,4 +511,8 @@ call.
   transaction; no physical disposal or pool quarantine is claimed.
 - An unknown `COMMIT` outcome is never retried automatically; the caller may repeat the request
   with the same key, which replays if the earlier commit succeeded.
-- M5e stores stage calls and outputs; M5f the report representation; M7 measures live behaviour.
+- M5e stores planned questions, evidence, call reservations and stages (implemented in Prompt
+  200, [ADR-0023](0023-review-stage-persistence.md)); under the E7 scope decision the report
+  output and its atomic writer belong to M5f/M5g, not M5e; M5f the report representation; M7
+  measures live behaviour. (Historical: this line read "M5e stores stage calls and outputs"
+  before E7.)

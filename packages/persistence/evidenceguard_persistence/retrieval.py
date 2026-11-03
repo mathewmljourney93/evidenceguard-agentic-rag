@@ -66,6 +66,7 @@ from evidenceguard_domain.retrieval import (
     CHANNEL_LIMIT,
     LEXICAL,
     MAX_EXCLUSION_IDS,
+    MAX_K,
     MAX_SNAPSHOT_CHUNKS,
     MAX_SNAPSHOT_REVISIONS,
     RETRIEVAL_CONFIG_V1,
@@ -757,7 +758,60 @@ def _verified_text(row: Any) -> bool:
     return bool(digest == row.content_sha256)
 
 
-def _retrieved(chunk: FusedChunk, row: Any) -> RetrievedChunk:
+@dataclass(frozen=True)
+class RetrievedEvidenceRow:
+    """One chunk's database-built evidence within a snapshot: its revision, its document and the
+    ``ChunkEvidence`` constructed from the row (M5e-J1)."""
+
+    revision_id: UUID
+    document_id: UUID
+    evidence: ChunkEvidence
+
+    def __post_init__(self) -> None:
+        if type(self.revision_id) is not UUID or type(self.document_id) is not UUID:
+            raise InvalidRetrievalRequestError()
+        if type(self.evidence) is not ChunkEvidence:
+            raise InvalidRetrievalRequestError()
+
+
+def _evidence_row(row: Any) -> RetrievedEvidenceRow:
+    return RetrievedEvidenceRow(row.revision_id, row.document_id, _evidence(row))
+
+
+def recheck_bindings(session: Session, snapshot: RetrievalSnapshot) -> SemanticOutcome | None:
+    """The binding and profile recheck: ``BINDING_RECHECK_SQL`` with ``binding_parameters``; a
+    count other than the number of bindings is ``snapshot_inconsistent``. Ordinary exceptions
+    propagate to the caller's boundary."""
+    verified = session.execute(text(BINDING_RECHECK_SQL), binding_parameters(snapshot)).scalar_one()
+    if type(verified) is not int or verified != len(snapshot.bindings):
+        return INCONSISTENT
+    return None
+
+
+def load_snapshot_evidence(
+    session: Session, snapshot: RetrievalSnapshot, chunk_ids: tuple[UUID, ...]
+) -> dict[UUID, RetrievedEvidenceRow] | SemanticOutcome:
+    """``EVIDENCE_SQL`` for ``chunk_ids`` (each through the full snapshot eligibility joins):
+    exactly one row per requested ID, a text digest equal to ``content_sha256`` and a
+    constructible ``ChunkEvidence`` (built in ``chunk_ids`` order), otherwise
+    ``snapshot_inconsistent``. Ordinary exceptions propagate to the caller's boundary."""
+    parameters = {**binding_parameters(snapshot), "chunk_ids": list(chunk_ids)}
+    rows = session.execute(text(EVIDENCE_SQL), parameters).all()
+    by_id = {row.chunk_id: row for row in rows}
+    if len(by_id) != len(rows) or set(by_id) != set(chunk_ids):
+        return INCONSISTENT
+    if not all(_verified_text(row) for row in rows):
+        return INCONSISTENT
+    loaded: dict[UUID, RetrievedEvidenceRow] = {}
+    for chunk_id in chunk_ids:
+        built = _build(partial(_evidence_row, by_id[chunk_id]))
+        if isinstance(built, SemanticOutcome):
+            return built
+        loaded[chunk_id] = built
+    return loaded
+
+
+def _retrieved(chunk: FusedChunk, row: RetrievedEvidenceRow) -> RetrievedChunk:
     return RetrievedChunk(
         chunk.chunk_id,
         row.revision_id,
@@ -765,21 +819,16 @@ def _retrieved(chunk: FusedChunk, row: Any) -> RetrievedChunk:
         chunk.fused_rank,
         chunk.fused_score,
         chunk.hits,
-        _evidence(row),
+        row.evidence,
     )
 
 
 def _items(
-    fused: tuple[FusedChunk, ...], rows: Sequence[Any]
+    fused: tuple[FusedChunk, ...], loaded: dict[UUID, RetrievedEvidenceRow]
 ) -> tuple[RetrievedChunk, ...] | SemanticOutcome:
-    by_id = {row.chunk_id: row for row in rows}
-    if len(by_id) != len(rows) or set(by_id) != {chunk.chunk_id for chunk in fused}:
-        return INCONSISTENT
-    if not all(_verified_text(row) for row in rows):
-        return INCONSISTENT
     items: list[RetrievedChunk] = []
     for chunk in fused:
-        item = _build(partial(_retrieved, chunk, by_id[chunk.chunk_id]))
+        item = _build(partial(_retrieved, chunk, loaded[chunk.chunk_id]))
         if isinstance(item, SemanticOutcome):
             return item
         items.append(item)
@@ -794,9 +843,9 @@ def _retrieval_body(
 
     def body(session: Session, now: datetime) -> RetrievalResult | SemanticOutcome:
         _set_timeout(session)
-        verified = session.execute(text(BINDING_RECHECK_SQL), parameters).scalar_one()
-        if type(verified) is not int or verified != len(snapshot.bindings):
-            return INCONSISTENT
+        rechecked = recheck_bindings(session, snapshot)
+        if rechecked is not None:
+            return rechecked
         lists: list[ChannelList] = []
         for position, query in enumerate(request.queries):
             rows = session.execute(text(LEXICAL_SQL), {**parameters, "query": query}).all()
@@ -821,12 +870,15 @@ def _retrieval_body(
             return fused
         items: tuple[RetrievedChunk, ...] = ()
         if fused:
-            evidence_parameters = {**parameters, "chunk_ids": [chunk.chunk_id for chunk in fused]}
-            rows = session.execute(text(EVIDENCE_SQL), evidence_parameters).all()
-            loaded = _items(fused, rows)
+            loaded = load_snapshot_evidence(
+                session, snapshot, tuple(chunk.chunk_id for chunk in fused)
+            )
             if isinstance(loaded, SemanticOutcome):
                 return loaded
-            items = loaded
+            built = _items(fused, loaded)
+            if isinstance(built, SemanticOutcome):
+                return built
+            items = built
         return _build(
             partial(RetrievalResult, snapshot, len(request.queries), request.k, skipped, items)
         )
@@ -847,3 +899,122 @@ def retrieve_with_vectors(
     checked_snapshot, checked_request = check_retrieval_access(actor, snapshot, request)
     vectors = checked_query_vectors(query_batch, checked_snapshot, checked_request)
     return run_read(session_factory, _retrieval_body(checked_snapshot, checked_request, vectors))
+
+
+# --- evidence recheck (M5e-J1, ADR-0023) ---------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class EvidenceRecheckFailure:
+    """An ordinary operational failure of ``recheck_evidence_in_transaction``, as a fixed category
+    only (no exception, message, SQL, parameter or chain)."""
+
+    category: DatabaseFailureCategory
+
+    def __post_init__(self) -> None:
+        if type(self.category) is not DatabaseFailureCategory:
+            raise ValueError("unknown evidence recheck failure category")
+
+
+def _rebuilt_item(value: object) -> RetrievedChunk:
+    if type(value) is not RetrievedChunk:
+        raise InvalidRetrievalRequestError()
+    assert isinstance(value, RetrievedChunk)
+    rebuilt = RetrievedChunk(
+        value.chunk_id,
+        value.revision_id,
+        value.document_id,
+        value.fused_rank,
+        value.fused_score,
+        value.hits,
+        value.evidence,
+    )
+    if rebuilt != value:
+        raise InvalidRetrievalRequestError()
+    return rebuilt
+
+
+def _recheck_inputs(
+    snapshot: object, items: object
+) -> tuple[RetrievalSnapshot, tuple[RetrievedChunk, ...]]:
+    """Structure checks before any statement; any failure is ``InvalidRetrievalRequestError``,
+    raised outside the handler."""
+    checked: list[tuple[RetrievalSnapshot, tuple[RetrievedChunk, ...]]] = []
+    with suppress(Exception):
+        checked_snapshot = revalidate_snapshot(snapshot)
+        if type(items) is tuple and len(items) <= MAX_K:
+            rebuilt = tuple(_rebuilt_item(item) for item in items)
+            owners = {
+                (binding.revision_id, binding.document_id) for binding in checked_snapshot.bindings
+            }
+            if len({item.chunk_id for item in rebuilt}) == len(rebuilt) and all(
+                (item.revision_id, item.document_id) in owners for item in rebuilt
+            ):
+                checked.append((checked_snapshot, rebuilt))
+    if not checked:
+        raise InvalidRetrievalRequestError()
+    return checked[0]
+
+
+def _recheck_steps(
+    session: Session, snapshot: RetrievalSnapshot, items: tuple[RetrievedChunk, ...]
+) -> tuple[RetrievedChunk, ...] | SemanticOutcome:
+    """Steps 5-8: bindings and profile, then (for a non-empty tuple) the chunks and a
+    field-by-field comparison. Ranks, hits and scores are not compared."""
+    rechecked = recheck_bindings(session, snapshot)
+    if rechecked is not None:
+        return rechecked
+    if not items:
+        return items
+    loaded = load_snapshot_evidence(session, snapshot, tuple(item.chunk_id for item in items))
+    if isinstance(loaded, SemanticOutcome):
+        return loaded
+    for item in items:
+        row = loaded[item.chunk_id]
+        if (
+            item.revision_id != row.revision_id
+            or item.document_id != row.document_id
+            or item.evidence != row.evidence
+        ):
+            return INCONSISTENT
+    return items
+
+
+def recheck_evidence_in_transaction(
+    session: Session,
+    actor: ActorContext,
+    snapshot: RetrievalSnapshot,
+    items: tuple[RetrievedChunk, ...],
+) -> tuple[RetrievedChunk, ...] | SemanticOutcome | EvidenceRecheckFailure:
+    """Recheck supplied evidence items against trusted database rows inside the **caller's**
+    transaction (M5e-J1).
+
+    Precedence, before any statement: actor type (``TypeError``), snapshot and items (0-20
+    distinct ``RetrievedChunk`` values, each in a snapshot binding;
+    ``InvalidRetrievalRequestError``), role (``PermissionDeniedError``), the actor's tenant
+    against the snapshot's (``RetrievalScopeError``). Then the binding and profile recheck and,
+    for a non-empty tuple, the chunks through the full snapshot eligibility joins and a
+    comparison of each item's revision, document and evidence with the database-built values.
+    Returns the rebuilt items, a ``SemanticOutcome`` (``snapshot_inconsistent``) or, for any
+    other ordinary exception during the statements, result consumption, row access or
+    comparison, an ``EvidenceRecheckFailure`` with its fixed category. Process control
+    propagates as the same object. It runs only ``SELECT`` statements and never commits, rolls
+    back, closes the session, retries, sets isolation or sets a timeout; nothing logs.
+
+    Trusted preconditions (not verifiable here): an active REPEATABLE READ transaction whose
+    snapshot is already established, so both statements read one snapshot, and the caller ends
+    the transaction. It proves consistency with stored rows only: not relevance, that the
+    original queries ran or produced this ranking, entailment, authenticity or injection
+    resistance.
+    """
+    _require_actor(actor)
+    checked_snapshot, checked_items = _recheck_inputs(snapshot, items)
+    _require_role(actor)
+    if actor.tenant_id != checked_snapshot.tenant_id:
+        raise RetrievalScopeError()
+    category: DatabaseFailureCategory | None = None
+    try:
+        return _recheck_steps(session, checked_snapshot, checked_items)
+    except Exception as error:  # classified here; the exception is not retained
+        category = classify_database_failure(error)
+    return EvidenceRecheckFailure(category)

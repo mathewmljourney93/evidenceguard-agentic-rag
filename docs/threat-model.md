@@ -391,7 +391,7 @@ acceptance. Residual risks once implemented:
 
 The settled decisions, details and the unresolved external API facts are listed in the plan.
 
-## Review workflow (M5: sequence and M5a–M5e specifications accepted; M5a, M5b and M5c on main; M5d on main; M5e implementation pending)
+## Review workflow (M5: sequence and M5a–M5e specifications accepted; M5a, M5b and M5c on main; M5d on main; M5e implemented and staged for review)
 
 The [M5 implementation sequence](plan.md#m5-implementation-sequence-accepted-at-review-prompt-170)
 and the [M5a specification](plan.md#m5a-model-call-contracts-and-scripted-fake-provider-accepted-at-review-prompt-170-implementation-pending)
@@ -494,10 +494,21 @@ unresolved although its steps, log and parent run succeeded); no production path
 none operates in the application).** The M5e persistence controls are
 [specified and accepted](plan.md#m5e-stage-and-call-reservation-persistence-specification-accepted-at-review-prompt-199-implementation-pending)
 (proposed in Prompt 196, corrected in Prompts 197–198, accepted at external review in Prompt 199
-with two binding clarifications; [acceptance record](plan.md#m5e-acceptance-prompt-199)), but
-their implementation is pending and none exists or operates; no application review path,
-`run_review` registration or live provider is added, and M5f–M5h and overall M5 acceptance remain
-pending. See
+with two binding clarifications; [acceptance record](plan.md#m5e-acceptance-prompt-199)) and
+implemented by Claude Code in Prompt 200, corrected in Prompt 201 (exact question validation and
+nested aggregate rebuilds; constructors remain consistency checks only), and accepted at external
+review for a local implementation commit only in Prompt 202
+([implementation status](plan.md#m5e-implementation-status-accepted-for-a-local-commit-prompt-202),
+[ADR-0023](decisions/0023-review-stage-persistence.md)): fenced writes bound to the canonical
+`run_review` job with ownership rechecked at entry and after the last write, the
+three-reservation budget and single repair across attempts, explicit completion identity,
+identical-replay no-ops and fixed conflicts, and a trusted reload that rechecks evidence against
+database chunks. Publication, PostgreSQL execution and exact-commit current-version CI are
+pending (its PostgreSQL tests were written but not run). No application path uses it, so none
+operates; no application review path, `run_review` registration, output writer or live provider
+is added; the report output stays with M5f/M5g (E7), and M5f–M5h and overall M5 acceptance
+remain pending. A U4 stage's discarded evidence and its original binding cannot be re-proved, and
+persistence cannot prove template origin, original retrieval execution or request reassembly. See
 [ADR-0022](decisions/0022-review-creation.md) and the
 [implementation status](plan.md#m5d-implementation-status-reviewed-verified-in-ci-and-on-main-at-1efe3ed3). The
 [M5d specification](plan.md#m5d-composable-capture-and-atomic-review-creation-specification-accepted-at-review-prompt-188-implementation-pending)

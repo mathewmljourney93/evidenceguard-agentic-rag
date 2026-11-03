@@ -893,3 +893,419 @@ class ReviewExcludedRevision(Base):
     tenant_id: Mapped[UUID] = mapped_column(Uuid)
     review_id: Mapped[UUID] = mapped_column(Uuid)
     revision_id: Mapped[UUID] = mapped_column(Uuid)
+
+
+# --- review stages and call reservations (M5e, ADR-0023) -----------------------------------------
+
+STAGE_QUESTION_ID_CHECK = "question_id ~ '^[A-Z][A-Z0-9]{1,9}-[0-9]{2,3}$'"
+STAGE_MODEL_ID_PATTERN = "'^[a-z0-9][a-z0-9.-]{0,63}$'"
+STAGE_KINDS = ("verification", "analysis")
+CALL_KINDS = ("initial", "retry", "repair")
+REQUEST_BASES = ("original", "repaired")
+RESERVATION_STATES = ("started", "completed")
+CALL_OUTCOMES = (
+    "completed",
+    "refusal",
+    "max_tokens",
+    "unexpected_stop",
+    "invalid_output",
+    "model_mismatch",
+    "timeout",
+    "provider_failed",
+)
+REJECTION_REASONS = (
+    "chunk_not_retrieved",
+    "quote_blank",
+    "quote_not_found",
+    "quote_too_long",
+    "quote_not_exact",
+    "claim_uncited",
+    "verdict_unsupported",
+    "rationale_blank",
+    "foreign_question",
+    "citation_not_validated",
+    "citation_not_shared",
+    "mixed_verdicts",
+    "finding_status_unsupported",
+    "finding_text_blank",
+)
+VERIFICATION_REJECTION_REASONS = REJECTION_REASONS[:8]
+STAGE_OUTCOMES = ("verified", "analyzed", "unresolved")
+UNRESOLVED_REASONS = (
+    "refusal",
+    "max_tokens",
+    "unexpected_stop",
+    "model_mismatch",
+    "invalid_output",
+    "citation_rejected",
+    "timeout",
+    "provider_failed",
+    "call_abandoned",
+    "request_too_large",
+    "repair_request_too_large",
+    "evidence_too_large",
+    "verification_unresolved",
+)
+STAGE_CALL_REQUEST_KEY = "uq_review_stage_calls_request"
+STAGE_CALL_ONE_REPAIR_INDEX = "uq_review_stage_calls_one_repair"
+STAGE_CALL_ONE_REPAIR_WHERE = "call_kind = 'repair'"
+
+
+def _in(column: str, values: tuple[str, ...]) -> str:
+    return f"{column} IN ({_sql_list(values)})"
+
+
+def _hex(column: str, *, nullable: bool = False) -> tuple[str, str]:
+    check = f"{column} ~ {REVIEW_SHA256}"
+    return (column, f"{column} IS NULL OR {check}" if nullable else check)
+
+
+PLAN_QUESTION_CHECKS: tuple[tuple[str, str], ...] = (
+    ("question_id", STAGE_QUESTION_ID_CHECK),
+    ("position", "position BETWEEN 0 AND 99"),
+    _hex("question_sha256"),
+    ("job_attempt", "job_attempt BETWEEN 1 AND 10"),
+)
+QUESTION_EVIDENCE_CHECKS: tuple[tuple[str, str], ...] = (
+    _hex("question_sha256"),
+    _hex("snapshot_sha256"),
+    _hex("evidence_sha256"),
+    ("item_count", "item_count BETWEEN 0 AND 20"),
+    ("evidence_ascii", "octet_length(evidence_canonical) = char_length(evidence_canonical)"),
+    ("evidence_size", "octet_length(evidence_canonical) BETWEEN 2 AND 4194304"),
+    ("job_attempt", "job_attempt BETWEEN 1 AND 10"),
+)
+STAGE_CALL_CHECKS: tuple[tuple[str, str], ...] = (
+    ("stage", _in("stage", STAGE_KINDS)),
+    ("call_kind", _in("call_kind", CALL_KINDS)),
+    ("request_basis", _in("request_basis", REQUEST_BASES)),
+    ("state", _in("state", RESERVATION_STATES)),
+    ("outcome", f"outcome IS NULL OR {_in('outcome', CALL_OUTCOMES)}"),
+    (
+        "rejection_reason",
+        f"rejection_reason IS NULL OR {_in('rejection_reason', REJECTION_REASONS)}",
+    ),
+    ("question_id", STAGE_QUESTION_ID_CHECK),
+    ("model_requested", f"model_requested ~ {STAGE_MODEL_ID_PATTERN}"),
+    ("model_used", f"model_used IS NULL OR model_used ~ {STAGE_MODEL_ID_PATTERN}"),
+    _hex("request_sha256"),
+    _hex("prompt_sha256"),
+    _hex("evidence_sha256", nullable=True),
+    _hex("dependency_sha256", nullable=True),
+    ("sequence", "sequence BETWEEN 1 AND 3"),
+    ("max_output_tokens", "max_output_tokens BETWEEN 1 AND 8192"),
+    ("timeout_ms", "timeout_ms BETWEEN 1000 AND 120000"),
+    ("job_attempt", "job_attempt BETWEEN 1 AND 10"),
+    ("input_tokens", "input_tokens BETWEEN 0 AND 10000000"),
+    ("output_tokens", "output_tokens BETWEEN 0 AND 10000000"),
+    ("latency_ms", "latency_ms BETWEEN 0 AND 86400000"),
+    ("rejection_item_index", "rejection_item_index BETWEEN 0 AND 19"),
+    ("rejection_citation_index", "rejection_citation_index BETWEEN 0 AND 7"),
+    ("rejection_count", "rejection_count BETWEEN 1 AND 80"),
+    ("initial_sequence", "(sequence = 1) = (call_kind = 'initial')"),
+    ("initial_basis", "call_kind <> 'initial' OR request_basis = 'original'"),
+    ("repair_basis", "call_kind <> 'repair' OR request_basis = 'repaired'"),
+    (
+        "stage_refs",
+        "(evidence_sha256 IS NOT NULL) = (stage = 'verification') "
+        "AND (dependency_sha256 IS NOT NULL) = (stage = 'analysis')",
+    ),
+    (
+        "started_shape",
+        "state <> 'started' OR (completed_at IS NULL AND outcome IS NULL AND dispatched IS NULL "
+        "AND model_used IS NULL AND input_tokens IS NULL AND output_tokens IS NULL "
+        "AND latency_ms IS NULL AND rejection_reason IS NULL AND rejection_item_index IS NULL "
+        "AND rejection_citation_index IS NULL AND rejection_count IS NULL)",
+    ),
+    (
+        "completed_shape",
+        "state <> 'completed' OR (completed_at IS NOT NULL AND outcome IS NOT NULL "
+        "AND dispatched IS NOT NULL)",
+    ),
+    (
+        "response_pair",
+        "(model_used IS NULL) = (input_tokens IS NULL) "
+        "AND (model_used IS NULL) = (output_tokens IS NULL)",
+    ),
+    (
+        "outcome_shape",
+        "outcome IS NULL "
+        "OR (outcome IN ('completed', 'refusal', 'max_tokens', 'unexpected_stop', "
+        "'invalid_output') AND dispatched AND model_used IS NOT NULL "
+        "AND model_used = model_requested) "
+        "OR (outcome = 'model_mismatch' AND dispatched AND model_used IS NOT NULL "
+        "AND model_used <> model_requested) "
+        "OR (outcome = 'timeout' AND dispatched AND model_used IS NULL) "
+        "OR (outcome = 'provider_failed' AND model_used IS NULL "
+        "AND (dispatched OR latency_ms IS NULL))",
+    ),
+    (
+        "rejection_shape",
+        "(rejection_reason IS NULL) = (rejection_count IS NULL) "
+        "AND (rejection_reason IS NULL OR outcome = 'completed') "
+        "AND (rejection_reason IS NOT NULL "
+        "OR (rejection_item_index IS NULL AND rejection_citation_index IS NULL))",
+    ),
+    (
+        "rejection_stage",
+        "rejection_reason IS NULL OR (stage = 'verification') = "
+        f"({_in('rejection_reason', VERIFICATION_REJECTION_REASONS)})",
+    ),
+)
+STAGE_RESULT_CHECKS: tuple[tuple[str, str], ...] = (
+    ("stage", _in("stage", STAGE_KINDS)),
+    ("outcome", _in("outcome", STAGE_OUTCOMES)),
+    (
+        "unresolved_reason",
+        f"unresolved_reason IS NULL OR {_in('unresolved_reason', UNRESOLVED_REASONS)}",
+    ),
+    ("call_sequence", "call_sequence BETWEEN 1 AND 3"),
+    _hex("request_sha256", nullable=True),
+    _hex("evidence_sha256", nullable=True),
+    _hex("dependency_sha256", nullable=True),
+    _hex("content_sha256", nullable=True),
+    ("question_id", STAGE_QUESTION_ID_CHECK),
+    ("job_attempt", "job_attempt BETWEEN 1 AND 10"),
+    (
+        "stage_outcome",
+        "(stage = 'verification' AND outcome IN ('verified', 'unresolved')) "
+        "OR (stage = 'analysis' AND outcome IN ('analyzed', 'unresolved'))",
+    ),
+    ("reason_present", "(outcome = 'unresolved') = (unresolved_reason IS NOT NULL)"),
+    (
+        "content",
+        "(outcome <> 'unresolved') = (content_canonical IS NOT NULL) "
+        "AND (content_canonical IS NULL) = (content_sha256 IS NULL)",
+    ),
+    (
+        "call_ref",
+        "(call_sequence IS NULL) = (request_sha256 IS NULL) "
+        "AND (call_sequence IS NULL) = (outcome = 'unresolved' AND unresolved_reason IN "
+        "('request_too_large', 'evidence_too_large', 'verification_unresolved'))",
+    ),
+    (
+        "evidence_ref",
+        "(evidence_sha256 IS NOT NULL) = "
+        "(stage = 'verification' AND coalesce(unresolved_reason, '') <> 'evidence_too_large')",
+    ),
+    ("dependency_ref", "(dependency_sha256 IS NOT NULL) = (stage = 'analysis')"),
+    (
+        "stage_reason",
+        "(coalesce(unresolved_reason, '') NOT IN ('evidence_too_large') "
+        "OR stage = 'verification') "
+        "AND (coalesce(unresolved_reason, '') NOT IN ('verification_unresolved') "
+        "OR stage = 'analysis')",
+    ),
+    (
+        "content_ascii",
+        "content_canonical IS NULL "
+        "OR octet_length(content_canonical) = char_length(content_canonical)",
+    ),
+    (
+        "content_size",
+        "content_canonical IS NULL "
+        "OR (stage = 'verification' AND octet_length(content_canonical) <= 2097152) "
+        "OR (stage = 'analysis' AND octet_length(content_canonical) <= 4194304)",
+    ),
+)
+_PLAN_REFERENCE = (
+    ["tenant_id", "review_id", "question_id"],
+    [
+        "review_plan_questions.tenant_id",
+        "review_plan_questions.review_id",
+        "review_plan_questions.question_id",
+    ],
+)
+_EVIDENCE_REFERENCE = (
+    ["tenant_id", "review_id", "question_id", "evidence_sha256"],
+    [
+        "review_question_evidence.tenant_id",
+        "review_question_evidence.review_id",
+        "review_question_evidence.question_id",
+        "review_question_evidence.evidence_sha256",
+    ],
+)
+
+
+class ReviewPlanQuestion(Base):
+    """One planned question of a review (position and digest), stored once per review (M5e)."""
+
+    __tablename__ = "review_plan_questions"
+    __table_args__ = (
+        PrimaryKeyConstraint("tenant_id", "review_id", "question_id"),
+        UniqueConstraint(
+            "tenant_id", "review_id", "position", name="uq_review_plan_questions_position"
+        ),
+        ForeignKeyConstraint(
+            ["tenant_id", "review_id"],
+            ["reviews.tenant_id", "reviews.id"],
+            name="fk_review_plan_questions_review",
+        ),
+        ForeignKeyConstraint(
+            ["tenant_id", "job_id"],
+            ["jobs.tenant_id", "jobs.id"],
+            name="fk_review_plan_questions_job",
+        ),
+        *(CheckConstraint(check, name=name) for name, check in PLAN_QUESTION_CHECKS),
+    )
+
+    tenant_id: Mapped[UUID] = mapped_column(Uuid)
+    review_id: Mapped[UUID] = mapped_column(Uuid)
+    job_id: Mapped[UUID] = mapped_column(Uuid)
+    question_id: Mapped[str] = mapped_column(String(14))
+    position: Mapped[int] = mapped_column(SmallInteger)
+    question_sha256: Mapped[str] = mapped_column(String(64))
+    job_attempt: Mapped[int] = mapped_column(SmallInteger)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.clock_timestamp()
+    )
+
+
+class ReviewQuestionEvidence(Base):
+    """A planned question's evidence in its canonical encoding, written once (M5e)."""
+
+    __tablename__ = "review_question_evidence"
+    __table_args__ = (
+        PrimaryKeyConstraint("tenant_id", "review_id", "question_id"),
+        UniqueConstraint(
+            "tenant_id",
+            "review_id",
+            "question_id",
+            "evidence_sha256",
+            name="uq_review_question_evidence_digest",
+        ),
+        ForeignKeyConstraint(*_PLAN_REFERENCE, name="fk_review_question_evidence_plan"),
+        ForeignKeyConstraint(
+            ["tenant_id", "job_id"],
+            ["jobs.tenant_id", "jobs.id"],
+            name="fk_review_question_evidence_job",
+        ),
+        *(CheckConstraint(check, name=name) for name, check in QUESTION_EVIDENCE_CHECKS),
+    )
+
+    tenant_id: Mapped[UUID] = mapped_column(Uuid)
+    review_id: Mapped[UUID] = mapped_column(Uuid)
+    job_id: Mapped[UUID] = mapped_column(Uuid)
+    question_id: Mapped[str] = mapped_column(String(14))
+    question_sha256: Mapped[str] = mapped_column(String(64))
+    snapshot_sha256: Mapped[str] = mapped_column(String(64))
+    evidence_sha256: Mapped[str] = mapped_column(String(64))
+    evidence_canonical: Mapped[str] = mapped_column(Text)
+    item_count: Mapped[int] = mapped_column(SmallInteger)
+    job_attempt: Mapped[int] = mapped_column(SmallInteger)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.clock_timestamp()
+    )
+
+
+class ReviewStageCall(Base):
+    """One call reservation of a stage, ``started`` before dispatch; the only update is the
+    guarded completion (M5e). Raw model output is never stored."""
+
+    __tablename__ = "review_stage_calls"
+    __table_args__ = (
+        PrimaryKeyConstraint("tenant_id", "review_id", "question_id", "stage", "sequence"),
+        UniqueConstraint(
+            "tenant_id",
+            "review_id",
+            "question_id",
+            "stage",
+            "sequence",
+            "request_sha256",
+            name=STAGE_CALL_REQUEST_KEY,
+        ),
+        Index(
+            STAGE_CALL_ONE_REPAIR_INDEX,
+            "tenant_id",
+            "review_id",
+            "question_id",
+            "stage",
+            unique=True,
+            postgresql_where=text(STAGE_CALL_ONE_REPAIR_WHERE),
+        ),
+        ForeignKeyConstraint(*_PLAN_REFERENCE, name="fk_review_stage_calls_plan"),
+        ForeignKeyConstraint(*_EVIDENCE_REFERENCE, name="fk_review_stage_calls_evidence"),
+        ForeignKeyConstraint(
+            ["tenant_id", "job_id"], ["jobs.tenant_id", "jobs.id"], name="fk_review_stage_calls_job"
+        ),
+        *(CheckConstraint(check, name=name) for name, check in STAGE_CALL_CHECKS),
+    )
+
+    tenant_id: Mapped[UUID] = mapped_column(Uuid)
+    review_id: Mapped[UUID] = mapped_column(Uuid)
+    job_id: Mapped[UUID] = mapped_column(Uuid)
+    question_id: Mapped[str] = mapped_column(String(14))
+    stage: Mapped[str] = mapped_column(String(16))
+    call_kind: Mapped[str] = mapped_column(String(16))
+    request_basis: Mapped[str] = mapped_column(String(16))
+    state: Mapped[str] = mapped_column(String(16))
+    sequence: Mapped[int] = mapped_column(SmallInteger)
+    request_sha256: Mapped[str] = mapped_column(String(64))
+    prompt_sha256: Mapped[str] = mapped_column(String(64))
+    model_requested: Mapped[str] = mapped_column(String(64))
+    max_output_tokens: Mapped[int] = mapped_column(Integer)
+    timeout_ms: Mapped[int] = mapped_column(Integer)
+    job_attempt: Mapped[int] = mapped_column(SmallInteger)
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.clock_timestamp()
+    )
+    evidence_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    dependency_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    outcome: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    rejection_reason: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    dispatched: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    model_used: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    input_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    output_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    rejection_item_index: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
+    rejection_citation_index: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
+    rejection_count: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
+
+
+class ReviewStageResult(Base):
+    """A committed stage (S1/S2 or U1-U6), written once and never updated (M5e)."""
+
+    __tablename__ = "review_stage_results"
+    __table_args__ = (
+        PrimaryKeyConstraint("tenant_id", "review_id", "question_id", "stage"),
+        ForeignKeyConstraint(*_PLAN_REFERENCE, name="fk_review_stage_results_plan"),
+        ForeignKeyConstraint(
+            ["tenant_id", "review_id", "question_id", "stage", "call_sequence", "request_sha256"],
+            [
+                "review_stage_calls.tenant_id",
+                "review_stage_calls.review_id",
+                "review_stage_calls.question_id",
+                "review_stage_calls.stage",
+                "review_stage_calls.sequence",
+                "review_stage_calls.request_sha256",
+            ],
+            name="fk_review_stage_results_call",
+        ),
+        ForeignKeyConstraint(*_EVIDENCE_REFERENCE, name="fk_review_stage_results_evidence"),
+        ForeignKeyConstraint(
+            ["tenant_id", "job_id"],
+            ["jobs.tenant_id", "jobs.id"],
+            name="fk_review_stage_results_job",
+        ),
+        *(CheckConstraint(check, name=name) for name, check in STAGE_RESULT_CHECKS),
+    )
+
+    tenant_id: Mapped[UUID] = mapped_column(Uuid)
+    review_id: Mapped[UUID] = mapped_column(Uuid)
+    job_id: Mapped[UUID] = mapped_column(Uuid)
+    question_id: Mapped[str] = mapped_column(String(14))
+    stage: Mapped[str] = mapped_column(String(16))
+    outcome: Mapped[str] = mapped_column(String(16))
+    job_attempt: Mapped[int] = mapped_column(SmallInteger)
+    committed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.clock_timestamp()
+    )
+    unresolved_reason: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    call_sequence: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
+    request_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    evidence_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    dependency_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    content_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    content_canonical: Mapped[str | None] = mapped_column(Text, nullable=True)

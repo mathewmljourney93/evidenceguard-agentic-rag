@@ -254,6 +254,32 @@ jobs:
           PY
           "${bin}/python" -I -c "import io; from alembic import command; from evidenceguard_persistence.migration_config import alembic_config; buf = io.StringIO(); command.upgrade(alembic_config(output_buffer=buf), 'head', sql=True); assert 'CREATE TABLE api_keys' in buf.getvalue(); print('offline migration SQL rendered from the installed wheel')"
           "${bin}/python" -I -c "import io; from alembic import command; from evidenceguard_persistence.migration_config import alembic_config; buf = io.StringIO(); command.upgrade(alembic_config(output_buffer=buf), 'head', sql=True); assert 'CREATE TABLE reviews' in buf.getvalue(); print('offline review migration SQL rendered from the installed wheel')"
+          # M5e (ADR-0023): render the stage tables offline and plan one scripted history (an
+          # invalid output, then a repair started by attempt 1, planned at attempt 2). No database
+          # is contacted; this check does not establish M5e persistence (the PostgreSQL job does).
+          "${bin}/python" -I - <<'PY'
+          import io
+          import uuid
+          from datetime import UTC, datetime
+          from alembic import command
+          import evidenceguard_domain.review_stages as stages
+          import evidenceguard_persistence.review_stages as persistence
+          from evidenceguard_domain.model_calls import CallOutcome, ModelUsage
+          from evidenceguard_persistence.migration_config import alembic_config
+          for module in (stages, persistence):
+              assert "site-packages" in (module.__file__ or ""), module.__name__
+          buf = io.StringIO()
+          command.upgrade(alembic_config(output_buffer=buf), "head", sql=True)
+          assert "CREATE TABLE review_stage_calls" in buf.getvalue()
+          ids = {"tenant_id": uuid.UUID(int=1), "review_id": uuid.UUID(int=2), "job_id": uuid.UUID(int=3), "question_id": "ENC-01", "stage": stages.StageKind.VERIFICATION}
+          common = {**ids, "prompt_sha256": "1" * 64, "model_requested": "fake-scripted-v1", "max_output_tokens": 4096, "timeout_ms": 60000, "evidence_sha256": "e" * 64, "dependency_sha256": None, "job_attempt": 1, "started_at": datetime(2026, 10, 23, tzinfo=UTC)}
+          first = stages.CallRecord(**common, sequence=1, call_kind=stages.CallKind.INITIAL, request_basis=stages.RequestBasis.ORIGINAL, request_sha256="a" * 64, state=stages.ReservationState.COMPLETED, completed_at=datetime(2026, 10, 23, tzinfo=UTC), outcome=CallOutcome.INVALID_OUTPUT, dispatched=True, model_used="fake-scripted-v1", usage=ModelUsage(1, 1), latency_ms=1)
+          repair = stages.CallRecord(**common, sequence=2, call_kind=stages.CallKind.REPAIR, request_basis=stages.RequestBasis.REPAIRED, request_sha256="b" * 64, state=stages.ReservationState.STARTED)
+          plan = stages.plan_stage(stages.StageHistory(**ids, current_attempt=2, calls=(first, repair), committed=None))
+          assert type(plan) is stages.PlanDispatch
+          assert (plan.call_kind, plan.request_basis, plan.sequence) == (stages.CallKind.RETRY, stages.RequestBasis.REPAIRED, 3)
+          print("stage migration SQL rendered and an abandoned repair planned as a retry from the installed wheel")
+          PY
 
   integration:
     # PostgreSQL integration tests. Service containers run only on Linux runners, so this job

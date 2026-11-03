@@ -27,7 +27,7 @@ from evidenceguard_persistence.settings import DATABASE_URL_ENV
 from evidenceguard_persistence.vendors import VendorPage, VendorRecord
 
 FAILURE_MARKER = "fake-internal-failure-marker"
-HEADS = frozenset({"0006"})
+HEADS = frozenset({"0007"})
 
 
 # --- evaluation --------------------------------------------------------------------------
@@ -44,15 +44,16 @@ def _raise() -> tuple[str, ...]:
 @pytest.mark.parametrize(
     ("probe", "expected"),
     [
-        (lambda: ("0006",), ReadinessResult(database=True, migrations=True)),
-        (lambda: ("0005",), ReadinessResult(database=True, migrations=False)),
+        (lambda: ("0007",), ReadinessResult(database=True, migrations=True)),
+        (lambda: ("0006",), ReadinessResult(database=True, migrations=False)),  # one behind
         (lambda: (), ReadinessResult(database=True, migrations=False)),  # no version table
-        (lambda: ("0004",), ReadinessResult(database=True, migrations=False)),  # one behind
+        (lambda: ("0005",), ReadinessResult(database=True, migrations=False)),
+        (lambda: ("0004",), ReadinessResult(database=True, migrations=False)),
         (lambda: ("0003",), ReadinessResult(database=True, migrations=False)),
         (lambda: ("0002",), ReadinessResult(database=True, migrations=False)),
         (lambda: ("0001",), ReadinessResult(database=True, migrations=False)),
-        (lambda: ("0007",), ReadinessResult(database=True, migrations=False)),
-        (lambda: ("0005", "0006"), ReadinessResult(database=True, migrations=False)),
+        (lambda: ("0008",), ReadinessResult(database=True, migrations=False)),  # future head
+        (lambda: ("0006", "0007"), ReadinessResult(database=True, migrations=False)),
         (_raise, ReadinessResult(database=False, migrations=None)),
     ],
 )
@@ -93,7 +94,7 @@ class _FakeMigrationContext:
         return _FakeMigrationContext()
 
     def get_current_heads(self) -> tuple[str, ...]:
-        return ("0006",)
+        return ("0007",)
 
 
 def test_probe_bounds_the_query_reads_heads_and_rolls_back(

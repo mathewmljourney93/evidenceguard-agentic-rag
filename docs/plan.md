@@ -6833,8 +6833,8 @@ status](#m5c-implementation-status-accepted-for-a-local-commit-prompt-184-ci-pen
 Prompt 191 for a local commit only; after feature CI at `1bea3731` failed three PostgreSQL tests and
 test-only corrections followed, M5d is **reviewed, verified in CI and on `main` at `1efe3ed3`**
 (Prompts 194–196) ([implementation
-status](#m5d-implementation-status-reviewed-verified-in-ci-and-on-main-at-1efe3ed3)). M5e–M5h are not
-implemented (the [M5e specification](#m5e-stage-and-call-reservation-persistence-specification-accepted-at-review-prompt-199-implementation-pending), proposed in Prompt 196 and corrected in Prompts 197–198, was accepted at external review in Prompt 199 with two binding clarifications, its E7 output-scope decision having been approved in Prompt 198; M5e implementation is pending); no review path or orchestration exists, the M5d persistence is used only by tests,
+status](#m5d-implementation-status-reviewed-verified-in-ci-and-on-main-at-1efe3ed3)). The
+[M5e specification](#m5e-stage-and-call-reservation-persistence-specification-accepted-at-review-prompt-199-implementation-pending), proposed in Prompt 196 and corrected in Prompts 197–198, was accepted at external review in Prompt 199 with two binding clarifications, its E7 output-scope decision having been approved in Prompt 198; M5e was implemented by Claude Code in Prompt 200, corrected after external review in Prompt 201 and accepted at external review for a local implementation commit only in Prompt 202, with publication, PostgreSQL execution and exact-commit current-version CI pending ([implementation status](#m5e-implementation-status-accepted-for-a-local-commit-prompt-202)). M5f–M5h are not implemented; no review path or orchestration exists, the M5d and M5e persistence is used only by tests,
 no M5b or M5c control is used by any review path, and overall M5 acceptance is pending.** The M5 milestone text above is the controlling requirement and is unchanged; this
 sequence only orders it into slices. Labels: **[DECISION]** already accepted; **[FACT]** current
 code at `46c02257`; **[REC]** recommendation (for M5a and the sequence-level choices, accepted in
@@ -7026,7 +7026,7 @@ renderer exists before the handler's atomic final commit needs it.
 | **M5b** | Provenance checks and status derivation (pure): Verifier output plus the question's retrieved evidence → `Verification` with derived status and trusted citation metadata, or `citation_rejected`; analyst findings restricted to already validated citations; the `requires_documentary_support` finding rule; exact quote-matching rules (W12) | M5a, M4d values | `evidenceguard_domain.provenance` | None |
 | **M5c** | Versioned artifacts: TOML review template, deterministic Planner, `prompts/verifier/v1.md` and `prompts/risk_analyst/v1.md` as packaged data with pinned SHA-256, and request assembly that places evidence only inside delimited blocks with **safe encoding** of document text (Correction E) | M5a, M5b | `evidenceguard_agents` (`planner`, `prompts`, `assembly`); packaged data | None |
 | **M5d** | Composable capture and review creation (Correction A): a public capture operation for a caller-owned transaction, extracted from the M4d capture phases with `capture_snapshot` unchanged; one creation transaction storing the review, every binding, the exclusions record, the pinned configuration and, through the same transaction, the `run_review` job; a trusted loader that rebuilds and revalidates the snapshot. Internal seams only (W8) | M4d, M5c | `evidenceguard_persistence.retrieval` (capture extraction), `evidenceguard_persistence.reviews`; migration `0006` | Yes |
-| **M5e** | Stage and call-reservation records (Correction D): per-question stage rows unique on `(tenant_id, review_id, question_id, stage)`, persisted call reservations and provider-call records and spans, all through fenced writes; identical replay is a no-op and a differing replay is a fixed conflict, never an overwrite. *Amended by the E7 scope decision approved at review in Prompt 198:* the stored report output is not part of M5e and moves to M5f/M5g (the M5e specification as a whole was accepted at review in Prompt 199; historically, until then the rest remained proposed) | M5a, M5b, M5d | `evidenceguard_persistence.review_stages`; migration `0007` (no output table) | Yes |
+| **M5e** | Stage and call-reservation records (Correction D): per-question stage rows unique on `(tenant_id, review_id, question_id, stage)`, persisted call reservations and provider-call records and spans, all through fenced writes; identical replay is a no-op and a differing replay is a fixed conflict, never an overwrite. *Amended by the E7 scope decision approved at review in Prompt 198:* the stored report output is not part of M5e and moves to M5f/M5g (the M5e specification as a whole was accepted at review in Prompt 199; historically, until then the rest remained proposed; implemented and staged for review in Prompt 200, implementation acceptance and current-version CI pending) | M5a, M5b, M5d | `evidenceguard_persistence.review_stages`; migration `0007` (no output table) | Yes |
 | **M5f** | Report content and renderer (pure): settles the hash-covered report-content representation under the report-integrity invariant (a versioned wrapper around `ReportContent`, or omission of conclusions it cannot hold), builds that content from committed stage values, and renders Markdown solely from the hashed content, including unresolved questions, authenticity labels and the contract-mode stamp | M5b, M5e values, M1 report contracts | `evidenceguard_agents.report` | None (stored by M5g; E7: M5f reviews the content representation and validation the output stores) |
 | **M5g** | `run_review` handler factory and bounded orchestration: plan → retrieve (M4d `search_snapshot` over the loaded snapshot) → verify (with repair) → analyze → render → one atomic final commit; resume, reservations and budgets, cancellation, lease-loss and failure precedence; fake-provider controlled crash tests. Not registered in production (W8) | M5a–M5f, M3b runtime | `evidenceguard_worker.review` | Uses M5d/M5e; E7 (Prompt 198): the output table in a later additive migration and its atomic output-plus-job-success writer, reviewed with M5f/M5g before completion is enabled |
 | **M5h** | Anthropic adapter behind the M5a protocol, tested only with an injected or mocked transport; not registered, no settings, no live call (W9) | M5a | `evidenceguard_agents.anthropic` (adapter) and, if a transport is needed, the worker | None |
@@ -11511,6 +11511,40 @@ Prompt 199. None of those earlier states accepted the specification as a whole.
     `from_rejection`/`to_rejection`; the worker builds M5c's `RepairReason` with
     `RepairReason.from_rejection` or `RepairReason.invalid_output`. *Tradeoff:* one more composition
     step in M5g versus a forbidden upward import.
+
+#### M5e implementation status (accepted for a local commit, Prompt 202)
+
+**Status.** Claude Code implemented the accepted M5e specification (E1–E20 with clarifications A
+and B) in Prompt 200 and staged it, uncommitted, on `feat/review-stage-persistence` for external
+review ([ADR-0023](decisions/0023-review-stage-persistence.md)); in Prompt 201, after external
+review, it corrected the question boundary (exact field types checked before any normalization or
+serialization) and the nested aggregate constructors (`TrustedQuestionStages`, `TrustedStages`
+and `StageState` now rebuild their nested values)
+([corrections](decisions/0023-review-stage-persistence.md#prompt-201-corrections)). The external
+reviewer accepted the corrected implementation and recorded implementation choices for a local
+implementation commit only in Prompt 202
+([review](decisions/0023-review-stage-persistence.md#external-review-prompt-202)). OpenAI Codex
+recovered the state, recorded acceptance and prepared the local commit. **Publication, PostgreSQL
+execution and exact-commit current-version CI are pending.** No endpoint, CLI command, handler,
+setting, production registry entry or production enqueue path uses M5e; `run_review` stays
+unregistered, so none of its controls operates in the application. The report output stays
+allocated to M5f/M5g (E7, M5e-L), no review can become `completed`, and overall M5 acceptance is
+pending.
+
+- *Added:* `evidenceguard_domain.review_stages`, `evidenceguard_persistence.review_stages`,
+  migration `0007` (`review_plan_questions`, `review_question_evidence`, `review_stage_calls`,
+  `review_stage_results`) and the matching models; in `evidenceguard_persistence.retrieval` the
+  extracted `recheck_bindings`, `load_snapshot_evidence` and the public
+  `recheck_evidence_in_transaction`, reused by `retrieve_with_vectors` without behaviour change;
+  five new test modules, the migration-head updates to `0007` (the `0006` migration test now uses
+  explicit targets), packaging boundaries and one additive installed-wheel assertion.
+- *Implementation choices approved for this local commit in Prompt 202:* listed in
+  [ADR-0023](decisions/0023-review-stage-persistence.md#implementation-choices-and-deviations-for-review).
+  The independently derived maximal-size bounds match the accepted 1,135,720 and 3,090,153 bytes.
+- *Historical local verification (Claude Code, Prompts 200–201):* see
+  [Prompt 200](decisions/0023-review-stage-persistence.md#verification-prompt-200-local-windows-claude-code)
+  and [Prompt 201](decisions/0023-review-stage-persistence.md#verification-prompt-201-local-windows-claude-code).
+  PostgreSQL tests were written but not run (no `EG_TEST_DATABASE_URL`) and are unverified.
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.
