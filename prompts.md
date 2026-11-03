@@ -45000,3 +45000,363 @@ build and installed-wheel results remain historical and were not repeated becaus
 implementation and test blobs are unchanged. The reviewer's 59 isolated passes are separately
 attributed, not a project or database run. All PostgreSQL-backed behaviour and exact-commit CI
 remain unverified. No remote operation, push, merge, history rewrite or M5f work occurred.
+
+### Prompt 202 handoff (saved .local/p202/handoff.md, verbatim file copy)
+
+This is the saved detailed handoff file, not the shorter chat response supplied at the end of Prompt 202. Its saved text is copied exactly below.
+
+Prompt 202 handoff for Mathew and the external reviewer
+
+M5e is accepted and committed locally only. Nothing was pushed or merged; no remote operation or M5f work occurred.
+
+Commit: 45764b100c38b8547070790246e46d340cf0d6e0
+Parent: 313b523d052a9dbd49f3dbd53e5f0af835ccfe1f
+Tree: 18246af80828973de5c2c8a31c4202f182896dc8
+Subject: feat: persist review stages and bounded call reservations
+Author and committer: mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+Branch: feat/review-stage-persistence
+Working tree: clean
+Local main and origin/main unchanged: 1efe3ed3f0aa9697ce4e71cee295293a89c94909
+origin/main is a local reference, not a fresh observation of GitHub.
+
+Recovery matched the supplied HEAD, branch, accepted tree and exactly 23 staged paths. The Prompt 201 export matched 73,242 bytes, 682 lines, SHA-256 6fea269e5527b5d1d2e82d04413223e8c2ce5bfa985e607cfb813ddc1bb9a4b4 and Git's full-index comparison from a5037d57047fa3933d02abd115c071dfcdbd3c92 to c6ca841a6c4e2c49e567d0557a17e42c6770ac60, excluding prompts.md. Recovery refs/status, accepted tree, all 23 original staged hashes and the exact prompt-history prefix/checksum are saved here.
+
+Recorded the external review acceptance for a local implementation commit only. Claude Code's Prompt 200 implementation and Prompt 201 corrections remain attributed to Claude Code; current recovery, acceptance documentation and commit preparation are attributed to OpenAI Codex. The reviewer independently verified the correction export, reconstructed domain blob 78f228c678f5f05e0e3ccfb5bd7431e2b1bf4461, inspected corrections/regressions and passed 59 isolated constructor checks using Python 3.12.14 and Pydantic 2.14.0. Those isolated reconstructed-environment checks were not a project-suite, installed-wheel or database run and did not byte-verify the entire staged repository. They demonstrate neither a database-reload bypass nor a defence against hostile in-process code. The M5b model_copy note remains a note, not a demonstrated new defect.
+
+Against the accepted tree, only README.md, docs/decisions/0023-review-stage-persistence.md, docs/plan.md, docs/threat-model.md and prompts.md differ. Every other repository blob and mode is identical, including all production code, tests, migration, models, retrieval.py, packaging, workflows, dependencies, resources and ADR-0022. Domain blob 78f228c678f5f05e0e3ccfb5bd7431e2b1bf4461 is unchanged. The commit has exactly the original 23 paths: 23 files changed, 12570 insertions(+), 57 deletions(-).
+
+Completed current checks:
+- Exact path set and whole-tree blob/mode comparison before and after commit.
+- No tracked .local or build artifacts; no unstaged or nonignored untracked files.
+- All 23 staged files: UTF-8 without BOM, LF only, no replacement characters.
+- Prompt-history original 2,370,432-byte prefix preserved, SHA-256 5e7c0decef4bba8e054aa74f1d72cf7a5d382471eb1fcf0c51001f039ac6b3cc; Prompt 202 included verbatim; completed-check note appended without prospective SHA.
+- Links/anchors/tables: 386 links, 85 tables, no problems in the four current documents. Accepted specification heading/anchor preserved; implementation-status links updated.
+- Ruff format --check .: 220 files already formatted; Ruff check .: all checks passed.
+- Git diff whitespace checks against HEAD and accepted tree, plus post-commit comparison: passed.
+- Staged privacy scan: established noreply email only; no credential or personal-path patterns.
+- Unsuppressed Gitleaks 8.30.1 staged scan: no leaks, including final history note.
+- Unsuppressed full-history Gitleaks 8.30.1 after commit: 86 commits, approximately 7.80 MB, no leaks. Both scans used --ignore-gitleaks-allow; no config, baseline, ignore file or environment override.
+- Post-commit SHA, parent, tree, subject, identities, changed paths, unchanged accepted blobs, clean status, local refs and export byte identity verified.
+
+No application tests, builds or installed-wheel checks were repeated because accepted implementation and test blobs are identical. Claude Code's historical Prompt 201 Windows evidence remains 658 focused passes, 3,966 full-suite passes and 387 skips, collection of 385 integration and 3,968 non-integration tests, plus static/build/wheel checks. These are historical local results, not exact-commit CI. All PostgreSQL-backed behaviour remains unverified; collection and skips verify none of it.
+
+The original Prompt 201 final handoff was unavailable in the recovered checkpoints; the appended history explicitly labels its checkpoint-based summary as not verbatim. Previous history bytes are intact.
+
+Export: .local/p202/m5e-commit-incremental.diff
+Baseline tree: c6ca841a6c4e2c49e567d0557a17e42c6770ac60
+Destination commit: 45764b100c38b8547070790246e46d340cf0d6e0
+Full-index comparison, prompts.md excluded; byte identity independently compared with Git.
+ README.md                                       |  2 +-
+ docs/decisions/0023-review-stage-persistence.md | 53 ++++++++++++++++++++++---
+ docs/plan.md                                    | 20 ++++++----
+ docs/threat-model.md                            |  9 +++--
+ 4 files changed, 66 insertions(+), 18 deletions(-)
+
+Bytes: 43351
+Lines: 185
+SHA-256: d6d33f21ae61fb89914e5bdbf46958cc394181c2140ec0b08870373a2fe898dc
+
+No M5e control operates in an application review path; run_review remains unregistered. No output table, production review path or live provider is added. E7 assigns the output table and atomic writer to M5f/M5g. Discarded U4 evidence cannot be re-proved at reload; worker composition obligations, the accepted M3 lease window and the open M4d trusted-snapshot limitation remain. Publication, PostgreSQL execution and exact-commit CI remain pending. M5f-M5h and overall M5 acceptance remain pending.
+
+All 23 commit paths (hashes are in committed-blobs.txt):
+- .github/workflows/ci.yml
+- README.md
+- docs/decisions/0022-review-creation.md
+- docs/decisions/0023-review-stage-persistence.md
+- docs/plan.md
+- docs/threat-model.md
+- packages/domain/evidenceguard_domain/review_stages.py
+- packages/persistence/evidenceguard_persistence/migrations/versions/v0007_review_stages.py
+- packages/persistence/evidenceguard_persistence/models.py
+- packages/persistence/evidenceguard_persistence/retrieval.py
+- packages/persistence/evidenceguard_persistence/review_stages.py
+- prompts.md
+- tests/test_evidence_recheck.py
+- tests/test_packaging.py
+- tests/test_persistence.py
+- tests/test_persistence_postgres.py
+- tests/test_readiness.py
+- tests/test_retrieval_postgres.py
+- tests/test_review_stage_persistence.py
+- tests/test_review_stage_planner.py
+- tests/test_review_stage_values.py
+- tests/test_review_stages_postgres.py
+- tests/test_reviews_postgres.py
+
+Mathew: return this handoff plus .local/p202/m5e-commit-incremental.diff to the external reviewer.
+
+### External review disposition (Prompt 203, supplied by Mathew)
+
+The external reviewer verified the supplied Prompt 202 incremental export and accepts the local-commit handoff. Publication of the accepted work to feat/review-stage-persistence and monitoring of exact-commit CI are authorized. If all five required jobs pass, observed evidence may be staged for review. No merge, push to main, production change or M5f work is authorized.
+
+### Prompt 203 (verbatim)
+
+Prompt 203 — Publish M5e to its feature branch and verify exact-commit CI
+
+Written for: Mathew and the external reviewer.
+
+The external reviewer has reviewed the Prompt 202 incremental export and accepts the local-commit handoff.
+
+You are authorized to publish the accepted M5e work to feat/review-stage-persistence and monitor its exact-commit CI. If every required job passes, record the observed feature-branch evidence as staged documentation for review.
+
+No merge, push to main, production change or M5f work is authorized.
+
+Continue in the current session if it is working reliably.
+
+1. Verify the starting state
+
+Read the applicable repository instructions and .local/p202/ checkpoints, including handoff.md.
+
+Expected:
+- Branch: feat/review-stage-persistence
+- HEAD:
+  45764b100c38b8547070790246e46d340cf0d6e0
+- Parent:
+  313b523d052a9dbd49f3dbd53e5f0af835ccfe1f
+- Tree:
+  18246af80828973de5c2c8a31c4202f182896dc8
+- Subject:
+  feat: persist review stages and bounded call reservations
+- Local main and origin/main:
+  1efe3ed3f0aa9697ce4e71cee295293a89c94909
+- Working tree and index clean.
+- Origin and established noreply identity unchanged.
+
+Verify .local/p202/m5e-commit-incremental.diff:
+- Baseline:
+  c6ca841a6c4e2c49e567d0557a17e42c6770ac60
+- Destination: 45764b100c38b8547070790246e46d340cf0d6e0
+- Full-index, prompts.md excluded.
+- 43,351 bytes; 185 lines.
+- Four files, 66 insertions and 18 deletions.
+- SHA-256:
+  d6d33f21ae61fb89914e5bdbf46958cc394181c2140ec0b08870373a2fe898dc
+
+Verify byte identity against Git.
+
+Confirm all implementation, test, migration, packaging and workflow blobs still match the accepted tree:
+c6ca841a6c4e2c49e567d0557a17e42c6770ac60
+
+Save a checkpoint under .local/p203/ with refs, status, range paths, blob identities and the prompts.md prefix/checksum.
+
+Preserve unexpected work. If the starting state differs materially, report the discrepancy before dependent changes.
+
+2. Publication preflight
+
+Remote reads and the feature push are authorized.
+
+Fetch origin without tags and inspect the actual remote refs.
+
+Expected:
+- Remote main remains at 1efe3ed3.
+- No remote feat/review-stage-persistence exists.
+- Local main equals origin/main and is an ancestor of HEAD.
+- The unpublished range is the specification commit 313b523d followed by implementation commit 45764b10.
+
+If the feature branch already exists at the intended target, do not push again; verify it and inspect existing exact-SHA runs.
+
+If remote refs differ unexpectedly, stop before publication and report them. Do not force-push, rewrite history or reconcile unexpected remote changes automatically.
+
+Inspect the complete unpublished range:
+- derive the exact path union and compare it with the reviewed scope;
+- confirm no unreviewed implementation changes;
+- confirm no tracked local artifacts or binaries;
+- confirm no dependency, lockfile, settings, secret-scan workflow, pinned-resource or unrelated changes;
+- verify workflow triggers and all five required jobs remain enabled;
+- confirm the integration job requires integration execution, including EG_REQUIRE_INTEGRATION and its pytest command;
+- confirm installed-wheel and container checks remain present;
+- complete privacy and unsuppressed range Gitleaks checks.
+
+Do not repeat local application tests or builds merely for publication. Preserve their attribution as historical local evidence.
+
+3. Record this authorization before publication
+
+Append to prompts.md:
+- the available Prompt 202 handoff, using its saved original text;
+- the review disposition: the reviewer verified the supplied incremental export and accepts the handoff;
+- this Prompt 203 verbatim;
+- a preflight note listing completed checks only.
+
+Preserve the previous bytes exactly as a prefix.
+
+If the saved handoff differs from the short handoff supplied to the reviewer, label the source accurately. Do not claim an unavailable text was copied verbatim.
+
+Create one history-only commit before publication, following repository conventions:
+- only prompts.md may change;
+- established noreply identity;
+- commit message written from a file;
+- accurate Codex assistance attribution and repository trailer conventions.
+
+Verify its parent, tree, one-file scope, clean working tree and unchanged implementation blobs. Run the required staged and full-history unsuppressed Gitleaks checks.
+
+The new history-only commit becomes the intended publication and CI target. Report its full SHA; do not predeclare it.
+
+4. Push the feature branch once
+
+Immediately before pushing, recheck the relevant remote refs.
+
+Push only:
+refs/heads/feat/review-stage-persistence
+to:
+refs/heads/feat/review-stage-persistence
+
+Set upstream if necessary.
+
+Use normal existing Git authentication. Do not disable interactive credential prompts, change accounts/configuration, inspect credentials or install authentication tooling.
+
+If normal sign-in requires Mathew, explain what is waiting and allow him to complete it. Do not leave an unexplained push running indefinitely.
+
+Do not automatically retry a failed or ambiguous push. First verify remote refs and report the outcome.
+
+After success, verify:
+- remote feature branch equals the exact publication target;
+- local HEAD and upstream match it;
+- remote main is unchanged.
+
+5. Monitor exact-commit CI
+
+Monitor for at most 25 minutes from publication, with concise progress updates and bounded polling.
+
+Identify the push runs for:
+- the exact publication SHA;
+- branch feat/review-stage-persistence;
+- the CI and secret-scan workflows.
+
+Verify all five required jobs:
+- Ubuntu verify;
+- Windows verify;
+- PostgreSQL integration;
+- container;
+- full-history Gitleaks.
+
+Record run IDs, URLs, job IDs, event, branch, SHA, attempt, status, conclusion and relevant step results.
+
+Use existing authorized GitHub access to retrieve logs where available. Do not change authentication or permissions to obtain them, and never print credentials.
+
+Separate:
+- conclusions observed through API metadata;
+- output actually read in job logs;
+- historical results from earlier commits.
+
+Do not infer test counts, per-test results, installed-wheel lines, container summaries or Gitleaks counts from a green conclusion.
+
+This is the first PostgreSQL execution of M5e. If logs are available, inspect:
+- the overall integration summary;
+- the new review-stage and evidence-recheck cases;
+- migration upgrade/downgrade and alembic check;
+- concurrency, lease-expiry, replay and trusted-reload results.
+
+If any job fails, is cancelled, has required checks skipped, or remains unconfirmed at the monitoring limit:
+- save the evidence;
+- stop without corrections, reruns, further commits or pushes;
+- report the exact failure or uncertainty and the relevant logs;
+- do not write green-status documentation.
+
+A successful parent run does not substitute for an unresolved required job conclusion. Report any metadata inconsistency explicitly.
+
+Ensure no monitor or push process remains running when you finish.
+
+6. Only after all five jobs pass
+
+Record feature-branch evidence as staged documentation only.
+
+Authorized paths:
+- README.md
+- docs/decisions/0023-review-stage-persistence.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Do not modify implementation, tests, migrations, models, packaging or workflows.
+
+ADR-0023:
+- add a feature-branch CI evidence section for the exact publication SHA;
+- link each job under its own run;
+- record conclusions and log results only to the extent actually observed;
+- distinguish unavailable logs from observed output;
+- preserve previous local evidence as historical;
+- state that M5e is published and feature-CI verified but not merged.
+
+Update short linked summaries in README, plan and threat model. Preserve accepted specification headings and anchors.
+
+Keep the limitations:
+- no application review path uses M5e;
+- run_review remains unregistered;
+- the unchanged container smoke does not exercise M5e;
+- installed-wheel migration checks are offline checks, separate from PostgreSQL execution;
+- no entailment, authenticity, injection-resistance or live-model-quality guarantee;
+- E7, U4, worker obligations, the M3 lease window and the open M4d trusted-snapshot limitation;
+- M5f–M5h and overall M5 acceptance pending.
+
+Append the actual publication/CI outcome to prompts.md without claiming events that have not happened.
+
+Check scope, links, tables, encoding, whitespace, privacy, prompt-prefix fidelity and unsuppressed staged Gitleaks.
+
+Leave these evidence updates staged and uncommitted. Do not push them.
+
+Export:
+.local/p203/m5e-feature-ci-evidence.diff
+
+Use the published SHA as baseline, final staged tree as destination, --full-index, and exclude prompts.md.
+
+Verify byte identity and report full tree IDs, paths, statistics, bytes, lines and SHA-256.
+
+7. Final handoff
+
+Provide a self-contained handoff covering:
+- verified starting state;
+- publication preflight;
+- history-only commit;
+- exact published SHA and refs;
+- all run/job links and conclusions;
+- log evidence and attribution limits;
+- PostgreSQL execution status;
+- any staged evidence documentation and its export;
+- final working-tree state;
+- remaining limitations.
+
+Do not merge or push main. Do not rerun CI or begin M5f.
+
+If publication or CI is blocked, return the handoff and diagnostic evidence without an evidence-documentation diff.
+
+Mathew: return the handoff and, if produced,
+.local/p203/m5e-feature-ci-evidence.diff
+to the external reviewer.
+
+### Prompt 203 publication preflight (OpenAI Codex; completed checks only)
+
+Verified branch `feat/review-stage-persistence`, clean index and working tree, implementation
+commit `45764b100c38b8547070790246e46d340cf0d6e0`, parent
+`313b523d052a9dbd49f3dbd53e5f0af835ccfe1f`, tree
+`18246af80828973de5c2c8a31c4202f182896dc8`, subject and established noreply identity.
+Origin is unchanged. Verified the Prompt 202 full-index export, excluding `prompts.md`, against
+Git: four files, 66 insertions, 18 deletions, 43,351 bytes, 185 lines, SHA-256
+`d6d33f21ae61fb89914e5bdbf46958cc394181c2140ec0b08870373a2fe898dc`.
+Saved recovery refs, status, range paths, blob identities and the exact 2,387,237-byte prompt
+prefix (SHA-256 `c6dcbc4e3c29b379626be24f979e6f38651e7870765f86dffaf39e9af3fca42b`)
+under `.local/p203/`.
+
+Fetched origin without tags and inspected actual remote refs: main remains at
+`1efe3ed3f0aa9697ce4e71cee295293a89c94909`; no remote feature ref exists. Local main
+equals origin/main and is an ancestor of HEAD. The complete unpublished range is specification
+commit `313b523d` followed by implementation commit `45764b10`. Its exact 23-path union matches
+the reviewed scope. No unreviewed implementation, tracked local artifact, binary, dependency,
+lockfile, settings, secret-scan workflow, pinned resource or unrelated change was found. All
+implementation, test, migration, packaging and workflow blobs match the accepted tree
+`c6ca841a6c4e2c49e567d0557a17e42c6770ac60`.
+
+Inspected workflow triggers and all five required jobs (Ubuntu verify, Windows verify,
+PostgreSQL integration, container and full-history Gitleaks). Integration retains
+`EG_REQUIRE_INTEGRATION: "1"` and `uv run --locked pytest -m integration`; installed-wheel and
+container checks remain present. The wheel stage-migration check is offline; the unchanged
+container smoke does not exercise M5e. The privacy scan found only the established noreply
+email and no credential or personal-path patterns. Unsuppressed range Gitleaks 8.30.1 scanned
+the two unpublished commits and found no leaks. Links, anchors and tables (386 links, 85 tables),
+UTF-8/LF checks, diff whitespace, Ruff formatting (220 files) and lint passed. No local application
+test, build or installed-wheel run was repeated; earlier results remain historical and separately
+attributed to Claude Code. No publication or current-version CI result is claimed in this note.
+
+Appended the saved `.local/p202/handoff.md` text with its source accurately labelled, the supplied
+review disposition, and Prompt 203 verbatim after the unchanged prefix. OpenAI Codex performed
+this recovery, preflight and history preparation; Claude Code's earlier implementation and
+corrections and the external reviewer's decisions retain their existing attribution.
