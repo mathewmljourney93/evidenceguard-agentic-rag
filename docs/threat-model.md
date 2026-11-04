@@ -498,18 +498,24 @@ with two binding clarifications; [acceptance record](plan.md#m5e-acceptance-prom
 implemented by Claude Code in Prompt 200, corrected in Prompt 201 (exact question validation and
 nested aggregate rebuilds; constructors remain consistency checks only), and accepted at external
 review for a local implementation commit only in Prompt 202
-([implementation status](plan.md#m5e-implementation-status-accepted-for-a-local-commit-prompt-202),
+([implementation status](plan.md#m5e-implementation-status-reviewed-verified-in-ci-and-on-main-at-14f510e),
 [ADR-0023](decisions/0023-review-stage-persistence.md)): fenced writes bound to the canonical
 `run_review` job with ownership rechecked at entry and after the last write, the
 three-reservation budget and single repair across attempts, explicit completion identity,
 identical-replay no-ops and fixed conflicts, and a trusted reload that rechecks evidence against
-database chunks. M5e is feature-published and feature-CI verified at `15cbfbae` (Prompt 205),
-but not merged. All five required jobs passed, including PostgreSQL (385 passed); the terse log
-does not individually name the replacement case. The failed `5b94d18a` setup case is historical,
-and Prompt 206 accepts the evidence and authorizes gated main publication after the new
-documentation commit passes its own feature gate; main publication has not happened
-([authorization](decisions/0023-review-stage-persistence.md#reviewer-acceptance-and-gated-main-authorization-prompt-206))
-([corrective CI evidence](decisions/0023-review-stage-persistence.md#corrective-feature-ci-at-15cbfbae-prompt-205)). No application path uses it, so none
+database chunks. M5e is reviewed, verified in CI and on main at `14f510e` (Prompt 206)
+([main publication evidence](decisions/0023-review-stage-persistence.md#main-publication-and-exact-sha-ci-prompt-206)).
+The [M5f report content and renderer specification](plan.md#m5f-report-content-and-renderer-specification-accepted-at-review-prompt-208-implementation-pending) was proposed in Prompt 207
+and **accepted at external review in Prompt 208**, including F1–F12 and two binding
+clarifications. M5f implementation and every implementation check remain pending; no M5f
+control operates. M5e is reviewed, CI verified and on main at `14f510e`; its publication
+evidence was independently accepted in Prompt 207. M5g–M5h and overall M5 acceptance remain
+pending.
+
+Its five-job feature gate passed before the authorized fast-forward and manual main push;
+all five separate main jobs passed, including PostgreSQL (385 passed). The terse logs show
+46 passing review-stage module positions without individually naming the replacement case.
+The earlier setup failure and feature-only/pending states remain historical. No application path uses it, so none
 operates; no application review path, `run_review` registration, output writer or live provider
 is added; the report output stays with M5f/M5g (E7), and M5f–M5h and overall M5 acceptance
 remain pending. A U4 stage's discarded evidence and its original binding cannot be re-proved, and

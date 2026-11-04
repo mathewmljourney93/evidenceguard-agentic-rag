@@ -1,27 +1,22 @@
 # ADR-0023: Stage and call-reservation persistence
 
-- **Status:** **Implemented by Claude Code in Prompt 200, corrected in Prompt 201 after external
-  review (exact question validation and nested aggregate rebuilds; see
-  [Prompt 201 corrections](#prompt-201-corrections)); accepted at external review for a local
-  implementation commit only in Prompt 202 ([review](#external-review-prompt-202)), including the
-  recorded implementation choices. Published on `feat/review-stage-persistence` at `5b94d18a`
-  in Prompt 203: four jobs passed and PostgreSQL ran but failed one test (384 passed). A test-only
-  correction from Prompt 204 was accepted at external review in Prompt 205 for a corrective
-  commit and feature publication ([acceptance](#correction-acceptance-prompt-205)). The corrective
-  commit `15cbfbae` is now feature-published and all five required jobs passed, including
-  PostgreSQL (385 passed): M5e is feature-CI verified but not merged. The evidence is accepted
-  in Prompt 206, with gated main publication authorized only after the new documentation
-  commit passes its own feature CI; main publication has not happened** ([corrective CI evidence](#corrective-feature-ci-at-15cbfbae-prompt-205))
-  ([evidence and diagnosis](#feature-ci-failure-and-test-setup-correction-prompts-203204)).
-  OpenAI Codex recovered the state, recorded acceptance and prepared the local commit in
-  Prompt 202; it made this test-only correction and recorded the failed gate in Prompt 204. Implements the
+- **Status:** **M5e is reviewed, verified in CI and on main at `14f510e` (Prompt 206)**
+  ([main publication and exact-SHA evidence](#main-publication-and-exact-sha-ci-prompt-206)). Claude Code
+  implemented it in Prompt 200 and corrected exact question validation and nested rebuilds in
+  Prompt 201 ([corrections](#prompt-201-corrections)); the external reviewer accepted the local
+  implementation and recorded choices in Prompt 202 ([review](#external-review-prompt-202)).
+  The failed `5b94d18a` feature gate and its test-setup correction by OpenAI Codex in Prompt 204
+  remain historical ([diagnosis](#feature-ci-failure-and-test-setup-correction-prompts-203204)).
+  The correction was accepted in Prompt 205, passed feature CI at `15cbfbae`, and the reviewer
+  accepted both evidence exports in Prompt 206. The new documentation commit's separate feature
+  and main gates then passed at `14f510e`. Neither the prior failure nor the correction is a
+  demonstrated production reload defect. Implements the
   [accepted M5e specification](../plan.md#m5e-stage-and-call-reservation-persistence-specification-accepted-at-review-prompt-199-implementation-pending)
-  (proposed in Prompt 196, corrected in Prompts 197–198, accepted at external review in Prompt 199
-  with E1–E20 and binding clarifications A and B), the fifth slice of the
+  (proposed in Prompt 196, corrected in Prompts 197–198, accepted in Prompt 199 with E1–E20 and
+  clarifications A and B), the fifth slice of the
   [accepted M5 sequence](../plan.md#m5-implementation-sequence-accepted-at-review-prompt-170).
-  No endpoint, CLI command, handler, setting, production registry entry or production enqueue path
-  uses M5e, `run_review` stays unregistered, so none of its controls operates in the application.
-  The report output stays allocated to M5f/M5g (E7), and overall M5 acceptance is pending.
+  No application review path uses M5e and `run_review` stays unregistered; no M5e control operates
+  in the application. E7 assigns output work to M5f/M5g, and overall M5 acceptance remains pending.
 - **Date:** 2026-10-23 (implementation); acceptance recorded 2026-11-04 (Prompt 202)
 - **Builds on:** [ADR-0007](0007-durable-job-core.md) (the M3 fence and `recheck_ownership`),
   [ADR-0016](0016-snapshot-retrieval.md) (snapshot retrieval and its evidence checks),
@@ -457,7 +452,7 @@ is recorded above, separately from the later corrective commit's evidence below.
 
 ## Corrective feature CI at 15cbfbae (Prompt 205)
 
-**M5e is feature-published and feature-CI verified at
+**Historical Prompt 205 state: M5e was feature-published and feature-CI verified at
 `15cbfbae88c52ecefb9f287f985bec734e8c535f`, but not merged.** The corrective commit's
 parent is `5b94d18a4053e0a7d6e32d8add631ecb5ccde70b` and its tree is
 `90e29b527a33b43a313cb57d868e446d6dc44a64`. The reviewed test remains exactly blob
@@ -526,7 +521,8 @@ The post-CI evidence updates were staged and uncommitted for review in Prompt 20
 not pushed in that prompt. Prompt 206 accepts them for a documentation commit and gated
 publication. The `15cbfbae` exact-SHA CI does not verify these later documentation blobs. E7, discarded U4 evidence,
 worker composition obligations, the accepted M3 lease window and the open M4d trusted-snapshot
-limitation remain. M5f–M5h and overall M5 acceptance remain pending; M5e is not merged.
+limitation remain. M5f–M5h and overall M5 acceptance remain pending. M5e was not merged at
+that Prompt 205 checkpoint; the subsequent gated main publication is recorded below.
 
 ### Reviewer acceptance and gated main authorization (Prompt 206)
 
@@ -550,9 +546,150 @@ Mathew manually publishes the new documentation commit to the feature branch; on
 five required jobs explicitly pass for that exact commit may Codex freshly verify refs, scope
 and clean state, fast-forward local main with `--ff-only`, and prepare Mathew's manual main push.
 Main's own exact-SHA five-job gate must then pass before main-publication evidence is staged.
-No automated push is authorized. Neither main publication nor these future CI results has
-happened at this acceptance note. No production change, history rewrite, branch deletion,
+No automated push was authorized. At that acceptance note, neither main publication nor the
+new feature/main CI results had happened; their subsequent completion is recorded below. No production change, history rewrite, branch deletion,
 CI rerun or M5f work is authorized; overall M5 acceptance remains pending.
+
+## Main publication and exact-SHA CI (Prompt 206)
+
+**M5e is reviewed, verified in CI and on main at
+`14f510e23e89bd890b2428405de922ef1fcb2232`.** The published documentation commit's
+parent is `15cbfbae88c52ecefb9f287f985bec734e8c535f` and its tree is
+`fce760c4fad950942ab5ec5152490fe6d3f00495`. It changes only the five reviewed
+documentation/history files; the reviewed PostgreSQL test remains blob
+`cb13b6289f74e202e1d2f6586c9c14fef1599e7d`. All production, other test, migration,
+model, resource, packaging, dependency and workflow blobs remain unchanged from the reviewed
+corrective source. M5f–M5h and overall M5 acceptance remain pending.
+
+### Publication sequence and attribution
+
+The external reviewer accepted both Prompt 205 exports and independently confirmed the
+`15cbfbae` gate, as recorded above. OpenAI Codex recorded that acceptance and prepared
+`14f510e`. Mathew manually pushed the feature branch. After the usage-limit interruption,
+Codex recovered the actual clean state: feature at `14f510e`, local and remote main still at
+`1efe3ed3f0aa9697ce4e71cee295293a89c94909`, and no remaining task/monitor. It retrieved
+the existing final feature records and all five logs, without starting new runs or a redundant
+monitor, and confirmed explicit success for every required job and step.
+
+Fresh main-publication checks then confirmed the clean tree, main/origin/main/remote-main
+baseline, exact feature ref, ancestry, the five reviewed commits and their 23-path union,
+protected blob/mode identity, unchanged reviewed workflow/dependency/resource content, privacy
+and publication scans. Range Gitleaks scanned five commits and full-history Gitleaks 89,
+both without leaks. Codex switched to main and ran `git merge --ff-only` to the exact verified
+commit. No merge commit was created. Mathew manually pushed main; Codex verified remote main,
+local main, origin/main and the retained feature branch all at the exact SHA above. Codex
+performed no automated push, history rewrite, branch deletion, CI rerun or M5f work.
+
+The following are **Codex's observed records and actual log output**. At the Prompt 206
+handoff, this was not a claim that the reviewer separately examined these later runs; that
+qualification is historical following the independent Prompt 207 review recorded below. Both stages were **push** events, **attempt 1**,
+at the full `14f510e` SHA. Feature and main are separate runs; neither stage's counts or
+conclusions are inferred from the other. The failed `5b94d18a` run and successful `15cbfbae`
+run remain historical and supply no counts for these newer runs. Earlier Claude Code
+implementation/corrections and local results retain their existing attribution.
+
+### Documentation-commit feature gate
+
+Feature CI run [41757399847](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847),
+branch `feat/review-stage-persistence`, completed with **success**:
+
+| Job | Explicit conclusion | Output actually read in its log |
+| --- | --- | --- |
+| [Ubuntu verify, 126336644043](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847/job/126336644043) | success | 3,968 passed, 385 skipped |
+| [Windows verify, 126336643968](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847/job/126336643968) | success | 3,967 passed, 386 skipped |
+| [PostgreSQL, 126336644016](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847/job/126336644016) | success | 385 passed, 3,968 deselected in 259.95 seconds |
+| [Container, 126336643752](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847/job/126336643752) | success | smoke and cleanup reported success |
+
+Feature secret-scan run [41757400849](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757400849),
+same feature branch and SHA, completed with **success**:
+
+| Job | Explicit conclusion | Output actually read in its log |
+| --- | --- | --- |
+| [Gitleaks, 126336646243](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757400849/job/126336646243) | success | 89 commits scanned, no leaks |
+
+### Separate main gate
+
+Main CI run [41788993019](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019),
+branch `main`, completed with **success**:
+
+| Job | Explicit conclusion | Output actually read in its log |
+| --- | --- | --- |
+| [Ubuntu verify, 126437699334](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019/job/126437699334) | success | 3,968 passed, 385 skipped |
+| [Windows verify, 126437699275](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019/job/126437699275) | success | 3,967 passed, 386 skipped |
+| [PostgreSQL, 126437699044](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019/job/126437699044) | success | 385 passed, 3,968 deselected in 248.53 seconds |
+| [Container, 126437699439](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019/job/126437699439) | success | smoke and cleanup reported success |
+
+Main secret-scan run [41788993093](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993093),
+same main branch and SHA, completed with **success**:
+
+| Job | Explicit conclusion | Output actually read in its log |
+| --- | --- | --- |
+| [Gitleaks, 126437699395](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993093/job/126437699395) | success | 89 commits scanned, no leaks |
+
+### Evidence precision and limits
+
+Every required job and step explicitly succeeded. No successful parent run substituted for
+an unresolved job, and final run/job metadata agree. Public GitHub API run records and
+connected GitHub job/step records were inspected. All ten job logs across these two gates
+were retrieved/read and saved under `.local/p206/feature-logs/` and `.local/p206/main-logs/`,
+with hashes and source metadata in `feature-ci-final.json` and `main-ci-final.json`. No log
+was unavailable and no authentication or permission change was used to obtain output.
+Separate main monitoring finished within the 25-minute bound, with no monitor left running.
+
+Both PostgreSQL logs show 46 passing review-stage module positions, but neither prints
+`test_the_reload_refuses_an_unclaimed_canonical_job_with_persisted_history` or a named PASS
+line. The corrected module participated in each successful 385-case integration run; an
+individual named result for the replacement remains **not directly confirmed by the logs**.
+No extra test dispatch or rerun was made to obtain one. The earlier reviewer accepted this
+distinction; it is preserved rather than replaced by an invented individual result.
+
+Each of the four verify logs across these gates printed the production registry
+(`ingest_revision`, `index_revision`) and all ten installed-wheel behaviour lines, including
+the M5e stage-migration and abandoned-repair line. Formatting, lint, strict mypy, distribution
+build and installed-wheel steps succeeded. The wheel migration assertions are **offline**,
+separate from PostgreSQL execution. The Recall example is arithmetic, Voyage is mocked and
+model calls are scripted. Both unchanged container smokes exercise ingestion/indexing, not
+M5e. None establishes live-model quality, entailment, authenticity or injection resistance.
+
+These main-publication evidence updates are staged, uncommitted and unpushed for review; they
+are not part of the published SHA and are not covered by its CI. No local application test,
+build or wheel check was repeated for them. No application review path or `run_review`
+registration was added. E7 keeps output work in M5f/M5g; U4 discarded evidence cannot be
+re-proved at reload; worker obligations, the accepted M3 lease window and the open M4d
+trusted-snapshot limitation remain. Overall M5 acceptance and M5f–M5h remain pending.
+
+## External-review evidence acceptance (Prompt 207)
+
+The external reviewer accepts both Prompt 206 exports and confirms M5e's publication
+evidence. **Reviewer attribution:** the reviewer independently verified the exports' sizes,
+line counts, full SHA-256 values, paths, statistics and wording; independently retrieved the
+documentation commit's feature job conclusions and all five logs; and previously independently
+retrieved the separate main run records, all five main job conclusions and all five main
+logs. The reviewer confirmed the exact main SHA
+`14f510e23e89bd890b2428405de922ef1fcb2232`, branch, push event, attempt 1, successful
+conclusions and remote main at that observation. These are supplied independent-review
+observations, separate from Codex's Prompt 206 observations above; Codex made no remote
+observation in Prompt 207.
+
+The accepted feature evidence is [CI 41757399847](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847)
+and [secret scan 41757400849](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757400849):
+Ubuntu 3968 passed/385 skipped, Windows 3967 passed/386 skipped, PostgreSQL 385 passed/3968
+deselected in 259.95 seconds, container smoke/cleanup success, and Gitleaks 89 commits/no leaks.
+The separate accepted main evidence is [CI 41788993019](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019)
+and [secret scan 41788993093](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993093):
+Ubuntu 3968 passed/385 skipped, Windows 3967 passed/386 skipped, PostgreSQL 385 passed/3968
+deselected in 248.53 seconds, container smoke/cleanup success, and Gitleaks 89 commits/no leaks.
+The individual job links and Codex's log evidence remain under their own runs above.
+The 46 passing review-stage module positions do not name the replacement case individually;
+the reviewer accepts this qualification without another dispatch or CI rerun. The failed
+parent, local checks and earlier acceptance records remain historical.
+
+**M5e is reviewed, verified in CI and on main within its recorded scope.** This does not
+accept overall M5 or close any runtime limitation below. OpenAI Codex records that acceptance
+and proposes the [M5f report content and renderer specification](../plan.md#m5f-report-content-and-renderer-specification)
+in Prompt 207. M5f is proposed, unaccepted, unimplemented and untested; no M5f control operates.
+M5g–M5h and overall M5 acceptance remain pending. No new ADR, implementation or migration is
+created by this documentation-only proposal.
 
 ## Limits and later-slice obligations
 

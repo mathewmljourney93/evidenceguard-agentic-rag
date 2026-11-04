@@ -6834,7 +6834,7 @@ Prompt 191 for a local commit only; after feature CI at `1bea3731` failed three 
 test-only corrections followed, M5d is **reviewed, verified in CI and on `main` at `1efe3ed3`**
 (Prompts 194–196) ([implementation
 status](#m5d-implementation-status-reviewed-verified-in-ci-and-on-main-at-1efe3ed3)). The
-[M5e specification](#m5e-stage-and-call-reservation-persistence-specification-accepted-at-review-prompt-199-implementation-pending), proposed in Prompt 196 and corrected in Prompts 197–198, was accepted at external review in Prompt 199 with two binding clarifications, its E7 output-scope decision having been approved in Prompt 198; M5e was implemented by Claude Code in Prompt 200, corrected after external review in Prompt 201 and accepted at external review for a local implementation commit only in Prompt 202, then published on `feat/review-stage-persistence` at `5b94d18a` in Prompt 203: four jobs passed and PostgreSQL ran but failed one test (384 passed); the Prompt 204 test-only correction was accepted in Prompt 205, committed and feature-published at `15cbfbae`, where all five required jobs passed (PostgreSQL 385 passed): M5e is feature-CI verified but not merged, and Prompt 206 authorizes gated main publication only after the new documentation commit passes its exact-SHA feature gate; main publication has not happened ([implementation status](#m5e-implementation-status-accepted-for-a-local-commit-prompt-202)). M5f–M5h are not implemented; no review path or orchestration exists, the M5d and M5e persistence is used only by tests,
+[M5e specification](#m5e-stage-and-call-reservation-persistence-specification-accepted-at-review-prompt-199-implementation-pending), proposed in Prompt 196 and corrected in Prompts 197–198, was accepted at external review in Prompt 199 with two binding clarifications, its E7 output-scope decision having been approved in Prompt 198; M5e was implemented by Claude Code in Prompt 200, corrected after external review in Prompt 201 and accepted at external review for a local implementation commit only in Prompt 202, then published on `feat/review-stage-persistence` at `5b94d18a` in Prompt 203: four jobs passed and PostgreSQL ran but failed one test (384 passed); the Prompt 204 test-only correction was accepted in Prompt 205, committed and feature-published at `15cbfbae`, where all five required jobs passed (PostgreSQL 385 passed): Prompt 206 accepted that evidence and published `14f510e` after its own successful feature gate, followed by a successful separate main gate: M5e is reviewed, verified in CI and on main at `14f510e` ([implementation status](#m5e-implementation-status-reviewed-verified-in-ci-and-on-main-at-14f510e)). M5f–M5h are not implemented; no review path or orchestration exists, the M5d and M5e persistence is used only by tests,
 no M5b or M5c control is used by any review path, and overall M5 acceptance is pending.** The M5 milestone text above is the controlling requirement and is unchanged; this
 sequence only orders it into slices. Labels: **[DECISION]** already accepted; **[FACT]** current
 code at `46c02257`; **[REC]** recommendation (for M5a and the sequence-level choices, accepted in
@@ -7026,7 +7026,7 @@ renderer exists before the handler's atomic final commit needs it.
 | **M5b** | Provenance checks and status derivation (pure): Verifier output plus the question's retrieved evidence → `Verification` with derived status and trusted citation metadata, or `citation_rejected`; analyst findings restricted to already validated citations; the `requires_documentary_support` finding rule; exact quote-matching rules (W12) | M5a, M4d values | `evidenceguard_domain.provenance` | None |
 | **M5c** | Versioned artifacts: TOML review template, deterministic Planner, `prompts/verifier/v1.md` and `prompts/risk_analyst/v1.md` as packaged data with pinned SHA-256, and request assembly that places evidence only inside delimited blocks with **safe encoding** of document text (Correction E) | M5a, M5b | `evidenceguard_agents` (`planner`, `prompts`, `assembly`); packaged data | None |
 | **M5d** | Composable capture and review creation (Correction A): a public capture operation for a caller-owned transaction, extracted from the M4d capture phases with `capture_snapshot` unchanged; one creation transaction storing the review, every binding, the exclusions record, the pinned configuration and, through the same transaction, the `run_review` job; a trusted loader that rebuilds and revalidates the snapshot. Internal seams only (W8) | M4d, M5c | `evidenceguard_persistence.retrieval` (capture extraction), `evidenceguard_persistence.reviews`; migration `0006` | Yes |
-| **M5e** | Stage and call-reservation records (Correction D): per-question stage rows unique on `(tenant_id, review_id, question_id, stage)`, persisted call reservations and provider-call records and spans, all through fenced writes; identical replay is a no-op and a differing replay is a fixed conflict, never an overwrite. *Amended by the E7 scope decision approved at review in Prompt 198:* the stored report output is not part of M5e and moves to M5f/M5g (the M5e specification as a whole was accepted at review in Prompt 199; historically, until then the rest remained proposed; implemented in Prompt 200, corrected in Prompt 201 and accepted for a local commit in Prompt 202; feature-published at `5b94d18a` in Prompt 203, four jobs passed and PostgreSQL failed one setup case with 384 passing; test-only correction from Prompt 204 accepted in Prompt 205 and feature-published at `15cbfbae`, all five required jobs passed including PostgreSQL 385 passed; feature-CI verified but not merged; evidence accepted in Prompt 206 with gated main publication authorized after the new documentation commit passes feature CI, main publication pending) | M5a, M5b, M5d | `evidenceguard_persistence.review_stages`; migration `0007` (no output table) | Yes |
+| **M5e** | Stage and call-reservation records (Correction D): per-question stage rows unique on `(tenant_id, review_id, question_id, stage)`, persisted call reservations and provider-call records and spans, all through fenced writes; identical replay is a no-op and a differing replay is a fixed conflict, never an overwrite. *Amended by the E7 scope decision approved at review in Prompt 198:* the stored report output is not part of M5e and moves to M5f/M5g (the M5e specification as a whole was accepted at review in Prompt 199; historically, until then the rest remained proposed; implemented in Prompt 200, corrected in Prompt 201 and accepted for a local commit in Prompt 202; feature-published at `5b94d18a` in Prompt 203, four jobs passed and PostgreSQL failed one setup case with 384 passing; test-only correction from Prompt 204 accepted in Prompt 205 and feature-published at `15cbfbae`, all five required jobs passed including PostgreSQL 385 passed; evidence accepted in Prompt 206; after a new five-job feature gate, authorized fast-forward and manual main push, all five main jobs passed at `14f510e`: reviewed, verified in CI and on main) | M5a, M5b, M5d | `evidenceguard_persistence.review_stages`; migration `0007` (no output table) | Yes |
 | **M5f** | Report content and renderer (pure): settles the hash-covered report-content representation under the report-integrity invariant (a versioned wrapper around `ReportContent`, or omission of conclusions it cannot hold), builds that content from committed stage values, and renders Markdown solely from the hashed content, including unresolved questions, authenticity labels and the contract-mode stamp | M5b, M5e values, M1 report contracts | `evidenceguard_agents.report` | None (stored by M5g; E7: M5f reviews the content representation and validation the output stores) |
 | **M5g** | `run_review` handler factory and bounded orchestration: plan → retrieve (M4d `search_snapshot` over the loaded snapshot) → verify (with repair) → analyze → render → one atomic final commit; resume, reservations and budgets, cancellation, lease-loss and failure precedence; fake-provider controlled crash tests. Not registered in production (W8) | M5a–M5f, M3b runtime | `evidenceguard_worker.review` | Uses M5d/M5e; E7 (Prompt 198): the output table in a later additive migration and its atomic output-plus-job-success writer, reviewed with M5f/M5g before completion is enabled |
 | **M5h** | Anthropic adapter behind the M5a protocol, tested only with an injected or mocked transport; not registered, no settings, no live call (W9) | M5a | `evidenceguard_agents.anthropic` (adapter) and, if a transport is needed, the worker | None |
@@ -11512,7 +11512,7 @@ Prompt 199. None of those earlier states accepted the specification as a whole.
     `RepairReason.from_rejection` or `RepairReason.invalid_output`. *Tradeoff:* one more composition
     step in M5g versus a forbidden upward import.
 
-#### M5e implementation status (accepted for a local commit, Prompt 202)
+#### M5e implementation status (reviewed, verified in CI and on main at 14f510e)
 
 **Status.** Claude Code implemented the accepted M5e specification (E1–E20 with clarifications A
 and B) in Prompt 200 and staged it, uncommitted, on `feat/review-stage-persistence` for external
@@ -11524,17 +11524,14 @@ and `StageState` now rebuild their nested values)
 reviewer accepted the corrected implementation and recorded implementation choices for a local
 implementation commit only in Prompt 202
 ([review](decisions/0023-review-stage-persistence.md#external-review-prompt-202)). OpenAI Codex
-recovered the state, recorded acceptance and prepared the local commit. **M5e is feature-published and feature-CI verified at `15cbfbae` in
-Prompt 205, but not merged**
-([corrective CI evidence](decisions/0023-review-stage-persistence.md#corrective-feature-ci-at-15cbfbae-prompt-205)). The
-Prompt 204 test-only correction was accepted in Prompt 205, committed and manually published
-by Mathew. All five required jobs explicitly passed, including PostgreSQL (385 passed). The
-terse integration log shows 46 passing review-stage module positions but no individual named
-result for the replacement case. The failed `5b94d18a` gate and the earlier acceptance remain
-historical. Prompt 206 accepts the evidence and authorizes gated main publication only after
-the new documentation commit passes its own exact-SHA feature gate
-([authorization](decisions/0023-review-stage-persistence.md#reviewer-acceptance-and-gated-main-authorization-prompt-206)); main publication
-has not happened. No endpoint, CLI command, handler,
+recovered the state, recorded acceptance and prepared the local commit. **M5e is reviewed, verified in CI and on main at `14f510e` (Prompt 206)**
+([main publication evidence](decisions/0023-review-stage-persistence.md#main-publication-and-exact-sha-ci-prompt-206)).
+The test-only correction from Prompt 204 was accepted in Prompt 205; the evidence was accepted
+in Prompt 206. The new documentation commit passed all five exact-SHA feature jobs before the
+authorized fast-forward and Mathew's manual main push. All five separate main jobs then passed,
+including PostgreSQL (385 passed). Both integration logs show 46 passing review-stage module
+positions but no named result for the replacement case. The earlier failed `5b94d18a` gate,
+successful `15cbfbae` gate and acceptance-time pending statements remain historical. No endpoint, CLI command, handler,
 setting, production registry entry or production enqueue path uses M5e; `run_review` stays
 unregistered, so none of its controls operates in the application. The report output stays
 allocated to M5f/M5g (E7, M5e-L), no review can become `completed`, and overall M5 acceptance is
@@ -11557,6 +11554,686 @@ pending.
   384 integration passes and one setup failure. The corrective `15cbfbae` run then passed all
   385 integration cases, with the named-case output limitation recorded above. Historical
   collection and local skips verify no corrected database behaviour.
+
+The external reviewer accepted both Prompt 206 exports and independently confirmed the
+publication evidence in Prompt 207 ([review record](decisions/0023-review-stage-persistence.md#external-review-evidence-acceptance-prompt-207)).
+The [M5f specification](#m5f-report-content-and-renderer-specification-accepted-at-review-prompt-208-implementation-pending) below was proposed in Prompt 207
+and accepted at external review in Prompt 208 with two binding clarifications.
+Implementation and every implementation check remain pending; no M5f control operates.
+M5g–M5h and overall M5 acceptance remain pending.
+
+<a id="m5f-report-content-and-renderer-specification"></a>
+
+#### M5f report content and renderer specification (accepted at review, Prompt 208; implementation pending)
+
+**ACCEPTED at external review in Prompt 208; implementation pending.** The complete
+specification and F1–F12 are accepted subject to binding clarifications A and B recorded below.
+The **PROPOSED, Prompt 207** status is historical. No specification decision remains open
+within this accepted scope. All M5f implementation and every implementation check remain
+pending; no M5f value, codec, renderer, test or runtime control exists yet.
+M5e is reviewed, CI verified and on main at `14f510e`; overall M5 acceptance and M5g–M5h
+remain pending. OpenAI Codex prepared the specification and acceptance documentation;
+Claude Code's M5b–M5e implementations and their earlier reviews remain the source of existing
+behaviour. Later M5g output/worker and M6 approval review obligations remain explicit below.
+
+**Controlling facts and decisions.** M1 `evidence.py` defines `ReportContent` with at most
+100 questions and 200 findings; `report.py` hashes its unchanged
+`evidenceguard.report-content.v1` envelope. M5b `provenance.py` supplies `VerifiedQuestion`,
+`AnalyzedQuestion`, the rechecks and deterministic finding IDs. Its accepted P11 rule must
+survive Analysis failure, and P16 requires a global bound. M5c supplies pinned template
+values and the contract-mode stamp. M5d `reviews.py` supplies `TrustedReview` and configuration
+canonical bytes; M5e `review_stages.py` supplies `PlannedQuestionSet`, `TrustedStages`, stage
+shapes and thirteen unresolved reasons. The report-integrity invariant and M5e-L/E7 are
+binding. The schemas, APIs, engineering caps and presentation below are **accepted
+specification requirements**, not descriptions of implemented code. Existing constructors prove supported-input consistency,
+not trusted database origin or resistance to hostile code in the same process.
+
+##### M5f acceptance (Prompt 208)
+
+**External-review evidence, supplied by Mathew.** The reviewer verified the Prompt 207
+export's size, line count, full SHA-256, paths and statistics; inspected the specification
+and saved handoff; and cross-checked published M1 report/evidence, M5b provenance, M5c
+template and M5d configuration contracts at `14f510e`. The reviewed comparison was
+`14f510e23e89bd890b2428405de922ef1fcb2232` to staged tree
+`da10f127b2b0c9b22779f0e25cc8a586c596d075`, full-index excluding `prompts.md`: four
+files, 796 insertions/47 deletions, 109,453 bytes, 947 lines, SHA-256
+`0442e876ef26622c49321119162c0ed3454b629d19187c60cdebb0dfcdbe5eef`.
+Codex separately verified those local bytes and Git comparison during Prompt 208; it made
+no remote observation. This is specification/source review: the reviewer did not implement
+M5f or run an M5f suite, renderer, decoder, build, installed-wheel check or database probe.
+
+The reviewer accepts the complete specification and F1–F12: domain-owned values/codecs and
+agents builder/renderer, the explicit sequence-placement extension, the versioned wrapper
+and separate approval digest, preserved Verification/unresolved conclusions, owner-only
+Analysis, mandatory documentary finding after Analysis failure, whole-report refusal above
+200 findings, canonical/strict decoding, engineering caps, JSON-literal Markdown and its
+tradeoff, private errors/precedence, M5g/M6 handover and planned verification obligations.
+The byte/depth/token/render caps are **accepted engineering limits**, not proved tight
+maxima, measured performance guarantees or quality claims; implementation and boundary
+verification remain pending.
+
+**Binding clarification A — privacy-safe representations.** Every new report value,
+including every nested new value, must implement privacy-safe `repr` and `str`, as specified
+in M5f-A and tested under M5f-J. No default dataclass representation or delegation to a
+content-bearing nested representation is permitted. Explicit requested canonical encoding
+and rendering still return their deliberate content. Error boundaries retain no-warning,
+no-output/no-log behaviour and process-control identity propagation.
+
+**Binding clarification B — distinct-query attribution.** M5c's template contract requires
+distinct queries. M5e's exact question rebuilding does **not independently impose uniqueness**.
+M5f preserves the template's distinct-query requirement and exact agreement of the template,
+planned and trusted-stage question tuples. Structural report validation checks this value
+invariant; source-bound rechecking establishes equality to the supplied inputs; neither
+proves that the caller supplied a genuinely pinned template. No M5c/M5e production change
+is required or authorized.
+
+No specification decision remains open within this accepted scope. All implementation and
+implementation verification remain pending; no M5f control operates. M5g must still review
+the later additive output migration and atomic fenced writer, replay/completeness and worker
+composition; M6 must still review wrapper revision/approval/finalization compatibility.
+M5e acceptance and all runtime limits remain intact; this acceptance does not accept overall M5.
+
+##### M5f-A. Scope, placement and public surface (decision F1)
+
+Use a new domain module `evidenceguard_domain.report_content` for the values, strict
+codec, revalidation and errors; put the pure builder, source-bound recheck and Markdown
+renderer in `evidenceguard_agents.report`. The domain module may import existing domain
+contracts and the standard library, never agents, persistence, retrieval, worker or API.
+The agents module may import domain values and M5c template **values**, never persistence,
+retrieval, worker or API. It must not call a template/prompt loader. A caller supplies an
+already loaded pinned template. No new dependency is proposed.
+
+This extends the accepted sequence's `evidenceguard_agents.report` placement: codec/value
+ownership moves down to domain so later persistence and approval code need no upward import.
+The builder and renderer stay at the accepted location. F1's explicit placement extension
+was approved in Prompt 208. The sequence row is the historical allocation, supplemented by
+this accepted domain/agents split; no upward import is authorized.
+No persistence, output table, migration, provider, endpoint, handler registration or production
+wiring belongs to M5f. `run_review` remains unregistered.
+
+Accepted public signatures (Python annotations here describe a future implementation only):
+
+```python
+# evidenceguard_domain.report_content
+def revalidate_review_report(value: ReviewReportContent) -> ReviewReportContent: ...
+def review_report_bytes(content: ReviewReportContent) -> bytes: ...
+def review_report_sha256(content: ReviewReportContent) -> str: ...
+def decode_review_report(data: bytes, *, expected_sha256: str) -> ReviewReportContent: ...
+
+
+# evidenceguard_agents.report
+def build_report_content(
+    review: TrustedReview,
+    template: ReviewTemplate,
+    planned: PlannedQuestionSet,
+    stages: TrustedStages,
+    *,
+    mode: ReportMode = ReportMode.CONTRACT,
+) -> ReviewReportContent: ...
+def recheck_report_content(
+    content: ReviewReportContent,
+    *,
+    review: TrustedReview,
+    template: ReviewTemplate,
+    planned: PlannedQuestionSet,
+    stages: TrustedStages,
+) -> ReviewReportContent: ...
+def render_report_markdown(content: ReviewReportContent) -> str: ...
+```
+
+All new value classes are frozen, keyword-only validating dataclasses. They expose the
+fields specified below and rebuild nested values. Their constructors take exactly those
+fields, except constants and derived digests (read-only properties). `ReportMode` has only
+`CONTRACT = "contract"`; no live/production mode is introduced. Existing stage/outcome/reason,
+evidence, verdict, severity, source, authenticity and finding-kind enums are reused rather
+than creating parallel vocabularies. Constructor defaults exist only for the builder's mode.
+There is no unchecked public factory or public mutable JSON representation.
+
+**Privacy-safe incidental representations (binding clarification A, Prompt 208).** Every new
+report value—`ReportBinding`, `ReportVerification`, `ReportStage`, `ReportFindingRef`,
+`ReportQuestion` and `ReviewReportContent`—must define explicit privacy-safe `__repr__` and
+`__str__`; disable the dataclass default repr. Apply the same rule to any additional nested
+report value introduced during implementation. Representations may contain only schema/version
+identifiers, ordinary identifiers, enums, counts and digests where appropriate. They must
+never include question/report titles or text, queries, evidence text/quotes, rationale/claims,
+finding titles/statements, follow-up text, canonical payload bytes, or a nested/container
+representation containing any such content. Do not delegate to content-bearing legacy
+models' repr/str. Enum representations likewise contain only their fixed identifiers/literals.
+This restricts incidental representations; explicit canonical encoder and renderer calls
+still return the content deliberately requested under this specification.
+
+##### M5f-B. Hash-covered wrapper and complete field contract (decisions F2–F3)
+
+Use schema `evidenceguard.review-report-content.v1` and renderer contract
+`evidenceguard.review-report-markdown.v1`. Preserve M1's schema, canonical bytes, hash function,
+models and legacy approvals unchanged. The wrapper has its **own** SHA-256 and approval
+meaning. Its exact canonical object keys are:
+
+```text
+{
+  "schema": "evidenceguard.review-report-content.v1",
+  "renderer": "evidenceguard.review-report-markdown.v1",
+  "mode": "contract",
+  "binding": {tenant_id, review_id, vendor_id, job_id, review_request_sha256,
+              snapshot_sha256, configuration, configuration_sha256},
+  "legacy": {"schema": "evidenceguard.report-content.v1", "content": {...}},
+  "legacy_sha256": <unchanged M1 digest>,
+  "questions": [<ReportQuestion>, ...]
+}
+```
+
+The braces with bare names above are a shape description, not JSON literals or an alternate
+encoding. All keys are mandatory; there are no extension keys. `ReviewReportContent` has
+constructor fields `binding: ReportBinding`, `mode: ReportMode`, `content: ReportContent`,
+`questions: tuple[ReportQuestion, ...]`. The schema/renderer constants, `legacy` envelope and
+`legacy_sha256` are derived. `content` is serialized under `legacy.content`, never twice.
+The nested legacy envelope is the same JSON **object** M1 hashes, not a claim that its ASCII
+embedding has identical raw bytes to M1's UTF-8 encoding. Recompute its digest using M1's
+unchanged `canonical_content_bytes`/`content_sha256`.
+
+`ReportBinding` constructor fields are exactly `tenant_id`, `review_id`, `vendor_id`, `job_id`
+(UUIDs), `review_request_sha256`, `snapshot_sha256` (digests) and
+`configuration: ReviewConfiguration`. `configuration_sha256` is derived. Serialize
+configuration using M5d's unchanged canonical object: keys `canonical` with value
+`eg-review-configuration-v1`, `kind` with value `review_configuration`, `template` with
+`id/version/sha256`, `verifier_prompt` and `analyst_prompt` each with `id/version/sha256`,
+`model` with `model_id/max_output_tokens/timeout_ms`, and `retrieval_k`.
+Revalidate M5d's exact bounds: template/prompt ID `[a-z][a-z0-9_]{0,31}`, version 1–999,
+distinct verifier/analyst IDs, model ID `[a-z0-9][a-z0-9.-]{0,63}`, output tokens 1–8192,
+timeout 1000–120000 ms and retrieval k 1–20. Recompute configuration SHA-256 from its own
+unchanged M5d canonical bytes. No idempotency key, audit timestamp or job-attempt number is
+displayed or added to the report. Retries do not create a new content identity merely by
+changing an attempt or commit timestamp.
+
+The complete nested M1 object remains:
+
+| Object | Mandatory fields and bounds |
+| --- | --- |
+| `ReportContent` | `tenant_id` UUID; `title` string 1–200; `questions` tuple/array 1–100; `findings` tuple/array 0–200; `unresolved_question_ids` tuple/array 0–100, unique and known |
+| `EvidenceQuestion` | `question_id` matching `[A-Z][A-Z0-9]{1,9}-[0-9]{2,3}`; `text` 1–500; `search_queries` tuple/array 1–5 of strings 1–200; `requires_documentary_support` exact bool |
+| `Finding` | `tenant_id` UUID; `finding_id` UUID; `question_ids` tuple/array 1–20 unique known IDs (wrapper narrows to exactly its owner); `title` 1–200; `severity` high/medium/low/info; `statement` 1–2000; `evidence_status` vendor_claim/documentary_support/conflicting/missing; `citations` tuple/array |
+| `Citation` | `tenant_id`, `document_revision_id`, `chunk_id` UUIDs; `source_type` vendor_statement/contract/third_party_report; `quote` 1–1000; `authenticity` exactly not_established |
+
+All text lengths are Unicode code points, not encoded bytes. Existing M1 status/citation
+rules remain mandatory: tenant consistency; no duplicate `(chunk_id, quote)` within a
+citation list; vendor_claim requires at least one citation and only vendor statements;
+documentary_support requires a contract or third-party report; conflicting requires at least
+two distinct quote texts; missing may have citations. M1's question/finding-ID uniqueness
+and finding ownership rules still apply. Wrapper-specific citation limits are 80 for
+Verification and the rule finding, and 8 for each Analyst finding. Quotes and authenticity
+labels are hash covered even when no Analyst finding exists.
+
+`ReportQuestion` fields and exact serialized keys:
+
+| Field | Type, bound and meaning |
+| --- | --- |
+| `question_id` | Known question ID; equals `content.questions[position].question_id` |
+| `position` | Exact int 0–99, equals its zero-based array position |
+| `plan_question_sha256` | Digest recomputed by M5e's existing planned-question canonical encoding from that exact question |
+| `verification` | `ReportStage`, verification-stage shape only |
+| `analysis` | `ReportStage`, analysis-stage shape only |
+| `findings` | Tuple/array 0–21 of `ReportFindingRef`, ordered as specified in M5f-D |
+
+`ReportStage` fields are exactly `shape`, `outcome`, `unresolved_reason`, `request_sha256`,
+`content_sha256`, `evidence_sha256`, `dependency_sha256`, `value`. `shape` uses the M5e
+`S1/S2/U1/U2/U3/U4/U5/U6` spelling. `outcome` is verified/analyzed/unresolved. Each digest
+is a lowercase 64-hex string or null, subject to this complete shape matrix. `value` is
+`ReportVerification` only in S1; it is null in every other shape, including S2. Analyst
+conclusions live in the hash-covered legacy findings and finding references, not a second
+copy of their text.
+
+| Shape/stage | Outcome and reason | Request | Content digest | Evidence | Dependency |
+| --- | --- | --- | --- | --- | --- |
+| S1 verification | verified; null reason | required | required | required | null |
+| S2 analysis | analyzed; null reason | required | required | null | required |
+| U1 either | unresolved; one of refusal, max_tokens, unexpected_stop, model_mismatch, invalid_output, citation_rejected, timeout, provider_failed | required | null | required for verification, otherwise null | required for analysis, otherwise null |
+| U2 either | unresolved; call_abandoned | required | null | required for verification, otherwise null | required for analysis, otherwise null |
+| U3 analysis only | unresolved; verification_unresolved | null | null | null | required |
+| U4 verification only | unresolved; evidence_too_large | null | null | null | null |
+| U5 either | unresolved; request_too_large | null | null | required for verification, otherwise null | required for analysis, otherwise null |
+| U6 either | unresolved; repair_request_too_large | required | null | required for verification, otherwise null | required for analysis, otherwise null |
+
+No other unresolved reason is accepted. Analysis is U3 if and only if Verification is
+unresolved; with successful Verification, Analysis is S2, U1, U2, U5 or U6. Every analysis
+dependency digest must equal the existing M5e owner-only dependency encoding computed from
+the question digest and the Verification outcome/content digest/reason, with `shared=[]`.
+Request digests are per-stage identities; an Analyst request digest must **not** be compared
+to the Verifier request digest. Source stage content/evidence/request digests are hashed
+references, not independently reconstructible proof of omitted stage payloads. In particular,
+the wrapper does not contain AcceptedCitation offsets/provenance, call sequence/history or
+usage data. Structural decoding validates their digest spelling and the derivable dependency;
+the source-bound recheck validates equality to actual trusted stages. No omitted value may
+later supply a displayed conclusion.
+
+`ReportVerification` fields are exactly `verdict` (supported/contradicted/insufficient_evidence),
+`evidence_status` (the four statuses above), `rationale` string 1–2000,
+`citations` tuple/array 0–80 of Citation, and `claims` tuple/array 0–10 of existing
+`ValidatedClaim`. A claim has exactly `text` string 1–1000 and `citation_indexes` tuple/array
+0–8 of unique exact ints 0–79, each less than the actual citation count. Preserve their
+existing order and canonical first-use citation union. A supported/contradicted result has
+nonempty citation indexes for each claim; all M5b verdict/status/claim consistency rules
+apply. Reconstruct an M1 Verification using the binding tenant and owning question, preserving
+its rationale, status and every accepted quote even after Analysis fails.
+
+Precisely, scanning claims and their indexes in stored order, each index's first appearance
+must be the next integer 0, 1, …, citation_count−1, and every citation must appear. An empty
+claim tuple therefore requires an empty citation tuple. Planned search queries must be
+distinct under M5f's preservation of the M5c template contract. M5e's exact question rebuilding
+does not independently impose query uniqueness (binding clarification B, Prompt 208).
+
+`ReportFindingRef` fields are exactly `kind` (analyst/documentary_support_required), `index`
+(analyst 0–19, rule exactly 0), `finding_id` UUID, `follow_up_questions` tuple/array 0–5 of
+strings 1–500. Rule follow-ups must be empty. Each reference resolves to exactly one legacy
+finding and vice versa; no orphan findings or references. Rule and Analyst findings are
+owner-only: `question_ids == (question_id,)`. A successful Analysis with zero findings is
+allowed. Unresolved Analysis has no Analyst references or follow-ups. Follow-ups are per
+finding, not a global unbound list.
+
+Strict wrapper validation also checks each Analyst citation against the **full** equal
+Citation value in that question's projected Verification. Re-derive its evidence status:
+no citations or an insufficient_evidence owner means missing; otherwise a supported owner
+means vendor_claim for vendor-only citations or documentary_support when any citation is a
+contract/third-party report; a contradicted owner requires at least two distinct quote texts
+and means conflicting. Reject all other combinations. These structural checks need no
+omitted provenance; the builder must still run the stronger existing trusted rechecks.
+The binding tenant equals the legacy tenant and every embedded citation/finding tenant.
+`questions` has exactly 1–100 entries, one for every legacy question. Analyst reference indexes
+are contiguous from zero with no gaps; the optional rule is exactly the leading rule slot.
+
+##### M5f-C. Construction, trust and completeness (decision F4)
+
+The builder accepts only the exact supported class types in M5f-A, not dictionaries,
+subclasses, iterables, ORM rows or caller assertions of trust. Before any `model_dump`,
+`model_copy`, JSON serialization, equality-based normalization or coercing constructor, walk
+every nested input field and require its declared exact type. Exact int excludes bool;
+UUID fields require UUID values, enum fields their declared enum class, and collections
+exact tuples with individually bounded entries. Reject strings containing NUL or surrogate
+code points. Rebuild all values field-by-field through their validating constructors and
+compare the resulting values and types without permitting normalization. In particular,
+M1-bound strings must already equal their stripped forms; claims/follow-ups retain their
+existing whitespace semantics. Reject malformed EvidenceQuestion fields before Pydantic
+serialization, without warnings. Do not infer validation from frozen storage or equality
+with a bool. Apply the same rules to all new constructors, revalidation and codecs.
+
+Rebuild TrustedReview, ReviewTemplate/TemplateRef, PlannedQuestionSet and TrustedStages,
+including their nested values and derived hashes; never trust a bypass-built stored digest.
+Then require:
+
+1. All tenant/review/job identities agree; the snapshot tenant/vendor and request/configuration
+   agree with TrustedReview, and its request and snapshot digests are recomputed/validated
+   using their existing contracts. The template ref exactly equals the configured template
+   ID/version/digest. Template title supplies the report title.
+2. The full template question tuple equals the planned tuple and TrustedStages question tuple,
+   field-for-field, type-for-type and in original template order. No sorting, subset, duplicate,
+   unknown question, foreign tenant or substituted text/query/doc flag is accepted. Recompute
+   all plan-question digests. The wrapper contains exactly that question tuple and order.
+3. Every planned question has **both committed stage records**. A missing Verification or
+   Analysis is incomplete work and produces `IncompleteReportStagesError`, never a fabricated
+   unresolved result. Existing TrustedStages/history validation remains mandatory. A committed
+   unresolved stage is a completed stage with a reason, not incomplete work.
+4. For S1 require retained QuestionEvidence and call `recheck_verified` with that exact evidence.
+   For S2 call `recheck_analyzed(analyzed, owner, question, shared=())`; reject cross-question
+   citations and any finding whose question tuple is not exactly its owner. Check stage
+   request/content/evidence/dependency digests against the corresponding rebuilt source values.
+   Preserve M5e's stage-shape/dependency rules and the U4 discarded-evidence limitation.
+   Copy every Analyst finding field and its parallel follow-up tuple exactly; do not rewrite
+   titles, statements, severity, evidence status, citations or follow-ups during construction.
+5. Preserve successful Verification when Analysis is unresolved. Copy its verdict, evidence
+   status, rationale, claims, quotes and authenticity; show the distinct Analysis reason.
+   Do not turn a provider failure into an unsupported factual conclusion or fake finding.
+6. Compute rule findings, global bounds and unresolved status as below; construct and revalidate
+   the wrapper. `recheck_report_content` repeats this builder and requires byte equality of
+   canonical wrappers; it returns a fresh rebuilt value, never enriches stored content.
+
+Constructors/rechecks can prove these identities and supported-input consistency. They cannot
+prove the template was loaded from pinned packaged bytes, stages were loaded under the correct
+database snapshot/fence, request bytes were reassembled before dispatch, or original retrieval
+membership/rank beyond the existing rechecks. The trusted loader and future M5g worker must
+supply those facts and the owner-only composition. `mode=contract` alone is not proof that a
+scripted fake supplied the stages. M4d's open trusted-snapshot limitation remains open.
+
+##### M5f-D. Mandatory documentary finding and unresolved projection (decision F5)
+
+For **every successful Verification**, call the existing `documentary_gap_finding` with its
+planned question, including when Analysis is unresolved. If and only if
+`requires_documentary_support` is true and Verification's evidence status is `vendor_claim`,
+include its exact rule finding: medium severity, missing evidence status, title
+`Documentary evidence required`, statement
+`Only vendor statements support this answer; the question requires a contract or third-party report.`,
+owner question only, all its accepted Verification citations and empty follow-ups. Do not ask
+the model to produce it. With unresolved Verification the condition is not established;
+record that unresolved result without inventing the rule's factual predicate.
+
+Use M5b's existing UUID5 namespace `56b13512-9167-5c9e-95c5-c6915da4cba6` and exact name
+`{tenant_id}:{review_id}:{question_id}:{kind.value}:{index}`: rule kind
+documentary_support_required/index 0, Analyst kind analyst/index 0–19 in Analysis order.
+Recompute IDs and reject any mismatch. For each question, references and legacy findings are
+ordered rule first (if present), then Analyst order; flatten questions in planned order.
+Only the builder creates the one rule slot, so it cannot accidentally add the same rule twice.
+Any repeated ID, including a hypothetical UUID5 collision or identical repeated payload, is
+`ReportFindingConflictError`; never deduplicate conflicting records, renumber or drop one.
+Different IDs with semantically similar text remain distinct. Strict reload derives and
+checks the exact mandatory rule payload, not just its ID or presence.
+
+Compute `legacy.content.unresolved_question_ids` in planned order with no extras: a question
+is unresolved if either stage is unresolved, or any owned finding is `missing`, or no owned
+finding resolves it under M1. A resolving finding is documentary_support/conflicting, or
+vendor_claim when documentary support is not required. This narrows M1's allowance for extra
+unresolved IDs deterministically. Successful Analysis with no findings can therefore leave
+a question unresolved while preserving successful Verification. The P11 missing rule finding
+always makes its question unresolved.
+
+Renderer-only explanatory causes are derived from hashed fields, in this fixed order, each
+included if true: `verification_unresolved`, `analysis_unresolved`,
+`documentary_support_required` (rule present), `missing_evidence_finding` (any missing finding),
+`no_resolving_finding`. These are presentation labels, not new M5e stage-reason codes. Multiple
+causes are allowed. The wrapper validator requires the exact unresolved projection above.
+
+##### M5f-E. Global finding and output bounds (decision F6, resolving P16)
+
+Preserve M1's 200-finding maximum. Use **whole-report refusal**, not truncation or
+ranking: first derive mandatory rules and all validated Analyst candidates, then count.
+If the total exceeds 200, raise `ReportLimitExceededError` and return no report, digest or
+Markdown. No mandatory finding may be dropped, no question silently omitted, and no partial
+report published. Iteration remains bounded by 100 × (20 + 1) = 2100 candidate findings.
+Do not construct an invalid oversized M1 ReportContent as an intermediate value.
+
+The current eight-question pinned template has a conservative worst case of 168 findings,
+so it cannot hit the count cap. Valid future plans up to 100 questions remain allowed if
+their actual total is at most 200; larger totals fail atomically. M5g must classify that
+report-level failure explicitly before enabling output completion, rather than manufacture
+an unresolved stage, shrink a pinned plan, retry a model automatically or claim job success.
+Widening M1, allocating per-question finding budgets or changing templates would require
+separate review. Tradeoff: complete conclusions and compatibility at the cost of refusing
+some otherwise valid large plans. This is a deliberate bounded outcome, not model compliance.
+
+Additional **engineering limits**, not semantic quality claims or proved tight maxima:
+canonical wrapper bytes ≤ 16,777,216; legacy canonical UTF-8 bytes ≤ 16,777,216; canonical
+JSON nesting depth ≤ 16 (root container depth 1); structural token budget ≤ 500,000; rendered
+Markdown ASCII bytes ≤ 33,554,432. A structural token is one container opening, one object
+key or one scalar value; container closings, commas and colons do not count. Strings are
+scanned for the same budget without interpreting their punctuation as structure. These caps
+bound parser/render work and transport size; they need future implementation measurement.
+Some combinations satisfying local field bounds may exceed a global byte cap and must fail
+as a whole. No prefix output or silent shortening is returned. Bound sizes while accumulating,
+not after allocating an unbounded object. Existing input-stage byte limits still apply.
+
+##### M5f-F. Canonical bytes, digest and strict reload (decisions F7–F8)
+
+Serialize the exact wrapper object using JSON with `sort_keys=True`, compact separators
+`,` and `:`, `ensure_ascii=True`, `allow_nan=False`, then ASCII encode with no BOM, whitespace
+outside strings or trailing newline. That byte sequence alone is hashed by SHA-256; return
+the lowercase 64-hex digest. Key order is Unicode lexicographic order as implemented by
+that JSON setting; all keys here are fixed ASCII. Arrays retain the defined question,
+claim, citation, finding-reference, follow-up and unresolved order; never sort them by ID.
+All optional stage keys are present with explicit null. There are no omitted defaults.
+UUID strings are lowercase hyphenated canonical `str(UUID)` with round-trip equality;
+no version-4 restriction is invented. Enums use only the exact literals specified above.
+JSON booleans are allowed only for question documentary flags. Integers are exact,
+nonnegative, at most 2,147,483,647 with narrower field bounds; no floats, exponent notation,
+negative zero, numeric strings, NaN or Infinity. ASCII escapes encode Unicode strings
+losslessly; no NFC normalization, newline normalization or quote rewriting occurs.
+
+The public decoder accepts exact bytes and an exact lowercase expected digest string;
+there is no unverified-load overload. Before general JSON parsing, enforce the byte cap,
+ASCII/no-BOM envelope, depth and structural-token budget with a bounded lexical scan aware
+of escapes/strings. Enforce integer spelling `0` or `[1-9][0-9]*`, at most ten digits and
+the magnitude cap before conversion. Reject duplicate keys at every depth; unknown or
+missing keys, illegal nulls, wrong types, noncanonical UUID/enum/digest spellings and
+unsupported versions. JSON escapes for NUL or lone surrogates are invalid values.
+
+Then build exact typed nested values without coercion, revalidate every cross-field rule,
+recompute configuration, question and legacy digests, check mandatory findings and
+unresolved projection, and require canonical re-encoding equality with the original bytes.
+Finally verify the wrapper digest against `expected_sha256`. Re-encoding rejects alternative
+escapes, key/whitespace order, duplicate representations and Unicode-equivalent but different
+bytes. A valid digest does not authorize malformed content. Full M5e content/evidence hashes
+remain opaque source references until `recheck_report_content` receives trusted inputs;
+decoding alone must not claim database provenance or original retrieval proof.
+
+The review-request and snapshot digests likewise bind omitted source objects: structural
+decoding cannot recompute those digests from this projection. Their spelling is checked here;
+their full existing validation and equality are obligations of the source-bound recheck.
+
+The new decoder rejects a bare legacy envelope, an unknown wrapper schema or renderer
+version; it does not auto-upgrade or reinterpret a legacy digest. Existing M1 callers and
+their exact bytes/hashes remain unchanged. A future schema/renderer requires explicit
+dispatch and approval compatibility review, never best-effort fallback. Audit timestamps
+are not serialized, sorted or used to invent temporal ordering guarantees.
+
+##### M5f-G. Deterministic Markdown contract (decision F9)
+
+Render **only** a freshly revalidated wrapper, never database rows, model output, a clock,
+randomness, filesystem resources or later stage enrichment. The hashed `mode=contract`
+and renderer ID determine the exact first stamp:
+`NOT a quality measurement of Claude or semantic retrieval`. The renderer cannot select
+a different stamp from an environment flag. Unsupported mode/renderer values are refused.
+
+Use a deliberately plain, reversible presentation. All dynamic scalar values use
+this fixed field primitive: emit a fixed ASCII label followed by `:`, an empty line, one
+line beginning with four spaces followed by the scalar's compact `json.dumps(...,
+ensure_ascii=True, allow_nan=False)` representation, then an empty line. In this presentation
+primitive additionally escape literal `<`, `>` and `&` as lowercase `\u003c`, `\u003e`,
+`\u0026`. Empty arrays use a fixed field `Count` with JSON integer 0; otherwise emit a Count
+and numbered entries. Never insert untrusted text into headings, inline Markdown, links,
+HTML, table cells or code fences. Strings containing LF/CR/tab, bidi controls, quotes or
+Markdown punctuation remain on one physical ASCII line in an indented code block. Lists
+of values are emitted as repeated fields, never interpolated raw JSON containers.
+
+Before the field primitive, convert UUIDs to their canonical strings and enums to their
+literal values; preserve exact strings, ints, bools and null unchanged. Use the explicit
+count labels in the emission order below (for example `Search query count`), including
+zero counts. Only the generic question/finding/unresolved lists use the label `Count`.
+
+The exact line-emission order is the following. Each heading emits itself and one empty
+line. Each field uses the primitive above; there are no additional blank lines. Numbered
+headings use decimal one-based positions with no leading zeros, not user-controlled IDs.
+Remove the final empty line and terminate the joined output with exactly one LF.
+
+1. `# EvidenceGuard review`, then `## Contract and binding`. Fields in order: `Contract mode
+   stamp`, `Mode`, `Renderer`, `Wrapper SHA-256`, `Legacy SHA-256`, `Tenant ID`, `Review ID`,
+   `Vendor ID`, `Job ID`, `Review request SHA-256`, `Snapshot SHA-256`, `Configuration SHA-256`,
+   `Template ID`, `Template version`, `Template SHA-256`, `Verifier prompt ID`, `Verifier prompt
+   version`, `Verifier prompt SHA-256`, `Analyst prompt ID`, `Analyst prompt version`, `Analyst
+   prompt SHA-256`, `Model ID`, `Max output tokens`, `Timeout ms`, `Retrieval k`, `Report title`.
+2. `## Questions`, `Count`, then for each question `### Question N`. Fields: `Question ID`,
+   `Question text`, `Requires documentary support`, `Plan question SHA-256`, `Search query count`,
+   then `Search query N` for each query. `Position` is conveyed solely by the heading.
+3. `#### Verification`: fields `Shape`, `Outcome`, `Unresolved reason`, `Request SHA-256`,
+   `Content SHA-256`, `Evidence SHA-256`, `Dependency SHA-256` (including JSON nulls). For S1
+   additionally fields `Verdict`, `Evidence status`, `Rationale`, `Citation count`, then each
+   `##### Verification citation N`; fields `Tenant ID`, `Document revision ID`, `Chunk ID`,
+   `Source type`, `Authenticity`, `Accepted quote (JSON literal; decode once for original text)`.
+   Then `Claim count`; each `##### Claim N` has `Text`, `Citation index count`, and repeated
+   `Citation index N` fields containing the stored **zero-based** indexes. No extra quotation
+   marks, ellipses or normalization are added to accepted quote values.
+4. `#### Analysis` with the same seven stage fields in step 3. Then fields `Report unresolved`,
+   `Unresolved cause count`, and `Unresolved cause N` in the M5f-D cause order.
+5. `#### Findings`, `Count`, then each `##### Finding N` in M5f-D order: `Kind`, `Index`,
+   `Finding ID`, `Tenant ID`, `Question ID`, `Title`, `Severity`, `Evidence status`, `Statement`,
+   `Citation count`; each `###### Finding citation N` has the six Citation fields in step 3.
+   Then `Follow-up count` and `Follow-up N` in stored order. Only a rule reference may carry
+   rule-kind labels; severity/status are the stored values, not rephrased conclusions.
+6. After all questions, `## Unresolved questions`, `Count`, and `Question ID N` in the exact
+   legacy unresolved order. With zero entries emit only Count, not invented reassurance.
+
+`Wrapper SHA-256` is computed from the validated content; its display is derived from hashed
+bytes and is not a recursive field inside those bytes. Fixed headings/labels, ordering,
+cause derivation and stamp are pinned by the hashed renderer ID. All substantive values
+displayed are stored or solely derived as specified. No findings are summarized or fused.
+The JSON-literal quotation label explicitly distinguishes presentation escapes from the
+unchanged stored quotation; decoding the literal once recovers its exact text.
+
+Indented code blocks prevent string-supplied Markdown, raw HTML and URLs from becoming
+active syntax in a conforming CommonMark renderer. No auto-link, URL fetch, custom HTML
+interpreter or image loading is supported. Consumers must retain code-block text escaping
+when converting to HTML; arbitrary viewers or extensions are outside this guarantee.
+Tradeoff: less natural prose and no clickable evidence links, in exchange for deterministic,
+reversible presentation. Content integrity, this presentation boundary and semantic injection
+resistance are different claims. Neither hashing nor escaping proves truth, entailment,
+document authenticity, live-model quality or injection resistance.
+
+##### M5f-H. Private errors and boundary precedence (decision F10)
+
+Accepted domain-owned `ReportContentError` base and fixed subclasses/messages (no caller text
+in constructor arguments, exception attributes or logs):
+
+| Public error | Exact message and classification |
+| --- | --- |
+| `InvalidReportInputError` | `invalid_report_input`; wrong API argument or malformed trusted input |
+| `InvalidReportValueError` | `invalid_report_value`; invalid new/nested report value |
+| `ReportBindingMismatchError` | `report_binding_mismatch`; identity/source-bound mismatch |
+| `IncompleteReportStagesError` | `incomplete_report_stages`; missing committed stage |
+| `ReportFindingConflictError` | `report_finding_conflict`; duplicate, colliding or incorrect finding identity |
+| `ReportLimitExceededError` | `report_limit_exceeded`; content/count/decoder engineering cap |
+| `InvalidReportEncodingError` | `invalid_report_encoding`; malformed/noncanonical bytes or inner digest mismatch |
+| `UnsupportedReportSchemaError` | `unsupported_report_schema`; unsupported wrapper schema or renderer |
+| `ReportDigestMismatchError` | `report_digest_mismatch`; otherwise valid wrapper differs from expected digest |
+| `ReportRenderError` | `report_render_failed`; unexpected ordinary renderer failure |
+| `ReportRenderLimitError` | `report_render_limit_exceeded`; Markdown byte cap |
+
+All public entry points catch ordinary `Exception` only, normalize to a **fresh** allowed
+error, and raise outside the original exception handler so both `__cause__` and `__context__`
+are None. `raise ... from None` alone is insufficient. Never stringify or log the original
+exception, input, model text, quote, digest or identifiers. No warnings, stdout/stderr writes
+or logging are allowed at these boundaries. Process-control `BaseException`
+(including KeyboardInterrupt/SystemExit and the existing control probe) propagates by
+object identity; no broad catch/reconstruction. Internal private markers may distinguish
+expected classifications, but arbitrary input exceptions are never exposed as public errors.
+
+Precedence is deterministic:
+
+- New value constructors/revalidation/encoding: exact local types and local field bounds,
+  then nested/cross-field consistency, deterministic finding rules, global limits. Ordinary
+  invalidity maps to InvalidReportValueError; explicit global caps map to ReportLimitExceededError.
+- Builder: exact types/local/nested input validity (InvalidReportInputError), binding mismatch,
+  completeness, stage/owner consistency (InvalidReportInputError), finding conflict, global
+  limits, output validation. Unexpected ordinary builder failures map to InvalidReportInputError.
+  Missing stages cannot be relabelled as an unresolved success. A source recheck first validates
+  the supplied report, then rebuilds; differing canonical content is ReportBindingMismatchError.
+- Decoder: argument types/expected-digest spelling (InvalidReportInputError), raw byte cap,
+  lexical/JSON/closed-envelope errors, unsupported schema/renderer, nested structural rules,
+  inner digests and canonical equality, then expected wrapper digest mismatch. Structural
+  errors map to InvalidReportEncodingError; recognized engineering caps retain ReportLimitExceededError.
+- Renderer: validate the report with value/limit classifications first; then renderer size
+  cap; unexpected ordinary rendering failures map to ReportRenderError. No partial output.
+
+These are supported-input privacy/consistency boundaries, not a sandbox against hostile
+in-process code, monkey-patching or arbitrary execution. Bypass-built probes do not establish
+a database-reload bypass. M5b's accepted `model_copy` pattern is not reclassified as a defect.
+
+##### M5f-I. M5g output and M6 approval handover (decision F11)
+
+M5g receives the rebuilt `ReviewReportContent`, exact wrapper canonical bytes, wrapper SHA-256,
+renderer ID and deterministic Markdown; unchanged legacy bytes/digest are compatibility
+artefacts only. Before writing output it must load trusted inputs and use the source-bound
+recheck, not structural decoding alone. On reload validate canonical bytes, expected wrapper
+digest and bindings; no stage-row enrichment may alter the rendered conclusions.
+
+E7 remains binding: M5g must separately review an output table in a **later additive
+migration**, never edit `0007`. Its writer must atomically persist the complete output and
+job success inside the accepted fenced `finish=True` transaction. Every planned question
+needs both committed stages, successful or explicitly unresolved. Byte-identical replay
+must check the same identities/digest; a conflicting output must not overwrite an earlier
+revision. No review may become completed without its validated output. Report-level bounds,
+output completeness/replay failures and unknown-commit handling must be reviewed in M5g;
+this proposal implements none of them or the worker's request-reassembly obligations.
+
+M6 must introduce/review explicit schema-dispatched revision and approval/finalization values
+for this wrapper. Existing M1 `ReportRevision`, ApprovalDecision and finalization values
+continue to mean the **legacy** content digest; do not silently pass the wrapper digest into
+those contracts or use a legacy approval as approval of the new report. M6 must bind the
+tenant/report/review/revision association, wrapper schema/renderer and exact wrapper SHA-256;
+approval, finalization and export refer to that exact revision. Any substantive change requires
+a new revision and corresponding approval; exporting must use the approved bytes and pinned
+renderer, without querying later stages. Existing valid legacy revisions/approvals remain
+legacy, with no implicit upgrade. M5f cannot close M4d's trusted-snapshot limitation.
+
+##### M5f-J. Planned verification only (decision F12)
+
+No tests are created or run by this proposal. Future verification must include:
+
+- Exact types before normalization/serialization, bool-as-int, subclasses, malformed question
+  fields, warnings-as-errors refusal, every nested model/dataclass revalidation, bounded
+  collections and bypass-built inputs. Ordinary failures stay private; process-control
+  sentinels survive by identity through construction, codec, source recheck and renderer.
+- Privacy-safe repr/str for every new report value, including nested values, with distinct
+  sentinel strings in every forbidden content field. Assert both representations exclude all
+  sentinels, payload bytes and content-bearing nested reprs; allow only the specified metadata.
+  Check explicit encoder/renderer calls still preserve requested content. Capture warnings,
+  stdout, stderr and logs at public error boundaries and require none, retaining control identity.
+- Every identity/config/template/plan mismatch, empty-Analysis outer IDs, exact owner-only
+  citations and shared=(), question/claim/citation/finding order, missing versus committed
+  unresolved stages, every S/U shape and dependency, successful Verification plus unresolved
+  Analysis, successful zero-finding Analysis and exact unresolved projection.
+- P11 exact payload/ID/citations after Analysis failure, one rule slot, duplicate/collision
+  refusal and no semantic deduplication. Global totals 199/200/201, conservative eight-question
+  maximum 168, and up-to-100-question plans with both valid and overflowing actual totals.
+  Verify no partial content, dropped mandatory finding or digest on refusal.
+- Independently authored canonical byte fixtures and separately derived literal SHA-256
+  expectations, not expectations calculated by the code under test. Check wrapper/legacy
+  digest distinction, unchanged M1 Unicode bytes, nulls/defaults, UUIDs, nested config/plan
+  digests, ASCII escaping, all byte/depth/token caps and exact deterministic Markdown bytes.
+- Strict reload: unknown/duplicate/missing keys at every depth, alternate schemas/renderers,
+  bare legacy input, float/exponent/bool/oversized ints, whitespace/escape/Unicode alternatives,
+  lone surrogates/NUL, tampered inner and outer digests, wrong expected digest and source-bound
+  mismatch despite structurally valid bytes. Verify precedence and fixed fresh errors.
+- Adversarial Markdown, HTML, URLs, code fences, indentation, backslashes, quotes, CR/LF/tab,
+  bidi and non-ASCII strings; accepted quotations round-trip unchanged through the labelled
+  JSON literals. No active syntax, fetched URL, fabricated conclusion or stage enrichment.
+- Packaging/import checks for both modules: no domain upward imports, no persistence/retrieval/
+  worker/API imports from agents, and no hidden provider/filesystem/clock/random operations.
+  A proposed installed-wheel assertion should construct synthetic committed trusted values,
+  build/strict-decode/hash/render the wrapper and compare independent byte/digest literals,
+  without database/network/provider access. Its output would be offline packaging evidence,
+  not PostgreSQL execution or live quality evidence.
+
+Preserve the accepted canary contract unchanged: the assembled scripted end-to-end M5g
+fixture must retrieve the evidence chunk and include it in the assembled request, with the
+canary absent verbatim from authorized document text. The checker covers canonical report
+bytes, Markdown, every committed stage (including claims/rationale), call records and logs/
+errors for exact-token and case-insensitive leakage. The scripted negative control emits
+the canary and must fail the **same checker**. The separate limitation probe puts the canary
+verbatim in authorized document evidence; accepting and rendering that quotation is expected.
+Do not add a production canary blacklist or infer live-model injection resistance from any
+of these fixtures. No extra dispatch or rerun is needed to rename M5e's replacement case.
+
+##### M5f-K. Numbered reviewer decisions and tradeoffs (all accepted, Prompt 208)
+
+1. **F1 Placement/API:** domain values/codecs plus agents builder/renderer; the explicit
+   sequence-placement extension is accepted to avoid upward imports, at the cost of another domain module.
+2. **F2 Wrapper/version:** new versioned envelope and approval digest, unchanged M1 semantics;
+   more metadata and M6 compatibility work in exchange for complete conclusion integrity.
+3. **F3 Projection:** include full Verification/claims/quotes plus findings/follow-ups and stage
+   reasons; retain source digests without copying provenance offsets/history. Structural
+   validity is self-contained; source provenance still requires trusted recheck.
+4. **F4 Inputs/completeness:** exact pinned-template/planned/trusted values, both stages per
+   question and owner-only Analysis; incomplete work refuses rather than masquerades as unresolved.
+5. **F5 P11/IDs:** deterministic rule first even after Analysis failure; collisions refuse and
+   semantically similar distinct IDs remain, avoiding silent loss at the cost of possible repetition.
+6. **F6 P16:** preserve 200 and refuse the entire oversized report; no truncation, but some future
+   large plans cannot produce output without a separately reviewed policy change.
+7. **F7 Canonical codec:** ASCII compact sorted wrapper, explicit nulls and exact strict reload;
+   differs from legacy UTF-8 encoding while preserving legacy bytes and digest separately.
+8. **F8 Engineering caps:** accepted limits of 16 MiB content, depth 16, 500,000 structural tokens, 32 MiB Markdown;
+   bounded failure rather than unlimited combinations, subject to implementation measurement.
+9. **F9 Renderer:** pinned deterministic labelled JSON-literal code blocks; reversible quotes
+   and inactive syntax at the cost of natural prose and clickable evidence links.
+10. **F10 Errors:** fixed fresh private classifications/precedence and process-control identity;
+    reduced diagnostic detail, with no hostile-process sandbox claim.
+11. **F11 Handover:** M5g later additive output/atomic completion and M6 explicit wrapper approval;
+    no reuse of a legacy digest as the new approval target and no premature runtime completion.
+12. **F12 Verification:** independent literals, strict/cap/adversarial/import/wheel plans and the
+    unchanged canary positive/negative/limitation contract; no tests or quality claim in this turn.
+
+**Remaining scope limits.** No application review path uses these slices and `run_review`
+is unregistered. No M5f control operates. E7, U4 discarded evidence, worker composition,
+the accepted M3 lease window and open M4d trusted-snapshot limitation remain. Wheel assertions
+are offline checks; container smoke does not exercise M5e. Nothing here guarantees entailment,
+authenticity, semantic injection resistance or live-model quality. This specification is
+accepted in Prompt 208; implementation and every implementation check remain pending.
+M5g–M5h and overall M5 acceptance remain pending.
+
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.

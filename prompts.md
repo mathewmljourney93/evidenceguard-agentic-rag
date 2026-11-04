@@ -46892,3 +46892,1209 @@ No application test, build or wheel check was repeated because their blobs are u
 No automated push, main fast-forward, new exact-commit feature/main CI result or future commit
 SHA is claimed in this pre-commit note. Main publication remains conditional on the new
 documentation commit's successful five-job feature gate and fresh precondition checks.
+
+### Prompt 206 manual feature-push confirmation (user text, verbatim)
+
+The manual feature push completed. Verify remote feat/review-stage-persistence, local HEAD and upstream all equal 14f510e23e89bd890b2428405de922ef1fcb2232, and remote main remains at 1efe3ed3f0aa9697ce4e71cee295293a89c94909.
+
+Do not push again. Resume Prompt 206 at exact-commit feature CI monitoring. Only after all five required jobs pass, prepare the authorized fast-forward and give me the manual main-push command. Preserve all existing limits.
+
+
+### Prompt 206 usage-limit recovery instruction (user text, verbatim)
+
+The usage limit interrupted Prompt 206. It has now reset. Recover and continue the existing task.
+
+The manual feature push was already completed. Its intended target was:
+14f510e23e89bd890b2428405de922ef1fcb2232
+
+The previous main baseline was:
+1efe3ed3f0aa9697ce4e71cee295293a89c94909
+
+First read the applicable repository instructions, Prompt 206 and the latest .local/p206/ checkpoints and evidence. Inspect the actual branch, refs, index, working tree and any remaining task or monitor.
+
+Determine the last completed step and first unfinished step. Preserve existing work and reuse valid saved evidence.
+
+Do not assume the interruption occurred before any particular operation. Main may already have been fast-forwarded locally; inspect rather than repeating operations blindly.
+
+The feature push must not be repeated.
+
+Verify the remote feature equals the intended SHA. Check the existing push-triggered CI and secret-scan runs for that exact SHA and branch. Retrieve their current final results rather than starting new runs or a redundant monitor.
+
+Require explicit success from all five jobs:
+- Ubuntu verify
+- Windows verify
+- PostgreSQL integration
+- container
+- Gitleaks
+
+If any required job failed, was cancelled or remains uncertain, save the evidence and report the stopping point. Do not correct or rerun anything.
+
+If all five passed, continue Prompt 206’s authorized main-publication preflight:
+- confirm the working tree is clean;
+- verify remote main against the expected baseline;
+- verify reviewed scope and blob identity;
+- prepare or confirm the local --ff-only fast-forward to the exact feature-verified SHA.
+
+Then give me the manual PowerShell main-push command and full target SHA. Do not execute the push yourself. Wait for my result.
+
+If main is already remotely at the target, do not push again; continue with its existing exact-SHA main CI under Prompt 206.
+
+All remaining Prompt 206 instructions stay in force, including evidence attribution, monitoring bounds and the conditional post-main-CI documentation step.
+
+No force-push, history rewrite, branch deletion, production change, CI rerun or M5f work.
+
+
+### Prompt 206 manual main-push confirmation (user text, verbatim)
+
+The manual main push completed. Verify remote main, local main and origin/main equal 14f510e23e89bd890b2428405de922ef1fcb2232.
+
+Do not push again. Resume Prompt 206 with the separate exact-commit main CI checks. Only after all five required jobs pass, stage the authorized main-publication evidence and produce the handoff and exports.
+
+
+### Prompt 206 main-publication outcome (OpenAI Codex observations)
+
+## Main publication and exact-SHA CI (Prompt 206)
+
+**M5e is reviewed, verified in CI and on main at
+`14f510e23e89bd890b2428405de922ef1fcb2232`.** The published documentation commit's
+parent is `15cbfbae88c52ecefb9f287f985bec734e8c535f` and its tree is
+`fce760c4fad950942ab5ec5152490fe6d3f00495`. It changes only the five reviewed
+documentation/history files; the reviewed PostgreSQL test remains blob
+`cb13b6289f74e202e1d2f6586c9c14fef1599e7d`. All production, other test, migration,
+model, resource, packaging, dependency and workflow blobs remain unchanged from the reviewed
+corrective source. M5f–M5h and overall M5 acceptance remain pending.
+
+### Publication sequence and attribution
+
+The external reviewer accepted both Prompt 205 exports and independently confirmed the
+`15cbfbae` gate, as recorded above. OpenAI Codex recorded that acceptance and prepared
+`14f510e`. Mathew manually pushed the feature branch. After the usage-limit interruption,
+Codex recovered the actual clean state: feature at `14f510e`, local and remote main still at
+`1efe3ed3f0aa9697ce4e71cee295293a89c94909`, and no remaining task/monitor. It retrieved
+the existing final feature records and all five logs, without starting new runs or a redundant
+monitor, and confirmed explicit success for every required job and step.
+
+Fresh main-publication checks then confirmed the clean tree, main/origin/main/remote-main
+baseline, exact feature ref, ancestry, the five reviewed commits and their 23-path union,
+protected blob/mode identity, unchanged reviewed workflow/dependency/resource content, privacy
+and publication scans. Range Gitleaks scanned five commits and full-history Gitleaks 89,
+both without leaks. Codex switched to main and ran `git merge --ff-only` to the exact verified
+commit. No merge commit was created. Mathew manually pushed main; Codex verified remote main,
+local main, origin/main and the retained feature branch all at the exact SHA above. Codex
+performed no automated push, history rewrite, branch deletion, CI rerun or M5f work.
+
+The following are **Codex's observed records and actual log output**, not a claim that the
+reviewer separately examined these later runs. Both stages were **push** events, **attempt 1**,
+at the full `14f510e` SHA. Feature and main are separate runs; neither stage's counts or
+conclusions are inferred from the other. The failed `5b94d18a` run and successful `15cbfbae`
+run remain historical and supply no counts for these newer runs. Earlier Claude Code
+implementation/corrections and local results retain their existing attribution.
+
+### Documentation-commit feature gate
+
+Feature CI run [41757399847](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847),
+branch `feat/review-stage-persistence`, completed with **success**:
+
+| Job | Explicit conclusion | Output actually read in its log |
+| --- | --- | --- |
+| [Ubuntu verify, 126336644043](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847/job/126336644043) | success | 3,968 passed, 385 skipped |
+| [Windows verify, 126336643968](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847/job/126336643968) | success | 3,967 passed, 386 skipped |
+| [PostgreSQL, 126336644016](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847/job/126336644016) | success | 385 passed, 3,968 deselected in 259.95 seconds |
+| [Container, 126336643752](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847/job/126336643752) | success | smoke and cleanup reported success |
+
+Feature secret-scan run [41757400849](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757400849),
+same feature branch and SHA, completed with **success**:
+
+| Job | Explicit conclusion | Output actually read in its log |
+| --- | --- | --- |
+| [Gitleaks, 126336646243](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757400849/job/126336646243) | success | 89 commits scanned, no leaks |
+
+### Separate main gate
+
+Main CI run [41788993019](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019),
+branch `main`, completed with **success**:
+
+| Job | Explicit conclusion | Output actually read in its log |
+| --- | --- | --- |
+| [Ubuntu verify, 126437699334](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019/job/126437699334) | success | 3,968 passed, 385 skipped |
+| [Windows verify, 126437699275](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019/job/126437699275) | success | 3,967 passed, 386 skipped |
+| [PostgreSQL, 126437699044](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019/job/126437699044) | success | 385 passed, 3,968 deselected in 248.53 seconds |
+| [Container, 126437699439](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019/job/126437699439) | success | smoke and cleanup reported success |
+
+Main secret-scan run [41788993093](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993093),
+same main branch and SHA, completed with **success**:
+
+| Job | Explicit conclusion | Output actually read in its log |
+| --- | --- | --- |
+| [Gitleaks, 126437699395](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993093/job/126437699395) | success | 89 commits scanned, no leaks |
+
+### Evidence precision and limits
+
+Every required job and step explicitly succeeded. No successful parent run substituted for
+an unresolved job, and final run/job metadata agree. Public GitHub API run records and
+connected GitHub job/step records were inspected. All ten job logs across these two gates
+were retrieved/read and saved under `.local/p206/feature-logs/` and `.local/p206/main-logs/`,
+with hashes and source metadata in `feature-ci-final.json` and `main-ci-final.json`. No log
+was unavailable and no authentication or permission change was used to obtain output.
+Separate main monitoring finished within the 25-minute bound, with no monitor left running.
+
+Both PostgreSQL logs show 46 passing review-stage module positions, but neither prints
+`test_the_reload_refuses_an_unclaimed_canonical_job_with_persisted_history` or a named PASS
+line. The corrected module participated in each successful 385-case integration run; an
+individual named result for the replacement remains **not directly confirmed by the logs**.
+No extra test dispatch or rerun was made to obtain one. The earlier reviewer accepted this
+distinction; it is preserved rather than replaced by an invented individual result.
+
+Each of the four verify logs across these gates printed the production registry
+(`ingest_revision`, `index_revision`) and all ten installed-wheel behaviour lines, including
+the M5e stage-migration and abandoned-repair line. Formatting, lint, strict mypy, distribution
+build and installed-wheel steps succeeded. The wheel migration assertions are **offline**,
+separate from PostgreSQL execution. The Recall example is arithmetic, Voyage is mocked and
+model calls are scripted. Both unchanged container smokes exercise ingestion/indexing, not
+M5e. None establishes live-model quality, entailment, authenticity or injection resistance.
+
+These main-publication evidence updates are staged, uncommitted and unpushed for review; they
+are not part of the published SHA and are not covered by its CI. No local application test,
+build or wheel check was repeated for them. No application review path or `run_review`
+registration was added. E7 keeps output work in M5f/M5g; U4 discarded evidence cannot be
+re-proved at reload; worker obligations, the accepted M3 lease window and the open M4d
+trusted-snapshot limitation remain. Overall M5 acceptance and M5f–M5h remain pending.
+
+### Prompt 206 final main-evidence checks (OpenAI Codex; completed checks only)
+
+Verified the completed manual main push: remote main, local main and origin/main equal
+`14f510e23e89bd890b2428405de922ef1fcb2232`; both feature refs remain at that SHA. Codex
+performed no automated push. Separate main CI run `41788993019` and secret-scan run
+`41788993093` explicitly succeeded, with all five required jobs and steps successful. Main
+logs report Ubuntu 3,968 passed/385 skipped, Windows 3,967 passed/386 skipped, PostgreSQL
+385 passed/3,968 deselected in 248.53 seconds, successful smoke/cleanup and Gitleaks 89
+commits/no leaks. All five main logs were available, retrieved and read. No feature result
+was substituted for a main result. The main log's 46 passing review-stage positions do not
+provide an individual named result for the replacement case; no extra test or rerun was made.
+The separate feature gate and recovery/preflight/ff-only records are preserved independently.
+
+Staged only README, ADR-0023, plan, threat model and prompt history. Whole-tree blob/mode
+comparison passed: all other tracked files remain identical to the published main commit,
+including test blob `cb13b6289f74e202e1d2f6586c9c14fef1599e7d`, production, migrations,
+models, dependencies, resources, packaging and workflows. No unstaged or nonignored untracked
+work and no tracked local/build artifacts. The original published 2,492,505-byte prompt prefix
+is identical, SHA-256 `be4be98e479ff9f8dd978b4b0ab8edec0a0e25c6426ed4ca2a8846f6f2cb588b`;
+all three available resume/recovery user instructions were appended verbatim and checked.
+Accepted specification headings/anchors are preserved; only the separate implementation-status
+heading was renamed and all current links updated. Local links/anchors/tables passed: 392 links,
+94 tables, no problems. UTF-8 without BOM, LF only/no replacement characters, whitespace and
+privacy passed. Locked offline Ruff format reported 220 files already formatted, lint passed,
+and unsuppressed staged Gitleaks 8.30.1 found no leaks. No custom scanner config/baseline/ignore
+file/environment override was used; inline allow comments were ignored.
+
+These are documentation checks, not repeated local application tests, builds or wheel probes.
+The final evidence documentation is not part of the published SHA and is not covered by its CI.
+No new commit, push, history rewrite, branch deletion, CI rerun, production/test change or M5f
+work occurred after publication. Final evidence remains staged, uncommitted and unpushed.
+Runtime/later-slice limitations and pending overall M5 acceptance remain. No monitor remains
+running. The earlier acceptance export was reverified; final export metadata is in the handoff.
+
+
+## Prompt 207 recovery: available Prompt 206 handoff
+
+Source: .local/p206/handoff.md, the saved detailed handoff, copied byte-for-byte below. This is not a claim to reproduce an unavailable short chat handoff.
+
+Prompt 206 final handoff for Mathew and the external reviewer
+
+M5e is reviewed, verified in CI and on main at 14f510e23e89bd890b2428405de922ef1fcb2232.
+Mathew performed both pushes manually. Codex performed no automated push, CI rerun, history
+rewrite, branch deletion, production/test edit or M5f work. The final main-publication evidence
+is staged, uncommitted and unpushed for review. Main and the retained feature branch both point
+to the same verified commit.
+
+Published documentation commit:
+- SHA: 14f510e23e89bd890b2428405de922ef1fcb2232
+- Direct parent: 15cbfbae88c52ecefb9f287f985bec734e8c535f
+- Tree: fce760c4fad950942ab5ec5152490fe6d3f00495
+- Subject: docs: record verified M5e feature CI results
+- Author and committer: mathewmljourney93
+  <257921624+mathewmljourney93@users.noreply.github.com>
+- Five-file scope: README.md, docs/decisions/0023-review-stage-persistence.md, docs/plan.md,
+  docs/threat-model.md and prompts.md. No production, test, migration, model, resource,
+  packaging, workflow or dependency blob changed in this documentation commit.
+- The reviewed PostgreSQL test remains cb13b6289f74e202e1d2f6586c9c14fef1599e7d.
+
+Starting-state recovery and acceptance:
+Prompt 206 began on feat/review-stage-persistence at HEAD/upstream
+15cbfbae88c52ecefb9f287f985bec734e8c535f, published tree
+90e29b527a33b43a313cb57d868e446d6dc44a64, with exactly five reviewed documents staged at
+bfe78ec9c956bcfaaec39d25b719801c61866065, no unstaged/unexpected untracked work, and local
+main/origin/main at 1efe3ed3f0aa9697ce4e71cee295293a89c94909. Both Prompt 205 exports matched
+all supplied bytes, line counts, paths, statistics, SHA-256 values and Git's full-index comparisons:
+- m5e-test-correction-acceptance.diff: 47,004 bytes, 150 lines, four files +50/-18,
+  SHA-256 6f24df9dfb466163dd20ae004392d981bfe3dd67ff5b1d9a9a19a92bd788c3aa.
+- m5e-corrective-feature-ci-evidence.diff: 56,916 bytes, 269 lines, four files +113/-37,
+  SHA-256 3a725f8e778408bb590f73f49a64b0797b22dea4b9c5bb2ee1695dbd1c2161c0.
+The reviewed test blob and all five saved log hashes matched. Refs/status/staged hashes and the
+original 2,462,903-byte prompt prefix were checkpointed under .local/p206/;
+its SHA-256 is 7df50bb546a9702b7cbc1057495de3b33171dc5fb43b227d27fcee2436379e22.
+
+The reviewer independently accepted both exports, checked corrective parent/tree/scope/test
+identity, and retrieved the earlier 15cbfbae run records, all five final job conclusions and all
+five logs. Codex recorded that acceptance separately from its own observations, preserved the
+failed parent and unnamed-case limitation, and recorded gated manual main publication without
+claiming future results. The saved detailed Prompt 205 handoff, source label, supplied review,
+Prompt 206 verbatim and completed-check note were appended after an identical prefix. The
+file-based commit message credits Codex's evidence documentation and preparation while retaining
+Claude Code's implementation/correction and external-review attribution. No earlier commit
+was rewritten.
+
+Pre-commit checks passed: five-path/blob/mode identity, unchanged test and production, links/
+anchors/tables (396 links, 90 tables), encoding/whitespace, prefix/text fidelity, privacy, locked
+offline Ruff formatting/lint and unsuppressed staged Gitleaks. Full-history Gitleaks scanned
+89 commits without leaks. Application tests, builds and wheel checks were not repeated locally.
+
+## Main publication and exact-SHA CI (Prompt 206)
+
+**M5e is reviewed, verified in CI and on main at
+`14f510e23e89bd890b2428405de922ef1fcb2232`.** The published documentation commit's
+parent is `15cbfbae88c52ecefb9f287f985bec734e8c535f` and its tree is
+`fce760c4fad950942ab5ec5152490fe6d3f00495`. It changes only the five reviewed
+documentation/history files; the reviewed PostgreSQL test remains blob
+`cb13b6289f74e202e1d2f6586c9c14fef1599e7d`. All production, other test, migration,
+model, resource, packaging, dependency and workflow blobs remain unchanged from the reviewed
+corrective source. M5f–M5h and overall M5 acceptance remain pending.
+
+### Publication sequence and attribution
+
+The external reviewer accepted both Prompt 205 exports and independently confirmed the
+`15cbfbae` gate, as recorded above. OpenAI Codex recorded that acceptance and prepared
+`14f510e`. Mathew manually pushed the feature branch. After the usage-limit interruption,
+Codex recovered the actual clean state: feature at `14f510e`, local and remote main still at
+`1efe3ed3f0aa9697ce4e71cee295293a89c94909`, and no remaining task/monitor. It retrieved
+the existing final feature records and all five logs, without starting new runs or a redundant
+monitor, and confirmed explicit success for every required job and step.
+
+Fresh main-publication checks then confirmed the clean tree, main/origin/main/remote-main
+baseline, exact feature ref, ancestry, the five reviewed commits and their 23-path union,
+protected blob/mode identity, unchanged reviewed workflow/dependency/resource content, privacy
+and publication scans. Range Gitleaks scanned five commits and full-history Gitleaks 89,
+both without leaks. Codex switched to main and ran `git merge --ff-only` to the exact verified
+commit. No merge commit was created. Mathew manually pushed main; Codex verified remote main,
+local main, origin/main and the retained feature branch all at the exact SHA above. Codex
+performed no automated push, history rewrite, branch deletion, CI rerun or M5f work.
+
+The following are **Codex's observed records and actual log output**, not a claim that the
+reviewer separately examined these later runs. Both stages were **push** events, **attempt 1**,
+at the full `14f510e` SHA. Feature and main are separate runs; neither stage's counts or
+conclusions are inferred from the other. The failed `5b94d18a` run and successful `15cbfbae`
+run remain historical and supply no counts for these newer runs. Earlier Claude Code
+implementation/corrections and local results retain their existing attribution.
+
+### Documentation-commit feature gate
+
+Feature CI run [41757399847](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847),
+branch `feat/review-stage-persistence`, completed with **success**:
+
+| Job | Explicit conclusion | Output actually read in its log |
+| --- | --- | --- |
+| [Ubuntu verify, 126336644043](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847/job/126336644043) | success | 3,968 passed, 385 skipped |
+| [Windows verify, 126336643968](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847/job/126336643968) | success | 3,967 passed, 386 skipped |
+| [PostgreSQL, 126336644016](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847/job/126336644016) | success | 385 passed, 3,968 deselected in 259.95 seconds |
+| [Container, 126336643752](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757399847/job/126336643752) | success | smoke and cleanup reported success |
+
+Feature secret-scan run [41757400849](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757400849),
+same feature branch and SHA, completed with **success**:
+
+| Job | Explicit conclusion | Output actually read in its log |
+| --- | --- | --- |
+| [Gitleaks, 126336646243](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41757400849/job/126336646243) | success | 89 commits scanned, no leaks |
+
+### Separate main gate
+
+Main CI run [41788993019](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019),
+branch `main`, completed with **success**:
+
+| Job | Explicit conclusion | Output actually read in its log |
+| --- | --- | --- |
+| [Ubuntu verify, 126437699334](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019/job/126437699334) | success | 3,968 passed, 385 skipped |
+| [Windows verify, 126437699275](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019/job/126437699275) | success | 3,967 passed, 386 skipped |
+| [PostgreSQL, 126437699044](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019/job/126437699044) | success | 385 passed, 3,968 deselected in 248.53 seconds |
+| [Container, 126437699439](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993019/job/126437699439) | success | smoke and cleanup reported success |
+
+Main secret-scan run [41788993093](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993093),
+same main branch and SHA, completed with **success**:
+
+| Job | Explicit conclusion | Output actually read in its log |
+| --- | --- | --- |
+| [Gitleaks, 126437699395](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41788993093/job/126437699395) | success | 89 commits scanned, no leaks |
+
+### Evidence precision and limits
+
+Every required job and step explicitly succeeded. No successful parent run substituted for
+an unresolved job, and final run/job metadata agree. Public GitHub API run records and
+connected GitHub job/step records were inspected. All ten job logs across these two gates
+were retrieved/read and saved under `.local/p206/feature-logs/` and `.local/p206/main-logs/`,
+with hashes and source metadata in `feature-ci-final.json` and `main-ci-final.json`. No log
+was unavailable and no authentication or permission change was used to obtain output.
+Separate main monitoring finished within the 25-minute bound, with no monitor left running.
+
+Both PostgreSQL logs show 46 passing review-stage module positions, but neither prints
+`test_the_reload_refuses_an_unclaimed_canonical_job_with_persisted_history` or a named PASS
+line. The corrected module participated in each successful 385-case integration run; an
+individual named result for the replacement remains **not directly confirmed by the logs**.
+No extra test dispatch or rerun was made to obtain one. The earlier reviewer accepted this
+distinction; it is preserved rather than replaced by an invented individual result.
+
+Each of the four verify logs across these gates printed the production registry
+(`ingest_revision`, `index_revision`) and all ten installed-wheel behaviour lines, including
+the M5e stage-migration and abandoned-repair line. Formatting, lint, strict mypy, distribution
+build and installed-wheel steps succeeded. The wheel migration assertions are **offline**,
+separate from PostgreSQL execution. The Recall example is arithmetic, Voyage is mocked and
+model calls are scripted. Both unchanged container smokes exercise ingestion/indexing, not
+M5e. None establishes live-model quality, entailment, authenticity or injection resistance.
+
+These main-publication evidence updates are staged, uncommitted and unpushed for review; they
+are not part of the published SHA and are not covered by its CI. No local application test,
+build or wheel check was repeated for them. No application review path or `run_review`
+registration was added. E7 keeps output work in M5f/M5g; U4 discarded evidence cannot be
+re-proved at reload; worker obligations, the accepted M3 lease window and the open M4d
+trusted-snapshot limitation remain. Overall M5 acceptance and M5f–M5h remain pending.
+
+Main-publication preflight and exact range:
+After the manual feature push and usage-limit recovery, actual refs showed feature at the
+target, local and remote main still at the baseline, clean work and no remaining monitor.
+Codex read the existing final runs, did not trigger any new run, and verified all five feature
+jobs/steps explicitly passed before any main fast-forward. It freshly checked refs and the
+reviewed range, privacy, encoding/whitespace, protected blob/mode identity and publication scans.
+The complete main range was exactly:
+1. 313b523d052a9dbd49f3dbd53e5f0af835ccfe1f ? accepted specification.
+2. 45764b100c38b8547070790246e46d340cf0d6e0 ? accepted implementation.
+3. 5b94d18a4053e0a7d6e32d8add631ecb5ccde70b ? publication history.
+4. 15cbfbae88c52ecefb9f287f985bec734e8c535f ? accepted test-only correction.
+5. 14f510e23e89bd890b2428405de922ef1fcb2232 ? reviewed evidence/acceptance documentation.
+Its 23-path union matched the reviewed scope. All protected source, test, migration, workflow,
+dependency and resource content matched reviewed corrective source; no unreviewed change was
+reconciled or introduced. Range Gitleaks scanned five commits and full history 89 without leaks.
+A fresh guarded remote-ref check preceded git switch main and git merge --ff-only to the exact
+target. The commit/tree/parent were preserved and no merge commit created. Mathew then manually
+pushed main. Main/local main/origin/main and feature refs were freshly verified at the target.
+
+Separate main monitoring:
+Main CI was a push event, attempt 1, created at 2026-11-04T06:57:56Z; main secret-scan was created
+at 06:57:57Z. The 25-minute deadline was 07:22:56Z (14:22:56 Asia/Bangkok). All five required
+jobs and steps explicitly succeeded and final run records were saved shortly after 07:02:45Z,
+within the bound. All five main logs were available and read. No success was inferred from the
+feature gate. The main PostgreSQL summary is 385 passed/3,968 deselected in 248.53 seconds,
+separate from the feature's 259.95 seconds. Neither log prints the replacement test's name;
+46 passing module positions and aggregate success are the precise available evidence, not
+an individually named PASS. No extra test dispatch was performed. No monitor remains running.
+
+Final evidence documentation:
+Exactly five paths are staged, uncommitted and unpushed:
+- README.md
+- docs/decisions/0023-review-stage-persistence.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Every other tracked blob and mode is identical to published main. The protected manifest in
+final-protected-blobs.txt has SHA-256 862366dddeaf1c69c6e4a030103cae709a53a33ac2a258ada4c55cc0a0a53ea3.
+The test remains cb13b6289f74e202e1d2f6586c9c14fef1599e7d; all production, migrations,
+models, resources, packaging, dependencies and workflows are unchanged. No unstaged or
+nonignored untracked files and no tracked .local/build artifacts. Both branches are retained.
+
+Accepted specification headings and anchors are intact. Only the separate implementation-status
+heading was renamed to reviewed/verified/on-main at 14f510e, with current links updated.
+The original published 2,492,505-byte prompt prefix is preserved exactly, SHA-256
+be4be98e479ff9f8dd978b4b0ab8edec0a0e25c6426ed4ca2a8846f6f2cb588b. The three available user
+resume/recovery instructions were appended verbatim along with actual feature/main evidence
+and a completed-check note. No unavailable or reconstructed handoff text is labelled verbatim.
+
+Final documentation checks passed: complete scope/blob/mode comparison; feature/main log-hash
+verification; first-export revalidation; 392 links and 94 tables without problems; UTF-8 without
+BOM, LF only and no replacement characters; whitespace, privacy and prompt fidelity; locked
+offline Ruff format (220 files already formatted) and lint; unsuppressed staged Gitleaks 8.30.1
+(no leaks, no custom config/baseline/ignore file/environment override, inline allow comments
+ignored). These final staged documents are outside the published SHA and are not covered by
+its CI. No further application tests, builds or wheel checks ran locally.
+
+Export 1 ? acceptance of feature evidence (unchanged, byte-reverified against Git):
+.local/p206/m5e-feature-evidence-acceptance.diff
+Baseline accepted tree: bfe78ec9c956bcfaaec39d25b719801c61866065
+Destination documentation commit: 14f510e23e89bd890b2428405de922ef1fcb2232
+Destination published tree: fce760c4fad950942ab5ec5152490fe6d3f00495
+Full-index, prompts.md excluded.
+ README.md                                       |  2 +-
+ docs/decisions/0023-review-stage-persistence.md | 42 +++++++++++++++++++++----
+ docs/plan.md                                    |  9 ++++--
+ docs/threat-model.md                            |  4 ++-
+ 4 files changed, 46 insertions(+), 11 deletions(-)
+
+Bytes: 47418
+Lines: 139
+SHA-256: b02d1d57c928faf86c6f92af31dc63ffcb64925f7633e6417e83bbaaecea57cf
+
+Export 2 ? final main-publication evidence:
+.local/p206/m5e-main-publication-evidence.diff
+Baseline published main commit: 14f510e23e89bd890b2428405de922ef1fcb2232
+Baseline tree: fce760c4fad950942ab5ec5152490fe6d3f00495
+Destination staged tree: 41f71edaa8955e66da1379d4841d8e11bcc6c438
+Full-index, prompts.md excluded. Byte-identical to both Git's tree comparison and cached diff.
+ README.md                                       |   2 +-
+ docs/decisions/0023-review-stage-persistence.md | 151 ++++++++++++++++++++----
+ docs/plan.md                                    |  25 ++--
+ docs/threat-model.md                            |  15 ++-
+ 4 files changed, 146 insertions(+), 47 deletions(-)
+
+Bytes: 59632
+Lines: 286
+SHA-256: 1fd2d036fabac528eb661931e40bd15e46266b0af8811519dadd7f7091dceeb7
+Including prompt history: 5 files changed, 347 insertions(+), 47 deletions(-).
+
+Final state:
+- Branch: main.
+- HEAD, local main, origin/main, remote main, local feature, remote feature:
+  14f510e23e89bd890b2428405de922ef1fcb2232.
+- Final staged tree: 41f71edaa8955e66da1379d4841d8e11bcc6c438.
+- Five documentation files staged; nothing unstaged or unexpectedly untracked.
+- No automated push, additional commit after publication, history rewrite, branch deletion,
+  CI rerun or M5f work. No push or monitor process remains running.
+
+The saved source records are checkpoint.json, publication-target.json,
+m5e-feature-evidence-acceptance.diff, recovery-checkpoint.json, feature-existing-runs.json,
+feature-jobs-*.json, feature-ci-final.json, feature-logs/job-*.log, main-preflight.json,
+pre-ff-remote-refs.txt, manual-main-pause.json, main-ci-checkpoint.json, main-runs-*.json,
+main-jobs-*.json, main-ci-final.json, main-logs/job-*.log, main-evidence-verification.json,
+final-remote-refs.txt, final-state.json and final-staged/protected blob manifests under .local/p206/.
+All prior pause checkpoints are historical; final-state.json and this handoff describe completion.
+
+Runtime and later-slice limitations remain: no application review path or run_review registration;
+E7 output work belongs to M5f/M5g; discarded U4 evidence cannot be re-proved at reload; worker
+composition obligations, the accepted M3 lease window and open M4d trusted-snapshot limitation
+remain. Offline wheel assertions and the unchanged ingestion/indexing container smoke do not
+establish M5e application operation or live-model quality, entailment, authenticity or injection
+resistance. M5f-M5h and overall M5 acceptance remain pending. M5e's reviewed main publication
+does not imply overall M5 acceptance.
+
+Mathew: return this handoff plus BOTH
+.local/p206/m5e-feature-evidence-acceptance.diff and
+.local/p206/m5e-main-publication-evidence.diff
+to the external reviewer. Leave the final evidence staged, uncommitted and unpushed for review.
+
+
+## Prompt 207 supplied review disposition
+
+Prompt 207 external review disposition (supplied by Mathew; not a new Codex remote observation)
+
+The external reviewer accepts both Prompt 206 exports and confirms M5e's publication evidence. The reviewer independently verified both exports' sizes, line counts, full SHA-256 values, paths, statistics and evidence wording; independently retrieved the documentation commit's feature job conclusions and all five logs; and previously independently retrieved the separate main run records, all five main job conclusions and all five main logs. The reviewer confirmed the main SHA, branch, push event, attempt 1, successful conclusions and remote main at that observation.
+
+Feature at 14f510e: CI 41757399847; secret scan 41757400849; Ubuntu 3968 passed/385 skipped; Windows 3967 passed/386 skipped; PostgreSQL 385 passed/3968 deselected in 259.95 seconds; container smoke/cleanup success; Gitleaks 89 commits/no leaks.
+Separate main at the same SHA: CI 41788993019; secret scan 41788993093; Ubuntu 3968 passed/385 skipped; Windows 3967 passed/386 skipped; PostgreSQL 385 passed/3968 deselected in 248.53 seconds; container smoke/cleanup success; Gitleaks 89 commits/no leaks.
+
+The 46 passing review-stage module positions do not individually name the replacement case. That evidence is accepted without another dispatch. M5e is reviewed, verified in CI and on main within its recorded scope. Overall M5 and its runtime limitations remain open. Prompt 207 authorizes only a proposed M5f specification and acceptance documentation, staged and uncommitted.
+
+
+## Prompt 207 user request (verbatim)
+
+Prompt 207 — Record M5e evidence acceptance and propose the complete M5f specification
+
+Written for: Mathew and the external reviewer.
+
+The external reviewer accepts both Prompt 206 exports and confirms M5e's publication evidence.
+
+Prepare the M5f specification for external review. This is documentation only: do not implement M5f, create tests or migrations, commit, push or rerun CI.
+
+Continue in the current session if it is working reliably. Do not reset the session based on prompt count.
+
+1. Recover, verify and checkpoint
+
+Read the applicable repository instructions and .local/p206/ handoff and checkpoints.
+
+Expected:
+- Current branch: main
+- HEAD, local main and origin/main:
+  14f510e23e89bd890b2428405de922ef1fcb2232
+- Published tree:
+  fce760c4fad950942ab5ec5152490fe6d3f00495
+- Staged tree:
+  41f71edaa8955e66da1379d4841d8e11bcc6c438
+- Exactly five staged files:
+  README.md
+  docs/decisions/0023-review-stage-persistence.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or unexpectedly untracked.
+
+Verify both exports against their recorded Git comparisons, using full indexes and excluding prompts.md:
+
+.local/p206/m5e-feature-evidence-acceptance.diff
+- Baseline: bfe78ec9c956bcfaaec39d25b719801c61866065
+- Destination: 14f510e23e89bd890b2428405de922ef1fcb2232
+- Four files, +46/-11
+- 47,418 bytes; 139 lines
+- SHA-256:
+  b02d1d57c928faf86c6f92af31dc63ffcb64925f7633e6417e83bbaaecea57cf
+
+.local/p206/m5e-main-publication-evidence.diff
+- Baseline: 14f510e23e89bd890b2428405de922ef1fcb2232
+- Destination: 41f71edaa8955e66da1379d4841d8e11bcc6c438
+- Four files, +146/-47
+- 59,632 bytes; 286 lines
+- SHA-256:
+  1fd2d036fabac528eb661931e40bd15e46266b0af8811519dadd7f7091dceeb7
+
+Confirm the reviewed test remains:
+cb13b6289f74e202e1d2f6586c9c14fef1599e7d
+
+Save a checkpoint under .local/p207/ containing refs, status, staged tree, five blob hashes and the prompts.md prefix/checksum.
+
+Preserve unexpected work. Report material discrepancies before dependent changes.
+
+Create docs/report-content-plan from the current HEAD, carrying the five staged documentation changes. If that branch already exists, inspect it rather than overwriting it.
+
+No remote operation is needed.
+
+2. Record the external reviewer's independent evidence
+
+The reviewer:
+- independently verified both Prompt 206 exports' sizes, line counts, full SHA-256 values, paths, statistics and evidence wording;
+- independently retrieved the documentation commit's feature job conclusions and all five logs;
+- previously independently retrieved the separate main run records, all five main job conclusions and all five main logs;
+- confirmed the main run SHA, branch, push event, attempt 1 and successful conclusions;
+- confirmed remote main at the published SHA at that observation.
+
+Feature runs at 14f510e:
+- CI: 41757399847
+- Secret scan: 41757400849
+- Ubuntu: 3968 passed, 385 skipped
+- Windows: 3967 passed, 386 skipped
+- PostgreSQL: 385 passed, 3968 deselected, 259.95 seconds
+- Container smoke/cleanup: success
+- Gitleaks: 89 commits, no leaks
+
+Separate main runs at the same SHA:
+- CI: 41788993019
+- Secret scan: 41788993093
+- Ubuntu: 3968 passed, 385 skipped
+- Windows: 3967 passed, 386 skipped
+- PostgreSQL: 385 passed, 3968 deselected, 248.53 seconds
+- Container smoke/cleanup: success
+- Gitleaks: 89 commits, no leaks
+
+Preserve the qualification about 46 passing review-stage module positions without a named result for the replacement case. The reviewer accepted that evidence; no extra dispatch or CI rerun is needed.
+
+Add a short external-review evidence-acceptance subsection to ADR-0023. Keep Codex's observations and the reviewer's independent retrieval separate. Mark the earlier statement that the reviewer had not inspected the later runs as historical where needed.
+
+M5e is reviewed, verified in CI and on main within its recorded scope. This does not accept overall M5 or close its runtime limitations.
+
+3. Read the controlling M5f requirements and actual contracts
+
+Before writing the proposal, inspect:
+- the M5 sequence and M5f/M5g allocation;
+- the report-integrity invariant;
+- M5b's P11 documentary rule and P16 global finding-bound obligation;
+- M5e-L and E7;
+- M1 ReportContent, canonical hashing and approval-related values;
+- M5b VerifiedQuestion, AnalyzedQuestion, deterministic finding IDs, rechecks and documentary_gap_finding;
+- M5c's pinned template and contract-mode requirements;
+- M5d TrustedReview and M5e TrustedStages, stage shapes and unresolved reasons;
+- relevant existing tests and import-boundary rules.
+
+Use the actual code as the source for current fields, bounds, canonical bytes and behaviour. Clearly distinguish existing facts, binding decisions and new proposals.
+
+Do not load the whole prompt history unnecessarily.
+
+4. Write a complete proposed M5f specification
+
+Add a clearly labelled section in docs/plan.md:
+
+M5f report content and renderer specification
+(PROPOSED, Prompt 207; not implemented)
+
+The proposal must be concrete enough to implement after review. Provide one recommended design with explicit numbered reviewer decisions and tradeoffs. Do not leave core schemas, error cases or bounds implicit.
+
+Cover the following.
+
+A. Scope and module placement
+- Pure report construction, validation, canonical encoding/decoding and Markdown rendering.
+- Exact proposed module and public API names/signatures.
+- Resolve value/schema placement and renderer placement without upward imports or circular dependencies.
+- Identify any proposed departure from the accepted sequence's module placement.
+- No persistence implementation, output table, handler registration, provider call, endpoint or production wiring.
+
+B. Hash-covered content
+- Recommend an explicitly versioned wrapper around the existing ReportContent unless a different design is justified.
+- Preserve evidenceguard.report-content.v1 and its existing bytes/hash semantics unchanged.
+- Define exact fields, types, enums, optionality, bounds and cross-field rules.
+- Cover every substantive displayed conclusion: findings, preserved Verification status, rationale/claims where displayed, accepted quotes, authenticity, follow-up questions, unresolved reasons and documentary-gap findings.
+- Define question identity/order and binding to the review, planned questions, snapshot and relevant configuration.
+- Include the contract-mode stamp within hashed content, or define it solely from hashed fields.
+- Do not derive displayed conclusions from unhashed stage rows after hashing.
+
+C. Construction from trusted inputs
+- State exactly which TrustedReview, planned-question and TrustedStages values the builder accepts.
+- Define identity checks, completeness and ordering.
+- Cover successful, unresolved and missing stages.
+- Distinguish a committed unresolved result from work that has not completed.
+- Preserve successful Verification even if Analysis is unresolved.
+- Require per-question owner-only Analysis, consistent with P9 and shared=().
+- State what constructors/builders can check and what only the trusted loader or future worker composition proves.
+
+D. Mandatory documentary finding
+- Include the accepted P11 rule whenever its condition holds.
+- It must remain hash-covered even when Analysis fails.
+- Specify deterministic IDs, deduplication and collision/conflict behaviour.
+- Do not rely on model compliance to produce it.
+
+E. Global bounds
+- Resolve P16 explicitly: up to 100 questions with up to 20 Analyst findings plus a rule finding each can exceed M1 ReportContent's 200-finding bound.
+- Preserve M1's accepted bound unless a separately reviewed change is proposed.
+- Define a bounded, deterministic policy with a clear outcome when limits are exceeded.
+- No silent truncation, dropped mandatory finding or unbounded report.
+- State how the policy affects valid existing templates and future larger plans.
+
+F. Canonical representation and strict reload
+- Exact schema ID and canonical object shape.
+- Key ordering, array ordering, optional keys, UUIDs, enums and integer rules.
+- Exact bytes used for the digest.
+- All size caps and their rationale, labelled engineering limits.
+- Bounded strict decoding, duplicate/unknown-field rejection, re-encoding equality and digest verification.
+- Nested revalidation and exact types before normalization or serialization.
+- Compatibility and schema-version failure behaviour.
+- Do not invent new temporal ordering guarantees from audit timestamps.
+
+G. Deterministic Markdown renderer
+- Render from the validated hash-covered content alone.
+- Define section/question/finding order and formatting, including unresolved reasons, quotations, authenticity labels, follow-ups and contract mode.
+- Specify how untrusted strings, Markdown syntax, raw HTML and URLs are handled.
+- Escaping must not add conclusions, silently change stored quotations or undermine the content/hash relationship.
+- No database lookup, model call, clock read, randomness or stage-row enrichment.
+- Separate content integrity from presentation safety and semantic injection resistance.
+
+H. Errors and boundaries
+- Fixed public error names, classifications and precedence.
+- Fresh normalized ordinary errors without original text, cause/context or logging.
+- Process-control identity propagation.
+- Explicitly preserve the limitation that these are supported-input boundaries, not a sandbox against hostile in-process code.
+
+I. M5g/M6 handover
+- Exact values, canonical bytes, digests and validation operations M5g will receive.
+- E7 remains binding: the output table belongs to a later additive migration, never an edit to 0007.
+- Carry forward atomic output-plus-job-success, replay and completeness obligations for M5g without implementing them.
+- State how M6 must approve/finalize/export the exact new hash-covered revision.
+- Do not silently reuse a legacy ReportContent digest as the wrapper's approval digest.
+- Do not claim the M4d trusted-snapshot limitation is closed by M5f.
+
+J. Planned verification
+Specification text only, covering:
+- exact types and nested revalidation;
+- identities, ordering, completeness and unresolved cases;
+- deterministic canonical bytes/digests and Markdown;
+- wrapper/legacy compatibility;
+- mandatory documentary findings after Analysis failure;
+- finding limits and overflow outcomes;
+- tampered bytes/digests and strict decoder boundaries;
+- adversarial Markdown/HTML/link strings;
+- fixed private errors and process-control identity;
+- packaging/import boundaries and a proposed installed-wheel assertion.
+
+Expected literals should be independently derived, not calculated by the code under test.
+
+Preserve the accepted canary contract and its negative control and limitation probe. Do not add a production canary blacklist or claim live-model injection resistance.
+
+5. Update status documentation
+
+Authorized tracked paths remain only:
+- README.md
+- ADR-0023
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+README and threat model should link to the new proposed specification and say:
+- M5e is on main and CI verified;
+- M5f is proposed, unaccepted, unimplemented and untested;
+- no M5f control operates;
+- M5g–M5h and overall M5 acceptance remain pending.
+
+Keep accepted specification headings/anchors unchanged. ADR-0023's implementation and historical evidence remain intact.
+
+Do not create ADR-0024, implementation files, tests, migrations or dependencies.
+
+6. History and checks
+
+Append:
+- the available Prompt 206 handoff, accurately identifying its source;
+- this review disposition;
+- Prompt 207 verbatim;
+- an outcome note listing completed checks only.
+
+Preserve the earlier prompts.md bytes exactly as a prefix. Do not label reconstructed text as verbatim.
+
+Run appropriate documentation checks:
+- exactly five changed paths against HEAD;
+- every other blob and mode unchanged;
+- no tracked local artifacts;
+- links, anchors and tables;
+- UTF-8 without BOM, LF only, no replacement characters;
+- whitespace;
+- history fidelity;
+- privacy;
+- required formatting/lint;
+- unsuppressed staged Gitleaks.
+
+No application tests, builds, wheel installs, database, Docker, provider calls or CI runs are needed for this documentation-only task.
+
+7. Export and handoff
+
+Leave all five files staged and uncommitted.
+
+Export:
+.local/p207/m5e-main-evidence-and-m5f-spec.diff
+
+Baseline:
+14f510e23e89bd890b2428405de922ef1fcb2232
+
+Destination:
+the final staged tree
+
+Use --full-index and exclude prompts.md. This cumulative export includes the existing main-publication evidence and the new proposal/review note.
+
+Verify byte identity and report:
+- full baseline and final tree IDs;
+- changed paths;
+- statistics, bytes, lines and full SHA-256;
+- completed checks;
+- proposed decisions and remaining review obligations;
+- final branch, refs and staged state.
+
+No commit, push, remote operation, implementation or M5g work.
+
+Mathew: return the handoff plus
+.local/p207/m5e-main-evidence-and-m5f-spec.diff
+to the external reviewer.
+
+
+## Prompt 207 completed outcome
+
+Prompt 207 outcome (OpenAI Codex; staged documentation only)
+
+Recovered main at 14f510e23e89bd890b2428405de922ef1fcb2232, published tree fce760c4fad950942ab5ec5152490fe6d3f00495 and the expected five-document staged tree 41f71edaa8955e66da1379d4841d8e11bcc6c438. Verified both Prompt 206 exports against their supplied byte sizes, line counts, SHA-256 values, paths, statistics and Git's full-index comparisons excluding prompts.md. Saved refs, status, staged hashes and the 2,506,330-byte prompt prefix/checksum under .local/p207/. Created docs/report-content-plan from the current HEAD carrying the staged documents; main and stored origin/main remained unchanged. No remote operation was performed.
+
+Recorded the supplied external reviewer's independent acceptance separately from Codex's earlier observations, preserving the failed parent, historical checks and unnamed replacement-case limitation. Prepared the complete proposed M5f specification in docs/plan.md, including F1-F12 decisions, exact wrapper fields and source bindings, owner-only construction, P11 after Analysis failure, whole-report refusal above 200 findings, strict canonical decoding, private error precedence, reversible deterministic Markdown, later output/approval obligations and planned verification. README and threat model link the unaccepted, unimplemented and untested proposal. No M5f control operates and overall M5 remains pending.
+
+Completed checks: exactly the five authorized paths changed; all 240 other tracked blob/mode pairs and the reviewed test blob cb13b6289f74e202e1d2f6586c9c14fef1599e7d unchanged; no tracked local artefacts or new tracked files; original prompt prefix identical and exact source copies of the saved detailed Prompt 206 handoff, supplied review disposition and Prompt 207 text preserved; previous document headings preserved; UTF-8 without BOM, LF only and no replacement/NUL characters; links/anchors (397, zero errors) and tables (98, zero errors); git diff whitespace checks; manual and supplemental pattern privacy review; locked offline Ruff format check (220 files already formatted) and lint; unsuppressed staged Gitleaks with inline allow suppression disabled (no leaks). Ruff initially requested formatting of the new documented signatures; only docs/plan.md was formatted and the checks then passed.
+
+No application test, build, wheel install/check, database, Docker, provider call, CI run, remote operation, commit or push was performed. M5f is proposed for external review, not accepted or implemented. The M5e runtime limitations, E7, U4, worker obligations, accepted M3 lease window, open M4d trusted-snapshot limitation, M5g-M5h and overall M5 acceptance remain pending. OpenAI Codex performed recovery and proposal/documentation work; earlier Claude Code implementation/corrections and reviewer attribution remain intact.
+
+
+## Prompt 208: available original Prompt 207 handoff
+
+Source: .local/p207/handoff.md, the saved detailed handoff, copied byte-for-byte below. This is not a claim to reproduce an unavailable short chat handoff.
+
+# Prompt 207 handoff for Mathew and the external reviewer
+
+M5e publication-evidence acceptance is recorded. The complete proposed M5f report-content
+and renderer specification is staged for external review. M5f is **unaccepted, unimplemented
+and untested**; no M5f control operates. No commit, push, remote operation, application test,
+build, installed-wheel check/install, database, Docker, provider call, CI run or M5g work was
+performed in Prompt 207.
+
+## Recovery, source evidence and checkpoint
+
+The starting state matched Prompt 207: branch main; HEAD/local main/stored origin/main
+`14f510e23e89bd890b2428405de922ef1fcb2232`; published tree
+`fce760c4fad950942ab5ec5152490fe6d3f00495`; five reviewed documents staged at
+`41f71edaa8955e66da1379d4841d8e11bcc6c438`; no unstaged or unexpected untracked work.
+The reviewed PostgreSQL test matched blob
+`cb13b6289f74e202e1d2f6586c9c14fef1599e7d` and remains unchanged.
+
+Both Prompt 206 exports were independently checked locally against the recorded Git comparisons
+with full indexes and prompts.md excluded, including byte identity, paths and statistics:
+
+| Export under .local/p206/ | Comparison | Statistics | Bytes / lines | SHA-256 |
+| --- | --- | --- | --- | --- |
+| m5e-feature-evidence-acceptance.diff | bfe78ec9c956bcfaaec39d25b719801c61866065 to 14f510e23e89bd890b2428405de922ef1fcb2232 | 4 files, +46/-11 | 47,418 / 139 | b02d1d57c928faf86c6f92af31dc63ffcb64925f7633e6417e83bbaaecea57cf |
+| m5e-main-publication-evidence.diff | 14f510e23e89bd890b2428405de922ef1fcb2232 to 41f71edaa8955e66da1379d4841d8e11bcc6c438 | 4 files, +146/-47 | 59,632 / 286 | 1fd2d036fabac528eb661931e40bd15e46266b0af8811519dadd7f7091dceeb7 |
+
+Recovery files are `.local/p207/checkpoint.json`, `staged-blobs.txt`, `starting-blobs.txt`
+and `prompts.prefix.md`. The preserved prefix is 2,506,330 bytes, SHA-256
+`91750e057a34c3fc8c0aa74e23f83e2159499d491c5b3d0c9230715e4aa77188`.
+The previously absent `docs/report-content-plan` branch was created from HEAD, carrying the
+five staged documents. No existing work was discarded or overwritten.
+
+## Acceptance and attribution
+
+ADR-0023 now records the reviewer's independently supplied acceptance of both Prompt 206
+exports and publication evidence. The reviewer verified bytes, checksums, paths, statistics
+and wording, independently retrieved the feature conclusions/all five logs, and previously
+retrieved separate main records/conclusions/all five logs. The reviewer confirmed exact SHA,
+main branch, push event, attempt 1, success and remote main at that observation. Codex's
+Prompt 206 observations remain separately attributed; no remote state was observed in this
+documentation-only turn. Earlier wording about the reviewer not inspecting the later runs
+is explicitly historical.
+
+Accepted feature evidence at `14f510e`: CI run 41757399847, secret-scan run 41757400849;
+Ubuntu 3968 passed/385 skipped; Windows 3967 passed/386 skipped; PostgreSQL 385 passed/3968
+deselected in 259.95 seconds; container smoke/cleanup success; Gitleaks 89 commits/no leaks.
+Separate main evidence at the same SHA: CI run 41788993019, secret-scan run 41788993093;
+the same verify counts; PostgreSQL 385 passed/3968 deselected in 248.53 seconds; container
+smoke/cleanup success; Gitleaks 89 commits/no leaks. Existing job links remain under their
+correct workflow runs in ADR-0023. The 46 passing review-stage module positions do not name
+the replacement case individually; the reviewer accepted this evidence without extra dispatch.
+The failed parent and earlier local evidence remain historical, with their original attribution.
+
+OpenAI Codex performed recovery, acceptance documentation and specification preparation.
+Claude Code's earlier implementations and corrections and the independent reviewer attribution
+are preserved. The saved detailed `.local/p206/handoff.md` was appended byte-for-byte with
+an accurate source label, followed by the supplied review disposition, Prompt 207 verbatim
+and a completed-check outcome. No unavailable short chat handoff was reconstructed.
+
+## Proposed specification and reviewer decisions
+
+The new section is `docs/plan.md#m5f-report-content-and-renderer-specification`.
+README and threat model link it; accepted headings/anchors remain unchanged. The proposal
+was checked against the actual M1 report/approval values, M5b provenance/rechecks/rules,
+M5c template and contract-mode values, M5d trusted-review configuration, M5e trusted stages,
+the sequence/import boundaries, report-integrity invariant, P11, P16 and E7/M5e-L.
+
+All twelve decisions require review; none is presented as accepted:
+
+1. F1: domain-owned report values/codecs/errors with builder/renderer in agents.report.
+   This explicitly requests an extension to the accepted module placement, avoiding upward imports.
+2. F2: a versioned `evidenceguard.review-report-content.v1` wrapper and separate approval digest,
+   preserving M1's `evidenceguard.report-content.v1` bytes and hash semantics unchanged.
+3. F3: full preserved Verification/claims/quotes, findings/follow-ups, stage reasons and source
+   bindings; omitted provenance stays subject to trusted source recheck, not structural proof.
+4. F4: exact trusted/pinned/planned inputs, template order, both committed stages per question,
+   owner-only Analysis with shared=(), and distinct incomplete versus unresolved outcomes.
+5. F5: deterministic P11 rule first, including after Analysis failure; exact IDs, no silent
+   deduplication, and conflict/collision refusal.
+6. F6: unchanged 200-finding global cap; whole-report refusal above it, with no truncation or
+   dropped mandatory finding. The eight-question template's conservative maximum is 168.
+7. F7: exact ASCII canonical wrapper, explicit nulls and bounded strict decode/re-encoding/digest
+   verification, without silently upgrading legacy revisions or approval digests.
+8. F8: proposed engineering caps of 16 MiB content, depth 16, 500,000 structural tokens and
+   32 MiB Markdown. These require implementation measurement; they are not proved tight maxima.
+9. F9: pinned deterministic Markdown with labelled, reversible JSON-literal code blocks;
+   no string-supplied active Markdown/HTML/links, at the cost of natural prose/clickable evidence.
+10. F10: fixed fresh private errors, explicit precedence and process-control identity;
+    supported-input boundaries, not a hostile in-process sandbox.
+11. F11: M5g later additive output migration/atomic completion/replay, M6 explicit wrapper
+    revision/approval/finalization contracts, no legacy digest used as new wrapper approval.
+12. F12: planned independent-literal/type/bounds/strict-decoder/adversarial-render/import/wheel
+    verification and preservation of the accepted canary, negative control and limitation probe.
+
+There is no ADR-0024, implementation file, new test, migration or dependency. The proposal
+does not allocate a concrete output table or implement M5g. External review must resolve
+F1–F12 before implementation; future implementation verification remains entirely pending.
+
+## Completed checks and final scope
+
+- Exactly the five authorized documents changed against HEAD; all 240 other tracked blob/mode
+  pairs match HEAD and the reviewed starting tree. No modes changed. All production, test,
+  migration, model, resource, dependency, packaging and workflow content remains unchanged.
+- No new tracked file, tracked .local artefact, build output, unstaged change or unexpected
+  untracked file. Original prompt prefix and exact copied source texts verified.
+- Previous headings/anchors preserved; local links/anchors: 397 checked, zero errors;
+  Markdown tables: 98 checked, zero problems. No remote link check was performed.
+- UTF-8 strict decoding, no BOM, LF only, no replacement/NUL characters; staged/unstaged
+  `git diff --check` passed. Privacy review and supplemental token-pattern checks passed.
+- `uv run --locked --offline ruff format --check .`: 220 files already formatted.
+  The initial formatting request affected only the documented API signatures in docs/plan.md;
+  that document was formatted and the check passed. `uv run --locked --offline ruff check .`:
+  all checks passed. No application tests/builds/wheel checks were repeated.
+- Final `gitleaks git --pre-commit --staged --redact --verbose --ignore-gitleaks-allow --no-banner .`:
+  no leaks, approximately 125,765 bytes scanned. No local secret-scan config/ignore or Gitleaks
+  environment override was present; no suppressions were added. The zero commits count is
+  staged-scan metadata, not a full-history scan claim.
+
+Detailed final blob hashes/checksums are in `.local/p207/document-checks.json`;
+export metadata is in `.local/p207/final-state.json`.
+
+## Cumulative export and final Git state
+
+Export: `.local/p207/m5e-main-evidence-and-m5f-spec.diff`
+
+- Baseline commit: `14f510e23e89bd890b2428405de922ef1fcb2232`
+- Baseline tree: `fce760c4fad950942ab5ec5152490fe6d3f00495`
+- Final staged tree: `da10f127b2b0c9b22779f0e25cc8a586c596d075`
+- Full-index Git diff, prompts.md excluded; verified byte-identical to a fresh tree comparison
+  and to the final cached comparison.
+- Export paths: README.md, docs/decisions/0023-review-stage-persistence.md, docs/plan.md,
+  docs/threat-model.md. The fifth staged file, prompts.md, is excluded as authorized.
+- Statistics: four files, 796 insertions, 47 deletions.
+- Bytes: 109,453. Lines: 947.
+- SHA-256: `0442e876ef26622c49321119162c0ed3454b629d19187c60cdebb0dfcdbe5eef`.
+
+Final branch: `docs/report-content-plan`. HEAD, local main, stored origin/main and the retained
+local/stored-remote feature refs remain `14f510e23e89bd890b2428405de922ef1fcb2232`.
+These are local ref observations, not a new observation of GitHub. Exactly README.md,
+ADR-0023, docs/plan.md, docs/threat-model.md and prompts.md are staged and uncommitted;
+nothing is unstaged or unexpectedly untracked. No publication was attempted.
+
+M5e is reviewed, verified in CI and on main within its recorded scope. No application review
+path uses M5e or M5f; run_review remains unregistered. E7 output work belongs to M5f/M5g
+review and a later additive migration, U4 discarded evidence cannot be re-proved, worker
+composition obligations remain, the accepted M3 lease window and open M4d trusted-snapshot
+limitation remain. Wheel checks are offline; container smoke does not exercise M5e. There
+is no entailment, authenticity, semantic injection-resistance or live-quality guarantee.
+M5f remains proposed/unaccepted/unimplemented/untested; M5g–M5h and overall M5 acceptance
+remain pending.
+
+Mathew: return this handoff plus `.local/p207/m5e-main-evidence-and-m5f-spec.diff` to the
+external reviewer.
+
+
+## Prompt 208 supplied acceptance record
+
+Prompt 208 supplied external-review acceptance
+
+The external reviewer accepts the complete M5f specification and F1–F12 subject to binding clarifications A and B. The reviewer verified the Prompt 207 export's size, line count, full checksum, paths and statistics; inspected the specification and handoff; and cross-checked published M1 report/evidence, M5b provenance, M5c template and M5d configuration contracts at 14f510e. This is specification/source review only: no M5f implementation, suite, renderer, decoder, build, installed-wheel check or database probe was run by the reviewer.
+
+Acceptance includes the domain/agents placement extension, separate versioned wrapper/approval digest, preserved Verification and unresolved conclusions, owner-only Analysis, P11 after Analysis failure, whole-report refusal above 200 findings, canonical/strict decoding, engineering caps, JSON-literal Markdown and tradeoff, private errors/precedence, M5g/M6 handover and planned verification. The caps are accepted engineering limits, not proved tight maxima, measured performance guarantees or quality claims. All implementation and implementation checks remain pending; no M5f control operates.
+
+A. Every new report value must have privacy-safe repr and str. Only schema/version identifiers, ordinary identifiers, enums, counts and digests are permitted where appropriate. No question/report text or titles, queries, evidence/quotes, rationale/claims, finding text/titles, follow-ups, payload bytes or nested representations containing those values. No default dataclass repr. This also binds nested values and planned verification. Explicit requested canonical encoding/rendering remains content-returning. No-warning/no-output/no-log error boundaries and process-control identity remain required.
+
+B. Distinct search queries are required by M5c's template contract, not independently by M5e's exact question rebuilding. M5f preserves distinctness and exact agreement of the supplied template, planned questions and trusted-stage questions, while distinguishing structural validation, source-bound rechecking and the caller's genuinely pinned-template obligation. No M5c/M5e production change is needed or authorized.
+
+
+## Prompt 208 user request (verbatim)
+
+Prompt 208 — Record M5f specification acceptance and commit the documentation locally
+
+Written for: Mathew and the external reviewer.
+
+The external reviewer accepts the complete M5f specification and F1–F12, subject to the two binding clarifications below.
+
+Record acceptance and commit the documentation locally. Do not implement M5f, push, merge or run CI.
+
+Continue in the current session if it is working reliably.
+
+1. Verify and checkpoint
+
+Read the repository instructions and .local/p207/ checkpoint and handoff.
+
+Expected:
+- Branch: docs/report-content-plan
+- HEAD, local main and stored origin/main:
+  14f510e23e89bd890b2428405de922ef1fcb2232
+- HEAD tree:
+  fce760c4fad950942ab5ec5152490fe6d3f00495
+- Staged tree:
+  da10f127b2b0c9b22779f0e25cc8a586c596d075
+- Exactly five staged documents:
+  README.md
+  docs/decisions/0023-review-stage-persistence.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or unexpectedly untracked.
+
+Verify .local/p207/m5e-main-evidence-and-m5f-spec.diff:
+- Baseline: 14f510e23e89bd890b2428405de922ef1fcb2232
+- Destination: da10f127b2b0c9b22779f0e25cc8a586c596d075
+- Full-index, prompts.md excluded.
+- Four files, 796 insertions, 47 deletions.
+- 109,453 bytes; 947 lines.
+- SHA-256:
+  0442e876ef26622c49321119162c0ed3454b629d19187c60cdebb0dfcdbe5eef
+
+Verify byte identity against Git.
+
+Save a checkpoint under .local/p208/ containing refs, status, staged paths and blob hashes, and the prompts.md prefix/checksum.
+
+Preserve unexpected work and report material discrepancies before dependent changes.
+
+No remote operation is authorized.
+
+2. Record the acceptance and its evidence
+
+The external reviewer:
+- verified the supplied Prompt 207 export's size, line count, full checksum, paths and statistics;
+- inspected the specification and handoff;
+- cross-checked the proposal against the published M1 report/evidence, M5b provenance, M5c template and M5d configuration contracts at 14f510e;
+- accepted F1–F12 and the complete specification, with the clarifications in section 3.
+
+This was specification/source review. The reviewer did not implement M5f or run an M5f test suite, renderer, decoder, build, installed-wheel check or database probe.
+
+The acceptance covers:
+- domain-owned values/codecs and agents builder/renderer;
+- the explicit extension to the sequence's module placement;
+- the versioned wrapper and separate approval digest;
+- preserved Verification conclusions and unresolved reasons;
+- owner-only Analysis;
+- the mandatory documentary finding after Analysis failure;
+- whole-report refusal above 200 findings;
+- exact canonical encoding and strict decoding;
+- the proposed engineering caps;
+- the deterministic JSON-literal Markdown presentation and its tradeoff;
+- fixed errors and precedence;
+- the M5g/M6 handover;
+- the planned verification obligations.
+
+The byte/depth/token/render caps are accepted engineering limits, not proved tight maxima, measured performance guarantees or quality claims. Their implementation and boundary verification remain pending.
+
+All M5f implementation and verification remain pending. No M5f control operates.
+
+3. Apply the binding clarifications
+
+A. Privacy-safe representations
+
+Explicitly require privacy-safe repr and str for every new report value.
+
+They may show only schema/version identifiers, ordinary identifiers, enums, counts and digests where appropriate. They must not expose:
+- question or report titles/text;
+- queries;
+- evidence text or quotes;
+- rationale or claims;
+- finding titles/statements;
+- follow-up text;
+- canonical payload bytes or nested representations containing that content.
+
+Do not rely on a dataclass's default repr. Apply the requirement consistently to nested values and add it to the planned verification.
+
+This concerns incidental representations. The explicit canonical encoder and report renderer still return their deliberately requested content under the specification.
+
+Keep the existing no-warning/no-output/no-log error-boundary rules and process-control identity requirements.
+
+B. Distinct-query attribution
+
+Correct the statement that distinct planned search queries are required by both M5c and M5e.
+
+M5c's template contract requires distinct queries. M5e's exact question rebuilding does not independently impose uniqueness.
+
+M5f still requires the supplied template, planned tuple and trusted-stage question tuple to agree exactly, and it preserves the template's distinct-query requirement. No M5c or M5e production change is authorized or needed.
+
+Keep the distinction between:
+- structural report validation;
+- source-bound rechecking;
+- the caller's obligation to supply a genuinely pinned template.
+
+4. Update documentation status
+
+Against the starting staged tree, changes are limited to:
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+ADR-0023's already reviewed staged content should remain unchanged in this task. It will be included in the documentation commit along with the other four files.
+
+Every production, test, migration, model, dependency, resource, packaging and workflow blob/mode must remain identical to HEAD.
+
+In docs/plan.md:
+- Rename the M5f specification heading to identify acceptance at review in Prompt 208 with implementation pending.
+- Update every link to that renamed heading.
+- Add an M5f acceptance subsection recording scope, export verification, source-review evidence and limits, and both binding clarifications.
+- Mark F1–F12 accepted.
+- Mark the earlier proposed status historical.
+- State that no specification decision remains open within this accepted scope.
+- Keep later M5g and M6 review obligations explicit.
+
+Do not change other accepted specification headings or anchors.
+
+README and threat model should say:
+- M5e is reviewed, CI verified and on main at 14f510e;
+- M5f specification was proposed in Prompt 207 and accepted in Prompt 208;
+- M5f implementation and every implementation check remain pending;
+- no M5f control operates;
+- M5g–M5h and overall M5 acceptance remain pending.
+
+Preserve all runtime limitations, the M4d trusted-snapshot limitation, E7 and the requirement for a later additive output migration and reviewed atomic writer.
+
+Do not create ADR-0024, source files, tests or migrations.
+
+5. History and checks
+
+Append to prompts.md:
+- the supplied Prompt 207 handoff, using its available original text and identifying its source;
+- this acceptance record with both clarifications;
+- Prompt 208 verbatim;
+- a pre-commit note listing completed checks only.
+
+Preserve the previous bytes exactly as a prefix. Do not label reconstructed text as verbatim.
+
+Complete appropriate documentation checks:
+- exactly five paths changed against HEAD;
+- against the starting staged tree, only the four permitted files changed;
+- ADR-0023 unchanged against that tree;
+- all other blobs/modes unchanged;
+- no tracked local artifacts;
+- links, anchors and tables;
+- UTF-8 without BOM, LF only, no replacement characters;
+- whitespace;
+- prompt-history and literal-text fidelity;
+- privacy;
+- required formatting/lint;
+- unsuppressed staged Gitleaks.
+
+No application tests, builds, wheel checks, database, Docker, provider or network operations are needed.
+
+6. Commit locally
+
+After checks pass, commit the five documentation/history files locally on docs/report-content-plan.
+
+Suggested subject:
+docs: record M5e main evidence and accepted M5f specification
+
+Use the established noreply author and committer identity.
+
+Write the commit message from a file. Accurately attribute Codex's documentation/specification work, the external review and earlier Claude Code work under repository conventions.
+
+Do not amend or rewrite history.
+
+After committing, verify:
+- full SHA, parent and tree;
+- exactly five changed paths;
+- all implementation/test and other protected blobs/modes unchanged;
+- clean working tree;
+- main and origin/main still at 14f510e;
+- required full-history unsuppressed Gitleaks passes.
+
+Nothing is authorized for publication.
+
+7. Export and handoff
+
+Export:
+.local/p208/m5f-spec-acceptance.diff
+
+Baseline:
+da10f127b2b0c9b22779f0e25cc8a586c596d075
+
+Destination:
+the new local commit
+
+Use --full-index and exclude prompts.md.
+
+Verify byte identity and report:
+- full baseline and destination IDs;
+- changed paths;
+- statistics, bytes, lines and full SHA-256;
+- commit SHA, parent, tree and identities;
+- completed checks;
+- final refs and clean working-tree state.
+
+Finish with a self-contained handoff.
+
+State clearly:
+- M5f specification accepted, implementation pending;
+- M5e evidence and accepted specification committed locally only;
+- nothing pushed or merged;
+- M5g–M5h and overall M5 acceptance pending.
+
+Do not start implementation.
+
+Mathew: return the handoff plus
+.local/p208/m5f-spec-acceptance.diff
+to the external reviewer.
+
+
+## Prompt 208 completed pre-commit checks
+
+Prompt 208 pre-commit note (completed checks only; OpenAI Codex)
+
+Verified docs/report-content-plan at HEAD/main/stored origin/main 14f510e23e89bd890b2428405de922ef1fcb2232, HEAD tree fce760c4fad950942ab5ec5152490fe6d3f00495 and the accepted five-file staged tree da10f127b2b0c9b22779f0e25cc8a586c596d075. Verified the Prompt 207 full-index export excluding prompts.md against Git: four files, +796/-47, 109,453 bytes, 947 lines and SHA-256 0442e876ef26622c49321119162c0ed3454b629d19187c60cdebb0dfcdbe5eef. Saved refs/status/staged hashes and the 2,543,010-byte history prefix/checksum under .local/p208/.
+
+Recorded external specification/source-review acceptance of the complete M5f specification and F1–F12 with binding privacy-safe repr/str and distinct-query-attribution clarifications. The reviewer did not implement or execute M5f. Caps are accepted engineering limits, not proved tight maxima, performance guarantees or quality evidence. All M5f implementation and checks remain pending; no control operates. The plan heading and permitted status links now identify acceptance in Prompt 208. An explicit old-anchor alias preserves the reviewed ADR-0023 link while that document remains byte-identical to the starting staged tree. Later M5g/M6 review obligations and all runtime limitations remain intact.
+
+Completed checks: exactly five paths changed against HEAD; only README.md, docs/plan.md, docs/threat-model.md and prompts.md changed against the starting staged tree; ADR-0023 unchanged against that tree; all 240 protected tracked blob/mode pairs unchanged from HEAD, including PostgreSQL test blob cb13b6289f74e202e1d2f6586c9c14fef1599e7d. No new tracked files, local artifacts or build outputs. No unstaged or unexpected untracked work. Verified UTF-8 without BOM, LF only, no replacement/NUL characters; whitespace; preserved other headings/anchors; 397 links/anchors and 98 tables with zero errors (including the explicit compatibility anchor); privacy review and supplemental token-pattern scan. Locked offline Ruff format check reported 220 files already formatted; Ruff lint passed. Unsuppressed staged Gitleaks with inline allow suppression disabled found no leaks. No local Gitleaks config/ignore or environment override was present.
+
+Verified the earlier prompts.md bytes as an identical prefix, SHA-256 4d2440a8bbe44b42b3d558ac8734680a77c2644939b369412f24561e6fc53395, and exact byte copies of the saved detailed .local/p207/handoff.md, supplied acceptance with clarifications and Prompt 208 text. The saved handoff is accurately labelled; no unavailable short handoff was reconstructed. OpenAI Codex performed documentation/specification and acceptance work; external-review and earlier Claude Code attribution are preserved. No application tests, builds, wheel checks, database, Docker, provider, network, push, merge or CI operation was performed.
