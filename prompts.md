@@ -46242,3 +46242,653 @@ The handoff source is labelled accurately. Prior assistance and reviewer attribu
 No application test, build or wheel check was repeated because the reviewed test and production
 blobs are unchanged. Prompt 204's local checks remain historical evidence. No commit, publication
 or new CI result is claimed in this pre-commit note. No prospective commit SHA is recorded.
+
+### Prompt 205 manual-push resume authorization (user text, verbatim)
+
+I completed the corrective feature push manually. Verify that remote feat/review-stage-persistence, local HEAD and upstream all equal 15cbfbae88c52ecefb9f287f985bec734e8c535f, and main remains at 1efe3ed3f0aa9697ce4e71cee295293a89c94909.
+
+Do not push again. Resume Prompt 205 at exact-commit CI monitoring, retaining its existing authorization and limits.
+
+### Prompt 205 corrective publication and CI outcome (OpenAI Codex observations)
+
+## Corrective feature CI at 15cbfbae (Prompt 205)
+
+**M5e is feature-published and feature-CI verified at
+`15cbfbae88c52ecefb9f287f985bec734e8c535f`, but not merged.** The corrective commit's
+parent is `5b94d18a4053e0a7d6e32d8add631ecb5ccde70b` and its tree is
+`90e29b527a33b43a313cb57d868e446d6dc44a64`. The reviewed test remains exactly blob
+`cb13b6289f74e202e1d2f6586c9c14fef1599e7d`; production, migrations, models, resources,
+packaging and workflows are unchanged. Mathew completed the corrective feature push manually
+after Codex's one attempt stalled in Git Credential Manager and was stopped without retry.
+Codex then verified feature/HEAD/upstream equality and unchanged main, and resumed monitoring
+without another push. Main publication and merge remain unauthorized.
+
+Both runs below were **push** events, **attempt 1**, on `feat/review-stage-persistence`, at the
+full corrective SHA above. All five required jobs explicitly concluded **success**; no parent
+success was substituted for an unresolved job. The earlier failed `5b94d18a` run remains
+historical evidence above and supplies no counts or conclusions for this correction.
+
+CI run [41751683294](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294)
+completed with **success**:
+
+| Job | Conclusion | Output actually read in this job's log |
+| --- | --- | --- |
+| [Ubuntu verify, 126318003800](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294/job/126318003800) | success | 3,968 passed, 385 skipped; formatting, lint, strict mypy, build and installed-wheel steps succeeded |
+| [Windows verify, 126318003627](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294/job/126318003627) | success | 3,967 passed, 386 skipped; formatting, lint, strict mypy, build and installed-wheel steps succeeded |
+| [PostgreSQL integration, 126318004051](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294/job/126318004051) | success | 385 passed, 3,968 deselected in 199.95 seconds; no failed or skipped integration cases reported |
+| [Container, 126318004071](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294/job/126318004071) | success | configuration, context and image checks succeeded; smoke and cleanup reported success |
+
+Secret-scan run [41751683205](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683205)
+completed with **success**:
+
+| Job | Conclusion | Output actually read in this job's log |
+| --- | --- | --- |
+| [Gitleaks, 126318003741](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683205/job/126318003741) | success | Gitleaks 8.30.1; 88 commits scanned; no leaks |
+
+**Corrected-case evidence and limit.** The PostgreSQL log shows 46 passing positions for
+`tests/test_review_stages_postgres.py` (35 dots followed by 11 dots) and the successful
+385-case integration summary. It does **not** print
+`test_the_reload_refuses_an_unclaimed_canonical_job_with_persisted_history` or a named PASS
+line. Thus the corrected module participated in the successful integration run, but the named
+replacement's execution and result are **not individually confirmed by the available log**.
+Prompt 204's collection identified that case in the reviewed source; it is historical local
+collection evidence, not a separate named CI result. No individual result is invented from a
+green conclusion, and no extra test dispatch or rerun was made to obtain one.
+
+**Observed steps and boundaries.** Both verify logs printed the production registry
+(`ingest_revision`, `index_revision`) and all ten installed-wheel behaviour lines, including
+"stage migration SQL rendered and an abandoned repair planned as a retry from the installed
+wheel". These wheel assertions render migration SQL offline and are separate from database
+execution. The Recall example is arithmetic, Voyage is mocked and model calls scripted.
+The unchanged container smoke reported ingestion/indexing success with two chunks and two
+embeddings and `smoke: ok`; it does not exercise M5e. No application review path or
+`run_review` registration was added. None of this establishes entailment, authenticity,
+injection resistance or live-model quality.
+
+**Attribution and access limits.** OpenAI Codex observed final run records through GitHub's
+public API, final job/step conclusions through the connected GitHub tool, and retrieved/read
+all five job logs through that tool. All five logs were available and saved under
+`.local/p205/logs/`; their sizes and SHA-256 values are recorded in `.local/p205/ci-final.json`.
+One metadata read had a transient transport failure and the final public job refresh was
+rate-limited (HTTP 403); the connected tool supplied explicit final job conclusions without
+an authentication or permission change. Final run and job conclusions agree. These are
+Codex's observations for the corrective SHA, distinct from the external reviewer's earlier
+independent review, Prompt 204's local checks, Claude Code's historical work and the failed
+parent's evidence. Monitoring finished within 25 minutes of publication; no monitor or push
+was left running.
+
+The post-CI evidence updates are staged and uncommitted for review and were not pushed. This
+exact-SHA CI does not verify these later documentation blobs. E7, discarded U4 evidence,
+worker composition obligations, the accepted M3 lease window and the open M4d trusted-snapshot
+limitation remain. M5f–M5h and overall M5 acceptance remain pending; M5e is not merged.
+
+### Prompt 205 post-CI documentation checks (OpenAI Codex; completed checks only)
+
+All five required jobs explicitly passed on published corrective SHA
+`15cbfbae88c52ecefb9f287f985bec734e8c535f`, push event, attempt 1, on the authorized feature
+branch. Run/job metadata and all five retrieved logs are saved under `.local/p205/`. PostgreSQL
+reported 385 passes and 3,968 deselections, with 46 passing module positions but no individual
+named result for the replacement case; that output limit is recorded without inventing a named
+PASS. Mathew completed the push manually; Codex did not push again. The earlier blocked-push
+checkpoint and failed-parent CI remain historical, separate from this successful gate.
+
+The five authorized evidence documents are staged and uncommitted. Scope and whole-tree blob/mode
+comparison passed: every other tracked file, including the reviewed test, is identical to the
+published corrective commit. The test remains blob `cb13b6289f74e202e1d2f6586c9c14fef1599e7d`.
+The published prompt-history bytes remain an identical prefix, SHA-256
+`83ad5edc1198c18a16afa26ccf39b38f56ecd00560624459a929ac4e099582f2`; exact inclusion of the
+resume instruction was checked. Accepted specification headings and anchors are preserved.
+Links, anchors and tables passed (393 links, 90 tables); UTF-8 without BOM, LF only, no replacement
+characters, diff whitespace and privacy checks passed. No tracked local/build artifacts or
+unexpected untracked/unstaged files were found. Locked offline Ruff format reported 220 files
+already formatted, lint passed, and unsuppressed staged Gitleaks 8.30.1 found no leaks. No custom
+config, baseline, ignore file or environment override was used; inline allow comments were ignored.
+
+No application test, build or wheel check was repeated locally for these documentation updates.
+These staged documentation blobs are not covered by the published SHA's CI. No further commit,
+push, merge, CI rerun, test/production change or M5f work occurred. Main publication and merge
+remain unauthorized; M5f–M5h and overall M5 acceptance remain pending.
+
+### Prompt 205 successful feature-CI handoff (saved .local/p205/handoff-feature-ci.md; verbatim file copy)
+
+This is the saved detailed handoff, not the shorter final chat response.
+
+Prompt 205 successful corrective feature-CI handoff for Mathew and the external reviewer
+
+M5e is feature-published and feature-CI verified at 15cbfbae88c52ecefb9f287f985bec734e8c535f,
+but not merged. Mathew completed the corrective feature push manually after Codex's single
+stalled attempt was stopped. On the resume instruction Codex verified actual remote refs,
+local HEAD/upstream equality and unchanged main, did not push again, monitored exact-SHA CI,
+retrieved all five logs, and staged only the five authorized evidence documents for review.
+No subsequent commit, push, merge, CI rerun, production/test change or M5f work occurred.
+
+Corrective commit:
+- SHA: 15cbfbae88c52ecefb9f287f985bec734e8c535f
+- Direct parent: 5b94d18a4053e0a7d6e32d8add631ecb5ccde70b
+- Tree: 90e29b527a33b43a313cb57d868e446d6dc44a64
+- Subject: test: correct unclaimed-job setup in stage reload coverage
+- Author and committer: mathewmljourney93
+  <257921624+mathewmljourney93@users.noreply.github.com>
+- Exactly the six reviewed paths were committed: README.md, ADR-0023, docs/plan.md,
+  docs/threat-model.md, prompts.md and tests/test_review_stages_postgres.py.
+- Reviewed test blob, unchanged through acceptance, publication and post-CI documentation:
+  cb13b6289f74e202e1d2f6586c9c14fef1599e7d
+- All production, migration, model, resource, packaging, workflow, dependency and unrelated
+  test blobs/modes were unchanged by the corrective commit; the current evidence updates
+  also preserve every file outside the five documentation paths.
+
+Starting-state verification and preflight, completed earlier in Prompt 205:
+The branch, HEAD/upstream 5b94d18a4053e0a7d6e32d8add631ecb5ccde70b, local main/origin/main
+1efe3ed3f0aa9697ce4e71cee295293a89c94909 and accepted staged tree 430956a63affa6e3c17d184d9ceedf16a31c6f6c
+matched. Exactly six reviewed paths were staged, no unstaged/unexpected untracked work. The
+Prompt 204 export matched 56,483 bytes, 319 lines, five files, 173 insertions, 24 deletions,
+SHA-256 efdfc2350fabb552c623daf38b2c8c4c73e79e19b688dd0ab5cc84dd63a35ba5, and Git's full-index
+comparison excluding prompts.md. The test blob matched the accepted value. Checkpointed refs,
+status, staged hashes and the original prompt prefix/checksum are in checkpoint.json.
+
+External review accepted the test correction for a corrective commit and feature publication,
+verified export bytes/checksum/paths/statistics and inspected the replacement against published
+source, but did not execute the corrected case locally or against PostgreSQL. Codex recorded
+that acceptance and its limits using only five documents against the accepted tree, preserving
+the reviewed test. Prompt 204's application checks remain historical; no local application test,
+build or wheel check was repeated in Prompt 205. The original failure occurred in the tampering
+UPDATE before reload; this is a test-setup correction, not a production reload fix.
+
+The local commit used a file-based message and established noreply identity, credits OpenAI
+Codex's correction/documentation/recovery/checks, and preserves earlier Claude Code assistance
+and independent reviewer attribution. No previous commit was amended or rewritten. Staged and
+range unsuppressed Gitleaks passed; full-history Gitleaks scanned 88 commits with no leaks.
+Before the sole Codex push attempt, origin was fetched without tags, actual refs were verified,
+the unpublished range was exactly the corrective commit, the tree was clean, workflows were
+unchanged and all five jobs remained enabled. Range privacy passed. The explicit feature-only
+push stalled with Git Credential Manager active, was safely stopped without retry, and fresh
+remote refs initially still showed the parent. Mathew then reported completing the push, and
+Codex independently verified that remote feature, local HEAD and upstream all equalled the
+corrective SHA and main stayed unchanged. No credentials/account/configuration/permissions
+were inspected or changed by Codex.
+
+## Corrective feature CI at 15cbfbae (Prompt 205)
+
+**M5e is feature-published and feature-CI verified at
+`15cbfbae88c52ecefb9f287f985bec734e8c535f`, but not merged.** The corrective commit's
+parent is `5b94d18a4053e0a7d6e32d8add631ecb5ccde70b` and its tree is
+`90e29b527a33b43a313cb57d868e446d6dc44a64`. The reviewed test remains exactly blob
+`cb13b6289f74e202e1d2f6586c9c14fef1599e7d`; production, migrations, models, resources,
+packaging and workflows are unchanged. Mathew completed the corrective feature push manually
+after Codex's one attempt stalled in Git Credential Manager and was stopped without retry.
+Codex then verified feature/HEAD/upstream equality and unchanged main, and resumed monitoring
+without another push. Main publication and merge remain unauthorized.
+
+Both runs below were **push** events, **attempt 1**, on `feat/review-stage-persistence`, at the
+full corrective SHA above. All five required jobs explicitly concluded **success**; no parent
+success was substituted for an unresolved job. The earlier failed `5b94d18a` run remains
+historical evidence above and supplies no counts or conclusions for this correction.
+
+CI run [41751683294](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294)
+completed with **success**:
+
+| Job | Conclusion | Output actually read in this job's log |
+| --- | --- | --- |
+| [Ubuntu verify, 126318003800](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294/job/126318003800) | success | 3,968 passed, 385 skipped; formatting, lint, strict mypy, build and installed-wheel steps succeeded |
+| [Windows verify, 126318003627](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294/job/126318003627) | success | 3,967 passed, 386 skipped; formatting, lint, strict mypy, build and installed-wheel steps succeeded |
+| [PostgreSQL integration, 126318004051](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294/job/126318004051) | success | 385 passed, 3,968 deselected in 199.95 seconds; no failed or skipped integration cases reported |
+| [Container, 126318004071](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294/job/126318004071) | success | configuration, context and image checks succeeded; smoke and cleanup reported success |
+
+Secret-scan run [41751683205](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683205)
+completed with **success**:
+
+| Job | Conclusion | Output actually read in this job's log |
+| --- | --- | --- |
+| [Gitleaks, 126318003741](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683205/job/126318003741) | success | Gitleaks 8.30.1; 88 commits scanned; no leaks |
+
+**Corrected-case evidence and limit.** The PostgreSQL log shows 46 passing positions for
+`tests/test_review_stages_postgres.py` (35 dots followed by 11 dots) and the successful
+385-case integration summary. It does **not** print
+`test_the_reload_refuses_an_unclaimed_canonical_job_with_persisted_history` or a named PASS
+line. Thus the corrected module participated in the successful integration run, but the named
+replacement's execution and result are **not individually confirmed by the available log**.
+Prompt 204's collection identified that case in the reviewed source; it is historical local
+collection evidence, not a separate named CI result. No individual result is invented from a
+green conclusion, and no extra test dispatch or rerun was made to obtain one.
+
+**Observed steps and boundaries.** Both verify logs printed the production registry
+(`ingest_revision`, `index_revision`) and all ten installed-wheel behaviour lines, including
+"stage migration SQL rendered and an abandoned repair planned as a retry from the installed
+wheel". These wheel assertions render migration SQL offline and are separate from database
+execution. The Recall example is arithmetic, Voyage is mocked and model calls scripted.
+The unchanged container smoke reported ingestion/indexing success with two chunks and two
+embeddings and `smoke: ok`; it does not exercise M5e. No application review path or
+`run_review` registration was added. None of this establishes entailment, authenticity,
+injection resistance or live-model quality.
+
+**Attribution and access limits.** OpenAI Codex observed final run records through GitHub's
+public API, final job/step conclusions through the connected GitHub tool, and retrieved/read
+all five job logs through that tool. All five logs were available and saved under
+`.local/p205/logs/`; their sizes and SHA-256 values are recorded in `.local/p205/ci-final.json`.
+One metadata read had a transient transport failure and the final public job refresh was
+rate-limited (HTTP 403); the connected tool supplied explicit final job conclusions without
+an authentication or permission change. Final run and job conclusions agree. These are
+Codex's observations for the corrective SHA, distinct from the external reviewer's earlier
+independent review, Prompt 204's local checks, Claude Code's historical work and the failed
+parent's evidence. Monitoring finished within 25 minutes of publication; no monitor or push
+was left running.
+
+The post-CI evidence updates are staged and uncommitted for review and were not pushed. This
+exact-SHA CI does not verify these later documentation blobs. E7, discarded U4 evidence,
+worker composition obligations, the accepted M3 lease window and the open M4d trusted-snapshot
+limitation remain. M5f–M5h and overall M5 acceptance remain pending; M5e is not merged.
+
+Monitoring timing and result:
+The secret-scan run was created at 2026-11-04T01:06:12Z and CI at 01:06:13Z (08:06:12/13
+Asia/Bangkok). The 25-minute monitoring deadline was 08:31:12 Bangkok. All required jobs were
+explicitly complete/success by the saved final run records at 01:10:40Z (08:10:40 Bangkok);
+monitoring ended within the limit. No unresolved required conclusion or final metadata
+inconsistency remained. No push or monitor process is running.
+
+Post-CI documentation checks:
+Only these five paths are staged and uncommitted:
+- README.md
+- docs/decisions/0023-review-stage-persistence.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Every other tracked blob and mode is identical to the published corrective commit. The
+post-ci-protected-blobs.txt manifest has SHA-256 862366dddeaf1c69c6e4a030103cae709a53a33ac2a258ada4c55cc0a0a53ea3.
+The reviewed test remains unchanged. The published history prefix was preserved exactly,
+SHA-256 83ad5edc1198c18a16afa26ccf39b38f56ecd00560624459a929ac4e099582f2; the resume instruction
+is included verbatim and the actual publication/CI outcome and completed-check note appended.
+The saved detailed Prompt 204 handoff and Prompt 205 already in the commit remain intact.
+
+Scope/blob/mode identity, no tracked .local/build artifacts, accepted specification headings
+and anchors, UTF-8 without BOM, LF only/no replacement characters, whitespace, privacy and
+prompt fidelity all passed. Link/anchor/table checker: 393 links, 90 tables, no problems.
+Locked offline Ruff format: 220 files already formatted; lint: all checks passed. Final
+unsuppressed staged Gitleaks 8.30.1: no leaks, no custom config/baseline/ignore file/environment
+override, inline allow comments ignored. No application tests, builds or wheel checks were
+repeated locally for the evidence documentation. These later staged documentation blobs are
+not part of the published SHA and are not covered by its CI.
+
+First export (produced earlier, unchanged and reverified byte-identical to Git):
+.local/p205/m5e-test-correction-acceptance.diff
+Baseline accepted tree: 430956a63affa6e3c17d184d9ceedf16a31c6f6c
+Destination corrective commit: 15cbfbae88c52ecefb9f287f985bec734e8c535f
+Destination tree: 90e29b527a33b43a313cb57d868e446d6dc44a64
+Full-index, prompts.md excluded.
+ README.md                                       |  2 +-
+ docs/decisions/0023-review-stage-persistence.md | 47 ++++++++++++++++++++-----
+ docs/plan.md                                    | 12 ++++---
+ docs/threat-model.md                            |  7 ++--
+ 4 files changed, 50 insertions(+), 18 deletions(-)
+
+Bytes: 47004
+Lines: 150
+SHA-256: 6f24df9dfb466163dd20ae004392d981bfe3dd67ff5b1d9a9a19a92bd788c3aa
+
+Second export (post-CI evidence):
+.local/p205/m5e-corrective-feature-ci-evidence.diff
+Baseline published corrective commit: 15cbfbae88c52ecefb9f287f985bec734e8c535f
+Baseline tree: 90e29b527a33b43a313cb57d868e446d6dc44a64
+Destination staged tree: bfe78ec9c956bcfaaec39d25b719801c61866065
+Full-index, prompts.md excluded; byte-identical to both Git's tree comparison and cached diff.
+ README.md                                       |   2 +-
+ docs/decisions/0023-review-stage-persistence.md | 112 ++++++++++++++++++++----
+ docs/plan.md                                    |  25 +++---
+ docs/threat-model.md                            |  11 ++-
+ 4 files changed, 113 insertions(+), 37 deletions(-)
+
+Bytes: 56916
+Lines: 269
+SHA-256: 3a725f8e778408bb590f73f49a64b0797b22dea4b9c5bb2ee1695dbd1c2161c0
+Including prompt history: 5 files changed, 219 insertions(+), 37 deletions(-).
+
+Final refs and working-tree state (fresh actual remote read after staging):
+- Branch: feat/review-stage-persistence.
+- HEAD, upstream and remote feature: 15cbfbae88c52ecefb9f287f985bec734e8c535f.
+- Local main, origin/main and remote main: 1efe3ed3f0aa9697ce4e71cee295293a89c94909.
+- Five authorized documentation files staged, nothing unstaged or unexpectedly untracked.
+- No additional commit or push; evidence updates are uncommitted and unpushed.
+- Main was neither merged nor pushed; no CI rerun or M5f work.
+
+Current evidence files are ci-final.json, connector-jobs-final.json,
+connector-secret-jobs-final.json, runs-*.json, all five logs/job-*.log files,
+resume-checkpoint.json, post-ci-verification.json, post-ci-remote-refs.txt,
+post-ci-final-state.json, post-ci-staged-blobs.txt, post-ci-protected-blobs.txt and both exports.
+The earlier handoff.md/final-state.json describe the pre-manual-push blocked checkpoint; this
+handoff and post-ci-final-state.json describe the current successful feature gate.
+
+M5e is feature-published and feature-CI verified, not merged. The named replacement is not
+individually confirmed by the terse log; the observed evidence is 46 passing module positions
+and the successful 385-case integration summary at the corrected SHA. All runtime limitations
+in the evidence section remain. M5f-M5h and overall M5 acceptance remain pending, and main
+publication and merge remain unauthorized.
+
+Mathew: return this handoff plus BOTH
+.local/p205/m5e-test-correction-acceptance.diff and
+.local/p205/m5e-corrective-feature-ci-evidence.diff
+to the external reviewer. Leave the post-CI evidence staged and uncommitted for review.
+
+### Reviewer acceptance and gated main authorization (Prompt 206)
+
+The external reviewer accepts both Prompt 205 exports and independently confirms the successful
+feature gate at `15cbfbae88c52ecefb9f287f985bec734e8c535f`. It verified both exports' bytes,
+checksums, paths and statistics; checked the corrective commit's parent, tree and six-file scope;
+confirmed test blob `cb13b6289f74e202e1d2f6586c9c14fef1599e7d`; and retrieved both run
+records, all five final job conclusions and all five logs. The independently confirmed results
+are those recorded above under CI run `41751683294` and secret-scan run `41751683205`:
+Ubuntu 3,968 passed/385 skipped, Windows 3,967 passed/386 skipped, PostgreSQL 385 passed/3,968
+deselected in 199.95 seconds, successful container smoke/cleanup and Gitleaks 88 commits/no leaks.
+Both verify logs printed the registry and all ten installed-wheel behaviour lines. PostgreSQL
+shows 46 passing review-stage module positions without naming the replacement individually.
+That distinction remains; the evidence is sufficient to accept the feature gate and no extra
+test dispatch or CI rerun is required. This is the reviewer's independent evidence and decision,
+separate from Codex's observations above and earlier Claude Code assistance. The failed parent
+remains historical evidence.
+
+Prompt 206 authorizes committing this reviewed documentation and **gated main publication**:
+Mathew manually publishes the new documentation commit to the feature branch; only after all
+five required jobs explicitly pass for that exact commit may Codex freshly verify refs, scope
+and clean state, fast-forward local main with `--ff-only`, and prepare Mathew's manual main push.
+Main's own exact-SHA five-job gate must then pass before main-publication evidence is staged.
+No automated push is authorized. Neither main publication nor these future CI results has
+happened at this acceptance note. No production change, history rewrite, branch deletion,
+CI rerun or M5f work is authorized; overall M5 acceptance remains pending.
+
+### Prompt 206 (verbatim)
+
+Prompt 206 — Publish the reviewed M5e evidence, gate main publication and record main CI
+
+Written for: Mathew and the external reviewer.
+
+The external reviewer accepts both Prompt 205 exports and independently confirms the successful feature gate at 15cbfbae.
+
+You are authorized to:
+- commit the reviewed evidence documentation;
+- prepare feature publication for Mathew to perform manually;
+- verify the new exact-commit feature gate;
+- only after that gate passes, fast-forward local main to the verified commit and prepare its manual publication;
+- verify main CI;
+- only after main CI passes, stage the main-publication evidence.
+
+Do not start an automated push. Mathew will run each push in VS Code’s PowerShell terminal because automated pushes repeatedly stall in Git Credential Manager.
+
+No production changes, history rewrite, branch deletion, CI rerun or M5f work is authorized.
+
+1. Verify and checkpoint
+
+Read the repository instructions and .local/p205/ checkpoints and handoff.
+
+Expected:
+- Branch: feat/review-stage-persistence
+- HEAD and upstream:
+  15cbfbae88c52ecefb9f287f985bec734e8c535f
+- Published tree:
+  90e29b527a33b43a313cb57d868e446d6dc44a64
+- Staged tree:
+  bfe78ec9c956bcfaaec39d25b719801c61866065
+- Exactly five staged documents:
+  README.md
+  docs/decisions/0023-review-stage-persistence.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or unexpectedly untracked.
+- Local main and origin/main:
+  1efe3ed3f0aa9697ce4e71cee295293a89c94909
+
+Verify both full-index exports, excluding prompts.md:
+
+.local/p205/m5e-test-correction-acceptance.diff
+- Baseline: 430956a63affa6e3c17d184d9ceedf16a31c6f6c
+- Destination: 15cbfbae88c52ecefb9f287f985bec734e8c535f
+- Four files, +50/-18
+- 47,004 bytes; 150 lines
+- SHA-256:
+  6f24df9dfb466163dd20ae004392d981bfe3dd67ff5b1d9a9a19a92bd788c3aa
+
+.local/p205/m5e-corrective-feature-ci-evidence.diff
+- Baseline: 15cbfbae88c52ecefb9f287f985bec734e8c535f
+- Destination: bfe78ec9c956bcfaaec39d25b719801c61866065
+- Four files, +113/-37
+- 56,916 bytes; 269 lines
+- SHA-256:
+  3a725f8e778408bb590f73f49a64b0797b22dea4b9c5bb2ee1695dbd1c2161c0
+
+Verify byte identity against Git.
+
+The reviewed PostgreSQL test must remain:
+cb13b6289f74e202e1d2f6586c9c14fef1599e7d
+
+Every production, test, migration, model, resource, packaging and workflow blob must remain unchanged.
+
+Save a checkpoint under .local/p206/ containing refs, status, staged paths and hashes, and the prompts.md prefix/checksum.
+
+Preserve unexpected work. Report material discrepancies before dependent changes.
+
+2. Record the reviewer’s evidence acceptance
+
+The external reviewer independently:
+- verified both supplied exports’ bytes, checksums, paths and statistics;
+- checked the published corrective commit’s parent, tree and six-file scope;
+- confirmed the reviewed test blob;
+- retrieved both run records, all five final job conclusions and all five logs.
+
+Exact-SHA evidence for 15cbfbae, feature branch, push event, attempt 1:
+
+CI run 41751683294:
+- Ubuntu 126318003800: success; 3968 passed, 385 skipped.
+- Windows 126318003627: success; 3967 passed, 386 skipped.
+- PostgreSQL 126318004051: success; 385 passed, 3968 deselected in 199.95 seconds.
+- Container 126318004071: success; smoke and cleanup succeeded.
+
+Secret-scan run 41751683205:
+- Gitleaks 126318003741: success; 88 commits scanned, no leaks.
+
+Both verify logs printed the registry and all ten installed-wheel behaviour lines.
+
+The PostgreSQL log shows 46 passing review-stage module positions but does not name the replacement test individually. Preserve that distinction. The evidence is sufficient to accept the feature gate; do not dispatch an extra test or rerun CI merely to obtain a named line.
+
+Add a short reviewer-acceptance note to ADR-0023, with separate attribution from Codex’s observations. Preserve the failed parent’s evidence as historical.
+
+Record that this prompt authorizes gated main publication. Do not claim main publication or future CI has already happened.
+
+3. Commit the documentation
+
+Against the starting staged tree, changes remain limited to the five documentation/history files.
+
+Append:
+- the available Prompt 205 handoff, identifying its source accurately;
+- this review disposition;
+- Prompt 206 verbatim;
+- a pre-commit note containing completed checks only.
+
+Preserve the prompts.md prefix byte-for-byte. Do not label reconstructed text as verbatim.
+
+Complete appropriate checks:
+- scope and blob/mode identity;
+- links, anchors and tables;
+- UTF-8 without BOM, LF only, no replacement characters;
+- whitespace;
+- prompt fidelity;
+- privacy;
+- required formatting/lint;
+- unsuppressed staged Gitleaks.
+
+Do not repeat application tests, builds or wheel checks when their blobs are unchanged.
+
+Commit locally with the established noreply identity.
+
+Suggested subject:
+docs: record verified M5e feature CI results
+
+Use a message file and accurate Codex, Claude Code and reviewer attribution under repository conventions.
+
+Verify the commit’s parent, tree, five-file scope, unchanged implementation/test blobs, clean working tree and required full-history Gitleaks result.
+
+Export:
+.local/p206/m5e-feature-evidence-acceptance.diff
+
+Baseline: bfe78ec9c956bcfaaec39d25b719801c61866065
+Destination: new documentation commit
+Options: --full-index, prompts.md excluded.
+
+Verify byte identity and report statistics, bytes, lines and SHA-256.
+
+4. Prepare the manual feature push
+
+Fetch origin without tags and inspect remote refs.
+
+Expected:
+- remote feature: 15cbfbae
+- remote main: 1efe3ed3
+- local main equals origin/main and is an ancestor of the new commit;
+- the unpublished feature range is exactly the new documentation commit;
+- working tree is clean.
+
+Confirm unchanged workflows and all five required jobs. Run the required range privacy and Gitleaks checks.
+
+If refs differ unexpectedly, stop and report. Do not force-push or reconcile unexpected changes.
+
+Give Mathew:
+- the full intended publication SHA;
+- the exact PowerShell feature-push command.
+
+Do not execute the push yourself. Pause for Mathew’s result.
+
+After he confirms success:
+- verify remote feature, local HEAD and upstream equal the intended SHA;
+- verify remote main is unchanged;
+- do not push again.
+
+5. Verify the new feature gate
+
+Monitor the exact documentation commit’s push-triggered feature runs for at most 25 minutes.
+
+Require explicit success from all five jobs:
+- Ubuntu;
+- Windows;
+- PostgreSQL;
+- container;
+- Gitleaks.
+
+Retrieve logs through existing authorized access where available. Record SHA, branch, event, attempt, run/job links, conclusions and actual log output.
+
+Do not reuse 15cbfbae counts as observations for the new commit.
+
+If any required job fails, is cancelled, skips required checks or remains unconfirmed at the limit, save evidence and stop. Do not correct, rerun or proceed to main.
+
+6. Prepare main publication only after the feature gate passes
+
+Recheck:
+- clean working tree;
+- local main equals origin/main;
+- remote main remains at 1efe3ed3;
+- remote feature equals the exact verified documentation commit;
+- main is an ancestor of that commit;
+- the full range contains only the reviewed specification, implementation, history, test correction and documentation commits;
+- path scope and implementation/test blob identity match the reviewed work;
+- no unreviewed production, workflow, dependency or resource change.
+
+Run the required publication checks.
+
+Switch to main and fast-forward it with --ff-only to the exact feature-verified commit. Do not create a merge commit or modify that commit.
+
+Give Mathew the exact PowerShell main-push command and full target SHA. Do not execute the push yourself. Pause for his result.
+
+After he confirms success, verify remote main equals the exact target and do not push again.
+
+If the push is rejected or refs changed, report the state without force-pushing.
+
+7. Verify main CI
+
+Monitor push-triggered main runs for that exact SHA, at most 25 minutes.
+
+Require explicit success from all five jobs and preserve the distinction between conclusions and log output.
+
+Do not infer main results from feature results.
+
+If the gate fails or remains unconfirmed, save evidence and stop without post-green documentation or further work.
+
+Do not rerun workflows. Leave no monitor running when finished.
+
+8. Only after all five main jobs pass
+
+Stage main-publication evidence in:
+- README.md
+- ADR-0023
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Record the exact main SHA, run/job links, actual results, evidence attribution and access limits.
+
+Current status may then say:
+M5e is reviewed, verified in CI and on main at the verified SHA.
+
+Mark superseded pending statements historical. Preserve accepted specification headings and update links if the separate implementation-status heading changes.
+
+Keep all runtime and later-slice limitations:
+- no application review path or run_review registration;
+- E7 output work belongs to M5f/M5g;
+- U4 discarded-evidence limitation;
+- worker composition obligations;
+- the accepted M3 lease window;
+- open M4d trusted-snapshot limitation;
+- no live-quality, entailment, authenticity or injection-resistance claim;
+- M5f–M5h and overall M5 acceptance pending.
+
+Complete documentation checks and leave these final evidence updates staged, uncommitted and unpushed.
+
+Export:
+.local/p206/m5e-main-publication-evidence.diff
+
+Baseline: published main commit
+Destination: final staged tree
+Options: --full-index, prompts.md excluded.
+
+Verify byte identity and report full IDs, paths, statistics, bytes, lines and SHA-256.
+
+9. Handoff
+
+At each manual-push pause, provide only the concrete command, target SHA and relevant state needed to continue.
+
+At completion, provide a self-contained handoff and both produced diff files.
+
+If a gate fails, report the exact stopping point and saved evidence instead.
+
+Do not begin M5f or delete either branch.
+
+### Prompt 206 pre-commit note (OpenAI Codex; completed checks only)
+
+Recovered the expected feature branch, HEAD/upstream `15cbfbae88c52ecefb9f287f985bec734e8c535f`,
+published tree `90e29b527a33b43a313cb57d868e446d6dc44a64`, accepted staged tree
+`bfe78ec9c956bcfaaec39d25b719801c61866065`, five staged documents and no unstaged or
+unexpected untracked work. Local main and origin/main remained at
+`1efe3ed3f0aa9697ce4e71cee295293a89c94909`. Verified both Prompt 205 exports against all
+supplied bytes, lines, full checksums, paths/statistics and Git's full-index comparisons.
+The reviewed test remains blob `cb13b6289f74e202e1d2f6586c9c14fef1599e7d`; all five saved
+job-log hashes match their checkpoint. Saved refs, status, staged hashes and the exact
+2,462,903-byte prompt prefix under `.local/p206/`, prefix SHA-256
+`7df50bb546a9702b7cbc1057495de3b33171dc5fb43b227d27fcee2436379e22`.
+
+Recorded the external reviewer's independent acceptance of both exports and the successful
+feature gate, preserving its attribution separately from Codex's earlier observations and
+Claude Code's historical implementation/corrections. The unnamed replacement-case limitation
+and failed-parent history remain intact. Recorded Prompt 206's gated main authorization and
+manual-push-only workflow without claiming future publication or CI results.
+
+Completed checks: exactly the five authorized documentation/history paths differ from both
+HEAD and the accepted staged tree; every other tracked blob/mode is identical to HEAD;
+reviewed test hash preserved; no tracked local/build artifacts; specification headings/anchors
+unchanged; 396 local links and 90 tables checked without problems; UTF-8 without BOM, LF only,
+no replacement characters; diff whitespace; prompt-prefix identity and exact inclusion of the
+saved detailed Prompt 205 handoff, its accurate source label, review disposition and Prompt 206;
+privacy (established noreply email only, no credential/personal-path patterns); locked offline
+Ruff formatting (220 files already formatted) and lint (all checks passed); unsuppressed staged
+Gitleaks 8.30.1 (no leaks, no custom config/baseline/ignore file/environment override, inline
+allow comments ignored). Origin and established noreply configuration were verified unchanged.
+
+No application test, build or wheel check was repeated because their blobs are unchanged.
+No automated push, main fast-forward, new exact-commit feature/main CI result or future commit
+SHA is claimed in this pre-commit note. Main publication remains conditional on the new
+documentation commit's successful five-job feature gate and fresh precondition checks.

@@ -7,9 +7,11 @@
   recorded implementation choices. Published on `feat/review-stage-persistence` at `5b94d18a`
   in Prompt 203: four jobs passed and PostgreSQL ran but failed one test (384 passed). A test-only
   correction from Prompt 204 was accepted at external review in Prompt 205 for a corrective
-  commit and feature publication ([acceptance](#correction-acceptance-prompt-205)); correction-specific
-  PostgreSQL and CI verification remain pending, the feature gate is not fully green and main
-  publication remains blocked**
+  commit and feature publication ([acceptance](#correction-acceptance-prompt-205)). The corrective
+  commit `15cbfbae` is now feature-published and all five required jobs passed, including
+  PostgreSQL (385 passed): M5e is feature-CI verified but not merged. The evidence is accepted
+  in Prompt 206, with gated main publication authorized only after the new documentation
+  commit passes its own feature CI; main publication has not happened** ([corrective CI evidence](#corrective-feature-ci-at-15cbfbae-prompt-205))
   ([evidence and diagnosis](#feature-ci-failure-and-test-setup-correction-prompts-203204)).
   OpenAI Codex recovered the state, recorded acceptance and prepared the local commit in
   Prompt 202; it made this test-only correction and recorded the failed gate in Prompt 204. Implements the
@@ -247,20 +249,21 @@ All later-slice and runtime limitations below remain in force; M5f–M5h and ove
 
 ## Feature CI failure and test-setup correction (Prompts 203–204)
 
-**Current state.** M5e was published on `feat/review-stage-persistence` at
+**Historical state before corrective feature CI.** M5e was published on
+`feat/review-stage-persistence` at
 `5b94d18a4053e0a7d6e32d8add631ecb5ccde70b` in Prompt 203. Mathew completed the push
 manually after Codex's earlier attempt stalled in Git Credential Manager and was stopped.
 Four jobs passed and PostgreSQL ran but failed one test, with 384 passing integration cases.
 The test-only correction by OpenAI Codex in Prompt 204 was accepted at external review in
-Prompt 205 for a corrective commit and feature publication. The feature gate is not fully green;
-correction-specific PostgreSQL execution and exact-version CI remain pending at commit time,
-and main publication is blocked. No production code, constraint, migration, model,
+Prompt 205 for a corrective commit and feature publication. At commit time the feature gate was
+not fully green; correction-specific PostgreSQL execution and exact-version CI were pending,
+and main publication was blocked. No production code, constraint, migration, model,
 resource, packaging or workflow change is part of the correction.
 
 ### Published feature evidence at 5b94d18a (Prompt 203)
 
 Both runs were **push** events, **attempt 1**, on `feat/review-stage-persistence`, at the full
-SHA above. They are evidence for that published version only, not the pending correction.
+SHA above. They are evidence for that published version only, not the later corrective commit.
 
 CI run [41739339372](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372)
 completed with **failure**:
@@ -317,13 +320,14 @@ review with no stored history remain unchanged. No constraint is weakened, and n
 xfail or acceptance of `IntegrityError` replaces the reload expectation.
 
 The intended scenario is a database-valid job that has never been claimed but nevertheless
-has persisted plan/stage history. **The corrected case has not yet run against PostgreSQL.**
-Local collection and skips prove no corrected database behaviour; the published run's 384
+has persisted plan/stage history. **At Prompt 204, the corrected case had not run against
+PostgreSQL.** Local collection and skips prove no corrected database behaviour; the published run's 384
 passes do not verify this changed case. Local Prompt 204 checks are recorded in its handoff
 and prompt-history outcome; builds and installed-wheel checks are not repeated because the
 production, resource, packaging and workflow blobs remain unchanged. Review accepted the
-correction in Prompt 205; correction-specific PostgreSQL execution and exact-commit CI remain
-pending at commit time. All scope limitations below and overall M5 acceptance remain unchanged.
+correction in Prompt 205; correction-specific PostgreSQL execution and exact-commit CI were
+pending at commit time. The later corrective feature CI is recorded below. All scope limitations
+and overall M5 acceptance remain unchanged.
 
 ### Correction acceptance (Prompt 205)
 
@@ -338,9 +342,11 @@ replacement test against the published source. The reviewed test blob is
 The reviewer did **not** run the corrected case locally or against PostgreSQL. The original
 failure occurred during the tampering `UPDATE`, before reload; this is a test-setup correction,
 not a production reload fix. Correction-specific PostgreSQL execution and exact-commit CI
-remain pending at commit time. The failed `5b94d18a` feature gate above remains historical
-evidence for that published version, separate from the pending correction. The feature gate
-is not yet green, and main publication remains blocked.
+were pending at commit time. The failed `5b94d18a` feature gate above remains historical
+evidence for that published version, separate from the corrective commit. At acceptance the
+feature gate was not yet green and main publication was blocked; the later successful feature
+gate is recorded below. Main publication was still unauthorized at that point; Prompt 206
+subsequently grants the gated authorization recorded below.
 
 OpenAI Codex wrote the Prompt 204 correction and documentation and performed the Prompt 205
 recovery, acceptance documentation and commit preparation. The external reviewer's independent
@@ -363,8 +369,9 @@ in the existing Windows Python 3.12.15 environment; not repeated in Prompt 205:
 | collection | 385 integration and 3,968 non-integration, 4,353 total, unchanged |
 
 The eight retained generic tamper cases and the unclaimed empty-history control are unchanged.
-One parameter became one standalone test, preserving the collected total. No test database is
-configured: the named corrected case was collected and skipped, **not run against PostgreSQL**.
+One parameter became one standalone test, preserving the collected total. No local test
+database was configured: the named corrected case was collected and skipped, **not run against
+PostgreSQL at those local checks**.
 Local skips establish nothing about the correction's database behaviour. No build,
 installed-wheel check, provider call or CI rerun was performed for the correction.
 
@@ -425,7 +432,7 @@ new tests in `test_retrieval_postgres.py` and the updated migration tests in
 correctness, including the migration upgrade/downgrade/`alembic check`, the constraint names, the
 concurrency and lease-expiry tests and every database-backed binding, replay and reload case, is
 **unverified** at that time. No CI was run in Prompt 200; the later published PostgreSQL run
-is recorded above and must not be confused with verification of the pending correction.
+is recorded above, separately from the later corrective commit's evidence below.
 
 ### Build and installed wheel (Prompt 200)
 
@@ -447,6 +454,105 @@ is recorded above and must not be confused with verification of the pending corr
   `--no-deps`. It exited 0, imported from `site-packages` and printed every expected line,
   including the new "stage migration SQL rendered and an abandoned repair planned as a retry from
   the installed wheel". This is an offline assertion; it is **not** PostgreSQL execution.
+
+## Corrective feature CI at 15cbfbae (Prompt 205)
+
+**M5e is feature-published and feature-CI verified at
+`15cbfbae88c52ecefb9f287f985bec734e8c535f`, but not merged.** The corrective commit's
+parent is `5b94d18a4053e0a7d6e32d8add631ecb5ccde70b` and its tree is
+`90e29b527a33b43a313cb57d868e446d6dc44a64`. The reviewed test remains exactly blob
+`cb13b6289f74e202e1d2f6586c9c14fef1599e7d`; production, migrations, models, resources,
+packaging and workflows are unchanged. Mathew completed the corrective feature push manually
+after Codex's one attempt stalled in Git Credential Manager and was stopped without retry.
+Codex then verified feature/HEAD/upstream equality and unchanged main, and resumed monitoring
+without another push. Main publication and merge were not authorized in Prompt 205; the
+subsequent gated authorization is recorded below.
+
+Both runs below were **push** events, **attempt 1**, on `feat/review-stage-persistence`, at the
+full corrective SHA above. All five required jobs explicitly concluded **success**; no parent
+success was substituted for an unresolved job. The earlier failed `5b94d18a` run remains
+historical evidence above and supplies no counts or conclusions for this correction.
+
+CI run [41751683294](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294)
+completed with **success**:
+
+| Job | Conclusion | Output actually read in this job's log |
+| --- | --- | --- |
+| [Ubuntu verify, 126318003800](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294/job/126318003800) | success | 3,968 passed, 385 skipped; formatting, lint, strict mypy, build and installed-wheel steps succeeded |
+| [Windows verify, 126318003627](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294/job/126318003627) | success | 3,967 passed, 386 skipped; formatting, lint, strict mypy, build and installed-wheel steps succeeded |
+| [PostgreSQL integration, 126318004051](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294/job/126318004051) | success | 385 passed, 3,968 deselected in 199.95 seconds; no failed or skipped integration cases reported |
+| [Container, 126318004071](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683294/job/126318004071) | success | configuration, context and image checks succeeded; smoke and cleanup reported success |
+
+Secret-scan run [41751683205](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683205)
+completed with **success**:
+
+| Job | Conclusion | Output actually read in this job's log |
+| --- | --- | --- |
+| [Gitleaks, 126318003741](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41751683205/job/126318003741) | success | Gitleaks 8.30.1; 88 commits scanned; no leaks |
+
+**Corrected-case evidence and limit.** The PostgreSQL log shows 46 passing positions for
+`tests/test_review_stages_postgres.py` (35 dots followed by 11 dots) and the successful
+385-case integration summary. It does **not** print
+`test_the_reload_refuses_an_unclaimed_canonical_job_with_persisted_history` or a named PASS
+line. Thus the corrected module participated in the successful integration run, but the named
+replacement's execution and result are **not individually confirmed by the available log**.
+Prompt 204's collection identified that case in the reviewed source; it is historical local
+collection evidence, not a separate named CI result. No individual result is invented from a
+green conclusion, and no extra test dispatch or rerun was made to obtain one.
+
+**Observed steps and boundaries.** Both verify logs printed the production registry
+(`ingest_revision`, `index_revision`) and all ten installed-wheel behaviour lines, including
+"stage migration SQL rendered and an abandoned repair planned as a retry from the installed
+wheel". These wheel assertions render migration SQL offline and are separate from database
+execution. The Recall example is arithmetic, Voyage is mocked and model calls scripted.
+The unchanged container smoke reported ingestion/indexing success with two chunks and two
+embeddings and `smoke: ok`; it does not exercise M5e. No application review path or
+`run_review` registration was added. None of this establishes entailment, authenticity,
+injection resistance or live-model quality.
+
+**Attribution and access limits.** OpenAI Codex observed final run records through GitHub's
+public API, final job/step conclusions through the connected GitHub tool, and retrieved/read
+all five job logs through that tool. All five logs were available and saved under
+`.local/p205/logs/`; their sizes and SHA-256 values are recorded in `.local/p205/ci-final.json`.
+One metadata read had a transient transport failure and the final public job refresh was
+rate-limited (HTTP 403); the connected tool supplied explicit final job conclusions without
+an authentication or permission change. Final run and job conclusions agree. These are
+Codex's observations for the corrective SHA, distinct from the external reviewer's earlier
+independent review, Prompt 204's local checks, Claude Code's historical work and the failed
+parent's evidence. Monitoring finished within 25 minutes of publication; no monitor or push
+was left running.
+
+The post-CI evidence updates were staged and uncommitted for review in Prompt 205 and were
+not pushed in that prompt. Prompt 206 accepts them for a documentation commit and gated
+publication. The `15cbfbae` exact-SHA CI does not verify these later documentation blobs. E7, discarded U4 evidence,
+worker composition obligations, the accepted M3 lease window and the open M4d trusted-snapshot
+limitation remain. M5f–M5h and overall M5 acceptance remain pending; M5e is not merged.
+
+### Reviewer acceptance and gated main authorization (Prompt 206)
+
+The external reviewer accepts both Prompt 205 exports and independently confirms the successful
+feature gate at `15cbfbae88c52ecefb9f287f985bec734e8c535f`. It verified both exports' bytes,
+checksums, paths and statistics; checked the corrective commit's parent, tree and six-file scope;
+confirmed test blob `cb13b6289f74e202e1d2f6586c9c14fef1599e7d`; and retrieved both run
+records, all five final job conclusions and all five logs. The independently confirmed results
+are those recorded above under CI run `41751683294` and secret-scan run `41751683205`:
+Ubuntu 3,968 passed/385 skipped, Windows 3,967 passed/386 skipped, PostgreSQL 385 passed/3,968
+deselected in 199.95 seconds, successful container smoke/cleanup and Gitleaks 88 commits/no leaks.
+Both verify logs printed the registry and all ten installed-wheel behaviour lines. PostgreSQL
+shows 46 passing review-stage module positions without naming the replacement individually.
+That distinction remains; the evidence is sufficient to accept the feature gate and no extra
+test dispatch or CI rerun is required. This is the reviewer's independent evidence and decision,
+separate from Codex's observations above and earlier Claude Code assistance. The failed parent
+remains historical evidence.
+
+Prompt 206 authorizes committing this reviewed documentation and **gated main publication**:
+Mathew manually publishes the new documentation commit to the feature branch; only after all
+five required jobs explicitly pass for that exact commit may Codex freshly verify refs, scope
+and clean state, fast-forward local main with `--ff-only`, and prepare Mathew's manual main push.
+Main's own exact-SHA five-job gate must then pass before main-publication evidence is staged.
+No automated push is authorized. Neither main publication nor these future CI results has
+happened at this acceptance note. No production change, history rewrite, branch deletion,
+CI rerun or M5f work is authorized; overall M5 acceptance remains pending.
 
 ## Limits and later-slice obligations
 
