@@ -503,8 +503,12 @@ review for a local implementation commit only in Prompt 202
 `run_review` job with ownership rechecked at entry and after the last write, the
 three-reservation budget and single repair across attempts, explicit completion identity,
 identical-replay no-ops and fixed conflicts, and a trusted reload that rechecks evidence against
-database chunks. Publication, PostgreSQL execution and exact-commit current-version CI are
-pending (its PostgreSQL tests were written but not run). No application path uses it, so none
+database chunks. M5e is published on `feat/review-stage-persistence` at `5b94d18a` (Prompt 203):
+four jobs passed and PostgreSQL ran but failed one test (384 passed). The Prompt 204 test-only
+correction was accepted at external review in Prompt 205 for a corrective commit and feature
+publication; correction-specific PostgreSQL and CI verification remain pending, the feature
+gate is not fully green and main publication is blocked
+([evidence and diagnosis](decisions/0023-review-stage-persistence.md#feature-ci-failure-and-test-setup-correction-prompts-203204)). No application path uses it, so none
 operates; no application review path, `run_review` registration, output writer or live provider
 is added; the report output stays with M5f/M5g (E7), and M5f–M5h and overall M5 acceptance
 remain pending. A U4 stage's discarded evidence and its original binding cannot be re-proved, and

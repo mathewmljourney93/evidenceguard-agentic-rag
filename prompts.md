@@ -45360,3 +45360,885 @@ Appended the saved `.local/p202/handoff.md` text with its source accurately labe
 review disposition, and Prompt 203 verbatim after the unchanged prefix. OpenAI Codex performed
 this recovery, preflight and history preparation; Claude Code's earlier implementation and
 corrections and the external reviewer's decisions retain their existing attribution.
+
+### Prompt 203 failure handoff (saved .local/p203/handoff-ci-failure.md; verbatim file copy)
+
+This is the saved detailed failure handoff, not the shorter final chat response.
+
+Prompt 203 resumed handoff for Mathew and the external reviewer
+
+M5e is published to its feature branch, but exact-commit CI failed. Mathew completed the push
+manually after Codex's earlier attempt stalled in Git Credential Manager and was stopped.
+On Mathew's instruction to resume monitoring without pushing again, OpenAI Codex verified the
+actual remote refs, identified the exact push runs, read all five job logs, and stopped the
+gate at the PostgreSQL failure. No correction, rerun, further commit, push, merge, production
+change or M5f work occurred during this resumed task.
+
+Verified publication and final refs:
+- Remote feat/review-stage-persistence: 5b94d18a4053e0a7d6e32d8add631ecb5ccde70b.
+- Local HEAD and upstream resolve to that same SHA on feat/review-stage-persistence.
+- Remote main, local main and origin/main remain unchanged at
+  1efe3ed3f0aa9697ce4e71cee295293a89c94909.
+- Working tree and index are clean. No evidence documentation is staged or changed.
+- No push or monitor process remains running. Polling stopped after observing the failure,
+  within the original 25-minute monitoring limit. No CI was cancelled or rerun.
+
+Starting-state and publication-preflight recovery (completed earlier in Prompt 203):
+The implementation HEAD 45764b100c38b8547070790246e46d340cf0d6e0, parent
+313b523d052a9dbd49f3dbd53e5f0af835ccfe1f, tree
+18246af80828973de5c2c8a31c4202f182896dc8, subject, clean state, origin and noreply identity
+matched the accepted handoff. The Prompt 202 export matched Git byte-for-byte: 43,351 bytes,
+185 lines, four files, 66 insertions and 18 deletions, SHA-256
+d6d33f21ae61fb89914e5bdbf46958cc394181c2140ec0b08870373a2fe898dc.
+Its baseline was c6ca841a6c4e2c49e567d0557a17e42c6770ac60, destination 45764b10,
+full-index and prompts.md excluded.
+
+Origin was fetched without tags. Before publication, actual remote main was unchanged, no
+feature ref existed, local main equalled origin/main and was an ancestor of HEAD. The complete
+unpublished range was specification commit 313b523d followed by implementation commit 45764b10;
+its exact 23-path union matched the reviewed scope. No unreviewed implementation, local
+artifact, binary, dependency, lockfile, settings, secret-scan workflow, pinned-resource or
+unrelated change was found. All five workflow jobs, push triggers, required PostgreSQL
+execution (EG_REQUIRE_INTEGRATION=1; uv run --locked pytest -m integration), installed-wheel
+and container checks were retained. Privacy and unsuppressed range Gitleaks passed. No local
+application test or build was repeated. Those preflight records remain under .local/p203/.
+
+The authorized history-only commit that became the published target:
+- SHA: 5b94d18a4053e0a7d6e32d8add631ecb5ccde70b.
+- Parent: 45764b100c38b8547070790246e46d340cf0d6e0.
+- Tree: 21d3d3bc246f11854af0b114653ae9242aea28f6.
+- Subject: docs: record M5e feature publication authorization.
+- Author and committer: mathewmljourney93
+  <257921624+mathewmljourney93@users.noreply.github.com>.
+- Only prompts.md changed: 360 inserted lines. The message was read from a file and credits
+  OpenAI Codex's current work separately from Claude Code's earlier implementation/corrections
+  and historical local results and the external reviewer's evidence and decisions.
+- The saved detailed Prompt 202 handoff was copied exactly and labelled as the saved file,
+  rather than the shorter chat handoff; the review disposition, Prompt 203 verbatim and
+  completed-check preflight note were appended. The previous 2,387,237-byte prefix remains
+  intact, SHA-256 c6dcbc4e3c29b379626be24f979e6f38651e7870765f86dffaf39e9af3fca42b.
+- History-only scope, protected blobs, encoding, privacy and prompt fidelity passed; staged
+  Gitleaks and post-commit full-history Gitleaks (87 commits) reported no leaks.
+
+All runs below have event push, branch feat/review-stage-persistence, exact SHA
+5b94d18a4053e0a7d6e32d8add631ecb5ccde70b and attempt 1. Both runs were created at
+2026-11-04 06:27:52 Asia/Bangkok (2026-11-03T23:27:52Z). Their final API metadata was saved
+at 06:33:22 Asia/Bangkok, before the 06:52:52 monitoring deadline.
+
+CI run 41739339372: completed / failure
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372
+
+| Job | ID | Final conclusion | Output actually read in its log |
+| --- | --- | --- | --- |
+| Ubuntu verify | 126276607907 | success | 3,968 passed, 385 skipped; formatting, lint, strict mypy, distribution build and installed-wheel checks passed |
+| Windows verify | 126276607952 | success | 3,967 passed, 386 skipped; formatting, lint, strict mypy, distribution build and installed-wheel checks passed |
+| PostgreSQL integration | 126276607831 | failure | 1 failed, 384 passed, 3,968 deselected in 268.96s; test step exited 1 |
+| Container | 126276607520 | success | compose config, effective context, image checks, smoke and cleanup reported success |
+
+Each job belongs to that CI run:
+- Ubuntu: https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372/job/126276607907
+- Windows: https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372/job/126276607952
+- PostgreSQL: https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372/job/126276607831
+- Container: https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372/job/126276607520
+
+Secret-scan run 41739339351: completed / success
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339351
+- Gitleaks job 126276607571: completed / success.
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339351/job/126276607571
+- Its log reports Gitleaks 8.30.1, checksum verification OK, 87 commits scanned and no leaks.
+
+Failure evidence and limit:
+tests/test_review_stages_postgres.py::test_the_reload_refuses_tampered_rows[<lambda>8]
+failed with sqlalchemy.exc.IntegrityError / psycopg.errors.CheckViolation:
+new row for relation "jobs" violates check constraint "ck_jobs_lease_while_running".
+The logged statement is UPDATE jobs SET attempt=%(attempt)s::INTEGER WHERE jobs.id =
+%(id_1)s::UUID, with attempt=0. The traceback reaches _tamper at line 1624 of the test,
+then connection.execute at line 365. Source inspection confirms that this ninth parameter
+changes the job attempt to zero. The database rejects that mutation before the subsequent
+pytest.raises(StageRecordInconsistentError) reload assertion executes. This is an observed
+test failure at tampering/setup; it does not demonstrate a production trusted-reload defect.
+No correction or reproduction was attempted.
+
+This was the first observed PostgreSQL execution of M5e, and its gate failed. The log shows
+review-stage module progress with one failure, retrieval PostgreSQL module progress without
+a failure, and persistence migration-module progress without a failure. The suite's sole
+failure is the case above. Source inspection identified migration 0007 upgrade/downgrade and
+alembic check, concurrency, lease-expiry, replay and trusted-reload tests among the collected
+review-stage cases; the log uses terse module progress, not separate named per-test PASS
+lines. The passing aggregate does not turn this failed gate into complete M5e verification.
+
+Evidence attribution:
+Codex observed final conclusions and step results through API metadata and retrieved/read
+the actual logs for every job through the connected GitHub tool. No job log was unavailable.
+The PostgreSQL test step explicitly failed; its later cleanup succeeded and the uv cache
+post-step was skipped. No required job was silently treated as passed. Earlier in-progress
+snapshots preceded the final completed/failure conclusion; no final parent/job metadata
+inconsistency was observed. Claude Code's Prompt 200-201 local results remain historical,
+separate from these exact-commit CI logs and from the external reviewer's isolated probes.
+
+Both verify logs printed the actual M5e line:
+stage migration SQL rendered and an abandoned repair planned as a retry from the installed wheel
+These wheel checks are offline and distinct from PostgreSQL execution. Both wheel logs also
+contain the earlier offline migration and review migration lines. Their Recall line remains
+arithmetic, the Voyage response mocked and model calls scripted. The container log reports
+two chunks and two embeddings through the existing ingestion/indexing smoke and smoke: ok;
+the unchanged container smoke does not exercise M5e.
+
+Final integrity and documentation state:
+Codex freshly verified remote feature and main refs after the failure. Local HEAD/upstream
+still match the published SHA; local main/origin/main remain unchanged. Against accepted tree
+c6ca841a6c4e2c49e567d0557a17e42c6770ac60, only the previously authorized README, ADR-0023,
+plan, threat model and prompt history differ. All implementation, tests, migration, models,
+retrieval.py, packaging, workflows, dependencies, resources and ADR-0022 remain byte-identical
+to that accepted tree. No tracked file changed during this resumed task; prompt history also
+matches its saved publication prefix exactly. No evidence-documentation diff was produced.
+
+Saved diagnostic evidence:
+- resume-checkpoint.json, resume-prompt.txt, resume-final-remote-refs.txt and
+  resume-final-state.json: manual-push attribution, exact target, refs and final state.
+- runs-*.json, jobs-*.json, connector-jobs-failure.json and ci-latest.json: API snapshots.
+- logs/job-126276607831.log: complete retrieved PostgreSQL job log.
+- integration-failure-excerpt.txt: failure traceback and summary excerpt.
+- logs/job-126276607907.log, logs/job-126276607952.log, logs/job-126276607520.log and
+  logs/job-126276607571.log: the other four complete retrieved job logs.
+- resume-final-state.json includes the saved log sizes and SHA-256 checksums.
+- The earlier handoff.md/final-state.json remain as the pre-manual-push blocked checkpoint;
+  this handoff and resume-final-state.json describe the current outcome.
+
+Remaining limitations:
+M5e is accepted and published to its feature branch but is not fully CI verified and not
+merged. No application review path uses M5e, run_review remains unregistered, no output table
+or writer exists, and E7 assigns that output slice to M5f/M5g. Discarded U4 evidence cannot be
+re-proved at reload. Worker composition obligations, the accepted M3 lease window and the open
+M4d trusted-snapshot limitation remain. No entailment, authenticity, injection-resistance or
+live-model-quality guarantee is claimed. M5f-M5h and overall M5 acceptance remain pending.
+Nothing was merged or pushed to main.
+
+Mathew: return this handoff plus .local/p203/integration-failure-excerpt.txt and, as needed,
+.local/p203/logs/job-126276607831.log to the external reviewer. No evidence-documentation diff
+was produced. Corrections and CI reruns require a new authorization.
+
+### Prompt 203 manual-push resume authorization (saved user text, verbatim)
+
+I completed the feature-branch push manually. Verify that the remote feat/review-stage-persistence equals 5b94d18a4053e0a7d6e32d8add631ecb5ccde70b, and that main is unchanged. Do not push again. Resume Prompt 203 at exact-commit CI monitoring, retaining its existing limits and authorization.
+
+### Prompt 204 review and diagnosis (supplied by Mathew; external reviewer evidence)
+
+The external reviewer independently retrieved both run records, job conclusions and all five
+job logs through GitHub. Both were push-triggered attempt 1 runs on
+`feat/review-stage-persistence` at `5b94d18a4053e0a7d6e32d8add631ecb5ccde70b`.
+CI run `41739339372`: Ubuntu `126276607907` succeeded (3,968 passed, 385 skipped), Windows
+`126276607952` succeeded (3,967 passed, 386 skipped), PostgreSQL `126276607831` failed
+(1 failed, 384 passed, 3,968 deselected), and container `126276607520` succeeded (smoke and
+cleanup reported success). Secret-scan run `41739339351`, Gitleaks job `126276607571`, succeeded
+(87 commits scanned, no leaks). Both verify logs printed the production registry and all ten
+installed-wheel behaviour lines, including the M5e stage-migration and abandoned-repair line.
+These observations concern the published SHA, not this pending correction. The wheel checks
+are offline, Recall is arithmetic, Voyage is mocked and the container smoke does not exercise
+M5e; none establishes live-model quality or injection resistance. Codex's separately recorded
+Prompt 203 observations remain its own evidence, not the reviewer's work.
+
+The sole failure, `test_the_reload_refuses_tampered_rows[<lambda>8]`, sets the canonical job's
+attempt to zero while leaving it running and leased. PostgreSQL correctly rejects that setup
+under `ck_jobs_lease_while_running` before the expected reload assertion. The authorized
+correction replaces only that parameter with a named standalone test for a database-valid
+queued/unclaimed canonical job that still has persisted plan/stage history. It must read the
+job back, assert its state and preserved history, then require `StageRecordInconsistentError`.
+The valid empty-history control, the other tampering cases, constraints and production code
+remain unchanged. The original failed CI execution is the evidence for the old setup failure;
+no production reload defect is demonstrated. The correction is staged for review, with its
+database execution and exact-correction CI pending. No commit, publication, rerun or M5f work
+is authorized by Prompt 204.
+
+### Prompt 204 (verbatim)
+
+Prompt 204 — Correct the PostgreSQL tampering test and record the failed feature gate
+
+Written for: Mathew and the external reviewer.
+
+Correct the single PostgreSQL test-setup failure identified below. Leave the correction and documentation staged and uncommitted for review.
+
+No production change, commit, push, merge, CI rerun or M5f work is authorized.
+
+1. Verify and checkpoint
+
+Read the repository instructions and .local/p203/ evidence, especially:
+- handoff-ci-failure.md
+- integration-failure-excerpt.txt
+- logs/job-126276607831.log
+
+Expected:
+- Branch: feat/review-stage-persistence
+- HEAD and upstream:
+  5b94d18a4053e0a7d6e32d8add631ecb5ccde70b
+- Local main and origin/main:
+  1efe3ed3f0aa9697ce4e71cee295293a89c94909
+- Clean working tree and index.
+- Accepted implementation and test blobs unchanged since Prompt 202, apart from the subsequent history-only commit.
+
+Inspect the actual state. Preserve unexpected work and report material discrepancies before dependent changes.
+
+Save a checkpoint under .local/p204/ with refs, status, blob hashes, the published test module and the prompts.md prefix/checksum.
+
+No remote operation is needed for this correction.
+
+2. Confirmed CI evidence
+
+The external reviewer independently retrieved the two run records, job conclusions and all five job logs through GitHub.
+
+Both runs were push-triggered, attempt 1, on feat/review-stage-persistence at exactly:
+5b94d18a4053e0a7d6e32d8add631ecb5ccde70b
+
+CI run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372
+
+Secret-scan run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339351
+
+Results:
+- Ubuntu job 126276607907: success; 3968 passed, 385 skipped.
+- Windows job 126276607952: success; 3967 passed, 386 skipped.
+- PostgreSQL job 126276607831: failure; 1 failed, 384 passed, 3968 deselected.
+- Container job 126276607520: success; smoke and cleanup reported success.
+- Gitleaks job 126276607571: success; 87 commits scanned, no leaks.
+
+Both verify logs printed the production registry and all ten installed-wheel behaviour lines, including:
+“stage migration SQL rendered and an abandoned repair planned as a retry from the installed wheel”.
+
+Keep these distinctions:
+- the wheel checks are offline checks;
+- the Recall example is arithmetic;
+- the Voyage response is mocked;
+- the container smoke does not exercise M5e;
+- none establishes live-model quality or injection resistance.
+
+These are observations for the published SHA, not for the pending correction.
+
+3. Correct the test setup only
+
+Failure:
+tests/test_review_stages_postgres.py::
+test_the_reload_refuses_tampered_rows[<lambda>8]
+
+The existing tamper operation:
+UPDATE jobs SET attempt=0
+
+leaves the job running with its lease fields set. It violates ck_jobs_lease_while_running before the test reaches its expected reload assertion.
+
+The production constraint correctly requires:
+- running jobs to have a lease and attempt >= 1;
+- non-running jobs to have no lease owner or lease expiry.
+
+Correct the intended test scenario without changing production code or weakening the constraint.
+
+Preferred approach:
+- Remove this final case from the generic tampering parameter list.
+- Replace it with a clearly named standalone test for an unclaimed canonical job that nevertheless has persisted plan/stage rows.
+- Keep all other tampering cases unchanged.
+
+The standalone test should:
+a. Build the existing committed review/stage fixture.
+b. Confirm reload succeeds before tampering.
+c. Update only the canonical job, selecting it by the fixture's tenant and job ID.
+d. Set the job to a database-valid unclaimed shape:
+   status="queued"
+   attempt=0
+   locked_by=None
+   lease_expires_at=None
+   and retain or explicitly establish the appropriate nonterminal finished_at=None.
+e. Commit that setup through the existing tamper helper.
+f. Read the row back and assert the intended job state, so setup failure cannot be confused with reload refusal.
+g. Confirm the persisted plan/stage data is still present.
+h. Require reload to raise StageRecordInconsistentError.
+
+This exercises the production rule that persisted planned/stage history cannot belong to a job that has never been claimed.
+
+Keep the existing valid control for a genuinely unclaimed review with no stored plan/stage history.
+
+Do not:
+- remove the coverage;
+- mark it skipped or xfail;
+- accept IntegrityError as the intended result;
+- disable constraints or triggers;
+- alter migrations, models, job invariants or reload production code;
+- weaken the expected reload error.
+
+The original failed CI execution is the evidence for the old test's setup failure. Do not describe this as reproducing and fixing a production reload defect.
+
+4. Authorized paths
+
+Change only:
+- tests/test_review_stages_postgres.py
+- docs/decisions/0023-review-stage-persistence.md
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Every other tracked blob and mode must remain identical to HEAD.
+
+5. Documentation and attribution
+
+Add an ADR-0023 section recording:
+- feature publication at 5b94d18a;
+- all five job links under their correct workflow runs;
+- the results above;
+- the independently retrieved reviewer evidence;
+- the test-setup diagnosis and correction;
+- correction verification still pending.
+
+Keep Codex's own observations separately attributed.
+
+Status wording must say:
+- M5e is published on the feature branch;
+- four jobs passed and PostgreSQL ran but failed one test;
+- a test-only correction is staged;
+- the feature gate is not fully green;
+- main publication remains blocked.
+
+Do not keep a current blanket claim that PostgreSQL has never run or that all database behaviour is unexecuted. Mark earlier statements historical where necessary. The published run had 384 passing integration cases; the corrected case remains unverified until it actually runs.
+
+Preserve the historical local-commit acceptance and all existing scope limitations.
+
+Update README, plan and threat model with short linked summaries. Keep accepted specification headings and anchors unchanged.
+
+6. Checks
+
+Run the locked offline checks appropriate to the test/documentation change:
+- Ruff formatting and lint;
+- strict mypy;
+- the relevant focused tests;
+- full suite;
+- integration and non-integration collection.
+
+If no test database is configured, explicitly report the corrected PostgreSQL test as collected but not run. Local skips prove nothing about the correction's database behaviour.
+
+Replacing one parameter case with one standalone test should preserve the total number of collected cases unless another justified change is made. Reconcile any difference.
+
+Do not repeat builds or installed-wheel checks: production, resources, packaging and workflow files must remain unchanged.
+
+Do not configure a database, change authentication or run provider calls.
+
+7. History and final checks
+
+Append to prompts.md:
+- the available Prompt 203 failure handoff, accurately identifying its source;
+- this review and diagnosis;
+- Prompt 204 verbatim;
+- an outcome note listing completed checks only.
+
+Preserve the previous bytes as an identical prefix. Do not label reconstructed or unavailable text as verbatim.
+
+Verify:
+- only the six authorized paths changed;
+- every other blob and mode identical to HEAD;
+- no tracked .local files or build artifacts;
+- links, anchors and tables;
+- UTF-8 without BOM, LF only, no replacement characters;
+- git diff checks;
+- privacy;
+- unsuppressed staged Gitleaks;
+- prompt-history prefix and text fidelity.
+
+8. Export and handoff
+
+Stage the correction but do not commit.
+
+Export:
+.local/p204/m5e-postgres-tamper-test-correction.diff
+
+Baseline:
+5b94d18a4053e0a7d6e32d8add631ecb5ccde70b
+
+Destination:
+the final staged tree
+
+Use --full-index and exclude prompts.md.
+
+Verify byte identity against Git. Report:
+- full baseline and final tree IDs;
+- changed paths;
+- statistics, bytes, lines and full SHA-256;
+- completed checks and skipped database execution;
+- unchanged production-blob identity;
+- final refs and working-tree state.
+
+Finish with a self-contained handoff.
+
+No commit, push, merge, CI rerun or M5f work.
+
+Mathew: return the handoff plus
+.local/p204/m5e-postgres-tamper-test-correction.diff
+to the external reviewer.
+
+### Prompt 204 outcome (OpenAI Codex; staged and uncommitted for review)
+
+Completed work and checks only. Starting branch, HEAD/upstream `5b94d18a4053e0a7d6e32d8add631ecb5ccde70b`,
+main/origin/main `1efe3ed3f0aa9697ce4e71cee295293a89c94909` and clean state matched the handoff.
+The saved Prompt 203 job-log hashes matched their recorded values. Checkpointed refs, status,
+whole-tree blob hashes, the published PostgreSQL test module and the exact 2,406,985-byte history
+prefix (SHA-256 `2862e63d09b39438bd870ded7fdd7809471be1c08f0aeba3352d892e0fffa7d4`)
+under `.local/p204/`. No remote operation was performed.
+
+Replaced only the final generic tamper parameter with the named standalone unclaimed-canonical-job
+test. It builds committed history and confirms reload first succeeds, selects the canonical job by
+tenant and job ID, commits a queued/attempt-zero state with cleared lease and `finished_at`, reads
+that state back, confirms all M5e rows remain unchanged and requires `StageRecordInconsistentError`.
+All eight retained tamper parameters and the valid unclaimed empty-history control are unchanged
+(AST comparison completed). No production invariant, constraint or reload implementation changed.
+The published CI failure supplies the old setup-failure evidence; no production defect was
+reproduced or fixed here.
+
+Recorded the failed feature gate in ADR-0023 and short README, plan and threat-model summaries:
+M5e is feature-published at `5b94d18a`; four jobs passed, PostgreSQL executed with 384 passes and
+one test-setup failure; this test-only correction is staged, the full feature gate is not green and
+main publication remains blocked. The independently retrieved external-reviewer evidence supplied
+in Prompt 204 is attributed separately from Codex's Prompt 203 observations and Claude Code's
+historical implementation/correction results. The current documents preserve accepted specification
+headings and anchors, prior acceptance and all scope limitations. Earlier unexecuted-PostgreSQL
+statements are explicitly historical.
+
+Current locked offline checks (`uv run --locked --offline`, Python 3.12.15 on Windows):
+- Ruff format: 220 files already formatted; Ruff lint: all checks passed.
+- Strict mypy: no issues in 176 source files.
+- Focused M5e values, planner, persistence, evidence-recheck and PostgreSQL module: 326 passed,
+  46 skipped.
+- Full suite: 3,966 passed, 387 skipped (385 PostgreSQL cases and two platform skips).
+- Collection: 385 integration and 3,968 non-integration, 4,353 total. Removing one parameter and
+  adding one standalone test preserved all totals. The corrected case is present exactly once;
+  the generic tamper test now has eight cases.
+- No test database is configured. The corrected PostgreSQL case was collected and skipped,
+  not run against PostgreSQL; local skips establish nothing about its database behaviour.
+
+Scope checks confirmed only the six authorized paths changed and every other tracked blob/mode
+identical to HEAD, including production, migrations, models, retrieval.py, packaging, workflows,
+dependencies and resources. No tracked local/build artifacts, unstaged files or nonignored
+untracked files; UTF-8 without BOM, LF only, no replacement characters; diff whitespace clean.
+Links/anchors/tables: 391 links, 88 tables, no problems. Privacy scan found only the established
+noreply email and no credential/personal-path patterns. Unsuppressed staged Gitleaks 8.30.1
+reported no leaks (no baseline, ignore file, scanner config or environment override; inline allow
+comments ignored). The saved detailed Prompt 203 handoff, its source label, supplied review,
+manual-push resume prompt and Prompt 204 were appended with byte-safe writes after the identical
+prefix, and exact text inclusion verified. Earlier assistance attribution remains intact.
+
+No build or installed-wheel check was repeated; no database configuration, authentication change,
+provider call, production change, commit, push, merge, CI rerun or M5f work occurred. PostgreSQL
+execution of the corrected case and exact-correction CI remain pending. M5f–M5h and overall M5
+acceptance remain pending. Final scope/security checks and the export are reported in the handoff.
+
+### Prompt 204 handoff (saved .local/p204/handoff.md; verbatim file copy)
+
+This is the saved detailed handoff file, not the shorter final chat response.
+
+Prompt 204 handoff for Mathew and the external reviewer
+
+The PostgreSQL tampering test setup is corrected and the failed feature gate is recorded.
+Exactly six authorized files are staged and uncommitted. No production change, commit, push,
+merge, remote operation, CI rerun or M5f work occurred.
+
+Starting state matched: feat/review-stage-persistence, clean index/working tree, HEAD and
+upstream 5b94d18a4053e0a7d6e32d8add631ecb5ccde70b, local main/origin/main
+1efe3ed3f0aa9697ce4e71cee295293a89c94909. Saved refs, status, whole-tree hashes,
+the published test module and original prompt prefix under .local/p204/. The saved Prompt 203
+log hashes matched their recorded values. No remote read was needed in this task.
+
+Correction by OpenAI Codex:
+Removed only the ninth generic tampering parameter, which set attempt=0 while leaving a job
+running and leased. Replaced it with
+ test_the_reload_refuses_an_unclaimed_canonical_job_with_persisted_history.
+It builds the existing committed fixture, verifies reload succeeds, selects only the fixture's
+tenant-bound canonical job and uses the existing committing tamper helper to set queued,
+attempt zero, locked_by=None, lease_expires_at=None and finished_at=None. It reads the job back
+and asserts all those fields, verifies plan/stage rows are present and every M5e row unchanged,
+then requires StageRecordInconsistentError from reload. All eight retained generic parameters
+and every existing test function, including the valid empty-history unclaimed control, remain
+unchanged by AST comparison. No skip, xfail, IntegrityError acceptance or constraint weakening
+was introduced. The original CI run proves the old setup failure; this is not a production
+reload-defect reproduction or fix.
+
+Published feature gate (historical for the pending correction):
+Both push runs, attempt 1, branch feat/review-stage-persistence at the full baseline SHA:
+CI run https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372
+- Ubuntu job 126276607907: success; 3,968 passed, 385 skipped.
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372/job/126276607907
+- Windows job 126276607952: success; 3,967 passed, 386 skipped.
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372/job/126276607952
+- PostgreSQL job 126276607831: failure; 1 failed, 384 passed, 3,968 deselected.
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372/job/126276607831
+- Container job 126276607520: success; smoke and cleanup reported success.
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372/job/126276607520
+Secret-scan run https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339351
+- Gitleaks job 126276607571: success; 87 commits scanned, no leaks.
+  https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339351/job/126276607571
+
+The external reviewer independently retrieved both records, all five conclusions and all five
+logs, as supplied in Prompt 204. Codex's separate API/log observations from Prompt 203 retain
+their own attribution. Claude Code's Prompt 200 implementation and Prompt 201 corrections and
+local checks remain historical. Both verify logs printed the production registry and all ten
+installed-wheel behaviour lines, including the M5e stage-migration/abandoned-repair line.
+Wheel checks are offline, Recall arithmetic, Voyage mocked and model calls scripted. The
+container smoke does not exercise M5e. None establishes live-model quality, entailment,
+authenticity or injection resistance.
+
+The sole failing case was test_the_reload_refuses_tampered_rows[<lambda>8]. PostgreSQL correctly
+rejected UPDATE jobs SET attempt=0 under ck_jobs_lease_while_running before the reload assertion.
+ADR-0023 now records the publication, exact job links, failure, diagnosis, correction and limits;
+README, plan and threat model have short linked summaries. M5e is feature-published, four jobs
+passed and PostgreSQL ran but failed one test; the test-only correction is staged, the feature
+gate is not fully green and main publication remains blocked. Earlier never-run database
+statements are explicitly historical rather than current blanket claims.
+
+Current local verification (OpenAI Codex, uv run --locked --offline, Windows Python 3.12.15):
+- Ruff formatting: 220 files already formatted; lint: all checks passed.
+- Strict mypy: no issues in 176 source files.
+- Focused M5e values/planner/persistence/evidence-recheck/PostgreSQL module: 326 passed, 46 skipped.
+- Full suite: 3,966 passed, 387 skipped (385 PostgreSQL cases, two platform skips).
+- Collection: 385 integration plus 3,968 non-integration = 4,353 total, unchanged. One parameter
+  was replaced by one standalone case. The named correction is collected exactly once.
+- No database is configured. The corrected case is collected and skipped, not executed against
+  PostgreSQL. Local skips prove nothing about its database behaviour. Its PostgreSQL execution,
+  review and exact-correction CI remain pending. The baseline's 384 integration passes do not
+  verify the changed case. Builds and installed-wheel checks were not repeated.
+- Scope, full-tree blob/mode comparison, retained-test identity, prompt-prefix/text fidelity,
+  accepted specification headings/anchors, UTF-8 without BOM, LF-only/no replacement characters,
+  diff whitespace, privacy and no tracked .local/build artifacts all passed.
+- Link/anchor/table check: 391 links, 88 tables, no problems.
+- Final unsuppressed staged Gitleaks 8.30.1: no leaks. No custom config, baseline, ignore file
+  or environment override; --ignore-gitleaks-allow disables inline finding suppressions.
+
+Exactly these six paths changed:
+- README.md
+- docs/decisions/0023-review-stage-persistence.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+- tests/test_review_stages_postgres.py
+
+Every other tracked blob and mode is identical to HEAD, including all production code,
+models, migrations, retrieval.py, packaging, workflows, dependencies, resources and ADR-0022.
+The identical protected-blob manifest is saved in protected-blobs.txt, SHA-256 62bcdbdf98be4b500f994e98a97c5b5bd24168a6315d04cd7247ea2ec5f17eff.
+The original 2,406,985-byte prompt history prefix is intact, SHA-256
+2862e63d09b39438bd870ded7fdd7809471be1c08f0aeba3352d892e0fffa7d4. The available saved detailed
+Prompt 203 failure handoff is copied verbatim with its actual file source labelled, followed by
+the available resume authorization, supplied review/diagnosis, Prompt 204 verbatim and completed
+outcome note. No missing or reconstructed handoff is labelled verbatim.
+
+Export: .local/p204/m5e-postgres-tamper-test-correction.diff
+Baseline commit: 5b94d18a4053e0a7d6e32d8add631ecb5ccde70b
+Baseline tree: 21d3d3bc246f11854af0b114653ae9242aea28f6
+Destination staged tree: 430956a63affa6e3c17d184d9ceedf16a31c6f6c
+Full-index; prompts.md excluded; byte-identical to both Git's tree comparison and cached diff.
+ README.md                                       |   2 +-
+ docs/decisions/0023-review-stage-persistence.md | 135 +++++++++++++++++++++---
+ docs/plan.md                                    |  16 ++-
+ docs/threat-model.md                            |   7 +-
+ tests/test_review_stages_postgres.py            |  37 ++++++-
+ 5 files changed, 173 insertions(+), 24 deletions(-)
+
+Bytes: 56483
+Lines: 319
+SHA-256: efdfc2350fabb552c623daf38b2c8c4c73e79e19b688dd0ab5cc84dd63a35ba5
+Including history: 6 files changed, 638 insertions(+), 24 deletions(-).
+
+Final refs and state:
+- Branch: feat/review-stage-persistence.
+- HEAD/upstream unchanged: 5b94d18a4053e0a7d6e32d8add631ecb5ccde70b.
+- Local main/origin/main unchanged: 1efe3ed3f0aa9697ce4e71cee295293a89c94909.
+- Six files staged, no unstaged changes and no nonignored untracked files. No commit created.
+- No authentication change, provider call, database configuration, build, remote operation,
+  push, merge, CI rerun or M5f work occurred.
+
+All prior scope limitations remain: no M5e application review path or run_review registration;
+E7 output table/atomic writer belongs to M5f/M5g; discarded U4 evidence cannot be re-proved at
+reload; worker composition obligations, the accepted M3 lease window and open M4d trusted-
+snapshot limitation remain. The corrected PostgreSQL case and exact-correction CI are pending;
+M5f-M5h and overall M5 acceptance remain pending. Main publication remains blocked.
+
+Mathew: return this handoff plus .local/p204/m5e-postgres-tamper-test-correction.diff to the
+external reviewer. Everything remains staged and uncommitted for review.
+
+### Correction acceptance (Prompt 205)
+
+The external reviewer accepted the Prompt 204 test-only correction for a corrective commit
+and feature publication to `feat/review-stage-persistence` in Prompt 205. The reviewer verified
+the export's bytes, checksum, paths and statistics (56,483 bytes, 319 lines, five files,
+173 insertions and 24 deletions; SHA-256
+`efdfc2350fabb552c623daf38b2c8c4c73e79e19b688dd0ab5cc84dd63a35ba5`) and inspected the
+replacement test against the published source. The reviewed test blob is
+`cb13b6289f74e202e1d2f6586c9c14fef1599e7d` and is preserved unchanged.
+
+The reviewer did **not** run the corrected case locally or against PostgreSQL. The original
+failure occurred during the tampering `UPDATE`, before reload; this is a test-setup correction,
+not a production reload fix. Correction-specific PostgreSQL execution and exact-commit CI
+remain pending at commit time. The failed `5b94d18a` feature gate above remains historical
+evidence for that published version, separate from the pending correction. The feature gate
+is not yet green, and main publication remains blocked.
+
+OpenAI Codex wrote the Prompt 204 correction and documentation and performed the Prompt 205
+recovery, acceptance documentation and commit preparation. The external reviewer's independent
+export verification, source inspection and acceptance retain their own attribution, as do
+Codex's Prompt 203 observations and Claude Code's earlier implementation, corrections and
+historical local evidence. Prompt 204's local checks are historical and are not repeated in
+Prompt 205 because the reviewed test and all production blobs remain unchanged.
+
+### Prompt 205 (verbatim)
+
+Prompt 205 — Commit and publish the accepted PostgreSQL test correction, then verify CI
+
+Written for: Mathew and the external reviewer.
+
+The external reviewer accepts the Prompt 204 test-only correction for a corrective commit and publication to feat/review-stage-persistence.
+
+Commit the reviewed correction, push that feature branch once and monitor exact-commit CI. If every required job passes, stage the feature-evidence documentation for review.
+
+No merge, push to main, production change or M5f work is authorized.
+
+1. Verify and checkpoint
+
+Read the repository instructions and .local/p204/ checkpoint and handoff.
+
+Expected:
+- Branch: feat/review-stage-persistence
+- HEAD and upstream:
+  5b94d18a4053e0a7d6e32d8add631ecb5ccde70b
+- Local main and origin/main:
+  1efe3ed3f0aa9697ce4e71cee295293a89c94909
+- Accepted staged tree:
+  430956a63affa6e3c17d184d9ceedf16a31c6f6c
+- Exactly six paths staged:
+  tests/test_review_stages_postgres.py
+  docs/decisions/0023-review-stage-persistence.md
+  README.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or unexpectedly untracked.
+
+Verify .local/p204/m5e-postgres-tamper-test-correction.diff:
+- Baseline commit:
+  5b94d18a4053e0a7d6e32d8add631ecb5ccde70b
+- Final tree:
+  430956a63affa6e3c17d184d9ceedf16a31c6f6c
+- Full-index, prompts.md excluded.
+- Five files, 173 insertions, 24 deletions.
+- 56,483 bytes; 319 lines.
+- SHA-256:
+  efdfc2350fabb552c623daf38b2c8c4c73e79e19b688dd0ab5cc84dd63a35ba5
+- Byte-identical to Git's comparison.
+
+The reviewed corrected test blob is:
+cb13b6289f74e202e1d2f6586c9c14fef1599e7d
+
+Verify that blob. Preserve it unchanged throughout this task.
+
+Save a checkpoint under .local/p205/ containing refs, status, staged paths and hashes, and the prompts.md prefix/checksum.
+
+Preserve unexpected work and report material discrepancies before dependent changes.
+
+2. Record acceptance
+
+Against the accepted staged tree, change only:
+- ADR-0023
+- README
+- plan
+- threat model
+- prompts.md
+
+Keep the reviewed test unchanged. Every production, migration, model, resource, packaging, workflow and other test blob must remain identical to HEAD.
+
+Record:
+- the correction was accepted at external review in Prompt 205 for a corrective commit and feature publication;
+- the reviewer verified the export's bytes, checksum, paths and statistics, and inspected the replacement test against the published source;
+- the reviewer did not run the corrected case locally or against PostgreSQL;
+- the original failure occurred during the tampering UPDATE, before reload;
+- this is a test-setup correction, not a production reload fix;
+- correction-specific PostgreSQL and CI verification remain pending at commit time.
+
+Keep the failed 5b94d18a evidence historical and separate. Do not describe the feature gate as green before the new jobs finish.
+
+Append the available Prompt 204 handoff, this review disposition, Prompt 205 verbatim and a completed-check pre-commit note to prompts.md. Preserve the previous bytes exactly as a prefix and label the source of any handoff text accurately.
+
+3. Check and commit
+
+No application test, build or wheel check needs repeating because the accepted test and all production blobs remain unchanged. Retain Prompt 204's local checks as historical evidence.
+
+Complete appropriate documentation checks:
+- scope and blob/mode identity;
+- links, anchors and tables;
+- encoding and whitespace;
+- prompt-prefix and verbatim fidelity;
+- privacy;
+- required formatting/lint;
+- unsuppressed staged Gitleaks.
+
+Commit locally, using the established noreply identity.
+
+Suggested subject:
+test: correct unclaimed-job setup in stage reload coverage
+
+Write the message from a file. Attribute the correction and documentation to OpenAI Codex, preserving earlier assistance and external-review attribution and repository trailer conventions.
+
+Verify:
+- direct parent is 5b94d18a;
+- exactly the six reviewed paths changed;
+- test blob is still cb13b6289f74e202e1d2f6586c9c14fef1599e7d;
+- every production and unrelated blob/mode is unchanged;
+- working tree is clean;
+- required full-history unsuppressed Gitleaks passes.
+
+Report the full corrective commit SHA. Do not amend or rewrite earlier commits.
+
+Export:
+.local/p205/m5e-test-correction-acceptance.diff
+
+Baseline: accepted staged tree 430956a63affa6e3c17d184d9ceedf16a31c6f6c
+Destination: new corrective commit
+Options: --full-index, prompts.md excluded.
+
+Verify byte identity and report statistics, bytes, lines and full SHA-256.
+
+4. Publication preflight and push
+
+Remote reads and one feature-branch push are authorized.
+
+Fetch origin without tags and verify actual refs:
+- remote feature is still 5b94d18a;
+- remote main is still 1efe3ed3;
+- local main equals origin/main;
+- the unpublished feature range is exactly the new corrective commit;
+- working tree is clean;
+- workflows are unchanged and all five required jobs remain enabled.
+
+If refs differ unexpectedly, stop before pushing and report. Do not force-push or reconcile unexpected changes.
+
+Run the required range privacy and Gitleaks checks.
+
+Push only:
+refs/heads/feat/review-stage-persistence
+to:
+refs/heads/feat/review-stage-persistence
+
+Use normal existing authentication. Do not change accounts, credential configuration or permissions, and do not inspect or print credentials.
+
+If the push stalls without a visible sign-in prompt, stop it safely, verify remote refs and report the exact outcome. Do not automatically retry. Mathew can complete a manual push if necessary.
+
+After a successful push, verify the remote feature, local HEAD and upstream all equal the corrective commit. Confirm remote main is unchanged.
+
+5. Exact-commit CI
+
+Monitor for at most 25 minutes with bounded polling and concise progress updates.
+
+Find the push-triggered CI and secret-scan runs for the exact corrective SHA and feature branch.
+
+Verify:
+- Ubuntu verify;
+- Windows verify;
+- PostgreSQL integration;
+- container;
+- full-history Gitleaks.
+
+Record run IDs, job links, SHA, branch, event, attempt, conclusions and relevant steps.
+
+Retrieve logs through existing authorized access where available.
+
+For PostgreSQL:
+- inspect the overall summary;
+- determine whether the named replacement test ran and passed, using available output;
+- do not claim individual test results absent from the logs;
+- if a successful summary cannot identify that case individually, report the precise evidence and limitation.
+
+Do not reuse counts or output from 5b94d18a as evidence for this commit.
+
+If any required job fails, is cancelled, has required checks skipped, or remains unconfirmed at the limit:
+- save logs and metadata;
+- stop without corrections, reruns, further commits or pushes;
+- report the failure or uncertainty;
+- do not write green-status documentation.
+
+Do not leave a monitor or push process running at the end.
+
+6. Only if all five required jobs pass
+
+Stage documentation recording the successful feature gate at the exact corrective SHA.
+
+Authorized paths:
+- README.md
+- ADR-0023
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Do not change the test or any production file.
+
+Record:
+- the corrective commit and its five job results;
+- each job under its own workflow run;
+- log results actually observed;
+- whether the named replacement case is individually confirmed;
+- evidence attribution and unavailable output;
+- M5e is feature-published and feature-CI verified, but not merged.
+
+Preserve the original failed run as historical evidence.
+
+Preserve all limitations: no application review path or run_review registration, offline wheel assertions versus database execution, container scope, E7, U4, worker obligations, the M3 lease window, the open M4d trusted-snapshot limitation and pending overall M5 acceptance.
+
+Complete documentation, scope, encoding, privacy and staged Gitleaks checks.
+
+Leave these post-CI updates staged and uncommitted.
+
+Export:
+.local/p205/m5e-corrective-feature-ci-evidence.diff
+
+Baseline: published corrective commit
+Destination: final staged tree
+Options: --full-index, prompts.md excluded.
+
+Verify byte identity and report full IDs, paths, statistics, bytes, lines and SHA-256.
+
+7. Final handoff
+
+Provide a self-contained handoff including:
+- starting-state verification;
+- corrective commit, parent and tree;
+- unchanged test and production blobs;
+- publication outcome and refs;
+- run/job links and actual log evidence;
+- corrected PostgreSQL case execution status;
+- both exports, if produced;
+- final working-tree state and limitations.
+
+No main merge, main push, CI rerun or M5f work.
+
+Mathew: return the handoff and the produced diff files to the external reviewer.
+
+### Prompt 205 pre-commit note (OpenAI Codex; completed checks only)
+
+Verified the expected branch, HEAD/upstream `5b94d18a4053e0a7d6e32d8add631ecb5ccde70b`,
+local main/origin/main `1efe3ed3f0aa9697ce4e71cee295293a89c94909`, accepted staged tree
+`430956a63affa6e3c17d184d9ceedf16a31c6f6c`, six staged paths and no unstaged or unexpected
+untracked files. The Prompt 204 export matched all supplied bytes, lines, SHA-256, paths and
+statistics and was byte-identical to Git's full-index comparison. Saved refs, status, staged
+hashes and the exact 2,433,122-byte prompt prefix, SHA-256
+`f96b8dd51a83081952e0a8fed6a3af017a1c6bf5b8eba0c69cf37b63b9ae0e9b`, under `.local/p205/`.
+
+Recorded the external reviewer's acceptance for a corrective commit and feature publication,
+its export/source inspection and lack of corrected-case execution. Only five documentation
+files differ from the accepted staged tree. The reviewed test remains exactly blob
+`cb13b6289f74e202e1d2f6586c9c14fef1599e7d`. All other production, migration, model, resource,
+packaging, workflow and test blobs/modes remain identical to HEAD. The original failed run is
+historical; the correction fixes tampering setup before reload, not production reload code.
+Correction-specific PostgreSQL and exact-commit CI remain pending at commit time.
+
+Completed checks: six-path scope and whole-tree blob/mode comparison; no tracked local/build
+artifacts; accepted specification headings/anchors preserved; links/anchors/tables (393 links,
+88 tables, no problems); UTF-8 without BOM, LF only and no replacement characters; diff whitespace;
+history-prefix identity and exact inclusion of the saved detailed Prompt 204 handoff and Prompt
+205; privacy scan (established noreply email only, no credential or personal-path patterns);
+locked offline Ruff formatting (220 files already formatted) and lint (all checks passed);
+unsuppressed staged Gitleaks 8.30.1 (no leaks, no custom config/baseline/ignore file/environment
+override, inline allow comments ignored). Established noreply configuration was verified unchanged.
+The handoff source is labelled accurately. Prior assistance and reviewer attribution are intact.
+
+No application test, build or wheel check was repeated because the reviewed test and production
+blobs are unchanged. Prompt 204's local checks remain historical evidence. No commit, publication
+or new CI result is claimed in this pre-commit note. No prospective commit SHA is recorded.

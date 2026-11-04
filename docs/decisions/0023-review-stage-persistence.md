@@ -4,9 +4,15 @@
   review (exact question validation and nested aggregate rebuilds; see
   [Prompt 201 corrections](#prompt-201-corrections)); accepted at external review for a local
   implementation commit only in Prompt 202 ([review](#external-review-prompt-202)), including the
-  recorded implementation choices. Publication, PostgreSQL execution and exact-commit
-  current-version CI remain pending.** OpenAI Codex recovered the state, recorded acceptance and
-  prepared the local commit. Implements the
+  recorded implementation choices. Published on `feat/review-stage-persistence` at `5b94d18a`
+  in Prompt 203: four jobs passed and PostgreSQL ran but failed one test (384 passed). A test-only
+  correction from Prompt 204 was accepted at external review in Prompt 205 for a corrective
+  commit and feature publication ([acceptance](#correction-acceptance-prompt-205)); correction-specific
+  PostgreSQL and CI verification remain pending, the feature gate is not fully green and main
+  publication remains blocked**
+  ([evidence and diagnosis](#feature-ci-failure-and-test-setup-correction-prompts-203204)).
+  OpenAI Codex recovered the state, recorded acceptance and prepared the local commit in
+  Prompt 202; it made this test-only correction and recorded the failed gate in Prompt 204. Implements the
   [accepted M5e specification](../plan.md#m5e-stage-and-call-reservation-persistence-specification-accepted-at-review-prompt-199-implementation-pending)
   (proposed in Prompt 196, corrected in Prompts 197–198, accepted at external review in Prompt 199
   with E1–E20 and binding clarifications A and B), the fifth slice of the
@@ -91,7 +97,8 @@ SQLAlchemy. Packaging tests pin both boundaries.
 ## Implementation choices and deviations (for review)
 
 The following recorded choices are approved at external review in Prompt 202 within the scope
-of the local implementation commit only; PostgreSQL execution and exact-commit CI remain pending.
+of the local implementation commit only. At that acceptance PostgreSQL execution and exact-commit
+CI were pending; the later failed feature gate is recorded below.
 
 1. **Error placement.** The two domain errors and a common base `ReviewStageError` live in the
    domain module; the thirteen persistence errors subclass it in the persistence module (M5d put
@@ -207,8 +214,9 @@ text, evidence with a malformed question or a non-evidence value, invalid histor
 implementation choices for a local implementation commit only. The specification was accepted
 in Prompt 199; Claude Code implemented it in Prompt 200 and corrected findings A and B in
 Prompt 201. OpenAI Codex performed this recovery, acceptance documentation and commit preparation
-in Prompt 202. Earlier reviewer and assistance attribution remains unchanged. Publication,
-PostgreSQL execution and exact-commit current-version CI remain pending.
+in Prompt 202. Earlier reviewer and assistance attribution remains unchanged. At that acceptance,
+publication, PostgreSQL execution and exact-commit current-version CI were pending; see the
+[later feature run](#feature-ci-failure-and-test-setup-correction-prompts-203204) for the current failed gate.
 
 **Reviewer evidence (supplied decision, not checks run by Codex).** The reviewer independently
 verified the Prompt 201 export's size (73,242 bytes), line count (682), SHA-256
@@ -231,10 +239,134 @@ Claude Code's separately attributed Prompt 201 Windows results below (658 focuse
 3,966 full-suite passes and 387 skips; collection of 385 integration and 3,968 non-integration
 tests; static checks, offline build, installed-wheel step and direct wheel probes) and the
 Prompt 200 results are historical local evidence, not exact-commit CI. Codex did not repeat
-application tests, builds or wheel checks: every implementation and test blob remains identical
-to accepted tree `c6ca841a6c4e2c49e567d0557a17e42c6770ac60`. All PostgreSQL-backed
-behaviour remains unverified; collection and skips verify none of it. All later-slice and
-runtime limitations below remain in force; M5f–M5h and overall M5 acceptance remain pending.
+application tests, builds or wheel checks in Prompt 202: every implementation and test blob then
+remained identical to accepted tree `c6ca841a6c4e2c49e567d0557a17e42c6770ac60`. At that
+acceptance PostgreSQL had not run; collection and skips verified none of its behaviour. The
+subsequent published feature run executed PostgreSQL and failed one case, as recorded below.
+All later-slice and runtime limitations below remain in force; M5f–M5h and overall M5 acceptance remain pending.
+
+## Feature CI failure and test-setup correction (Prompts 203–204)
+
+**Current state.** M5e was published on `feat/review-stage-persistence` at
+`5b94d18a4053e0a7d6e32d8add631ecb5ccde70b` in Prompt 203. Mathew completed the push
+manually after Codex's earlier attempt stalled in Git Credential Manager and was stopped.
+Four jobs passed and PostgreSQL ran but failed one test, with 384 passing integration cases.
+The test-only correction by OpenAI Codex in Prompt 204 was accepted at external review in
+Prompt 205 for a corrective commit and feature publication. The feature gate is not fully green;
+correction-specific PostgreSQL execution and exact-version CI remain pending at commit time,
+and main publication is blocked. No production code, constraint, migration, model,
+resource, packaging or workflow change is part of the correction.
+
+### Published feature evidence at 5b94d18a (Prompt 203)
+
+Both runs were **push** events, **attempt 1**, on `feat/review-stage-persistence`, at the full
+SHA above. They are evidence for that published version only, not the pending correction.
+
+CI run [41739339372](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372)
+completed with **failure**:
+
+| Job | Conclusion | Observed log result |
+| --- | --- | --- |
+| [Ubuntu verify, 126276607907](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372/job/126276607907) | success | 3,968 passed, 385 skipped |
+| [Windows verify, 126276607952](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372/job/126276607952) | success | 3,967 passed, 386 skipped |
+| [PostgreSQL integration, 126276607831](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372/job/126276607831) | failure | 1 failed, 384 passed, 3,968 deselected |
+| [Container, 126276607520](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339372/job/126276607520) | success | smoke and cleanup reported success |
+
+Secret-scan run [41739339351](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339351)
+completed with **success**:
+
+| Job | Conclusion | Observed log result |
+| --- | --- | --- |
+| [Gitleaks, 126276607571](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/41739339351/job/126276607571) | success | 87 commits scanned, no leaks |
+
+**Attribution.** The external reviewer independently retrieved both run records, all five job
+conclusions and all five logs through GitHub (reported in Prompt 204). Separately, OpenAI Codex
+observed the exact-SHA API metadata and retrieved/read all five logs during Prompt 203, then
+stopped at the failed gate. Its saved records and logs are under `.local/p203/`. Neither
+account is Claude Code's historical Prompt 200–201 local evidence; no remote read or CI rerun
+was made in Prompt 204.
+
+Both verify logs printed the production registry and all ten installed-wheel behaviour lines,
+including "stage migration SQL rendered and an abandoned repair planned as a retry from the
+installed wheel". Those checks are offline, separate from the PostgreSQL execution. The Recall
+example is arithmetic, the Voyage response mocked and model calls scripted; the unchanged
+container smoke does not exercise M5e. None establishes live-model quality, entailment,
+authenticity or injection resistance.
+
+### Test-setup diagnosis and correction (Prompt 204)
+
+The sole failure was
+`tests/test_review_stages_postgres.py::test_the_reload_refuses_tampered_rows[<lambda>8]`.
+Its final tamper parameter executed `UPDATE jobs SET attempt=0` while retaining the running
+job's lease fields. PostgreSQL correctly refused that setup under
+`ck_jobs_lease_while_running`, before the expected reload assertion. Running jobs require a
+lease and attempt at least one; non-running jobs require no lease owner or lease expiry.
+The original failed CI execution supplies the old setup-failure evidence. It does not
+demonstrate a production reload defect.
+
+The correction removes only that final parameter and replaces it with the named standalone
+`test_the_reload_refuses_an_unclaimed_canonical_job_with_persisted_history`. It builds the
+committed fixture, confirms an initial reload succeeds and records the existing plan/stage
+rows. Through the existing committing tamper helper, it selects only the fixture tenant's
+canonical job by tenant and job ID and sets `status="queued"`, `attempt=0`, `locked_by=None`,
+`lease_expires_at=None` and `finished_at=None`. It reads the row back and asserts that exact
+state, confirms all persisted M5e rows remain identical, then requires
+`StageRecordInconsistentError` from reload. Thus a setup failure cannot be mistaken for the
+intended refusal. The other eight tamper cases and the valid control for a genuinely unclaimed
+review with no stored history remain unchanged. No constraint is weakened, and no skip,
+xfail or acceptance of `IntegrityError` replaces the reload expectation.
+
+The intended scenario is a database-valid job that has never been claimed but nevertheless
+has persisted plan/stage history. **The corrected case has not yet run against PostgreSQL.**
+Local collection and skips prove no corrected database behaviour; the published run's 384
+passes do not verify this changed case. Local Prompt 204 checks are recorded in its handoff
+and prompt-history outcome; builds and installed-wheel checks are not repeated because the
+production, resource, packaging and workflow blobs remain unchanged. Review accepted the
+correction in Prompt 205; correction-specific PostgreSQL execution and exact-commit CI remain
+pending at commit time. All scope limitations below and overall M5 acceptance remain unchanged.
+
+### Correction acceptance (Prompt 205)
+
+The external reviewer accepted the Prompt 204 test-only correction for a corrective commit
+and feature publication to `feat/review-stage-persistence` in Prompt 205. The reviewer verified
+the export's bytes, checksum, paths and statistics (56,483 bytes, 319 lines, five files,
+173 insertions and 24 deletions; SHA-256
+`efdfc2350fabb552c623daf38b2c8c4c73e79e19b688dd0ab5cc84dd63a35ba5`) and inspected the
+replacement test against the published source. The reviewed test blob is
+`cb13b6289f74e202e1d2f6586c9c14fef1599e7d` and is preserved unchanged.
+
+The reviewer did **not** run the corrected case locally or against PostgreSQL. The original
+failure occurred during the tampering `UPDATE`, before reload; this is a test-setup correction,
+not a production reload fix. Correction-specific PostgreSQL execution and exact-commit CI
+remain pending at commit time. The failed `5b94d18a` feature gate above remains historical
+evidence for that published version, separate from the pending correction. The feature gate
+is not yet green, and main publication remains blocked.
+
+OpenAI Codex wrote the Prompt 204 correction and documentation and performed the Prompt 205
+recovery, acceptance documentation and commit preparation. The external reviewer's independent
+export verification, source inspection and acceptance retain their own attribution, as do
+Codex's Prompt 203 observations and Claude Code's earlier implementation, corrections and
+historical local evidence. Prompt 204's local checks are historical and are not repeated in
+Prompt 205 because the reviewed test and all production blobs remain unchanged.
+
+### Local correction checks (Prompt 204, OpenAI Codex)
+
+Historical local results, run by OpenAI Codex in Prompt 204 with `uv run --locked --offline`
+in the existing Windows Python 3.12.15 environment; not repeated in Prompt 205:
+
+| Check | Result |
+| --- | --- |
+| Ruff formatting and lint | 220 files already formatted; all lint checks passed |
+| strict mypy | no issues in 176 source files |
+| focused M5e values, planner, persistence, evidence-recheck and PostgreSQL module | 326 passed, 46 skipped |
+| full suite | 3,966 passed, 387 skipped (385 PostgreSQL cases and two platform skips) |
+| collection | 385 integration and 3,968 non-integration, 4,353 total, unchanged |
+
+The eight retained generic tamper cases and the unclaimed empty-history control are unchanged.
+One parameter became one standalone test, preserving the collected total. No test database is
+configured: the named corrected case was collected and skipped, **not run against PostgreSQL**.
+Local skips establish nothing about the correction's database behaviour. No build,
+installed-wheel check, provider call or CI rerun was performed for the correction.
 
 ## Verification (Prompt 201, local Windows, Claude Code)
 
@@ -250,8 +382,9 @@ Historical local evidence recorded by Claude Code in Prompt 201; not rerun in Pr
 | collection | 385 integration and 3,968 non-integration tests |
 | offline build, comparison and installed wheel | see [Build and installed wheel (Prompt 201)](#build-and-installed-wheel-prompt-201) |
 
-PostgreSQL tests remain written but **not run** (no `EG_TEST_DATABASE_URL`); collecting or
-skipping them verifies no database behaviour. No CI was run.
+Historical Prompt 201 status: PostgreSQL tests were written but **not run** locally (no
+`EG_TEST_DATABASE_URL`); collection and skips verified no database behaviour. No CI was run in
+that prompt. The later Prompt 203 PostgreSQL execution is recorded above.
 
 ### Build and installed wheel (Prompt 201)
 
@@ -285,13 +418,14 @@ not rerun in Prompt 202.
 | collection | 385 integration and 3,903 non-integration tests |
 | offline build and comparison | see [Build and installed wheel](#build-and-installed-wheel-prompt-200) |
 
-**PostgreSQL tests were written but not run.** No disposable test database is configured here
-(`EG_TEST_DATABASE_URL` is unset), so the 46 tests in `test_review_stages_postgres.py`, the two
+**Historical Prompt 200 status: PostgreSQL tests were written but not run.** No disposable test
+database was configured locally (`EG_TEST_DATABASE_URL` was unset), so the 46 tests in `test_review_stages_postgres.py`, the two
 new tests in `test_retrieval_postgres.py` and the updated migration tests in
 `test_reviews_postgres.py` and `test_persistence_postgres.py` were collected and skipped. Their
 correctness, including the migration upgrade/downgrade/`alembic check`, the constraint names, the
 concurrency and lease-expiry tests and every database-backed binding, replay and reload case, is
-**unverified** until the CI PostgreSQL job runs them. No CI was run for this change.
+**unverified** at that time. No CI was run in Prompt 200; the later published PostgreSQL run
+is recorded above and must not be confused with verification of the pending correction.
 
 ### Build and installed wheel (Prompt 200)
 

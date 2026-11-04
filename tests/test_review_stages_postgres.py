@@ -1615,13 +1615,48 @@ def _committed_world(world: World) -> None:
         ),
         lambda w: update(ReviewStageResult).values(job_attempt=2),
         lambda w: delete(ReviewStageResult).where(ReviewStageResult.stage == "analysis"),
-        lambda w: update(Job).where(Job.id == w.review.job_id).values(attempt=0),
     ],
 )
 def test_the_reload_refuses_tampered_rows(world: World, tamper: Callable[[World], Any]) -> None:
     _committed_world(world)
     reload(world)  # consistent before tampering
     _tamper(world.engine, tamper(world))
+    with pytest.raises(StageRecordInconsistentError):
+        reload(world)
+
+
+def test_the_reload_refuses_an_unclaimed_canonical_job_with_persisted_history(world: World) -> None:
+    _committed_world(world)
+    reload(world)  # consistent before tampering
+    before = _rows(world.engine)
+    assert before["plans"] and before["stages"]
+
+    _tamper(
+        world.engine,
+        update(Job)
+        .where(Job.tenant_id == world.actor.tenant_id, Job.id == world.review.job_id)
+        .values(
+            status="queued",
+            attempt=0,
+            locked_by=None,
+            lease_expires_at=None,
+            finished_at=None,
+        ),
+    )
+    with world.engine.connect() as connection:
+        job = connection.execute(
+            select(Job.__table__).where(
+                Job.tenant_id == world.actor.tenant_id, Job.id == world.review.job_id
+            )
+        ).one()
+    assert (job.status, job.attempt, job.locked_by, job.lease_expires_at, job.finished_at) == (
+        "queued",
+        0,
+        None,
+        None,
+        None,
+    )
+    assert _rows(world.engine) == before
     with pytest.raises(StageRecordInconsistentError):
         reload(world)
 
