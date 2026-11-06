@@ -49511,3 +49511,414 @@ Source: Claude Code. This note lists only observations completed before it was w
 - **Gitleaks:** unsuppressed 8.30.1 with `--ignore-gitleaks-allow` scanned 2 commits (~369 KB) with no leaks.
 
 No application tests, builds or wheel checks were repeated.
+
+
+## Prompt 212 resume instruction after the manual feature push (transcribed)
+
+Source: Mathew's message to Claude Code reporting the manual push. Claude Code transcribed it from the prompt text in its session. It was not compared against an independently saved original.
+
+The manual feature push completed. Resume Prompt 212 at section 5.
+
+Verify remote feature, local HEAD and upstream all equal:
+3e58f650afd79c4f54313ee083db23d85b9d1b6b
+
+Verify remote main remains:
+14f510e23e89bd890b2428405de922ef1fcb2232
+
+Do not push again. Monitor the exact-SHA feature CI within the authorized 25-minute bound. Stage the evidence documents only after all five required jobs pass. Preserve every existing limit; no main publication, further commit, CI rerun or M5g work.
+
+## Prompt 212 feature CI evidence note
+
+Source: Claude Code. These are observations Claude Code made after Mathew's manual push. Claude Code did not push.
+
+**Refs.** The remote `feat/review-report-content`, local HEAD and its upstream `origin/feat/review-report-content` all equal `3e58f650afd79c4f54313ee083db23d85b9d1b6b`. Remote main is `14f510e23e89bd890b2428405de922ef1fcb2232`, and the working tree was clean.
+
+**Runs (public GitHub API, no credentials; monitored 05:00:48Z–05:05:05Z on 2026-11-06, within the 25-minute bound).** Both runs are for head SHA `3e58f650…`, branch `feat/review-report-content`, event `push`, attempt 1:
+
+- **ci run 42165746043:** success, 04:59:59Z–05:03:49Z.
+  - verify ubuntu-24.04 (job 127721717390): success.
+  - verify windows-2025 (job 127721717245): success.
+  - integration, PostgreSQL 17 + pgvector (job 127721717238): success.
+  - container (job 127721717093): success.
+- **secret-scan run 42165746029:** success. Its Gitleaks (full history) job 127721717133 succeeded.
+
+Every listed step of the five jobs concluded success. That includes Test, Build distribution and the installed-wheel step on both platforms, the integration-test step, the Compose smoke test and its clean-up, and the Gitleaks history scan. The API metadata is saved under `.local/p212/ci/`.
+
+**Unavailable.** The job-log API returned HTTP 403 without credentials, and the check runs have no output text or annotations. Authentication was not changed. So no test counts, PostgreSQL pass or deselection counts, installed-wheel output lines (including the M5f line), container output or Gitleaks commit count are recorded, and none is inferred from a green conclusion.
+
+**Documentation staged (uncommitted).** README.md, ADR-0024, docs/plan.md, docs/threat-model.md and this history record M5f as feature-CI verified but not merged. The implementation-status heading was renamed, and all five of its links were updated. Main publication, merge, CI reruns and M5g remain unauthorized. All runtime limits are unchanged. The final documentation checks are reported in the Prompt 212 handoff.
+
+
+## Prompt 212 handoff (saved file, byte-copied)
+
+Source: `.local/p212/handoff.md`, the handoff file Claude Code saved in Prompt 212. Its bytes are inserted unchanged between the two marker lines below and were compared byte-for-byte against that file after insertion. Claude Code's Prompt 212 chat reply is not reproduced. Its "logs unavailable" statements are an accurate historical record of Claude Code's own access; the reviewer later retrieved the logs (see Prompt 213). The earlier fidelity disclosure still applies: entries headed "verbatim" in Prompt 210 were transcribed from the session, not byte-verified.
+
+-----BEGIN SAVED PROMPT 212 HANDOFF-----
+# Prompt 212 handoff: M5f feature publication and exact-commit CI (Claude Code)
+
+M5f is feature-CI verified but not merged. The five evidence documents are staged and
+uncommitted. Main publication, merge, CI reruns and M5g are not authorized.
+
+## Publication
+- **Target:** `3e58f650afd79c4f54313ee083db23d85b9d1b6b`, the history-only commit
+  `docs: record M5f feature publication authorization`. Its parent is `6c1c9e9d` and its tree
+  is `464bfdd7…`. Only prompts.md changed in it; every other blob equals 6c1c9e9d.
+- **Push:** Mathew pushed manually. Claude Code did not push.
+- **Remote:** `feat/review-report-content` is `3e58f650`; main is `14f510e2…`, unchanged.
+- **Local:** HEAD and upstream `origin/feat/review-report-content` are both `3e58f650`. Local
+  main and origin/main are `14f510e2…`.
+- **Preflight (before the push):**
+  - Read-only fetch.
+  - The range 14f510e2..6c1c9e9d holds 2 commits and 13 paths (the twelve M5f paths plus
+    ADR-0023).
+  - ci.yml changes only by the additive M5f block. All five jobs, the push triggers,
+    `EG_REQUIRE_INTEGRATION=1` and the integration command remain, with no new secrets.
+  - Privacy checks and range Gitleaks (2 commits) passed. Staged and full-history Gitleaks
+    (92 commits) passed after the history commit.
+
+## CI at 3e58f650 (Claude Code, public API, no credentials)
+All runs are for branch feat/review-report-content, event push, attempt 1, observed
+05:00:48Z–05:05:05Z:
+
+- **ci 42165746043:** success.
+  - verify ubuntu 127721717390: success.
+  - verify windows 127721717245: success.
+  - integration 127721717238: success.
+  - container 127721717093: success.
+- **secret-scan 42165746029:** success. Gitleaks 127721717133: success.
+- **Steps:** all of them succeeded.
+
+**Logs were unavailable.** The log API returned HTTP 403 without credentials, and the check
+runs have no output or annotations. Authentication was not changed. So there are no test
+counts, PostgreSQL pass or deselection counts, wheel output lines (including the M5f line),
+container output or Gitleaks commit count, and none is inferred. API JSON is in `ci/`.
+
+## Staged evidence (uncommitted)
+- **Files:** README.md, ADR-0024, docs/plan.md, docs/threat-model.md and prompts.md.
+- **Staged tree:** `29a8bf706c75002b2b39712cdc74352c1da5a1b7`. Every non-documentation blob and
+  mode equals 3e58f650.
+- **Heading:** the implementation-status heading is now "feature CI passed at 3e58f650, Prompt
+  212; not merged", and all five links were updated. The specification heading, legacy anchor
+  and contract text are unchanged.
+- **Checks:**
+  - links and tables: 560 links, 128 tables, zero problems;
+  - encoding: UTF-8 without BOM, LF only;
+  - `git diff --cached --check`;
+  - history prefix (2,652,436 bytes): identical;
+  - privacy: clean;
+  - Ruff format (226 files) and Ruff lint;
+  - staged Gitleaks: no leaks.
+
+## Export
+`.local/p212/m5f-feature-ci-evidence.diff`: from 3e58f650 to staged tree 29a8bf70, full
+indexes, prompts.md excluded, byte-identical to cached and tree Git output.
+
+- Paths: README.md, ADR-0024, docs/plan.md, docs/threat-model.md.
+- 4 files, 116 insertions, 24 deletions; 19,396 bytes, 250 lines.
+- SHA-256 8d3649748869bd67c7c93aee2d3c0cd31b406c23802a9a0960058fa4f18b68ea.
+
+## Limits
+- **Runtime:** no application review path, and run_review is unregistered. No live provider
+  or model-quality evidence. Provenance does not establish entailment or authenticity, and
+  rendering does not establish semantic injection resistance.
+- **CI scope:** the container smoke does not exercise M5f. Offline migrations are not database
+  execution. Recall is arithmetic, and Voyage is mocked.
+- **No proofs:** no browser/CommonMark-parser check and no tight size or performance proof.
+- **Still open:** E7, U4, the M3 lease window, M4d and M6.
+- **Acceptance:** M5g–M5h and overall M5 acceptance remain pending.
+-----END SAVED PROMPT 212 HANDOFF-----
+
+## Prompt 213 reviewer evidence, acceptance, gated publication authorization and user request (transcribed)
+
+Source: Mathew's Prompt 213 instruction to Claude Code. It carries the reviewer's acceptance of the Prompt 212 feature evidence, the reviewer's independently retrieved logs and the gated main-publication authorization. Claude Code transcribed it from the prompt text in its session. It was not compared against an independently saved original. The log results in it are the reviewer's observations, not Claude Code's.
+
+Prompt 213: record independently retrieved M5f feature logs, commit the evidence, and prepare gated main publication.
+
+Repository:
+D:\Claude\evidenceguard_agentic_rag
+
+The reviewer accepts the Prompt 212 feature evidence. Recording the additional reviewer-retrieved logs, committing the evidence, publishing that documentation commit on the feature branch, and then gated main publication are authorized below.
+
+All pushes remain manual operations by Mathew. Do not run git push yourself. No CI rerun, production change or M5g work is authorized.
+
+1. Verify and checkpoint the starting state
+
+Read applicable repository instructions and Prompt 212’s handoff/checkpoint.
+
+Expected branch:
+feat/review-report-content
+
+HEAD and upstream:
+3e58f650afd79c4f54313ee083db23d85b9d1b6b
+
+HEAD tree:
+464bfdd752e3ea541ca47326a372e2a33b14d044
+
+Parent:
+6c1c9e9d5d20ac516867fc2df59bfdec261dc44e
+
+Expected staged tree:
+29a8bf706c75002b2b39712cdc74352c1da5a1b7
+
+Exactly five paths should be staged:
+- README.md
+- docs/decisions/0024-review-report-content.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Nothing should be unstaged or unexpectedly untracked.
+
+Local main and stored origin/main:
+14f510e23e89bd890b2428405de922ef1fcb2232
+
+Verify .local/p212/m5f-feature-ci-evidence.diff:
+- Baseline: 3e58f650afd79c4f54313ee083db23d85b9d1b6b
+- Destination: 29a8bf706c75002b2b39712cdc74352c1da5a1b7
+- Full indexes, prompts.md excluded
+- Four files, 116 insertions and 24 deletions
+- 19,396 bytes; 250 lines
+- SHA-256:
+  8d3649748869bd67c7c93aee2d3c0cd31b406c23802a9a0960058fa4f18b68ea
+
+Verify raw-byte identity against fresh Git output.
+
+Save refs, status, staged paths/blobs/modes and the prompts.md prefix under .local/p213/.
+
+Preserve unexpected work and report discrepancies rather than resetting anything.
+
+2. Record the reviewer’s independently retrieved feature evidence
+
+The reviewer independently retrieved:
+- CI run 42165746043;
+- secret-scan run 42165746029;
+- all five job conclusions, steps and complete job logs.
+
+Both runs:
+- SHA 3e58f650afd79c4f54313ee083db23d85b9d1b6b;
+- branch feat/review-report-content;
+- event push;
+- attempt 1;
+- completed successfully.
+
+Every step of all five jobs succeeded.
+
+Actual log results:
+
+CI run 42165746043:
+- Ubuntu job 127721717390:
+  4051 passed, 385 skipped in 67.31 seconds.
+- Windows job 127721717245:
+  4050 passed, 386 skipped in 112.05 seconds.
+- PostgreSQL job 127721717238:
+  collected 4436 items / 4051 deselected / 385 selected;
+  385 passed, 4051 deselected in 195.98 seconds.
+- Container job 127721717093:
+  smoke and cleanup succeeded.
+
+Secret-scan run 42165746029:
+- Gitleaks job 127721717133:
+  92 commits scanned; no leaks found.
+
+Both verify logs show the 80 M5f module positions passing:
+- test_report_builder.py: 26;
+- test_report_content.py: 49;
+- test_report_renderer.py: 5.
+
+The PostgreSQL log shows 46 passing review-stage module positions and 28 passing review-creation module positions. It does not print individual test names; do not claim a named replacement test’s individual result.
+
+Both verify logs printed:
+production registry: ingest_revision, index_revision
+
+And all eleven installed-wheel behaviour lines:
+- offline embedding, canonical storage and indexing modules ran from the installed wheel
+- retrieval modules imported and fusion ran from the installed wheel
+- evaluation modules imported and Recall@5 = 2/3 computed from the installed wheel
+- Voyage adapter validated a mocked response from the installed wheel
+- model-call contracts classified a scripted fake response from the installed wheel
+- provenance matched a quote and derived a status from the installed wheel
+- review template, prompts and request assembly ran from the installed wheel
+- offline migration SQL rendered from the installed wheel
+- offline review migration SQL rendered from the installed wheel
+- stage migration SQL rendered and an abandoned repair planned as a retry from the installed wheel
+- hash-covered review report built, strictly decoded and rendered offline from the installed wheel
+
+Container smoke reported:
+- healthy database/API and completed migration;
+- migrate, API and worker using the CI-built image;
+- API key held in memory;
+- upload accepted;
+- ingestion succeeded;
+- active revision with two verified chunks;
+- duplicate upload returned the existing revision;
+- one offline indexing job enqueued;
+- ready index with two embeddings;
+- idle worker exited with code 0;
+- smoke: ok;
+- cleanup: ok.
+
+These are the smoke’s reported checks, not M5f application-path execution.
+
+The reviewer also independently confirmed:
+- remote feature at 3e58f650;
+- remote main at 14f510e;
+- 3e58f650’s parent is 6c1c9e9d and its only changed file is prompts.md.
+
+Keep attribution explicit:
+- Claude Code observed API conclusions and could not download logs.
+- The reviewer subsequently retrieved the logs independently.
+- The earlier HTTP 403 statements remain accurate historical observations, not current assertions that log evidence is unavailable.
+
+3. Update only the five evidence documents
+
+Only the five currently staged files may change.
+
+ADR-0024 is the detailed evidence record. Put each job’s log results under its own run/job links. Update README, plan and threat model with short linked summaries.
+
+Record acceptance of the Prompt 212 evidence and this gated publication authorization. Main publication has not happened yet.
+
+Keep the accepted specification heading, anchor and contract unchanged.
+
+Preserve all limitations:
+- no application review path; run_review unregistered;
+- no live-provider or model-quality evidence;
+- provenance does not establish entailment or authenticity;
+- structural/rendering checks do not establish semantic injection resistance;
+- container smoke does not exercise M5f;
+- offline migration assertions are not PostgreSQL execution;
+- Recall is arithmetic; Voyage is mocked; model calls scripted;
+- no browser/CommonMark-parser or tight maximal-size/performance proof;
+- E7 output migration and atomic writer, discarded U4 evidence, M3 lease window, M4d and M6 obligations remain;
+- M5g–M5h and overall M5 acceptance remain pending.
+
+Preserve the prompts.md prefix. Append the saved Prompt 212 handoff, this review/authorization, Prompt 213 and a completed-check pre-commit note with accurate source labels and existing transcription disclosures.
+
+4. Validate and commit the evidence locally
+
+Verify:
+- exactly the five authorized paths differ;
+- all other blobs and modes equal 3e58f650;
+- protected implementation/test/packaging/workflow bytes remain accepted;
+- no tracked local artifacts;
+- links, anchors, tables, encoding and whitespace;
+- history-prefix fidelity and accurate source labels;
+- privacy and required formatting/lint;
+- unsuppressed staged Gitleaks.
+
+Do not repeat application tests, builds or wheel checks.
+
+Create one normal local commit, parent 3e58f650:
+docs: record verified M5f feature CI evidence
+
+Use the established noreply identity and truthful attribution conventions. Write the message from a file; no amend or history rewrite.
+
+Verify the clean tree, five-path scope, protected blobs and full-history unsuppressed Gitleaks.
+
+Save:
+.local/p213/m5f-feature-evidence-acceptance.diff
+
+Baseline:
+29a8bf706c75002b2b39712cdc74352c1da5a1b7
+
+Destination:
+new documentation commit
+
+Use full indexes, exclude prompts.md, verify raw-byte identity and report complete metadata.
+
+5. Prepare the manual feature push
+
+Fetch without tags and inspect remote refs read-only.
+
+Require:
+- remote feature still 3e58f650;
+- remote main still 14f510e;
+- new documentation commit is a direct child of 3e58f650;
+- working tree clean;
+- workflows and implementation unchanged.
+
+If remote feature already equals the new target, do not push again.
+
+Otherwise give Mathew the full target SHA and this command:
+
+git -C 'D:\Claude\evidenceguard_agentic_rag' push origin refs/heads/feat/review-report-content:refs/heads/feat/review-report-content
+
+Stop and wait for his result. Do not run the push or alter authentication.
+
+6. After Mathew’s feature push
+
+Verify remote feature, local HEAD and upstream equal the new documentation SHA. Main must remain 14f510e. Do not push again.
+
+Monitor the push-triggered CI and secret-scan runs for that exact SHA and feature branch, within 25 minutes.
+
+Require all five job conclusions to be success. Retrieve actual logs where existing access permits; do not change authentication. Keep this new commit’s observations separate from 3e58f650’s results.
+
+If any job fails, is cancelled, or the gate is unconfirmed at the bound, stop with evidence and a resume note. No correction or CI rerun.
+
+7. Only after the new feature gate passes: prepare main
+
+This prompt authorizes a fast-forward to the new, verified documentation commit, followed by Mathew’s manual main push.
+
+Recheck:
+- working tree clean;
+- local main equals origin/main;
+- remote main remains 14f510e;
+- remote feature equals the exact verified target;
+- main is an ancestor of that target;
+- the range from main is exactly:
+  8e0173c1, 6c1c9e9d, 3e58f650, and the new documentation commit;
+- the path union remains the thirteen reviewed paths;
+- accepted implementation blobs/modes remain unchanged;
+- range privacy and unsuppressed Gitleaks pass.
+
+If anything differs, stop without merging.
+
+Switch to main and fast-forward with --ff-only to the exact verified SHA. Do not create a merge commit.
+
+Recheck remote main immediately before handover. Give Mathew the exact target SHA and:
+
+git -C 'D:\Claude\evidenceguard_agentic_rag' push origin refs/heads/main:refs/heads/main
+
+Stop and wait. Do not push yourself.
+
+8. After Mathew’s main push
+
+Verify remote main, local main and origin/main equal the target. Do not push again.
+
+Monitor the separate push-triggered main CI and secret-scan runs for that exact SHA, within a fresh 25-minute bound. All five required main jobs must explicitly succeed.
+
+Keep main evidence separate from feature evidence. Record actual counts/output only if observed in main logs; do not reuse feature counts as main results.
+
+If a job fails or remains unconfirmed, stop with evidence and a resume note. No rerun or correction.
+
+9. Only after all five main jobs pass
+
+Stage main-publication evidence, uncommitted, in the same five documents.
+
+Record M5f as reviewed, verified in CI and on main at the actual target SHA, within its accepted scope. Preserve all runtime and evidence limitations.
+
+Update only the separate implementation-status heading and its links. Keep the accepted specification contract unchanged.
+
+Run documentation/scope/history/encoding/whitespace/privacy/formatting/lint and unsuppressed staged Gitleaks checks.
+
+Save:
+.local/p213/m5f-main-publication-evidence.diff
+
+Baseline: the published main target.
+Destination: final staged tree.
+Full indexes, prompts.md excluded, verified byte-identical to Git.
+
+Return the complete handoff and both exports with full hashes, byte/line counts, statistics, refs, CI run/job links and attribution.
+
+Stop with main evidence staged and uncommitted. Do not create another commit, delete branches, rerun CI or start M5g.
+
+## Prompt 213 pre-commit note
+
+Source: Claude Code. This note lists only checks completed before it was written. The staged scope, prefix and Gitleaks checks on the final content, and the commit verification, are reported in the Prompt 213 handoff and `.local/p213/`.
+
+**Starting state.** Verified: branch `feat/review-report-content`; HEAD and upstream `3e58f650afd79c4f54313ee083db23d85b9d1b6b` with tree `464bfdd752e3ea541ca47326a372e2a33b14d044` and parent `6c1c9e9d5d20ac516867fc2df59bfdec261dc44e`; staged tree `29a8bf706c75002b2b39712cdc74352c1da5a1b7` with exactly the five evidence paths; nothing unstaged or untracked; local main and stored origin/main `14f510e23e89bd890b2428405de922ef1fcb2232`; origin and noreply identity unchanged. The Prompt 212 export matched its recorded properties and was byte-identical to fresh Git output. The checkpoint is under `.local/p213/checkpoint/`, with a prompts.md prefix of 2,655,306 bytes, SHA-256 `19f172b01b73115f633545f0fb661cbaf42a029fd3d02116756901b498fc26c0`.
+
+**Documentation.** ADR-0024 now records the reviewer-retrieved logs under each run and job link. The plan, README and threat model have short linked summaries. Claude Code's Prompt 212 HTTP 403 statements are kept and labelled as its historical access. The reviewer's acceptance of the Prompt 212 evidence and the gated publication authorization are recorded, with main publication not yet done. All runtime limits are preserved.
+
+**Checks.** Links, anchors and tables passed (561 links, 128 tables, zero problems). UTF-8 without BOM, LF only and no replacement or NUL characters were confirmed. The specification heading, legacy anchor and contract text are identical to `3e58f650`. Ruff format reported 226 files already formatted, and Ruff lint passed.
+
+**Not repeated.** No application tests, builds or wheel checks were rerun.

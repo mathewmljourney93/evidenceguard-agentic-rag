@@ -149,14 +149,20 @@ No retrieval, agent workflow, evaluation results, security guarantees or benchma
 The [M5f report content and renderer specification](docs/plan.md#m5f-report-content-and-renderer-specification-accepted-at-review-prompt-208-implementation-pending) was proposed in Prompt 207
 and **accepted at external review in Prompt 208**, including F1–F12 and two binding
 clarifications. OpenAI Codex implemented M5f in Prompt 209
-([implementation status](docs/plan.md#m5f-implementation-status-accepted-for-a-local-commit-prompt-211-ci-pending), [ADR-0024](docs/decisions/0024-review-report-content.md)).
+([implementation status](docs/plan.md#m5f-implementation-status-feature-ci-passed-at-3e58f650-prompt-212-not-merged), [ADR-0024](docs/decisions/0024-review-report-content.md)).
 Claude Code recovered that work read-only and, in Prompt 210, corrected the builder's retained
 evidence checks after external review findings ([correction](docs/plan.md#m5f-evidence-binding-correction-prompt-210)).
 The corrected implementation was **accepted at external review in Prompt 211 for a local
 implementation commit only** ([acceptance](docs/plan.md#m5f-external-review-acceptance-prompt-211)).
-Publication, merge, Linux verification and current-version CI remain pending; none of the 385
-PostgreSQL tests has run against this version. No M5f control operates in an application
-review path; `run_review` remains unregistered. M5e is reviewed,
+After Mathew's manual feature push, all five required jobs passed at `3e58f650` on
+`feat/review-report-content` (Prompt 212; [feature CI evidence](docs/plan.md#m5f-feature-ci-evidence-at-3e58f650-prompt-212)).
+Claude Code could observe only API conclusions. The reviewer independently retrieved the logs:
+Ubuntu `4051 passed, 385 skipped`, Windows `4050 passed, 386 skipped`, PostgreSQL
+`385 passed, 4051 deselected`, the M5f installed-wheel line on both platforms, smoke and
+cleanup ok, and Gitleaks with 92 commits and no leaks. The reviewer accepted that evidence in
+Prompt 213, which authorizes gated main publication. M5f is **feature-CI verified but not
+merged**; main publication has not happened yet. No M5f control
+operates in an application review path; `run_review` remains unregistered. M5e is reviewed,
 CI verified and on main at `14f510e`; its publication evidence was independently accepted
 in Prompt 207. M5g–M5h and overall M5 acceptance remain pending.
 

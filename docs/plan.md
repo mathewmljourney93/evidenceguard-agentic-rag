@@ -11559,13 +11559,17 @@ The external reviewer accepted both Prompt 206 exports and independently confirm
 publication evidence in Prompt 207 ([review record](decisions/0023-review-stage-persistence.md#external-review-evidence-acceptance-prompt-207)).
 The [M5f specification](#m5f-report-content-and-renderer-specification-accepted-at-review-prompt-208-implementation-pending) below was proposed in Prompt 207
 and accepted at external review in Prompt 208 with two binding clarifications.
-OpenAI Codex implemented M5f in Prompt 209 ([implementation status](#m5f-implementation-status-accepted-for-a-local-commit-prompt-211-ci-pending)).
+OpenAI Codex implemented M5f in Prompt 209 ([implementation status](#m5f-implementation-status-feature-ci-passed-at-3e58f650-prompt-212-not-merged)).
 Claude Code recovered that work read-only and corrected its builder evidence checks in Prompt 210
 ([correction](#m5f-evidence-binding-correction-prompt-210)). The corrected implementation was
 **accepted at external review in Prompt 211 for a local implementation commit only**
-([acceptance](#m5f-external-review-acceptance-prompt-211)). Publication, merge, Linux
-verification and current-version CI remain pending; no M5f control operates in an application
-review path. M5g–M5h and overall M5 acceptance remain pending.
+([acceptance](#m5f-external-review-acceptance-prompt-211)). After Mathew's manual feature
+push, all five required jobs passed at `3e58f650` on `feat/review-report-content` (Prompt 212)
+([feature CI evidence](#m5f-feature-ci-evidence-at-3e58f650-prompt-212)). M5f is
+**feature-CI verified but not merged**. The reviewer independently retrieved the feature logs
+and accepted the evidence in Prompt 213, which authorizes gated main publication; main
+publication has not happened yet. No M5f control
+operates in an application review path. M5g–M5h and overall M5 acceptance remain pending.
 
 <a id="m5f-report-content-and-renderer-specification"></a>
 
@@ -11573,9 +11577,9 @@ review path. M5g–M5h and overall M5 acceptance remain pending.
 
 **Historical acceptance status.** The implementation-pending statements within this
 accepted specification record the Prompt 208 review state. For the implementation staged in
-Prompt 209 and its actual checks, see the separate [implementation status](#m5f-implementation-status-accepted-for-a-local-commit-prompt-211-ci-pending);
-the implementation was accepted for a local commit in Prompt 211, and publication and
-current-version CI are still pending.
+Prompt 209 and its actual checks, see the separate [implementation status](#m5f-implementation-status-feature-ci-passed-at-3e58f650-prompt-212-not-merged);
+the implementation was accepted for a local commit in Prompt 211, and its feature-branch CI
+passed in Prompt 212. It is not merged.
 
 **ACCEPTED at external review in Prompt 208; implementation pending.** The complete
 specification and F1–F12 are accepted subject to binding clarifications A and B recorded below.
@@ -12246,7 +12250,7 @@ accepted in Prompt 208; implementation and every implementation check remain pen
 M5g–M5h and overall M5 acceptance remain pending.
 
 
-#### M5f implementation status (accepted for a local commit, Prompt 211; CI pending)
+#### M5f implementation status (feature CI passed at 3e58f650, Prompt 212; not merged)
 
 OpenAI Codex implemented the accepted Prompt 208 specification, F1–F12 and clarifications
 A/B in Prompt 209: domain-owned immutable values and strict wrapper codec, pure trusted-input
@@ -12265,7 +12269,8 @@ hash-covered values and reversible JSON literals, without stage enrichment or li
 All new values have privacy-safe repr/str. Distinct queries derive from M5c, not an independent
 M5e uniqueness rule. No application review path uses M5f and `run_review` remains unregistered.
 
-Publication, merge, Linux verification and current-version CI remain pending. E7 still requires
+Feature-branch CI passed at `3e58f650` (Prompt 212); main publication and merge remain pending
+and unauthorized. E7 still requires
 a later additive output migration and reviewed atomic fenced writer in M5g, never an edit to
 0007; no persistence or completion path is added. U4, worker obligations, the M3 lease window,
 the open M4d trusted-snapshot limitation and M6 wrapper approval/revision review remain.
@@ -12301,8 +12306,9 @@ corrected blobs, and ran 25 isolated checks on Python 3.12.14 and Pydantic 2.14.
 not a project-suite, installed-wheel, PostgreSQL or CI run. Details and attribution are in
 [ADR-0024](decisions/0024-review-report-content.md#external-review-prompt-211).
 
-Publication, merge, Linux verification and current-version CI remain pending. None of the 385
-PostgreSQL tests has run against this version; M5f adds no PostgreSQL tests. No application
+At acceptance (Prompt 211), publication, merge, Linux verification and current-version CI were
+pending, and none of the 385 PostgreSQL tests had run against this version; M5f adds no
+PostgreSQL tests. The Prompt 212 feature CI below updates that state. No application
 review path uses M5f and `run_review` remains unregistered. Provenance, structural and rendering
 checks do not establish entailment, authenticity, semantic injection resistance or live-model
 quality. No browser or CommonMark-parser check and no tight maximal-size or performance proof
@@ -12310,6 +12316,50 @@ is claimed. E7's additive output migration and reviewed atomic writer/completion
 remain for M5g. Discarded U4 evidence, the M3 lease window, the open M4d trusted-snapshot
 limitation and M6 wrapper approval/revision obligations remain. M5g–M5h and overall M5
 acceptance remain pending.
+
+##### M5f feature CI evidence at 3e58f650 (Prompt 212)
+
+Mathew pushed `feat/review-report-content` manually at
+`3e58f650afd79c4f54313ee083db23d85b9d1b6b`. This is the history-only authorization commit on
+top of the accepted implementation commit `6c1c9e9d`, which leaves every non-history blob
+unchanged. Claude Code observed both push-triggered runs for that exact SHA and branch through
+the public GitHub API (attempt 1):
+
+- [ci run 42165746043](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42165746043)
+  succeeded, with all four of its jobs passing.
+- [secret-scan run 42165746029](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42165746029)
+  succeeded, with its Gitleaks job passing.
+
+Every step of the five required jobs succeeded. Job links and steps are in
+[ADR-0024](decisions/0024-review-report-content.md#feature-branch-ci-evidence-at-3e58f650-prompt-212).
+
+**Logs.** In Prompt 212, Claude Code's anonymous job-log requests returned HTTP 403, so it
+recorded conclusions only; that historical observation stands. The external reviewer then
+retrieved the complete logs independently, and they are recorded per job in
+[ADR-0024](decisions/0024-review-report-content.md#feature-branch-ci-evidence-at-3e58f650-prompt-212):
+
+- **Verify:** Ubuntu `4051 passed, 385 skipped` and Windows `4050 passed, 386 skipped`. Both
+  logs show all 80 M5f module positions passing and the production registry line, plus all
+  eleven installed-wheel lines, including the new M5f report line.
+- **PostgreSQL:** `385 selected` of 4436 collected, and `385 passed, 4051 deselected`.
+- **Container:** the smoke and cleanup succeeded.
+- **Gitleaks:** 92 commits scanned with no leaks.
+
+The reviewer accepted this evidence in Prompt 213, which authorizes gated main publication
+(the evidence commit, its feature CI, a fast-forward and Mathew's manual main push). M5f is
+**feature-CI verified but not merged**; main publication has not happened yet, and M5g is not
+authorized. The runtime limits are unchanged:
+
+- No application review path uses M5f, and `run_review` is unregistered. There is no live
+  provider or model-quality evidence.
+- Provenance does not establish entailment or authenticity, and the rendering and structural
+  checks do not establish semantic injection resistance.
+- The container smoke does not exercise M5f. Offline migration checks are not database
+  execution. Recall is arithmetic, and Voyage is mocked.
+- There is no browser or CommonMark-parser check and no tight size or performance proof.
+- E7's output migration and atomic writer, discarded U4 evidence, the M3 lease window, M4d and
+  M6 obligations remain.
+- M5g–M5h and overall M5 acceptance remain pending.
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.
