@@ -148,10 +148,17 @@ No retrieval, agent workflow, evaluation results, security guarantees or benchma
 
 The [M5f report content and renderer specification](docs/plan.md#m5f-report-content-and-renderer-specification-accepted-at-review-prompt-208-implementation-pending) was proposed in Prompt 207
 and **accepted at external review in Prompt 208**, including F1–F12 and two binding
-clarifications. M5f implementation and every implementation check remain pending; no M5f
-control operates. M5e is reviewed, CI verified and on main at `14f510e`; its publication
-evidence was independently accepted in Prompt 207. M5g–M5h and overall M5 acceptance remain
-pending.
+clarifications. OpenAI Codex implemented M5f in Prompt 209
+([implementation status](docs/plan.md#m5f-implementation-status-accepted-for-a-local-commit-prompt-211-ci-pending), [ADR-0024](docs/decisions/0024-review-report-content.md)).
+Claude Code recovered that work read-only and, in Prompt 210, corrected the builder's retained
+evidence checks after external review findings ([correction](docs/plan.md#m5f-evidence-binding-correction-prompt-210)).
+The corrected implementation was **accepted at external review in Prompt 211 for a local
+implementation commit only** ([acceptance](docs/plan.md#m5f-external-review-acceptance-prompt-211)).
+Publication, merge, Linux verification and current-version CI remain pending; none of the 385
+PostgreSQL tests has run against this version. No M5f control operates in an application
+review path; `run_review` remains unregistered. M5e is reviewed,
+CI verified and on main at `14f510e`; its publication evidence was independently accepted
+in Prompt 207. M5g–M5h and overall M5 acceptance remain pending.
 
 ## Development (Windows, PowerShell)
 

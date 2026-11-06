@@ -287,6 +287,7 @@ def test_m5a_agents_package_contains_only_the_accepted_modules() -> None:
         "py.typed",
         "providers.py",
         "scripted.py",
+        "report.py",  # M5f: only the accepted pure builder/renderer is added.
         *M5C_MODULES,
         "data",
     }
@@ -341,10 +342,11 @@ def test_m5b_provenance_uses_only_the_domain_and_the_standard_library() -> None:
 
 def test_m5b_is_not_wired_into_any_application_or_handler() -> None:
     """M5b adds no handler, endpoint, command or persistence use; later slices own that. The
-    accepted M5c request assembly (M5c-B) is the only agents module that may use its values,
-    and the accepted M5e stage persistence (M5e-A) the only persistence module."""
+    accepted M5c request assembly and M5f pure report builder may use its values; the accepted
+    M5e stage persistence (M5e-A) remains the only persistence consumer."""
     allowed = {
         (evidenceguard_agents, "assembly.py"),
+        (evidenceguard_agents, "report.py"),  # M5f's accepted pure provenance rechecks.
         (evidenceguard_persistence, "review_stages.py"),
     }
     for package in (
@@ -550,6 +552,56 @@ def test_m5e_domain_module_imports_only_the_accepted_domain_modules() -> None:
     }
 
 
+@pytest.mark.parametrize(
+    "package,name,allowed",
+    [
+        (evidenceguard_domain, "report_content.py", {"evidenceguard_domain"}),
+        (evidenceguard_agents, "report.py", {"evidenceguard_domain", "evidenceguard_agents"}),
+    ],
+)
+def test_m5f_report_modules_keep_the_pure_import_boundary(
+    package: ModuleType,
+    name: str,
+    allowed: set[str],
+) -> None:
+    path = _source(package, name)
+    assert _module_imports(path) - set(sys.stdlib_module_names) <= allowed
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    forbidden_calls = {
+        "open",
+        "files",
+        "load_template",
+        "load_pinned_template",
+        "load_prompt",
+        "load_pinned_prompt",
+        "now",
+        "utcnow",
+        "uuid4",
+        "connect",
+        "urlopen",
+    }
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            name = (
+                node.func.attr
+                if isinstance(node.func, ast.Attribute)
+                else node.func.id
+                if isinstance(node.func, ast.Name)
+                else ""
+            )
+            assert name not in forbidden_calls
+
+
+def test_m5f_is_not_wired_into_any_application_or_worker() -> None:
+    for package in (evidenceguard_api, evidenceguard_worker, evidenceguard_persistence):
+        assert package.__file__ is not None
+        for path in Path(package.__file__).parent.rglob("*.py"):
+            imports = _module_imports(path)
+            assert "evidenceguard_agents.report" not in _domain_imports(path)
+            assert "evidenceguard_domain.report_content" not in _domain_imports(path)
+            assert "report_content" not in imports
+
+
 def test_m5e_persistence_module_keeps_the_accepted_boundaries() -> None:
     """M5e-A: the domain, persistence (jobs, reviews' values, retrieval) and SQLAlchemy only;
     never the agents, the worker or a provider."""
@@ -585,9 +637,9 @@ def test_m5e_migration_and_modules_are_packaged() -> None:
 
 
 def test_m5e_is_not_wired_into_any_route_command_handler_or_registry() -> None:
-    """W8: M5e is an internal persistence seam; no application, worker, agents or observability
-    module uses it, no output table or writer exists (E7), and ``run_review`` stays
-    unregistered."""
+    """W8: M5e stays internal. Only M5f's pure report consumer may use its domain values;
+    no application/worker/observability use, output table/writer (E7), or run_review registration.
+    """
     from evidenceguard_worker.handlers import production_registry
 
     for package in (
@@ -599,6 +651,8 @@ def test_m5e_is_not_wired_into_any_route_command_handler_or_registry() -> None:
     ):
         assert package.__file__ is not None
         for source in Path(package.__file__).parent.rglob("*.py"):
+            if package is evidenceguard_agents and source.name == "report.py":
+                continue  # M5f consumes domain stage values, never persistence/runtime seams.
             assert "review_stages" not in source.read_text(encoding="utf-8"), source.name
     persistence = _source(evidenceguard_persistence, "__init__.py").parent
     users = {

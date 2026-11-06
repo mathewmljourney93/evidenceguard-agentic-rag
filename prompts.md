@@ -48098,3 +48098,1110 @@ Recorded external specification/source-review acceptance of the complete M5f spe
 Completed checks: exactly five paths changed against HEAD; only README.md, docs/plan.md, docs/threat-model.md and prompts.md changed against the starting staged tree; ADR-0023 unchanged against that tree; all 240 protected tracked blob/mode pairs unchanged from HEAD, including PostgreSQL test blob cb13b6289f74e202e1d2f6586c9c14fef1599e7d. No new tracked files, local artifacts or build outputs. No unstaged or unexpected untracked work. Verified UTF-8 without BOM, LF only, no replacement/NUL characters; whitespace; preserved other headings/anchors; 397 links/anchors and 98 tables with zero errors (including the explicit compatibility anchor); privacy review and supplemental token-pattern scan. Locked offline Ruff format check reported 220 files already formatted; Ruff lint passed. Unsuppressed staged Gitleaks with inline allow suppression disabled found no leaks. No local Gitleaks config/ignore or environment override was present.
 
 Verified the earlier prompts.md bytes as an identical prefix, SHA-256 4d2440a8bbe44b42b3d558ac8734680a77c2644939b369412f24561e6fc53395, and exact byte copies of the saved detailed .local/p207/handoff.md, supplied acceptance with clarifications and Prompt 208 text. The saved handoff is accurately labelled; no unavailable short handoff was reconstructed. OpenAI Codex performed documentation/specification and acceptance work; external-review and earlier Claude Code attribution are preserved. No application tests, builds, wheel checks, database, Docker, provider, network, push, merge or CI operation was performed.
+
+
+## Prompt 209: available original Prompt 208 handoff
+
+Source: .local/p208/handoff.md, the saved detailed handoff, copied byte-for-byte; no unavailable short chat handoff is reconstructed.
+
+# Prompt 208 handoff for Mathew and the external reviewer
+
+**M5f specification accepted; implementation and every implementation check pending.**
+The complete specification and F1–F12, subject to binding clarifications A and B, are recorded
+in a local documentation commit. The commit includes M5e's reviewed main-publication evidence.
+Nothing was pushed or merged. No implementation was started. M5g–M5h and overall M5
+acceptance remain pending.
+
+## Recovery and reviewed baseline
+
+The starting state matched every supplied expectation: branch `docs/report-content-plan`,
+HEAD/local main/stored origin/main `14f510e23e89bd890b2428405de922ef1fcb2232`, HEAD tree
+`fce760c4fad950942ab5ec5152490fe6d3f00495`, staged tree
+`da10f127b2b0c9b22779f0e25cc8a586c596d075`, exactly five staged documents, and no unstaged
+or unexpected untracked work. Repository instructions and the Prompt 207 checkpoint/handoff
+were consulted. No unexpected work was discarded or overwritten.
+
+The supplied `.local/p207/m5e-main-evidence-and-m5f-spec.diff` matched a fresh full-index
+Git comparison from `14f510e23e89bd890b2428405de922ef1fcb2232` to
+`da10f127b2b0c9b22779f0e25cc8a586c596d075`, excluding prompts.md: four files,
+796 insertions/47 deletions, 109,453 bytes, 947 lines, SHA-256
+`0442e876ef26622c49321119162c0ed3454b629d19187c60cdebb0dfcdbe5eef`.
+
+Checkpoint: `.local/p208/checkpoint.json`, `starting-blobs.txt`, and `prompts.prefix.md`.
+The 2,543,010-byte history prefix has SHA-256
+`4d2440a8bbe44b42b3d558ac8734680a77c2644939b369412f24561e6fc53395`.
+
+## Acceptance and clarifications
+
+The external reviewer verified the supplied export's bytes, checksum, paths and statistics,
+inspected the specification/handoff, and cross-checked the published M1 evidence/report,
+M5b provenance, M5c template and M5d configuration contracts. This was specification/source
+review, not M5f execution. The reviewer did not implement M5f or run a suite, renderer,
+decoder, build, installed-wheel check or database probe.
+
+The plan records complete F1–F12 acceptance, including domain-owned values/codecs and agents
+builder/renderer, the explicit sequence-placement extension, versioned wrapper/separate
+approval digest, preserved Verification and unresolved reasons, owner-only Analysis, P11
+after Analysis failure, whole-report refusal above 200 findings, exact encoding/strict
+decoding, engineering caps, reversible JSON-literal Markdown, private errors/precedence,
+M5g/M6 handover and verification obligations. Caps are accepted engineering limits, not
+proved tight maxima, measured performance guarantees or quality claims. No specification
+decision remains open within this accepted scope.
+
+- **A:** every new report value and nested value requires explicit privacy-safe repr/str;
+  no dataclass default or content-bearing nested representation. Only appropriate schema/
+  version identifiers, ordinary identifiers, enums, counts and digests may appear. No report/
+  question text/titles, queries, evidence/quotes, rationale/claims, finding text/titles,
+  follow-ups or canonical payload bytes. Planned sentinel-based checks cover each forbidden
+  field, nested values and both representations. Explicit requested encoding/rendering still
+  returns content. No-warning/no-output/no-log errors and process-control identity remain.
+- **B:** distinct queries are required by M5c's template contract; M5e exact question rebuilding
+  does not independently require uniqueness. M5f preserves distinct queries and exact agreement
+  of template, plan and trusted-stage questions. Structural validation, source-bound rechecking
+  and the caller's genuinely pinned-template obligation remain distinct. No production change.
+
+The renamed accepted heading is
+`docs/plan.md#m5f-report-content-and-renderer-specification-accepted-at-review-prompt-208-implementation-pending`.
+Links in the permitted files use it. ADR-0023 is byte-identical to the reviewed staged blob,
+as explicitly required; its existing link resolves through a retained old-anchor alias in
+the plan. All other accepted specification headings/anchors remain intact. Earlier proposal
+status is historical. README and threat model record acceptance and pending implementation.
+
+OpenAI Codex performed documentation/specification and acceptance work. Supplied external
+review evidence and earlier Claude Code implementation/corrections remain separately
+attributed. prompts.md preserves its prior bytes exactly, followed by the original saved
+detailed `.local/p207/handoff.md` with an accurate source label, supplied acceptance,
+Prompt 208 verbatim and a completed-check pre-commit note. No missing short handoff was
+reconstructed and no prospective commit SHA appears in that pre-commit note.
+
+## Local commit
+
+- Commit: `8e0173c1c9325ed1e4602aa32fd42b44bd4325ba`
+- Direct parent: `14f510e23e89bd890b2428405de922ef1fcb2232`
+- Tree: `379d506b46f9181f7915803ed7ebcb225bedeb65`
+- Subject: `docs: record M5e main evidence and accepted M5f specification`
+- Author and committer: `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>`
+- Message read from `.local/p208/commit-message.txt`; accurate assistance attribution and
+  `Co-Authored-By: OpenAI Codex <noreply@openai.com>` trailer follow repository convention.
+- Exactly five changed paths against the parent: README.md,
+  docs/decisions/0023-review-stage-persistence.md, docs/plan.md, docs/threat-model.md, prompts.md.
+- Against the reviewed staged tree, only README.md, docs/plan.md, docs/threat-model.md and
+  prompts.md differ. ADR-0023 is unchanged against that tree.
+- All 240 other tracked blob/mode pairs remain identical to the parent, including all source,
+  tests, migrations, models, dependencies, resources, packaging and workflows. No modes changed.
+  The reviewed PostgreSQL test remains `cb13b6289f74e202e1d2f6586c9c14fef1599e7d`.
+
+## Completed verification and limits
+
+Scope/blob/mode checks, no tracked local artifacts/new tracked files, exact history prefix/
+source-copy fidelity, UTF-8 without BOM, LF only, no replacement/NUL characters, whitespace,
+other headings/anchors and privacy checks passed. Local link/anchor checker (including the
+explicit compatibility alias): 397 links, zero errors; 98 tables, zero problems. No remote
+link check or other network operation was performed.
+
+`uv run --locked --offline ruff format --check .`: 220 files already formatted.
+`uv run --locked --offline ruff check .`: all checks passed.
+Final unsuppressed staged Gitleaks, with inline allow suppression disabled: approximately
+156,804 bytes scanned, no leaks. Post-commit
+`gitleaks git --redact --verbose --ignore-gitleaks-allow --no-banner .`: 90 commits,
+approximately 8.12 MB scanned, no leaks. No local config/ignore or environment override was
+present and no suppressions were added. Clean status and unchanged main refs were verified
+after committing. A PowerShell parsing error in an unquoted tree-query argument was corrected
+by retrieving and asserting the tree through an argument-safe Python subprocess; no state
+change resulted from that query error.
+
+No application tests, builds, wheel checks, database, Docker, provider, network, CI, push,
+merge, amend, rebase or other history rewrite occurred. No M5f implementation exists and
+no M5f control operates. Later implementation/boundary verification remains pending.
+
+## Incremental acceptance export
+
+File: `.local/p208/m5f-spec-acceptance.diff`
+
+- Baseline tree: `da10f127b2b0c9b22779f0e25cc8a586c596d075`
+- Destination commit: `8e0173c1c9325ed1e4602aa32fd42b44bd4325ba`
+- Destination tree: `379d506b46f9181f7915803ed7ebcb225bedeb65`
+- Full-index, prompts.md excluded, verified byte-identical to fresh Git output.
+- Export paths: README.md, docs/plan.md, docs/threat-model.md.
+- Statistics: three files, 113 insertions, 35 deletions.
+- Bytes: 20,978. Lines: 277.
+- SHA-256: `6e13b49addd1e4502b177a7d7d1f11c37b1a34a41dae27bd6b71d7c8a79efe96`.
+
+Detailed final refs/commit/export metadata: `.local/p208/final-state.json`.
+Protected identities, file checksums and history fidelity: `.local/p208/document-checks.json`.
+
+## Final state and remaining scope
+
+Branch `docs/report-content-plan` is at the new local commit, with clean index and working
+tree and no unexpected untracked files. Local main, stored origin/main and the retained
+local/stored-remote feature refs remain `14f510e23e89bd890b2428405de922ef1fcb2232`.
+Origin and the established identity are unchanged. These are local ref observations; no
+remote operation was authorized or performed. Nothing from this task was pushed or merged.
+
+M5e is reviewed, CI verified and on main at `14f510e` within its recorded scope; its evidence
+and the accepted M5f specification are committed **locally only** in this task. No application
+review path or run_review registration is added. E7's later additive output migration and
+reviewed atomic writer, U4 discarded-evidence limit, worker obligations, accepted M3 lease
+window, open M4d trusted-snapshot limitation and all prior runtime/quality limits remain.
+M5g/M6 still require their own reviews. M5f implementation and every implementation check,
+M5g–M5h and overall M5 acceptance remain pending.
+
+Mathew: return this handoff plus `.local/p208/m5f-spec-acceptance.diff` to the external reviewer.
+
+
+## Prompt 209 implementation authorization
+
+Mathew authorizes the accepted M5f implementation, meaningful local verification, offline packaging and staged review only. No commit, publication, remote operation, provider call or M5g implementation.
+
+## Prompt 209 user request (verbatim)
+
+Prompt 209 — Implement the accepted M5f report content and renderer
+
+Written for: Mathew and the external reviewer.
+
+Implement the complete M5f specification accepted in Prompt 208, including F1–F12 and binding clarifications A and B.
+
+Complete the implementation, meaningful tests, local verification, packaging checks and documentation. Leave the result staged and uncommitted for external review.
+
+No commit, push, merge, remote operation, provider call or M5g implementation is authorized.
+
+Continue in this session if it is working reliably. Do not request a fresh session based on prompt count.
+
+1. Verify and checkpoint
+
+Read the repository instructions and .local/p208/ handoff/checkpoints.
+
+Expected:
+- Branch: docs/report-content-plan
+- HEAD:
+  8e0173c1c9325ed1e4602aa32fd42b44bd4325ba
+- Parent:
+  14f510e23e89bd890b2428405de922ef1fcb2232
+- HEAD tree:
+  379d506b46f9181f7915803ed7ebcb225bedeb65
+- Clean index and working tree.
+- Local main and stored origin/main:
+  14f510e23e89bd890b2428405de922ef1fcb2232
+- Origin and established noreply identity unchanged.
+
+Verify .local/p208/m5f-spec-acceptance.diff:
+- Baseline:
+  da10f127b2b0c9b22779f0e25cc8a586c596d075
+- Destination: 8e0173c1c9325ed1e4602aa32fd42b44bd4325ba
+- Full-index, prompts.md excluded.
+- Three files, +113/-35
+- 20,978 bytes; 277 lines
+- SHA-256:
+  6e13b49addd1e4502b177a7d7d1f11c37b1a34a41dae27bd6b71d7c8a79efe96
+
+Verify byte identity against Git.
+
+Save a checkpoint under .local/p209/ containing refs, status, tracked blob/mode identities and the prompts.md prefix/checksum.
+
+Create feat/review-report-content from HEAD if it does not exist. Inspect any existing branch rather than overwriting it.
+
+Preserve unexpected work. Report material discrepancies before dependent changes.
+
+2. Read the controlling implementation contract
+
+Read the full accepted M5f section in docs/plan.md, including its acceptance subsection, F1–F12 and both clarifications.
+
+Inspect the actual M1, M5b–M5e contracts and relevant tests before coding.
+
+The accepted specification controls. This prompt summarizes the work; it does not replace or relax the detailed field tables, canonical schemas, stage matrix, renderer emission order, error precedence or bounds.
+
+In particular:
+- evidenceguard.report-content.v1 and existing M1 hashes/approvals remain unchanged;
+- the new wrapper has a separate versioned schema and digest;
+- all substantive displayed conclusions are hash-covered or derived solely from that content;
+- no unhashed stage enrichment;
+- no persistence, output table, migration, worker handler or production registration;
+- E7 and the M5g/M6 handover remain binding.
+
+3. Authorized tracked paths
+
+New:
+- packages/domain/evidenceguard_domain/report_content.py
+- packages/agents/evidenceguard_agents/report.py
+- tests/test_report_content.py
+- tests/test_report_builder.py
+- tests/test_report_renderer.py
+- docs/decisions/0024-review-report-content.md
+
+Modified:
+- tests/test_packaging.py
+- .github/workflows/ci.yml
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+These are the twelve authorized paths.
+
+Keep every other tracked blob/mode unchanged, including:
+- all M1 and M5a–M5e production modules;
+- ADR-0023;
+- migrations, persistence and worker code;
+- pyproject.toml and uv.lock;
+- pinned template/prompt resources and sample data;
+- secret-scan workflow;
+- existing PostgreSQL tests.
+
+If an actual necessary dependency requires another path, explain the concrete need before changing it. Do not broaden scope for convenience.
+
+4. Implement the pure domain values and codec
+
+Implement the exact accepted public values, enums, errors and APIs in evidenceguard_domain.report_content.
+
+Cover:
+- ReportBinding;
+- ReportVerification;
+- ReportStage;
+- ReportFindingRef;
+- ReportQuestion;
+- ReviewReportContent;
+- ReportMode;
+- revalidation, canonical bytes, wrapper SHA-256 and strict decoding.
+
+Follow the exact schemas and shape matrix. Recompute all derivable configuration, plan-question, dependency and legacy digests. Treat omitted source payload digests as references, not structural proof of provenance.
+
+Enforce:
+- exact types before coercion or serialization;
+- nested rebuilding and type/value preservation;
+- closed fields and explicit nulls;
+- accepted string, integer, collection and global bounds;
+- deterministic rule-finding identity/payload and unresolved projection;
+- full citation-value equality for Analyst references;
+- distinct queries as the M5c-derived wrapper invariant;
+- fixed error classifications and precedence;
+- no warnings, stdout/stderr or logging at error boundaries;
+- fresh errors outside handlers without cause/context;
+- process-control identity.
+
+Every new value needs explicit privacy-safe repr and str. Disable default dataclass repr and never delegate to content-bearing nested representations.
+
+Implement bounded lexical checks before general JSON parsing, including size, depth, structural tokens, integer spelling/magnitude, escaped strings, duplicate keys and unsupported versions. Require exact canonical re-encoding and expected-digest verification.
+
+Preserve M1 canonical bytes and hash behaviour exactly. Never reinterpret a legacy digest as the wrapper's digest.
+
+5. Implement builder, source recheck and renderer
+
+In evidenceguard_agents.report implement the accepted APIs:
+- build_report_content;
+- recheck_report_content;
+- render_report_markdown.
+
+Builder and source recheck:
+- validate exact trusted/template/planned/stage inputs and all identities;
+- preserve template question order;
+- require both committed stages per question;
+- distinguish incomplete work from committed unresolved stages;
+- use the accepted provenance rechecks and owner-only Analysis;
+- preserve successful Verification after unresolved Analysis;
+- include the exact P11 documentary finding whenever required, including after Analysis failure;
+- preserve Analyst content and follow-ups exactly;
+- reject collisions/conflicts;
+- apply whole-report refusal above 200 findings without truncation;
+- produce the exact unresolved projection;
+- make the source-bound recheck rebuild and compare canonical content.
+
+Renderer:
+- use only freshly validated hash-covered content;
+- implement the accepted renderer ID, stamp, field primitive and exact emission order;
+- preserve quotation text through the labelled reversible JSON-literal presentation;
+- handle adversarial Markdown/HTML/URL/control-character text as specified;
+- enforce the render cap without returning partial output;
+- do not access a database, loader, provider, clock, filesystem resource or randomness.
+
+Keep import boundaries intact. Domain code must not import agents. Builder/renderer must not import persistence, worker or API packages or call artifact loaders.
+
+Do not silently change the accepted presentation because another format looks nicer.
+
+6. Meaningful verification
+
+Write tests that establish behaviour, including:
+- exact field types, bool-as-int, subclasses and nested bypass-built inputs;
+- privacy-safe repr/str with distinct sentinels in every forbidden text field;
+- warning/output/log silence and process-control identity;
+- canonical byte fixtures and independently derived literal digests;
+- unchanged M1 bytes/hash fixtures, including Unicode;
+- wrapper/legacy digest distinction and unsupported-version behaviour;
+- strict decoder keys, nulls, integer/escape/Unicode cases and all engineering caps;
+- source identities, template/plan equality and question ordering;
+- complete versus missing/unresolved stages and the accepted S/U matrix;
+- owner-only Analysis, citation metadata and dependency binding;
+- Verification preserved after Analysis failure;
+- mandatory documentary finding and deterministic IDs;
+- totals 199/200/201 and no partial report or dropped rule finding;
+- successful zero-finding Analysis and unresolved projection;
+- exact Markdown bytes, reversible quotes and adversarial strings;
+- source recheck refusing inconsistent content.
+
+Expected bytes/digests must come from independent test-owned fixtures and standard-library derivations, not the implementation under test.
+
+Test boundaries meaningfully. Do not obtain a passing test by weakening the accepted contract or merely copying implementation logic into an oracle.
+
+Preserve the accepted canary contract, negative control and limitation probe. Do not introduce a production canary blacklist or claim live-model injection resistance.
+
+Add packaging/import-boundary coverage. Update existing file-set/import assertions only as narrowly required by the accepted new modules, explaining any adjustment.
+
+Add one purely additive offline installed-wheel assertion in ci.yml. Keep all existing checks, jobs, triggers and production-registry assertions.
+
+7. Local checks, build and installed wheel
+
+Use the existing locked offline environment.
+
+Run:
+- Ruff formatting/lint;
+- strict mypy;
+- the three new test modules;
+- a focused set covering affected M1 report/hash, M5b–M5e and packaging contracts;
+- full suite;
+- integration and non-integration collection.
+
+Report skipped PostgreSQL tests accurately. M5f is pure and adds no PostgreSQL tests.
+
+Build the working implementation offline and compare against a git-archive build of 8e0173c1.
+
+Confirm:
+- only authorized additions/changes;
+- nothing unexpectedly removed;
+- all sample-data and pinned template/prompt bytes unchanged.
+
+Run the complete installed-wheel step extracted from ci.yml in a fresh environment outside the checkout:
+- locked dependencies installed offline with hashes;
+- wheel installed with --no-deps;
+- imports/resources verified as coming from site-packages;
+- all existing assertions plus the new report assertion.
+
+Directly probe representative wrapper decode/hash/render and malformed-input refusals against the installed wheel.
+
+Ensure the final staged implementation's wheel is the tested artifact or verify its relationship precisely after later documentation edits.
+
+Save representative rendered Markdown examples under .local/p209/ for:
+- successful stages;
+- unresolved Analysis with preserved Verification and a mandatory documentary finding;
+- adversarial text.
+
+Inspect those outputs for conformity with the accepted format. Do not claim an unperformed browser/CommonMark-parser test.
+
+No dependency additions, downloads, database configuration, Docker or live calls are authorized.
+
+8. Documentation and history
+
+Create ADR-0024 with:
+- implemented contracts and module boundaries;
+- wrapper/legacy integrity and compatibility;
+- renderer behaviour and its tradeoff;
+- bounds and failure policy;
+- implementation choices/deviations needing review;
+- actual checks and packaging results;
+- limitations and M5g/M6 obligations.
+
+Update README, plan and threat model:
+- specification accepted in Prompt 208;
+- implemented and staged for review in Prompt 209;
+- implementation acceptance, publication and current-version CI pending;
+- no M5f control operates in an application review path;
+- M5g–M5h and overall M5 acceptance pending.
+
+Keep the accepted specification heading/anchor unchanged. Add a separate implementation-status subsection.
+
+Do not claim the M4d trusted-snapshot limitation is closed.
+
+Append the available Prompt 208 handoff, this implementation authorization, Prompt 209 verbatim and a completed-check outcome to prompts.md. Preserve the previous bytes exactly as a prefix and identify source text accurately.
+
+9. Final checks and export
+
+Stage exactly the authorized paths. Verify:
+- all other tracked blobs/modes unchanged;
+- no tracked local artifacts/build outputs;
+- links, anchors and tables;
+- UTF-8 without BOM, LF only, no replacement characters;
+- whitespace;
+- history and literal-text fidelity;
+- privacy;
+- unsuppressed staged Gitleaks.
+
+Export:
+.local/p209/m5f-implementation.diff
+
+Baseline:
+8e0173c1c9325ed1e4602aa32fd42b44bd4325ba
+
+Destination:
+the final staged tree
+
+Use --full-index and exclude prompts.md. Verify byte identity against Git.
+
+Report full IDs, paths, statistics, byte/line counts, full SHA-256, actual verification, any deviations and final refs/state.
+
+Leave everything staged and uncommitted. No push, merge, CI run or M5g work.
+
+Mathew: return the handoff plus
+.local/p209/m5f-implementation.diff
+to the external reviewer.
+
+
+## Prompt 209 completed outcome
+
+Prompt 209 completed outcome (OpenAI Codex; implementation staged for external review)
+
+Verified the expected clean docs/report-content-plan starting state at 8e0173c1c9325ed1e4602aa32fd42b44bd4325ba, its parent/tree, unchanged main/stored origin/main at 14f510e23e89bd890b2428405de922ef1fcb2232, origin and noreply identity. Verified the Prompt 208 acceptance export's full-index Git identity, three paths, +113/-35, 20,978 bytes, 277 lines and full SHA-256. Saved refs/status/tracked blob/mode identities and the 2,567,904-byte history prefix with SHA-256 cf832cedc10596a495aeda5ec13ff96270ba94172623582e9a10b42f02a49485. Created feat/review-report-content without overwriting an existing branch.
+
+Implemented the accepted M5f domain values/errors/codec and agents builder/source recheck/renderer, F1–F12 and clarifications A/B, with exact nested types and rebuilding, real-tenant/owning-question M1 Verification validation, privacy-safe representations, preserved Verification and P11 after Analysis failure, owner-only Analysis, source/digest/dependency/configuration binding, whole-report refusal above 200 findings, strict bounded lexical/JSON decoding, separate wrapper digest, and exact deterministic JSON-literal Markdown. Added meaningful tests, narrow packaging guards, the purely additive offline installed-wheel assertion and ADR-0024/status documentation. No intended schema/renderer/bounds deviation; internal helper placement and packaging guard adjustments are recorded for implementation review. Specification acceptance is not implementation acceptance.
+
+Final locked offline checks completed: Ruff formatting (226 files already formatted), Ruff lint, strict mypy (181 source files), three new modules (70 passed), focused M1/M5b–M5e/packaging contracts (849 passed), full suite (4,039 passed, 387 skipped), integration collection (385 selected/4,041 deselected), non-integration collection (4,041 selected/385 deselected), 4,426 total cases. The 73 new cases are 70 pure M5f cases plus three packaging checks. No test database is configured; 385 PostgreSQL cases were collected, not run, and skips establish no database behaviour. After final review added the real-owner Verification reconstruction, static/focused/full/collection checks and installed-wheel verification were repeated for that exact final source.
+
+Offline sdist/wheel builds and git-archive comparison against 8e0173c1 passed. The final wheel adds only evidenceguard_domain/report_content.py and evidenceguard_agents/report.py; existing wheel members differ only in generated METADATA/RECORD. Sdist adds only the six authorized files; changed existing members are README, test_packaging and derived PKG-INFO; nothing removed. Sample and pinned-resource bytes remain unchanged. The final tested wheel SHA-256 is 94c6d6a2f86930435e329e0d2d83474257d23ff46adf67ce6861c56b3641a2d6. Its source hashes match the final staged source (history is not a wheel/sdist payload), and the installed M5f module bytes match the wheel members.
+
+Executed the complete installed-wheel step extracted from ci.yml in a fresh environment outside the checkout, with locked runtime requirements installed from cache using --offline --require-hashes and the wheel using --offline --no-deps. All existing imports/resources/registry assertions and ten existing behaviour lines passed, plus the new pure report assertion. Direct isolated wheel probes passed S1/U1, preserved Verification/P11, wrapper decode/hash, reversible adversarial quotation, malformed-input refusal and privacy-safe representation. Wheel checks are offline packaging evidence; migration SQL is not PostgreSQL execution, Recall is arithmetic, Voyage mocked and calls scripted. No container smoke or browser/CommonMark-parser test was performed. Three Markdown examples under .local/p209/examples/ were rendered and inspected as text.
+
+Final documentation checks completed: twelve authorized paths only; all 239 protected tracked blob/mode pairs unchanged, including ADR-0023, M1/M5a–M5e production, migrations/persistence/worker, PostgreSQL tests, dependencies/resources and secret-scan workflow; no tracked local/build artifacts. The old CI content is byte-identical after removing the additive M5f assertion. Prompt prefix and copied original saved Prompt 208 handoff/Prompt 209 text fidelity verified. UTF-8 without BOM, LF only, no replacement/NUL characters, whitespace, all accepted specification headings/anchors, 407 links/anchors and 99 tables with zero errors, privacy review and supplemental token-pattern checks passed. Unsuppressed staged Gitleaks with inline allow suppression disabled passed before this outcome note; the final staged scan includes this note. No suppressions or secret-scan config changes were added.
+
+OpenAI Codex performed this implementation and local verification; earlier Claude Code work and independent reviewer attribution remain intact. Implementation acceptance, publication and current-version CI remain pending. No M5f control operates in an application review path and run_review remains unregistered. E7's later additive migration and reviewed atomic output writer, U4, worker obligations, accepted M3 lease window, open M4d trusted-snapshot limitation and M6 wrapper approval/revision review remain. No entailment, authenticity, live-model-quality or semantic injection-resistance guarantee. Canary/negative-control/limitation obligations remain unchanged. M5g–M5h and overall M5 acceptance remain pending. No commit, push, merge, remote operation, provider call, database configuration, Docker, CI run or M5g implementation was performed.
+
+
+## Prompt 209 recovery user request (verbatim)
+
+Source: Mathew's recovery prompt to a fresh Claude Code session after the switch from OpenAI Codex. It forbade tracked writes, so it is recorded here at the next authorized documentation update.
+
+Recover the EvidenceGuard project after switching from OpenAI Codex to this fresh Claude Code session.
+
+The Codex chat output was lost, but its saved Prompt 209 handoff and implementation export survived. Recover from those files and verify the local state. This is recovery and handoff preparation only; implementation review is still pending.
+
+Repository:
+D:\Claude\evidenceguard_agentic_rag
+
+1. Read the repository instructions and saved records
+
+Read applicable AGENTS.md and other repository instructions. Then inspect:
+- .local/p209/handoff.md, or the actual handoff file saved under .local/p209/
+- .local/p209/checkpoint.json
+- .local/p209/final-state.json
+- .local/p209/final-checks.json
+- .local/p209/checks/results.json
+- .local/p209/m5f-implementation.diff
+- relevant artifact/check records referenced by the handoff
+
+Locate missing filenames rather than inventing their contents. Read the accepted M5f specification in docs/plan.md and ADR-0024 for context.
+
+Preserve attribution: OpenAI Codex performed Prompt 209’s implementation and checks. Your work is this recovery verification. Do not present its results as checks you ran.
+
+2. Verify the expected state without changing it
+
+Expected branch:
+feat/review-report-content
+
+Expected HEAD:
+8e0173c1c9325ed1e4602aa32fd42b44bd4325ba
+
+Expected HEAD tree:
+379d506b46f9181f7915803ed7ebcb225bedeb65
+
+Expected final staged tree:
+551155ef0a04bcd5f07737bd0042fec455262ac4
+
+Expected local main and stored origin/main:
+14f510e23e89bd890b2428405de922ef1fcb2232
+
+Exactly these twelve paths should be staged:
+
+- packages/domain/evidenceguard_domain/report_content.py
+- packages/agents/evidenceguard_agents/report.py
+- tests/test_report_content.py
+- tests/test_report_builder.py
+- tests/test_report_renderer.py
+- docs/decisions/0024-review-report-content.md
+- tests/test_packaging.py
+- .github/workflows/ci.yml
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+There should be no unstaged or unexpected untracked work. All other tracked blobs and modes must match HEAD.
+
+The protected PostgreSQL test blob remains:
+cb13b6289f74e202e1d2f6586c9c14fef1599e7d
+
+Inspect whether any relevant test, build, push or monitor process is still running. Do not terminate unrelated processes.
+
+If the state differs, preserve everything and report the exact discrepancy. Do not reset, restore, re-stage, overwrite or reconstruct the expected state automatically.
+
+3. Verify the surviving export
+
+.local/p209/m5f-implementation.diff must have:
+
+- Baseline: 8e0173c1c9325ed1e4602aa32fd42b44bd4325ba
+- Destination staged tree: 551155ef0a04bcd5f07737bd0042fec455262ac4
+- Full indexes, prompts.md excluded
+- 11 files, 2,903 insertions and 15 deletions
+- 132,343 bytes
+- 3,051 lines
+- SHA-256:
+  c68b20573d8f03663ef9a6a58c7ff03b132414b64e9f50cee8e52c4b15341a28
+
+Compare its raw bytes with a fresh Git comparison between those recorded objects, and with the current cached comparison if the index matches.
+
+Preserve the original export and records unchanged.
+
+4. Establish whether anything actually remains unfinished
+
+The saved handoff says Prompt 209 is complete:
+- M5f implemented and staged, uncommitted.
+- Local Ruff, strict mypy, focused/full tests, collection, offline builds and isolated installed-wheel checks completed.
+- Full suite: 4,039 passed and 387 skipped.
+- PostgreSQL tests were not executed locally.
+- No implementation acceptance, publication or current-version CI.
+- No application review path or run_review registration.
+
+Inspect the saved check records and their relationship to the final source/artifact hashes. Reuse completed evidence when it applies to the final staged source. Do not rerun application tests, builds or wheel checks merely because this is a fresh session.
+
+If a saved result cannot be substantiated, report that limitation. Do not silently convert it into a verified result or repeat substantial work without identifying a concrete need.
+
+5. Save a recovery note and return a concise handoff
+
+You may create only gitignored recovery notes under:
+.local/p209/recovery/
+
+Record:
+- verified branch, refs, staged tree and paths;
+- export size/checksum and Git byte comparison;
+- which observations you made during recovery;
+- which results belong to Codex’s saved Prompt 209 evidence;
+- any missing records or discrepancies;
+- that the original chat response was lost but the saved handoff/export survived.
+
+Do not edit tracked files, append prompt history, change implementation, stage anything, commit, amend, fetch, push, merge, rerun CI, change authentication or start M5g.
+
+If everything matches, stop with the implementation staged for external review. Return a concise recovery handoff and identify the existing complete Prompt 209 handoff and implementation diff for Mathew to supply to the reviewer.
+
+M5f specification acceptance is not implementation acceptance. Do not mark the implementation accepted or CI-verified.
+
+## Prompt 209 recovery output (Claude Code chat response, verbatim)
+
+Source: the final chat response Claude Code returned for the recovery prompt above, copied unchanged from this session. The detailed record is the gitignored `.local/p209/recovery/recovery-note.md`. The lost OpenAI Codex Prompt 209 chat response is not reconstructed; the saved `.local/p209/handoff.md` remains its evidence source.
+
+Recovery is complete and the local state matches every expected value. Prompt 209's M5f implementation is staged and uncommitted, waiting for external review. I changed nothing except one gitignored recovery note.
+
+**What I checked myself (read-only)**
+- **Instructions:** there is no `AGENTS.md` in the repo; `CLAUDE.md` is the governing file. I read the ADR-0024 status and the M5f section headings in `docs/plan.md` for context.
+- **Branch and refs:** branch `feat/review-report-content`, HEAD `8e0173c1…ba`, HEAD tree `379d506b…eb65`. Local `main` and the stored `origin/main` are both `14f510e2…2232` (no fetch).
+- **Staged state:** the index tree is `551155ef…c4`. Exactly the 12 expected paths are staged, with nothing unstaged and no untracked files.
+- **Everything else:** the index has 251 entries, which is 245 from HEAD plus 6 new files. The other 239 blobs and modes match HEAD. Each staged blob matches Codex's `final-checks.json`. The protected PostgreSQL test is still blob `cb13b628…7d`.
+- **Export:** [m5f-implementation.diff](.local/p209/m5f-implementation.diff) is 132,343 bytes, 3,051 lines, SHA-256 `c68b2057…41a28`. It uses full indexes, excludes `prompts.md`, and covers 11 files with 2,903 insertions and 15 deletions. Its bytes are identical to a fresh comparison between the two recorded objects and to the current cached comparison.
+- **Source vs. tested build:** all 11 source files match the hashes recorded in the build snapshot (`build/final-artifacts.json`). `prompts.md` differs, as the handoff expects, because the history note was written after the build. The wheel (`94c6d6a2…`) and sdist (`3461eef4…`) hashes match the handoff.
+- **Processes:** no test, build, push, monitor or Git process is running. The `codex.exe` extension server and the Playwright helpers were left alone.
+
+**Codex's saved Prompt 209 evidence (I did not rerun it)**
+Ruff, strict mypy, the 70 M5f tests, the 849 focused tests, the full suite (4,039 passed, 387 skipped), test collection, offline builds and the isolated installed-wheel check all recorded success. PostgreSQL tests were collected but not run, and no CI ran. Nothing remains unfinished, and I found no concrete reason to repeat any of it.
+
+**Limitations**
+- **How checks tie to the final source:** the check records don't store source hashes. They link to the final source only by timestamps and Codex's statement that nothing functional changed afterwards. Only the build snapshot is hash-bound.
+- **ADR-0024 timing:** it was last edited at 17:41:35, after the format, lint, mypy and M5f outputs. It was still before the focused tests, full suite and builds, and it is Markdown, so Ruff and mypy don't check it.
+- **No Gitleaks log survives:** the staged secret-scan result is backed only by the handoff and outcome text. So are the link/anchor/table and history-fidelity checks.
+
+**Recovery note:** [recovery-note.md](.local/p209/recovery/recovery-note.md) (gitignored). Nothing was edited, staged, committed, fetched or pushed. M5g has not started.
+
+The implementation is not accepted and not CI-verified; accepting the M5f specification does not accept the implementation.
+
+**Next step:** Mathew, please return **output plus the diff file**, giving the reviewer the existing complete Prompt 209 handoff [.local/p209/handoff.md](.local/p209/handoff.md) and [.local/p209/m5f-implementation.diff](.local/p209/m5f-implementation.diff).
+
+## Prompt 210 user request (verbatim)
+
+Source: Mathew's review/correction instruction, including the external reviewer's isolated findings, to Claude Code.
+
+Prompt 210: correct the M5f builder’s evidence binding and evidence-state checks.
+
+Work in:
+D:\Claude\evidenceguard_agentic_rag
+
+M5f implementation acceptance remains pending. Correct only the findings below, verify them, and leave the result staged and uncommitted for external review.
+
+1. Recover and verify the starting state
+
+Read CLAUDE.md and any other applicable repository instructions, the saved Prompt 209 handoff, the recovery note, ADR-0024, and the full accepted M5f specification.
+
+Expected branch:
+feat/review-report-content
+
+HEAD:
+8e0173c1c9325ed1e4602aa32fd42b44bd4325ba
+
+HEAD tree:
+379d506b46f9181f7915803ed7ebcb225bedeb65
+
+Starting staged tree:
+551155ef0a04bcd5f07737bd0042fec455262ac4
+
+Local main and stored origin/main:
+14f510e23e89bd890b2428405de922ef1fcb2232
+
+Exactly the original twelve Prompt 209 paths should be staged, with nothing unstaged or unexpectedly untracked.
+
+Verify .local/p209/m5f-implementation.diff:
+- 132,343 bytes
+- 3,051 lines
+- 11 files, 2,903 insertions and 15 deletions
+- SHA-256:
+  c68b20573d8f03663ef9a6a58c7ff03b132414b64e9f50cee8e52c4b15341a28
+- Full indexes, prompts.md excluded
+- Byte-identical to Git’s comparison from HEAD to the starting staged tree.
+
+Preserve unexpected work and report any discrepancy rather than resetting or overwriting it.
+
+Save a checkpoint under .local/p210/ containing the starting tree, staged paths and blob/mode hashes, prompts.md prefix, and exact submitted report.py and test_report_builder.py.
+
+No remote operation is needed.
+
+2. Reviewer findings and evidence
+
+The reviewer inspected the supplied export and verified its size, line count and full SHA-256.
+
+The reviewer’s isolated probes used Python 3.12.14 and Pydantic 2.14.1, published unchanged dependencies from 14f510e, and the submitted M5f modules. Both new production files matched their exported Git blob IDs:
+- report.py: 0111cca735e860333e29e193f87d890516bda7c7
+- report_content.py: 27b07dc6b865744f6d8b597948b6f58e96ca8df3
+
+These were isolated fixture-based probes, not a project-suite, installed-wheel, PostgreSQL or CI run.
+
+Finding A: retained evidence is not bound to the configured retrieval k.
+
+Starting from a valid successful world, the reviewer rebuilt ReviewConfiguration with retrieval_k=1, rebuilt ReviewRequest, recomputed its tenant-bound request digest, and rebuilt TrustedReview. The unchanged retained evidence had result.k=8.
+
+All those values passed their constructors. build_report_content accepted them and produced a wrapper recording retrieval_k=1.
+
+The builder must check the available retained evidence against the review’s retrieval configuration. It must not present internally inconsistent sources as a valid report. This check does not prove the original query execution or database origin.
+
+Finding B: evidence presence is not checked against the committed Verification state.
+
+Using validated dataclass constructors:
+- A valid U4/U3 world was rebuilt with retained QuestionEvidence attached. The builder accepted it.
+- A valid U1 refusal Verification and U3 Analysis, with matching valid histories, were supplied without retained QuestionEvidence. The builder accepted them.
+
+The accepted M5e evidence-state rules distinguish closed U4, whose evidence bytes were discarded, from other Verification stages that require retained evidence. M5f must preserve those consistency rules.
+
+Valid controls passed: matching-k success, U4/U3 without evidence, and U1/U3 with retained evidence.
+
+These findings do not establish that the database loader produces inconsistent values. They concern the builder’s accepted supported-input consistency boundary.
+
+3. Correct the builder
+
+In packages/agents/evidenceguard_agents/report.py:
+
+- Require retained evidence’s result.k to equal the review configuration’s retrieval_k.
+- Preserve the existing question/query-count, snapshot, tenant/review, evidence-digest and provenance checks.
+- For complete stage inputs, require U4 to have no retained evidence.
+- Require non-U4 committed Verification stages to have retained evidence.
+- Apply the retained-evidence checks to unresolved Verification paths too, rather than only successful Verification.
+
+Keep the accepted error precedence:
+- malformed inputs first;
+- binding mismatch;
+- incomplete stages;
+- stage/evidence/owner consistency;
+- finding conflicts and limits.
+
+Use the existing fixed InvalidReportInputError for these stage/evidence consistency refusals. Preserve fresh errors without original text, cause, context, warnings or logging, and process-control identity.
+
+Do not infer or reconstruct discarded U4 evidence. Do not add a database-origin, retrieval-execution or relevance claim. Preserve valid U4 behaviour and the existing discarded-evidence limitation.
+
+4. Add meaningful regression coverage
+
+In tests/test_report_builder.py, cover:
+
+- Configured k differing from retained result.k, using validated constructors and a correctly recomputed review request digest.
+- U4 with retained evidence.
+- Non-U4 unresolved Verification without retained evidence, with valid matching stage histories.
+- Matching-k success.
+- Valid U4/U3 without evidence.
+- Valid unresolved Verification with retained evidence.
+- Missing stages still producing IncompleteReportStagesError.
+- Source-bound recheck refusing the inconsistent sources.
+- Quiet fixed errors and process-control behaviour where relevant.
+
+Exercise representative unresolved shapes that use the shared check, including a no-call unresolved path if supported by the existing fixtures.
+
+Run finding-specific regressions against isolated exact copies of the submitted report.py and the corrected module. Confirm the imported module paths. Separate reproduced failures from controls and new coverage; do not claim every new test fails on the submitted version.
+
+Do not weaken constructors, histories, existing tests or source-binding rules to create the fixtures.
+
+5. Authorized scope
+
+Only these seven files may change against the starting staged tree:
+
+- packages/agents/evidenceguard_agents/report.py
+- tests/test_report_builder.py
+- docs/decisions/0024-review-report-content.md
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+All other blobs and modes must remain identical to the starting staged tree, including report_content.py, the other M5f tests, packaging tests, workflows and every M1–M5e file.
+
+Do not change the accepted specification to accommodate the defects. Keep its heading and anchor unchanged.
+
+6. Verification
+
+Use the existing locked offline environment and established repository commands.
+
+Run:
+- Ruff formatting and lint.
+- Strict mypy.
+- The three M5f test modules.
+- The established focused M1/M5b–M5e/packaging set.
+- Full suite and collection.
+
+Report PostgreSQL skips accurately. Do not configure a database, run Docker, make provider calls or download dependencies.
+
+Because production report.py changes:
+- Rebuild offline.
+- Compare against the preserved Prompt 209 artifacts and the original 8e0173c1 baseline.
+- Confirm only authorized differences and unchanged sample/pinned-resource bytes.
+- Run the complete existing installed-wheel step in a fresh environment outside the checkout with hashed offline dependencies and the wheel installed --no-deps.
+- Add direct installed-wheel probes for the corrected cases and valid controls.
+- Verify the final artifact’s relationship to the final staged source.
+
+Do not broaden testing after successful checks without a concrete unresolved concern.
+
+7. Documentation and history
+
+Record:
+- implemented by OpenAI Codex in Prompt 209;
+- recovered read-only by Claude Code;
+- corrected by Claude Code in Prompt 210;
+- implementation acceptance, publication and current-version CI still pending.
+
+Separate the reviewer’s isolated findings from your project and installed-wheel results. Preserve historical evidence and the recovery note’s limitations, including missing original scan logs.
+
+Append the available recovery output, this review/correction instruction and Prompt 210 outcome to prompts.md with accurate source labels. Preserve its previous bytes as an identical prefix.
+
+Do not reconstruct the lost Codex chat response or label a summary as verbatim. The surviving Prompt 209 handoff remains its saved evidence source.
+
+8. Final staged checks and export
+
+Keep the original twelve-path staged change against HEAD.
+
+Verify:
+- Only the seven authorized files differ from the starting staged tree.
+- Every protected blob and mode is unchanged.
+- No tracked local artifacts.
+- Links, anchors and tables.
+- UTF-8 without BOM, LF only, no replacement characters.
+- Both diff whitespace checks.
+- Prompt-history prefix/source fidelity.
+- Privacy review and unsuppressed staged Gitleaks.
+
+Save:
+.local/p210/m5f-evidence-binding-corrections.diff
+
+Compare starting tree 551155ef0a04bcd5f07737bd0042fec455262ac4 with the final staged tree, using full indexes and excluding prompts.md.
+
+Verify raw-byte identity against Git and report the final tree, paths, statistics, bytes, lines and full SHA-256.
+
+Return a complete handoff plus that diff for external review.
+
+Stop staged and uncommitted. No commit, fetch, push, merge, CI operation, authentication change or M5g work is authorized.
+
+
+## Prompt 210 completed outcome
+
+Source: Claude Code outcome note for Prompt 210. The implementation is staged and uncommitted for external correction review.
+
+**Attribution.** OpenAI Codex implemented M5f in Prompt 209. Its chat response was lost, but the saved `.local/p209/handoff.md` and implementation export survived and remain that prompt's evidence source. Claude Code recovered the work read-only, then made the Prompt 210 correction. Implementation acceptance, publication and current-version CI remain pending.
+
+**Starting state.** Verified before any change: branch `feat/review-report-content`; HEAD `8e0173c1c9325ed1e4602aa32fd42b44bd4325ba`; HEAD tree `379d506b46f9181f7915803ed7ebcb225bedeb65`; staged tree `551155ef0a04bcd5f07737bd0042fec455262ac4`; local main and stored origin/main `14f510e23e89bd890b2428405de922ef1fcb2232`. Exactly the twelve Prompt 209 paths were staged, with no unstaged or untracked work. The Prompt 209 export matched every expected property and was byte-identical to Git's cached comparison from HEAD. The checkpoint under `.local/p210/checkpoint/` holds the index blob/mode list, staged paths, the 2,595,574-byte prompts.md prefix (SHA-256 `0a5f9986dde006b78b50cfdb37fc03d285a4fd7f8bfd3ff524f54650365b6bf6`), and the submitted report.py (blob `0111cca7…`) and test_report_builder.py.
+
+**Reviewer findings (external; isolated fixture probes, not run by Claude Code).** A: retained evidence with `result.k=8` was accepted for a review rebuilt with `retrieval_k=1`. B: a U4/U3 world with retained evidence, and a U1/U3 world without it, were both accepted.
+
+**Correction.** Only report.py changed in production. For every committed Verification shape, successful or unresolved, M5e's E7 rule now applies. U4 must have no retained evidence. Every other shape must have retained evidence on the review snapshot, with `result.k == retrieval_k`, and its stage evidence digest must equal the digest recomputed from that evidence; that recomputation also keeps the question/query-count checks. Refusals use the fixed `InvalidReportInputError`, and the accepted precedence is unchanged. No U4 evidence is inferred, and no claim of database origin, retrieval execution or relevance is added. The accepted specification is byte-identical.
+
+**Regression results (run by Claude Code).** There are ten new builder cases (26 in total). Against an isolated exact copy of the submitted report.py, with the imported module path confirmed, 7 cases failed with "DID NOT RAISE" and 19 passed. The 7 are the k cases for S1, U1 and U5, U4 with evidence, U1 and U5 without evidence, and quiet refusal. Three of the new cases already passed on the submitted version and are coverage, not reproductions: S1 without evidence, the digest mismatch and incomplete precedence. All 26 passed against the corrected copy.
+
+**Local checks (Claude Code, Python 3.12.15, Pydantic 2.14.0, locked offline).** Ruff format: 226 files already formatted. Ruff lint passed. Strict mypy passed on 181 files. The three M5f modules had 80 passed; the focused set had 849 passed. The full suite had 4,049 passed and 387 skipped: 385 PostgreSQL cases with no database configured (collected, not run) and 2 platform skips. Integration collection selected 385 and deselected 4,051; non-integration selected 4,051 and deselected 385. Source hashes were identical at the start and end of the run.
+
+**Builds and installed wheel.** The rebuilt 8e0173c1 baseline is byte-identical to Prompt 209's preserved baseline. Against Prompt 209's tested wheel, the candidate wheel changes only report.py and generated METADATA/RECORD. The sdist changes only authorized files and PKG-INFO. Sample and pinned-resource bytes are unchanged. The complete ci.yml installed-wheel step passed in a fresh environment outside the checkout, with hashed offline dependencies and the wheel installed `--no-deps`. Direct probes passed the controls and the corrected refusals. The final rebuild reproduced the tested wheel byte for byte, and the installed modules are byte-identical to the staged source.
+
+**Final checks.** Exactly the seven authorized paths differ from the starting tree, and all 244 other index entries are unchanged. There are no tracked local artifacts. Checks also passed for links, anchors and tables (549 links, 127 tables, zero problems), UTF-8 without BOM, LF only, no replacement or NUL characters, both whitespace checks, prompt-prefix fidelity, a privacy and token-pattern review, and unsuppressed staged Gitleaks (with `--ignore-gitleaks-allow`). Logs are under `.local/p210/checks/`. The incremental export `.local/p210/m5f-evidence-binding-corrections.diff` covers 6 files with 326 insertions and 21 deletions: 27,361 bytes and 468 lines, SHA-256 `ecdb4674073e1c7a223a5593348ea62c43b32cf3bc21d32e4a9899b22e837532`. It uses full indexes, excludes prompts.md and is byte-identical to Git.
+
+**Limits.** No commit, fetch, push, merge, CI run, database, Docker, provider call or M5g work. The recovery limitations stand: no original Prompt 209 Gitleaks log survives. No application review path exists and `run_review` remains unregistered. U4 discarded evidence, E7's M5g writer, the M3 lease window, the open M4d trusted-snapshot limitation and M6 wrapper review remain. M5g–M5h and overall M5 acceptance remain pending.
+
+
+## Prompt 210 handoff (saved file, byte-copied)
+
+Source: `.local/p210/handoff.md`, the handoff file Claude Code saved in Prompt 210. Its bytes are inserted unchanged between the two marker lines below and were compared byte-for-byte against that file after insertion. Claude Code's Prompt 210 chat reply, which summarised the same handoff, is not reproduced here.
+
+**Fidelity disclosure for earlier Prompt 210 entries.** The entries headed "Prompt 209 recovery user request (verbatim)", "Prompt 209 recovery output (Claude Code chat response, verbatim)" and "Prompt 210 user request (verbatim)" were transcribed by Claude Code from the prompt and response text in its session. They were not compared against an independently saved original, because no saved copy of the pasted prompt text exists. "Verbatim" in those headings means "transcribed from the session", not byte-verified. The earlier bytes are preserved unchanged as the history prefix.
+
+-----BEGIN SAVED PROMPT 210 HANDOFF-----
+# Prompt 210 handoff: M5f evidence-binding correction (Claude Code)
+
+Staged and uncommitted for external correction review. Implementation acceptance, publication
+and current-version CI remain pending. OpenAI Codex implemented M5f in Prompt 209; Claude Code
+recovered it read-only and made this correction.
+
+## Correction
+`packages/agents/evidenceguard_agents/report.py` now applies M5e's E7 evidence-state rule to
+every committed Verification shape, successful or unresolved:
+
+- U4 must have no retained evidence; none is inferred.
+- Every other shape must have retained evidence on the review snapshot, with
+  `result.k == config.retrieval_k`.
+- Its stage evidence digest must equal the one recomputed through EvidenceRecord, which also
+  keeps the question and query-count checks.
+
+Refusals use the fixed InvalidReportInputError, and the accepted precedence is unchanged. No
+claim of database origin, retrieval execution or relevance is added. The accepted
+specification section is byte-identical.
+
+## Evidence (all run by Claude Code in Prompt 210)
+- **Differential runs on isolated exact copies, module path confirmed.** The submitted copy
+  (sha256 48ea11ac…) had 7 failures ("DID NOT RAISE") and 19 passes. The corrected copy
+  (d0a3a50b…) passed all 26. See `differential/` for which cases reproduce the findings and
+  which are controls or new coverage.
+- **Local checks.** Ruff format and lint passed; mypy passed on 181 files. M5f modules: 80
+  passed. Focused set: 849 passed. Full suite: 4,049 passed and 387 skipped (385 PostgreSQL
+  not run, 2 platform). Collection: 385 integration and 4,051 non-integration. Source hashes
+  were stable across the run (`checks/results.json`).
+- **Builds.** The rebuilt baseline is byte-identical to the p209 baseline. Against the p209
+  tested wheel, only report.py and METADATA/RECORD changed. The sdist changed only authorized
+  files and PKG-INFO. Protected resources are unchanged.
+- **Wheel and sdist hashes.** Wheel `96739dc243891058cd47324590077749e6accf435030a48a6f7a1a91cd6cbd17`:
+  the tested and final rebuilds are byte-identical, and its sources match the staged blobs.
+  Sdist `181a0c304109aa0d03fa6cbf95426b5e4f7477c56c7a3197ed6c2baaba2bb672`.
+- **Installed wheel.** The complete ci.yml installed-wheel step ran outside the checkout
+  (offline, `--require-hashes`, `--no-deps`): exit 0. The direct probes (`wheel-probe.py`)
+  exited 0. The installed modules are byte-identical to the staged source.
+- **Final checks.** Links: 549, tables: 127, zero problems. Encoding, LF and both whitespace
+  checks passed. The prompt prefix is identical. The privacy pattern scan was clean.
+  Unsuppressed staged Gitleaks passed, with logs saved in `checks/gitleaks-staged-*.txt`.
+
+## Git state
+- Branch feat/review-report-content. HEAD 8e0173c1c9325ed1e4602aa32fd42b44bd4325ba.
+  main and origin/main are 14f510e23e89bd890b2428405de922ef1fcb2232.
+- Starting staged tree 551155ef0a04bcd5f07737bd0042fec455262ac4. Final staged tree
+  a41a954afada7121b92e2c2a93f19cc85f1df90c.
+- The twelve original paths are staged against HEAD. Seven paths changed against the starting
+  tree: report.py, test_report_builder.py, ADR-0024, README.md, plan.md, threat-model.md and
+  prompts.md. All 244 other entries are unchanged, and there is no unstaged or untracked work.
+
+## Export
+`.local/p210/m5f-evidence-binding-corrections.diff`. Baseline 551155ef…, final tree a41a954a….
+It uses full indexes, excludes prompts.md, and is byte-identical to fresh tree and cached Git
+output. It covers 6 files with 326 insertions and 21 deletions: 27,361 bytes, 468 lines,
+SHA-256 ecdb4674073e1c7a223a5593348ea62c43b32cf3bc21d32e4a9899b22e837532.
+
+## Limits
+- Not done: no commit, fetch, push, merge, CI, database, Docker, provider call or M5g work.
+- No original Prompt 209 Gitleaks log survives.
+- No application review path exists; run_review is unregistered.
+- Still open: U4, E7's M5g writer, the M3 lease window, M4d and M6.
+-----END SAVED PROMPT 210 HANDOFF-----
+
+## Prompt 211 review decision and user request (transcribed)
+
+Source: Mathew's Prompt 211 instruction to Claude Code, which carries the external reviewer's acceptance decision. Claude Code transcribed it from the prompt text in its session. It was not compared against an independently saved original.
+
+Prompt 211: record M5f implementation acceptance and commit locally only.
+
+Repository:
+D:\Claude\evidenceguard_agentic_rag
+
+The external reviewer accepts the corrected M5f implementation for a local commit only. No publication, merge, CI operation or M5g work is authorized.
+
+1. Verify the starting state
+
+Read applicable repository instructions and the Prompt 209–210 handoffs/checkpoints.
+
+Expected branch:
+feat/review-report-content
+
+HEAD:
+8e0173c1c9325ed1e4602aa32fd42b44bd4325ba
+
+Accepted staged tree:
+a41a954afada7121b92e2c2a93f19cc85f1df90c
+
+Local main and stored origin/main:
+14f510e23e89bd890b2428405de922ef1fcb2232
+
+Exactly the original twelve Prompt 209 paths should be staged. There should be nothing unstaged or unexpectedly untracked. Origin and the established noreply identity should be unchanged.
+
+Verify both exports against their recorded Git comparisons:
+
+.local/p209/m5f-implementation.diff
+- Baseline: 8e0173c1c9325ed1e4602aa32fd42b44bd4325ba
+- Destination: 551155ef0a04bcd5f07737bd0042fec455262ac4
+- 132,343 bytes; 3,051 lines
+- SHA-256:
+  c68b20573d8f03663ef9a6a58c7ff03b132414b64e9f50cee8e52c4b15341a28
+
+.local/p210/m5f-evidence-binding-corrections.diff
+- Baseline: 551155ef0a04bcd5f07737bd0042fec455262ac4
+- Destination: a41a954afada7121b92e2c2a93f19cc85f1df90c
+- 27,361 bytes; 468 lines
+- 6 files, 326 insertions and 21 deletions
+- SHA-256:
+  ecdb4674073e1c7a223a5593348ea62c43b32cf3bc21d32e4a9899b22e837532
+
+Both use full indexes and exclude prompts.md.
+
+Confirm the accepted corrected blobs:
+- packages/agents/evidenceguard_agents/report.py:
+  94d6b379ec9a0a42a1baaa5842fa040daf764237
+- tests/test_report_builder.py:
+  2a7fc2d56aa430b565f79b91b38bf78c368cc59e
+
+Save a checkpoint under .local/p211/ containing refs, status, all twelve staged blob/mode pairs and the prompts.md prefix with its checksum.
+
+Preserve unexpected work and report discrepancies rather than resetting or overwriting anything. No fetch or other remote operation is needed.
+
+2. Record the external review accurately
+
+The reviewer independently:
+- verified the Prompt 209 implementation export and Prompt 210 correction export sizes, line counts and full SHA-256 values;
+- inspected the submitted implementation and correction;
+- applied the correction to isolated review copies;
+- confirmed the corrected report.py and test_report_builder.py bytes match their exported Git blob IDs;
+- ran 25 isolated checks on Python 3.12.14 and Pydantic 2.14.1.
+
+Those checks covered:
+- configured-k mismatch for S1, U1 and U5, through build and source recheck;
+- missing retained evidence for those shapes, through build and source recheck;
+- U4 with retained evidence, through build and source recheck;
+- valid matching-k and U4/U3 controls;
+- binding-mismatch and incomplete-stage precedence;
+- fresh fixed errors without original cause/context;
+- no warnings, stdout, stderr or log records;
+- KeyboardInterrupt, SystemExit and GeneratorExit propagating by identity.
+
+The isolated checks passed. This was not a project-suite, installed-wheel, database, PostgreSQL or CI run.
+
+The reviewer accepts the implementation within the accepted M5f contract, including the recorded implementation choices:
+- shared internal M5f boundary/preflight helpers;
+- bounded line-by-line renderer accounting;
+- narrowly scoped packaging exceptions for the pure report consumer;
+- the additive offline installed-wheel fixture.
+
+The two Prompt 210 findings are resolved. This acceptance authorizes a local implementation commit only.
+
+Keep Codex’s Prompt 209 work, Claude Code’s recovery and Prompt 210 checks, and the reviewer’s isolated evidence separately attributed.
+
+3. Documentation-only acceptance changes
+
+Only these five files may change against the accepted staged tree:
+- README.md
+- docs/decisions/0024-review-report-content.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+ADR-0024:
+- Update status to accepted at external review in Prompt 211 for a local implementation commit, with publication and current-version CI pending.
+- Add an External review (Prompt 211) section recording scope, approved implementation choices, evidence attribution and limitations.
+- Mark the Prompt 209–210 local results as historical local evidence, not exact-commit CI.
+- Preserve both findings, their corrections and the recovery disclosures.
+
+README, plan and threat model:
+- Record specification accepted in Prompt 208, implemented by Codex in Prompt 209, recovered by Claude Code, corrected in Prompt 210 and accepted for a local commit in Prompt 211.
+- Rename the separate implementation-status heading to reflect scoped acceptance and CI pending, updating every link to it.
+- Keep the accepted specification heading, anchor and contract text unchanged.
+
+Retain these limits:
+- Publication, merge, Linux verification and current-version CI are pending.
+- None of the 385 PostgreSQL tests has run against this version; M5f adds no PostgreSQL tests.
+- No application review path uses M5f; run_review remains unregistered.
+- Provenance and structural/rendering checks do not establish entailment, authenticity, semantic injection resistance or live-model quality.
+- No browser/CommonMark-parser check or tight maximal-size/performance proof is claimed.
+- E7 still requires the later additive output migration and reviewed atomic writer/completion composition in M5g.
+- Discarded U4 evidence, the M3 lease window, the open M4d trusted-snapshot limitation and M6 wrapper approval/revision obligations remain.
+- M5g–M5h and overall M5 acceptance remain pending.
+
+4. Prompt history and fidelity
+
+Preserve the existing prompts.md bytes as an identical prefix.
+
+Append the available Prompt 210 handoff, this review decision and Prompt 211 instruction, and a pre-commit note listing completed checks only.
+
+Use accurate source labels. Do not reconstruct Codex’s lost chat response. Keep the existing disclosure that the recovery prompt and Prompt 210 were transcribed without an independent original-text comparison.
+
+Only label a new entry byte-verified/verbatim if an actual source comparison was performed. Otherwise state how it was captured. Do not retroactively claim fidelity that was not established.
+
+5. Verify before committing
+
+Exactly twelve paths must remain staged against HEAD.
+
+Against accepted tree a41a954a, only the five authorized documentation/history files may differ. All seven implementation, test, packaging and workflow blobs and modes must remain identical.
+
+Every other tracked path must remain unchanged from HEAD. No .local file or build artifact may be tracked.
+
+Check:
+- relative links, anchors and tables;
+- UTF-8 without BOM, LF only, no replacement characters;
+- git diff --cached --check;
+- prompt-prefix fidelity and accurate source labels;
+- privacy;
+- repository-required formatting/lint checks;
+- unsuppressed staged Gitleaks, saving the output.
+
+Do not repeat application tests, builds or installed-wheel checks: accepted implementation bytes are unchanged. Report the historical evidence with its original attribution.
+
+6. Create one local commit
+
+Use the established noreply author and committer:
+mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>
+
+Suggested subject:
+feat: add hash-covered review report content and renderer
+
+Write the message from a file. Attribute:
+- OpenAI Codex’s Prompt 209 implementation;
+- Claude Code’s recovery, Prompt 210 correction and Prompt 211 acceptance documentation;
+- the independent reviewer’s work;
+- earlier attribution where relevant.
+
+Use the repository’s truthful Assistance/Co-Authored-By conventions. Do not invent a model version or identity.
+
+Create one normal local commit, with parent 8e0173c1. Do not amend or rewrite history.
+
+After committing:
+- verify commit, parent, tree, subject and identities;
+- verify exactly the twelve reviewed paths;
+- prove the seven protected implementation/test/packaging/workflow blobs and modes still equal the accepted staged tree;
+- verify the working tree is clean;
+- verify main and stored origin/main remain unchanged;
+- run unsuppressed full-history Gitleaks and save its actual result/count.
+
+7. Export and handoff
+
+Save:
+.local/p211/m5f-commit-incremental.diff
+
+Baseline:
+a41a954afada7121b92e2c2a93f19cc85f1df90c
+
+Destination:
+the new local commit
+
+Use full indexes and exclude prompts.md. Verify byte identity against a fresh Git comparison. Report paths, statistics, bytes, lines and full SHA-256.
+
+Return the complete handoff and this incremental export, including:
+- commit, parent and tree;
+- checks actually completed;
+- protected blob/mode identity;
+- final refs and clean working tree;
+- evidence attribution and fidelity disclosures;
+- pending publication, CI and runtime limitations.
+
+Stop after the local commit and handoff. Do not fetch, push, merge, change authentication, run CI or start M5g.
+
+## Prompt 211 pre-commit note
+
+Source: Claude Code. This note lists only checks completed before it was written. The checks that run on the final staged content after this note, namely the staged whitespace check, the prefix and fidelity comparison and the unsuppressed staged Gitleaks, are reported in the Prompt 211 handoff and the `.local/p211/` records.
+
+**Starting state.** Verified: branch `feat/review-report-content`, HEAD `8e0173c1c9325ed1e4602aa32fd42b44bd4325ba`, accepted staged tree `a41a954afada7121b92e2c2a93f19cc85f1df90c`, main and stored origin/main `14f510e23e89bd890b2428405de922ef1fcb2232`, the twelve Prompt 209 paths staged, and nothing unstaged or untracked. Origin and the noreply identity are unchanged. The accepted blobs are report.py `94d6b379ec9a0a42a1baaa5842fa040daf764237` and test_report_builder.py `2a7fc2d56aa430b565f79b91b38bf78c368cc59e`. Both exports matched their recorded sizes, line counts and SHA-256 values. Each was byte-identical to a fresh full-index Git comparison between its recorded objects, and the Prompt 210 export also to the cached comparison. The checkpoint is under `.local/p211/checkpoint/`. The prompts.md prefix is 2,619,269 bytes, SHA-256 `a534ed06bcf6a90e06541f3892b58e6bddce53ef49571080438441c52031ac45`.
+
+**Documentation checks completed (Claude Code).** The changes are documentation-only: ADR-0024, README.md, docs/plan.md and docs/threat-model.md. The implementation-status heading was renamed, and all five links to it were updated. The accepted specification heading, legacy anchor and contract text are byte-identical to the accepted tree. Inside that section, only the Prompt 209 "Historical acceptance status" note changed: its link target and its status sentence. Links, anchors and tables passed (555 links and 127 tables across README, plan, threat model and all ADRs, zero problems). UTF-8 without BOM, LF only and no replacement or NUL characters were confirmed. Locked offline Ruff format reported 226 files already formatted, and Ruff lint passed.
+
+**Not repeated.** No application tests, builds or installed-wheel checks were rerun, because the accepted implementation bytes are unchanged. The historical evidence keeps its original attribution: OpenAI Codex for Prompt 209's local results, and Claude Code for Prompt 210's local, build and installed-wheel results. The external reviewer's 25 isolated checks were run by the reviewer, not by Claude Code.

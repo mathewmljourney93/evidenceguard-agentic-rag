@@ -11559,12 +11559,23 @@ The external reviewer accepted both Prompt 206 exports and independently confirm
 publication evidence in Prompt 207 ([review record](decisions/0023-review-stage-persistence.md#external-review-evidence-acceptance-prompt-207)).
 The [M5f specification](#m5f-report-content-and-renderer-specification-accepted-at-review-prompt-208-implementation-pending) below was proposed in Prompt 207
 and accepted at external review in Prompt 208 with two binding clarifications.
-Implementation and every implementation check remain pending; no M5f control operates.
-M5g–M5h and overall M5 acceptance remain pending.
+OpenAI Codex implemented M5f in Prompt 209 ([implementation status](#m5f-implementation-status-accepted-for-a-local-commit-prompt-211-ci-pending)).
+Claude Code recovered that work read-only and corrected its builder evidence checks in Prompt 210
+([correction](#m5f-evidence-binding-correction-prompt-210)). The corrected implementation was
+**accepted at external review in Prompt 211 for a local implementation commit only**
+([acceptance](#m5f-external-review-acceptance-prompt-211)). Publication, merge, Linux
+verification and current-version CI remain pending; no M5f control operates in an application
+review path. M5g–M5h and overall M5 acceptance remain pending.
 
 <a id="m5f-report-content-and-renderer-specification"></a>
 
 #### M5f report content and renderer specification (accepted at review, Prompt 208; implementation pending)
+
+**Historical acceptance status.** The implementation-pending statements within this
+accepted specification record the Prompt 208 review state. For the implementation staged in
+Prompt 209 and its actual checks, see the separate [implementation status](#m5f-implementation-status-accepted-for-a-local-commit-prompt-211-ci-pending);
+the implementation was accepted for a local commit in Prompt 211, and publication and
+current-version CI are still pending.
 
 **ACCEPTED at external review in Prompt 208; implementation pending.** The complete
 specification and F1–F12 are accepted subject to binding clarifications A and B recorded below.
@@ -12234,6 +12245,71 @@ authenticity, semantic injection resistance or live-model quality. This specific
 accepted in Prompt 208; implementation and every implementation check remain pending.
 M5g–M5h and overall M5 acceptance remain pending.
 
+
+#### M5f implementation status (accepted for a local commit, Prompt 211; CI pending)
+
+OpenAI Codex implemented the accepted Prompt 208 specification, F1–F12 and clarifications
+A/B in Prompt 209: domain-owned immutable values and strict wrapper codec, pure trusted-input
+builder/source recheck and the pinned Markdown renderer, with meaningful tests, packaging
+guards and an additive offline installed-wheel assertion ([ADR-0024](decisions/0024-review-report-content.md)).
+Claude Code recovered that staged work read-only and corrected it in Prompt 210. The external
+reviewer accepted the corrected implementation in Prompt 211 for a local implementation commit
+only. The Prompt 209–210 local results recorded in ADR-0024 are historical local evidence, not
+exact-commit CI. Earlier Claude Code work and independent reviewer evidence retain their
+attribution.
+
+The separate wrapper digest leaves M1 bytes/approvals unchanged. Verification survives unresolved
+Analysis; P11 remains mandatory and counts toward the unchanged 200-finding cap, with whole-report
+refusal on overflow. Structural validation does not prove source origin. Markdown uses only
+hash-covered values and reversible JSON literals, without stage enrichment or live-quality claims.
+All new values have privacy-safe repr/str. Distinct queries derive from M5c, not an independent
+M5e uniqueness rule. No application review path uses M5f and `run_review` remains unregistered.
+
+Publication, merge, Linux verification and current-version CI remain pending. E7 still requires
+a later additive output migration and reviewed atomic fenced writer in M5g, never an edit to
+0007; no persistence or completion path is added. U4, worker obligations, the M3 lease window,
+the open M4d trusted-snapshot limitation and M6 wrapper approval/revision review remain.
+M5g–M5h and overall M5 acceptance remain pending.
+
+##### M5f evidence-binding correction (Prompt 210)
+
+The Prompt 209 Codex chat response was lost. Claude Code recovered the saved handoff and
+export read-only and then, in Prompt 210, corrected two external review findings in the
+builder. The reviewer found these with isolated fixture probes, not a project, wheel,
+PostgreSQL or CI run. The builder accepted retained evidence whose `result.k` differed from
+the configured `retrieval_k`. It also did not check evidence presence against the committed
+Verification state.
+
+The builder now applies M5e's E7 evidence-state rule (clarification B) to every committed
+Verification shape, successful or unresolved. Closed U4 must have no retained evidence. Every
+other shape must have retained evidence on the review snapshot, with `result.k` equal to
+`retrieval_k` and the stage's evidence digest recomputed from it. Refusals are the existing
+fixed `InvalidReportInputError`. Binding mismatch and incomplete stages keep precedence. No
+discarded U4 evidence is inferred, and no claim is added about database origin, retrieval
+execution or relevance. The specification above is unchanged; details and local results are
+in [ADR-0024](decisions/0024-review-report-content.md#evidence-binding-correction-prompt-210-claude-code).
+Both findings were resolved and accepted in Prompt 211.
+
+##### M5f external review acceptance (Prompt 211)
+
+The external reviewer accepted the corrected implementation within the accepted M5f contract,
+for a **local implementation commit only**. The acceptance includes the recorded
+implementation choices: shared internal boundary/preflight helpers, bounded line-by-line
+renderer accounting, narrowly scoped packaging exceptions for the pure report consumer, and
+the additive offline installed-wheel fixture. The reviewer verified both exports and the
+corrected blobs, and ran 25 isolated checks on Python 3.12.14 and Pydantic 2.14.1. These were
+not a project-suite, installed-wheel, PostgreSQL or CI run. Details and attribution are in
+[ADR-0024](decisions/0024-review-report-content.md#external-review-prompt-211).
+
+Publication, merge, Linux verification and current-version CI remain pending. None of the 385
+PostgreSQL tests has run against this version; M5f adds no PostgreSQL tests. No application
+review path uses M5f and `run_review` remains unregistered. Provenance, structural and rendering
+checks do not establish entailment, authenticity, semantic injection resistance or live-model
+quality. No browser or CommonMark-parser check and no tight maximal-size or performance proof
+is claimed. E7's additive output migration and reviewed atomic writer/completion composition
+remain for M5g. Discarded U4 evidence, the M3 lease window, the open M4d trusted-snapshot
+limitation and M6 wrapper approval/revision obligations remain. M5g–M5h and overall M5
+acceptance remain pending.
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.
