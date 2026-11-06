@@ -52729,3 +52729,405 @@ The checkpoint is under `.local/p220/checkpoint/`, with a prompts.md prefix of 2
 - **Ruff:** format reported 240 files already formatted, and lint passed.
 
 No application tests, builds or wheel checks were rerun, because their bytes are unchanged.
+
+## Prompt 220 handoff (saved file, byte-copied)
+
+Source: `.local/p220/handoff.md`, the handoff file Claude Code saved in Prompt 220. Its bytes are inserted unchanged between the two marker lines below and were compared byte-for-byte against that file after insertion. Claude Code's Prompt 220 chat reply is not reproduced. Disclosure found in Prompt 221: the Prompt 220 checkpoint file `.local/p220/checkpoint/accepted-tree-listing.txt` is empty, because it was written with `git ls-tree -r` from inside that directory without `--full-tree`. The Prompt 220 identity checks themselves listed the tree objects from the repository root and are unaffected, and Prompt 221 re-verified them against the tree object `9217e545`.
+
+-----BEGIN SAVED PROMPT 220 HANDOFF-----
+# Prompt 220 handoff: M5g implementation acceptance recorded and committed locally (Claude Code)
+
+This prompt changed documentation and history only. The accepted implementation and tests were
+committed byte-identically. Nothing was fetched, pushed or merged, and no CI, PostgreSQL,
+application test, build or wheel check was run.
+
+## Recovery
+
+- **Refs:** branch `feat/review-orchestration`; HEAD `ebcc2df96acc610071fef6c926cbaba772d28c6c`;
+  local main and stored origin/main `e7dd3be384e36e14cce27c67e902ea9531b39d71`.
+- **Accepted staged tree:** `9217e545e566567bbcb60abcae1bfc45b5bfb38d`, equal to the Prompt 219
+  handoff and to `git write-tree`. The 27 staged paths are exactly the recorded inventory: the 26
+  Prompt 218 paths plus `tests/test_review_output_persistence.py`. Nothing was unstaged or
+  untracked.
+- **Prompt 219 export:** it matched every recorded property and was byte-identical to fresh Git
+  output: `d899f28d → 9217e545`, 8 files, +1,124/−33, 55,293 bytes, 1,245 lines, SHA-256
+  `d238a4c3…b180e`.
+- **Checkpoint (`.local/p220/checkpoint/`):** refs, status, the accepted tree and its full
+  listing, paths, the index blob/mode listing, and the prompts.md prefix (2,810,004 bytes,
+  SHA-256 `d902149bb02b205deb42dc2a6198b97fa214a2ad67dfeba485836213516f920f`).
+
+## Acceptance and documentation changes
+
+Only these five files differ from the accepted tree:
+
+- **ADR-0025:**
+  - the status is now "accepted at external review for a local commit only (Prompt 220)", with
+    PostgreSQL, CI, publication, merge and overall M5 pending; earlier staged and unaccepted
+    statements are explicitly historical;
+  - a sentence records choices 1–4 approved in Prompt 219 and all ten accepted in Prompt 220;
+  - a new **External review (Prompt 220)** section records the decision, the reviewer's evidence
+    (attributed to the reviewer), that the reviewer ran no suite, wheel, PostgreSQL or CI for
+    Prompt 219, that the local results are Claude Code's and not exact-commit CI, and the limits.
+- **Plan:**
+  - the implementation-status heading is renamed to "M5g implementation status (accepted for a
+    local commit, Prompt 220; PostgreSQL and CI pending)", the only heading change;
+  - all four links to it are updated (ADR-0025, the plan's specification status bullet, README
+    and threat model);
+  - a Prompt 220 acceptance paragraph is added and the Prompt 218 state paragraph is labelled
+    historical;
+  - a Prompt 220 bullet is added to the specification status list;
+  - the accepted specification heading, anchors and contract text are unchanged.
+- **README and threat model:** consistent acceptance sentences. M5f publication evidence and all
+  limitations are preserved.
+- **`prompts.md`:** appended entries only:
+  - the Prompt 219 handoff, byte-copied and compared with `.local/p219/handoff.md`;
+  - Prompt 220 with its acceptance decision, transcribed from the pasted prompt into
+    `.local/p220/prompt220.txt` and labelled as such;
+  - the pre-commit note.
+
+## Checks actually run (documentation scope; saved in `.local/p220/checks/`)
+
+| Check | Result |
+| --- | --- |
+| changed paths against the accepted tree | exactly the 5 authorized files |
+| protected blob and mode identity, staged and committed | all 260 other entries identical (265 paths, same path set) |
+| links, anchors and tables | 45 files, 593 links, 152 tables, 0 problems |
+| encoding | UTF-8, no BOM, LF only, no U+FFFD or NUL |
+| whitespace | working, staged and incremental (`9217e545`→tree) checks clean |
+| history prefix | the first 2,810,004 bytes equal the checkpoint SHA-256; the Prompt 219 handoff insertion is byte-identical to its source |
+| privacy grep on added lines | 0 hits |
+| `uv run --locked --offline ruff format --check .` / `ruff check .` | 240 files already formatted / passed |
+| `gitleaks git --pre-commit --staged --redact --verbose .` | exit 0, no leaks (`gitleaks-staged.txt`) |
+| `gitleaks git --redact --verbose .` after the commit | exit 0, **95 commits scanned, no leaks** (`gitleaks-full-history.txt`) |
+
+No application test, build or installed-wheel check was rerun, because implementation and test
+bytes are unchanged. Claude Code's earlier local results remain historical and tied to what they
+checked:
+
+- **Prompt 218:** builds and wheel `b546539b…aadf`.
+- **Prompt 219:** full suite 4997 passed and 441 skipped, plus the mutation probes.
+
+## Commit
+
+| | Value |
+| --- | --- |
+| SHA | `5d97acbcb72d83a13878d0a40cbf2c87ca09770d` |
+| Parent | `ebcc2df96acc610071fef6c926cbaba772d28c6c` (normal commit; no amend or rewrite) |
+| Tree | `55122f52def1009f810d14bd844d5f444d19a6b6` |
+| Subject | `feat: orchestrate reviews and atomically persist outputs` |
+| Author / committer | `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>` |
+| Message | `.local/p220/commit-message.txt` (Claude Code's implementation and local verification and the reviewer's evidence attributed separately; `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`) |
+
+**Committed paths (27, all mode 100644; equal to the accepted inventory):**
+
+```
+.github/workflows/ci.yml
+README.md
+apps/worker/evidenceguard_worker/review.py
+docs/decisions/0025-review-orchestration.md
+docs/plan.md
+docs/threat-model.md
+packages/domain/evidenceguard_domain/review_outputs.py
+packages/persistence/evidenceguard_persistence/db.py
+packages/persistence/evidenceguard_persistence/migrations/versions/v0008_review_outputs.py
+packages/persistence/evidenceguard_persistence/models.py
+packages/persistence/evidenceguard_persistence/review_outputs.py
+prompts.md
+tests/review_postgres_world.py
+tests/review_world.py
+tests/test_packaging.py
+tests/test_persistence.py
+tests/test_persistence_postgres.py
+tests/test_readiness.py
+tests/test_review_canary_postgres.py
+tests/test_review_creation.py
+tests/test_review_handler.py
+tests/test_review_handler_postgres.py
+tests/test_review_output_persistence.py
+tests/test_review_output_values.py
+tests/test_review_outputs_postgres.py
+tests/test_review_stages_postgres.py
+tests/test_transaction_process_control.py
+```
+
+## Final state
+
+- **Working tree:** clean, with nothing untracked outside the ignored `.local/`, and no
+  `.local/` file is tracked.
+- **Refs:** local `main` and stored `origin/main` are still `e7dd3be3…`; HEAD is `5d97acbc…` on
+  `feat/review-orchestration`.
+
+## Export
+
+| Property | Value |
+| --- | --- |
+| Path | `.local/p220/m5g-commit-incremental.diff` |
+| Baseline | accepted Prompt 219 staged tree `9217e545e566567bbcb60abcae1bfc45b5bfb38d` |
+| Destination | commit `5d97acbcb72d83a13878d0a40cbf2c87ca09770d` |
+| Options | `--full-index --binary`, `prompts.md` excluded (prompts.md: +395/−0, appended only) |
+| Paths | `README.md` (+6/−2), `docs/decisions/0025-review-orchestration.md` (+46/−6), `docs/plan.md` (+17/−3), `docs/threat-model.md` (+6/−2) |
+| Statistics | 4 files, 75 insertions, 13 deletions |
+| Size | 12,216 bytes; 169 lines |
+| SHA-256 | `117073c725e0ad78fbb15b090f01399dd840ea08f41f565cf2f3c71761d88e96` |
+| Identity | byte-identical to fresh `git diff` against both the commit SHA and `HEAD` |
+
+## Still pending
+
+- **PostgreSQL:** none of the 54 M5g cases (44 outputs, 7 handler, 3 canary) or the other 385
+  integration tests has run. `alembic check` and migration `0008` have not been run against
+  PostgreSQL.
+- **Publication and CI:** a feature push, exact-commit CI for `5d97acbc` (all five jobs, including
+  the new installed-wheel line and the PostgreSQL job), main publication and its CI all wait for
+  Mathew's authorization.
+- **Not authorized or closed:** M4d and E7 are not declared closed. No production review path or
+  `run_review` registration is authorized. M5h, M6 and overall M5 acceptance remain pending.
+
+Mathew: return this complete handoff plus `.local/p220/m5g-commit-incremental.diff` to the
+external reviewer.
+-----END SAVED PROMPT 220 HANDOFF-----
+
+## Prompt 221 review note and feature-publication authorization (transcribed)
+
+Source: Mathew's Prompt 221 instruction to Claude Code. It carries the external reviewer's note that the Prompt 220 export and acceptance record were verified as accurate, the two status inconsistencies to correct, and the authorization for preparation and manual feature-branch publication only. Claude Code transcribed it from the pasted prompt text in its session into `.local/p221/prompt221.txt` and inserted that file's bytes unchanged below. The transcription was not compared against an independently saved original.
+
+Written for: Mathew and Claude Code.
+
+## Prompt 221 — Prepare M5g feature publication, then verify exact-commit CI
+
+Authorize preparation and manual feature-branch publication only. Do not push automatically, merge, fast-forward main, change authentication, rerun CI, register run_review or start M5h.
+
+### 1. Recover and verify
+
+Read the applicable repository instructions.
+
+Expected:
+- Branch: feat/review-orchestration.
+- HEAD:
+  5d97acbcb72d83a13878d0a40cbf2c87ca09770d.
+- Parent:
+  ebcc2df96acc610071fef6c926cbaba772d28c6c.
+- Main and stored origin/main:
+  e7dd3be384e36e14cce27c67e902ea9531b39d71.
+- Clean index and working tree.
+- Origin and noreply identity unchanged.
+
+Verify the full HEAD tree, accepted path inventory and protected blob/mode identities from .local/p220/handoff.md and its checkpoint.
+
+Verify .local/p220/m5g-commit-incremental.diff:
+- Baseline: the full accepted Prompt 219 tree beginning 9217e545.
+- Destination: HEAD.
+- Full indexes; prompts.md excluded.
+- Four files, 75 insertions, 13 deletions.
+- 12,216 bytes; 169 lines.
+- SHA-256:
+  117073c725e0ad78fbb15b090f01399dd840ea08f41f565cf2f3c71761d88e96.
+
+Compare its bytes with fresh Git output.
+
+Save refs, status, HEAD blobs/modes and the prompts.md prefix/checksum under .local/p221/checkpoint/.
+
+### 2. Correct two current-status inconsistencies
+
+The reviewer verified the Prompt 220 export and found its acceptance record accurate. Two introductory passages still use current-tense staged/unaccepted wording:
+
+- README: the introductory M5g paragraph still says it is not implementation-accepted or committed.
+- Threat model: the introductory paragraph still says it is staged for external review and not accepted or committed. Its later “mechanism exists but is unreviewed” wording is also stale.
+
+Correct these passages to describe the sequence clearly:
+- Implemented in Prompt 218.
+- Tests corrected in Prompt 219.
+- Accepted for a local commit and committed in Prompt 220.
+- Feature publication and exact-commit CI pending.
+- PostgreSQL behavior remains unverified locally.
+
+Keep all limits, evidence attribution and accepted contracts unchanged. Do not claim M4d or E7 closed.
+
+Authorize only README, threat model and prompts.md changes for this preparation commit. ADR-0025 and plan already contain the acceptance record and should remain unchanged.
+
+### 3. History and preparation commit
+
+Preserve prompts.md as an identical byte prefix.
+
+Append:
+- The saved Prompt 220 handoff.
+- This review and feature-publication authorization.
+- Prompt 221.
+- A preflight note containing completed checks only.
+
+Label copied and transcribed text accurately.
+
+Run:
+- Exact path and protected blob/mode checks.
+- Links, anchors and tables.
+- Encoding and whitespace.
+- Prompt-prefix/source fidelity.
+- Privacy scan.
+- Locked offline Ruff formatting and lint.
+- Unsuppressed staged Gitleaks, with saved logs.
+
+No application tests, builds or wheel checks are needed because implementation and tests must remain byte-identical.
+
+Commit locally using the established noreply identity and attribution rules, with the message written from a file.
+
+Subject:
+docs: prepare accepted M5g implementation for feature publication
+
+Only the three authorized files may differ from 5d97acbc. Verify the clean working tree and run the established full-history Gitleaks check.
+
+This new commit is the publication target. Record its full SHA, parent and tree.
+
+### 4. Read-only remote preflight
+
+Fetch origin with --no-tags. Do not change credentials or Git configuration.
+
+Verify:
+- Remote main remains:
+  e7dd3be384e36e14cce27c67e902ea9531b39d71.
+- Local main equals origin/main and is an ancestor of the target.
+- Determine whether remote feat/review-orchestration exists.
+- No unexpected remote or local divergence.
+- The range above main is exactly:
+  ebcc2df9,
+  5d97acbc,
+  the new preparation commit.
+- The range contains only the reviewed implementation/specification/evidence paths plus the authorized preparation edits.
+- Accepted implementation, migration, model, test, fixture, packaging and workflow blobs/modes remain unchanged.
+- No tracked local artifacts, binaries, credentials or unexpected dependency/resource changes.
+- Both workflows still trigger on push.
+- Ubuntu verify, Windows verify, PostgreSQL integration, container and Gitleaks remain present.
+- Integration retains EG_REQUIRE_INTEGRATION=1 and its integration-test command.
+- Range privacy and unsuppressed Gitleaks pass.
+
+If remote state differs materially, report it before proceeding. Never force-push.
+
+### 5. Manual push handoff
+
+Do not run git push yourself.
+
+If the remote feature branch is absent and preflight passes, give Mathew:
+- The full publication target SHA.
+- Confirmation that main is unchanged and the working tree clean.
+- This PowerShell command:
+
+git -C 'D:\Claude\evidenceguard_agentic_rag' push --set-upstream origin refs/heads/feat/review-orchestration:refs/heads/feat/review-orchestration
+
+If the feature branch already exists, first verify that a normal fast-forward push is appropriate and give the corresponding command.
+
+Save .local/p221/resume-note.md and wait for Mathew’s push result.
+
+### 6. After Mathew reports the push
+
+Do not push again.
+
+Verify remote feature, local HEAD and upstream all equal the full target SHA. Verify remote main remains e7dd3be3.
+
+Monitor only the push-triggered CI and secret-scan runs for that exact SHA and branch, attempt 1.
+
+Use a 25-minute monitoring bound, with bounded polling and periodic progress updates. Do not rerun workflows.
+
+Required gate:
+- Ubuntu verify success.
+- Windows verify success.
+- PostgreSQL integration success.
+- Container success.
+- Gitleaks success.
+
+Inspect job and step conclusions. Attempt to retrieve logs using available existing access without changing authentication.
+
+If logs are available:
+- Record actual test counts, skips and deselections.
+- Record the M5g PostgreSQL module results at the granularity printed.
+- Record migration/alembic-check evidence where actually present.
+- Record installed-wheel lines, container output and Gitleaks results.
+- Keep job results under their own run/job links.
+
+If logs are unavailable, record conclusions and the access limitation only. Do not infer counts or individual test results.
+
+On any failure, cancellation, missing required job or timeout:
+- Stop monitoring.
+- Save evidence and a resume note.
+- Make no corrections, reruns, commits, pushes or green-status documentation.
+- Return the failure details and available excerpt.
+
+### 7. Only if all five jobs pass
+
+Stage feature-CI evidence in:
+- README.md
+- docs/decisions/0025-review-orchestration.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Record:
+- Exact target SHA, branch, push event, attempt and run/job links.
+- Actual observations and access limits.
+- Feature-CI verified, not merged.
+- Local and reviewer evidence attributed separately.
+- No production registration, live-provider or model-quality claim.
+- No automatic M4d/E7 closure or overall M5 acceptance claim.
+
+Preserve accepted specification text and all non-documentation blobs/modes.
+
+Run documentation checks, privacy and unsuppressed staged Gitleaks.
+
+Leave these evidence changes staged and uncommitted.
+
+### 8. Exports and final handoff
+
+Create:
+.local/p221/m5g-publication-preparation.diff
+- Baseline: 5d97acbc.
+- Destination: preparation commit.
+- Full indexes; prompts.md excluded.
+
+If all five jobs pass, also create:
+.local/p221/m5g-feature-ci-evidence.diff
+- Baseline: published target commit.
+- Destination: final staged evidence tree.
+- Full indexes; prompts.md excluded.
+
+Verify each export against fresh Git output and report exact paths, statistics, bytes, lines and SHA-256.
+
+Save .local/p221/handoff.md covering refs, preparation changes, manual publication, exact-SHA CI evidence, limitations, exports and final state.
+
+Stop without merging or changing main. No automatic push, CI rerun or M5h work.
+
+Mathew: return the complete handoff and the applicable diff files to the external reviewer.
+
+## Prompt 221 preflight note
+
+Source: Claude Code. This note lists only checks completed before it was written. The staged Gitleaks scan of the final content, the commit verification, the full-history scan, the read-only remote preflight and any CI observations are reported in the Prompt 221 handoff and the `.local/p221/` records.
+
+**Recovery.** Verified:
+
+- HEAD `5d97acbcb72d83a13878d0a40cbf2c87ca09770d` (parent `ebcc2df96acc610071fef6c926cbaba772d28c6c`, tree `55122f52def1009f810d14bd844d5f444d19a6b6`) on `feat/review-orchestration`;
+- local main and stored origin/main `e7dd3be384e36e14cce27c67e902ea9531b39d71`;
+- a clean tree, with origin and the noreply identity unchanged;
+- the accepted path inventory, and all 260 protected entries identical to the accepted tree object `9217e545`;
+- the Prompt 220 export matching every recorded property and byte-identical to fresh Git output.
+
+**Disclosure.** The Prompt 220 checkpoint file `.local/p220/checkpoint/accepted-tree-listing.txt` was found empty (written with `git ls-tree -r` from inside that directory, without `--full-tree`). Protected identity was therefore re-verified against the tree object itself.
+
+The checkpoint is under `.local/p221/checkpoint/`, with a prompts.md prefix of 2,831,912 bytes, SHA-256 `e3b8c03fa4a7c96d54a65c022740c3415e037ac3aee7547b24bbc928b603f6bf`.
+
+**Corrections.** The README's introductory M5g paragraph and the threat model's introductory and later mechanism passages now describe the sequence:
+
+- implemented in Prompt 218;
+- tests corrected in Prompt 219;
+- accepted for a local commit and committed in Prompt 220;
+- feature publication and exact-commit CI pending;
+- PostgreSQL behaviour unverified locally.
+
+All limits are kept, and M4d and E7 are not claimed closed. ADR-0025 and the plan are unchanged.
+
+**Checks completed.**
+
+- **Scope:** only README, the threat model and prompts.md differ from `5d97acbc`.
+- **Protected entries:** all 262 other entries are identical in blob and mode.
+- **Documentation:** links, anchors and tables passed (592 links and 152 tables, zero problems).
+- **Encoding and whitespace:** UTF-8 without BOM, LF only and no replacement or NUL characters; working and staged whitespace checks were clean.
+- **History:** the prompts.md prefix is identical, and the Prompt 220 handoff insertion was byte-compared with its source.
+- **Privacy:** the scan found zero hits.
+- **Ruff:** format reported 240 files already formatted, and lint passed.
+
+No application tests, builds or wheel checks were run, because their bytes are unchanged.

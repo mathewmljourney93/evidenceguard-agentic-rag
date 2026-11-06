@@ -172,21 +172,24 @@ This is packaging and regression evidence, not application review-path protectio
 [M5g review orchestration specification](docs/plan.md#m5g-review-orchestration-and-atomic-output-specification-accepted-at-review-prompt-217-implementation-pending)
 was **accepted at external review in Prompt 217** (proposed in Prompt 214, corrected in Prompts
 215–216) with two binding clarifications ([acceptance](docs/plan.md#m5g-acceptance-prompt-217)).
-That was specification acceptance only. **In Prompt 218 Claude Code implemented M5g and
-staged it for external review** ([implementation status](docs/plan.md#m5g-implementation-status-accepted-for-a-local-commit-prompt-220-postgresql-and-ci-pending),
-[ADR-0025](docs/decisions/0025-review-orchestration.md)): the output values, migration `0008`,
-the fenced output writer and reads, the G15 transaction rule and the unregistered `run_review`
-handler factory. It is **not** implementation-accepted, committed, published or CI-verified.
-Its PostgreSQL tests are written but **were not executed** (no test database locally), so no
-database behaviour of M5g is verified. No application review path exists, no live provider is
-configured, and `run_review` remains unregistered. The M4d trusted-snapshot limitation and E7
-are not claimed closed. In Prompt 219 its tests were corrected after review (constraint
-attribution; real persistence-boundary tests). No production byte changed, the 54 M5g
-PostgreSQL tests remain unexecuted, and the implementation was then still unaccepted.
-**In Prompt 220 the external reviewer accepted the M5g implementation, with those test
-corrections, for a local commit only** ([ADR-0025](docs/decisions/0025-review-orchestration.md#external-review-prompt-220)).
-No PostgreSQL behaviour is accepted as verified, there is no exact-commit CI, and
-publication, M4d and E7 closure, M5h and overall M5 acceptance remain pending. M5e is reviewed,
+That was specification acceptance only. The implementation followed in three steps
+([implementation status](docs/plan.md#m5g-implementation-status-accepted-for-a-local-commit-prompt-220-postgresql-and-ci-pending),
+[ADR-0025](docs/decisions/0025-review-orchestration.md)):
+
+- **Prompt 218:** Claude Code implemented M5g: the output values, migration `0008`, the
+  fenced output writer and reads, the G15 transaction rule and the unregistered `run_review`
+  handler factory.
+- **Prompt 219:** its tests were corrected after review (constraint attribution; real
+  persistence-boundary tests); no production byte changed.
+- **Prompt 220:** the external reviewer accepted the implementation, with those test
+  corrections, for a local commit only, and it was **committed locally** on
+  `feat/review-orchestration` ([external review](docs/decisions/0025-review-orchestration.md#external-review-prompt-220)).
+
+**Feature publication and exact-commit CI are pending.** Its 54 PostgreSQL tests are written
+but **were not executed** (no test database locally), so no database behaviour of M5g is
+verified. No application review path exists, no live provider is configured, and `run_review`
+remains unregistered. The M4d trusted-snapshot limitation and E7 are not claimed closed, and
+merge, M5h and overall M5 acceptance remain pending. M5e is reviewed,
 CI verified and on main at `14f510e`; its publication evidence was independently accepted
 in Prompt 207. M5g–M5h and overall M5 acceptance remain pending.
 
