@@ -12431,6 +12431,14 @@ binding clarifications ([acceptance](#m5g-acceptance-prompt-217)).
   acceptance, publication and exact-version CI.
 - **Runtime:** no M5g control operates. No application review path has been added, and
   `run_review` stays unregistered.
+- **Prompt 218 update:** implemented by Claude Code and staged for external review; not
+  implementation-accepted, committed, published or CI-verified, and no PostgreSQL test was
+  executed ([implementation status](#m5g-implementation-status-accepted-for-a-local-commit-prompt-220-postgresql-and-ci-pending)).
+  The "pending" and "nothing exists in code" statements in this section describe the state at
+  acceptance.
+- **Prompt 220 update:** the implementation, with Prompt 219's test corrections, was
+  accepted at external review for a local commit only. PostgreSQL execution, exact-commit CI,
+  publication and overall M5 acceptance remain pending.
 
 **History (historical states).** The rest of this paragraph records how the specification
 reached acceptance:
@@ -13790,6 +13798,82 @@ historical.
 specification was **accepted in Prompt 217 as a specification only**. Its implementation,
 tests, migration `0008`, ADR-0025, implementation acceptance, publication and exact-version CI
 remain pending, and each requires its own authorization.
+
+#### M5g implementation status (accepted for a local commit, Prompt 220; PostgreSQL and CI pending)
+
+**Acceptance (Prompt 220).** The external reviewer accepted the Prompt 218 implementation
+with Prompt 219's test corrections **for a local commit only**. Both verification findings
+are resolved, all documented implementation choices are accepted, and no implementation
+review decision remains open ([external review](decisions/0025-review-orchestration.md#external-review-prompt-220)).
+The reviewer reviewed the code and the Prompt 219 diff statically, verified the exports, and
+exercised the source-extracted transaction helper. The reviewer ran no project suite, wheel,
+PostgreSQL or CI. **No PostgreSQL behaviour is accepted as verified:** the 54 M5g PostgreSQL
+cases remain unexecuted. There is no exact-commit CI, M4d and E7 are not declared closed, no
+production review path or `run_review` registration is authorized, and M5h, M6 and overall
+M5 acceptance remain pending. The Prompt 218 and 219 paragraphs below are historical.
+
+**State (Prompt 218, historical).** Claude Code implemented the accepted specification in Prompt 218 on
+`feat/review-orchestration` (from `ebcc2df9`). The work is **staged and uncommitted** for external
+review. It is **not** implementation-accepted, committed, published or CI-verified. Decisions,
+material implementation choices and evidence limits are in
+[ADR-0025](decisions/0025-review-orchestration.md).
+
+**What exists in code:**
+
+- the four M5g-A modules and migration `0008`;
+- the additive `review_outputs` model and `reviews` unique in `models.py`;
+- the G15 rule in `persistence/db.py`;
+- the five planned test modules, two shared test helpers (`tests/review_world.py`,
+  `tests/review_postgres_world.py`) and a G15 test module (`tests/test_transaction_process_control.py`);
+- updated head, table-set, readiness and packaging assertions;
+- one additive offline installed-wheel assertion in CI.
+
+`run_review` stays unregistered and nothing outside tests builds the handler.
+
+**Verification run locally in Prompt 218** (Claude Code; Windows; locked offline environment):
+
+- Ruff format and lint, and strict mypy, all clean.
+- The full suite, with the M5g non-database tests and the G15 matrix passing; all
+  PostgreSQL tests were skipped for lack of `EG_TEST_DATABASE_URL`.
+- Baseline and candidate build comparison.
+- The complete installed-wheel CI step run outside the checkout.
+
+Exact commands, counts and hashes are in the Prompt 218 handoff.
+
+**Not verified:**
+
+- **PostgreSQL.** The M5g PostgreSQL modules (`test_review_outputs_postgres.py`,
+  `test_review_handler_postgres.py`, `test_review_canary_postgres.py`) are written and collected
+  but **not executed**, and no existing PostgreSQL regression was executed. Migration `0008`
+  against PostgreSQL and `alembic check` are therefore unverified.
+- **CI and review.** No CI ran and the implementation is not reviewed.
+
+**Limits unchanged by the implementation:**
+
+- **M4d trusted-snapshot limitation.** The closing mechanisms exist for the `run_review` path:
+  the only retrieval is `search_snapshot` over the loaded snapshot (structure test) and there is
+  no recapture. The limitation is **not closed** until those mechanisms are reviewed and the
+  replacement-activation database test passes.
+- **E7.** The output writer exists, but its database behaviour is unverified, so E7 is not
+  claimed satisfied.
+- **Other limits:** U4's discarded bytes, the M3 lease/commit window, no overall deadline and no
+  exactly-once call remain. M5h, M6 and overall M5 acceptance are pending.
+
+**Prompt 219 test corrections (still staged for review, not accepted).** The reviewer
+approved four outcome choices as implementation choices only; this does not accept the
+implementation. Review found two verification gaps, with no demonstrated production defect:
+
+- **Finding A:** a PostgreSQL constraint test attributed a populated-review deletion to an
+  output foreign key. The test now uses catalogue inspection and isolated invalid-reference,
+  key and positive-control cases.
+- **Finding B:** the real persistence boundaries were untested. The new
+  `tests/test_review_output_persistence.py` calls the real writer and readers over scripted
+  sessions.
+
+No production byte changed. **Database status:** 54 M5g PostgreSQL tests are written and
+collected but not executed. The collected integration total is 439 (the earlier 385 plus
+54), all skipped locally. Details are in
+[ADR-0025](decisions/0025-review-orchestration.md#prompt-219-review-findings-and-test-corrections).
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.

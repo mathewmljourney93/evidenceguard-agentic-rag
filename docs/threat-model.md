@@ -530,16 +530,32 @@ including main PostgreSQL `385 passed` and Gitleaks with 93 commits and no leaks
 packaging, regression and structural checks, not runtime protection. The
 [M5g orchestration specification](plan.md#m5g-review-orchestration-and-atomic-output-specification-accepted-at-review-prompt-217-implementation-pending)
 was accepted at review in Prompt 217 as a specification only
-([acceptance](plan.md#m5g-acceptance-prompt-217)); its implementation is pending.
+([acceptance](plan.md#m5g-acceptance-prompt-217)). **It was implemented in Prompt 218 and is
+staged for external review** ([implementation status](plan.md#m5g-implementation-status-accepted-for-a-local-commit-prompt-220-postgresql-and-ci-pending),
+[ADR-0025](decisions/0025-review-orchestration.md)). It is not implementation-accepted,
+committed, published or CI-verified, and its PostgreSQL tests were not executed.
 
-- **Current gap:** fenced write paths do not preserve process-control identity when
-  transaction cleanup fails. The accepted G15 rule authorizes fixing that in the future
-  implementation.
-- **Accepted for later:** unclassified context-exit failures are to be normalized to a fixed
-  error, so that no database text reaches job errors or logs (G22).
+- **Process control on fenced paths:** `transaction()` now keeps the first process-control
+  object by identity across body, commit, rollback and close (G15). Its non-database tests
+  pass; no rollback, disposal or commit outcome is claimed.
+- **Context-exit privacy:** unclassified ordinary failures leaving a fenced block are replaced
+  by the fixed `ReviewFenceExitError`, so no SQL, parameter or database text reaches job errors
+  or logs (G22). This is tested with sentinel text against fake sessions only.
+- **Atomic output:** the output row and the job's success share one finish transaction. Their
+  database behaviour is unverified.
 
-None of this operates yet. No M5g control and no application review path exist. No M5f control
-operates in an application review path; `run_review` remains unregistered. M5e is reviewed,
+None of this operates in an application review path: no endpoint, command or production
+registration builds the handler, no live provider is configured, and `run_review` remains
+unregistered. The M4d trusted-snapshot limitation is not closed: the snapshot-only retrieval
+mechanism exists but is unreviewed and its database test unexecuted. Scripted canary tests do
+not establish live-model injection resistance. Prompt 219 added tests of the real
+persistence boundaries over scripted sessions (read process control, fixed database errors,
+writer precedence and ownership) and corrected the constraint-test attribution. No production
+byte changed, and the 54 M5g PostgreSQL tests remain unexecuted. In Prompt 220 the
+implementation was accepted at external review for a local commit only
+([ADR-0025](decisions/0025-review-orchestration.md#external-review-prompt-220)). None of
+these controls is database-verified or operates in an application review path; the M4d
+limitation and E7 are not declared closed. M5e is reviewed,
 CI verified and on main at `14f510e`; its publication evidence was independently accepted
 in Prompt 207. M5g–M5h and overall M5 acceptance remain pending.
 

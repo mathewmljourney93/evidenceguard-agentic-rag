@@ -309,10 +309,14 @@ def test_m5a_is_not_imported_by_other_packages_or_registered() -> None:
     ):
         assert package.__file__ is not None
         for source in Path(package.__file__).parent.rglob("*.py"):
-            if package is evidenceguard_worker and source.name == "review_seams.py":
-                continue
+            if package is evidenceguard_worker and source.name in M5G_AGENT_IMPORTERS:
+                continue  # M5d composition (D2) and M5g orchestration (G12)
             assert "evidenceguard_agents" not in _module_imports(source), source.name
     assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
+
+
+M5G_AGENT_IMPORTERS = {"review_seams.py", "review.py"}
+"""The only worker modules that import ``evidenceguard_agents``: M5d (D2) and M5g (G12)."""
 
 
 # --- M5b (ADR-0020) ------------------------------------------------------------------------------
@@ -348,6 +352,7 @@ def test_m5b_is_not_wired_into_any_application_or_handler() -> None:
         (evidenceguard_agents, "assembly.py"),
         (evidenceguard_agents, "report.py"),  # M5f's accepted pure provenance rechecks.
         (evidenceguard_persistence, "review_stages.py"),
+        (evidenceguard_worker, "review.py"),  # M5g orchestration composes the M5b conversions.
     }
     for package in (
         evidenceguard_agents,
@@ -488,7 +493,7 @@ def test_m5d_review_seams_are_the_only_worker_module_importing_agents() -> None:
         for source in _source(evidenceguard_worker, "__init__.py").parent.rglob("*.py")
         if "evidenceguard_agents" in _module_imports(source)
     }
-    assert importing == {"review_seams.py"}
+    assert importing == M5G_AGENT_IMPORTERS  # M5d's D2 module plus M5g's G12 module
     imported = _module_imports(_source(evidenceguard_worker, "review_seams.py"))
     assert imported - set(sys.stdlib_module_names) == {
         "evidenceguard_agents",
@@ -513,7 +518,10 @@ def test_m5d_creation_is_not_wired_into_any_route_command_or_runtime_path() -> N
         if source.name == "review_seams.py":
             continue
         text = source.read_text(encoding="utf-8")
-        assert "review_seams" not in text and "persistence.reviews" not in text, source.name
+        assert "persistence.reviews" not in text, source.name
+        if source.name == "review.py":
+            continue  # M5g: the unregistered run_review composition uses the M5d seams (G12)
+        assert "review_seams" not in text, source.name
         assert "run_review" not in text, source.name
     assert "run_review" not in production_registry().kinds
 
@@ -596,6 +604,8 @@ def test_m5f_is_not_wired_into_any_application_or_worker() -> None:
     for package in (evidenceguard_api, evidenceguard_worker, evidenceguard_persistence):
         assert package.__file__ is not None
         for path in Path(package.__file__).parent.rglob("*.py"):
+            if package is evidenceguard_worker and path.name == "review.py":
+                continue  # M5g: the only consumer of the M5f builder/renderer (G12)
             imports = _module_imports(path)
             assert "evidenceguard_agents.report" not in _domain_imports(path)
             assert "evidenceguard_domain.report_content" not in _domain_imports(path)
@@ -653,6 +663,8 @@ def test_m5e_is_not_wired_into_any_route_command_handler_or_registry() -> None:
         for source in Path(package.__file__).parent.rglob("*.py"):
             if package is evidenceguard_agents and source.name == "report.py":
                 continue  # M5f consumes domain stage values, never persistence/runtime seams.
+            if package is evidenceguard_worker and source.name == "review.py":
+                continue  # M5g: the unregistered orchestration is the M5e consumer (G12).
             assert "review_stages" not in source.read_text(encoding="utf-8"), source.name
     persistence = _source(evidenceguard_persistence, "__init__.py").parent
     users = {
@@ -660,6 +672,69 @@ def test_m5e_is_not_wired_into_any_route_command_handler_or_registry() -> None:
         for source in persistence.rglob("*.py")
         if "review_stages" in source.read_text(encoding="utf-8")
     }
-    assert users == {"review_stages.py"}
+    assert users == {"review_stages.py", "review_outputs.py"}  # M5g reuses ``StageFence``
     assert "run_review" not in production_registry().kinds
+    assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
+
+
+# --- M5g (ADR-0025) ------------------------------------------------------------------------------
+
+
+def test_m5g_domain_outputs_use_only_the_domain_and_the_standard_library() -> None:
+    path = _source(evidenceguard_domain, "review_outputs.py")
+    assert _module_imports(path) - set(sys.stdlib_module_names) == {"evidenceguard_domain"}
+    assert _domain_imports(path) == {"evidenceguard_domain.report_content"}
+    assert not _module_imports(path) & (M5E_FORBIDDEN | {"pydantic", "sqlalchemy"})
+
+
+def test_m5g_persistence_outputs_never_import_the_agents_or_the_worker() -> None:
+    path = _source(evidenceguard_persistence, "review_outputs.py")
+    imported = _module_imports(path)
+    assert imported - set(sys.stdlib_module_names) == {
+        "evidenceguard_domain",
+        "evidenceguard_persistence",
+        "sqlalchemy",
+    }
+    assert not imported & (M5E_FORBIDDEN | {"evidenceguard_agents", "evidenceguard_worker"})
+    migration = _source(evidenceguard_persistence, "migrations/versions/v0008_review_outputs.py")
+    assert migration.is_file()
+    assert not _module_imports(migration) & {"evidenceguard_persistence", "evidenceguard_domain"}
+
+
+def test_m5g_orchestration_keeps_the_accepted_boundaries() -> None:
+    imported = _module_imports(_source(evidenceguard_worker, "review.py"))
+    assert imported - set(sys.stdlib_module_names) == {
+        "evidenceguard_agents",
+        "evidenceguard_domain",
+        "evidenceguard_persistence",
+        "evidenceguard_retrieval",
+        "evidenceguard_worker",
+        "sqlalchemy",
+    }
+    assert not imported & {"logging", "os", "socket", "http", "urllib", "ssl"}
+
+
+def test_m5g_is_not_wired_into_any_route_command_setting_or_production_registry() -> None:
+    """W8: ``run_review`` stays unregistered; nothing outside tests builds the handler."""
+    from evidenceguard_worker.handlers import production_registry
+
+    for package in (
+        evidenceguard_api,
+        evidenceguard_observability,
+        evidenceguard_persistence,
+        evidenceguard_retrieval,
+        evidenceguard_agents,
+        evidenceguard_domain,
+        evidenceguard_worker,
+    ):
+        assert package.__file__ is not None
+        for source in Path(package.__file__).parent.rglob("*.py"):
+            if package is evidenceguard_worker and source.name == "review.py":
+                continue
+            text = source.read_text(encoding="utf-8")
+            assert "make_run_review_handler" not in text, source.name
+            assert "evidenceguard_worker.review " not in text, source.name
+            assert "from evidenceguard_worker.review import" not in text, source.name
+            if package is not evidenceguard_persistence and package is not evidenceguard_domain:
+                assert "review_outputs" not in text, source.name
     assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})

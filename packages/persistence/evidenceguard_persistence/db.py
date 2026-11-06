@@ -48,16 +48,56 @@ def transaction(session_factory: sessionmaker[Session]) -> Iterator[Session]:
 
     Commits when the block finishes normally, rolls back if it raises, and always closes the
     session. Code inside the block must not commit or roll back the session itself.
+
+    Failure selection (the accepted M5g G15 rule, ADR-0025). Once ``session_factory()`` has
+    returned a session, ``commit()`` is attempted at most once (only after the block returned),
+    ``rollback()`` at most once (only after a block or commit failure) and ``close()`` exactly
+    once; nothing is retried. Across the block, ``commit()``, ``rollback()`` and ``close()`` the
+    **first** ``BaseException`` that is not an ``Exception`` (process control) is raised as the
+    same object; every later failure is dropped without inspection. Without process control,
+    the ordinary exception selected is the one the earlier helper raised: the block or commit
+    error, replaced by a rollback error, replaced by a close error. If ``session_factory()``
+    raises, no commit, rollback or close is attempted and its exception propagates unchanged.
+    None of this proves that a rollback ran, that a connection was disposed or what a commit's
+    outcome was. Nothing here logs or reads exception text.
     """
     session = session_factory()
+    control: BaseException | None = None
+    ordinary: BaseException | None = None
     try:
         yield session
-        session.commit()
-    except BaseException:
-        session.rollback()
-        raise
-    finally:
+    except BaseException as error:  # thrown into the generator at the yield
+        control, ordinary = _selected(error, control, ordinary)
+    else:
+        try:
+            session.commit()
+        except BaseException as error:
+            control, ordinary = _selected(error, control, ordinary)
+    if control is not None or ordinary is not None:
+        try:
+            session.rollback()
+        except BaseException as error:
+            control, ordinary = _selected(error, control, ordinary)
+    try:
         session.close()
+    except BaseException as error:
+        control, ordinary = _selected(error, control, ordinary)
+    if control is not None:
+        raise control
+    if ordinary is not None:
+        raise ordinary
+
+
+def _selected(
+    error: BaseException, control: BaseException | None, ordinary: BaseException | None
+) -> tuple[BaseException | None, BaseException | None]:
+    """The G15 selection: the first process-control object is kept by identity; without one, a
+    later ordinary failure replaces the earlier one (the earlier helper's behaviour)."""
+    if control is not None:
+        return control, ordinary
+    if not isinstance(error, Exception):
+        return error, ordinary
+    return None, error
 
 
 def dispose_engine(engine: Engine) -> None:

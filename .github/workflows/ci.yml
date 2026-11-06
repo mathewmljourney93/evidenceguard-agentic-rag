@@ -359,6 +359,35 @@ jobs:
           print("hash-covered review report built, strictly decoded and rendered offline from the installed wheel")
           PY
 
+          # M5g (ADR-0025): import the orchestration and output modules, refuse a handler without a
+          # provider and render migration 0008 offline. No database, provider or runtime review
+          # path is used; this check does not establish M5g persistence (the PostgreSQL job does).
+          "${bin}/python" -I - <<'PY'
+          import io
+          from alembic import command
+          import evidenceguard_domain.review_outputs as outputs
+          import evidenceguard_persistence.review_outputs as output_store
+          import evidenceguard_worker.review as orchestration
+          from evidenceguard_persistence.migration_config import alembic_config
+          from evidenceguard_worker.handlers import production_registry
+          for module in (outputs, output_store, orchestration):
+              assert "site-packages" in (module.__file__ or ""), module.__name__
+          try:
+              orchestration.make_run_review_handler()
+          except TypeError:
+              pass
+          else:
+              raise AssertionError("a handler was built without a model provider")
+          assert str(orchestration.REVIEW_WORKER_ACTOR_ID) == "382866d6-e3c2-5725-999c-3a181e4e661c"
+          assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
+          buf = io.StringIO()
+          command.upgrade(alembic_config(output_buffer=buf), "0007:0008", sql=True)
+          rendered = buf.getvalue()
+          assert "CREATE TABLE review_outputs" in rendered
+          assert "ADD CONSTRAINT uq_reviews_tenant_id_id_run_review_job_id UNIQUE" in rendered
+          print("review orchestration imported and migration 0008 rendered offline from the installed wheel")
+          PY
+
   integration:
     # PostgreSQL integration tests. Service containers run only on Linux runners, so this job
     # is Ubuntu-only; the verify job keeps the database-independent checks on both systems.

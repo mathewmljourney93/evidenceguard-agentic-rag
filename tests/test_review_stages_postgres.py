@@ -1836,7 +1836,7 @@ def test_migration_0007_downgrades_upgrades_and_matches_the_models(
             ).scalar_one()
         return found
 
-    assert tables() >= STAGE_TABLES and version() == "0007"
+    assert tables() >= STAGE_TABLES and version() == "0008"  # head (M5g adds 0008)
     try:
         command.downgrade(config, "0006")
         assert not STAGE_TABLES & tables() and version() == "0006"

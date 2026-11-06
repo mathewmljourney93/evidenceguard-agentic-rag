@@ -789,6 +789,8 @@ class Review(Base):
         UniqueConstraint("tenant_id", "id"),
         UniqueConstraint("tenant_id", "idempotency_key"),
         UniqueConstraint("tenant_id", "run_review_job_id"),
+        # M5g (G9, migration 0008): the target of the output's review-and-job foreign key.
+        UniqueConstraint("tenant_id", "id", "run_review_job_id"),
         ForeignKeyConstraint(["tenant_id", "vendor_id"], ["vendors.tenant_id", "vendors.id"]),
         ForeignKeyConstraint(["tenant_id", "run_review_job_id"], ["jobs.tenant_id", "jobs.id"]),
         *(CheckConstraint(check, name=name) for name, check in REVIEW_CHECKS),
@@ -1309,3 +1311,76 @@ class ReviewStageResult(Base):
     dependency_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
     content_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
     content_canonical: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+# --- review outputs (M5g, ADR-0025; migration 0008) ----------------------------------------------
+
+REVIEW_OUTPUT_CHECKS: tuple[tuple[str, str], ...] = (
+    ("schema_id", "schema_id = 'evidenceguard.review-report-content.v1'"),
+    ("renderer_id", "renderer_id = 'evidenceguard.review-report-markdown.v1'"),
+    ("mode", "mode = 'contract'"),
+    ("wrapper_ascii", "octet_length(wrapper_canonical) = char_length(wrapper_canonical)"),
+    ("wrapper_printable", "wrapper_canonical !~ '[^ -~]'"),
+    ("wrapper_size", "octet_length(wrapper_canonical) BETWEEN 1 AND 16777216"),
+    _hex("wrapper_sha256"),
+    _hex("legacy_sha256"),
+    _hex("review_request_sha256"),
+    _hex("snapshot_sha256"),
+    _hex("configuration_sha256"),
+    _hex("markdown_sha256"),
+    ("question_count", "question_count BETWEEN 1 AND 100"),
+    ("finding_count", "finding_count BETWEEN 0 AND 200"),
+    ("unresolved_count", "unresolved_count BETWEEN 0 AND question_count"),
+    ("markdown_bytes", "markdown_bytes BETWEEN 1 AND 33554432"),
+    ("job_attempt", "job_attempt BETWEEN 1 AND 10"),
+)
+
+
+class ReviewOutputRow(Base):
+    """A review's stored output: the canonical M5f wrapper and its derived columns, written once
+    in the finish transaction that records the job's success (M5g). Markdown is not stored; its
+    digest and size are. Never updated or deleted by application code; no foreign key cascades.
+    The database cannot prove that the digests match the bytes or that the stages are complete
+    (write-time and reload checks in ``evidenceguard_persistence.review_outputs``)."""
+
+    __tablename__ = "review_outputs"
+    __table_args__ = (
+        PrimaryKeyConstraint("tenant_id", "review_id"),
+        UniqueConstraint("tenant_id", "job_id"),
+        ForeignKeyConstraint(
+            ["tenant_id", "review_id"],
+            ["reviews.tenant_id", "reviews.id"],
+            name="fk_review_outputs_review",
+        ),
+        ForeignKeyConstraint(
+            ["tenant_id", "job_id"], ["jobs.tenant_id", "jobs.id"], name="fk_review_outputs_job"
+        ),
+        ForeignKeyConstraint(
+            ["tenant_id", "review_id", "job_id"],
+            ["reviews.tenant_id", "reviews.id", "reviews.run_review_job_id"],
+            name="fk_review_outputs_review_job",
+        ),
+        *(CheckConstraint(check, name=name) for name, check in REVIEW_OUTPUT_CHECKS),
+    )
+
+    tenant_id: Mapped[UUID] = mapped_column(Uuid)
+    review_id: Mapped[UUID] = mapped_column(Uuid)
+    job_id: Mapped[UUID] = mapped_column(Uuid)
+    schema_id: Mapped[str] = mapped_column(String(64))
+    renderer_id: Mapped[str] = mapped_column(String(64))
+    mode: Mapped[str] = mapped_column(String(16))
+    wrapper_canonical: Mapped[str] = mapped_column(Text)
+    wrapper_sha256: Mapped[str] = mapped_column(String(64))
+    legacy_sha256: Mapped[str] = mapped_column(String(64))
+    review_request_sha256: Mapped[str] = mapped_column(String(64))
+    snapshot_sha256: Mapped[str] = mapped_column(String(64))
+    configuration_sha256: Mapped[str] = mapped_column(String(64))
+    question_count: Mapped[int] = mapped_column(SmallInteger)
+    finding_count: Mapped[int] = mapped_column(SmallInteger)
+    unresolved_count: Mapped[int] = mapped_column(SmallInteger)
+    markdown_sha256: Mapped[str] = mapped_column(String(64))
+    markdown_bytes: Mapped[int] = mapped_column(Integer)
+    job_attempt: Mapped[int] = mapped_column(SmallInteger)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.clock_timestamp()
+    )

@@ -1180,7 +1180,10 @@ def test_offline_migration_0006_renders_the_model_tables_and_constraint_names() 
         for model in (Review, ReviewBinding, ReviewExcludedRevision)
     )
     names = set(re.findall(r"CONSTRAINT (\w+)", rendered))
-    assert names == set(re.findall(r"CONSTRAINT (\w+)", model_ddl))
+    # 0008 (M5g) later adds exactly one constraint to the reviews model; 0006 itself is unchanged.
+    added_by_0008 = {"uq_reviews_tenant_id_id_run_review_job_id"}
+    assert added_by_0008 <= set(re.findall(r"CONSTRAINT (\w+)", model_ddl))
+    assert names == set(re.findall(r"CONSTRAINT (\w+)", model_ddl)) - added_by_0008
     assert "uq_reviews_tenant_id_idempotency_key" in names and len(names) == 49
     assert "ON CONFLICT" not in rendered
 
