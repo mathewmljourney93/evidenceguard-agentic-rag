@@ -149,7 +149,7 @@ No retrieval, agent workflow, evaluation results, security guarantees or benchma
 The [M5f report content and renderer specification](docs/plan.md#m5f-report-content-and-renderer-specification-accepted-at-review-prompt-208-implementation-pending) was proposed in Prompt 207
 and **accepted at external review in Prompt 208**, including F1–F12 and two binding
 clarifications. OpenAI Codex implemented M5f in Prompt 209
-([implementation status](docs/plan.md#m5f-implementation-status-feature-ci-passed-at-3e58f650-prompt-212-not-merged), [ADR-0024](docs/decisions/0024-review-report-content.md)).
+([implementation status](docs/plan.md#m5f-implementation-status-reviewed-verified-in-ci-and-on-main-at-e7dd3be3), [ADR-0024](docs/decisions/0024-review-report-content.md)).
 Claude Code recovered that work read-only and, in Prompt 210, corrected the builder's retained
 evidence checks after external review findings ([correction](docs/plan.md#m5f-evidence-binding-correction-prompt-210)).
 The corrected implementation was **accepted at external review in Prompt 211 for a local
@@ -160,8 +160,21 @@ Claude Code could observe only API conclusions. The reviewer independently retri
 Ubuntu `4051 passed, 385 skipped`, Windows `4050 passed, 386 skipped`, PostgreSQL
 `385 passed, 4051 deselected`, the M5f installed-wheel line on both platforms, smoke and
 cleanup ok, and Gitleaks with 92 commits and no leaks. The reviewer accepted that evidence in
-Prompt 213, which authorizes gated main publication. M5f is **feature-CI verified but not
-merged**; main publication has not happened yet. No M5f control
+Prompt 213. After the evidence commit's own feature CI passed, main was fast-forwarded and
+pushed manually by Mathew, and all five main jobs passed: **M5f is reviewed, verified in CI and
+on main at `e7dd3be3`** ([main evidence](docs/plan.md#m5f-main-publication-at-e7dd3be3-prompt-213)),
+within its accepted scope. Claude Code could observe only conclusions. The reviewer
+independently retrieved all ten `e7dd3be3` feature and main job logs
+([ADR-0024](docs/decisions/0024-review-report-content.md#reviewer-retrieved-e7dd3be3-logs-prompt-214)).
+On main: Ubuntu `4051 passed, 385 skipped`, Windows `4050 passed, 386 skipped`, PostgreSQL
+`385 passed, 4051 deselected`, smoke and cleanup ok, and Gitleaks with 93 commits and no leaks.
+This is packaging and regression evidence, not application review-path protection. The
+[M5g review orchestration specification](docs/plan.md#m5g-review-orchestration-and-atomic-output-specification-accepted-at-review-prompt-217-implementation-pending)
+was **accepted at external review in Prompt 217** (proposed in Prompt 214, corrected in Prompts
+215–216) with two binding clarifications ([acceptance](docs/plan.md#m5g-acceptance-prompt-217)).
+This is specification acceptance only. Implementation, migration `0008`, ADR-0025,
+implementation acceptance, publication and CI are pending. No M5g control operates and no
+application review path has been added. No M5f control
 operates in an application review path; `run_review` remains unregistered. M5e is reviewed,
 CI verified and on main at `14f510e`; its publication evidence was independently accepted
 in Prompt 207. M5g–M5h and overall M5 acceptance remain pending.

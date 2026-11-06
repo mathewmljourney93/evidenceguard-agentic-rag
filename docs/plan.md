@@ -11559,17 +11559,24 @@ The external reviewer accepted both Prompt 206 exports and independently confirm
 publication evidence in Prompt 207 ([review record](decisions/0023-review-stage-persistence.md#external-review-evidence-acceptance-prompt-207)).
 The [M5f specification](#m5f-report-content-and-renderer-specification-accepted-at-review-prompt-208-implementation-pending) below was proposed in Prompt 207
 and accepted at external review in Prompt 208 with two binding clarifications.
-OpenAI Codex implemented M5f in Prompt 209 ([implementation status](#m5f-implementation-status-feature-ci-passed-at-3e58f650-prompt-212-not-merged)).
+OpenAI Codex implemented M5f in Prompt 209 ([implementation status](#m5f-implementation-status-reviewed-verified-in-ci-and-on-main-at-e7dd3be3)).
 Claude Code recovered that work read-only and corrected its builder evidence checks in Prompt 210
 ([correction](#m5f-evidence-binding-correction-prompt-210)). The corrected implementation was
 **accepted at external review in Prompt 211 for a local implementation commit only**
 ([acceptance](#m5f-external-review-acceptance-prompt-211)). After Mathew's manual feature
 push, all five required jobs passed at `3e58f650` on `feat/review-report-content` (Prompt 212)
-([feature CI evidence](#m5f-feature-ci-evidence-at-3e58f650-prompt-212)). M5f is
-**feature-CI verified but not merged**. The reviewer independently retrieved the feature logs
-and accepted the evidence in Prompt 213, which authorizes gated main publication; main
-publication has not happened yet. No M5f control
-operates in an application review path. M5g–M5h and overall M5 acceptance remain pending.
+([feature CI evidence](#m5f-feature-ci-evidence-at-3e58f650-prompt-212)). The reviewer
+independently retrieved the feature logs and accepted the evidence in Prompt 213. After the
+evidence commit's own feature CI passed, main was fast-forwarded and Mathew pushed it, and all
+five main jobs passed: M5f is **reviewed, verified in CI and on main at `e7dd3be3`**
+([main evidence](#m5f-main-publication-at-e7dd3be3-prompt-213)). The reviewer independently
+retrieved all ten `e7dd3be3` job logs and accepted that evidence in Prompt 214. No M5f control
+operates in an application review path. The
+[M5g specification](#m5g-review-orchestration-and-atomic-output-specification-accepted-at-review-prompt-217-implementation-pending)
+was proposed in Prompt 214, corrected in Prompts 215 and 216, and **accepted at review in Prompt
+217** with two binding clarifications ([acceptance](#m5g-acceptance-prompt-217)). Its
+implementation is pending, and no M5g control operates. M5g–M5h and overall M5
+acceptance remain pending.
 
 <a id="m5f-report-content-and-renderer-specification"></a>
 
@@ -11577,9 +11584,9 @@ operates in an application review path. M5g–M5h and overall M5 acceptance rema
 
 **Historical acceptance status.** The implementation-pending statements within this
 accepted specification record the Prompt 208 review state. For the implementation staged in
-Prompt 209 and its actual checks, see the separate [implementation status](#m5f-implementation-status-feature-ci-passed-at-3e58f650-prompt-212-not-merged);
-the implementation was accepted for a local commit in Prompt 211, and its feature-branch CI
-passed in Prompt 212. It is not merged.
+Prompt 209 and its actual checks, see the separate [implementation status](#m5f-implementation-status-reviewed-verified-in-ci-and-on-main-at-e7dd3be3);
+the implementation was accepted for a local commit in Prompt 211, its feature-branch CI
+passed in Prompt 212, and it is verified in CI and on main at `e7dd3be3` (Prompt 213).
 
 **ACCEPTED at external review in Prompt 208; implementation pending.** The complete
 specification and F1–F12 are accepted subject to binding clarifications A and B recorded below.
@@ -12250,7 +12257,7 @@ accepted in Prompt 208; implementation and every implementation check remain pen
 M5g–M5h and overall M5 acceptance remain pending.
 
 
-#### M5f implementation status (feature CI passed at 3e58f650, Prompt 212; not merged)
+#### M5f implementation status (reviewed, verified in CI and on main at e7dd3be3)
 
 OpenAI Codex implemented the accepted Prompt 208 specification, F1–F12 and clarifications
 A/B in Prompt 209: domain-owned immutable values and strict wrapper codec, pure trusted-input
@@ -12345,10 +12352,10 @@ retrieved the complete logs independently, and they are recorded per job in
 - **Container:** the smoke and cleanup succeeded.
 - **Gitleaks:** 92 commits scanned with no leaks.
 
-The reviewer accepted this evidence in Prompt 213, which authorizes gated main publication
-(the evidence commit, its feature CI, a fast-forward and Mathew's manual main push). M5f is
-**feature-CI verified but not merged**; main publication has not happened yet, and M5g is not
-authorized. The runtime limits are unchanged:
+The reviewer accepted this evidence in Prompt 213, which authorized gated main publication
+(the evidence commit, its feature CI, a fast-forward and Mathew's manual main push). At this
+point M5f was feature-CI verified but not merged (historical); the publication follows below.
+The runtime limits are unchanged:
 
 - No application review path uses M5f, and `run_review` is unregistered. There is no live
   provider or model-quality evidence.
@@ -12360,6 +12367,1429 @@ authorized. The runtime limits are unchanged:
 - E7's output migration and atomic writer, discarded U4 evidence, the M3 lease window, M4d and
   M6 obligations remain.
 - M5g–M5h and overall M5 acceptance remain pending.
+
+##### M5f main publication at e7dd3be3 (Prompt 213)
+
+The evidence commit `e7dd3be384e36e14cce27c67e902ea9531b39d71` changes only the five evidence
+documents. Mathew pushed it to the feature branch. Its push-triggered
+[ci run 42171600972](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600972)
+and [secret-scan run 42171600682](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600682)
+succeeded with all five jobs passing.
+
+After a clean preflight, Claude Code fast-forwarded local main (`--ff-only`, no merge commit).
+The preflight confirmed a range of exactly the four reviewed commits over the thirteen reviewed
+paths, unchanged accepted blobs, and clean privacy and Gitleaks checks. Mathew then pushed main
+manually. Remote main, local main and origin/main all equal `e7dd3be3`.
+
+The separate push-triggered main runs succeeded with every step of all five required jobs
+succeeding:
+
+- [ci run 42172997295](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997295):
+  Ubuntu and Windows verify, PostgreSQL integration and container all passed.
+- [secret-scan run 42172997198](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997198):
+  Gitleaks passed.
+
+Claude Code observed these conclusions through the public API; its log requests returned HTTP
+403 (a historical access limitation). The reviewer then independently retrieved all ten
+`e7dd3be3` feature and main job logs and accepted the publication evidence in Prompt 214:
+
+- **Main:** Ubuntu `4051 passed, 385 skipped`, Windows `4050 passed, 386 skipped`, PostgreSQL
+  `385 passed, 4051 deselected`, smoke and cleanup ok, and Gitleaks with 93 commits and no
+  leaks.
+- **All four verify logs:** the registry line, all eleven installed-wheel lines and the 80 M5f
+  module positions.
+
+Per-job results for the feature and main runs are recorded separately in
+[ADR-0024](decisions/0024-review-report-content.md#reviewer-retrieved-e7dd3be3-logs-prompt-214).
+This is packaging and regression evidence, not application review-path protection.
+
+M5f is **reviewed, verified in CI and on main at `e7dd3be3`**, within its accepted scope. The
+runtime limits are unchanged:
+
+- No application review path uses M5f, and `run_review` is unregistered. There is no live
+  provider or model-quality evidence.
+- Provenance does not establish entailment or authenticity, and structural and rendering
+  checks do not establish semantic injection resistance.
+- The container smoke does not exercise M5f. Offline migration assertions are not PostgreSQL
+  execution. Recall is arithmetic, Voyage is mocked and model calls are scripted.
+- There is no browser or CommonMark-parser check and no tight maximal-size or performance proof.
+- E7's output migration and atomic writer, discarded U4 evidence, the M3 lease window, M4d and
+  M6 obligations remain.
+
+M5g is not authorized. M5g–M5h and overall M5 acceptance remain pending.
+
+<a id="m5g-review-orchestration-and-atomic-output-specification"></a>
+
+#### M5g review orchestration and atomic output specification (ACCEPTED at review, Prompt 217; implementation pending)
+
+**Status.** The specification was **accepted at external review in Prompt 217**, subject to two
+binding clarifications ([acceptance](#m5g-acceptance-prompt-217)).
+
+- **Decisions:** G1–G15 and G17–G24 are accepted. G16 is resolved as not selected. No M5g
+  design decision remains open.
+- **Pending:** the implementation, its tests, migration `0008`, ADR-0025, implementation
+  acceptance, publication and exact-version CI.
+- **Runtime:** no M5g control operates. No application review path has been added, and
+  `run_review` stays unregistered.
+
+**History (historical states).** The rest of this paragraph records how the specification
+reached acceptance:
+
+- **Prompt 214:** proposed by Claude Code.
+- **Prompt 215:** not accepted at external review. Claude Code then corrected and completed it
+  in Prompt 215 under the [review disposition](#m5g-r-prompt-215-review-disposition-and-corrections).
+- **Prompt 216:** still not accepted. The reviewer supported the Prompt 215 corrections as
+  directions and identified six remaining contract issues (R10–R15). Claude Code corrected them
+  in Prompt 216, recorded in the same disposition subsection.
+- **Supported directions:** the reviewer supported several directions subject to review of the
+  complete corrected contracts. That is **not** acceptance of G1–G14, of any later decision, or
+  of the specification as a whole. The justification originally given for G11 was not accepted
+  and has been replaced.
+- **Prompt 217:** accepted, with the clarifications below. The "not accepted", "supported
+  direction" and "proposed" statements in this section are historical.
+- **What exists:** nothing below exists in code. Migration `0008` does not exist, and there is
+  no ADR-0025.
+- **Accepted contracts:** the accepted M5a–M5f contracts, headings and anchors are unchanged.
+  Every change this specification needs to an existing module is a numbered decision (M5g-K);
+  nothing is silently applied.
+
+##### M5g acceptance (Prompt 217)
+
+**Scope.** The external reviewer accepted the M5g specification as proposed in Prompt 214 and
+corrected in Prompts 215–216, subject to the two binding clarifications below.
+
+- **Accepted:** G1–G15 and G17–G24.
+- **G16 resolved:** the proposed public uncertain-finish property is **not** added. It remains
+  documented as an alternative considered and not selected.
+- **No M5g design decision remains open.**
+- **G15:** authorizes the specified minimal `transaction()` change in
+  `packages/persistence/evidenceguard_persistence/db.py` during the future implementation,
+  with every regression obligation listed in M5g-E3 and M5g-J.
+
+This is **specification acceptance only**. It does not accept an implementation, establish
+runtime protection, close the M4d trusted-snapshot limitation, satisfy E7 in code, or authorize
+publication.
+
+**Reviewer evidence (the reviewer's, not Claude Code's).** The reviewer did the following:
+
+- independently verified the Prompt 216 export's size, line count and SHA-256;
+- reviewed the correction diff against the previously reviewed M5g contracts;
+- ran isolated transaction-pseudocode probes over 625 phase combinations, all of which passed
+  the first-process-control identity and cleanup-call-count checks;
+- confirmed that, within those, 16 ordinary-only combinations preserved the selected exception
+  object and call sequence of the published transaction helper;
+- ran six isolated fenced-helper cases using the published context code and fake sessions:
+  normal and finish fences covering fixed-body classification, latched cancellation and
+  context-exit privacy normalization. All passed, including the fresh-error cause and context
+  checks.
+
+These were isolated source and pseudocode probes. They were not project-suite, installed-wheel,
+SQLAlchemy database, PostgreSQL or CI runs, and they did not test an M5g implementation, which
+does not exist.
+
+**Binding clarification A (outcome-write states).** The general outcome-write wording now
+includes `succeeded`. A `complete` transaction can commit `succeeded` before `close()` raises.
+An outcome-write exception, or a `job.outcome_failed` log, does not alone establish the durable
+state. The job may remain `running`, may already have transitioned to `succeeded`, `queued`,
+`failed` or `dead`, or its state may be unknown. Operation-specific outcomes are unchanged:
+`complete` → `succeeded`; `fail_retryable` → `queued` or `dead`; `fail_permanent` → `failed`.
+This changes no runtime behaviour, adds no retry, and does not imply that `fail_retryable` can
+produce `succeeded`. Applied in M5g-A0 and M5g-H2.
+
+**Binding clarification B (session construction).** The E3 call counts assume that
+`session_factory()` returned a session:
+
+- If it returns a session, `close()` is attempted exactly once, `commit()` at most once and
+  `rollback()` at most once, as specified.
+- If it raises before returning a session, no commit, rollback or close is attempted.
+- A process-control exception from session construction propagates unchanged.
+- No cleanup, database-outcome or connection-disposal claim follows from a failed session
+  construction.
+
+Applied in M5g-E3 and the planned tests (M5g-J). The first-process-control and ordinary-error
+selection policies are unchanged.
+
+Labels used below:
+
+- **[ACCEPTED]:** an accepted requirement (cited).
+- **[FACT]:** current source at `e7dd3be3`, read in Prompts 214–215.
+- **[REC]:** a new recommendation.
+- **[DECISION]:** a numbered decision (G1–G24 in M5g-K). All of them were resolved in Prompt 217.
+
+##### M5g-R. Prompt 215 review disposition and corrections
+
+*Historical (Prompts 215–216); superseded by the [Prompt 217 acceptance](#m5g-acceptance-prompt-217).*
+
+The reviewer accepted the M5f evidence updates within their recorded scope; they are unchanged
+here. **At that point M5g was not accepted.** The reviewer supported the following directions, subject to
+review of complete corrected contracts:
+
+- the explicit session-factory and embedding-provider dependencies;
+- a tenant-bound internal worker actor with no claim of human approval;
+- the M5e planner as the only budget algorithm;
+- trusted owner values and fenced state reads;
+- sequential processing;
+- no overall-deadline claim;
+- regenerated Markdown with a stored digest and size;
+- an additive review–job foreign key;
+- the existing job codes where sufficient;
+- narrow packaging changes;
+- an internal read-time status projection.
+
+| # | Finding (Prompt 215) | Correction (where) |
+| --- | --- | --- |
+| R1 | No explicit cancellation boundary between the reservation commit and dispatch | `ctx.check()` after the reservation fence exits and immediately before every `call_validated`, for all four dispatch kinds; consequences stated (M5g-C2, M5g-E) |
+| R2 | Request reconstruction under-specified | Exact use of `PlanDispatch.predecessor`, `trigger`, `required_request_sha256`, `original_request_sha256`; repaired retry uses the original failing trigger; trigger validation and purpose/question mapping (M5g-C3). The planner's `_retry` already sets the trigger to the call that caused the repair; no planner change |
+| R3 | Embedding-provider resolution unspecified | Lookup, construction, identity, boundaries and fixed outcomes (M5g-B2) |
+| R4 | Transaction, cleanup and process-control claims were inaccurate ("rollback is certain", unconditional requeue, NONE treated as confirmed rollback) | Rewritten from `transaction`, `fenced_transaction`, `JobContext.fenced` and the runtime's outcome recording; identity-confirmed classification pseudocode; process-control boundary stated; smallest M3 change proposed as G15 (M5g-E, M5g-H) |
+| R5 | Inconsistent loop bound (7 changes, 8 iterations) | One algorithm, with defined iterations and derived bounds (5 for Verification, 4 for Analysis) and traces (M5g-C4) |
+| R6 | `PlanInFlight` explanation wrong | A propagated exception ends the attempt and never re-enters its loop; in-flight current-attempt state is defensive only (M5g-C2) |
+| R7 | Incomplete value/API contracts | Exact signatures, fence protocol, value tables, read-API precedence, renderer-drift loader, and an error table with codes (M5g-A, M5g-F, M5g-G) |
+| R8 | Schema and replay not implementable | Every named check, the printable-ASCII rule, digest checks, foreign-key columns and actions, downgrade; explicit replay comparison sets; writer return value (M5g-F, M5g-G) |
+| R9 | Test map gaps | Added (M5g-J) |
+| R10 | (Prompt 216) The E2 helper raised an identity-confirmed body classification without checking cancellation or lease loss latched during the body | E2: capture the class, leave the context, then outside every handler `ctx.check()` before raising the fresh classification; never on a process-control or unclassified exit path |
+| R11 | (Prompt 216) A failed runtime outcome write was described as leaving the job `running` | A0 and H2: an outcome-write exception establishes nothing about the stored transition (it may have committed before `close()` raised); lease expiry applies only if the job is still `running` |
+| R12 | (Prompt 216) G15 covered only body control followed by an ordinary cleanup failure | E3: one first-process-control rule across body, commit, rollback and close, with call counts, pseudocode and a decision table (G15 completed) |
+| R13 | (Prompt 216) E2 propagated raw exit exceptions while I promised no exception text | E2 and I: unclassified ordinary context-exit failures normalized to the fixed `ReviewFenceExitError` without retaining the original (G22); semantics unchanged (`unexpected_error`) |
+| R14 | (Prompt 216) `load_review_output` did not enforce the lifecycle/presence rules of the status projection | F4: one shared lifecycle/presence table for all three loaders (G23) |
+| R15 | (Prompt 216) Input wording: the factory required a class attribute `provider_id`; nested actor/fence validation unspecified | A factory table; F2 argument rebuilding of `ActorContext`, `FencedSession`/`JobSnapshot` and `ReviewOutput` (G24) |
+
+**Reviewer evidence in Prompt 216.** These are the reviewer's isolated source and pseudocode
+probes. They were not project-suite, SQLAlchemy database, PostgreSQL or CI runs.
+
+- **The proposed `fenced_write` flow**, run against the published context and transaction code
+  with stand-in fixed errors, in normal and finish fences. When the body latched cancellation,
+  raised a fixed error and cleanup returned normally, the Prompt 215 helper raised the
+  permanent classification while `cancel_requested` remained true (R10).
+- **The published `_write_outcome`**, run with a fake transaction whose commit changed the
+  durable stand-in state to `queued` and whose `close()` then raised. It logged
+  `job.outcome_failed` (R11).
+
+##### M5g-A0. Accepted requirements and current-source facts
+
+[ACCEPTED] The binding inputs are the following:
+
+- **M5 sequence row for M5g:** a handler factory and bounded orchestration. The flow is plan,
+  retrieve through `search_snapshot` over the loaded snapshot, verify with repair, analyze,
+  render, and then one atomic final commit. Not registered in production.
+- **Correction D.**
+- **W4–W8 and W13–W15.**
+- **The report-integrity invariant.**
+- **M5e-H, M5e-I and M5e-L.**
+- **M5f-I.**
+- **The canary contract (Correction E, W10).**
+- **The M4d boundary:** the trusted-snapshot limitation closes for review paths only once M5g
+  obtains its snapshot solely from the trusted loader.
+
+[FACT] Callable surfaces and transaction ownership at `e7dd3be3`:
+
+| Area | Callable | Transaction ownership |
+| --- | --- | --- |
+| `persistence/db.py` | `transaction(session_factory)`: `yield session`, then `session.commit()`; `except BaseException: session.rollback(); raise`; `finally: session.close()` | A `rollback()` or `close()` that raises **replaces** the exception in flight (including a process-control object); a `close()` failure after a successful commit raises after the commit |
+| `persistence/jobs.py` | `fenced_transaction(session_factory, token)` inside `transaction`: lock with `lock_timeout`, `LeaseLostError` if not owned, `JobLockTimeoutError` on lock timeout, then yields a `Fence`; `Fence.succeed()` performs a fresh ownership check and writes the `succeeded` transition | — |
+| `worker/context.py` | `JobContext.fenced(finish=False)`: `check()`, open the fence, `check()` after the lock, yield `HandlerFence`. `finish=True`: `begin_finish()`, then inside the fence `check()`, yield, `check()`, `fence.succeed()`, set `effects_done = True`; on any `BaseException`, `end_finish(UNCERTAIN if effects_done else NONE)` and re-raise; on a clean exit `end_finish(COMMITTED)` | `effects_done` is true only after `succeed()` returned; an exception after it comes from transaction commit or cleanup. **Public surface:** `job`, `token`, `lease_lost`, `cancel_requested`, `finished` (committed only), `check()`, `fenced()`; no public uncertain-finish state |
+| `worker/runtime.py` `_record_outcome` | finish `COMMITTED` → log only; `LeaseLostError` → latch loss; latched loss → log ownership lost (and `outcome_unknown` if uncertain), **write nothing**; else no error → `store.complete`; `RetryableJobError` → `fail_retryable(code)`; `PermanentJobError` → `fail_permanent(code)`; cancellation requested + `JobCancelledError` → `fail_retryable(worker_shutdown)`; any other → `fail_retryable(unexpected_error)` | Each write is a new fenced transaction |
+| `worker/runtime.py` `_write_outcome` | `LeaseLostError` → log ownership lost, return; any other `Exception` → log `job.outcome_failed`, return; else log by resulting status | Each outcome write (`complete`, `fail_retryable`, `fail_permanent`) owns its own transaction (`fenced_transaction` inside `transaction`). Its `COMMIT` may succeed and its `close()` may then raise, so `job.outcome_failed` can be logged **after a committed transition**. An outcome-write exception, or a `job.outcome_failed` log, therefore does not alone establish the durable state: the job may remain `running`, may already have transitioned to `succeeded`, `queued`, `failed` or `dead`, or its state may be unknown (clarification A). Operation-specific results: `complete` → `succeeded`; `fail_retryable` → `queued` while attempts remain, otherwise `dead`; `fail_permanent` → `failed` |
+| M5d | `load_trusted_review(session_factory, actor, review_id) -> ResolvedReview`; canonical job `kind = run_review`, `idempotency_key = str(review_id)`, payload `{"review_id": …}`, `max_attempts = 3` | Own read-only transaction via `read_snapshot` with recording wrappers (first process-control object preserved even if cleanup fails) |
+| M4d | `search_snapshot(session_factory, actor, snapshot, request, provider)`; `BINDING_RECHECK_SQL` requires `activated_at IS NOT NULL`, not current activity | Provider call outside transactions; `run_read` |
+| M4c precedent | `resolve_provider(providers, identity)`: lookup by fingerprint, factory call and identity read guarded, control-flow errors propagate, others become a fixed `UnsupportedProfileError` | — |
+| M5c | `plan_review`, `assemble_verifier_request`, `assemble_analyst_request`, `assemble_repair_request(original, inputs, reason)`, `RepairReason.invalid_output(*, purpose, question_id)`, `RepairReason.from_rejection(rejection)` | Pure |
+| M5a | `ModelProvider` (`provider_id`, `generate(request)`), `call_validated(provider, request, *, clock)` | Pure |
+| M5b | `verify_question`, `analyze_question(..., shared=())`, `recheck_verified`, `recheck_analyzed` | Pure |
+| M5e | `StageFence` protocol (`.session: FencedSession`, `.job: JobSnapshot`) in `persistence.review_stages`; eight fenced APIs and `load_trusted_stages`; planner `plan_stage`, `PlanDispatch(sequence, call_kind, request_basis, predecessor, trigger, required_request_sha256, original_request_sha256)` | Writes compose into the caller's fence; reload owns a read transaction with recording wrappers |
+| M5e planner facts | initial: all references `None`; retry: `predecessor = n`, `required = last call's digest`, `trigger = None` for basis original, `trigger = repair.sequence − 1` for basis repaired (the call that caused the repair, set by `_retry`); repair: `predecessor = trigger = n`, `original = calls[0].request_sha256`, `required = None` | — |
+| M5f | `build_report_content`, `recheck_report_content`, `render_report_markdown`, `review_report_bytes`, `review_report_sha256`, `decode_review_report` | Pure |
+
+[FACT] Missing seams (unchanged from Prompt 214):
+
+1. no worker actor;
+2. no session factory in `JobContext`;
+3. no embedding provider in the accepted factory signature;
+4. no output table, value, writer, reload or status projection;
+5. no public uncertain-finish state;
+6. the D2 packaging guard allows only one agents-importing worker module.
+
+A seventh seam was found in Prompt 215:
+
+7. **The fence paths do not preserve process-control identity.** `transaction()` lets a
+   rollback or close failure replace a process-control object, so no fenced M5g write path can
+   currently guarantee it (M5g-E, G15).
+
+##### M5g-A. Placement, public contracts and values
+
+[REC] Module ownership:
+
+| Path (proposed) | Owns | May import |
+| --- | --- | --- |
+| `packages/domain/evidenceguard_domain/review_outputs.py` | `ReviewOutput`, `StoredReviewOutput`, `ReviewOutputWrite`, `ReviewStatus`, `decode_stored_review_output`, domain errors | stdlib, `evidenceguard_domain` |
+| `packages/persistence/evidenceguard_persistence/review_outputs.py` | `write_review_output`, `load_review_output`, `load_review_status`, persistence errors | domain, persistence (reuses `StageFence` from `review_stages`); **never** agents or worker |
+| `.../migrations/versions/v0008_review_outputs.py` | migration `0008` | alembic, sqlalchemy |
+| `apps/worker/evidenceguard_worker/review.py` | `make_run_review_handler`, `REVIEW_WORKER_ACTOR_ID`, `TrustedReviewOutput`, `load_trusted_review_output`, worker errors, orchestration | worker, agents, domain, persistence, retrieval |
+
+[REC] **Factory.** Every argument is validated when the factory is called, before a handler
+exists:
+
+```text
+make_run_review_handler(
+    provider: ModelProvider,
+    *,
+    session_factory: sessionmaker[Session],
+    embedding_providers: Mapping[str, Callable[[], EmbeddingProvider]] = SUPPORTED_PROVIDERS,
+    clock: Callable[[], float] = time.monotonic,
+) -> JobHandler
+```
+
+| Argument | Rule | Failure (raised fresh, no cause) |
+| --- | --- | --- |
+| `provider` | required, positional, no default. One guarded check: `generate = getattr(provider, "generate", None)`, then `callable(generate)`. The guard catches an ordinary `Exception` from attribute access (a property may raise) and treats it as a failed check; process control raised there propagates as the same object. `provider_id` is **not** read at factory time, whether it is a class attribute, a property or an instance attribute: M5a's `call_validated` reads and validates it on every call (`is_usable_provider_id`) and maps any failure to its fixed outcome. No provider method is called by the factory | `TypeError("provider must be a ModelProvider")`, raised after the guard, with no cause or context |
+| `session_factory` | `isinstance(session_factory, sessionmaker)` | `TypeError("session_factory must be a sessionmaker")` |
+| `embedding_providers` | a `Mapping`; every key a `str` of 64 lowercase hex, every value callable; copied into a `MappingProxyType` | `TypeError("embedding_providers must map fingerprints to provider factories")` |
+| `clock` | callable | `TypeError("clock must be callable")` |
+
+The default `SUPPORTED_PROVIDERS` is the existing offline M4c mapping (`HASH_IDENTITY` →
+`HashingEmbedder`), imported, not copied. There is no setting, endpoint, CLI or registration.
+Calling the factory without a provider is Python's own `TypeError` for a missing argument.
+
+[REC] **Worker actor (G1, a supported direction).** The constant is
+`REVIEW_WORKER_ACTOR_ID = uuid5(NAMESPACE_URL,
+"https://evidenceguard.invalid/actors/run-review/v1")`. Inside one handler invocation, after
+the job and payload checks, the actor is
+`ActorContext(tenant_id=ctx.job.tenant_id, actor_id=REVIEW_WORKER_ACTOR_ID, role=Role.REVIEWER)`.
+It is tenant-bound and internal to the handler, and it claims no human approval. Authorization
+rests on canonical-job ownership: the loaders check the role, and every fenced write re-proves
+job association.
+
+[REC] **Domain values.** All are frozen dataclasses with keyword-only validating constructors.
+Their shared rules:
+
+- An unknown keyword is refused, and a missing field is Python's `TypeError`. Both are re-raised
+  as the value's fixed error, outside the handler.
+- Types are exact: `type(x) is T`, so `bool` is not an `int`.
+- Nested values are rebuilt through their own constructors and compared for equality without
+  normalization.
+- Derived fields are always recomputed and never accepted as arguments.
+- Each value has an explicit privacy-safe `__repr__`/`__str__`.
+
+*`ReviewOutput`* (error `InvalidReviewOutputError`):
+
+| Field | Kind | Type and bound |
+| --- | --- | --- |
+| `tenant_id`, `review_id`, `job_id` | init | `UUID`; must equal `content.binding.tenant_id`, `.review_id`, `.job_id` |
+| `content` | init | `ReviewReportContent`, rebuilt by `revalidate_review_report` (full nested rebuild and derived-digest checks) |
+| `markdown_sha256` | init | `str`, `^[0-9a-f]{64}$` |
+| `markdown_bytes` | init | `int`, 1–33,554,432 |
+| `schema_id`, `renderer_id` | derived | the M5f wrapper schema and renderer constants |
+| `mode` | derived | `content.mode.value` (`"contract"`) |
+| `wrapper_canonical` | derived | `bytes` = `review_report_bytes(content)`, 1–16,777,216 bytes |
+| `wrapper_sha256` | derived | `review_report_sha256(content)` |
+| `legacy_sha256` | derived | `content.legacy_sha256` |
+| `review_request_sha256`, `snapshot_sha256`, `configuration_sha256` | derived | from `content.binding` |
+| `question_count` | derived | `len(content.questions)`, 1–100 |
+| `finding_count` | derived | `len(content.content.findings)`, 0–200 |
+| `unresolved_count` | derived | `len(content.content.unresolved_question_ids)`, 0–`question_count` |
+
+- **`repr`:** `ReviewOutput(review_id=…, wrapper_sha256=…, questions=…, findings=…,
+  unresolved=…)`, with no title, text, quotes or bytes.
+- **What it cannot prove:** that the content came from trusted stages through the source-bound
+  recheck; that `markdown_sha256` and `markdown_bytes` describe the pinned renderer's output;
+  that the database links the job to the review. All three are worker or writer obligations.
+
+*`StoredReviewOutput`* (error `InvalidStoredOutputError`):
+
+| Field | Type and rule |
+| --- | --- |
+| `output` | `ReviewOutput`, rebuilt |
+| `job_attempt` | `int`, 1–10 (audit only) |
+| `created_at` | `datetime` with `tzinfo` and a non-`None` `utcoffset()`; a naive value is refused; normalized to UTC with `astimezone(UTC)`; an audit value only, never ordered or compared with other timestamps |
+
+The `repr` is the output's repr plus `job_attempt`.
+
+*`ReviewOutputWrite`* (error `InvalidStoredOutputError`): `stored: StoredReviewOutput` and
+`replayed: bool` (exact `bool`). Its repr is `ReviewOutputWrite(review_id=…, replayed=…)`.
+
+*`ReviewStatus(StrEnum)`:* `queued`, `running`, `completed` and `failed`.
+
+*`decode_stored_review_output(row: Mapping[str, object]) -> StoredReviewOutput`.* This is the
+bounded strict decoder for one stored row. It runs in this order:
+
+1. **Closed key set.** The keys must be exactly the `review_outputs` column names; any extra or
+   missing key is refused.
+2. **Exact column types:**
+   - `UUID` for the three identifiers;
+   - `str` for the identifier and digest columns, each matching its pattern;
+   - `str` for `wrapper_canonical`, which must be printable ASCII, 1–16,777,216 characters;
+   - `int` for the counts, `markdown_bytes` and `job_attempt`;
+   - `datetime` for `created_at`.
+3. **Strict decode.** `decode_review_report(wrapper_canonical.encode("ascii"),
+   expected_sha256=wrapper_sha256)` produces the content.
+4. **Rebuild.** `ReviewOutput` is rebuilt from the decoded content and the stored
+   `markdown_sha256` and `markdown_bytes`, then `StoredReviewOutput` with the stored attempt and
+   timestamp.
+5. **Derived columns.** Every stored derived column must equal the rebuilt value: the schema,
+   renderer, mode, legacy digest, the three binding digests and the three counts.
+
+Any failure is `InvalidStoredOutputError`. An M5f encoding, schema or digest error is converted
+to it, with no cause or context.
+
+##### M5g-B. Trusted entry, loading and planning
+
+[REC] **Entry order.** The first failing step decides; job outcomes are in M5g-H.
+
+1. **Job and payload (pure):**
+   - `ctx.job.kind == "run_review"`;
+   - the payload keys are exactly `{"review_id"}`, with a canonical lowercase UUID string;
+   - `ctx.job.idempotency_key == review_id`;
+   - `ctx.job.max_attempts == 3`.
+2. **Actor (G1).**
+3. **Trusted review.**
+   - `ctx.check()`, then `load_trusted_review(session_factory, actor, review_id)`.
+   - Require `review.job_id == ctx.job.id` and `review.tenant_id == ctx.job.tenant_id`.
+   - Template and prompt binding are proved by M5d's `ResolvedReview` constructor and the M5c
+     pinned loaders. `ModelSettings` come only from the stored configuration.
+4. **Plan.**
+   - `plan_review(template, k=configuration.retrieval_k)`.
+   - Then `PlannedQuestionSet` in template order.
+   - Then `record_planned_questions` in one fenced write. Identical replay is a no-op.
+5. **Trusted stage reload.** `ctx.check()`, then `load_trusted_stages(session_factory, actor,
+   review, planned)`. Every resume decision starts from it, and owner values come only from it
+   or from this attempt's own `verify_question` over trusted evidence (G4).
+6. **Questions** in planned order (M5g-C).
+7. **Report and output** (M5g-G).
+
+[REC] **Exclusive trusted path and snapshot preservation:**
+
+- **No other loaders.** The handler never calls `capture_snapshot`, `search_current`, the
+  unpinned `load_template` or `load_prompt`, or any retrieval except
+  `search_snapshot(session_factory, actor, review.snapshot, planned.retrieval, embedder)`.
+  This is enforced by a structure test.
+- **No recapture.** Every attempt uses the stored snapshot. A revision activated after the
+  review was created is outside its bindings and is never used; superseded bound revisions
+  still verify.
+- **Snapshot failures are permanent.** These are `InvalidSnapshotError`,
+  `RetrievalScopeError`, `EmptySnapshotError`, `SnapshotBoundsError`, `SnapshotNotReadyError`
+  and `SnapshotInconsistentError`.
+- **No substitution.** Nothing substitutes current revisions, recaptures the snapshot or
+  reloads drifted artifacts.
+
+[REC] **M4d.** An implementation passing the structure and replacement-activation tests could
+close the limitation for the `run_review` path only. The limitation stays open now. Outside
+that claim even after implementation:
+
+- `search_current` callers;
+- direct database writes, data-altering migrations and malicious in-process code;
+- original retrieval membership and rank beyond M5e-J1's recheck;
+- the U4 discarded bytes.
+
+<a id="m5g-b2-embedding-provider-resolution"></a>
+
+[REC] **M5g-B2. Embedding-provider resolution (R3).** Resolution happens at most once per
+attempt, lazily, before the first retrieval the attempt needs. If every question already has
+stored evidence or a committed U4, no embedder is resolved.
+
+1. **Check:** `ctx.check()`.
+2. **Lookup:** `fingerprint = review.snapshot.identity.fingerprint`, then
+   `factory = embedding_providers.get(fingerprint)`. A missing entry is
+   `UnsupportedEmbeddingProfileError`.
+3. **Construction and identity:** inside a guard, `embedder = factory()`, then
+   `identity = require_storable_identity(embedder.identity)`, then
+   `identity == review.snapshot.identity`. The guard behaves as follows:
+   - `JobCancelledError`, `LeaseLostError` and `FenceClosedError` propagate unchanged;
+   - a `BaseException` that is not an `Exception` propagates as the same object;
+   - any other exception, or an identity mismatch, sets a flag.
+4. **Result.** If the flag is set, run `ctx.check()` first, so latched loss or cancellation
+   wins, and then raise `UnsupportedEmbeddingProfileError` fresh, outside the handler.
+
+`UnsupportedEmbeddingProfileError` is permanent. `search_snapshot` reads the identity again
+itself, and its `RetrievalProviderError` is retryable (M5g-H).
+
+##### M5g-C. Stage state machine and dispatch
+
+[ACCEPTED] `plan_stage` (T0–T9) is the **only** budget algorithm. Reservations commit before
+dispatch, provider calls run outside every transaction, `ctx.check()` runs after each call, and
+only a committed stage is reused as success.
+
+<a id="m5g-c2-dispatch-boundary"></a>
+
+[REC] **M5g-C2. Dispatch boundary and in-flight state.** For every dispatch kind (initial,
+retry with basis original, repair, retry with basis repaired) the sequence is fixed:
+
+```text
+with ctx.fenced() as fence:                      # reservation transaction
+    reserve_call(fence, review_id, qid, stage, sequence=plan.sequence,
+                 call_kind=plan.call_kind, request_basis=plan.request_basis, request=request)
+# the reservation fence has exited without an exception (its COMMIT returned)
+ctx.check()                                      # R1: last boundary before the provider
+result_or_failure = guarded_call_validated(provider, request, clock)
+```
+
+- A `JobCancelledError`, `LeaseLostError` or `FenceClosedError` raised by that pre-dispatch
+  `ctx.check()` propagates, and **the provider is not called**. The committed reservation stays
+  `started` and consumes budget. The next attempt plans it as abandoned (T3 retry, or T4
+  `call_abandoned` at sequence 3).
+- No completion, stage or compensating write follows lost ownership.
+- The check is an explicit boundary only. A cancellation or lease loss latched after it, during
+  the synchronous provider call, is observed by the `ctx.check()` after the call (M5g-E). It
+  cannot stop the call, and the response is then discarded uncompleted.
+- If the reservation fence raises at entry or in its body, nothing was reserved and nothing is
+  dispatched. If it raises while exiting (commit or cleanup), the reservation's existence is
+  unknown. The fenced-write helper normalizes it to `ReviewFenceExitError` (E2) and nothing is
+  dispatched (M5e-I).
+
+**`PlanInFlight` (R6).** In normal flow every reservation an attempt makes is followed, in the
+same iteration, either by its completion or by an exception that ends the attempt. An exception
+that propagates out of the handler ends the attempt; its loop is **never re-entered**. A later
+attempt has a larger `attempt`, so it sees that reservation as abandoned, never as
+`PlanInFlight`.
+
+A current-attempt `started` call can therefore appear only outside normal flow, for example
+through an out-of-band write. Defensively, `PlanInFlight` from the reload or a re-read raises
+the worker's private `ReviewCompositionError`, mapped to **retryable**
+(`RetryableJobError(retryable_failure)`) [DECISION G6]. A later attempt would plan it as
+abandoned, and no dispatch happens in this attempt.
+
+<a id="m5g-c3-request-reconstruction"></a>
+
+[REC] **M5g-C3. Request reconstruction (R2).** The fixed mappings are:
+
+- **Purpose:** `StageKind.VERIFICATION` → `ModelPurpose.VERIFIER`; `StageKind.ANALYSIS` →
+  `ModelPurpose.RISK_ANALYST`.
+- **Inputs:** Verifier inputs are `VerifierRequestInputs(evidence, verifier_spec,
+  verifier_text, settings)`. Analyst inputs are `AnalystRequestInputs(owner, question,
+  analyst_spec, analyst_text, settings)`.
+- **Original request:** `original = assemble_*_request(inputs)`.
+
+| Plan (`PlanDispatch`) | Request built | Required checks before reservation |
+| --- | --- | --- |
+| `initial` (`sequence = 1`; all references `None`) | `original` | the history has no calls |
+| `retry`, basis `original` (`predecessor = n`, `required = calls[n−1].request_sha256`, `trigger = None`) | `original` | `original.request_sha256 == required` **and** `== calls[0].request_sha256` |
+| `repair` (`predecessor = trigger = n`, `original_request_sha256 = calls[0]` digest, `required = None`) | `assemble_repair_request(original, inputs, reason(trigger))` | `original.request_sha256 == plan.original_request_sha256`; `repaired.request_sha256 != plan.original_request_sha256` |
+| `retry`, basis `repaired` (`predecessor = n`, `required = calls[n−1]` digest, `trigger = repair.sequence − 1`) | `assemble_repair_request(original, inputs, reason(trigger))` | `original.request_sha256 == calls[0].request_sha256`; `repaired.request_sha256 == required` |
+
+The reason is **always** built from the call numbered `trigger`, the call that caused the
+repair. For a repaired retry, that is the original failing call, never the abandoned or failed
+repair reservation. The planner already sets this trigger (`_retry`); no planner change is
+proposed.
+
+`reason(trigger)` validates the trigger call `t = calls[trigger − 1]`:
+
+1. It exists and is `completed`.
+2. Its `stage` and `question_id` equal the stage's.
+3. Either `t.outcome is invalid_output` and `t.rejection is None`, giving
+   `RepairReason.invalid_output(purpose=<mapped purpose>, question_id=t.question_id)`; or
+   `t.outcome is completed` and `t.rejection is not None`, giving
+   `RepairReason.from_rejection(t.rejection.to_rejection(t.question_id))`.
+4. `reason.purpose` and `reason.question_id` equal the mapped purpose and the question.
+
+A missing, malformed or inconsistent trigger, a factory `InvalidAgentValueError`, or an
+`InvalidAssemblyInputError` raises `ReviewCompositionError` (**permanent**). There is no
+dispatch and no fallback to a fresh plan.
+
+**Settings checks for every kind.** `request.model_id`, `max_output_tokens`, `timeout_ms`, the
+prompt ref and the system-text digest must equal the trusted configuration, with `timeout_ms`
+compared explicitly because the M5a digest excludes it. A mismatch is `ReviewCompositionError`
+(permanent). `reserve_call` repeats the settings and plan checks under the job lock.
+
+**Oversize requests:**
+
+- **Initial:** `RequestTooLargeError` → `commit_unresolved(stage, request_too_large)` (**U5**).
+- **Repair:** → `commit_unresolved(stage, repair_request_too_large)` (**U6**).
+- **Either retry:** → `ReviewCompositionError` (permanent), because the identical deterministic
+  request fit before.
+
+<a id="m5g-c4-stage-loop-and-bounds"></a>
+
+[REC] **M5g-C4. Stage loop and bounds (R5).** `state` is a `StageState` (history, plan and
+evidence digest). At stage entry it comes from the trusted reload for that question, rebuilt as
+a `StageState`; afterwards it comes from `read_stage_state`, executed **in the same fenced
+transaction** as each continuing write.
+
+```text
+MAX_ITERATIONS = {VERIFICATION: 5, ANALYSIS: 4}
+
+def run_stage(stage, state) -> StageRecord:
+    for _ in range(MAX_ITERATIONS[stage]):
+        plan = state.plan
+        if PlanReuse:     return plan.stage                                  # RETURN, no write
+        if PlanExhausted: return fenced(commit_unresolved(stage, plan.reason))   # RETURN (U1/U2)
+        if PlanInFlight:  raise ReviewCompositionError(retryable)            # defensive
+        # PlanDispatch
+        if stage is VERIFICATION and state.evidence_sha256 is None:          # only possible when n = 0
+            record = retrieve_and_build_evidence()                           # B2, search_snapshot
+            if not record.fits_storage:
+                return fenced(commit_unresolved(VERIFICATION, evidence_too_large, evidence=record))  # RETURN (U4)
+            state = fenced(record_evidence(record); read_stage_state(...))   # CONTINUE (evidence)
+            continue
+        request = build_request(plan)                    # C3; too large -> RETURN U5 / U6
+        fenced(reserve_call(...)); ctx.check()           # C2
+        outcome = dispatch_and_check(request)            # E: ctx.check() after the call
+        if success_value(outcome):                       # S1 / S2
+            return fenced(commit_verified | commit_analyzed)                 # RETURN
+        state = fenced(complete_failed_call(...); read_stage_state(...))     # CONTINUE (dispatch)
+    raise ReviewCompositionError(permanent)              # unreachable for valid histories
+```
+
+An iteration is exactly one of three kinds:
+
+- **(a) Evidence iteration.** One fenced transaction: `record_evidence` and a re-read.
+- **(b) Dispatch iteration.** A reservation transaction, the provider call, and one completion
+  transaction. Reservation and completion share the iteration, and the completion transaction
+  includes the re-read.
+- **(c) Return iteration.** No write (reuse), or one terminal write: S1/S2, U1/U2/U4/U5/U6, or
+  U3 in the Analysis rule below.
+
+State is re-read only at the end of a continuing iteration, never between the reservation and
+the completion.
+
+**The derived bound:**
+
+- Evidence is recorded at most once, and only while no call exists. M5e E7 forbids calls
+  without evidence.
+- Each dispatch iteration adds exactly one reservation, and a stage has at most 3 across all
+  attempts.
+- Exactly one return iteration ends the stage.
+
+Hence Verification takes at most **1 + 3 + 1 = 5** iterations, and Analysis at most
+**3 + 1 = 4**, from every valid starting state. Starting states with prior calls or stored
+evidence need fewer. A success on dispatch `k` returns in that iteration, giving 1 + k for
+Verification. The provider-call budget is unchanged at 3 per stage.
+
+**Analysis rule.** If Verification is S1, `run_stage(ANALYSIS, …)` uses the owner. Otherwise a
+single return iteration writes `commit_unresolved(ANALYSIS, verification_unresolved)` (**U3**),
+with no call. `shared=()` always applies. A successful Verification is never altered after an
+Analysis failure, and M5f emits the mandatory P11 finding.
+
+**Traces** (Verification, fresh question, unless stated):
+
+| Case | Iterations |
+| --- | --- |
+| Evidence, then three failed dispatches, then unresolved | 1 (a) record evidence → T1; 2 (b) initial → `timeout` → T5; 3 (b) retry → `timeout` → T5; 4 (b) retry → `timeout` → T6 `PlanExhausted(timeout)`; 5 (c) `commit_unresolved(timeout)` = **U1**; 3 provider calls |
+| Initial rejection, repair, abandoned repair retried | attempt 1: 1 (a); 2 (b) initial completed + rejection → T7 `repair(trigger=1, original=d1)`; 3 (b) repair seq 2 reserved, pre-dispatch `ctx.check()` raises (cancel) → attempt ends, seq 2 `started`. Attempt 2: reload → T3 `retry(seq 3, basis repaired, required=d2, trigger=1)`; 1 (b) reason from **call 1**'s rejection, original = d1, repaired = d2 → reserve seq 3 → success → (returns) **S1**. Two provider calls |
+| U4 | 1 (c) retrieve → `fits_storage` false → **U4**; no call |
+| U5 | 1 (a); 2 (c) initial `RequestTooLargeError` → **U5**; no call |
+| U6 | 1 (a); 2 (b) initial → `invalid_output` → T7; 3 (c) repair `RequestTooLargeError` → **U6**; one call, no repair reservation |
+| Success | 1 (a); 2 (b) initial → `completed`, verified → **S1** returned in the same iteration |
+| Committed reuse | 1 (c) `PlanReuse` → return; no write, no call |
+
+##### M5g-D. Budgets, bounds and scheduling
+
+[ACCEPTED] The budget rules hold:
+
+- 3 reservations per stage across attempts, and one repair.
+- An abandoned reservation consumes budget.
+- Retries reuse their basis request.
+- An abandoned repair is retried once at sequence 3 (T3), or ends `call_abandoned` (T4).
+- Attempts (`max_attempts = 3`) are separate from reservations.
+- No exactly-once call is claimed.
+
+[REC] **Scheduling.** The handler is sequential: questions in planned order, with
+Verification before Analysis for each question, and no in-handler concurrency (G14).
+
+**Bounds per attempt:**
+
+- 100 questions × (5 + 4) iterations at most;
+- at most 600 provider calls (also the lifetime maximum);
+- at most 100 retrievals;
+- 2 trusted stage reloads (entry and pre-report) and 1 output write.
+
+**Time limits.** Only existing limits apply: the per-call `timeout_ms` (enforced by the
+provider per M5a, not interrupted), database `lock_timeout` for lock waits (other statements are
+not universally bounded), and the 60 s lease with its 20 s heartbeat. No overall review deadline
+is proposed or claimed (G7).
+
+##### M5g-E. Cancellation, lease loss and process control
+
+[ACCEPTED] W7 as corrected in M5e-I; no `ctx.check()` may replace a process-control object.
+
+[REC] **`ctx.check()` boundaries.** These are explicit boundaries, not atomic guarantees:
+
+- before each trusted reload;
+- before and after embedding resolution;
+- before and after each `search_snapshot`;
+- **after each reservation fence exits and before each dispatch** (C2);
+- immediately after `call_validated` returns or raises an ordinary `Exception`, before
+  classification or any write;
+- before report building;
+- before the finish fence.
+
+`JobContext.fenced` adds its own checks: before opening, after the lock, and before
+`succeeded`.
+
+**Guarded calls.** Each pure or remote step (retrieval, assembly, provenance, the M5f build,
+recheck and render, and `call_validated`) is wrapped as follows:
+
+```text
+failed = None
+try:
+    value = step()
+except (JobCancelledError, LeaseLostError, FenceClosedError):
+    raise                                   # untouched
+except Exception as error:                  # ordinary only
+    failed = type(error)                    # keep the class, not the object
+# a BaseException that is not an Exception was never caught: it propagated as the same object
+ctx.check()                                 # loss/cancellation wins over classification
+if failed is not None:
+    raise fixed_error_for(failed)()         # fresh, outside every handler, no cause/context
+```
+
+<a id="m5g-e2-fenced-writes-and-classification"></a>
+
+[REC] **M5g-E2. Fenced writes: what is and is not known (R4).** The handler distinguishes
+four failure points. Only the first can be classified with confidence.
+
+1. **Body failure.** An M5e or output-writer fixed error is raised inside the block. The
+   transaction helper then calls `rollback()` and, finally, `close()`. **No `COMMIT` is issued
+   on this path** (a source fact). If `rollback()` or `close()` raises, that exception
+   **replaces** the original; the handler can then no longer see the original.
+2. **Lifecycle-transition failure (finish only).** `fence.succeed()` raises: `LeaseLostError`
+   from its fresh ownership check, `FenceClosedError`, a lifecycle error, or a database error.
+   `effects_done` is still false, so the context records finish `NONE`. No `COMMIT` is issued.
+   The same rollback/close replacement risk applies.
+3. **Commit failure.** `session.commit()` raises after `effects_done`. The context records
+   `UNCERTAIN`. Whether the transaction committed is **unknown**.
+4. **Cleanup failure after a successful commit.** `close()` raises after the commit returned.
+   The context records `UNCERTAIN` although the transaction committed.
+
+`FinishState.NONE` means only that the effects had not finished. It does not confirm that
+rollback or cleanup succeeded, and the handler has no public way to read it.
+
+**Classification and privacy normalization (R10, R13).** This is the only translation the
+handler performs on fenced paths:
+
+```text
+CONTROL_FLOW = (JobCancelledError, LeaseLostError, FenceClosedError)   # fixed classes, no text
+
+def fenced_write(ctx, op, *, finish=False):
+    body_failure = None              # class of an identity-confirmed fixed body error
+    exit_failed = False              # an unclassified ordinary failure left the context
+    raised = None
+    try:
+        with ctx.fenced(finish=finish) as fence:
+            try:
+                return op(fence)                     # normal return: commit (and success if finish)
+            except FIXED_BODY_ERRORS as error:       # M5e / output-writer fixed classes only
+                raised = error
+                raise                                # must escape so no COMMIT is issued
+    except CONTROL_FLOW:
+        raise                                        # same object, untouched
+    except Exception as escaped:                     # ordinary only; process control is not caught
+        if raised is not None and escaped is raised:
+            body_failure = type(raised)              # keep the class, not the object
+        else:
+            exit_failed = True                       # lifecycle, commit, cleanup or replacement
+        raised = None                                # drop every reference to the original object
+    # From here on no exception is being handled: nothing raised below can gain a cause or context.
+    if body_failure is not None:
+        ctx.check()                                  # R10: latched cancellation, lease loss or
+                                                     # fence closure wins over the classification
+        raise BODY_CLASSIFICATION[body_failure]()    # fresh RetryableJobError / PermanentJobError
+    if exit_failed:
+        raise ReviewFenceExitError()                 # R13: privacy normalization only, no ctx.check()
+```
+
+**How the branches behave:**
+
+- **Body failure.** It is classified only when the escaping object **is** the body's own fixed
+  error. That proves neither `rollback()` nor `close()` raised and no `COMMIT` was issued, and
+  nothing more. `ctx.check()` then runs **after** the context has exited, outside every
+  handler, so a cancellation, lease loss or fence closure latched during the body raises its
+  own control-flow error instead of the classification. In a finish fence, a body failure
+  leaves the finish state `NONE`, so `check()` reflects only loss or cancellation.
+- **`JobCancelledError`, `LeaseLostError` and `FenceClosedError`** propagate as the same
+  objects. Their messages are fixed and carry no text.
+- **Every other ordinary exception leaving the context** is replaced by a fresh
+  `ReviewFenceExitError`. That covers a lifecycle-transition error from `succeed()`, a commit
+  error, a cleanup error, a replacement, and `JobLockTimeoutError` at fence entry.
+  - It retains no original object, text, SQL, parameters, cause or context. The local name
+    bound by `except … as` is deleted by Python when the handler ends, and `raised` is cleared.
+  - It is **privacy normalization, not classification.** The runtime maps it, like any other
+    unclassified exception, to `fail_retryable(unexpected_error)`. It never claims a known body
+    failure, and an uncertain exit is not relabelled.
+  - **No `ctx.check()`** runs on this path, because after an uncertain finish `check()` would
+    raise `FenceClosedError` and hide the original branch.
+  - `JobContext`'s finish and uncertainty flags were already set by `fenced()` before the
+    exception left it, and are unchanged.
+- **Process control** (a `BaseException` that is not an `Exception`) is never caught here and
+  propagates as the same object, subject to the transaction helper (E3, G15). No `ctx.check()`,
+  logging or text inspection runs on its path.
+- **The pre-dispatch boundary (C2) is unchanged.** The `ctx.check()` after a successful
+  reservation fence and before `call_validated` is separate from this helper.
+
+**Process control.** Within M5g's own code, a process-control object always propagates as the
+same object. No `except BaseException` handler converts it, and no `ctx.check()` runs on its
+path. The M5d and M5e reloads preserve the first process-control object even when cleanup
+fails (their recording wrappers).
+
+**The current limit.** With unchanged M3, for **fenced writes the guarantee holds only if
+`rollback()` and `close()` do not raise.** If they do, the current `transaction()` replaces the
+process-control object with whatever cleanup raised. The reviewer's isolated probe in Prompt 215
+showed exactly this: 12 rollback/close-failure cases replaced the original object, while 6
+clean cases preserved `KeyboardInterrupt`, `SystemExit` and `GeneratorExit` by identity, for
+both normal and finish fences. That probe was not a project-suite or PostgreSQL run and does
+not establish any database commit outcome. Unchanged M3 **does not provide**
+first-process-control preservation on fenced paths. The complete rule proposed as **G15** is in
+E3.
+
+<a id="m5g-e3-first-process-control-rule"></a>
+
+**M5g-E3. First-process-control rule for `transaction()` (G15, R12).** The proposal is
+confined to `packages/persistence/evidenceguard_persistence/db.py`. It is not implemented.
+
+**Rule:** across the body, `commit()`, `rollback()` and `close()`, the **first** raised
+`BaseException` that is not an `Exception` wins by identity. Every later failure, ordinary or
+process control, is discarded without inspection.
+
+```text
+@contextmanager
+def transaction(session_factory):
+    session = session_factory()
+    control = None                     # first process-control object, by identity
+    ordinary = None                    # the ordinary exception today's helper would raise
+    try:
+        yield session                  # body
+    except BaseException as error:     # thrown into the generator at the yield
+        control, ordinary = classify(error, control, ordinary)
+    else:
+        try:
+            session.commit()           # at most once, only if the body returned
+        except BaseException as error:
+            control, ordinary = classify(error, control, ordinary)
+    if control is not None or ordinary is not None:
+        try:
+            session.rollback()         # at most once, only after a body or commit failure
+        except BaseException as error:
+            control, ordinary = classify(error, control, ordinary)
+    try:
+        session.close()                # exactly once
+    except BaseException as error:
+        control, ordinary = classify(error, control, ordinary)
+    if control is not None:
+        raise control                  # outside every handler: no new context attached
+    if ordinary is not None:
+        raise ordinary
+
+def classify(error, control, ordinary):
+    if control is not None:
+        return control, ordinary       # a later failure never replaces the first control object
+    if not isinstance(error, Exception):
+        return error, ordinary         # first process control
+    return None, error                 # ordinary: the later one replaces the earlier, as today
+```
+
+| First failure | Later failures | Raised |
+| --- | --- | --- |
+| none | none | nothing (committed) |
+| body control | rollback or close: ordinary or control | the body's control object |
+| commit control | rollback or close: ordinary or control | the commit's control object |
+| body or commit ordinary | rollback control (then close: any) | the rollback's control object |
+| body or commit ordinary | rollback ordinary, then close control | the close's control object |
+| commit acknowledged | close control | the close's control object (after a commit that returned) |
+| body or commit ordinary | rollback or close ordinary, no control | the last ordinary exception, the same object today's helper raises |
+
+**What the rule establishes:**
+
+- **Call counts (when `session_factory()` returned a session).** `commit()` is attempted at
+  most once, only after the body returned. `rollback()` is attempted at most once, only after a
+  body or commit failure. `close()` is attempted exactly once. Nothing is retried.
+- **Session construction failure (clarification B).** If `session_factory()` raises before
+  returning a session, no commit, rollback or close is attempted. A process-control exception
+  from session construction propagates unchanged. No cleanup, database-outcome or
+  connection-disposal claim follows from a failed construction.
+- **It proves nothing about the database.** Preserving the first object does not prove that
+  rollback ran, that the connection was disposed, or what the commit outcome was.
+- **Nothing extra runs on the control path.** No `ctx.check()`, logging or exception-text
+  inspection runs. Discarded later failures are dropped without being read.
+- **Ordinary errors without process control are unchanged.** The same exception object is
+  selected as today: the body or commit error, replaced by a rollback error, replaced by a
+  close error. The call counts are the same. The only difference is that implicit `__context__`
+  links may differ, because the selected object is raised after the handlers rather than
+  inside them. Regression obligation: existing fixed errors that callers raise outside handlers
+  keep `__cause__` and `__context__` as `None`.
+- **`JobContext` stays conservative.** `fenced(finish=True)` still records `UNCERTAIN` for any
+  exception after `effects_done`, including a close-time control object after a commit that
+  returned. It records `NONE` otherwise. `NONE` still does not confirm rollback.
+- **No other seam is needed.** `fenced_transaction` and `JobContext.fenced` already re-raise
+  what `transaction()` raises.
+- **Python semantics to verify in implementation:** `contextlib.contextmanager` must re-raise
+  the same object when the generator raises the thrown exception, including `GeneratorExit`.
+  The implementation tests must pin this.
+
+**Regression obligations if G15 is accepted:**
+
+- the existing transaction, jobs and fence tests;
+- the API database tests;
+- the worker runtime, ingest and index handlers;
+- M5d review creation and reload;
+- the M5e write APIs and reload;
+- the new cases in M5g-J.
+
+**Lease window.** The accepted M3 lease/commit window is unchanged: statements may still
+execute after expiry and are rolled back only if the final ownership recheck fails and its
+error escapes. A held row lock does not stop expiry.
+
+**Precedence when failures coincide.** The first matching rule wins:
+
+1. the first process-control object (identity; on fenced paths only with G15, E3);
+2. latched lease loss or fence closure;
+3. cancellation;
+4. an identity-confirmed fixed classification, raised only after `ctx.check()` (E2);
+5. any other ordinary exception: outside fenced paths a fixed guarded-call error, on fenced
+   paths the fixed `ReviewFenceExitError`. The runtime maps the latter to `unexpected_error`.
+
+##### M5g-F. Additive output persistence (migration `0008`)
+
+[ACCEPTED] The output table lives in a new additive migration. `0007` and earlier migrations
+are never edited.
+
+[REC] **Table `review_outputs`.** Column types follow the `0007` conventions (`String(64)` for
+digests, `Text` for canonical bytes, `SmallInteger`/`Integer` for counts).
+
+| Column | Type | Null | Default |
+| --- | --- | --- | --- |
+| `tenant_id` | `uuid` | NOT NULL | — |
+| `review_id` | `uuid` | NOT NULL | — |
+| `job_id` | `uuid` | NOT NULL | — |
+| `schema_id` | `varchar(64)` | NOT NULL | — |
+| `renderer_id` | `varchar(64)` | NOT NULL | — |
+| `mode` | `varchar(16)` | NOT NULL | — |
+| `wrapper_canonical` | `text` | NOT NULL | — |
+| `wrapper_sha256` | `varchar(64)` | NOT NULL | — |
+| `legacy_sha256` | `varchar(64)` | NOT NULL | — |
+| `review_request_sha256` | `varchar(64)` | NOT NULL | — |
+| `snapshot_sha256` | `varchar(64)` | NOT NULL | — |
+| `configuration_sha256` | `varchar(64)` | NOT NULL | — |
+| `question_count` | `smallint` | NOT NULL | — |
+| `finding_count` | `smallint` | NOT NULL | — |
+| `unresolved_count` | `smallint` | NOT NULL | — |
+| `markdown_sha256` | `varchar(64)` | NOT NULL | — |
+| `markdown_bytes` | `integer` | NOT NULL | — |
+| `job_attempt` | `smallint` | NOT NULL | — |
+| `created_at` | `timestamptz` | NOT NULL | `clock_timestamp()` |
+
+**Printable-ASCII rule.** Every character must be in the range U+0020–U+007E. It is
+expressed as two checks: `octet_length(wrapper_canonical) = char_length(wrapper_canonical)`
+(ASCII only, as in `0007`) and `wrapper_canonical !~ '[^ -~]'` (no character outside space to
+tilde).
+
+**Named checks.** Each is `ck_review_outputs_<name>`, generated with `op.f`:
+
+| Name | Expression |
+| --- | --- |
+| `schema_id` | `schema_id = 'evidenceguard.review-report-content.v1'` |
+| `renderer_id` | `renderer_id = 'evidenceguard.review-report-markdown.v1'` |
+| `mode` | `mode = 'contract'` |
+| `wrapper_ascii` | `octet_length(wrapper_canonical) = char_length(wrapper_canonical)` |
+| `wrapper_printable` | `wrapper_canonical !~ '[^ -~]'` |
+| `wrapper_size` | `octet_length(wrapper_canonical) BETWEEN 1 AND 16777216` |
+| `wrapper_sha256` | `wrapper_sha256 ~ '^[0-9a-f]{64}$'` |
+| `legacy_sha256` | `legacy_sha256 ~ '^[0-9a-f]{64}$'` |
+| `review_request_sha256` | `review_request_sha256 ~ '^[0-9a-f]{64}$'` |
+| `snapshot_sha256` | `snapshot_sha256 ~ '^[0-9a-f]{64}$'` |
+| `configuration_sha256` | `configuration_sha256 ~ '^[0-9a-f]{64}$'` |
+| `markdown_sha256` | `markdown_sha256 ~ '^[0-9a-f]{64}$'` |
+| `question_count` | `question_count BETWEEN 1 AND 100` |
+| `finding_count` | `finding_count BETWEEN 0 AND 200` |
+| `unresolved_count` | `unresolved_count BETWEEN 0 AND question_count` |
+| `markdown_bytes` | `markdown_bytes BETWEEN 1 AND 33554432` |
+| `job_attempt` | `job_attempt BETWEEN 1 AND 10` |
+
+**Keys and foreign keys.** Every foreign key uses `ON DELETE NO ACTION ON UPDATE NO ACTION`
+(SQLAlchemy's default, with no `ondelete`/`onupdate` given) and none cascades.
+
+| Name | Local columns | References |
+| --- | --- | --- |
+| `pk_review_outputs` (PK) | `(tenant_id, review_id)` | — |
+| `uq_review_outputs_tenant_id_job_id` (unique) | `(tenant_id, job_id)` | — |
+| `fk_review_outputs_review` | `(tenant_id, review_id)` | `reviews (tenant_id, id)` (existing `uq_reviews_tenant_id_id`) |
+| `fk_review_outputs_job` | `(tenant_id, job_id)` | `jobs (tenant_id, id)` (existing unique used by `0006`/`0007`) |
+| `fk_review_outputs_review_job` | `(tenant_id, review_id, job_id)` | `reviews (tenant_id, id, run_review_job_id)` (new unique below) |
+
+**The additive `reviews` change (G9, a supported direction).** `0008` adds a unique
+constraint `uq_reviews_tenant_id_id_run_review_job_id` on `reviews (tenant_id, id,
+run_review_job_id)`. No existing constraint, column or row changes.
+
+**`downgrade()`.** It drops `review_outputs` (and with it its constraints), then
+`uq_reviews_tenant_id_id_run_review_job_id`. Nothing else.
+
+**Markdown (G8, a supported direction).** Markdown is not stored. It is regenerated by the
+pinned renderer, and the row stores `markdown_sha256` and `markdown_bytes`.
+
+**Guarantee layers:**
+
+- **Database:** the constraints above. The database cannot prove that the digests match the
+  bytes, that the bindings equal the review row beyond the foreign keys, or that the stages
+  are complete.
+- **Write time:** `write_review_output`, below.
+- **Reload:** `decode_stored_review_output` plus `load_review_output`'s binding checks, and
+  render consistency in the worker.
+- **Trusted caller:** the source-bound recheck in the same attempt, and the Markdown metadata
+  computed from `render_report_markdown`. Structural decoding alone is never sufficient.
+
+<a id="m5g-f2-persistence-operations"></a>
+
+[REC] **M5g-F2. Persistence operations.** These are in `evidenceguard_persistence.review_outputs`.
+The fence type is `StageFence` from `review_stages`, a structural protocol with `.session:
+FencedSession` and `.job: JobSnapshot` that imports no worker type.
+
+`write_review_output(fence: StageFence, output: ReviewOutput) -> ReviewOutputWrite`. It
+composes into the caller's fence (intended: the `finish=True` fence), never commits or rolls
+back, and logs nothing. Order (the first failure decides):
+
+1. **Arguments (G24).** Every failure here is `InvalidOutputRequestError`:
+   - **`output`:** `type(output) is ReviewOutput`, then rebuilt field by field through its
+     constructor. That nested-rebuilds `content` through `revalidate_review_report`, which
+     catches bypass-built nested values, and recomputes every derived field.
+   - **`fence`:** the M5e `_fence_parts` pattern. `fence.session` and `fence.job` are read once
+     inside a guard, then `type(session) is FencedSession` and `type(job) is JobSnapshot`.
+     `job` is then rebuilt through `JobSnapshot` from its fields, with exact field types, and
+     must compare equal. Merely having the attributes, or the right outer class, is not
+     accepted.
+2. **Fence association.** The fence job is the review's canonical `run_review` job (kind,
+   idempotency key, payload, max attempts), the review row exists for the job's tenant and names
+   the job, and `recheck_ownership` runs at entry. A failure is
+   `ReviewOutputFenceMismatchError`; lease problems pass through unchanged.
+3. **Binding (`ReviewOutputBindingError`).** The review row's tenant, vendor, job, request
+   digest, snapshot digest and configuration digest equal `output`'s. The planned-question rows,
+   by position and plan digest, equal the wrapper's.
+4. **Completeness (`ReviewOutputIncompleteError`).** Every planned question has both committed
+   stage rows. Each row's shape, outcome, reason and request, content, evidence and dependency
+   digests equal the wrapper's `ReportStage`.
+5. **Replay (M5g-G).**
+6. **Insert.** `job_attempt = fence.job.attempt` is taken from the fence, not the caller.
+   `created_at` comes from the database default and is read back with `RETURNING`.
+7. **Final ownership.** `recheck_ownership` again.
+
+It returns `ReviewOutputWrite(stored, replayed=False)`. A unique or primary-key violation (only
+possible through a bypass race) is `ReviewOutputConflictError`. Any other database failure is
+`ReviewOutputDatabaseError`. `LeaseLostError`, `FenceClosedError` and `JobLockTimeoutError`
+pass through unchanged, and process control propagates as the same object (within the G15
+limit of the caller's transaction).
+
+`load_review_output(session_factory: sessionmaker[Session], actor: ActorContext, review_id:
+UUID) -> StoredReviewOutput` and `load_review_status(session_factory: sessionmaker[Session],
+actor: ActorContext, review_id: UUID) -> ReviewStatus` share a deterministic precedence:
+
+1. **Types (G24).** Every failure here is `InvalidOutputRequestError`, and comes before any
+   role check or SQL:
+   - **`actor`:** `type(actor) is ActorContext`. Its fields are checked by exact type
+     (`tenant_id`, `actor_id` are `UUID`; `role` is `Role`), then it is rebuilt with
+     `ActorContext(tenant_id=…, actor_id=…, role=…)` and must compare equal. That rejects
+     `model_construct` or `object.__new__` bypass values and coerced fields.
+   - **`review_id`:** `type(review_id) is UUID`.
+2. **Role.** `actor.role in {reviewer, approver}` (`PermissionDeniedError`, the existing
+   domain error).
+3. **One read.** One read-only REPEATABLE READ transaction through `read_snapshot` with M5d's
+   recording wrappers. These are the read's own transaction, not a fence. Within it:
+   - **Review row.** The review row for `(actor.tenant_id, review_id)`; if absent,
+     `ReviewNotFoundError` (the existing M5d class). A review in another tenant is
+     indistinguishable from an absent one.
+   - **Canonical job.** The job row; if it is absent or not the canonical `run_review` job,
+     `ReviewOutputRecordInconsistentError`.
+   - **Lifecycle and presence.** The output row's presence and the canonical job's status
+     are evaluated with the **shared table in F4**, before any decoding.
+   - **Output row.** For `load_review_output`, and only in the "present + succeeded" case,
+     `decode_stored_review_output(row)` runs (a failure is
+     `ReviewOutputRecordInconsistentError`). Then the bindings against the review row and job,
+     the planned-question and stage-digest consistency as at write time, and
+     `job_attempt <= job.attempt`. A failure is `ReviewOutputRecordInconsistentError`.
+   - **Status.** For `load_review_status`, the F4 table's status column.
+4. **Failures.** A database or session failure is `ReviewOutputDatabaseError`. Process control
+   is re-raised as the first object, also when cleanup fails, by the existing recording
+   pattern.
+
+Neither read writes. Neither adds a conclusion from stage rows: the rows are compared by digest
+only.
+
+<a id="m5g-f3-render-consistency"></a>
+
+[REC] **M5g-F3. Worker render consistency.** It lives in `evidenceguard_worker.review`:
+
+```text
+load_trusted_review_output(session_factory: sessionmaker[Session], actor: ActorContext,
+                           review_id: UUID) -> TrustedReviewOutput
+```
+
+*`TrustedReviewOutput`* has the fields `stored: StoredReviewOutput` and `markdown: str`. Its
+`repr` shows only the review ID, wrapper digest and Markdown size.
+
+The function runs in this order:
+
+1. `load_review_output(...)`, whose errors pass through unchanged. This includes the
+   argument, role, missing-review and non-canonical-job precedence and the F4
+   lifecycle/presence rules, all applied before anything is rendered;
+2. `render_report_markdown(stored.output.content)`;
+3. a comparison of SHA-256 and UTF-8 length with `markdown_sha256` and `markdown_bytes`.
+
+A render failure, or any mismatch, raises the fixed `ReviewRendererDriftError` fresh. **Drift
+is reported, never repaired.** The stored row is not changed, no Markdown is returned, and no
+conclusion is added or recomputed from stage rows.
+
+<a id="m5g-f4-lifecycle-and-presence"></a>
+
+[REC] **M5g-F4. Shared lifecycle/presence table (R14, G23).** This table is evaluated inside the
+read transaction. It runs after the actor, role, missing-review and non-canonical-job checks,
+which keep their precedence, and before any output decoding.
+
+| Output row | Canonical job status | `load_review_output` | `load_review_status` | `load_trusted_review_output` |
+| --- | --- | --- | --- | --- |
+| present | `succeeded` | strict decode and binding checks, then `StoredReviewOutput` | `completed` | inherits, then renders and compares (F3) |
+| present | `queued`, `running`, `failed` or `dead` | `ReviewOutputRecordInconsistentError` | `ReviewOutputRecordInconsistentError` | inherits (no render) |
+| absent | `succeeded` | `ReviewOutputRecordInconsistentError` | `ReviewOutputRecordInconsistentError` | inherits (no render) |
+| absent | `queued` | `ReviewOutputNotFoundError` | `queued` | inherits (`ReviewOutputNotFoundError`) |
+| absent | `running` | `ReviewOutputNotFoundError` | `running` | inherits |
+| absent | `failed` or `dead` | `ReviewOutputNotFoundError` | `failed` | inherits |
+
+The writer's deliberate replay of an output row while the job is `running` (M5g-G2) remains a
+separately specified recovery or test case inside the finish fence. It does **not** make that
+inconsistent state readable as a completed output: until the finish commits, every public
+loader reports `ReviewOutputRecordInconsistentError` for it.
+
+[REC] **Error table.** Every error is raised fresh, outside handlers, with no cause or context.
+"Message" is the fixed `str()`.
+
+| Class | Owner | Code | Message | Classification (job outcome when raised in the handler) |
+| --- | --- | --- | --- | --- |
+| `InvalidReviewOutputError` | domain `review_outputs` | `invalid_review_output` | "the review output is invalid" | permanent |
+| `InvalidStoredOutputError` | domain `review_outputs` | `invalid_stored_review_output` | "the stored review output is invalid" | (read paths only) |
+| `InvalidOutputRequestError` | persistence `review_outputs` | `invalid_review_output_request` | "the review output request is invalid" | permanent |
+| `ReviewOutputFenceMismatchError` | persistence | `review_output_fence_mismatch` | "the fence is not the review's canonical job" | permanent |
+| `ReviewOutputBindingError` | persistence | `review_output_binding_mismatch` | "the review output does not match the review" | permanent |
+| `ReviewOutputIncompleteError` | persistence | `review_output_incomplete` | "the review stages are incomplete or differ" | permanent |
+| `ReviewOutputConflictError` | persistence | `review_output_conflict` | "a different review output exists" | permanent |
+| `ReviewOutputNotFoundError` | persistence | `review_output_not_found` | "the review has no output" | (read paths only) |
+| `ReviewOutputRecordInconsistentError` | persistence | `review_output_record_inconsistent` | "the stored review output is inconsistent" | (read paths only) |
+| `ReviewOutputDatabaseError` | persistence | `review_output_database_error` | "the review output could not be read or written" | retryable |
+| `UnsupportedEmbeddingProfileError` | worker `review` | `unsupported_embedding_profile` | "the review's embedding profile is not supported" | permanent |
+| `ReviewRendererDriftError` | worker `review` | `review_renderer_drift` | "the stored review output does not match its renderer" | (read path only) |
+| `ReviewCompositionError` (private) | worker `review` | — | — | permanent, or retryable for `PlanInFlight` only |
+| `ReviewFenceExitError` (internal, fixed) | worker `review` | `review_fence_exit_failed` | "a fenced review operation did not complete" | none of its own: privacy normalization of an unclassified ordinary context-exit failure; the runtime records `unexpected_error` (retryable) (G22) |
+
+##### M5g-G. Atomic completion, replay and review status
+
+[REC] **Completion.** It runs once every question has both committed stages:
+
+1. `ctx.check()`;
+2. `stages = load_trusted_stages(...)`;
+3. `content = build_report_content(review, template, planned, stages)`;
+4. `recheck_report_content(content, review=…, template=…, planned=…, stages=stages)`;
+5. `markdown = render_report_markdown(content)`;
+6. `output = ReviewOutput(tenant_id, review_id, job_id, content, sha256(markdown),
+   len(markdown.encode("utf-8")))`;
+7. `ctx.check()`;
+8. `fenced_write(ctx, lambda fence: write_review_output(fence, output), finish=True)`.
+
+The runtime's `succeeded` transition is written in the same transaction before `COMMIT`, so
+the output and success are durable together or not at all. Completeness is enforced by the M5f
+builder and by the writer against the stored rows. The handler **always** ends through that
+finish block or by raising. It never returns normally without a committed finish, because the
+runtime would otherwise record `complete` with no output.
+
+**The reload-to-finish gap.** Committed stages are immutable. With every stage committed,
+`reserve_call` refuses new calls (`PlanReuse`). Another worker can write only after a reclaim,
+which changes the attempt and token, so this attempt's finish fence then fails. The writer
+re-proves the stage digests inside the finish transaction.
+
+<a id="m5g-g2-replay"></a>
+
+[REC] **M5g-G2. Replay (R8).** A **successful completion is terminal**. The job is
+`succeeded`, no worker can claim it, and every fence for it fails at entry. A post-completion
+handler therefore **cannot** replay. An existing output row while the job is still `running`
+is an inconsistent state, reachable only outside the normal atomic path (a fence bypass or a
+deliberate test or recovery insertion). The writer's replay rule exists for that deliberate
+case only, and it is never a normal handler path.
+
+When step 5 finds a row for `(tenant_id, review_id)`, the incoming value is compared with the
+stored row in three sets:
+
+- **Must match** (immutable identity, content and render): `tenant_id`, `review_id`, `job_id`,
+  `schema_id`, `renderer_id`, `mode`, `wrapper_canonical` (byte equality), `wrapper_sha256`,
+  `markdown_sha256` and `markdown_bytes`.
+- **Recomputed and compared:** `legacy_sha256`, `review_request_sha256`, `snapshot_sha256`,
+  `configuration_sha256`, `question_count`, `finding_count` and `unresolved_count`. The stored
+  row is decoded with `decode_stored_review_output`, which recomputes these from the stored
+  bytes. Disagreement in either the stored or the incoming row is a conflict.
+- **Preserved and excluded:** the original `job_attempt` and `created_at`. The incoming
+  attempt's values are ignored.
+
+If everything matches, the writer returns `ReviewOutputWrite(stored=<the stored row as
+decoded>, replayed=True)` and writes nothing. The surrounding finish then records `succeeded`,
+which resolves the inconsistency. Otherwise it raises `ReviewOutputConflictError`. Nothing is
+overwritten and no new revision is created.
+
+**Concurrency.** There is one lease holder under the job row lock, and the primary key decides
+any bypass race; a unique violation is `ReviewOutputConflictError`. A stale fence fails at
+entry or at the final ownership recheck.
+
+<a id="m5g-g3-status-projection"></a>
+
+[REC] **M5g-G3. W15 status projection.** `load_review_status` reads one snapshot. It makes no
+writes and no compensation. Its results are the status column of the shared F4 table,
+restated here.
+
+| Output row | Canonical job | Result |
+| --- | --- | --- |
+| present | `succeeded` | `ReviewStatus.completed` (full validation is `load_review_output`) |
+| absent | `failed` or `dead` | `ReviewStatus.failed` (committed stages retained) |
+| absent | `queued` | `ReviewStatus.queued` |
+| absent | `running` | `ReviewStatus.running` |
+| present | `queued`, `running`, `failed` or `dead` | `ReviewOutputRecordInconsistentError` (the inconsistent state of M5g-G2) |
+| absent | `succeeded` | `ReviewOutputRecordInconsistentError` (success without output) |
+
+An absent review is `ReviewNotFoundError`. There is no endpoint.
+
+##### M5g-H. Report-level failures, database failures and commit outcomes
+
+[REC] **Outcome mapping.** Only existing `JobErrorCode`s are used (G10, a supported direction).
+"Permanent" is `PermanentJobError(permanent_failure)` and "retryable" is
+`RetryableJobError(retryable_failure)`.
+
+| Failure | Outcome |
+| --- | --- |
+| payload, kind, idempotency or attempts mismatch; review missing; job mismatch; `ReviewRecordInconsistentError`; `ReviewArtifactsUnavailableError`; `PermissionDeniedError` | permanent |
+| snapshot semantic failures; `UnsupportedEmbeddingProfileError` | permanent |
+| outside fenced paths (guarded calls): `RetrievalProviderError`, `RetrievalDatabaseError`, `ReviewDatabaseError`, `StageDatabaseError` from `load_trusted_stages` | retryable |
+| identity-confirmed fenced body errors `StageDatabaseError`, `ReviewOutputDatabaseError` (after `ctx.check()`, E2) | retryable |
+| identity-confirmed M5e body errors (`StageFenceMismatchError`, `StageConflictError`, `StageBindingError`, `StageDependencyError`, `StagePlanMismatchError`, `StageNotPlannedError`, `StageRecordInconsistentError`, `EvidenceTooLargeError`, `StageBudgetExhaustedError`, `StageCallAbandonedError`, `InvalidStageRequestError`) | permanent |
+| identity-confirmed output-writer errors (`InvalidOutputRequestError`, `ReviewOutputFenceMismatchError`, `ReviewOutputBindingError`, `ReviewOutputIncompleteError`, `ReviewOutputConflictError`); `InvalidReviewOutputError` | permanent |
+| `ReviewCompositionError` | permanent, except retryable for `PlanInFlight` (G6) |
+| M5a `InvalidModelRequestError` | permanent |
+| M5a `ModelClockError` | retryable (the reservation becomes abandoned budget) |
+| M5f `IncompleteReportStagesError`, `ReportBindingMismatchError`, `ReportFindingConflictError`, `ReportLimitExceededError`, `InvalidReportInputError`, `ReportRenderLimitError`, `ReportRenderError` | permanent (deterministic) |
+| anything else leaving a fenced block (lifecycle, commit, cleanup, replacement, `JobLockTimeoutError` at entry) | normalized to `ReviewFenceExitError` (no semantic classification); the runtime records `unexpected_error` |
+| `JobCancelledError`, `LeaseLostError`, `FenceClosedError`; process control | propagated as the same objects |
+
+A report-level failure is never turned into a fabricated unresolved stage, a partial output or
+job success.
+
+<a id="m5g-h2-runtime-branches"></a>
+
+[REC] **M5g-H2. Runtime branches after a failure (replaces the Prompt 214 G11 justification).**
+The handler relies on the existing runtime and states its branches. Those branches are:
+
+**Outcome writes in general (R11).** Every runtime outcome write (`complete`,
+`fail_retryable`, `fail_permanent`) owns a transaction, so it can fail at three points:
+
+- **Before its COMMIT** (fence entry, the transition, or a body error). `LeaseLostError` is
+  logged as ownership lost and nothing more is written; any other ordinary exception is logged
+  `job.outcome_failed`.
+- **Commit uncertain** (the commit raised). It is logged `job.outcome_failed`, and the stored
+  transition is unknown.
+- **Commit acknowledged, then `close()` raised.** It is logged `job.outcome_failed` **although
+  the transition committed**. The reviewer's fake-session probe showed the committed state
+  `queued` with that log line.
+
+Therefore **an outcome-write exception, or a `job.outcome_failed` log, establishes nothing**
+about the stored job:
+
+- it may remain `running`;
+- it may already have transitioned to `succeeded`, `queued`, `failed` or `dead`;
+- or its state may be unknown.
+
+This is clarification A. The operation-specific outcomes stay distinct: `complete` →
+`succeeded`; `fail_retryable` → `queued` or `dead`; `fail_permanent` → `failed`. No runtime
+change or retry is implied, and `fail_retryable` never produces `succeeded`.
+
+**Lease expiry and reclaim** (`lease_expired`, counting an attempt) apply **only if** the job is
+in fact still `running`. A failed write is never described as a confirmed requeue or a
+confirmed absence of a transition.
+
+**Branches after the handler exits:**
+
+- **Handler raises `PermanentJobError`.** The runtime attempts `fail_permanent`. On success the
+  job is `failed` and the review projects `failed`. `LeaseLostError` means nothing is
+  written. Any other failure leaves the stored state unknown, as above.
+- **Handler raises `RetryableJobError`, `ReviewFenceExitError` or another unclassified
+  exception (`unexpected_error`).** The runtime attempts `fail_retryable`. On success the job
+  is `queued` while attempts remain and **`dead` when they are exhausted**. `LeaseLostError`
+  means nothing is written. Any other failure leaves the stored state unknown.
+- **Latched lease loss, or a `LeaseLostError` that latches it.** The runtime writes nothing.
+- **Cancellation requested and `JobCancelledError`.** The runtime attempts
+  `fail_retryable(worker_shutdown)`, with the same branches.
+- **Finish `UNCERTAIN`** (the finish commit raised, or post-commit cleanup did). The handler
+  receives the fixed `ReviewFenceExitError` (E2) and lets it propagate.
+  - If no lease loss is latched, the runtime attempts `fail_retryable(unexpected_error)`:
+    - **if the finish committed:** the job is terminal, that write fails with
+      `LeaseLostError`, nothing more is written, and `job.outcome_unknown` is logged;
+    - **if it did not commit:** the write may move the job to `queued` or `dead`, or may
+      itself fail with the stored state unknown.
+  - A later attempt, if one runs, sees every stage committed, rebuilds identical wrapper
+    bytes, finds no output row and writes it.
+  - **No in-handler retry follows an unknown commit.**
+- **Finish `NONE`** (a body or lifecycle failure). No `COMMIT` was issued by the finish fence.
+  An identity-confirmed body error is classified after `ctx.check()`; anything else is
+  normalized (E2).
+
+**Limitations.** The handler cannot read the uncertain state. A failed outcome write leaves
+the stored lifecycle unknown until it is read again. G11 (revised) keeps this conservative
+runtime behaviour unchanged; G16 records the alternative of a public uncertain-state seam.
+
+##### M5g-I. Privacy and trust limits
+
+[REC] The privacy rules:
+
+- **No raw content anywhere.** No raw model output is in call records or errors. No document
+  text, quotes, rationales, claims, findings, prompts, system text, requests, credentials,
+  payload bytes, SQL or exception text is in logs, errors or default representations.
+- **Fixed errors.** All errors are fixed classes with fixed messages (M5g-F3 table), raised
+  outside handlers, with no cause or context. An ordinary exception leaving a fenced block
+  without identity confirmation is replaced by `ReviewFenceExitError` (E2, G22), so no SQL,
+  parameter or database text can propagate from the handler. The runtime logs only class names
+  (`ReviewFenceExitError`), never messages.
+- **No logging.** The handler logs nothing.
+- **Process control.** It propagates as the same object, within the G15 limit.
+- **Not claimed:** entailment, authenticity, semantic injection resistance or live-model
+  quality.
+
+##### M5g-J. Planned verification (map only; not written or run)
+
+[REC] All tests are synthetic, with a scripted fake model provider and the offline hash
+embedder. **Kept from Prompt 214:**
+
+- the happy path;
+- every S/U shape;
+- budgets and reuse;
+- interruptions;
+- cancellation and fences;
+- snapshot and replacement activation;
+- bindings;
+- report failures;
+- atomic output;
+- reload and status;
+- migration;
+- packaging;
+- privacy;
+- the narrow offline installed-wheel assertion;
+- the three-part canary contract (all below).
+
+| Area | Planned tests (module) |
+| --- | --- |
+| Happy path | `tests/test_review_handler_postgres.py`: ingest, index, create review, run the handler built by `make_run_review_handler(fake, session_factory=…)` in a test registry; output row, job `succeeded`, status `completed`, Markdown re-rendered equal |
+| Stage outcomes | every S/U shape: S1/S2, U1 per terminal outcome (refusal, max_tokens, unexpected_stop, model_mismatch, invalid_output after repair, citation_rejected after repair, timeout/provider_failed exhausted), U2 abandoned at 3, U3 after each unresolved Verification, U4 oversized evidence, U5 oversized initial request, U6 oversized repair; P11 rule present after Analysis failure |
+| Budgets | retry reuses the digest; one repair across attempts; abandoned repair retried once (T3) then `call_abandoned` (T4); reservations never exceed 3 |
+| Reuse | committed stages reused with **zero** provider calls on rerun (fake call counter) |
+| Interruptions | controlled `SystemExit`/`KeyboardInterrupt` after the provider responds but before completion commits (next attempt: abandoned retry); after a stage commit (next attempt: reuse); process-control identity |
+| Cancellation and fences | cancellation latched during the call wins over classification; lease loss before reservation, after reservation, inside the finish block; stale token at the final ownership check; no write after loss |
+| Snapshot | replacement activated before the run and between attempts: only snapshot chunks in evidence; structure test forbids `capture_snapshot`/`search_current`/unpinned loaders in `review.py` |
+| Bindings | wrong tenant/job/kind/payload/idempotency; template or prompt drift; request digest or timeout mismatch before dispatch; evidence digest mismatch |
+| Report failures | >200 findings → permanent, no output, status `failed`; missing mandatory rule detected by builder and writer; render limit |
+| Atomic output | output and success commit together; injected failure inside the writer rolls back both; commit failure simulated → outcome unknown path; rerun after rollback writes identical bytes; identical bypass row → replay; different row → conflict; concurrent finish race through a bypass |
+| Reload and status | strict decode, digest and binding tampering detected; Markdown digest drift detected; every W15 row including both inconsistent combinations |
+| Migration | `0008` up/down, all named constraints, foreign keys without cascade, the new reviews unique constraint, alembic head/offline SQL |
+| Packaging and imports | persistence/domain never import agents/worker; `review.py` allowed in the agents-import allowlist; `production_registry()` still lacks `run_review`; no settings, endpoint or CLI reference |
+| Privacy | captured logs, errors and reprs contain no text, quotes, prompts or payload bytes |
+| Installed wheel (proposed, narrow, offline) | import `evidenceguard_worker.review`; `make_run_review_handler()` without a provider raises `TypeError`; `production_registry().kinds` unchanged; offline `0008` SQL renders `review_outputs` |
+
+[ACCEPTED] **The canary contract** is preserved exactly, with dedicated fixtures under `tests/`
+and the accepted M4e corpus unchanged:
+
+1. **Acceptance fixture.** The injected authorized document reaches retrieval and an evidence
+   block of the assembled request. The scripted outputs are ordinary. The checker finds the
+   assembled canary (exact and case-insensitive) in **none** of:
+   - the wrapper bytes and the Markdown;
+   - the committed stage outputs (verifications, claims, quotes, rationales and findings,
+     including titles, statements and follow-ups);
+   - the call records;
+   - the captured logs and error codes.
+2. **Negative control.** A script that emits the canary in a rationale and a finding statement
+   makes the **same** checker fail, and the test asserts that it does.
+3. **Labelled limitation probe.** A genuine authorized quotation containing the canary verbatim
+   is accepted, stored and rendered, and the test asserts exactly that.
+
+There is no production denylist. Passing does not establish live-model injection resistance.
+
+**Added in Prompt 215:**
+
+| Area | Planned tests |
+| --- | --- |
+| Pre-dispatch boundary | cancellation latched, and separately lease loss, after the reservation fence exits but before dispatch: fake provider call count **0**, the reservation `started` and counted (next attempt plans T3/T4), no completion or compensating write; for initial, original retry, repair and repaired retry |
+| Repaired retry | abandoned repair at sequence 2, reclaim: the sequence-3 request's reason comes from call 1's rejection (or invalid output), its digest equals the repair call's; a tampered trigger (wrong stage, question, outcome, missing rejection) gives a permanent composition error with no dispatch |
+| Loop bounds | every trace in M5g-C4 with exact iteration and write counts; maximum 5 (Verification) and 4 (Analysis) from every starting state; the defensive bound error unreachable for valid histories; `PlanInFlight` from an out-of-band current-attempt row gives retryable with no dispatch |
+| Embedding resolution | missing fingerprint, factory raising, identity property raising, identity mismatch, each permanent after `ctx.check()`; cancellation during resolution wins; process control same object; no resolution when no retrieval is needed |
+| Body plus cleanup failure | a fixed M5e error raised in a fence with an injected `rollback()` failure, and with an injected `close()` failure: the escaping object is not the original, it is **not** translated, and the runtime records `unexpected_error` |
+| Process control plus cleanup | `KeyboardInterrupt`/`SystemExit`/`GeneratorExit` inside normal and finish fences, with clean cleanup (identity preserved) and with injected rollback/close failure (documents the G15 limit; under G15 identity preserved) |
+| Lifecycle, commit, cleanup | `succeed()` raising `LeaseLostError` (nothing recorded), raising a database error (finish `NONE`, `unexpected_error`); commit raising (finish `UNCERTAIN`; committed and uncommitted variants); `close()` raising after commit (uncertain but committed) |
+| Runtime branches | `fail_retryable` at the last attempt gives `dead`; a failing outcome write is covered by the Prompt 216 outcome-write row below (the stored state is read, never inferred from the log); lease expiry and `lease_expired` reclaim are asserted only when the job is in fact still `running` |
+| Read-API precedence | for `load_review_output`, `load_review_status`, `load_trusted_review_output`: wrong actor type, wrong review ID type, admin role, wrong tenant (not found), absent review, absent output, non-canonical job, decode failure, database failure, process control during read and cleanup, in that precedence |
+| Writer precedence | arguments, fence mismatch, binding, incompleteness, replay or conflict, final ownership, each in order |
+| Values | exact types (bool for int, subclass, `model_construct`/`object.__new__` bypass), unknown and missing keywords, nested rebuild, derived-field recomputation, naive and offset `created_at` (normalized to UTC), `job_attempt` bounds, private reprs (no title, quote, text or bytes) |
+| Constraints | each of the 17 named checks rejects one violating row; each foreign key, the PK and the unique refuse violations; no cascade on review or job delete; the new `reviews` unique; downgrade drops exactly the table and that unique |
+| Replay | `ReviewOutput` has no `created_at` or `job_attempt` arguments: run the writer for an identical stored row from a fence whose current `job.attempt` differs from the stored `job_attempt` (and with a later database time): it replays (`replayed=True`) and returns the stored `job_attempt` and `created_at` unchanged; a difference in any must-match or recomputed field conflicts |
+| Renderer | `markdown_sha256` or `markdown_bytes` mismatch gives `ReviewRendererDriftError` with the row unchanged; absent output gives `ReviewOutputNotFoundError` |
+| Body error plus latched control (R10) | in normal and finish fences, with clean cleanup: the body latches cancellation, then raises a fixed error → `JobCancelledError` (not the classification); the body latches lease loss, then raises a fixed error → `LeaseLostError`; the raised job error, when no latch, is fresh with no cause or context |
+| Outcome-write branches (R11) | runtime outcome write failing before COMMIT, with COMMIT raising, and with COMMIT acknowledged then `close()` raising: `job.outcome_failed` logged in all three; the stored job read afterwards is respectively unchanged, unknown (both variants), and transitioned; no test asserts a requeue from the log alone; attempt cap gives `dead`; lease-loss branch writes nothing |
+| First-process-control rule (R12, G15) | for each of `KeyboardInterrupt`, `SystemExit`, `GeneratorExit`: body control with ordinary and with control rollback/close failures; commit control with cleanup failures; ordinary body or commit failure followed by rollback control, and by close control; acknowledged commit followed by close control; each asserts the first object by identity and the call counts (commit ≤ 1, rollback ≤ 1, close = 1); without process control the selected ordinary object equals today's; session construction raising an ordinary exception and each process-control type (clarification B) propagates unchanged with zero commit, rollback and close calls |
+| Outcome-write states (clarification A) | a `complete` outcome write whose commit is acknowledged and whose `close()` raises: `job.outcome_failed` is logged and the stored job reads `succeeded`; no test infers the stored state from the log alone |
+| Privacy normalization (R13, G22) | a commit error and a cleanup error carrying sentinel text (SQL-like and parameter-like strings) leave the helper as `ReviewFenceExitError` with no sentinel in `str`, `repr`, `__cause__`, `__context__`, the captured logs or the recorded job error; `JobContext` finish/uncertain flags and the runtime outcome (`unexpected_error`, `outcome_unknown` logging) unchanged |
+| Lifecycle/presence (R14, G23) | every F4 row for `load_review_output`, `load_review_status` and `load_trusted_review_output`, including present + running (the deliberate replay state) and absent + succeeded |
+| Input boundaries (R15, G24) | factory accepts a provider whose `provider_id` is an instance attribute; a `generate` property that raises gives the fixed `TypeError` (process control from it propagates); `model_construct`/`object.__new__` actors, coerced actor fields, a non-`FencedSession` session, a bypass-built `JobSnapshot` and a bypass-built `ReviewOutput` are refused with `InvalidOutputRequestError` before any role check or SQL |
+
+##### M5g-K. Reviewer decisions, scope and paths
+
+**Status of decisions (Prompt 217).** G1–G15 and G17–G24 are **accepted**. G16 is **resolved
+as not selected**: it remains documented as an alternative considered. No decision remains
+open. The "Status" column below records the pre-acceptance state from Prompts 214–216 and is
+historical.
+
+| # | Decision | Recommendation | Tradeoff | Status |
+| --- | --- | --- | --- | --- |
+| G1 | Worker actor | Fixed uuid5 actor, role reviewer, tenant from the job, no human-approval claim | Uses the existing role-gated loaders versus no per-user attribution | supported direction; proposed |
+| G2 | Session factory | Explicit keyword argument | Trusted loaders keep their own transactions versus an extra dependency | supported direction; proposed |
+| G3 | Embedding provider | Mapping defaulting to the offline M4c mapping; B2 resolution | Mirrors M4c versus another argument | supported direction; proposed |
+| G4 | Owner source | Rechecked reload value, or this attempt's `verify_question` result over trusted evidence | No per-question reload versus reload after every Verification | supported direction; proposed |
+| G5 | State reads | `read_stage_state` inside each continuing write transaction | Fresh plan without an extra transaction versus a separate read | supported direction; proposed |
+| G6 | `PlanInFlight` | Defensive retryable `ReviewCompositionError`; not a normal path | Spends an attempt versus guessing | proposed (justification corrected) |
+| G7 | Overall deadline | None | Matches accepted limits versus unbounded wall time | supported direction; proposed |
+| G8 | Markdown | Not stored; digest and size stored; regenerate | Single source versus renderer needed at read | supported direction; proposed |
+| G9 | Review–job FK | New `reviews` unique plus composite FK in `0008` | Database-enforced binding versus touching `reviews` additively | supported direction; proposed |
+| G10 | Job codes | Existing `JobErrorCode`s only | No M3 enum change versus coarser diagnostics | supported direction; proposed |
+| G11 | Unknown finish (revised twice) | Keep the existing runtime's conservative handling with the branches and limits in M5g-H2 (including unknown outcome-write results); the handler never semantically classifies a context-exit failure, only normalizes it (G22) | No M3 change versus no handler-visible uncertainty | proposed (Prompt 214 justification withdrawn; corrected in Prompt 216) |
+| G12 | Packaging | Allow `evidenceguard_worker.review` as the second agents-importing worker module | Needed for composition versus widening D2 | supported direction; proposed |
+| G13 | Status function | `load_review_status` in persistence, internal | Testable now versus deferring W15 | supported direction; proposed |
+| G14 | Order | Sequential, Verification then Analysis | Simple and bounded versus no parallelism | supported direction; proposed |
+| G15 | First process control through `transaction()` (completed in Prompt 216) | The complete E3 rule: across body, commit, rollback and close, the first non-`Exception` `BaseException` wins by identity; commit ≤ 1, rollback ≤ 1, close = 1 attempts; ordinary-only behaviour selects the same object as today (only implicit `__context__` links may differ); no proof of rollback, disposal or commit outcome | Restores the M5e-I/W7 identity guarantee on fenced paths versus a change to an M3 helper used by every transaction. **Affected:** `packages/persistence/evidenceguard_persistence/db.py` only; **regression obligations:** in E3 and M5g-J | proposed (support conditional on this complete policy) |
+| G16 | Public uncertain-finish state | **Not recommended now.** Alternative: a read-only `JobContext.finish_uncertain` property in `apps/worker/evidenceguard_worker/context.py` | Lets a handler know about an unknown commit versus a new M3 surface with no current consumer (G11 suffices) | **new; proposed (not recommended)** |
+| G17 | Identity-confirmed classification (corrected in Prompt 216) | Classify only an escaping object that **is** the body's own fixed error, and raise the classification only after `ctx.check()` outside handlers; no type-matched mapping on fenced paths | Never mislabels a commit or cleanup failure and lets latched control win versus coarser codes after replacement | proposed |
+| G18 | Loop bounds | `MAX_ITERATIONS` 5 (Verification) and 4 (Analysis), derived in M5g-C4; exceeding is permanent | Exact, testable bound versus a constant to maintain | **new; proposed** |
+| G19 | Embedding failures | Unsupported profile, factory or identity failure → permanent; `RetrievalProviderError` from `search_snapshot` → retryable | Mirrors M4c versus retrying a deterministic local failure | **new; proposed** |
+| G20 | Writer result | `ReviewOutputWrite(stored, replayed)`, with audit fields from the database | Distinguishes the deliberate replay case versus a slightly larger value | **new; proposed** |
+| G21 | Renderer drift | Report `ReviewRendererDriftError`; never repair, re-store or return Markdown | Integrity over availability | **new; proposed** |
+| G22 | Context-exit privacy normalization | Replace every unclassified ordinary context-exit failure with the fixed internal `ReviewFenceExitError`, retaining nothing of the original; no `ctx.check()` on that path; no semantic classification (the runtime records `unexpected_error`); no public uncertain-finish property added for this | Upholds the no-text privacy rule versus losing the original exception class in the runtime's log | **new (Prompt 216); proposed** |
+| G23 | Shared lifecycle/presence table | One F4 table for `load_review_output`, `load_review_status` and `load_trusted_review_output`; inconsistent combinations are errors, absent output with a non-succeeded job is `ReviewOutputNotFoundError` for the output loaders | Consistent reads versus a strict loader that refuses the deliberate replay state | **new (Prompt 216); proposed** |
+| G24 | Input rebuilding | Rebuild `ActorContext` (exact field types, constructor, equality), the fence's `FencedSession`/`JobSnapshot` (M5e `_fence_parts` pattern plus `JobSnapshot` rebuild) and `ReviewOutput` before any role check or SQL; factory checks only a guarded `callable(getattr(provider, "generate", None))` | Refuses bypass-built inputs versus small per-call validation cost | **new (Prompt 216); proposed** |
+
+[REC] **Proposed paths:**
+
+- **New:** the four modules in M5g-A.
+- **New tests:** `tests/test_review_output_values.py`, `tests/test_review_outputs_postgres.py`,
+  `tests/test_review_handler.py`, `tests/test_review_handler_postgres.py` and
+  `tests/test_review_canary_postgres.py`, plus fixtures under `tests/`.
+- **Changes to existing files:**
+  - `packages/persistence/evidenceguard_persistence/models.py` (additive table metadata);
+  - `tests/test_packaging.py` (G12, registry and import guards);
+  - `.github/workflows/ci.yml` (one additive installed-wheel assertion);
+  - the migration head tests;
+  - `packages/persistence/evidenceguard_persistence/db.py` **only if G15 is accepted**;
+  - documentation (ADR-0025 at implementation).
+- **No change** to M5a–M5f modules, the M3 runtime or `context.py` (unless G16, which is not
+  recommended), `0001`–`0007`, dependencies or resources.
+
+[REC] **Requirement-to-check map:**
+
+| Requirement | Mechanism | Planned tests |
+| --- | --- | --- |
+| Reservation before dispatch; pre-dispatch boundary | C2 | pre-dispatch boundary |
+| One budget, one repair, correct trigger | `plan_stage`, C3 | budgets, repaired retry |
+| Finite loop | C4 | loop bounds |
+| W7 and identity | E, E2, E3, G15, G17, G22 | cancellation, cleanup, process control, body error plus latched control, privacy normalization |
+| Snapshot from loader | B, structure test | snapshot |
+| Report integrity | M5f builder and recheck, writer digests, F3 | atomic output, reload, renderer |
+| Atomic completion | `fenced(finish=True)`, `write_review_output` | atomic output, lifecycle and commit |
+| W15 and output reads | `load_review_status`, F4 shared table | read-API precedence, lifecycle/presence |
+| Canary contract | checker over all surfaces | canary |
+
+**Out of scope:** M5h, production wiring, M6, M7 and overall M5 acceptance. This
+specification was **accepted in Prompt 217 as a specification only**. Its implementation,
+tests, migration `0008`, ADR-0025, implementation acceptance, publication and exact-version CI
+remain pending, and each requires its own authorization.
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.

@@ -1,18 +1,18 @@
 # ADR-0024: Review report content and deterministic Markdown
 
-- **Status:** implementation **accepted at external review in Prompt 211 for a local
-  implementation commit only** ([external review](#external-review-prompt-211)). In Prompt 212
-  all five required jobs passed at `3e58f650` on `feat/review-report-content`
-  ([feature CI evidence](#feature-branch-ci-evidence-at-3e58f650-prompt-212)). The reviewer
-  independently retrieved the job logs and accepted that evidence in Prompt 213, which
-  authorizes gated main publication. M5f is **feature-CI verified but not merged**; main
-  publication has not happened yet. The specification was
+- **Status:** M5f is **reviewed, verified in CI and on main at `e7dd3be3`** (Prompt 213), within
+  its accepted scope ([main publication evidence](#main-publication-and-exact-sha-ci-at-e7dd3be3-prompt-213)).
+  The implementation was accepted at external review in Prompt 211 for a local implementation
+  commit ([external review](#external-review-prompt-211)). In Prompt 212 all five required jobs
+  passed at `3e58f650` on `feat/review-report-content`
+  ([feature CI evidence](#feature-branch-ci-evidence-at-3e58f650-prompt-212)), and the reviewer
+  independently retrieved those logs and accepted the evidence in Prompt 213. The specification was
   accepted at external review in Prompt 208. OpenAI Codex implemented it in Prompt 209. Claude
   Code recovered that staged work read-only after the Codex chat response was lost, and in
   Prompt 210 [corrected the builder's evidence checks](#evidence-binding-correction-prompt-210-claude-code)
   after external review findings.
 - **Specification:** [accepted M5f specification](../plan.md#m5f-report-content-and-renderer-specification-accepted-at-review-prompt-208-implementation-pending),
-  F1–F12 and binding clarifications A/B; [implementation status](../plan.md#m5f-implementation-status-feature-ci-passed-at-3e58f650-prompt-212-not-merged).
+  F1–F12 and binding clarifications A/B; [implementation status](../plan.md#m5f-implementation-status-reviewed-verified-in-ci-and-on-main-at-e7dd3be3).
 - **Preceding evidence:** M5e is reviewed, verified in CI and on main at `14f510e`, within
   [ADR-0023's recorded scope](0023-review-stage-persistence.md). Earlier Claude Code work,
   historical local results and independent external-review observations retain their attribution.
@@ -389,11 +389,141 @@ this is regression evidence for M1–M5e persistence, not M5f database execution
 - Historical local checks: Codex for Prompt 209, and Claude Code for Prompt 210 and the
   Prompt 211–212 documentation and preflight checks.
 
-**Status.** The reviewer accepted this Prompt 212 feature evidence in Prompt 213. M5f is
-**feature-CI verified at `3e58f650` but not merged**. Prompt 213 authorizes gated main
-publication: committing this evidence, verifying it on the feature branch, a fast-forward and
-Mathew's manual main push. Main publication has not happened yet. CI reruns and M5g are not
-authorized. The container smoke does not exercise M5f. All the runtime limits below remain.
+**Status at that point (historical).** The reviewer accepted this Prompt 212 feature evidence
+in Prompt 213. M5f was then feature-CI verified at `3e58f650` but not merged. Prompt 213
+authorized gated main publication: committing this evidence, verifying it on the feature
+branch, a fast-forward and Mathew's manual main push. That publication is recorded in the next
+section.
+
+## Main publication and exact-SHA CI at e7dd3be3 (Prompt 213)
+
+**Evidence commit and its feature CI (Claude Code, public API; conclusions only).** The
+evidence commit `e7dd3be384e36e14cce27c67e902ea9531b39d71`
+(`docs: record verified M5f feature CI evidence`) is a direct child of `3e58f650`. It changes
+only the five evidence documents, so every implementation, test, packaging and workflow blob
+is the accepted one. Mathew pushed it manually to the feature branch, and both push-triggered
+runs for that SHA (branch `feat/review-report-content`, attempt 1) succeeded, with every step of
+all five jobs succeeding:
+
+- [ci run 42171600972](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600972):
+  - [verify (ubuntu-24.04)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600972/job/127740482580): success.
+  - [verify (windows-2025)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600972/job/127740482869): success.
+  - [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600972/job/127740482822): success.
+  - [container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600972/job/127740483377): success.
+- [secret-scan run 42171600682](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600682),
+  [Gitleaks](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600682/job/127740481907): success.
+
+**Main preflight and fast-forward (Claude Code).** All of the following were checked before the
+main push:
+
+- The working tree was clean, and local main equalled origin/main.
+- Remote main was `14f510e2` and the remote feature branch was `e7dd3be3`, with main an
+  ancestor of `e7dd3be3`.
+- The range was exactly `8e0173c1`, `6c1c9e9d`, `3e58f650` and `e7dd3be3`, with a path union of
+  exactly the thirteen reviewed paths.
+- The accepted implementation blobs and modes, and the PostgreSQL test blob `cb13b628…`, were
+  unchanged.
+- The range privacy check passed, and unsuppressed Gitleaks over the four range commits found
+  no leaks.
+
+Local main was then fast-forwarded with `--ff-only` to `e7dd3be3`, with no merge commit.
+Mathew pushed main manually; Claude Code did not push. Afterwards remote main, local main and
+origin/main all equalled `e7dd3be3`.
+
+**Main CI at e7dd3be3 (Claude Code, public API; conclusions only).** Both push-triggered main
+runs for that SHA (branch `main`, attempt 1) succeeded, with every step of all five jobs
+succeeding. Claude Code observed them between 06:12:57Z and 06:18:47Z on 2026-11-06:
+
+| Run / job | Conclusion |
+| --- | --- |
+| [ci run 42172997295](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997295) | success |
+| [verify (ubuntu-24.04, Python 3.12)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997295/job/127744932706) | success |
+| [verify (windows-2025, Python 3.12)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997295/job/127744932723) | success |
+| [integration (ubuntu-24.04, PostgreSQL 17 + pgvector)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997295/job/127744932708) | success |
+| [container (image build and Compose smoke)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997295/job/127744932323) | success |
+| [secret-scan run 42172997198](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997198) / [Gitleaks (full history)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997198/job/127744932064) | success |
+
+**Claude Code's log access (Prompt 213, historical).** The job-log API returned HTTP 403
+without credentials, and authentication was not changed, so Claude Code recorded no
+`e7dd3be3` counts or output lines. That remains an accurate record of its own access. The
+reviewer's independent retrieval below supersedes it as evidence.
+
+<a id="reviewer-retrieved-e7dd3be3-logs-prompt-214"></a>
+
+**Reviewer-retrieved `e7dd3be3` logs (independent; recorded in Prompt 214).** The external
+reviewer independently retrieved the following:
+
+- all four workflow-run records;
+- all ten job conclusions and their steps;
+- all ten complete job logs;
+- the remote refs, with main and `feat/review-report-content` both at
+  `e7dd3be384e36e14cce27c67e902ea9531b39d71`.
+
+All four runs were event `push`, attempt 1, for that exact SHA, and every job and step
+succeeded. Feature and main results are recorded separately below, and neither is reused for
+the other or for `3e58f650`.
+
+Feature branch (`feat/review-report-content`):
+
+- [ci run 42171600972](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600972):
+  - [verify (ubuntu-24.04)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600972/job/127740482580):
+    `4051 passed, 385 skipped in 51.67s`.
+  - [verify (windows-2025)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600972/job/127740482869):
+    `4050 passed, 386 skipped in 110.40s`.
+  - [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600972/job/127740482822):
+    `collected 4436 items / 4051 deselected / 385 selected`, then
+    `385 passed, 4051 deselected in 277.41s`.
+  - [container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600972/job/127740483377):
+    `smoke: ok`, `cleanup: ok`.
+- [secret-scan run 42171600682](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600682),
+  [Gitleaks](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42171600682/job/127740481907):
+  93 commits scanned; no leaks found.
+
+Main (`main`):
+
+- [ci run 42172997295](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997295):
+  - [verify (ubuntu-24.04)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997295/job/127744932706):
+    `4051 passed, 385 skipped in 59.26s`.
+  - [verify (windows-2025)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997295/job/127744932723):
+    `4050 passed, 386 skipped in 100.81s`.
+  - [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997295/job/127744932708):
+    `collected 4436 items / 4051 deselected / 385 selected`, then
+    `385 passed, 4051 deselected in 282.35s`.
+  - [container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997295/job/127744932323):
+    `smoke: ok`, `cleanup: ok`.
+- [secret-scan run 42172997198](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997198),
+  [Gitleaks](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42172997198/job/127744932064):
+  93 commits scanned; no leaks found.
+
+What all four verify logs (feature and main, Ubuntu and Windows) show:
+
+- the line `production registry: ingest_revision, index_revision`;
+- the eleven installed-wheel behaviour lines listed above, including
+  `hash-covered review report built, strictly decoded and rendered offline from the installed wheel`;
+- all 80 M5f module positions passing: report builder 26, report content 49, report renderer 5.
+
+What both PostgreSQL logs show:
+
+- 46 passing review-stage module positions and 28 passing review-creation module positions;
+- no individual test names, so no named-case result is claimed.
+
+Both container logs report the existing ingestion and indexing smoke:
+
+- healthy services, a completed migration and the CI-built image;
+- an accepted upload, successful ingestion and two verified chunks;
+- duplicate-upload reuse;
+- successful offline indexing with two embeddings;
+- a clean idle-worker exit;
+- smoke and cleanup success.
+
+That smoke does not exercise M5f.
+
+**Status.** The reviewer accepted both Prompt 213 exports and this publication evidence in
+Prompt 214. M5f is **reviewed, verified in CI and on main at `e7dd3be3`**, within its accepted
+scope. This is packaging, regression and structural evidence for the pure M5f modules. It is
+not application review-path protection: no application review path uses M5f, and `run_review`
+is unregistered. M5g is specified separately (proposed, not implemented). All the runtime
+limits below remain.
 
 ## Limits and handover
 

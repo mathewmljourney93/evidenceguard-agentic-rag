@@ -49922,3 +49922,1530 @@ Source: Claude Code. This note lists only checks completed before it was written
 **Checks.** Links, anchors and tables passed (561 links, 128 tables, zero problems). UTF-8 without BOM, LF only and no replacement or NUL characters were confirmed. The specification heading, legacy anchor and contract text are identical to `3e58f650`. Ruff format reported 226 files already formatted, and Ruff lint passed.
 
 **Not repeated.** No application tests, builds or wheel checks were rerun.
+
+
+## Prompt 213 resume instructions after the manual pushes (transcribed)
+
+Source: Mathew's two messages to Claude Code reporting the manual pushes. Claude Code transcribed them from the prompt text in its session. They were not compared against independently saved originals.
+
+After the feature push:
+
+The manual feature push succeeded:
+3e58f65..e7dd3be feat/review-report-content -> feat/review-report-content
+
+Resume Prompt 213 at section 6.
+
+Verify remote feature, local HEAD and upstream all equal:
+e7dd3be384e36e14cce27c67e902ea9531b39d71
+
+Verify remote main remains:
+14f510e23e89bd890b2428405de922ef1fcb2232
+
+Do not push again. Monitor this exact SHA’s feature CI within the authorized bound. Only after all five required jobs pass, complete section 7’s main preflight and local fast-forward, then give me the manual main-push command.
+
+Preserve every existing limit. No automated push, CI rerun or M5g work.
+
+After the main push:
+
+The manual main push succeeded. Resume Prompt 213 at section 8.
+
+Verify remote main, local main and origin/main all equal:
+e7dd3be384e36e14cce27c67e902ea9531b39d71
+
+Do not push again. Monitor the separate exact-SHA main CI and secret-scan runs within the authorized 25-minute bound.
+
+Only after all five required jobs pass, stage the main-publication evidence and produce the final handoff and both exports. Keep main results separate from feature results.
+
+No further commit, push, CI rerun, branch deletion or M5g work.
+
+## Prompt 213 main publication evidence note
+
+Source: Claude Code. Claude Code made these observations through the public GitHub API without credentials. It did not run either push.
+
+**Evidence commit feature CI.** The commit is `e7dd3be384e36e14cce27c67e902ea9531b39d71`, parent `3e58f650`, and it changes only the five evidence documents. After Mathew's manual feature push, the remote feature branch, local HEAD and upstream all equalled e7dd3be3, and remote main was 14f510e2. The ci run 42171600972 and secret-scan run 42171600682 (branch feat/review-report-content, push, attempt 1) both succeeded. Jobs 127740482580 (Ubuntu), 127740482869 (Windows), 127740482822 (integration), 127740483377 (container) and 127740481907 (Gitleaks) all succeeded, with every step succeeding.
+
+**Main preflight.** All of the following passed:
+
+- The tree was clean, and local main equalled origin/main.
+- Remote main was 14f510e2 and remote feature e7dd3be3, and main was an ancestor of the target.
+- The range was exactly 8e0173c1, 6c1c9e9d, 3e58f650 and e7dd3be3, and the path union was exactly the thirteen reviewed paths.
+- The accepted blobs were unchanged, and the PostgreSQL test blob was cb13b628.
+- The range privacy check passed, and unsuppressed Gitleaks over the four range commits found no leaks.
+
+`git merge --ff-only` then moved local main to e7dd3be3, with no merge commit.
+
+**Main CI.** After Mathew's manual main push, remote main, local main and origin/main all equalled e7dd3be3. The ci run 42172997295 and secret-scan run 42172997198 (branch main, push, attempt 1) both succeeded. Jobs 127744932706 (Ubuntu), 127744932723 (Windows), 127744932708 (integration), 127744932323 (container) and 127744932064 (Gitleaks) all succeeded, with every step succeeding. Monitoring ran from 06:12:57Z to 06:18:47Z, within the bound.
+
+**Not observed.** The job-log API returned HTTP 403 for both e7dd3be3 feature and main jobs, and authentication was not changed. No counts or output lines are recorded for those runs. The reviewer's 3e58f650 feature log counts are not reused as main results.
+
+**Staged.** README.md, ADR-0024, docs/plan.md, docs/threat-model.md and prompts.md record M5f as reviewed, verified in CI and on main at e7dd3be3, within its accepted scope, with all runtime limits preserved. The implementation-status heading was renamed and its five links were updated. The specification contract is unchanged. The final checks are reported in the Prompt 213 handoff.
+
+
+## Prompt 213 handoff (saved file, byte-copied)
+
+Source: `.local/p213/handoff.md`, the handoff file Claude Code saved in Prompt 213. Its bytes are inserted unchanged between the two marker lines below and were compared byte-for-byte against that file after insertion. Claude Code's Prompt 213 chat reply is not reproduced. Its "logs returned HTTP 403" statements are an accurate historical record of Claude Code's own access; the reviewer later retrieved the logs (Prompt 214). Earlier disclosures still apply: the lost Codex Prompt 209 chat response, the missing original Prompt 209 Gitleaks log, and "verbatim" Prompt 210 entries that were transcribed rather than byte-verified.
+
+-----BEGIN SAVED PROMPT 213 HANDOFF-----
+# Prompt 213 handoff: M5f reviewed, verified in CI and on main at e7dd3be3 (Claude Code)
+
+The main-publication evidence is staged and uncommitted on branch main.
+
+## Refs
+- **Main target:** `e7dd3be384e36e14cce27c67e902ea9531b39d71`
+  (`docs: record verified M5f feature CI evidence`). Its parent is 3e58f650 and its tree is
+  d642fa00.
+- **Remote:** main and feat/review-report-content are both e7dd3be3. Local main and
+  origin/main are e7dd3be3 too, and the current branch is main.
+- **Pushes:** both were made manually by Mathew. Claude Code ran none, and no branch was
+  deleted.
+
+## Evidence commit e7dd3be3 (local)
+- **Scope:** only the five evidence documents changed; all other blobs equal 3e58f650 and the
+  accepted blobs are unchanged.
+- **Content:** the reviewer-retrieved 3e58f650 logs recorded per job in ADR-0024.
+- **Checks:** links, encoding, whitespace, prefix, privacy, Ruff, staged Gitleaks, and
+  full-history Gitleaks after the commit (93 commits, no leaks).
+- **Export 1:** `.local/p213/m5f-feature-evidence-acceptance.diff`, from 29a8bf70 to e7dd3be3,
+  full indexes, prompts.md excluded, byte-identical to Git (rechecked at the end).
+  - Paths: README.md, ADR-0024, docs/plan.md, docs/threat-model.md.
+  - 4 files, 97 insertions, 33 deletions; 14,957 bytes, 201 lines.
+  - SHA-256 26c702d8f801a76866abd586114c3724c2cd249d3e1276de8961f8eeee7df8ce.
+
+## CI (Claude Code, public API, conclusions only; logs returned HTTP 403)
+- **Feature at e7dd3be3:** ci 42171600972 and secret-scan 42171600682 both succeeded. Jobs
+  127740482580, 127740482869, 127740482822, 127740483377 and 127740481907: all success.
+- **Main preflight:** passed. The range was exactly 8e0173c1, 6c1c9e9d, 3e58f650 and e7dd3be3
+  over 13 paths. Privacy passed and range Gitleaks found no leaks in 4 commits.
+  `--ff-only` fast-forward, no merge commit.
+- **Main at e7dd3be3:** ci 42172997295 and secret-scan 42172997198 (branch main, push,
+  attempt 1) both succeeded. All steps succeeded in each job:
+  - verify ubuntu 127744932706: success;
+  - verify windows 127744932723: success;
+  - integration 127744932708: success;
+  - container 127744932323: success;
+  - Gitleaks 127744932064: success.
+- **Not observed:** main and e7dd3be3 feature log counts and output. The 3e58f650 counts
+  belong to the reviewer's retrieval and are not reused.
+
+## Staged main evidence (uncommitted)
+- **Files and tree:** README.md, ADR-0024, docs/plan.md, docs/threat-model.md and prompts.md;
+  staged tree `0f3a593ada9cda21e9e136322ebcdb8348e7c1b2`. Every non-documentation blob equals
+  e7dd3be3.
+- **Heading:** "M5f implementation status (reviewed, verified in CI and on main at e7dd3be3)",
+  with its five links updated. The specification heading, anchor and contract are unchanged.
+- **Checks:**
+  - links and tables: 566 links, 129 tables, zero problems;
+  - encoding: UTF-8, no BOM, LF only;
+  - `git diff --cached --check`;
+  - prefix: identical;
+  - privacy: clean;
+  - Ruff format (226 files) and Ruff lint;
+  - staged Gitleaks: no leaks.
+- **Export 2:** `.local/p213/m5f-main-publication-evidence.diff`, from e7dd3be3 to 0f3a593a,
+  full indexes, prompts.md excluded, byte-identical to cached and tree Git output.
+  - 4 files, 137 insertions, 32 deletions; 20,935 bytes, 271 lines.
+  - SHA-256 9066121cf98d107fb0b27835167ad36a767683234110835ab786b304065c1734.
+
+## Attribution
+- OpenAI Codex: the Prompt 209 implementation.
+- Claude Code: recovery, Prompt 210, documentation, preflights, monitoring and the
+  fast-forward.
+- The reviewer: the 25 isolated checks and the 3e58f650 logs.
+- Prompt-history entries are byte-copied where stated; all others are transcribed.
+
+## Limits
+- **Runtime:** no application review path, and run_review is unregistered. No live provider
+  or model-quality evidence. Provenance is not entailment or authenticity, and rendering is not
+  semantic injection resistance.
+- **CI scope:** the container smoke does not exercise M5f. Offline migrations are not
+  PostgreSQL execution. Recall is arithmetic, Voyage is mocked and model calls are scripted.
+- **No proofs:** no browser/CommonMark-parser check and no tight size or performance proof.
+- **Still open:** E7, U4, the M3 lease window, M4d and M6.
+- **Acceptance:** M5g–M5h and overall M5 acceptance remain pending.
+-----END SAVED PROMPT 213 HANDOFF-----
+
+## Prompt 214 reviewer evidence, acceptance and user request (transcribed)
+
+Source: Mathew's Prompt 214 instruction to Claude Code. It carries the reviewer's acceptance of both Prompt 213 exports and the M5f publication evidence, the reviewer's independently retrieved `e7dd3be3` logs, and the M5g specification request. Claude Code transcribed it from the prompt text in its session. It was not compared against an independently saved original. The log results in it are the reviewer's observations, not Claude Code's.
+
+Prompt 214: record independently verified M5f publication evidence and propose the M5g specification.
+
+Repository:
+D:\Claude\evidenceguard_agentic_rag
+
+Documentation only. Record the reviewer’s evidence and write a complete, reviewable M5g proposal. Do not implement M5g.
+
+1. Recover and checkpoint
+
+Read applicable repository instructions and Prompt 213’s handoff/checkpoints.
+
+Expected current branch: main.
+
+HEAD, local main and stored origin/main:
+e7dd3be384e36e14cce27c67e902ea9531b39d71
+
+Expected staged tree:
+0f3a593ada9cda21e9e136322ebcdb8348e7c1b2
+
+Exactly five documents should be staged:
+- README.md
+- docs/decisions/0024-review-report-content.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Nothing should be unstaged or unexpectedly untracked. Origin and the established noreply identity must be unchanged.
+
+Verify both exports, including byte identity with their recorded Git comparisons:
+
+.local/p213/m5f-feature-evidence-acceptance.diff
+- Baseline: 29a8bf706c75002b2b39712cdc74352c1da5a1b7
+- Destination: e7dd3be384e36e14cce27c67e902ea9531b39d71
+- Four files, +97/-33
+- 14,957 bytes; 201 lines
+- SHA-256:
+  26c702d8f801a76866abd586114c3724c2cd249d3e1276de8961f8eeee7df8ce
+
+.local/p213/m5f-main-publication-evidence.diff
+- Baseline: e7dd3be384e36e14cce27c67e902ea9531b39d71
+- Destination: 0f3a593ada9cda21e9e136322ebcdb8348e7c1b2
+- Four files, +137/-32
+- 20,935 bytes; 271 lines
+- SHA-256:
+  9066121cf98d107fb0b27835167ad36a767683234110835ab786b304065c1734
+
+Both use full indexes and exclude prompts.md.
+
+Save the starting refs, status, staged tree, blob/mode list and prompt-history prefix under .local/p214/.
+
+Create docs/review-orchestration-plan from HEAD, carrying the staged documentation with it, if that branch does not exist. If it exists, inspect it before proceeding; do not overwrite unrelated work.
+
+No remote operation is needed.
+
+2. Record independent M5f evidence
+
+The reviewer accepts both Prompt 213 exports and the M5f publication evidence within its accepted scope.
+
+The reviewer independently retrieved:
+- all four workflow-run records;
+- all ten job conclusions and their steps;
+- all ten complete job logs;
+- remote main and remote feat/review-report-content refs.
+
+Both refs equalled:
+e7dd3be384e36e14cce27c67e902ea9531b39d71
+
+All runs were event push, attempt 1, for that exact SHA. All jobs and every step succeeded.
+
+Feature branch evidence:
+- CI run 42171600972, branch feat/review-report-content:
+  - Ubuntu job 127740482580:
+    4051 passed, 385 skipped in 51.67s.
+  - Windows job 127740482869:
+    4050 passed, 386 skipped in 110.40s.
+  - PostgreSQL job 127740482822:
+    collected 4436 items / 4051 deselected / 385 selected;
+    385 passed, 4051 deselected in 277.41s.
+  - Container job 127740483377:
+    smoke: ok; cleanup: ok.
+- Secret-scan run 42171600682:
+  - Gitleaks job 127740481907:
+    93 commits scanned; no leaks found.
+
+Separate main evidence:
+- CI run 42172997295, branch main:
+  - Ubuntu job 127744932706:
+    4051 passed, 385 skipped in 59.26s.
+  - Windows job 127744932723:
+    4050 passed, 386 skipped in 100.81s.
+  - PostgreSQL job 127744932708:
+    collected 4436 items / 4051 deselected / 385 selected;
+    385 passed, 4051 deselected in 282.35s.
+  - Container job 127744932323:
+    smoke: ok; cleanup: ok.
+- Secret-scan run 42172997198:
+  - Gitleaks job 127744932064:
+    93 commits scanned; no leaks found.
+
+All four verify logs printed:
+production registry: ingest_revision, index_revision
+
+All four printed the eleven installed-wheel behaviour lines already supplied in Prompt 213, including:
+hash-covered review report built, strictly decoded and rendered offline from the installed wheel
+
+All four show the 80 passing M5f module positions:
+- report builder: 26;
+- report content: 49;
+- report renderer: 5.
+
+Both PostgreSQL logs show 46 passing review-stage module positions and 28 passing review-creation module positions. Individual test names are not printed; do not invent named-case evidence.
+
+Both container logs report the existing ingestion/indexing smoke:
+healthy services and migration, CI-built image, accepted upload, successful ingestion, two verified chunks, duplicate-upload reuse, successful offline indexing with two embeddings, clean idle-worker exit, smoke and cleanup success.
+
+Attribute these results to the reviewer. Preserve Claude Code’s earlier HTTP 403 observations as historical access limitations. Do not present these logs as downloads you performed.
+
+Update ADR-0024 in detail, with each job under its own run/job link. Update README, plan and threat model with short linked summaries.
+
+M5f is reviewed, verified in CI and on main at e7dd3be3. Preserve the distinction between packaging/regression evidence and application review-path protection.
+
+3. Read controlling contracts before proposing M5g
+
+Inspect current source, not just historical summaries:
+- M3 worker runtime, handler/context interfaces, heartbeat, cancellation, fencing and completion/error handling;
+- M4d trusted snapshot/retrieval contracts and the extracted evidence-recheck helper;
+- M5a model calls and outcomes;
+- M5b provenance, rejection mapping, documentary findings and reload checks;
+- M5c pinned loaders, planner, assembly and repair factories;
+- M5d review creation, canonical job linkage, trusted reload and worker seams;
+- M5e planner, histories, nine persistence APIs, trusted reload and E7;
+- M5f builder, source-bound recheck, canonical codec and renderer.
+
+Read the accepted M5 sequence, Correction D, W4–W8, W13–W15, report-integrity invariant, M5e-L and M5f-I, including the accepted scripted-canary obligations.
+
+Trace actual callable signatures and transaction ownership. Identify any missing composition seam explicitly rather than assuming it exists.
+
+4. Write the M5g proposal in docs/plan.md
+
+Add a distinct section titled:
+M5g review orchestration and atomic output specification (PROPOSED, Prompt 214; not implemented)
+
+Use stable subsection anchors. Clearly separate:
+- accepted requirements;
+- current-source facts;
+- new recommendations;
+- decisions requiring review.
+
+The proposal must be implementable and settle the following.
+
+A. Placement and public contracts
+
+Propose exact module ownership, imports, public signatures, explicit dependencies and the handler-factory interface.
+
+Keep make_run_review_handler requiring an explicitly supplied provider. No default fake, live provider, settings, endpoint, CLI or production registration.
+
+Specify every new value’s fields, exact types, bounds, defaults, invariants, privacy-safe representation and what its constructor cannot prove.
+
+Persistence/domain must not import agents or worker code. If the existing seams cannot support the composition, propose the smallest explicit change and its review scope.
+
+B. Trusted entry and question processing
+
+Define validation and error precedence for:
+- context/job/payload;
+- tenant, review and canonical job linkage;
+- actor construction/authorization;
+- trusted review and stage reload;
+- pinned artifact loading and configuration matching;
+- deterministic planning and evidence persistence/reuse.
+
+Require exclusive use of the trusted loading/recheck path. Explain precisely which part of the M4d trusted-snapshot limitation implementation could close, and what remains outside that claim. Keep it open now.
+
+Specify snapshot preservation across replacement activation and resume. No silent recapture, template drift or substitution of current active revisions.
+
+C. Stage state machine and dispatch
+
+Give an explicit transition table or equivalent pseudocode using the accepted M5e planner, not a second competing budget algorithm.
+
+Cover:
+- reuse of committed stages;
+- dispatch, in-flight and exhausted plans;
+- every S/U shape and unresolved reason;
+- U4 evidence-too-large, U5 request-too-large and U6 repair-too-large;
+- owner-only Analysis with shared=();
+- unresolved Verification leading to the correct Analysis dependency state;
+- successful Verification preserved after Analysis failure;
+- mandatory documentary findings through M5f.
+
+Reservation commits before dispatch. Provider calls occur outside database transactions.
+
+Before every initial, retry or repair dispatch, rebuild the request from trusted inputs and compare its digest and all required pinned settings. The timeout comparison remains explicit because M5a’s request digest excludes it.
+
+Reconstruct repairs only from stored fixed reasons/positions using the public M5b/M5c factories. Never persist or replay raw model output as a substitute for a committed stage.
+
+D. Budgets and bounded execution
+
+Preserve:
+- at most three reservations per question/stage across all job attempts;
+- at most one repair across attempts;
+- abandoned reservations consume budget;
+- retries reuse the appropriate request;
+- abandoned repair retry follows the accepted planner;
+- job attempts are separate from provider-call reservations;
+- no exactly-once claim.
+
+State finite work/loop bounds and scheduling order. Distinguish per-call timeout, database waits, lease expiry and any proposed overall deadline. Do not invent an accepted end-to-end deadline.
+
+E. Cancellation, lease loss and process control
+
+Specify ctx.check and fence boundaries precisely.
+
+After call_validated returns or raises an ordinary exception, ctx.check must run before classification or persistence. Process-control exceptions propagate as the same object without a later ctx.check replacing them.
+
+Cover interruptions during retrieval, assembly, provenance, rendering, fenced writes and cleanup. Preserve M3’s accepted lease/commit window; do not claim holding a row lock stops expiry.
+
+Define terminal versus retryable failures and precedence for simultaneous failures.
+
+F. Additive output persistence
+
+Propose migration 0008, never edit published migration 0007 or earlier migrations.
+
+Specify the exact output table schema:
+- types, nullability, keys, named constraints and no-cascade foreign keys;
+- tenant/review/canonical-job bindings;
+- wrapper schema, canonical bytes, digest and renderer;
+- Markdown storage or deterministic regeneration policy;
+- bounded columns and byte limits;
+- audit fields and their non-ordering role.
+
+Separate database guarantees from write-time checks, reload checks and trusted-caller obligations.
+
+Before output persistence, trusted inputs and source-bound M5f rechecking are required. Structural decoding alone is insufficient.
+
+Specify bounded strict reload and exact binding/digest/render consistency. No enrichment from later stage rows may alter stored conclusions.
+
+G. Atomic completion, replay and review status
+
+Output persistence and canonical job success must happen in one fenced finish=True transaction using the actual M3 API.
+
+Require both committed stages for every planned question, successful or explicitly unresolved.
+
+Define identical replay, conflicting replay, concurrent completion and stale-fence behaviour. Preserve original audit fields on replay. No overwrite or silent new revision.
+
+Explain how completion/replay interacts with the job’s lifecycle and the fence’s preconditions. Do not describe a replay operation that cannot actually acquire the required fence.
+
+Define W15’s read-time status projection, including failed/dead jobs without output and inconsistent output/job combinations. No compensating write after lease loss.
+
+H. Report-level failure and commit outcomes
+
+Define fixed behaviour for:
+- report finding/byte/render limits;
+- incomplete or inconsistent stages;
+- binding, output and replay conflicts;
+- database failures;
+- definitive versus unknown final COMMIT outcomes.
+
+Do not translate report-level failure into a fake unresolved stage, partial output or job success.
+
+Tie final-commit handling to the actual existing transaction/runtime behaviour. Identify any necessary new seam as a proposed decision. Do not assume retries are safe after an unknown commit.
+
+I. Privacy and trust limits
+
+No raw model output in call records or errors. No document text, quotes, rationale, findings, prompts, requests, credentials or payload bytes in logs/default representations.
+
+Specify fixed errors, causes/contexts, process-control identity and deterministic precedence across public operations.
+
+No claim of entailment, authenticity, semantic injection resistance or live-model quality.
+
+J. Planned verification
+
+Write a concrete test map, not tests, covering:
+- happy-path synthetic end-to-end execution;
+- all stage outcomes and repair/retry budgets;
+- committed-stage reuse without another call;
+- controlled interruption after response/before commit and after stage commit;
+- abandoned repair/reclaim;
+- cancellation and stale fences at meaningful boundaries;
+- replacement activation before run and between attempts;
+- tenant/job/template/request/evidence binding;
+- report overflow and missing mandatory findings;
+- atomic output-plus-success, rollback, races, replay and unknown commit;
+- strict output reload/tampering and status projection;
+- migration up/down, constraint and alembic checks;
+- package/import/no-production-wiring guards;
+- a narrow proposed offline installed-wheel assertion.
+
+Preserve the accepted three-part canary contract:
+1. acceptance fixture with injected authorized document reaching retrieval and assembly, whose scripted outputs pass the checker;
+2. canary-emitting negative control that makes the same checker fail;
+3. labelled limitation probe where a genuine authorized canary quotation is accepted.
+
+Check all specified hashed/rendered/stage/call/log/error surfaces. Do not add a production blacklist or change the accepted corpus to make the fixture pass.
+
+K. Reviewer decisions and scope
+
+Provide numbered reviewer decisions, each with recommendation, tradeoff and explicit status.
+
+List exact proposed implementation paths and any required changes to existing modules. Map requirements to APIs, persistence checks and planned tests.
+
+Keep M5h transport, production wiring, M6 approval/export and overall M5 acceptance separate.
+
+5. Authorized changes and status
+
+Only these five tracked files may change:
+- README.md
+- docs/decisions/0024-review-report-content.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+No implementation, tests, migration, workflow, packaging, dependency or resource edits. No ADR-0025 yet.
+
+M5g must remain proposed, unaccepted, unimplemented and untested. This prompt authorizes its specification only.
+
+Keep all accepted specification headings, anchors and contracts intact. Any proposed departure must be identified for review, not silently applied.
+
+6. History, checks and export
+
+Preserve the prompts.md prefix. Append the available Prompt 213 handoff, this reviewer evidence/decision, Prompt 214 and a completed-check outcome with accurate source labels.
+
+Preserve all lost-output, transcription and missing-log disclosures.
+
+Check:
+- exactly five staged paths against HEAD;
+- every other blob and mode unchanged;
+- no tracked local artifacts;
+- links, anchors, tables;
+- UTF-8 without BOM, LF only, no replacement characters;
+- both whitespace checks;
+- history-prefix/source fidelity;
+- privacy, required formatting/lint and unsuppressed staged Gitleaks.
+
+Do not run application tests, builds, wheel checks, PostgreSQL, Docker, provider calls, remote operations or CI.
+
+Save the cumulative export:
+.local/p214/m5f-main-evidence-and-m5g-spec.diff
+
+Baseline:
+e7dd3be384e36e14cce27c67e902ea9531b39d71
+
+Destination:
+final staged tree
+
+Use full indexes, exclude prompts.md, verify byte identity against fresh Git output, and report paths, statistics, bytes, lines and full SHA-256.
+
+Return the complete handoff and export for external review.
+
+Stop staged and uncommitted. No commit, push, merge, branch deletion or M5g implementation.
+
+## Prompt 214 completed outcome
+
+Source: Claude Code. This note lists only checks completed before it was written. The staged whitespace, prefix and Gitleaks checks on the final content are reported in the Prompt 214 handoff and the `.local/p214/` records.
+
+**Starting state.** Verified: branch main; HEAD, local main and stored origin/main `e7dd3be384e36e14cce27c67e902ea9531b39d71`; staged tree `0f3a593ada9cda21e9e136322ebcdb8348e7c1b2` with exactly the five documents; nothing unstaged or untracked; origin and noreply identity unchanged. Both Prompt 213 exports matched their recorded properties and were byte-identical to fresh Git output. The checkpoint is under `.local/p214/checkpoint/`, with a prompts.md prefix of 2,677,344 bytes, SHA-256 `90489e2a24ad66b2844cc1eb5d239059c37eb40cd31dc877e747ed95877d2ec3`. `docs/review-orchestration-plan` did not exist and was created from HEAD, carrying the staged documents.
+
+**M5f evidence.** ADR-0024 records the reviewer's independently retrieved `e7dd3be3` evidence, with each job under its own run and job link and feature and main kept separate. Claude Code's HTTP 403 statements are kept as historical access limitations. README, plan and threat model have short linked summaries. M5f is recorded as reviewed, verified in CI and on main at `e7dd3be3`, as packaging and regression evidence and not application review-path protection.
+
+**M5g proposal.** The plan has a new section, "M5g review orchestration and atomic output specification (PROPOSED, Prompt 214; not implemented)", with subsections M5g-A0 to M5g-K and decisions G1–G14. Claude Code read the current M3, M4d, M5a–M5f source before writing it. It names six missing composition seams:
+
+1. no worker actor;
+2. no session factory in the job context;
+3. no embedding provider in the accepted factory signature;
+4. no output table, value, writer, reload or status projection;
+5. the job context cannot report an uncertain finish;
+6. the packaging guard allows only one worker module to import agents.
+
+The section is proposed, unaccepted, unimplemented and untested. No ADR-0025 exists.
+
+**Checks completed.** Links, anchors and tables passed (571 links and 138 tables across README, plan, threat model and all ADRs, zero problems). UTF-8 without BOM, LF only and no replacement or NUL characters were confirmed. Every heading in the starting staged tree is kept. The accepted M5a, M5d, M5e and M5f sections are byte-identical to the starting staged tree, and the M5f contract text also to HEAD. Ruff format reported 226 files already formatted, and Ruff lint passed. No application tests, builds, wheel checks, PostgreSQL, Docker, provider calls, remote operations or CI were run.
+
+
+## Prompt 214 handoff (saved file, byte-copied)
+
+Source: `.local/p214/handoff.md`, the handoff file Claude Code saved in Prompt 214. Its bytes are inserted unchanged between the two marker lines below and were compared byte-for-byte against that file after insertion. Claude Code's Prompt 214 chat reply is not reproduced. Earlier disclosures still apply: the lost Codex Prompt 209 chat response, the missing original Prompt 209 Gitleaks log, Claude Code's historical HTTP 403 log access, and "verbatim" Prompt 210 entries that were transcribed rather than byte-verified.
+
+-----BEGIN SAVED PROMPT 214 HANDOFF-----
+# Prompt 214 handoff: M5f evidence recorded and M5g specification proposed (Claude Code)
+
+Documentation only. The five documents are staged and uncommitted on the new branch
+`docs/review-orchestration-plan`, created from HEAD `e7dd3be3`. M5g is proposed only: not
+accepted, not implemented and not tested.
+
+## State
+- **Branch and refs:** branch docs/review-orchestration-plan; HEAD, main and origin/main are
+  `e7dd3be384e36e14cce27c67e902ea9531b39d71`.
+- **Staged tree:** `372cbfe9661fbc253b5f79dff687cfc0f77f8b07`. Exactly five paths are staged:
+  README.md, ADR-0024, docs/plan.md, docs/threat-model.md and prompts.md.
+- **Unchanged:** every other blob and mode equals HEAD. There are no tracked local artifacts
+  and no ADR-0025.
+- **Remote:** no remote operation was performed.
+
+## M5f evidence (the reviewer's)
+- ADR-0024 records all ten `e7dd3be3` job logs that the reviewer retrieved, with each job under
+  its own run and job link and the feature and main runs kept separate.
+- On main: Ubuntu 4051 passed and 385 skipped; Windows 4050 passed and 386 skipped; PostgreSQL
+  385 passed and 4051 deselected; smoke and cleanup ok; Gitleaks with 93 commits and no leaks.
+- All four verify logs show the registry line, the eleven wheel lines and the 80 M5f module
+  positions.
+- Claude Code's HTTP 403 statements are kept as historical access limitations.
+- This is packaging and regression evidence, not review-path protection.
+
+## M5g proposal
+- **Location:** docs/plan.md, section "M5g review orchestration and atomic output specification
+  (PROPOSED, Prompt 214; not implemented)", subsections M5g-A0 to M5g-K, with decisions G1–G14.
+- **Missing seams, named explicitly:**
+  1. no worker actor;
+  2. no session factory in JobContext;
+  3. no embedding provider in the accepted factory signature;
+  4. no output table, value, writer, reload or status projection;
+  5. JobContext cannot report an uncertain finish;
+  6. the packaging guard allows only one worker module to import agents.
+- **Proposed approach:**
+  - `make_run_review_handler(provider, *, session_factory, embedding_providers, clock)`;
+  - a fixed reviewer-role worker actor;
+  - the M5e planner as the sole budget algorithm;
+  - migration 0008 `review_outputs`, with Markdown regenerated rather than stored;
+  - `write_review_output` inside `fenced(finish=True)`;
+  - `load_review_output` and `load_review_status` (W15);
+  - existing JobErrorCodes only;
+  - unknown finish left to the existing runtime.
+- **Not claimed:** the M4d limitation is not closed; the proposal states what implementation
+  could close (the run_review path only) and what remains outside that claim.
+
+## Checks completed
+- Links and tables: 571 links, 138 tables, zero problems.
+- Encoding: UTF-8 without BOM, LF only.
+- Whitespace: `git diff --cached --check` against HEAD and the incremental check against
+  0f3a593a.
+- Accepted sections: every starting heading is kept; the accepted M5a, M5d, M5e and M5f
+  sections are byte-identical to the starting tree, and the M5f contract text also to HEAD.
+- History: prefix identical (2,677,344 bytes). The embedded Prompt 213 handoff is
+  byte-identical to its saved file; Prompt 214 is labelled as transcribed.
+- Privacy: clean.
+- Ruff format (226 files) and Ruff lint.
+- Unsuppressed staged Gitleaks: ~91 KB, no leaks.
+- Not run: application tests, builds, wheel checks, PostgreSQL, Docker, providers, remote
+  operations or CI.
+
+## Export
+`.local/p214/m5f-main-evidence-and-m5g-spec.diff`: from e7dd3be3 to staged tree 372cbfe9,
+full indexes, prompts.md excluded, byte-identical to cached and tree Git output.
+
+- Paths: README.md, ADR-0024, docs/plan.md, docs/threat-model.md.
+- 4 files, 923 insertions, 33 deletions; 74,387 bytes, 1,058 lines.
+- SHA-256 e44b93c482e4488007b4608984cc8d9dc5032a40fa9d0cc60d4736ee3bd77e17.
+-----END SAVED PROMPT 214 HANDOFF-----
+
+## Prompt 215 review disposition and user request (transcribed)
+
+Source: Mathew's Prompt 215 instruction to Claude Code. It carries the reviewer's disposition: the M5f evidence updates accepted, M5g not accepted, supported directions and findings, and the reviewer's isolated cleanup probe. Claude Code transcribed it from the prompt text in its session. It was not compared against an independently saved original. The probe results are the reviewer's, not Claude Code's.
+
+Prompt 215: complete and correct the proposed M5g contracts.
+
+Repository:
+D:\Claude\evidenceguard_agentic_rag
+
+Documentation only. M5g remains proposed, unaccepted, unimplemented and untested. Do not implement anything or create ADR-0025.
+
+1. Recover and verify
+
+Read applicable repository instructions, Prompt 214’s handoff/checkpoint and the full proposed M5g section.
+
+Expected branch:
+docs/review-orchestration-plan
+
+HEAD, local main and stored origin/main:
+e7dd3be384e36e14cce27c67e902ea9531b39d71
+
+Starting staged tree:
+372cbfe9661fbc253b5f79dff687cfc0f77f8b07
+
+Exactly five paths should be staged:
+- README.md
+- docs/decisions/0024-review-report-content.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Nothing should be unstaged or unexpectedly untracked.
+
+Verify .local/p214/m5f-main-evidence-and-m5g-spec.diff:
+- Baseline: e7dd3be384e36e14cce27c67e902ea9531b39d71
+- Destination: 372cbfe9661fbc253b5f79dff687cfc0f77f8b07
+- Full indexes, prompts.md excluded
+- Four files, 923 insertions and 33 deletions
+- 74,387 bytes; 1,058 lines
+- SHA-256:
+  e44b93c482e4488007b4608984cc8d9dc5032a40fa9d0cc60d4736ee3bd77e17
+
+Verify raw-byte identity against Git.
+
+Checkpoint refs, status, staged paths/blobs/modes and the prompts.md prefix under .local/p215/. Preserve unexpected work rather than resetting it.
+
+No remote operation is needed.
+
+2. Record the review disposition
+
+The reviewer accepts the M5f evidence updates within their recorded scope. Preserve the independently retrieved feature/main results and attribution.
+
+M5g is not accepted.
+
+The following directions are supported, subject to review of complete corrected contracts:
+- explicit session-factory and embedding-provider dependencies;
+- a tenant-bound internal worker actor with no claim of human approval;
+- the existing M5e planner as the only budget algorithm;
+- trusted owner values and fenced state reads;
+- sequential question processing;
+- no new overall deadline claim;
+- regenerated Markdown with stored digest/size;
+- an additive review–job foreign key;
+- existing job outcome codes where sufficient;
+- narrowly scoped packaging changes;
+- an internal read-time status projection.
+
+These are supported directions, not acceptance of G1–G14 or the whole specification. G11’s current justification is not accepted.
+
+Add a review-disposition subsection mapping the findings below to their corrections. Keep the existing M5g heading/anchor stable and put Prompt 215’s correction status in its status paragraph.
+
+3. Dispatch and repair contracts
+
+Add an explicit ctx.check() immediately after the reservation transaction has exited successfully and immediately before every call_validated dispatch.
+
+Explain:
+- a cancellation or lease loss observed there prevents the provider call;
+- the already committed reservation remains started and consumes budget;
+- no completion or compensating write follows lost ownership;
+- the check is an explicit boundary, not an atomic guarantee against a later cancellation.
+
+Cover initial, original retry, repair and repaired retry.
+
+Make request reconstruction precise:
+- use PlanDispatch.predecessor, trigger, required_request_sha256 and original_request_sha256 according to the existing planner;
+- a retry must match its required request digest;
+- a repair must differ from the original digest;
+- a repaired retry reconstructs the reason from the original rejection trigger, not from the abandoned repair reservation.
+
+Source clarification: the reviewer inspected _retry. It already sets trigger to the call that caused the repair. Do not report an existing planner defect or propose changing it.
+
+Specify missing, malformed or inconsistent trigger handling and exact purpose/question mapping through the public repair factories.
+
+Describe embedding-provider resolution too: lookup, construction, identity comparison, cancellation boundaries and fixed outcomes for unsupported identity or factory/provider failures.
+
+4. Correct transaction, cleanup and process-control claims
+
+Read the actual published implementations:
+- JobContext.fenced in worker/context.py;
+- transaction in persistence/db.py;
+- runtime._record_outcome and _write_outcome.
+
+Relevant source facts:
+- JobContext exposes finished, but not a public uncertain-finish state.
+- effects_done becomes true only after fence.succeed() returns.
+- Exceptions after that point include commit or transaction cleanup failures.
+- transaction calls rollback on BaseException and close in finally.
+- A rollback or close exception can replace an earlier exception.
+- Runtime outcome handling can refrain from writing after latched lease loss.
+- A retryable outcome can become dead when attempts are exhausted.
+- A failure to record the outcome does not establish that the job was requeued.
+
+Reviewer probe:
+An isolated probe extracted the published JobContext/AttemptState classes and transaction function, with fake sessions and injected cleanup failures.
+- Six clean cases preserved KeyboardInterrupt/SystemExit/GeneratorExit by identity.
+- Twelve rollback/close-failure cases replaced the original object.
+- Both normal and finish fences were exercised.
+This was not a project-suite, SQLAlchemy database or PostgreSQL run, and does not establish a database commit outcome.
+
+Correct M5g-E/H:
+- Remove the unconditional “rollback is certain” claim.
+- Do not equate FinishState.NONE with independently confirmed rollback or successful cleanup.
+- Do not promise unconditional requeue after an uncommitted finish.
+- Distinguish handler-body failure, lifecycle-transition failure, commit uncertainty and cleanup failure.
+- Give explicit pseudocode showing where fixed errors are classified and how exceptions from context-manager exit avoid incorrect translation.
+- Define how the first process-control object is preserved, including subsequent cleanup failures, and the precise boundary of that guarantee.
+- Preserve the rule that no ctx.check may replace process control.
+- Do not expose raw SQL/error text through new public operations.
+
+If the required guarantee needs a new public seam or a change to M3, identify the smallest proposal as a new reviewer decision, with exact affected paths and regression obligations for existing handlers. Do not silently assume unchanged M3 provides it, and do not implement the change.
+
+Retaining the existing runtime’s conservative outcome handling may remain a recommendation, but state all branches and limitations accurately.
+
+5. Replace the loop-bound explanation with a consistent algorithm
+
+The current text says:
+- one state change per iteration;
+- at most seven state changes;
+- eight iterations;
+but evidence persistence adds another change, while the dispatch row combines reservation and completion.
+
+Write precise pseudocode defining:
+- what one iteration does;
+- when state is reread;
+- which branches return versus continue;
+- whether reservation and completion share an iteration;
+- how evidence recording and terminal stage insertion count;
+- the maximum iterations from every valid starting state.
+
+Derive the bound from that algorithm. Do not change the accepted provider-call budget.
+
+Include traces for:
+- evidence recording followed by three failed dispatches and unresolved commit;
+- initial rejection, repair and retry of an abandoned repair;
+- U4, U5 and U6;
+- success and committed-stage reuse.
+
+Correct the PlanInFlight explanation. An exception propagated out of an attempt does not then re-enter its loop. Define the defensive outcome for an already in-flight current-attempt history without claiming this is normal flow after a propagated commit exception.
+
+6. Complete the public value/API contracts
+
+Provide exact signatures and return types for every new public operation, including:
+- write_review_output;
+- load_review_output;
+- load_review_status;
+- load_trusted_review_output;
+- any proposed domain stored-row decoder.
+
+Define the fence protocol without importing worker types into persistence.
+
+Complete the value table for ReviewOutput and StoredReviewOutput:
+- exact types, bounds, constructor fields and derived fields;
+- nested rebuilding and derived-value comparison;
+- timestamp admission and normalization rules;
+- job-attempt audit checks;
+- unknown/missing-field behaviour;
+- privacy-safe representations;
+- what is checked by each constructor versus trusted worker composition.
+
+Define absent-review and absent-output behaviour explicitly. Specify actor type, role, tenant and canonical-job validation, transaction ownership and deterministic error precedence for every read API.
+
+The worker-side render-consistency loader must have a complete signature and fixed error behaviour. State how renderer drift is reported without adding conclusions or changing stored content.
+
+Give every new error an exact fixed code/message, owner module and classification. Complete factory-argument validation and error behaviour as well.
+
+7. Finish the schema and replay contracts
+
+Make migration 0008 fully implementable:
+- list every CHECK constraint’s exact name and expression;
+- define the printable-ASCII rule;
+- include digest-format checks for every digest column, including markdown_sha256;
+- state local and referenced columns for every foreign key;
+- state nullability, defaults and update/delete actions;
+- preserve the additive reviews unique constraint and exact downgrade scope.
+
+Do not alter 0007 or earlier migrations.
+
+Replace “compares every column” on replay with explicit comparison sets:
+- immutable identity/content/render fields that must match;
+- derived values that are recomputed;
+- original audit fields preserved and excluded from incoming-attempt equality.
+
+Define writer return values consistently for first insert and identical replay.
+
+Keep the distinction:
+- successful completion is terminal and cannot ordinarily be fenced again;
+- an existing output with a running job is inconsistent and reachable only outside the normal atomic path;
+- any specified replay of that state is a deliberate recovery/test case, not a normal post-completion handler path.
+
+Align the writer, reload and status projection around that distinction.
+
+8. Update planned tests and decisions
+
+Add specification-only tests for:
+- cancellation/lease loss after reservation commit but before dispatch, with zero provider calls and consumed reservation;
+- repaired retry using the correct original rejection trigger;
+- all derived loop bounds and return paths;
+- body failure plus rollback/close failure;
+- process control combined with cleanup failures;
+- lifecycle-transition, commit and cleanup uncertainty;
+- exhausted attempts and failed runtime outcome recording;
+- every new API’s argument/role/tenant/missing-row/error precedence;
+- constructor bypass/exact types and private representations;
+- every named output constraint;
+- replay with different incoming audit values;
+- renderer metadata mismatch and absent output.
+
+Keep the existing atomicity, snapshot, budgets, privacy and three-part canary test map.
+
+Number new reviewer decisions after G14. Mark supported directions accurately; keep the corrected specification as a whole proposed and unaccepted.
+
+9. Scope, documentation and history
+
+Only these five tracked files may change:
+- README.md
+- docs/decisions/0024-review-report-content.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+ADR-0024’s M5f evidence should remain unchanged unless an actual accuracy correction is needed. Focus the M5g corrections in the plan, with short status summaries elsewhere.
+
+Keep all accepted M5a–M5f contracts and anchors intact. No implementation, tests, migrations, workflows, dependencies or resources may change.
+
+Preserve the prompts.md prefix. Append the available Prompt 214 handoff, this review, Prompt 215 and a completed-check outcome using accurate source labels. Preserve earlier fidelity disclosures; do not invent verbatim records.
+
+10. Checks, export and stop
+
+Run documentation checks only:
+- scope and protected blob/mode identity;
+- links, anchors and tables;
+- UTF-8 without BOM, LF only, no replacement characters;
+- both whitespace checks;
+- history-prefix/source fidelity;
+- privacy;
+- required formatting/lint;
+- unsuppressed staged Gitleaks.
+
+No application tests, probes, builds, wheel checks, PostgreSQL, Docker, provider calls, remote operations or CI are needed in this documentation task.
+
+Save:
+.local/p215/m5g-contract-corrections.diff
+
+Baseline:
+372cbfe9661fbc253b5f79dff687cfc0f77f8b07
+
+Destination:
+final staged tree
+
+Use full indexes, exclude prompts.md, verify byte identity against Git, and report paths, statistics, bytes, lines and full SHA-256.
+
+Return a complete handoff and the correction export for external review.
+
+Stop staged and uncommitted. No commit, push, merge, branch deletion or M5g implementation.
+
+## Prompt 215 completed outcome
+
+Source: Claude Code. This note lists only checks completed before it was written. The staged whitespace, prefix and Gitleaks checks on the final content are reported in the Prompt 215 handoff and the `.local/p215/` records.
+
+**Starting state.** Verified: branch `docs/review-orchestration-plan`; HEAD, local main and stored origin/main `e7dd3be384e36e14cce27c67e902ea9531b39d71`; staged tree `372cbfe9661fbc253b5f79dff687cfc0f77f8b07` with exactly the five documents; nothing unstaged or untracked. The Prompt 214 export matched its recorded properties and was byte-identical to Git. The checkpoint is under `.local/p215/checkpoint/`, with a prompts.md prefix of 2,701,370 bytes, SHA-256 `4106e81032191df73cfc83aa6a61a6b28ff8f85fa5ae81c66713d24edad4a55f`.
+
+**Source read.** Claude Code read `transaction` (`persistence/db.py`), `fenced_transaction` and `Fence` (`persistence/jobs.py`), `JobContext.fenced` and `AttemptState` (`worker/context.py`), `_record_outcome` and `_write_outcome` (`worker/runtime.py`), and the planner's `PlanDispatch`, `_plan_calls` and `_retry`. This confirmed the reviewer's source facts. `_retry` already sets the repaired-retry trigger to the call that caused the repair, so no planner defect is reported. The reviewer's isolated cleanup probe is recorded as the reviewer's evidence only.
+
+**Corrections.** The M5g section keeps its heading, anchor and subsection headings, and is corrected in place:
+
+- **Disposition:** a review-disposition subsection (M5g-R) maps findings R1–R9 to their corrections.
+- **Dispatch and repair (C2, C3):** the pre-dispatch `ctx.check()` boundary for all four dispatch kinds, exact repair reconstruction from the original trigger, and trigger validation.
+- **Embedding resolution (B2).**
+- **Loop algorithm (C4):** one algorithm with derived bounds of 5 for Verification and 4 for Analysis, plus traces, and a corrected `PlanInFlight` explanation.
+- **Fenced writes (E2, H2):** rewritten. The handler distinguishes body, lifecycle-transition, commit and cleanup failures. It translates only an escaping object that is identical to the body's own error. The process-control limit on fenced cleanup is stated. All runtime branches are listed.
+- **Values and APIs (A, F2, F3):** complete values, signatures, read-API precedence, the renderer-drift loader and an error table.
+- **Schema and replay (F, G2, G3):** 17 named checks, the printable-ASCII rule, foreign-key columns and actions, downgrade scope, explicit replay comparison sets and the writer result.
+- **Tests (J):** the planned additions. The Prompt 214 test map and the three-part canary contract are kept.
+- **Decisions (K):** new decisions G15–G21. G15 is the smallest M3 change for process-control identity, at `persistence/db.py`. G16, a public uncertain-finish seam, is not recommended. G11 is revised.
+
+Supported directions are marked as such. The specification as a whole remains proposed and unaccepted. README, plan and threat-model status lines are updated, and ADR-0024 is unchanged.
+
+**Checks completed.** Links, anchors and tables passed (573 links and 147 tables, zero problems). UTF-8 without BOM, LF only and no replacement or NUL characters were confirmed. Every heading in the starting staged tree is kept. The accepted M5a–M5f sections, including M5b and M5c, are byte-identical to the starting tree, as is ADR-0024. Ruff format reported 226 files already formatted, and Ruff lint passed. No application tests, probes, builds, wheel checks, PostgreSQL, Docker, provider calls, remote operations or CI were run.
+
+
+## Prompt 215 handoff (saved file, byte-copied)
+
+Source: `.local/p215/handoff.md`, the handoff file Claude Code saved in Prompt 215. Its bytes are inserted unchanged between the two marker lines below and were compared byte-for-byte against that file after insertion. Claude Code's Prompt 215 chat reply is not reproduced. Earlier disclosures still apply: the lost Codex Prompt 209 chat response, the missing original Prompt 209 Gitleaks log, Claude Code's historical HTTP 403 log access, and "verbatim" Prompt 210 entries that were transcribed rather than byte-verified.
+
+-----BEGIN SAVED PROMPT 215 HANDOFF-----
+# Prompt 215 handoff: M5g contracts corrected (Claude Code)
+
+Documentation only. M5g remains proposed, unaccepted, unimplemented and untested. There is no
+ADR-0025.
+
+## State
+- **Branch and refs:** branch docs/review-orchestration-plan; HEAD, main and origin/main are
+  `e7dd3be384e36e14cce27c67e902ea9531b39d71`.
+- **Staged tree:** `188e135ae7c7ad2508290a0ba9025a61a8ccc25e`. The five documents are staged
+  and uncommitted.
+- **Changed against the starting tree 372cbfe9:** README.md, docs/plan.md, docs/threat-model.md
+  and prompts.md. ADR-0024 is unchanged.
+- **Unchanged:** every other blob and mode equals the starting tree, and every non-doc blob
+  equals HEAD. There are no tracked local artifacts and no remote operation was performed.
+
+## Corrections (all in the existing M5g section; heading, anchor and subsection headings unchanged)
+- **M5g-R:** the disposition. It lists the supported directions (not acceptance) and maps
+  findings R1–R9 to their corrections.
+- **C2:** a `ctx.check()` after the reservation fence exits and before every `call_validated`,
+  for all four dispatch kinds. The committed reservation stays `started`, consumes budget and
+  gets no completion or compensating write. `PlanInFlight` is corrected: it is defensive and
+  retryable, not normal flow.
+- **C3:** exact use of `PlanDispatch` fields. A retry must equal its required digest; a repair
+  must differ from the original. A repaired retry's reason comes from the original trigger;
+  `_retry` is already correct, so no planner change is proposed. Trigger validation and the
+  purpose and question mapping are defined.
+- **B2:** embedding-provider resolution.
+- **C4:** a single loop algorithm with derived bounds (5 for Verification, 4 for Analysis),
+  return versus continue, and traces for every requested case.
+- **E2 and H2:**
+  - The handler distinguishes body, lifecycle-transition, commit and post-commit cleanup
+    failures. No `COMMIT` is issued on the body and lifecycle paths, but rollback and cleanup
+    are not confirmed.
+  - It translates only when the escaping object is identical to the body's own error.
+  - Process control is preserved within M5g code and the reloads, but **not** through
+    `transaction()` cleanup failures, which matches the reviewer's probe.
+  - All runtime branches are stated: `dead` at exhaustion, a failed outcome write leaving
+    expiry and reclaim, and no promised requeue.
+- **A, F2, F3:**
+  - Values: `ReviewOutput`, `StoredReviewOutput`, `ReviewOutputWrite`, `ReviewStatus` and the
+    decoder.
+  - The factory's argument validation.
+  - Exact signatures for `write_review_output(StageFence, ReviewOutput) -> ReviewOutputWrite`,
+    `load_review_output`, `load_review_status` and `load_trusted_review_output`.
+  - The read-API precedence: absent review, absent output, and so on.
+  - Renderer drift is reported only, never repaired.
+  - An error table with codes and messages.
+- **F, G2, G3:**
+  - All 17 named checks, including the printable-ASCII rule and every digest column.
+  - The foreign-key columns, with NO ACTION and no cascade.
+  - The additive `reviews` unique constraint and the exact downgrade.
+  - Replay must-match, recomputed and preserved-audit sets, with
+    `ReviewOutputWrite(replayed=…)`.
+  - The terminal-completion distinction is aligned across the writer, reload and status.
+- **J:** the added tests. The Prompt 214 test map and the three-part canary contract are kept.
+- **K:**
+  - G1–G14 marked (supported direction versus proposed), with G6 and G11 revised.
+  - New G15: the smallest M3 change, in `persistence/db.py` `transaction()`, so that cleanup
+    failures cannot replace process control. Regression obligations are listed.
+  - G16: a public uncertain-finish seam, not recommended.
+  - G17–G21: identity classification, loop bounds, embedding failures, writer result and
+    renderer drift.
+
+## Checks completed (documentation only)
+- Links and tables: 573 links, 147 tables, zero problems.
+- Encoding: UTF-8 without BOM, LF only.
+- Whitespace: `git diff --cached --check` and the incremental check.
+- Accepted sections: every starting heading is kept; the accepted M5a–M5f sections are
+  byte-identical, and so is ADR-0024.
+- History: prefix identical (2,701,370 bytes). The embedded Prompt 214 handoff is
+  byte-identical to its saved file; Prompt 215 is labelled as transcribed.
+- Privacy: clean.
+- Ruff format (226 files) and Ruff lint.
+- Unsuppressed staged Gitleaks: ~141 KB, no leaks.
+- Not run: tests, probes, builds, wheel checks, PostgreSQL, Docker, providers, remote
+  operations or CI.
+
+## Export
+`.local/p215/m5g-contract-corrections.diff`: from 372cbfe9 to 188e135a, full indexes,
+prompts.md excluded, byte-identical to fresh Git output.
+
+- Paths: README.md, docs/plan.md, docs/threat-model.md.
+- 3 files, 923 insertions, 538 deletions; 115,800 bytes, 1,619 lines.
+- SHA-256 969788d81b5d9dfb37216aed606b94571c844edd94001a75385f1af011b93eb6.
+-----END SAVED PROMPT 215 HANDOFF-----
+
+## Prompt 216 review and user request (transcribed)
+
+Source: Mathew's Prompt 216 instruction to Claude Code. It carries the reviewer's evaluation of the Prompt 215 corrections, the remaining findings and the reviewer's isolated source and pseudocode probes. Claude Code transcribed it from the prompt text in its session. It was not compared against an independently saved original. The probe results are the reviewer's, not Claude Code's.
+
+Prompt 216: resolve the remaining M5g failure and output-read contracts.
+
+Repository:
+D:\Claude\evidenceguard_agentic_rag
+
+Documentation only. M5g remains proposed, unaccepted, unimplemented and untested. No implementation, commit or remote operation is authorized.
+
+1. Recover and checkpoint
+
+Read applicable repository instructions and Prompt 215’s handoff/checkpoints.
+
+Expected branch:
+docs/review-orchestration-plan
+
+HEAD, local main and stored origin/main:
+e7dd3be384e36e14cce27c67e902ea9531b39d71
+
+Starting staged tree:
+188e135ae7c7ad2508290a0ba9025a61a8ccc25e
+
+Exactly five documents should be staged:
+- README.md
+- docs/decisions/0024-review-report-content.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Nothing should be unstaged or unexpectedly untracked.
+
+Verify .local/p215/m5g-contract-corrections.diff:
+- Baseline: 372cbfe9661fbc253b5f79dff687cfc0f77f8b07
+- Destination: 188e135ae7c7ad2508290a0ba9025a61a8ccc25e
+- Full indexes, prompts.md excluded
+- Three files, 923 insertions and 538 deletions
+- 115,800 bytes; 1,619 lines
+- SHA-256:
+  969788d81b5d9dfb37216aed606b94571c844edd94001a75385f1af011b93eb6
+
+Verify raw-byte identity against Git. Save refs, status, staged paths/blobs/modes and the prompts.md prefix under .local/p216/.
+
+Preserve unexpected work rather than resetting it.
+
+2. Record this review accurately
+
+The reviewer verified the correction export’s size, line count and SHA-256 and reviewed its contracts against the published source.
+
+The following corrections address the earlier concerns:
+- the post-reservation pre-dispatch check;
+- repaired-retry reconstruction using the planner’s original rejection trigger;
+- the sequential loop algorithm and derived 5/4 iteration bounds;
+- expanded output schema, API and replay descriptions;
+- the explicit recognition that unchanged transaction cleanup can replace process control.
+
+These are supported directions, subject to the complete corrected specification. M5g is not accepted.
+
+The reviewer additionally evaluated:
+- the proposed fenced_write classification flow with published context/transaction code and stand-in fixed errors;
+- the published runtime outcome-write method with a fake transaction that commits, then raises during close.
+
+These were isolated source/pseudocode probes, not project-suite, SQLAlchemy database, PostgreSQL or CI runs.
+
+Keep M5f’s accepted evidence unchanged.
+
+3. Correct cancellation precedence after a fenced body error
+
+The current E2 pseudocode translates an identity-confirmed body error immediately after the context exits. It does not check whether cancellation or lease loss was latched during the body.
+
+In the reviewer’s two variants, normal and finish fences:
+- the body latched cancellation;
+- the body raised a fixed error;
+- cleanup returned normally;
+- the proposed helper raised the permanent classification while cancel_requested remained true.
+
+That contradicts the stated precedence.
+
+Revise E2 pseudocode so:
+- an identity-confirmed ordinary body failure is captured;
+- after the context has exited and outside exception handlers, ctx.check() runs before its job classification is raised;
+- latched cancellation, lease loss or fence closure wins;
+- the new job error remains fresh and has no original cause/context.
+
+Do not run ctx.check() on:
+- a process-control path;
+- an unclassified context-exit failure that may represent an uncertain finish.
+
+Keep the post-reservation pre-dispatch boundary unchanged.
+
+Add planned cases for cancellation and lease loss latched during a failing body, with clean cleanup, in normal and finish fences.
+
+4. Correct claims about failed runtime outcome writes
+
+The current source-facts table and H2 still say that an outcome write raising an ordinary exception leaves the job running until lease expiry.
+
+That is not established. fail_retryable and fail_permanent own transactions. Their COMMIT may succeed and their subsequent close may raise. The runtime then logs job.outcome_failed even though the lifecycle transition committed.
+
+The reviewer’s isolated fake-session probe demonstrated:
+- commit changed the durable stand-in state to queued;
+- close raised;
+- the published _write_outcome logged job.outcome_failed.
+
+Correct all affected tables, prose and planned tests:
+
+- An outcome-write exception does not prove that nothing was recorded.
+- The stored job may still be running, may have become queued/failed/dead, or its outcome may be unknown.
+- A job.outcome_failed log is not proof of rollback.
+- Lease expiry/reclaim applies only if the job remains running.
+- A failed write must not be described as a confirmed requeue or confirmed absence of a transition.
+- Preserve the runtime’s actual lease-loss and attempt-cap branches.
+
+Include body/pre-commit, commit-uncertain and acknowledged-commit/close-failure outcome-write cases. Do not change runtime behaviour merely to simplify the description.
+
+5. Complete G15’s first-process-control policy
+
+Support for a narrow transaction-helper correction is conditional on a complete policy. The current G15 covers only a process-control object from the body followed by an ordinary cleanup failure.
+
+It does not cover:
+- process control first raised by commit;
+- a second process-control object during rollback or close;
+- process control first raised during cleanup while an ordinary error is active;
+- process control during close after an acknowledged commit.
+
+Define one explicit first-process-control rule across:
+- body;
+- commit;
+- rollback;
+- close.
+
+The first BaseException that is not an Exception wins by identity over later ordinary or process-control failures. Do not let a later cleanup interrupt replace it.
+
+State:
+- which cleanup operations are attempted and their maximum call counts;
+- that preserving the first object does not prove rollback, disposal or commit outcome;
+- that no ctx.check, logging or exception-text inspection runs on that path;
+- what remains unchanged for ordinary errors when no process control occurs;
+- how existing JobContext finish-state accounting remains conservative.
+
+Provide precise transaction-helper pseudocode or an equivalent complete decision table. Keep the proposed production change confined to persistence/db.py unless a genuinely necessary additional seam is explicitly proposed for review.
+
+Expand planned regressions for all three control types:
+- body control plus ordinary and control cleanup failures;
+- commit control plus cleanup failures;
+- ordinary body/commit failure followed by cleanup control;
+- acknowledged commit followed by close control;
+- ordinary-error behaviour without process control remaining unchanged;
+- existing transaction/fence/API/worker/M5d/M5e regression obligations.
+
+This is specification work only. Do not edit db.py or write tests.
+
+6. Reconcile privacy with context-exit failures
+
+E2 says raw lifecycle/commit/cleanup exceptions propagate untouched, while I promises that SQL and exception text never reach errors.
+
+Both cannot be unconditional.
+
+Specify a privacy-safe, non-classifying boundary for ordinary context-exit failures:
+- preserve cancellation, lease-loss and fence-control exceptions;
+- preserve process-control identity under the corrected G15 policy;
+- normalize other unclassified exit failures to a fresh fixed internal worker error outside handlers;
+- retain no original exception object, text, SQL, parameters, cause or context;
+- let the runtime treat that fixed error as unexpected_error;
+- leave JobContext’s existing finish/uncertainty flags unchanged.
+
+Distinguish privacy normalization from assigning a permanent or retryable semantic classification. An uncertain exit must not be relabelled as a known body failure.
+
+Update G11/G17 and the error table consistently. A public uncertain-finish property need not be added merely to sanitize an error.
+
+Add planned sentinel tests for commit/cleanup error text and for unchanged runtime uncertainty/outcome behaviour.
+
+7. Align output loading with the lifecycle consistency table
+
+load_review_status rejects:
+- output present with a non-succeeded canonical job;
+- succeeded canonical job without output.
+
+The current load_review_output contract does not explicitly enforce either rule.
+
+Add a shared explicit lifecycle/presence decision table:
+
+- Output present + succeeded:
+  load_review_output continues to strict decode and binding checks.
+- Output present + queued/running/failed/dead:
+  ReviewOutputRecordInconsistentError.
+- Output absent + succeeded:
+  ReviewOutputRecordInconsistentError.
+- Output absent + queued/running/failed/dead:
+  ReviewOutputNotFoundError for load_review_output;
+  the existing status projection for load_review_status.
+
+Preserve missing-review and non-canonical-job precedence. load_trusted_review_output inherits these checks before rendering.
+
+The deliberate writer replay while a job is running remains a separately specified recovery/test case. It does not make that inconsistent state readable as a completed output through the public loaders.
+
+Clarify replay tests:
+ReviewOutput has no incoming created_at/job_attempt arguments. Vary the current fence attempt relative to the stored audit values; do not invent caller fields absent from the API.
+
+Add planned tests for all lifecycle/presence combinations across the output loader, status loader and render-consistency loader.
+
+8. Tighten remaining input-boundary wording
+
+Make the factory protocol check compatible with providers whose provider_id is an instance attribute. Do not require type(provider).provider_id to exist when the accepted protocol does not require a class attribute.
+
+Define guarded access and deferred value validation accurately, without adding provider calls or exposing arbitrary attribute errors.
+
+For the new persistence APIs, specify rebuilding/validation of:
+- nested ActorContext fields before role/SQL work;
+- the fence session/job fields using the established M5e validation pattern;
+- malformed or bypass-built supported input values.
+
+Merely possessing attributes or having the outer class type must not stand in for nested validation. Keep existing deterministic argument/role/tenant precedence and fixed errors.
+
+9. Update decisions and documentation
+
+Update the review-disposition table, E2, F2/F3, H2, I, J and relevant G decisions together.
+
+Keep all directions proposed and the specification as a whole unaccepted. Identify any new policy as a numbered reviewer decision.
+
+Preserve the corrected dispatch, repair, loop, schema, budget, snapshot, canary and M5f handover contracts. Do not broaden M5g to production wiring, M5h or M6.
+
+Only these five tracked paths may change:
+- README.md
+- docs/decisions/0024-review-report-content.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+ADR-0024 should remain unchanged unless an actual evidence correction is necessary. Preserve accepted M5a–M5f contract text, headings and anchors.
+
+Preserve the prompts.md prefix. Append the available Prompt 215 handoff, this review, Prompt 216 and a completed-check outcome with accurate source labels and existing fidelity disclosures.
+
+10. Validate, export and stop
+
+Run documentation checks only:
+- scope and unchanged protected blobs/modes;
+- links, anchors and tables;
+- UTF-8 without BOM, LF only, no replacement characters;
+- both whitespace checks;
+- history-prefix/source fidelity;
+- privacy;
+- required formatting/lint;
+- unsuppressed staged Gitleaks.
+
+No tests, probes, builds, wheel checks, database, Docker, provider, remote or CI operations.
+
+Save:
+.local/p216/m5g-failure-and-output-read-corrections.diff
+
+Baseline:
+188e135ae7c7ad2508290a0ba9025a61a8ccc25e
+
+Destination:
+final staged tree
+
+Use full indexes, exclude prompts.md, verify byte identity against Git, and report paths, statistics, bytes, lines and full SHA-256.
+
+Return the handoff and correction export for external review.
+
+Stop staged and uncommitted. No commit, push, merge, branch deletion or implementation.
+
+## Prompt 216 completed outcome
+
+Source: Claude Code. This note lists only checks completed before it was written. The staged whitespace, prefix and Gitleaks checks on the final content are reported in the Prompt 216 handoff and the `.local/p216/` records.
+
+**Starting state.** Verified: branch `docs/review-orchestration-plan`; HEAD, local main and stored origin/main `e7dd3be384e36e14cce27c67e902ea9531b39d71`; staged tree `188e135ae7c7ad2508290a0ba9025a61a8ccc25e` with exactly the five documents; nothing unstaged or untracked. The Prompt 215 export matched its recorded properties and was byte-identical to Git. The checkpoint is under `.local/p216/checkpoint/`, with a prompts.md prefix of 2,722,687 bytes, SHA-256 `b9d03bfaf5518317770266c002b871a561969d44f2f8f61c01ae7892adfee122`.
+
+**Corrections.** All are in the existing M5g section, whose heading, anchor and subsection headings are unchanged:
+
+- **Status and disposition.** The status paragraph and the disposition gain findings R10–R15 and the reviewer's Prompt 216 probe evidence, attributed to the reviewer.
+- **E2 (R10, R13).** The pseudocode now captures an identity-confirmed body error. It runs `ctx.check()` after the context exits and outside every handler, then raises the fresh classification, so latched control wins. Unclassified ordinary exit failures are normalized to the fixed `ReviewFenceExitError` with no `ctx.check()` and no semantic classification. Control-flow errors and process control propagate as the same objects.
+- **A0 and H2 (R11).** An outcome-write exception, or a `job.outcome_failed` log, now establishes nothing about the stored job. Three cases are covered: failure before COMMIT, commit uncertain, and acknowledged commit followed by a close failure. Lease expiry applies only if the job is still running. The lease-loss and attempt-cap branches are preserved.
+- **E3 (R12).** One first-process-control rule across body, commit, rollback and close, with pseudocode, a decision table, call counts, unchanged ordinary-error selection, conservative finish accounting and regression obligations. It is confined to `persistence/db.py` (G15, completed).
+- **F4 (R14).** One shared lifecycle/presence table for the output, status and render-consistency loaders. The deliberate replay state is not readable as completed.
+- **A and F2 (R15).** The factory check works with a guarded `generate` and never reads `provider_id`. `ActorContext`, `FencedSession`/`JobSnapshot` and `ReviewOutput` are rebuilt before any role check or SQL.
+- **I, J and K.** The privacy rule, the planned tests (including replay by varying the fence attempt) and the error table are updated. G11, G15 and G17 are revised, and G22–G24 are new.
+
+Everything remains proposed. README, plan and threat-model status lines are updated, and ADR-0024 is unchanged.
+
+**Checks completed.** Links, anchors and tables passed (573 links and 149 tables, zero problems). UTF-8 without BOM, LF only and no replacement or NUL characters were confirmed. Every heading in the starting staged tree is kept, and all explicit anchors are kept, with two new anchors added. The accepted M5a–M5f sections are byte-identical to the starting tree, as is ADR-0024. Ruff format reported 226 files already formatted, and Ruff lint passed. No tests, probes, builds, wheel checks, database, Docker, provider, remote or CI operations were run.
+
+
+## Prompt 216 handoff (saved file, byte-copied)
+
+Source: `.local/p216/handoff.md`, the handoff file Claude Code saved in Prompt 216. Its bytes are inserted unchanged between the two marker lines below and were compared byte-for-byte against that file after insertion. Claude Code's Prompt 216 chat reply is not reproduced. Earlier disclosures still apply: the lost Codex Prompt 209 chat response, the missing original Prompt 209 Gitleaks log, Claude Code's historical HTTP 403 log access, and "verbatim" Prompt 210 entries that were transcribed rather than byte-verified.
+
+-----BEGIN SAVED PROMPT 216 HANDOFF-----
+# Prompt 216 handoff: M5g failure and output-read contracts corrected (Claude Code)
+
+Documentation only. M5g remains proposed, unaccepted, unimplemented and untested.
+
+## State
+- **Branch and refs:** branch docs/review-orchestration-plan; HEAD, main and origin/main are
+  `e7dd3be384e36e14cce27c67e902ea9531b39d71`.
+- **Staged tree:** `6392fa7e5da392e3b8b81fd052c0124f8e8e8410`. The five documents are staged
+  and uncommitted.
+- **Changed against the starting tree 188e135a:** README.md, docs/plan.md, docs/threat-model.md
+  and prompts.md. ADR-0024 is unchanged.
+- **Unchanged:** every non-doc blob equals HEAD. There are no tracked local artifacts and no
+  remote operation was performed.
+
+## Corrections (existing M5g section; heading, anchor and subsection headings unchanged)
+- **R10 (E2):** an identity-confirmed body error is captured as a class. After the context
+  exits and outside every handler, `ctx.check()` runs, then the fresh classification is
+  raised, so latched cancellation, lease loss or fence closure wins. There is no `ctx.check()`
+  on process-control or unclassified exit paths. The C2 pre-dispatch boundary is unchanged.
+- **R11 (A0, H2):** an outcome-write exception, or a `job.outcome_failed` log, establishes
+  nothing about the stored job.
+  - Three cases are distinguished: failure before COMMIT, commit uncertain, and acknowledged
+    commit followed by a close failure.
+  - The job may still be running, may be queued, failed or dead, or may be unknown. Lease
+    expiry applies only if it is still running.
+  - The lease-loss and attempt-cap branches are preserved.
+- **R12 (E3, G15 completed):**
+  - **Rule:** one first-process-control rule across body, commit, rollback and close, with
+    pseudocode and a decision table.
+  - **Call counts:** commit ≤ 1, rollback ≤ 1, close = 1.
+  - **Ordinary errors:** without process control the same object is selected as today; only
+    implicit `__context__` may differ.
+  - **Finish accounting:** stays conservative. Nothing about rollback, disposal or commit is
+    proved.
+  - **Scope:** confined to `persistence/db.py`, with regression obligations listed.
+- **R13 (E2, I, G22):** unclassified ordinary context-exit failures are normalized to the
+  fixed `ReviewFenceExitError`. It retains no object, text, cause or context, involves no
+  `ctx.check()` and assigns no semantic classification; the runtime records `unexpected_error`.
+  The JobContext flags are unchanged.
+- **R14 (F4, G23):** one lifecycle/presence table for `load_review_output`,
+  `load_review_status` and `load_trusted_review_output`. The deliberate replay state is not
+  readable as completed.
+- **R15 (A, F2, G24):** the factory makes a guarded `callable(getattr(provider, "generate",
+  None))` check and never reads `provider_id`. `ActorContext`, `FencedSession`/`JobSnapshot`
+  and `ReviewOutput` are rebuilt before any role check or SQL.
+- **Tests (J):** cases added for every finding. Replay tests vary the fence attempt; there are
+  no invented caller fields.
+- **Decisions:** G11, G15 and G17 are revised; G22–G24 are new. All are proposed.
+
+## Checks completed (documentation only)
+- Links and tables: 573 links, 149 tables, zero problems.
+- Encoding: UTF-8 without BOM, LF only.
+- Whitespace: `git diff --cached --check` and the incremental check.
+- Accepted sections: all starting headings and anchors are kept (two anchors added: M5g-E3 and
+  M5g-F4). The accepted M5a–M5f sections are byte-identical, and so is ADR-0024.
+- History: prefix identical (2,722,687 bytes). The embedded Prompt 215 handoff is
+  byte-identical to its saved file; Prompt 216 is labelled as transcribed.
+- Privacy: clean.
+- Ruff format (226 files) and Ruff lint.
+- Unsuppressed staged Gitleaks: ~182 KB, no leaks.
+- Not run: tests, probes, builds, wheel checks, database, Docker, providers, remote operations
+  or CI.
+
+## Export
+`.local/p216/m5g-failure-and-output-read-corrections.diff`: from 188e135a to 6392fa7e, full
+indexes, prompts.md excluded, byte-identical to fresh Git output.
+
+- Paths: README.md, docs/plan.md, docs/threat-model.md.
+- 3 files, 305 insertions, 85 deletions; 56,736 bytes, 620 lines.
+- SHA-256 b31fb08dc9e924da1c56156a4b47e43802558f333926fe4695232ae42dc3ff60.
+-----END SAVED PROMPT 216 HANDOFF-----
+
+## Prompt 217 review decision, binding clarifications and user request (transcribed)
+
+Source: Mathew's Prompt 217 instruction to Claude Code. It carries the external reviewer's acceptance of the M5g specification, the two binding clarifications and the reviewer's isolated probe evidence. Claude Code transcribed it from the prompt text in its session. It was not compared against an independently saved original. The probe results are the reviewer's, not Claude Code's.
+
+Written for: Mathew and Claude Code.
+
+## Prompt 217 — Record M5g specification acceptance and commit locally
+
+Record the external reviewer’s acceptance of the corrected M5g specification. This is documentation only. Do not implement M5g, create migration 0008 or ADR-0025, fetch, push, merge, run CI, change authentication, or start M5h.
+
+### 1. Recover and verify
+
+Read the applicable repository instructions.
+
+Expected state:
+- Branch: docs/review-orchestration-plan.
+- HEAD, local main and stored origin/main:
+  e7dd3be384e36e14cce27c67e902ea9531b39d71.
+- Staged tree:
+  6392fa7e5da392e3b8b81fd052c0124f8e8e8410.
+- Exactly five staged paths:
+  README.md
+  docs/decisions/0024-review-report-content.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Nothing unstaged or unexpectedly untracked.
+
+Verify .local/p216/m5g-failure-and-output-read-corrections.diff:
+- Baseline tree:
+  188e135ae7c7ad2508290a0ba9025a61a8ccc25e.
+- Destination tree:
+  6392fa7e5da392e3b8b81fd052c0124f8e8e8410.
+- Full indexes, prompts.md excluded.
+- 3 files, 305 insertions, 85 deletions.
+- 56,736 bytes; 620 lines.
+- SHA-256:
+  b31fb08dc9e924da1c56156a4b47e43802558f333926fe4695232ae42dc3ff60.
+
+Compare its bytes with fresh Git output. Preserve all existing work. Save refs, status, staged tree, paths, blob/mode listing and the prompts.md prefix with its checksum under .local/p217/.
+
+If the substantive state differs, report the discrepancy before modifying it.
+
+### 2. External review decision
+
+The reviewer accepts the M5g specification as proposed in Prompt 214 and corrected in Prompts 215–216, subject to the two binding clarifications below.
+
+Record:
+- G1–G15 and G17–G24 are accepted.
+- G16 is resolved: do not add the proposed public uncertain-finish property. Keep it documented as an alternative considered and not selected.
+- No M5g design decision remains open.
+- G15 authorizes the specified minimal transaction-helper change in persistence/db.py during the future implementation, with all listed regression obligations.
+- This is specification acceptance only. It does not accept an implementation, establish runtime protection, close M4d, satisfy E7 in code, or grant publication authorization.
+
+Reviewer evidence:
+- Independently verified the Prompt 216 export’s size, line count and SHA-256.
+- Reviewed the correction diff against the previously reviewed M5g contracts.
+- Ran isolated transaction-pseudocode probes over 625 phase combinations. All passed first-process-control identity and cleanup-call-count checks.
+- Within those, 16 ordinary-only combinations preserved the selected exception object and call sequence of the published transaction helper.
+- Ran six isolated fenced-helper cases using the published context code and fake sessions: normal and finish fences covering fixed-body classification, latched cancellation, and context-exit privacy normalization. All passed, including fresh-error cause/context checks.
+- These were isolated source/pseudocode probes, not project-suite, installed-wheel, SQLAlchemy database, PostgreSQL or CI runs.
+
+Do not attribute these probes to Claude Code or imply they tested an M5g implementation.
+
+### 3. Binding clarifications
+
+A. Outcome-write state lists must include succeeded.
+
+The general discussion covers complete, fail_retryable and fail_permanent. A complete transaction can commit succeeded before close raises.
+
+Therefore update the general A0/H2 wording to say that an outcome-write exception or job.outcome_failed log alone does not establish the durable state: it may remain running, may already have transitioned to succeeded, queued, failed or dead, or may be unknown.
+
+Keep operation-specific distinctions accurate. This does not change the runtime, add retries or imply that fail_retryable itself can produce succeeded.
+
+B. Cleanup call counts assume session construction returned.
+
+In E3, state explicitly:
+- If session_factory() returns a session, close is attempted exactly once, commit at most once and rollback at most once, as specified.
+- If session_factory() raises before returning a session, no commit, rollback or close is attempted.
+- A process-control exception from session construction propagates unchanged.
+- No cleanup, database outcome or connection-disposal claim follows from a failed session construction.
+
+Add these cases to the planned implementation tests. Preserve the existing first-process-control policy and ordinary-error selection policy.
+
+### 4. Documentation changes
+
+Authorize changes only to the five documentation/history paths listed above.
+
+In docs/plan.md:
+- Rename the M5g specification heading to identify acceptance at review in Prompt 217, with implementation pending.
+- Update every link to the renamed heading.
+- Add an M5g acceptance subsection recording scope, the review evidence, both binding clarifications and the decision resolution.
+- Mark previous proposed, supported and open states as historical.
+- Keep the actual contracts, tables, schema, algorithms, obligations and limitations intact except for the two clarifications.
+- State that implementation, tests, migration 0008, ADR-0025, implementation acceptance, publication and exact-version CI remain pending.
+
+In README and threat model:
+- Add concise, linked and consistent status statements.
+- State that no M5g control operates and no application review path has been added.
+- Keep run_review unregistered and all existing runtime and evidence limitations.
+
+Leave ADR-0024 unchanged unless a specific accuracy correction is necessary; explain any such correction.
+
+Preserve every accepted M5a–M5f contract and its anchors. Preserve the M5f publication evidence and attribution.
+
+### 5. Prompt history
+
+Preserve the existing prompts.md bytes as an identical prefix.
+
+Append:
+- The Prompt 216 handoff, copied from its saved handoff file.
+- This review decision and both clarifications.
+- Prompt 217.
+- A pre-commit outcome note listing only completed checks.
+
+Use “byte-copied” or “verbatim” only where an actual source comparison is possible. Otherwise label the entry transcribed. Do not reconstruct unavailable chat text or remove existing fidelity disclosures.
+
+### 6. Checks and local commit
+
+Run documentation-appropriate checks:
+- Exact path scope and protected blob/mode identity.
+- Links, anchors and tables.
+- UTF-8 without BOM, LF only, no replacement characters.
+- Working and staged whitespace checks.
+- Prompt-prefix and available-source fidelity.
+- Privacy scan.
+- Locked offline Ruff formatting and lint.
+- Unsuppressed staged Gitleaks.
+
+Do not run application tests, probes, builds, wheel checks, PostgreSQL, Docker, providers or CI for this documentation-only change.
+
+Commit locally using the established noreply identity and repository attribution rules. Write the message from a file.
+
+Subject:
+docs: record accepted M5g orchestration specification
+
+Do not amend or rewrite history. Do not push or merge. Verify the commit’s parent, tree, changed paths, protected blobs/modes and clean working tree. Run the established full-history Gitleaks check.
+
+### 7. Export and handoff
+
+Create:
+.local/p217/m5g-spec-acceptance.diff
+
+Baseline:
+6392fa7e5da392e3b8b81fd052c0124f8e8e8410.
+
+Destination:
+the new local commit.
+
+Use full indexes and exclude prompts.md. Verify byte identity against fresh Git output and report paths, statistics, bytes, lines and SHA-256.
+
+Save .local/p217/handoff.md with:
+- Recovery results.
+- Acceptance and clarification changes.
+- Actual checks and their scope.
+- Commit SHA, parent and tree.
+- Protected blob/mode identity.
+- Export details.
+- Final refs and clean state.
+- Remaining implementation, verification and runtime obligations.
+
+Stop after the local commit and export. No implementation or publication is authorized.
+
+Mathew: return the complete handoff plus
+.local/p217/m5g-spec-acceptance.diff
+to the external reviewer.
+
+## Prompt 217 pre-commit note
+
+Source: Claude Code. This note lists only checks completed before it was written. The staged whitespace, prefix and Gitleaks checks on the final content, the commit verification and the full-history scan are reported in the Prompt 217 handoff and the `.local/p217/` records.
+
+**Recovery.** Verified: branch `docs/review-orchestration-plan`; HEAD, local main and stored origin/main `e7dd3be384e36e14cce27c67e902ea9531b39d71`; staged tree `6392fa7e5da392e3b8b81fd052c0124f8e8e8410` with exactly the five paths; nothing unstaged or untracked; noreply identity unchanged. The Prompt 216 export matched its recorded properties and was byte-identical to fresh Git output. The checkpoint is under `.local/p217/checkpoint/`, with a prompts.md prefix of 2,744,040 bytes, SHA-256 `ad2da3a8f3a5a0abc6e3b7ac10a40a93d9e5f01b1132690875a893010262e3c8`.
+
+**Documentation.**
+
+- **Plan heading.** The M5g heading now reads "(ACCEPTED at review, Prompt 217; implementation pending)", with a stable `m5g-review-orchestration-and-atomic-output-specification` anchor added. All three links to the old anchor were updated.
+- **Acceptance subsection.** It records the scope, the reviewer's probe evidence (attributed to the reviewer), the decision resolution and both binding clarifications.
+- **Historical states.** Earlier proposed, supported and not-accepted states are marked historical.
+- **Clarification A.** The outcome-write state lists in A0 and H2 now include `succeeded`, with the operation-specific outcomes kept distinct.
+- **Clarification B.** E3's session-construction rule is added, with planned tests.
+- **Other files.** README and threat-model status lines are updated. ADR-0024 is unchanged; no accuracy correction was needed.
+
+**Checks completed.** Links, anchors and tables passed (577 links and 149 tables, zero problems). UTF-8 without BOM, LF only and no replacement or NUL characters were confirmed. The only plan heading change is the intended M5g rename. All explicit anchors are kept. The accepted M5a–M5f sections are byte-identical to the starting tree; the M5f implementation-status section differs only by the inserted M5g anchor line that follows it. ADR-0024 is byte-identical. Ruff format reported 226 files already formatted, and Ruff lint passed. No application tests, probes, builds, wheel checks, PostgreSQL, Docker, providers or CI were run.
