@@ -1,16 +1,24 @@
 # ADR-0025: Review orchestration and atomic output
 
-- **Status:** M5g is **accepted at external review for a local commit only (Prompt 220)**
-  ([external review](#external-review-prompt-220)). PostgreSQL execution, exact-commit CI,
-  publication, merge and overall M5 acceptance are pending. Claude Code implemented it in
-  Prompt 218 and corrected its tests in Prompt 219. Until Prompt 221 no PostgreSQL test had
-  run for it. In feature CI at `f0d4ce92` the PostgreSQL job ran with one failure, an invalid
-  cross-question test comparison corrected in Prompt 222 and accepted for a corrective commit
-  in Prompt 223 ([review](#external-review-of-the-test-correction-prompt-223)); it has not yet
-  run against PostgreSQL
-  ([feature CI and correction](#feature-ci-at-f0d4ce92-and-the-abandoned-reservation-test-correction-prompts-221222)). Main publication is blocked until CI
-  passes on the corrected version. Statements below that M5g is staged, unaccepted or pending review describe the state at
-  the time and are historical.
+- **Status:** M5g is **feature-CI verified at `3d41f435`, not merged**
+  ([evidence](#feature-ci-at-3d41f435-prompt-223)), and main publication is not authorized.
+  The sequence was:
+  - **Prompt 218:** implemented by Claude Code.
+  - **Prompt 219:** tests corrected.
+  - **Prompt 220:** accepted at external review for a local commit only
+    ([external review](#external-review-prompt-220)). Until Prompt 221 no PostgreSQL test had
+    run for it.
+  - **Prompt 221:** feature CI at `f0d4ce92` failed one PostgreSQL test, an invalid
+    cross-question test comparison
+    ([f0d4ce92 evidence and correction](#feature-ci-at-f0d4ce92-and-the-abandoned-reservation-test-correction-prompts-221222)).
+  - **Prompt 222:** that test corrected.
+  - **Prompt 223:** the correction accepted for a corrective commit
+    ([review](#external-review-of-the-test-correction-prompt-223)); feature CI for `3d41f435`
+    then passed all five required jobs. Claude Code saw conclusions only; the reviewer later
+    retrieved the logs and accepted the evidence in Prompt 224 ([reviewer logs](#reviewer-retrieved-3d41f435-logs-and-acceptance-prompt-224)).
+
+  Merge, M5h, M6 and overall M5 acceptance are pending. Statements below that M5g is staged,
+  unaccepted, unexecuted or blocked describe the state at the time and are historical.
 - **Specification:** [accepted M5g specification](../plan.md#m5g-review-orchestration-and-atomic-output-specification-accepted-at-review-prompt-217-implementation-pending),
   G1–G15 and G17–G24 with binding clarifications A and B
   ([acceptance](../plan.md#m5g-acceptance-prompt-217)); G16 not selected.
@@ -443,3 +451,104 @@ PostgreSQL or in CI. That verification is still pending for the corrective commi
 - **Verification:** corrected-version PostgreSQL and CI verification are pending, and main
   publication stays blocked until that gate passes.
 - **Not claimed:** M4d and E7 are not closed.
+
+## Feature CI at `3d41f435` (Prompt 223)
+
+**Publication.** Claude Code committed the corrective commit `3d41f435aa5cb65128751e7bee9c9ba163ae1626` (parent `f0d4ce92`, test
+blob `837136d61e1ec815a1fa2324ff596e83dc55d591` unchanged from the accepted correction). Mathew
+pushed it manually to `feat/review-orchestration` as a fast-forward, `f0d4ce9..3d41f43`. Main was
+unchanged at `e7dd3be3`.
+
+**Exact-SHA CI.** These are Claude Code's observations through the anonymous public API: run, job
+and step conclusions only. All runs are for push event, attempt 1, branch
+`feat/review-orchestration` and SHA `3d41f435`. Monitoring started at 2026-11-06T11:28:15Z and
+both runs completed by 11:35:17Z.
+
+- [ci run 42210425265](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42210425265): **success**.
+  - [verify (ubuntu-24.04, Python 3.12)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42210425265/job/127867418645): success. Reviewer's log:
+    `4999 passed, 439 skipped in 77.31s`.
+  - [verify (windows-2025, Python 3.12)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42210425265/job/127867418511): success. Reviewer's log:
+    `4998 passed, 440 skipped in 164.74s`.
+  - Both verify logs (reviewer's) printed `production registry: ingest_revision,
+    index_revision` and all twelve installed-wheel result lines, including "review
+    orchestration imported and migration 0008 rendered offline from the installed wheel".
+  - [integration (ubuntu-24.04, PostgreSQL 17 + pgvector)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42210425265/job/127867418142): success. Every
+    step succeeded, including step 7, "Run integration tests" (`EG_REQUIRE_INTEGRATION: "1"`,
+    `uv run --locked pytest -m integration`). Reviewer's log: `439 passed, 4999 deselected in
+    394.31s`, including `test_review_handler_postgres.py` 7 passing positions,
+    `test_review_outputs_postgres.py` 44 and `test_review_canary_postgres.py` 3.
+  - [container (ubuntu-24.04, image build and Compose smoke)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42210425265/job/127867418591): success.
+    Reviewer's log: the smoke and cleanup succeeded (ingestion and indexing only).
+- [secret-scan run 42210425244](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42210425244): **success**.
+  - [Gitleaks (full history)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42210425244/job/127867418251): success. Reviewer's log: 97 commits
+    scanned, no leaks.
+
+**Access limitation (Claude Code's, historical).** Claude Code's anonymous job-log downloads
+returned HTTP 403 ("Must have admin rights to Repository"), and no authentication was
+changed. Claude Code itself therefore observed **none** of the following for `3d41f435`
+(the reviewer's log figures above were added in Prompt 224):
+
+- test, skip or deselection counts;
+- the corrected test's individual result or any per-module M5g result;
+- migration or `alembic check` output;
+- installed-wheel lines, container output or Gitleaks output.
+
+The `f0d4ce92` counts (reviewer-retrieved, above) are **not** results for this commit.
+
+**What the job conclusions show.** The required PostgreSQL integration job's test step concluded
+successfully on this exact commit, so this is the first green exact-commit PostgreSQL run for
+M5g. On its own the step-level conclusion supported nothing more specific; the reviewer's
+logs ([Prompt 224](#reviewer-retrieved-3d41f435-logs-and-acceptance-prompt-224)) add the counts.
+
+**Status.**
+
+- **Feature CI:** M5g is **feature-CI verified at `3d41f435`, not merged**. At Prompt 223 main
+  publication was not authorized; Prompt 224 authorizes it subject to new gates
+  ([acceptance and authorization](#reviewer-retrieved-3d41f435-logs-and-acceptance-prompt-224)).
+- **Not authorized:** a production review registration or live provider.
+- **Not claimed:** model quality or injection resistance; the container smoke covers ingestion
+  and indexing only. M4d and E7 are not declared closed, and M5h, M6 and overall M5 acceptance
+  remain pending.
+- **Historical:** the failed `f0d4ce92` gate and its reviewer-retrieved evidence remain separate.
+
+## Reviewer-retrieved `3d41f435` logs and acceptance (Prompt 224)
+
+**Evidence (the external reviewer's observations, from logs the reviewer retrieved; separate from
+Claude Code's anonymous API observations above).** All are for SHA
+`3d41f435aa5cb65128751e7bee9c9ba163ae1626`, branch `feat/review-orchestration`, the push event,
+attempt 1. The per-job figures are recorded under each job link in the
+[Prompt 223 section](#feature-ci-at-3d41f435-prompt-223):
+
+- **verify:** Ubuntu `4999 passed, 439 skipped`, Windows `4998 passed, 440 skipped`.
+- **PostgreSQL:** `439 passed, 4999 deselected`. All 439 selected integration tests passed,
+  including the 54 M5g PostgreSQL positions (7, 44 and 3).
+- **Container:** the smoke and cleanup succeeded.
+- **Gitleaks:** 97 commits scanned, no leaks.
+
+**Limits of this evidence.**
+
+- **Not named individually:** the log prints module positions, not test names, so the corrected
+  `test_a_reservation_abandoned_before_dispatch_is_retried_on_the_next_attempt` result is not
+  separately named. It is within the seven passing `test_review_handler_postgres.py` positions.
+- **No separate migration output:** no separately printed migration or `alembic check` output
+  line is recorded. The migration tests are among the passing positions.
+- **What the passing jobs do not cover:**
+  - the container smoke covers ingestion and indexing, not review orchestration;
+  - the wheel's Recall line is arithmetic and its Voyage line mocked, and the offline SQL
+    rendering is offline only;
+  - no live-model quality, entailment, authenticity or injection-resistance claim follows.
+
+**Acceptance (Prompt 224).** The external reviewer accepted the Prompt 223 evidence
+documentation and independently confirmed the corrective feature gate at `3d41f435`.
+
+**Publication authorization (subject to gates).** Mathew authorized the following, in order:
+
+1. a local evidence commit, manually pushed with its own exact-commit feature CI;
+2. only after that gate passes, a main preflight and an `--ff-only` fast-forward;
+3. a manual main push with separate exact-commit main CI.
+
+This section records the authorization; it does **not** record that any of those steps
+happened.
+
+**Unchanged.** There is no production `run_review` registration or live provider. M4d and E7
+closure and overall M5 acceptance remain pending. The failed `f0d4ce92` gate stays historical.

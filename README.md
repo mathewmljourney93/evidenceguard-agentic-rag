@@ -185,12 +185,21 @@ That was specification acceptance only. The implementation followed in three ste
   corrections, for a local commit only, and it was **committed locally** on
   `feat/review-orchestration` ([external review](docs/decisions/0025-review-orchestration.md#external-review-prompt-220)).
 
-**Feature CI at `f0d4ce92` failed** (Prompt 221). The PostgreSQL job ran for the first time
-with one failure, an invalid cross-question test comparison that Prompt 222 corrects (test
-only). Prompt 223 accepted that correction for a corrective commit and feature publication;
-corrected-version PostgreSQL and CI verification are pending. The other four required jobs passed for that commit only; logs were
-retrieved by the external reviewer ([evidence](docs/decisions/0025-review-orchestration.md#feature-ci-at-f0d4ce92-and-the-abandoned-reservation-test-correction-prompts-221222)). Feature CI is **not verified** and main publication is blocked until CI
-passes on the corrected version, so M5g's database behaviour is not verified. No application review path exists, no live provider is configured, and `run_review`
+**Feature CI at `f0d4ce92` failed** (Prompt 221, historical). The PostgreSQL job ran for the
+first time with one failure, an invalid cross-question test comparison. The other four
+required jobs passed for that commit only. Its logs were retrieved by the external reviewer
+([evidence](docs/decisions/0025-review-orchestration.md#feature-ci-at-f0d4ce92-and-the-abandoned-reservation-test-correction-prompts-221222)).
+Prompt 222 corrected that test only, and Prompt 223 accepted the correction. **At the
+corrective commit `3d41f435` all five required feature-CI jobs passed**, including the
+PostgreSQL integration job
+([evidence](docs/decisions/0025-review-orchestration.md#feature-ci-at-3d41f435-prompt-223)).
+Claude Code saw conclusions only (its log downloads returned HTTP 403). The external
+reviewer's retrieved logs show PostgreSQL `439 passed, 4999 deselected`, including all 54
+M5g positions; Ubuntu `4999 passed, 439 skipped`; Windows `4998 passed, 440 skipped`; and
+Gitleaks with 97 commits and no leaks. The reviewer accepted that evidence in Prompt 224
+([reviewer logs](docs/decisions/0025-review-orchestration.md#reviewer-retrieved-3d41f435-logs-and-acceptance-prompt-224)). M5g is feature-CI
+verified and **not merged**. Main publication is authorized only through new
+exact-commit feature and main CI gates. No application review path exists, no live provider is configured, and `run_review`
 remains unregistered. The M4d trusted-snapshot limitation and E7 are not claimed closed, and
 merge, M5h and overall M5 acceptance remain pending. M5e is reviewed,
 CI verified and on main at `14f510e`; its publication evidence was independently accepted

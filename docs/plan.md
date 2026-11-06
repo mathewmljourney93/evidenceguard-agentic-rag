@@ -13821,7 +13821,15 @@ demonstrated production defect. Prompt 222 corrects that test only. The correcte
 unexecuted locally, the passing jobs cover `f0d4ce92` only, feature CI is **not verified**,
 and main publication is blocked until CI passes on the corrected version. In Prompt 223 the
 external reviewer accepted the correction for a corrective commit and feature publication;
-this does not establish that the corrected test has passed PostgreSQL or CI
+this does not establish that the corrected test has passed PostgreSQL or CI. **Feature CI at
+the corrective commit `3d41f435` (Prompt 223) passed all five required jobs**, including the
+PostgreSQL integration job. Claude Code observed conclusions only (its log downloads returned
+HTTP 403). The external reviewer's retrieved logs show PostgreSQL `439 passed, 4999
+deselected`, including all 54 M5g positions; Ubuntu `4999 passed, 439 skipped`; Windows
+`4998 passed, 440 skipped`; and Gitleaks with 97 commits and no leaks. The reviewer
+accepted that evidence in Prompt 224. M5g is feature-CI verified and not merged. Main
+publication is authorized only through the new feature and main CI gates
+([evidence](decisions/0025-review-orchestration.md#feature-ci-at-3d41f435-prompt-223)).
 ([ADR-0025](decisions/0025-review-orchestration.md#feature-ci-at-f0d4ce92-and-the-abandoned-reservation-test-correction-prompts-221222)).
 
 **State (Prompt 218, historical).** Claude Code implemented the accepted specification in Prompt 218 on

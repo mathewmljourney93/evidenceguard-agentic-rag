@@ -535,9 +535,15 @@ was accepted at review in Prompt 217 as a specification only
 Prompt 220** ([implementation status](plan.md#m5g-implementation-status-accepted-for-a-local-commit-prompt-220-postgresql-and-ci-pending),
 [ADR-0025](decisions/0025-review-orchestration.md)). Its feature CI at `f0d4ce92` failed: the
 PostgreSQL job ran with one failure, an invalid cross-question test comparison corrected in
-Prompt 222 and accepted for a corrective commit in Prompt 223, with corrected-version
-PostgreSQL and CI verification pending ([evidence](decisions/0025-review-orchestration.md#feature-ci-at-f0d4ce92-and-the-abandoned-reservation-test-correction-prompts-221222)).
-Its database behaviour therefore remains unverified, and main publication is blocked.
+Prompt 222 and accepted for a corrective commit in Prompt 223
+([f0d4ce92 evidence](decisions/0025-review-orchestration.md#feature-ci-at-f0d4ce92-and-the-abandoned-reservation-test-correction-prompts-221222)).
+At the corrective commit `3d41f435` all five required feature-CI jobs passed, including
+PostgreSQL integration ([evidence](decisions/0025-review-orchestration.md#feature-ci-at-3d41f435-prompt-223)).
+Claude Code saw conclusions only. The external reviewer's retrieved logs show all 439
+selected integration tests passing, including the 54 M5g positions, and the reviewer
+accepted that evidence in Prompt 224 ([reviewer logs](decisions/0025-review-orchestration.md#reviewer-retrieved-3d41f435-logs-and-acceptance-prompt-224)).
+M5g is feature-CI verified but not merged; main publication is authorized only through new
+CI gates.
 
 - **Process control on fenced paths:** `transaction()` now keeps the first process-control
   object by identity across body, commit, rollback and close (G15). Its non-database tests
@@ -546,19 +552,20 @@ Its database behaviour therefore remains unverified, and main publication is blo
   by the fixed `ReviewFenceExitError`, so no SQL, parameter or database text reaches job errors
   or logs (G22). This is tested with sentinel text against fake sessions only.
 - **Atomic output:** the output row and the job's success share one finish transaction. Their
-  database behaviour is unverified.
+  PostgreSQL tests are among the positions that passed in the green `3d41f435` integration job
+  (reviewer's logs, which print positions rather than test names).
 
 None of this operates in an application review path: no endpoint, command or production
 registration builds the handler, no live provider is configured, and `run_review` remains
 unregistered. The M4d trusted-snapshot limitation is not closed: the snapshot-only retrieval
 mechanism was reviewed and accepted with the implementation for a local commit, but its
-replacement-activation database test has not yet passed in a verified run (the
-`f0d4ce92` CI gate failed). Scripted canary tests do not
+replacement-activation database test is among the passing positions of the green `3d41f435`
+integration job (not separately named in the log), and the implementation is not merged. Scripted canary tests do not
 establish live-model injection resistance. Prompt 219 added tests of the real persistence
 boundaries over scripted sessions (read process control, fixed database errors, writer
 precedence and ownership) and corrected the constraint-test attribution; no production byte
-changed. None of these controls is database-verified or operates in an application review path:
-they are unverified until corrected-version CI passes, and the M4d limitation and E7 are not
+changed. None of these controls operates in an application review path, their database
+evidence is limited to that feature-CI job conclusion, and the M4d limitation and E7 are not
 declared closed. M5e is reviewed,
 CI verified and on main at `14f510e`; its publication evidence was independently accepted
 in Prompt 207. M5g–M5h and overall M5 acceptance remain pending.
