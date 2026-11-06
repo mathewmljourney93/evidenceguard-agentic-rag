@@ -13807,10 +13807,22 @@ are resolved, all documented implementation choices are accepted, and no impleme
 review decision remains open ([external review](decisions/0025-review-orchestration.md#external-review-prompt-220)).
 The reviewer reviewed the code and the Prompt 219 diff statically, verified the exports, and
 exercised the source-extracted transaction helper. The reviewer ran no project suite, wheel,
-PostgreSQL or CI. **No PostgreSQL behaviour is accepted as verified:** the 54 M5g PostgreSQL
-cases remain unexecuted. There is no exact-commit CI, M4d and E7 are not declared closed, no
+PostgreSQL or CI. **No PostgreSQL behaviour is accepted as verified:** at that time the 54
+M5g PostgreSQL cases were unexecuted. There was no exact-commit CI, M4d and E7 are not declared closed, no
 production review path or `run_review` registration is authorized, and M5h, M6 and overall
 M5 acceptance remain pending. The Prompt 218 and 219 paragraphs below are historical.
+
+**Feature CI at `f0d4ce92` (Prompts 221–222): failed, test corrected, not re-run.** On the
+push of `f0d4ce92` to `feat/review-orchestration`, the four other required jobs passed and
+the PostgreSQL job ran with one failure (`1 failed, 438 passed`; logs retrieved by the
+external reviewer). The failure was an invalid cross-question comparison in
+`test_a_reservation_abandoned_before_dispatch_is_retried_on_the_next_attempt`, not a
+demonstrated production defect. Prompt 222 corrects that test only. The corrected test is
+unexecuted locally, the passing jobs cover `f0d4ce92` only, feature CI is **not verified**,
+and main publication is blocked until CI passes on the corrected version. In Prompt 223 the
+external reviewer accepted the correction for a corrective commit and feature publication;
+this does not establish that the corrected test has passed PostgreSQL or CI
+([ADR-0025](decisions/0025-review-orchestration.md#feature-ci-at-f0d4ce92-and-the-abandoned-reservation-test-correction-prompts-221222)).
 
 **State (Prompt 218, historical).** Claude Code implemented the accepted specification in Prompt 218 on
 `feat/review-orchestration` (from `ebcc2df9`). The work is **staged and uncommitted** for external

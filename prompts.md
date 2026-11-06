@@ -53131,3 +53131,856 @@ All limits are kept, and M4d and E7 are not claimed closed. ADR-0025 and the pla
 - **Ruff:** format reported 240 files already formatted, and lint passed.
 
 No application tests, builds or wheel checks were run, because their bytes are unchanged.
+
+## Prompt 221 handoff (saved file, byte-copied)
+
+Source: `.local/p221/handoff.md`, the handoff file Claude Code saved in Prompt 221. Its bytes are inserted unchanged between the two marker lines below and were compared byte-for-byte against that file after insertion. Claude Code's Prompt 221 chat replies are not reproduced. Its HTTP 403 log-access statements are Claude Code's historical access limitation; the logs were later retrieved separately by the external reviewer (Prompt 222).
+
+-----BEGIN SAVED PROMPT 221 HANDOFF-----
+# Prompt 221 handoff: M5g feature published; exact-commit CI FAILED in PostgreSQL integration (Claude Code)
+
+**Result: the five-job gate did not pass.** The `integration (ubuntu-24.04, PostgreSQL 17 +
+pgvector)` job failed at its "Run integration tests" step. The other four required jobs passed.
+Following the prompt, monitoring stopped and nothing was corrected, rerun, committed, pushed or
+documented as green. No feature-CI evidence is staged, and
+`.local/p221/m5g-feature-ci-evidence.diff` was **not** created.
+
+## Refs
+
+| | Value |
+| --- | --- |
+| Starting HEAD | `5d97acbcb72d83a13878d0a40cbf2c87ca09770d` (parent `ebcc2df9…`, tree `55122f52def1009f810d14bd844d5f444d19a6b6`), clean |
+| Publication target | `f0d4ce921a4e58ce381d3f3d26e9a0a80ad94b2c` (parent `5d97acbc…`, tree `e48c0ffb1fb4b22e9f51c695b61bd36bc971da7c`) |
+| Remote `feat/review-orchestration` | `f0d4ce92…` (new branch; equal to local HEAD and the upstream `origin/feat/review-orchestration`) |
+| Remote, stored and local `main` | `e7dd3be384e36e14cce27c67e902ea9531b39d71`, unchanged |
+| Working tree / index | clean |
+
+**Recovery.**
+
+- **HEAD and inventory:** the HEAD tree and the 27-path inventory matched, and the Prompt 220
+  export was byte-identical to fresh Git output (`9217e545 → 5d97acbc`, 4 files, +75/−13,
+  12,216 bytes, 169 lines, SHA-256 `117073c7…8e96`).
+- **Recording defect found:** the Prompt 220 checkpoint file
+  `.local/p220/checkpoint/accepted-tree-listing.txt` is **empty**. It was written with
+  `git ls-tree -r` from inside that directory without `--full-tree`. The Prompt 220 identity
+  checks themselves listed the tree objects from the repository root, so they are unaffected.
+- **Re-verified here:** the protected identity was checked against the tree object `9217e545`
+  directly, and all 260 protected entries are identical. The defect is disclosed in
+  `prompts.md`.
+- **Checkpoint:** `.local/p221/checkpoint/`, with the prompts.md prefix of 2,831,912 bytes,
+  SHA-256 `e3b8c03f…03f6bf`.
+
+## Preparation commit `f0d4ce92`
+
+- **Corrections:** the README's introductory M5g paragraph and the threat model's introductory
+  and later mechanism passages now state the sequence: implemented in Prompt 218, tests
+  corrected in Prompt 219, accepted for a local commit and committed in Prompt 220, feature
+  publication and exact-commit CI pending, and PostgreSQL unverified locally. The stale "exists
+  but is unreviewed" wording is replaced. All limits are kept and M4d and E7 are not claimed
+  closed. ADR-0025 and the plan are unchanged.
+- **`prompts.md`:** the Prompt 220 handoff (byte-copied and compared), Prompt 221 (transcribed)
+  and a preflight note.
+- **Checks:**
+  - only README, the threat model and prompts.md differ from `5d97acbc`, and the 262 other
+    entries are identical;
+  - links and tables 592/152 with 0 problems; encoding, working and staged whitespace, prefix
+    fidelity and privacy (0 hits) all clean;
+  - Ruff format (240 files) and lint pass;
+  - staged Gitleaks clean; full-history Gitleaks after the commit scanned 96 commits with no
+    leaks.
+- **Commit:** subject `docs: prepare accepted M5g implementation for feature publication`,
+  with the noreply author and committer, the message from `.local/p221/commit-message.txt`, and
+  the Co-Authored-By trailer.
+
+## Read-only remote preflight (`git fetch --no-tags origin`, exit 0; no configuration change)
+
+- **Remote state:** remote main is `e7dd3be3` and equals local main, an ancestor of the target.
+  The remote feature branch was absent.
+- **Range above main:** exactly `ebcc2df9`, `5d97acbc`, `f0d4ce92`, with 28 paths. All are the
+  reviewed M5g implementation, test, workflow, specification and evidence paths, plus this
+  preparation.
+- **Protected bytes:** the accepted non-documentation blobs and modes are identical to
+  `9217e545`. All entries are mode 100644, there are no binaries and no tracked `.local/` files,
+  and no dependency, resource, Docker, Compose or secret-scan change.
+- **Workflows:** both trigger on push; verify (ubuntu-24.04 and windows-2025), integration
+  (`EG_REQUIRE_INTEGRATION: "1"`, `uv run --locked pytest -m integration`), container and
+  Gitleaks are present.
+- **Scans:** range privacy 0 hits; range Gitleaks 3 commits, no leaks.
+
+## Manual publication
+
+Mathew ran the push command; Claude Code did not push. Output: `* [new branch]
+feat/review-orchestration -> feat/review-orchestration`, with the upstream set. Two earlier pushes
+appear in the same pasted scrollback (`feat/review-report-content` and `main` to `e7dd3be`). They
+match the previously recorded M5f publication, and remote main was already `e7dd3be3` before this
+push, so they are not part of this publication.
+
+**Post-push verification (`ls-remote`):** the remote feature branch is `f0d4ce92…`, equal to
+local HEAD and the upstream; remote main is `e7dd3be3…`.
+
+## Exact-SHA CI (push event, attempt 1, branch `feat/review-orchestration`, SHA `f0d4ce92…`)
+
+Monitoring started at 2026-11-06T10:47:00Z with a 25-minute bound and 45-second anonymous
+public-API polls (`.local/p221/poll_ci.py`). Both runs had completed by 10:53:05Z.
+
+| Workflow run | Job | Conclusion |
+| --- | --- | --- |
+| [ci 42205208269](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269) (failure) | [verify (ubuntu-24.04, Python 3.12)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269/job/127849986602) | success |
+| | [verify (windows-2025, Python 3.12)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269/job/127849986480) | success |
+| | [integration (ubuntu-24.04, PostgreSQL 17 + pgvector)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269/job/127849986506) | **failure** |
+| | [container (ubuntu-24.04, image build and Compose smoke)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269/job/127849986032) | success |
+| [secret-scan 42205208210](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208210) (success) | [Gitleaks (full history)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208210/job/127849986119) | success |
+
+**Integration job steps:**
+
+| Step | Conclusion |
+| --- | --- |
+| 1 Set up job | success |
+| 2 Initialize containers | success |
+| 3 Check out | success |
+| 4 Set up uv and Python 3.12 | success |
+| 5 Install locked dependencies | success |
+| 6 Confirm the database is ready | success |
+| **7 Run integration tests** | **failure** |
+| 12 Post Set up uv and Python 3.12 | skipped |
+| 13 Post Check out | success |
+| 14 Stop containers | success |
+| 15 Complete job | success |
+
+**Available excerpt.** The public check-run annotation for that job reads only: `Process
+completed with exit code 1.`, at `.github` line 107.
+
+**Access limitation.** An anonymous job-log download returned HTTP 403 ("Must have admin rights
+to Repository."), and no authentication was changed. **No log was retrieved**, so no test count,
+skip or deselection count, failing test name, M5g module result, migration, `alembic check`,
+installed-wheel or container output is known to Claude Code. Nothing is inferred.
+
+- It is **not known** whether the failure is in a new M5g PostgreSQL case or in an existing
+  integration test.
+- The two verify successes mean their recorded steps concluded successfully. Their counts and
+  installed-wheel lines were not observed.
+
+**Saved evidence (`.local/p221/ci-feature/`):**
+
+| File | SHA-256 |
+| --- | --- |
+| `runs.json` | `4ad14db8…b0d6` |
+| `jobs-ci.json` | `097e7212…2c2b` |
+| `jobs-secret-scan.json` | `28c9f4c5…9347` |
+| `check-runs.json` (the annotation) | `b7c43c07…0a92` |
+
+Also saved: `integration-job.log` (it holds the 403 response body, not a log), `poll.log` and
+`monitor-start.txt`.
+
+## Limitations and next step
+
+M5g is **not** feature-CI verified. Its PostgreSQL behaviour is unverified and it is not merged.
+
+**Next step:** Mathew or the reviewer should retrieve the integration job log with repository
+access, at job [127849986506](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269/job/127849986506).
+Any correction needs a new authorization. None was attempted.
+
+**Unchanged:** there is no production review path, `run_review` registration or live provider.
+M4d and E7 are not closed, and M5h, M6 and overall M5 acceptance remain pending.
+
+## Exports
+
+| Property | Value |
+| --- | --- |
+| Path | `.local/p221/m5g-publication-preparation.diff` |
+| Baseline | `5d97acbcb72d83a13878d0a40cbf2c87ca09770d` |
+| Destination | `f0d4ce921a4e58ce381d3f3d26e9a0a80ad94b2c` |
+| Options | `--full-index --binary`, `prompts.md` excluded (prompts.md: +402/−0) |
+| Paths | `README.md` (+18/−15), `docs/threat-model.md` (+14/−13) |
+| Statistics | 2 files, 32 insertions, 28 deletions |
+| Size | 7,345 bytes; 89 lines |
+| SHA-256 | `243008495a5c9da52b3e3a4fa2f25ac06a3b1407233dff14d44a88631ac768e4` |
+| Identity | byte-identical to fresh Git output (by SHA and `HEAD`) |
+
+`.local/p221/m5g-feature-ci-evidence.diff`: **not created**, because the gate failed.
+
+## Final state
+
+- **Refs:** branch `feat/review-orchestration` at `f0d4ce92`, published and tracking origin.
+  Main is unchanged at `e7dd3be3`.
+- **Tree:** clean; nothing staged.
+- **Operations:** no merge, rerun, further push or M5h work.
+
+Mathew: return this complete handoff plus `.local/p221/m5g-publication-preparation.diff` to the
+external reviewer, together with the integration job log if you can retrieve it.
+-----END SAVED PROMPT 221 HANDOFF-----
+
+## Prompt 222 reviewer evidence, diagnosis and correction authorization (transcribed)
+
+Source: Mathew's Prompt 222 instruction to Claude Code. It carries the external reviewer's log-retrieved CI observations for `f0d4ce92` and diagnosis (the reviewer's, not Claude Code's) and the authorization for a test and documentation correction only. Claude Code transcribed it from the pasted prompt text in its session into `.local/p222/prompt222.txt` and inserted that file's bytes unchanged below. The transcription was not compared against an independently saved original. The reviewer's log archive was not available to Claude Code.
+
+Written for: Mathew and Claude Code.
+
+## Prompt 222 — Correct the cross-question PostgreSQL assertion; stage for review
+
+The reviewer retrieved all five feature-job logs and diagnosed the single integration failure.
+
+Authorize a test and documentation correction only. Do not commit, fetch, push, merge, rerun CI, change authentication, modify production code or start M5h.
+
+### 1. Recover and checkpoint
+
+Read the repository instructions.
+
+Expected:
+- Branch: feat/review-orchestration.
+- HEAD and upstream:
+  f0d4ce921a4e58ce381d3f3d26e9a0a80ad94b2c.
+- HEAD tree:
+  e48c0ffb1fb4b22e9f51c695b61bd36bc971da7c.
+- Local main and stored origin/main:
+  e7dd3be384e36e14cce27c67e902ea9531b39d71.
+- Clean working tree and index.
+
+Verify .local/p221/m5g-publication-preparation.diff:
+- Baseline:
+  5d97acbcb72d83a13878d0a40cbf2c87ca09770d.
+- Destination: HEAD.
+- Two files, 32 insertions, 28 deletions.
+- 7,345 bytes; 89 lines.
+- SHA-256:
+  243008495a5c9da52b3e3a4fa2f25ac06a3b1407233dff14d44a88631ac768e4.
+
+Compare its bytes with fresh Git output.
+
+Save .local/p222/checkpoint/ with refs, status, HEAD tree, full-tree blob/mode listing, the submitted test module and prompts.md prefix/checksum.
+
+Use --full-tree where needed. Verify checkpoint listings are nonempty and have the expected entry count.
+
+No remote operation is authorized.
+
+### 2. Record the reviewer-retrieved evidence
+
+These are the external reviewer’s observations, not Claude Code’s anonymous API observations.
+
+Commit:
+f0d4ce921a4e58ce381d3f3d26e9a0a80ad94b2c.
+Branch: feat/review-orchestration.
+Event: push. Attempt: 1.
+
+CI run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269
+
+Jobs:
+- Ubuntu 127849986602:
+  4999 passed, 439 skipped in 128.52s.
+- Windows 127849986480:
+  4998 passed, 440 skipped in 183.71s.
+- PostgreSQL 127849986506:
+  1 failed, 438 passed, 4999 deselected in 345.13s.
+  Collection: 5438 total, 439 selected.
+- Container 127849986032:
+  smoke and cleanup succeeded.
+
+Secret-scan run:
+https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208210
+
+Gitleaks job 127849986119:
+96 commits scanned; no leaks.
+
+Both verify logs printed:
+- production registry: ingest_revision, index_revision
+- all twelve installed-wheel result lines, including:
+  review orchestration imported and migration 0008 rendered offline from the installed wheel
+
+The container smoke exercises the existing ingestion/indexing path, not M5g review orchestration. Recall is arithmetic, Voyage is mocked and offline SQL rendering is not database execution.
+
+Preserve Claude Code’s earlier HTTP 403 statements as its historical access limitation. The reviewer obtained the logs separately.
+
+If the reviewer’s evidence archive is available, preserve it and extracted logs under .local/p222/evidence/. Do not claim that Claude Code downloaded them independently.
+
+### 3. Diagnosis
+
+The only failing test is:
+
+tests/test_review_handler_postgres.py::
+test_a_reservation_abandoned_before_dispatch_is_retried_on_the_next_attempt
+
+It fails at line 152:
+
+assert retried and retried[0].request_sha256 == first_question[0].request_sha256
+
+The final query selects every Verification call, orders by question_id and sequence, and then compares the retry with the first row.
+
+The pinned template starts with RET-01. Alphabetical ordering puts BCP-01 first. The assertion therefore compares request digests from different questions.
+
+The CI log confirms the earlier assertions passed:
+- cancellation raised JobCancelledError;
+- one sequence-1 started reservation remained from attempt 1;
+- the next worker run exited successfully;
+- the job reached succeeded.
+
+The failure demonstrates an invalid test comparison, not a production retry defect.
+
+### 4. Correct the test without weakening it
+
+Change only this test’s setup/assertions as necessary.
+
+Before the retry:
+- Capture the interrupted reservation’s complete identity:
+  tenant, review, question, stage and sequence.
+- Capture its request digest and relevant reservation fields.
+- Require exactly the expected sequence-1 initial/original started reservation from attempt 1.
+- Confirm it is for the expected first planned question.
+
+After the retry:
+- Query the captured tenant/review/question/stage explicitly.
+- Order only that history by sequence.
+- Require exactly the expected two reservations:
+  - sequence 1: initial/original, started, job attempt 1;
+  - sequence 2: retry/original, completed, job attempt 2.
+- Compare both request digests with the digest captured before the retry.
+- Keep the final succeeded-job assertion.
+- Do not use a digest from another question or hardcode the random fixture hashes printed in CI.
+- Do not change template order, planner behavior, retry rules or production code.
+
+Also strengthen the no-dispatch assertion:
+- Give the cancelling provider an explicit call counter or recorded-call list.
+- Assert zero provider calls.
+- Do not rely solely on AssertionError inside generate: call_validated can catch ordinary provider exceptions, so that alone does not prove generate was never invoked.
+
+Keep synchronization bounded and deterministic. No sleeps or extra worker-draining loop.
+
+### 5. Authorized paths
+
+Only:
+- tests/test_review_handler_postgres.py
+- docs/decisions/0025-review-orchestration.md
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+All production, migration, model, other test, fixture, dependency, packaging and workflow blobs/modes must remain identical to HEAD.
+
+In ADR-0025:
+- Record the exact failed-commit CI evidence under each run/job link.
+- Attribute retrieved logs to the reviewer.
+- Explain the cross-question comparison defect and correction.
+- Keep the Prompt 220 acceptance as a historical, scoped decision.
+- State that main publication remains blocked until corrected-version CI passes.
+- State that the corrected database test remains unexecuted locally unless it is actually run.
+
+Update the short status summaries consistently. Historical “no PostgreSQL tests executed” statements must be time-scoped: PostgreSQL has now executed for f0d4ce92 and the gate failed.
+
+Do not call the feature CI verified or imply that these results cover the forthcoming correction.
+
+Preserve accepted specification text, anchors and all runtime limitations. Do not declare M4d or E7 closed.
+
+### 6. Verification
+
+Use the locked offline environment.
+
+Run:
+- Ruff formatting and lint.
+- Strict mypy.
+- Focused M5g and relevant regression tests.
+- Full suite with skip reasons.
+- Integration and non-integration collection.
+
+If no dedicated disposable test database is configured, collect the corrected PostgreSQL case and report it as unexecuted. Do not create infrastructure or use an application database.
+
+Do not repeat builds or installed-wheel checks: production and packaging bytes must remain unchanged. The passing jobs and wheel output at f0d4ce92 remain evidence for that commit only.
+
+Tie the new checks to final test/source hashes. Save commands, exit codes and outputs.
+
+Run final:
+- Scope and protected blob/mode identity.
+- Links, anchors and tables.
+- Encoding and whitespace.
+- Prompt-prefix/source fidelity.
+- Privacy.
+- Unsuppressed staged Gitleaks, with saved logs.
+
+### 7. History, export and stop
+
+Preserve prompts.md as an identical prefix.
+
+Append:
+- The saved Prompt 221 handoff.
+- This diagnosis, review evidence and correction authorization.
+- Prompt 222.
+- An outcome note with completed checks only.
+
+Label copied versus transcribed text accurately.
+
+Stage only the six authorized paths. Do not commit.
+
+Create:
+.local/p222/m5g-abandoned-reservation-test-correction.diff
+
+Baseline:
+f0d4ce921a4e58ce381d3f3d26e9a0a80ad94b2c.
+
+Destination:
+the final staged tree.
+
+Use full indexes and exclude prompts.md. Verify byte identity against fresh tree-to-tree and cached Git comparisons.
+
+Report paths, statistics, bytes, lines and SHA-256.
+
+Save .local/p222/handoff.md with:
+- Recovery and exact refs/tree.
+- The correction and preserved production identity.
+- Reviewer evidence separated from local checks.
+- Database execution status.
+- Export details.
+- Remaining limitations.
+
+Stop staged and uncommitted. No remote operation, CI rerun or M5h work.
+
+Mathew: return the complete handoff plus
+.local/p222/m5g-abandoned-reservation-test-correction.diff
+to the external reviewer.
+
+## Prompt 222 outcome note
+
+Source: Claude Code. This note lists only checks completed before it was written. The final staged scope, encoding, whitespace, prefix, privacy and Gitleaks checks on the final content are reported in the Prompt 222 handoff and the `.local/p222/` records.
+
+**State.** Staged and uncommitted on `feat/review-orchestration`. HEAD and upstream are `f0d4ce921a4e58ce381d3f3d26e9a0a80ad94b2c` (tree `e48c0ffb1fb4b22e9f51c695b61bd36bc971da7c`), and local main and stored origin/main are `e7dd3be384e36e14cce27c67e902ea9531b39d71`. No remote operation was performed. The Prompt 221 export matched every recorded property and fresh Git output. The checkpoint is under `.local/p222/checkpoint/`, with a nonempty full-tree listing of 265 entries and a prompts.md prefix of 2,851,779 bytes, SHA-256 `3e5854527931a35f1a090468eea6e7e7668418a30b34c83b1a76f70d998c6652`. The reviewer's log archive was not available locally, so `.local/p222/evidence/` holds none.
+
+**Correction (test only).** `test_a_reservation_abandoned_before_dispatch_is_retried_on_the_next_attempt` now:
+
+- captures the single interrupted reservation's full identity (tenant, review, job, the first planned question, verification, sequence 1, initial/original, started, attempt 1) and its digest;
+- after the retry, queries only that stage's history by sequence, requires exactly (1, initial, original, started, 1) and (2, retry, original, completed, 2), and requires both digests to equal the captured one;
+- keeps the succeeded-job assertion;
+- records provider calls explicitly and asserts zero.
+
+No production, migration, model, other test, fixture, packaging, dependency or workflow byte changed. ADR-0025 records the reviewer's log evidence for `f0d4ce92` and the diagnosis. The README, plan and threat-model status statements are now time-scoped: PostgreSQL ran for `f0d4ce92` and the gate failed, feature CI is not verified, and main publication is blocked until corrected-version CI passes.
+
+**Checks completed** (Claude Code, Windows, locked offline environment, bound to the staged blobs):
+
+- Ruff format and lint, and strict mypy (194 files), all clean.
+- Focused M5g: 943 passed, 54 skipped.
+- Regression subset: 1026 passed.
+- Full suite: 4997 passed, 441 skipped.
+- Collection: 439 integration and 4999 non-integration of 5438.
+- The corrected case is collected and **not executed** locally (no test database).
+- Documentation checks: 596 links and 152 tables, zero problems.
+
+No build or wheel check was run, because production and packaging bytes are unchanged.
+
+## Prompt 222 handoff (saved file, byte-copied)
+
+Source: `.local/p222/handoff.md`, the handoff file Claude Code saved in Prompt 222. Its bytes are inserted unchanged between the two marker lines below and were compared byte-for-byte against that file after insertion. Claude Code's Prompt 222 chat reply is not reproduced. Earlier fidelity disclosures still apply.
+
+-----BEGIN SAVED PROMPT 222 HANDOFF-----
+# Prompt 222 handoff: cross-question PostgreSQL assertion corrected and staged for review (Claude Code)
+
+The change is to one test plus documentation. **No production, migration, model, other test,
+fixture, packaging, dependency or workflow byte changed.** It is staged and uncommitted. There
+was no remote operation, CI rerun or M5h work.
+
+## Recovery and refs
+
+| | Value |
+| --- | --- |
+| Branch | `feat/review-orchestration` |
+| HEAD and upstream | `f0d4ce921a4e58ce381d3f3d26e9a0a80ad94b2c` (tree `e48c0ffb1fb4b22e9f51c695b61bd36bc971da7c`) |
+| Local main / stored origin/main | `e7dd3be384e36e14cce27c67e902ea9531b39d71` |
+| Starting state | clean working tree and index |
+| Final staged tree | `e39354302a3d0e04cfbdaf3c519d0ab64ca977c1` |
+
+**Recovery.** The Prompt 221 export matched every recorded property and fresh Git output:
+`5d97acbc → f0d4ce92`, 2 files, +32/−28, 7,345 bytes, 89 lines, SHA-256 `24300849…c768e4`.
+
+**Checkpoint (`.local/p222/checkpoint/`).** It holds refs, status, the HEAD tree, the full-tree
+blob/mode listing, the submitted test module (9,818 bytes) and the prompts.md prefix (2,851,779
+bytes, SHA-256 `3e585452…6c6652`). The listing used `--full-tree` and was verified **nonempty,
+with the expected 265 entries**.
+
+**Reviewer archive.** It was not available locally: no file was received, and a search of
+Downloads found none. `.local/p222/evidence/` is empty, and nothing is claimed as downloaded by
+Claude Code.
+
+## The correction (`tests/test_review_handler_postgres.py`, +57/−10, this test only)
+
+`test_a_reservation_abandoned_before_dispatch_is_retried_on_the_next_attempt`:
+
+- **Diagnosed defect (the reviewer's):** the final query took every Verification call ordered by
+  `question_id`, so its first row was `BCP-01`, while the retry belonged to `RET-01`, the first
+  question in template order. It was a cross-question comparison, not a demonstrated production
+  defect.
+- **Before the retry:** the test requires exactly one stored reservation and pins its tenant,
+  review, job, question (the first **planned** question, from the pinned template's order),
+  `verification`, sequence 1, `initial`, `original`, `started` and job attempt 1. It captures
+  that reservation's `request_sha256`.
+- **After the retry:** it selects only that tenant, review, question and stage, ordered by
+  sequence. It requires exactly `[(1, initial, original, started, 1), (2, retry, original,
+  completed, 2)]`, and both digests must equal the captured digest. The `succeeded` job
+  assertion is kept.
+- **No dispatch:** the cancelling provider records every `generate` call, and the test asserts
+  the list is empty. Raising inside `generate` alone was not proof, because `call_validated`
+  maps ordinary provider exceptions to `provider_failed`.
+- **Not changed:** no hardcoded digest, template order, planner, retry rule or production code;
+  no sleep or extra worker loop.
+
+**Preserved identity.** Of the 265 entries, the 259 outside the six authorized paths are
+identical to HEAD in blob and mode, and every mode is 100644.
+
+## Reviewer evidence (the external reviewer's log-retrieved observations; recorded in ADR-0025)
+
+All of it is for commit `f0d4ce92`, branch `feat/review-orchestration`, the push event, attempt 1.
+
+**[ci run 42205208269](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269):**
+
+| Job | Reviewer's observation |
+| --- | --- |
+| [Ubuntu 127849986602](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269/job/127849986602) | `4999 passed, 439 skipped in 128.52s` |
+| [Windows 127849986480](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269/job/127849986480) | `4998 passed, 440 skipped in 183.71s` |
+| [PostgreSQL 127849986506](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269/job/127849986506) | `1 failed, 438 passed, 4999 deselected in 345.13s`; 439 of 5438 selected |
+| [Container 127849986032](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269/job/127849986032) | smoke and cleanup succeeded |
+
+Both verify logs printed the production-registry line and all twelve installed-wheel lines,
+including the M5g line.
+
+**[secret-scan run 42205208210](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208210):**
+[Gitleaks 127849986119](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208210/job/127849986119)
+scanned 96 commits and found no leaks.
+
+**Limits of that evidence:**
+
+- The container smoke exercises ingestion and indexing, not M5g.
+- The wheel's Recall line is arithmetic and its Voyage line mocked.
+- The offline SQL rendering is not database execution.
+- Claude Code's Prompt 221 HTTP 403 statements remain its historical access limitation.
+
+## Local checks (Claude Code, Windows, `uv run --locked --offline`; `.local/p222/checks/`)
+
+The checks ran with nothing unstaged. The staged blobs and the SHA-256 of 27 check-bound Python
+files were recorded before and after (`source-binding-*.json`) and are unchanged. Afterwards only
+`prompts.md` changed.
+
+| Check | Exit | Result |
+| --- | --- | --- |
+| `ruff format --check .` / `ruff check .` | 0 / 0 | 240 files already formatted / passed |
+| `mypy` strict | 0 | no issues in 194 files |
+| focused M5g (7 modules, `-rs`) | 0 | 943 passed, 54 skipped (PostgreSQL) |
+| regression subset (18 modules) | 0 | 1026 passed |
+| full suite (`-rs`) | 0 | 4997 passed, 441 skipped (439 integration + 2 Windows platform skips) |
+| integration / non-integration collection | 0 | 439 / 4999 of 5438 (the same totals the reviewer observed in CI) |
+| corrected case, collected by node ID | 0 | 1 test collected |
+| scope / protected identity / modes | — | only the 6 authorized paths changed; 259 others identical; all 100644 |
+| links / anchors / tables | 0 | 596 / 152, 0 problems |
+| encoding / whitespace | — | clean (working and staged) |
+| history prefix | — | first 2,851,779 bytes identical; the Prompt 221 handoff insertion byte-compared |
+| privacy | — | 0 hits |
+| `gitleaks git --pre-commit --staged --redact --verbose .` | 0 | no leaks (`gitleaks-staged.txt`) |
+
+No builds or installed-wheel checks were run, because production and packaging bytes are
+unchanged. The passing jobs and wheel output at `f0d4ce92` remain evidence for that commit only.
+
+## Database execution status
+
+- **At `f0d4ce92`:** PostgreSQL executed in CI with 439 tests selected, 438 passed and 1 failed
+  (the reviewer's observation). The gate failed.
+- **The corrected test:** collected locally but **not executed**, because no disposable test
+  database is configured and no infrastructure was created.
+- **Status:** feature CI is not verified. The other 53 M5g PostgreSQL cases passed in that run,
+  according to the reviewer's counts, but that run does not cover the correction.
+
+## Documentation
+
+- **ADR-0025:** the status bullet is time-scoped. A new section, "Feature CI at `f0d4ce92` and
+  the abandoned-reservation test correction (Prompts 221–222)", records the per-run and per-job
+  reviewer evidence, the attribution, the diagnosis and the correction. It keeps the Prompt 220
+  acceptance as a historical, scoped decision, states that main publication is blocked until
+  corrected-version CI passes, and states that the corrected test is unexecuted locally.
+- **Plan:** an additions-only paragraph under the implementation status. The Prompt 220 sentence
+  is now time-scoped ("at that time … were unexecuted"). The specification text and anchors are
+  unchanged.
+- **README and threat model:** the "not executed" statements are time-scoped. They now say that
+  CI at `f0d4ce92` failed, that feature CI is not verified, and that main is blocked. M4d and E7
+  are not declared closed.
+- **`prompts.md`:** the Prompt 221 handoff (byte-copied and compared), Prompt 222 (transcribed)
+  and the outcome note.
+
+## Export
+
+| Property | Value |
+| --- | --- |
+| Path | `.local/p222/m5g-abandoned-reservation-test-correction.diff` |
+| Baseline | `f0d4ce921a4e58ce381d3f3d26e9a0a80ad94b2c` |
+| Destination | final staged tree `e39354302a3d0e04cfbdaf3c519d0ab64ca977c1` |
+| Options | `--full-index --binary`, `prompts.md` excluded (prompts.md: +432/−0) |
+| Paths | `README.md` (+5/−3), `docs/decisions/0025-review-orchestration.md` (+89/−3), `docs/plan.md` (+12/−2), `docs/threat-model.md` (+8/−6), `tests/test_review_handler_postgres.py` (+57/−10) |
+| Statistics | 5 files, 171 insertions, 24 deletions |
+| Size | 19,267 bytes; 298 lines |
+| SHA-256 | `46ef0da7cabc8776dc6d804a212513b389595289bfc77f04674c73a61bf25c60` |
+| Identity | byte-identical to fresh tree-to-tree and `--cached` Git output |
+
+## Remaining limitations
+
+- **Unverified:** the correction has not run against PostgreSQL. Feature CI is not verified, and
+  main publication is blocked until corrected-version CI passes.
+- **Next publication:** needs a commit and push authorization.
+- **Unchanged:** no production review path, `run_review` registration or live provider. M4d and
+  E7 are not closed, and M5h, M6 and overall M5 acceptance remain pending.
+
+Mathew: return this complete handoff plus
+`.local/p222/m5g-abandoned-reservation-test-correction.diff` to the external reviewer.
+-----END SAVED PROMPT 222 HANDOFF-----
+
+## Prompt 223 correction acceptance and publication authorization (transcribed)
+
+Source: Mathew's Prompt 223 instruction to Claude Code. It carries the external reviewer's acceptance of the Prompt 222 test correction for a corrective commit and feature publication, and the reviewer's evidence (the reviewer's, not Claude Code's). Claude Code transcribed it from the pasted prompt text in its session into `.local/p223/prompt223.txt` and inserted that file's bytes unchanged below. The transcription was not compared against an independently saved original.
+
+Written for: Mathew and Claude Code.
+
+## Prompt 223 — Commit the accepted test correction; prepare manual feature push and verify CI
+
+The external reviewer accepts Prompt 222’s test correction for a corrective commit and feature publication.
+
+Authorize the local commit, read-only remote preflight, manual-push handoff and exact-commit CI monitoring. Do not push automatically, merge, change main, rerun CI, alter authentication, modify production code or start M5h.
+
+### 1. Recover and checkpoint
+
+Read the applicable repository instructions.
+
+Expected:
+- Branch: feat/review-orchestration.
+- HEAD and upstream:
+  f0d4ce921a4e58ce381d3f3d26e9a0a80ad94b2c.
+- Main and stored origin/main:
+  e7dd3be384e36e14cce27c67e902ea9531b39d71.
+- Staged tree begins e3935430.
+- Exactly the six Prompt 222 paths staged.
+- Nothing unstaged or unexpectedly untracked.
+
+Read the full staged-tree SHA from .local/p222/handoff.md and require it to match git write-tree.
+
+Verify .local/p222/m5g-abandoned-reservation-test-correction.diff:
+- Baseline: HEAD.
+- Destination: the recorded staged tree.
+- Full indexes; prompts.md excluded.
+- Five files, 171 insertions, 24 deletions.
+- 19,267 bytes; 298 lines.
+- SHA-256:
+  46ef0da7cabc8776dc6d804a212513b389595289bfc77f04674c73a61bf25c60.
+
+Compare its bytes with fresh Git output.
+
+The accepted test blob is:
+837136d61e1ec815a1fa2324ff596e83dc55d591
+for tests/test_review_handler_postgres.py.
+
+Save .local/p223/checkpoint/ containing refs, status, full staged tree, full-tree blobs/modes and prompts.md prefix/checksum. Verify listings are nonempty.
+
+### 2. Acceptance and documentation
+
+Record the external reviewer’s decision:
+- The cross-question comparison defect is corrected.
+- The test captures the interrupted reservation and compares only its own question/stage history.
+- It requires the expected initial and retry reservations with the captured digest.
+- It explicitly asserts zero calls to the cancelling provider.
+- The correction is accepted for a corrective commit and feature publication.
+- This does not establish that the corrected test has passed PostgreSQL or CI.
+
+Reviewer evidence:
+- Static review of the correction diff.
+- Independent verification of its size, line count and SHA-256.
+- Earlier retrieval of all five f0d4ce92 job logs.
+
+Do not attribute Claude Code’s local checks to the reviewer.
+
+Only these five files may change from the accepted staged tree:
+- README.md
+- docs/decisions/0025-review-orchestration.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Keep the accepted test blob and mode exactly unchanged.
+
+Make the current status consistent:
+- f0d4ce92 was feature-published.
+- Four required jobs passed.
+- PostgreSQL ran and failed one test.
+- The test correction is now accepted for a corrective commit.
+- Corrected-version PostgreSQL and CI verification remain pending.
+- Main publication remains blocked until that gate passes.
+
+Preserve historical evidence, attribution, accepted specification text and anchors. Do not claim M4d or E7 closed.
+
+Append the saved Prompt 222 handoff, this acceptance/publication authorization, Prompt 223 and a completed-checks-only pre-commit note to prompts.md. Preserve its earlier bytes exactly and label transcription accurately.
+
+### 3. Checks and corrective commit
+
+Run:
+- Exact six-path scope.
+- Accepted test blob/mode identity.
+- Every protected production, migration, model, other test, fixture, dependency, packaging and workflow blob/mode unchanged from f0d4ce92.
+- Links, anchors and tables.
+- Encoding and whitespace.
+- Prompt-prefix/source fidelity.
+- Privacy scan.
+- Locked offline Ruff formatting and lint.
+- Unsuppressed staged Gitleaks, with saved logs.
+
+Do not repeat application tests, builds or wheel checks because the accepted test and implementation bytes are unchanged.
+
+Commit normally using the established noreply identity and attribution conventions, with the message written from a file.
+
+Subject:
+test: scope abandoned review retry assertions to their question
+
+Do not amend or rewrite history.
+
+Verify:
+- Parent is f0d4ce921a4e58ce381d3f3d26e9a0a80ad94b2c.
+- Exactly the six authorized paths changed.
+- The test blob remains 837136d61e1ec815a1fa2324ff596e83dc55d591.
+- All production and other protected files remain unchanged.
+- Working tree is clean.
+- No local artifact is tracked.
+- Main remains unchanged.
+
+Run the established full-history Gitleaks check and record the actual result.
+
+The corrective commit is the new publication target.
+
+### 4. Export and remote preflight
+
+Create:
+.local/p223/m5g-test-correction-acceptance.diff
+
+Baseline:
+the full accepted Prompt 222 staged tree.
+
+Destination:
+the corrective commit.
+
+Use full indexes and exclude prompts.md. Verify byte identity against fresh Git output. Report paths, statistics, bytes, lines and SHA-256.
+
+Then fetch origin with --no-tags and verify:
+- Remote feature remains f0d4ce92.
+- Remote main remains e7dd3be3.
+- Local main equals origin/main.
+- The unpublished feature range is exactly the corrective commit, a direct child of upstream.
+- Working tree is clean.
+- Workflows retain all five required jobs and push triggers.
+- Integration retains EG_REQUIRE_INTEGRATION=1.
+- Privacy and range Gitleaks pass.
+
+If refs differ materially, report the discrepancy before proceeding. Never force-push.
+
+### 5. Manual push handoff
+
+Do not run git push.
+
+Give Mathew:
+- Full publication target SHA.
+- Confirmation that main is unchanged and the working tree clean.
+- This PowerShell command:
+
+git -C 'D:\Claude\evidenceguard_agentic_rag' push origin refs/heads/feat/review-orchestration:refs/heads/feat/review-orchestration
+
+Save .local/p223/resume-note.md and wait for the push result.
+
+### 6. After Mathew reports the push
+
+Do not push again.
+
+Verify remote feature, local HEAD and upstream all equal the corrective target. Verify remote main remains e7dd3be3.
+
+Monitor only the push-triggered ci and secret-scan runs for that exact SHA, branch and attempt 1, with a fresh 25-minute bound and periodic progress updates.
+
+Required:
+- Ubuntu verify success.
+- Windows verify success.
+- PostgreSQL integration success.
+- Container success.
+- Gitleaks success.
+
+Attempt log retrieval using existing access without changing authentication.
+
+Record only actual observations:
+- Test counts, skips and deselections.
+- Corrected test’s result at the granularity printed.
+- M5g module results.
+- Migration/alembic evidence where printed.
+- Installed-wheel lines.
+- Container and Gitleaks output.
+
+Do not reuse f0d4ce92’s counts as corrective-commit results. Do not claim an individually named result if the log prints only module positions.
+
+If a job fails, is cancelled, is missing or exceeds the bound:
+- Stop.
+- Save available logs and evidence.
+- Make no edits, reruns, further commits or pushes.
+- Return the failure and resume note.
+
+### 7. Only after all five jobs pass
+
+Stage feature-CI evidence in:
+- README.md
+- docs/decisions/0025-review-orchestration.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Record the exact corrective SHA, run/job links, observations and access limits. Keep the failed f0d4ce92 evidence separate and historical.
+
+Status:
+- M5g feature-CI verified, not merged.
+- Main publication remains unauthorized.
+- No production review registration or live provider.
+- No automatic M4d/E7 closure or overall M5 acceptance claim.
+
+Keep all non-documentation blobs/modes identical to the published target.
+
+Run documentation, scope, privacy and staged Gitleaks checks.
+
+Leave evidence staged and uncommitted.
+
+Create:
+.local/p223/m5g-corrective-feature-ci-evidence.diff
+
+Baseline:
+the corrective commit.
+
+Destination:
+final staged evidence tree.
+
+Use full indexes, exclude prompts.md, verify byte identity and report exact statistics and SHA-256.
+
+Save .local/p223/handoff.md covering the commit, manual publication, exact-SHA results, attribution, exports, final refs and remaining limitations.
+
+Stop without merging, changing main, rerunning CI or starting M5h.
+
+Mathew: return the complete handoff and both applicable diff files to the external reviewer.
+
+## Prompt 223 pre-commit note
+
+Source: Claude Code. This note lists only checks completed before it was written. The staged Gitleaks scan of the final content, the commit verification, the full-history scan, the remote preflight and any CI observations are reported in the Prompt 223 handoff and the `.local/p223/` records.
+
+**Recovery.** Verified:
+
+- HEAD and upstream `f0d4ce921a4e58ce381d3f3d26e9a0a80ad94b2c`, with local main and stored origin/main `e7dd3be384e36e14cce27c67e902ea9531b39d71`;
+- the accepted staged tree `e39354302a3d0e04cfbdaf3c519d0ab64ca977c1` with exactly the six Prompt 222 paths, and nothing unstaged or untracked;
+- the accepted test blob `837136d61e1ec815a1fa2324ff596e83dc55d591`;
+- the Prompt 222 export matching every recorded property and byte-identical to fresh Git output.
+
+The checkpoint is under `.local/p223/checkpoint/`, with a nonempty 265-entry full-tree listing and a prompts.md prefix of 2,873,508 bytes, SHA-256 `989308c4a30c63fa00130ed15600b90041851f5d3ec72efa38dce2688641418a`.
+
+**Documentation.** ADR-0025 records the reviewer's acceptance of the correction for a corrective commit and feature publication, with the reviewer's evidence, in a new section. Its status bullet, the plan, README and threat model now state the current position:
+
+- `f0d4ce92` was feature-published, four required jobs passed, and PostgreSQL ran and failed one test;
+- the correction is accepted for a corrective commit;
+- corrected-version PostgreSQL and CI verification are pending, and main publication stays blocked.
+
+**Checks completed.**
+
+- **Scope:** only the five documentation and history files differ from the accepted tree, and only the six authorized paths differ from `f0d4ce92`.
+- **Protected entries:** the test blob and mode are unchanged, and every other entry is identical (265 paths, all mode 100644).
+- **Documentation:** links, anchors and tables passed (597 links and 152 tables, zero problems).
+- **Encoding and whitespace:** UTF-8 without BOM, LF only and no replacement or NUL characters; working and staged whitespace checks were clean.
+- **History:** the prompts.md prefix is identical, and the Prompt 222 handoff insertion was byte-compared with its source.
+- **Privacy:** the scan found zero hits.
+- **Ruff:** format reported 240 files already formatted, and lint passed.
+
+No application tests, builds or wheel checks were run, because the accepted test and implementation bytes are unchanged.

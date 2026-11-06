@@ -185,9 +185,12 @@ That was specification acceptance only. The implementation followed in three ste
   corrections, for a local commit only, and it was **committed locally** on
   `feat/review-orchestration` ([external review](docs/decisions/0025-review-orchestration.md#external-review-prompt-220)).
 
-**Feature publication and exact-commit CI are pending.** Its 54 PostgreSQL tests are written
-but **were not executed** (no test database locally), so no database behaviour of M5g is
-verified. No application review path exists, no live provider is configured, and `run_review`
+**Feature CI at `f0d4ce92` failed** (Prompt 221). The PostgreSQL job ran for the first time
+with one failure, an invalid cross-question test comparison that Prompt 222 corrects (test
+only). Prompt 223 accepted that correction for a corrective commit and feature publication;
+corrected-version PostgreSQL and CI verification are pending. The other four required jobs passed for that commit only; logs were
+retrieved by the external reviewer ([evidence](docs/decisions/0025-review-orchestration.md#feature-ci-at-f0d4ce92-and-the-abandoned-reservation-test-correction-prompts-221222)). Feature CI is **not verified** and main publication is blocked until CI
+passes on the corrected version, so M5g's database behaviour is not verified. No application review path exists, no live provider is configured, and `run_review`
 remains unregistered. The M4d trusted-snapshot limitation and E7 are not claimed closed, and
 merge, M5h and overall M5 acceptance remain pending. M5e is reviewed,
 CI verified and on main at `14f510e`; its publication evidence was independently accepted

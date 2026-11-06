@@ -533,9 +533,11 @@ was accepted at review in Prompt 217 as a specification only
 ([acceptance](plan.md#m5g-acceptance-prompt-217)). It was **implemented in Prompt 218**, its
 **tests were corrected in Prompt 219**, and it was **accepted for a local commit and committed in
 Prompt 220** ([implementation status](plan.md#m5g-implementation-status-accepted-for-a-local-commit-prompt-220-postgresql-and-ci-pending),
-[ADR-0025](decisions/0025-review-orchestration.md)). Feature publication and exact-commit CI are
-pending, and its PostgreSQL tests were not executed, so its database behaviour remains
-unverified locally.
+[ADR-0025](decisions/0025-review-orchestration.md)). Its feature CI at `f0d4ce92` failed: the
+PostgreSQL job ran with one failure, an invalid cross-question test comparison corrected in
+Prompt 222 and accepted for a corrective commit in Prompt 223, with corrected-version
+PostgreSQL and CI verification pending ([evidence](decisions/0025-review-orchestration.md#feature-ci-at-f0d4ce92-and-the-abandoned-reservation-test-correction-prompts-221222)).
+Its database behaviour therefore remains unverified, and main publication is blocked.
 
 - **Process control on fenced paths:** `transaction()` now keeps the first process-control
   object by identity across body, commit, rollback and close (G15). Its non-database tests
@@ -550,13 +552,14 @@ None of this operates in an application review path: no endpoint, command or pro
 registration builds the handler, no live provider is configured, and `run_review` remains
 unregistered. The M4d trusted-snapshot limitation is not closed: the snapshot-only retrieval
 mechanism was reviewed and accepted with the implementation for a local commit, but its
-replacement-activation database test has not been executed. Scripted canary tests do not
+replacement-activation database test has not yet passed in a verified run (the
+`f0d4ce92` CI gate failed). Scripted canary tests do not
 establish live-model injection resistance. Prompt 219 added tests of the real persistence
 boundaries over scripted sessions (read process control, fixed database errors, writer
 precedence and ownership) and corrected the constraint-test attribution; no production byte
 changed. None of these controls is database-verified or operates in an application review path:
-the 54 M5g PostgreSQL tests remain unexecuted, and the M4d limitation and E7 are not declared
-closed. M5e is reviewed,
+they are unverified until corrected-version CI passes, and the M4d limitation and E7 are not
+declared closed. M5e is reviewed,
 CI verified and on main at `14f510e`; its publication evidence was independently accepted
 in Prompt 207. M5g–M5h and overall M5 acceptance remain pending.
 

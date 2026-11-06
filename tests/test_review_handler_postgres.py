@@ -105,7 +105,7 @@ def test_a_reservation_abandoned_before_dispatch_is_retried_on_the_next_attempt(
     world: pw.ReviewWorld,
 ) -> None:
     claimed = job_store.claim(world.factory, "w-m5g", kinds={"run_review"})
-    assert claimed is not None and claimed.id == world.job_id
+    assert claimed is not None and claimed.id == world.job_id and claimed.attempt == 1
     state = AttemptState(deadline=float("inf"), lease_seconds=60.0, clock=lambda: 0.0)
     store = job_store
 
@@ -116,11 +116,20 @@ def test_a_reservation_abandoned_before_dispatch_is_retried_on_the_next_attempt(
     model = pw.provider(world.chunk_id)
 
     class Cancelling:
+        """Records every dispatch. ``call_validated`` maps an ordinary provider exception to a
+        ``provider_failed`` result, so raising here alone would not prove the absence of a call;
+        the recorded list does."""
+
         provider_id = "scripted-fake"
 
+        def __init__(self) -> None:
+            self.calls: list[str] = []
+
         def generate(self, request: Any) -> Any:
+            self.calls.append(request.request_sha256)
             raise AssertionError("dispatched after cancellation")
 
+    cancelling = Cancelling()
     real_reserve = getattr(review_module, "reserve_call")  # noqa: B009 - patched below
 
     def reserve_then_cancel(*args: Any, **kwargs: Any) -> Any:
@@ -130,26 +139,64 @@ def test_a_reservation_abandoned_before_dispatch_is_retried_on_the_next_attempt(
 
     with pytest.MonkeyPatch.context() as patch:
         patch.setattr(review_module, "reserve_call", reserve_then_cancel)
-        handler = review_module.make_run_review_handler(Cancelling(), session_factory=world.factory)
+        handler = review_module.make_run_review_handler(cancelling, session_factory=world.factory)
         with pytest.raises(Exception) as raised:
             handler(ctx)
     assert type(raised.value).__name__ == "JobCancelledError"
+    assert cancelling.calls == []  # the pre-dispatch boundary stopped the only call
+    # The interrupted reservation: exactly one row, the first planned question's initial
+    # Verification call, started by attempt 1. Its identity and digest are captured here.
     with world.engine.connect() as connection:
-        rows = connection.execute(select(ReviewStageCall.__table__)).all()
-    assert [(r.sequence, r.state, r.job_attempt) for r in rows] == [(1, "started", 1)]
+        (interrupted,) = connection.execute(select(ReviewStageCall.__table__)).all()
+    first_question = pw.question_ids()[0]  # planned (template) order, not alphabetical order
+    assert (
+        interrupted.tenant_id,
+        interrupted.review_id,
+        interrupted.job_id,
+        interrupted.question_id,
+        interrupted.stage,
+        interrupted.sequence,
+        interrupted.call_kind,
+        interrupted.request_basis,
+        interrupted.state,
+        interrupted.job_attempt,
+    ) == (
+        world.actor.tenant_id,
+        world.review_id,
+        world.job_id,
+        first_question,
+        "verification",
+        1,
+        "initial",
+        "original",
+        "started",
+        1,
+    )
+    digest = interrupted.request_sha256
     job_store.fail_retryable(world.factory, ctx.token)
     with world.engine.begin() as connection:
         connection.execute(text("UPDATE jobs SET run_after = clock_timestamp()"))
     assert world.run(model).exit_code == 0
     assert world.job().status == "succeeded"
+    # Only the interrupted stage's own history, ordered by sequence.
     with world.engine.connect() as connection:
-        first_question = connection.execute(
-            select(ReviewStageCall.call_kind, ReviewStageCall.request_sha256)
-            .where(ReviewStageCall.stage == "verification")
-            .order_by(ReviewStageCall.question_id, ReviewStageCall.sequence)
+        history = connection.execute(
+            select(ReviewStageCall.__table__)
+            .where(
+                ReviewStageCall.tenant_id == interrupted.tenant_id,
+                ReviewStageCall.review_id == interrupted.review_id,
+                ReviewStageCall.question_id == interrupted.question_id,
+                ReviewStageCall.stage == interrupted.stage,
+            )
+            .order_by(ReviewStageCall.sequence)
         ).all()
-    retried = [row for row in first_question if row.call_kind == "retry"]
-    assert retried and retried[0].request_sha256 == first_question[0].request_sha256
+    assert [
+        (r.sequence, r.call_kind, r.request_basis, r.state, r.job_attempt) for r in history
+    ] == [
+        (1, "initial", "original", "started", 1),  # abandoned: never completed, still counted
+        (2, "retry", "original", "completed", 2),
+    ]
+    assert [r.request_sha256 for r in history] == [digest, digest]  # the retry reuses it
 
 
 def test_a_replacement_activated_after_creation_is_outside_the_snapshot(

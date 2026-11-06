@@ -3,9 +3,13 @@
 - **Status:** M5g is **accepted at external review for a local commit only (Prompt 220)**
   ([external review](#external-review-prompt-220)). PostgreSQL execution, exact-commit CI,
   publication, merge and overall M5 acceptance are pending. Claude Code implemented it in
-  Prompt 218 and corrected its tests in Prompt 219. No PostgreSQL test has been executed for it
-  (no disposable test database is configured locally); those tests are written and collected
-  only. Statements below that M5g is staged, unaccepted or pending review describe the state at
+  Prompt 218 and corrected its tests in Prompt 219. Until Prompt 221 no PostgreSQL test had
+  run for it. In feature CI at `f0d4ce92` the PostgreSQL job ran with one failure, an invalid
+  cross-question test comparison corrected in Prompt 222 and accepted for a corrective commit
+  in Prompt 223 ([review](#external-review-of-the-test-correction-prompt-223)); it has not yet
+  run against PostgreSQL
+  ([feature CI and correction](#feature-ci-at-f0d4ce92-and-the-abandoned-reservation-test-correction-prompts-221222)). Main publication is blocked until CI
+  passes on the corrected version. Statements below that M5g is staged, unaccepted or pending review describe the state at
   the time and are historical.
 - **Specification:** [accepted M5g specification](../plan.md#m5g-review-orchestration-and-atomic-output-specification-accepted-at-review-prompt-217-implementation-pending),
   G1–G15 and G17–G24 with binding clarifications A and B
@@ -324,3 +328,118 @@ CI.
 - **Not closed:** M4d and E7 are not declared closed.
 - **Not authorized:** a production review path or `run_review` registration.
 - **Pending:** publication, merge, M5h, M6 and overall M5 acceptance.
+
+## Feature CI at `f0d4ce92` and the abandoned-reservation test correction (Prompts 221–222)
+
+**Publication (Prompt 221).**
+
+- **What was pushed:** after the preparation commit
+  `f0d4ce921a4e58ce381d3f3d26e9a0a80ad94b2c` (README and threat-model status corrections),
+  Mathew pushed it manually as the new branch `feat/review-orchestration`. Main was unchanged at
+  `e7dd3be3`.
+- **What Claude Code could see:** using anonymous API access it observed only run, job and step
+  conclusions. The integration job failed at "Run integration tests" and the other four required
+  jobs succeeded.
+- **Access limitation (historical):** its job-log download returned HTTP 403, so it recorded no
+  counts or test names.
+
+**Logs retrieved by the external reviewer (the reviewer's observations, not Claude Code's).** All
+were from commit `f0d4ce92`, branch `feat/review-orchestration`, the push event, attempt 1.
+
+- [ci run 42205208269](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269):
+  - [verify (ubuntu-24.04)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269/job/127849986602):
+    `4999 passed, 439 skipped in 128.52s`.
+  - [verify (windows-2025)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269/job/127849986480):
+    `4998 passed, 440 skipped in 183.71s`.
+  - Both verify logs printed `production registry: ingest_revision, index_revision` and all
+    twelve installed-wheel result lines, including "review orchestration imported and migration
+    0008 rendered offline from the installed wheel".
+  - [integration (PostgreSQL 17 + pgvector)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269/job/127849986506):
+    `1 failed, 438 passed, 4999 deselected in 345.13s`, with 439 of 5438 collected tests
+    selected.
+  - [container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208269/job/127849986032):
+    the smoke and cleanup succeeded.
+- [secret-scan run 42205208210](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208210):
+  [Gitleaks](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42205208210/job/127849986119)
+  scanned 96 commits and found no leaks.
+
+**What those passes do not show:**
+
+- The container smoke exercises the existing ingestion and indexing path, not M5g review
+  orchestration.
+- The wheel's Recall line is arithmetic and its Voyage line mocked.
+- The offline `0008` SQL rendering is not database execution.
+
+Claude Code holds no copy of the reviewer's log archive.
+
+**Diagnosis (the reviewer's).** The one failure was
+`tests/test_review_handler_postgres.py::test_a_reservation_abandoned_before_dispatch_is_retried_on_the_next_attempt`,
+at its final assertion:
+
+- **The flaw:** the final query selected every Verification call across all questions, ordered
+  them by `question_id` and `sequence`, and compared the first retry with the first row. The
+  pinned template begins with `RET-01`, but alphabetical order puts `BCP-01` first, so the
+  assertion compared request digests of **different questions**.
+- **What did pass:** the log shows the earlier assertions passing. The cancellation raised
+  `JobCancelledError`, one sequence-1 started reservation from attempt 1 remained, the next
+  worker run exited successfully, and the job reached `succeeded`.
+- **Conclusion:** the failure is an invalid test comparison, not a demonstrated production retry
+  defect.
+
+**Correction (Prompt 222; this test only, no production byte changed).**
+
+- **Before the retry:** the test captures the single interrupted reservation and requires its
+  complete identity: tenant, review, job, the first **planned** question (template order),
+  `verification`, sequence 1, `initial`/`original`, `started` and job attempt 1. It records that
+  row's request digest.
+- **After the retry:** it queries only that tenant, review, question and stage, ordered by
+  sequence. It requires exactly sequence 1 (`initial`/`original`, still `started`, attempt 1)
+  and sequence 2 (`retry`/`original`, `completed`, attempt 2), and both digests must equal the
+  captured digest. The `succeeded` job assertion is kept.
+- **No-dispatch proof:** the cancelling provider now records every call, and the test asserts
+  zero. Raising inside `generate` alone proved nothing, because `call_validated` maps an ordinary
+  provider exception to `provider_failed`.
+- **Unchanged:** no hardcoded digest, template-order, planner, retry-rule or production change.
+
+**Status.**
+
+- **Database execution:** for `f0d4ce92`, PostgreSQL has now executed and the gate failed (one
+  test). The corrected test is collected but **not executed locally**: no disposable test
+  database is configured.
+- **Scope of the passing jobs:** they are evidence for `f0d4ce92` only, not for the correction.
+- **Prompt 220 acceptance:** it remains a historical decision, scoped to a local commit.
+- **Blocked:** feature CI is not verified, and main publication remains blocked until CI passes
+  on the corrected version.
+- **Not claimed:** M4d and E7 are not declared closed, and M5h, M6 and overall M5 acceptance
+  remain pending.
+
+## External review of the test correction (Prompt 223)
+
+**Decision (the external reviewer's).** The Prompt 222 correction is **accepted for a corrective
+commit and feature publication**:
+
+- the cross-question comparison defect is corrected;
+- the test captures the interrupted reservation and compares only its own question and stage
+  history;
+- it requires the expected initial and retry reservations with the captured digest;
+- it explicitly asserts zero calls to the cancelling provider.
+
+**The reviewer's evidence.** The reviewer:
+
+- statically reviewed the correction diff;
+- independently verified its size, line count and SHA-256;
+- earlier retrieved all five `f0d4ce92` job logs.
+
+Claude Code's local checks are its own.
+
+**Limit.** This acceptance does **not** establish that the corrected test has passed against
+PostgreSQL or in CI. That verification is still pending for the corrective commit.
+
+**Current status.**
+
+- **`f0d4ce92`:** feature-published; four required jobs passed, and the PostgreSQL job ran and
+  failed one test.
+- **Correction:** accepted for a corrective commit.
+- **Verification:** corrected-version PostgreSQL and CI verification are pending, and main
+  publication stays blocked until that gate passes.
+- **Not claimed:** M4d and E7 are not closed.
