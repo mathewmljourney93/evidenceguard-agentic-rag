@@ -13827,9 +13827,27 @@ PostgreSQL integration job. Claude Code observed conclusions only (its log downl
 HTTP 403). The external reviewer's retrieved logs show PostgreSQL `439 passed, 4999
 deselected`, including all 54 M5g positions; Ubuntu `4999 passed, 439 skipped`; Windows
 `4998 passed, 440 skipped`; and Gitleaks with 97 commits and no leaks. The reviewer
-accepted that evidence in Prompt 224. M5g is feature-CI verified and not merged. Main
-publication is authorized only through the new feature and main CI gates
+accepted that evidence in Prompt 224. **Main publication (Prompt 224).** Feature CI for the
+evidence commit `bebd2f75` passed. After a main preflight, local main was fast-forwarded
+with `--ff-only`, Mathew pushed it manually, and the separate main CI for `bebd2f75` passed
+all five jobs (conclusions only; log downloads returned HTTP 000 or 403). M5g is
+**reviewed, verified in CI and on main at `bebd2f75`** within its accepted scope. The
+publication evidence awaits review. The "PostgreSQL and CI pending" wording in this
+subsection's heading is historical. There is no production `run_review` registration or
+live provider. M4d and E7 closure need explicit assessment, and M5h, M6 and overall M5
+acceptance remain pending
 ([evidence](decisions/0025-review-orchestration.md#feature-ci-at-3d41f435-prompt-223)).
+**Prompt 225.** The reviewer independently retrieved all ten `bebd2f75` logs and accepted
+the publication evidence ([reviewer logs](decisions/0025-review-orchestration.md#reviewer-retrieved-bebd2f75-logs-and-acceptance-prompt-225)). An
+[M4d and E7 closure assessment](#m4d-and-e7-closure-assessment-proposed-prompt-225-awaiting-review-neither-closed) and a
+[proposed M5h specification](#m5h-anthropic-adapter-specification-proposed-prompt-225-unaccepted-unimplemented-untested) follow this subsection; neither is accepted.
+**Prompt 226.** The reviewer accepted the M4d trusted-snapshot requirement and the E7
+output-persistence and atomic-finish requirement as satisfied **for the internal `run_review`
+handler composition at `bebd2f75`** ([scoped acceptance](#m4d-and-e7-closure-assessment-scoped-acceptance-prompt-226)).
+This is not production wiring or overall M5 acceptance. M5h stays proposed and unaccepted,
+with its contracts completed for review. **Prompt 227.** The corrected M5h specification is
+accepted at review with binding clarifications A–C ([M5h](#m5h-anthropic-adapter-specification-accepted-at-review-prompt-227-implementation-pending));
+its implementation is pending.
 ([ADR-0025](decisions/0025-review-orchestration.md#feature-ci-at-f0d4ce92-and-the-abandoned-reservation-test-correction-prompts-221222)).
 
 **State (Prompt 218, historical).** Claude Code implemented the accepted specification in Prompt 218 on
@@ -13894,6 +13912,1313 @@ No production byte changed. **Database status:** 54 M5g PostgreSQL tests are wri
 collected but not executed. The collected integration total is 439 (the earlier 385 plus
 54), all skipped locally. Details are in
 [ADR-0025](decisions/0025-review-orchestration.md#prompt-219-review-findings-and-test-corrections).
+
+<a id="m4d-and-e7-closure-assessment-proposed-prompt-225-awaiting-review-neither-closed"></a>
+
+#### M4d and E7 closure assessment (scoped acceptance, Prompt 226)
+
+**Status (Prompt 226).** The external reviewer **accepted** both assessed requirements **for the
+internal `run_review` handler composition at `bebd2f75`**, with a scope clarification
+([disposition](#m4d-and-e7-review-disposition-prompt-226)). This accepts the assessed
+requirements only. It does not accept production wiring or overall M5, and it authorizes no
+production path. The anchor above keeps links to the Prompt 225 heading valid.
+
+**Assessment (Prompt 225; its wording is kept as history).** Claude Code proposed the
+recommendations below for external review; they changed no accepted contract. The source and
+tests were read at `bebd2f75`; the CI evidence is the external reviewer's retrieved logs for
+that commit
+([ADR-0025](decisions/0025-review-orchestration.md#reviewer-retrieved-bebd2f75-logs-and-acceptance-prompt-225)),
+not a green conclusion alone.
+
+**Shared evidence limits.** The logs print module positions, not test names, so no single case
+below is named in them. *Inference from the source:* `test_review_handler_postgres.py` and
+`test_review_canary_postgres.py` define exactly 7 and 3 test functions and carry no parametrize
+mark, so their 7 and 3 passing positions are consistent with every one of those functions
+passing. `test_review_outputs_postgres.py` defines 17 functions, some parametrized, for its 44
+positions. No migration or `alembic check` output is printed separately.
+
+##### M4d trusted-snapshot limitation
+
+**Original requirement.**
+
+- M4d's explicit-snapshot retrieval (`search_snapshot`) accepts a snapshot value from a trusted
+  caller. Nothing in M4d proves that a caller-supplied snapshot was captured by the application
+  (wording clarified in Prompt 226)
+  ([M4d specification](#m4d-snapshot-and-retrieval-specification-accepted-at-review-prompt-133-implementation-pending)).
+- The closure condition is in the
+  [M5 sequence](#m5-implementation-sequence-accepted-at-review-prompt-170) and M5d: the limitation
+  closes **for review paths only**, once M5d is implemented and verified and M5g obtains its
+  snapshot solely from `load_trusted_review`.
+- M5g restated it for its handler: retrieval only through `search_snapshot` over the loaded
+  snapshot, with no recapture, current-revision search or unpinned artifact load.
+
+**Implementation and tests addressing it.**
+
+| Obligation | Implementation at `bebd2f75` | Tests |
+| --- | --- | --- |
+| Trusted review snapshot | `review.py` step 3 calls `load_trusted_review` (M5d) only. The loader rebuilds the snapshot through its constructors and compares the stored digests. The resolved review must name this job and tenant. | M5d's loader tests (on main at `1efe3ed3`); `test_a_review_that_names_another_job_is_permanent`; `test_job_and_payload_mismatches_are_permanent_before_any_read` |
+| Trusted stage reloads | Every resume decision, and completion, starts from `load_trusted_stages` (M5e). | `test_an_uncommitted_finish_is_retried_and_reuses_every_stage_with_zero_calls`; `test_a_rerun_after_an_uncommitted_finish_reuses_every_stage_with_zero_calls`; `test_choice_3_a_reload_for_another_attempt_is_refused_as_retryable`; the M5e reload tests |
+| Retrieval against the captured bindings | `_retrieve` calls `search_snapshot(..., snapshot, ...)` with the loaded snapshot. `capture_snapshot`, `capture_in_transaction`, `search_current` and the unpinned template and prompt loaders are absent from `review.py`. | `test_review_py_uses_only_the_trusted_snapshot_retrieval_path` (AST structure test) |
+| Replacement activation | A revision activated after creation is never substituted: the superseded bound revision still supplies the evidence. | `test_a_replacement_activated_after_creation_is_outside_the_snapshot` (PostgreSQL); `test_retrieval_provider_failure_is_retryable_and_snapshot_failures_permanent` |
+| Evidence recheck | Each evidence record is written and re-read in one fenced transaction. `QuestionEvidence` is built from the trusted review's tenant, review and snapshot digest and revalidated by its constructor (the result's tenant must match) before any request is assembled; a retry whose rebuilt request differs is refused. | `test_the_evidence_then_three_timeouts_trace_has_the_exact_writes`; `test_a_retry_whose_rebuilt_request_differs_is_permanent_with_no_dispatch`; `test_u4_oversized_evidence_makes_no_call_and_records_no_evidence`; M5e evidence-state tests |
+| Source-bound report | `_complete` reloads the stages, builds the M5f content and calls `recheck_report_content` against the trusted review, template, plan and stages. It then renders only from that content. | `test_a_fresh_review_commits_every_stage_the_output_and_success_together`; `test_the_trusted_output_reader_renders_and_compares`; `test_renderer_drift_is_reported_never_repaired`; the M5f recheck tests |
+
+**Observed CI evidence.** Feature and main PostgreSQL jobs at `bebd2f75` passed `439 passed,
+4999 deselected`, with 7 passing `test_review_handler_postgres.py` positions; the verify jobs
+ran the non-database structure test (`4999` and `4998` passed). M5d and M5e evidence is their
+own, on main at `1efe3ed3` and `14f510e`.
+
+**Scope that could be considered satisfied.** The closure condition holds **for the internal
+`run_review` handler composition**, as built by `make_run_review_handler` and registered only in
+test registries:
+
+- its snapshot comes solely from `load_trusted_review`;
+- its retrieval is solely `search_snapshot` over that snapshot;
+- a later replacement activation stays outside it.
+
+**Outside that scope.**
+
+- **Production review paths.** None exists. `run_review` is not in `production_registry`, and no
+  endpoint, command, setting or enqueue path builds the handler. Closure for a production path
+  needs that path's own review when it is registered.
+- **The general retrieval APIs (wording corrected in Prompt 226).** Explicit-snapshot retrieval
+  through `search_snapshot` still trusts its caller's snapshot. `capture_snapshot` and
+  `capture_in_transaction` capture snapshots and accept none from a caller. `search_current`
+  intentionally selects current state
+  ([disposition](#m4d-and-e7-review-disposition-prompt-226)).
+- **Database trust.** Nothing protects against direct database writes, data-altering migrations
+  or malicious trusted in-process code; the digests only detect disagreement between stored rows.
+- **U4.** A U4 stage's discarded evidence and its original binding cannot be re-proved.
+- **Execution history.** Persistence cannot prove template origin, original retrieval execution
+  or request reassembly.
+
+**Recommendation (Prompt 225).** Record the M4d trusted-snapshot limitation as **satisfied for
+the internal `run_review` handler composition at `bebd2f75`**, without extending to any
+production registration or to other callers of the general retrieval APIs. **Accepted in
+Prompt 226** for that scope. There is no name-level log line for the replacement-activation
+case: the evidence is the printed position count plus the source inference above. The reviewer
+ruled this an evidence-granularity limitation, not an outstanding implementation gap, and not
+a requirement for another CI run.
+
+##### E7 report output
+
+**Original requirement.** The Correction D output requirement and the
+[M5e-L scope decision](#m5e-l-output-requirement-carried-to-m5f-and-m5g-e7-scope-decision-approved-in-prompt-198)
+require:
+
+- a concrete output table in a later additive migration, never a change to `0007`, with bounded
+  columns and digests;
+- an atomic writer inside `fenced(finish=True)`, with M3 recording `succeeded` in the same
+  transaction, so a review is never complete without its output;
+- the completeness rule: every planned question has a committed verification and an analysis
+  stage (S1/S2 or U1–U6);
+- replay rules, and the read-time status projection (W15: `completed` iff the output row exists).
+
+**Implementation and tests addressing it.**
+
+| Obligation | Implementation at `bebd2f75` | Tests |
+| --- | --- | --- |
+| Migration `0008` | `v0008_review_outputs.py` creates `review_outputs` only (0007 unchanged): bounded, named checks (renderer, mode, digests, sizes), composite tenant/review and tenant/job references, the primary key on the review and a tenant/job unique. | `test_migration_0008_downgrades_upgrades_and_matches_the_models`; `test_each_named_check_refuses_one_violating_row`; `test_the_catalogue_records_the_exact_keys_and_foreign_keys`; the reference, key and no-cascade cases |
+| Output persistence | `write_review_output(fence, output)` checks the fence's job, the review binding, the plan and the completeness of every stage before inserting. | `test_the_writer_refuses_a_fence_for_another_job_and_incomplete_stages`; `test_review_output_persistence.py` (real boundaries over scripted sessions) |
+| Replay and conflict | An identical stored row replays with its original audit fields. A different row raises `ReviewOutputConflictError` and is never overwritten. | `test_an_identical_stored_row_replays_with_its_original_audit_fields`; `test_a_different_stored_row_is_a_conflict` |
+| Lifecycle-aware reads | `load_review_status` and `load_review_output` project the shared table: a present output requires a succeeded job, and an absent output never pairs with a succeeded job (otherwise `ReviewOutputRecordInconsistentError`). Tenants are isolated, and Markdown drift is reported without changing the row. | `test_a_present_output_with_a_job_that_has_not_succeeded_is_inconsistent`; `test_an_absent_output_follows_the_shared_table`; `test_tenants_are_isolated_and_a_missing_review_is_not_found`; `test_tampered_output_rows_are_inconsistent`; `test_a_non_canonical_job_is_inconsistent`; `test_markdown_drift_is_reported_and_the_row_is_unchanged` |
+| Output plus job success in one finish | `_complete` calls `write_review_output` inside `ctx.fenced(finish=True)`, and the M3 runtime records `succeeded` in that transaction. | `test_a_review_runs_end_to_end_and_commits_its_output_with_success`; `test_an_uncommitted_finish_is_retried_and_reuses_every_stage_with_zero_calls`; `test_lease_loss_in_the_finish_block_rolls_back_the_output_and_success`; `test_finish_commit_and_cleanup_failures_are_uncertain_and_normalized`; the G15 and G22 non-database tests |
+
+**Observed CI evidence.** Feature and main PostgreSQL jobs at `bebd2f75` passed, with 44
+`test_review_outputs_postgres.py` positions and 7 `test_review_handler_postgres.py` positions.
+All four verify logs printed "review orchestration imported and migration 0008 rendered offline
+from the installed wheel". That line shows offline SQL rendering, not PostgreSQL execution.
+
+**Scope that could be considered satisfied.** The E7 output obligations carried by M5e-L
+(table, migration, writer, completeness, replay and conflict, lifecycle reads and the atomic
+finish) are implemented and exercised against PostgreSQL **for the internal handler
+composition**.
+
+**Outside that scope.**
+
+- **M6.** Approval, revisions, finalize, export, ETags, the approver role and audit events. A
+  `completed` review is not an approved, finalized or exported one. M6 must also keep the
+  report-integrity invariant for every displayed conclusion.
+- **Production completion.** No production path can reach completion while `run_review` is
+  unregistered.
+- **Commit-window and unknown outcome.** A finish commit whose outcome is unknown is not proved
+  either way. The M3 lease/commit window still allows a stale holder's in-flight transaction to
+  commit around lease loss. There is no exactly-once provider call.
+- **Provenance, not semantics.** The output proves agreement with committed stage rows and the
+  pinned renderer. It does not prove semantic correctness, entailment or authenticity.
+
+**Recommendation.** Record the E7 output requirement as **satisfied for the internal
+`run_review` handler composition at `bebd2f75`**, with M6's approval and export obligations
+explicitly separate and still pending. **Accepted in Prompt 226** for that scope. As for M4d,
+the log evidence is position-level only, which is an evidence-granularity limitation; no
+implementation gap was found.
+
+**Not changed by this assessment (Prompt 225, historical).** At Prompt 225 both limitations
+stayed open in the threat model until the reviewer accepted or amended these recommendations.
+The threat model now records the scoped acceptance. The U4, M3 lease/commit-window,
+unknown-outcome and provenance-versus-semantic limits are unchanged.
+
+##### M4d and E7 review disposition (Prompt 226)
+
+**Decision (external review, Prompt 226).** Accepted, with this scope clarification:
+
+- **M4d.** The trusted-snapshot requirement is **satisfied for the internal `run_review`
+  handler composition at `bebd2f75`**.
+- **E7.** The deferred output-persistence and atomic-finish requirement is **satisfied for that
+  internal composition at `bebd2f75`**.
+- **Scope.** This accepts the assessed requirements. It does not accept production wiring or
+  overall M5.
+
+**Evidence basis.** The reviewer ruled the source inspection and the complete passing PostgreSQL
+module results sufficient for this scoped decision. Two kinds of evidence stay distinct:
+
+- **Printed directly** in the reviewer-retrieved logs: the module positions (7, 44 and 3) and
+  the job totals.
+- **Inferred** from the source by Claude Code: that the named functions, including the
+  replacement-activation test, are among those positions.
+
+The absence of individually printed test names is an **evidence-granularity limitation**. It is
+not an outstanding implementation gap, and not a requirement for another CI run.
+
+**Retrieval API scope (clarified).** This replaces the Prompt 225 wording under "Outside that
+scope":
+
+- **Explicit-snapshot retrieval** (`search_snapshot`, through `check_retrieval_access`) still
+  relies on a trusted caller: nothing in M4d proves that a snapshot value passed to it was
+  captured by the application.
+- **`capture_snapshot` and `capture_in_transaction` capture snapshots.** They read the vendor's
+  eligible revisions and return a new snapshot; neither accepts an arbitrary caller-supplied
+  snapshot.
+- **`search_current` intentionally selects current state.** It captures a fresh snapshot of
+  the current eligible revisions and searches it.
+- **The internal review handler** uses only its trusted persisted snapshot, loaded by
+  `load_trusted_review`, and retrieves only through `search_snapshot` over it.
+- **Any future production registration** needs its own composition review.
+
+**Limits that remain.**
+
+- **U4.** A U4 stage's discarded evidence and its original binding cannot be re-proved.
+- **Database trust.** Nothing protects against direct database writes, data-altering migrations
+  or malicious trusted in-process code.
+- **M3's lease/commit window**, unknown commit outcomes and the absence of an exactly-once
+  provider call.
+- **M6** approval and export obligations, which stay separate and pending.
+- **Provenance, not semantics.** No entailment, authenticity, model-quality or
+  injection-resistance claim follows.
+
+<a id="m5h-anthropic-adapter-specification-proposed-prompt-225-unaccepted-unimplemented-untested"></a>
+
+#### M5h Anthropic adapter specification (ACCEPTED at review, Prompt 227; implementation pending)
+
+**Status.** **ACCEPTED at external review in Prompt 227**, with binding clarifications A–C
+([acceptance](#m5h-acceptance-prompt-227)). It was proposed by Claude Code in Prompt 225 and corrected in
+Prompt 226. Implementation, implementation tests, builds, publication and exact-version CI are
+**pending**, and **no M5h control operates yet**. Specification acceptance is not
+implementation or CI acceptance, and it authorizes no implementation by itself. It follows
+the [M5 sequence](#m5-implementation-sequence-accepted-at-review-prompt-170) row: "Anthropic
+adapter behind the M5a protocol, tested only with an injected or mocked transport; not
+registered, no settings, no live call (W9)". It changes no accepted M5a–M5g contract. The adapter
+alone establishes no model quality, entailment, authenticity or injection resistance. The anchor
+above keeps links to the Prompt 225 heading valid.
+
+##### M5h acceptance (Prompt 227)
+
+**History.**
+
+- **Prompt 225:** proposed by Claude Code.
+- **Prompt 226:** the reviewer kept it unaccepted and required corrections R1–R5
+  ([M5h-R](#m5h-r-prompt-226-review-disposition-and-corrections)), which Claude Code made.
+- **Prompt 227:** the corrected specification is **accepted at external review**, with the
+  binding clarifications below.
+
+**Decisions.** H1–H10 ([M5h-M](#m5h-m-decisions-for-review)) are **accepted**. No specification
+decision remains open.
+
+**Binding clarifications (applied in this section's subsections).**
+
+| Ref | Clarification | Applied in |
+| --- | --- | --- |
+| A | Response admission precedes status classification. An exact `AnthropicResponse` with exact field types, a status of 100–599 and a body within `MAX_RESPONSE_BYTES` is required first, whatever the status. Only an admitted 504 becomes `ModelCallTimeout` without JSON inspection. An admitted non-200 body above `MAX_ERROR_BODY_BYTES` is not inspected. The real transport's status-only result after a failed or over-cap error-body read is a newly constructed, admissible value, so a real 504 whose body read fails is still `timeout`. | M5h-C, M5h-F, M5h-G (step 1, status table, G5–G7, G11), M5h-I, M5h-J, H6 |
+| B | Clock failures depend on the phase. Before a valid status, and on the 200 path, an unusable, backwards or ordinarily raising clock is `clock_failed`; a valid expired budget is `timeout`. The status is read and validated before the post-header elapsed check. Once a valid non-200 status is known, an ordinary clock failure is an ordinary failure on the error path and yields a status-only response. Process control always propagates. | M5h-C (phases 4–6), M5h-F, M5h-G (G12, G13, G19), M5h-I, M5h-J |
+| C | Finite JSON floats only. `parse_constant` still refuses the named constants, and a guarded `parse_float` refuses a non-finite conversion such as `1e999`, even in ignored fields. Finite floats stay allowed in ignored fields, and every float is refused where an exact integer is required. A 200 body failing this is `malformed_response`; an error envelope failing it is no usable envelope. | M5h-H (J5, J6), M5h-G (G10), M5h-J |
+
+**Consistency corrections (not additional scope).**
+
+- `str(error)` is the code string, and `error.args` is the one-element tuple.
+- `ModelCallTimeout`'s existing M5a representation is described as it is. M5a is not changed.
+- `SecretStr.get_secret_value` is used during constructor validation as well as for the header.
+- An ordinary TLS-context construction failure becomes a fresh `configuration` error. Process
+  control is preserved, and the connection factory is not called.
+- `response_too_large` is qualified by the non-200 status-preservation rule.
+
+**Reviewer evidence (the external reviewer's, Prompt 227).**
+
+- **The export.** The reviewer verified the uploaded Prompt 226 export's SHA-256, bytes, lines,
+  statistics and encoding, and inspected its contracts.
+- **The request bound.** The reviewer independently constructed the maximal request with the
+  standard-library `json` module and reproduced 2,784,148 serialized bytes.
+- **Non-finite floats.** A separate isolated probe showed that Python's `json.loads` decodes
+  `1e999` to positive infinity even when `parse_constant` rejects the `NaN` and `Infinity`
+  tokens. This is the reason for clarification C.
+- **Limits.** These were isolated standard-library checks. They were not project-suite,
+  installed-wheel, PostgreSQL or provider tests, and they establish no M5h behaviour.
+
+**Implementation contract.**
+
+- **What binds an implementation.** M5h-B to M5h-J as clarified above, with H1–H10.
+- **Unchanged.** Every accepted M5a–M5g contract, the separately attributed M5g logs and the
+  scoped M4d/E7 acceptance.
+
+**Pending obligations.**
+
+- implementation and its planned tests (M5h-J);
+- the build, the installed-wheel line and publication;
+- exact-version CI and implementation review;
+- the live behaviour reserved for M7 (M5h-L).
+
+**Not authorized:** implementation without the next authorization, production wiring,
+`run_review` registration, credentials, live calls, M6 and overall M5 acceptance.
+
+##### M5h-R. Prompt 226 review disposition and corrections
+
+**Disposition (external review, Prompt 226; historical, superseded by the [Prompt 227 acceptance](#m5h-acceptance-prompt-227)).**
+At that point M5h remained proposed and unaccepted, and H1–H10
+([M5h-M](#m5h-m-decisions-for-review)) were **supported directions**, subject to the completed
+contracts below, not then accepted implementation decisions. The reviewer required five
+corrections:
+
+| Ref | Finding | Corrected in |
+| --- | --- | --- |
+| R1 | Classifying the status before the body contradicted letting `error.type == "timeout_error"` override it; an injected transport returns an already-read body. | M5h-C (transport phases), M5h-G (ordered algorithm and decision table) |
+| R2 | The content rules conflicted, "discarded unread" implied undecoded bytes, the strict-JSON rules only referred to M4f, and an injected transport could bypass the byte bound. | M5h-H |
+| R3 | Public values and errors were incomplete; a default dataclass representation of `AnthropicResponse` would print body bytes; `RETRYABLE_CODES` suggested a second retry policy. | M5h-B, M5h-I |
+| R4 | The HTTPS transport signature used ellipses; framing, headers and cleanup were incomplete, and the timeout claim overstated the bound. | M5h-B, M5h-C, M5h-D, M5h-F |
+| R5 | There was no explicit bound for the whole serialized request, and caps and strict choices were not labelled as engineering limits and project policy. | M5h-F, M5h-H |
+
+**What changed from Prompt 225.**
+
+- **Retry hints removed.** `RETRYABLE_CODES` and any `retryable` property are gone.
+- **One parser boundary.** `parse_response` now takes the whole `AnthropicResponse`. The status,
+  the error envelope and the byte bound are therefore checked at the parser for every transport,
+  real or injected.
+- **Error bodies.** The HTTPS transport now reads non-200 bodies, bounded, only to detect
+  `timeout_error`. An admitted HTTP 504 is a timeout without inspecting its body (admission
+  first: clarification A, Prompt 227). This deliberately differs from M4f,
+  which never reads a non-200 body.
+- **Codes.** 404 is `not_found` (it does not prove a model is unavailable). 413 is
+  `payload_too_large`, distinct from the pre-dispatch `request_too_large`. Clock failures have
+  their own code.
+- **Key rule.** The key uses M4f's printable-ASCII rule.
+- **Withdrawn claims.** Two Prompt 225 statements were wrong:
+  - "one blocking operation may overrun by up to its own timeout": no such bound exists (M5h-F);
+  - "M4f's strict rules … depth over 8 are refused": M4f has no explicit depth limit, and only
+    maps a `RecursionError` to `voyage_malformed_response`. M5h now defines its own depth rule
+    (J3).
+
+##### M5h-A. Sources and fact-versus-policy rule
+
+**Sources (official Anthropic documentation, read in Prompt 225; no provider call, no
+credential).**
+
+- [Messages API: create a message](https://platform.claude.com/docs/en/api/messages/create)
+- [Errors](https://platform.claude.com/docs/en/api/errors)
+- [Versions](https://platform.claude.com/docs/en/api/versioning)
+- Claude Code's bundled Claude API reference, cached on 2026-10-06, as a secondary pointer only.
+
+No further page was consulted in Prompt 226. The corrections are project policy and
+implementation contracts derived from the facts below, from the M5a source and from the existing
+M4f source (`voyage.py` and `voyage_http.py` at `bebd2f75`).
+
+Items marked **[API]** are statements from those pages as read on 2026-11-07; they can change.
+Items marked **[POLICY]** are proposed project choices, not API requirements.
+
+**[API] facts used below.**
+
+- **Endpoint and headers.** `POST /v1/messages` on `api.anthropic.com`; an `anthropic-version`
+  header is required; the key is sent as `x-api-key`. Versions listed: `2026-10-21` (it removes
+  `temperature`, `top_p` and `top_k`) and `2023-06-01`. Within a version, Anthropic may add
+  optional inputs, output values and enum variants, and may change the conditions of error types.
+- **Request.** Required body fields are `model`, `max_tokens` and `messages`. `system` is a string
+  or text blocks.
+- **Response.** A `message` object with `id`, `type`, `role` (`assistant`), `model`, `content`
+  (typed blocks such as `text`, `thinking`, `redacted_thinking` and `tool_use`), `stop_reason`,
+  `stop_sequence`, `stop_details` and `usage`.
+- **Stop reasons.** `end_turn`, `max_tokens`, `stop_sequence`, `tool_use`, `pause_turn`, `refusal`
+  and `model_context_window_exceeded`; non-null in non-streaming mode.
+- **Usage.** It includes `input_tokens` and `output_tokens`. Total input is `input_tokens` plus the
+  two cache counters.
+- **Errors.** JSON `{"type": "error", "error": {"type", "message"}, "request_id"}`. Statuses: 400
+  `invalid_request_error`, 401 `authentication_error`, 402 `billing_error`, 403
+  `permission_error`, 404 `not_found_error`, 409 `conflict_error`, 413 `request_too_large`, 429
+  `rate_limit_error`, 500 `api_error`, 504 `timeout_error` and 529 `overloaded_error`.
+  `timeout_error` can also arrive with other statuses. Error `type` values may grow.
+- **Size and duration.** The Messages API request limit is 128 MB. Streaming is recommended for
+  long requests, especially those over 10 minutes.
+- **Model-dependent behaviour.** Current models reject `temperature`, `top_p` and `top_k`. Some
+  run adaptive thinking when `thinking` is omitted and return `thinking` blocks. The API offers
+  optional server-side model fallbacks.
+
+##### M5h-B. Scope, placement and public signatures
+
+**[POLICY] In scope:**
+
+- the adapter `evidenceguard_agents.anthropic` (pure: standard library and domain only);
+- an injectable transport protocol;
+- one standard-library HTTPS transport in `evidenceguard_worker.anthropic_http` (decision H1),
+  mirroring M4f's `voyage.py` and `voyage_http.py` split;
+- offline tests and one additive offline installed-wheel line.
+
+**Out of scope:** registration, settings, environment reads, credentials, endpoints, a default
+provider or model, streaming, tools, caching, batches, fallbacks and any live call. Live wiring and
+the first live call stay with M7 (W9).
+
+**Adapter module `evidenceguard_agents.anthropic`** (accepted in Prompt 227; proposed in Prompt 225):
+
+```python
+ANTHROPIC_PROVIDER_ID = "anthropic"  # matches PROVIDER_ID_PATTERN
+ANTHROPIC_API_VERSION = "2026-10-21"  # decision H3
+ANTHROPIC_HOST = "api.anthropic.com"
+ANTHROPIC_PATH = "/v1/messages"
+MAX_REQUEST_BYTES = 4_194_304  # derived valid maximum: 2,784,148 (M5h-F)
+MAX_RESPONSE_BYTES = 1_048_576  # every status
+MAX_ERROR_BODY_BYTES = 65_536  # largest error body inspected for an envelope
+MAX_JSON_DEPTH = 16
+MAX_JSON_INTEGER_DIGITS = 20
+MAX_CONTENT_BLOCKS = 64
+
+
+class AnthropicErrorCode(StrEnum): ...  # members and values in M5h-I
+
+
+class AnthropicError(Exception):
+    code: AnthropicErrorCode
+
+    def __init__(self, code: AnthropicErrorCode) -> None: ...
+
+
+@dataclass(frozen=True, init=False, repr=False)
+class AnthropicResponse:
+    status: int
+    body: bytes
+
+    def __init__(self, status: int, body: bytes) -> None: ...
+
+
+class AnthropicTransport(Protocol):
+    def post(self, body: bytes, *, timeout_ms: int) -> AnthropicResponse: ...
+
+
+def build_request_body(request: StructuredRequest) -> bytes: ...
+def parse_response(response: AnthropicResponse) -> ProviderResponse: ...
+
+
+@dataclass(frozen=True, init=False, repr=False)
+class AnthropicProvider:  # satisfies the M5a ModelProvider protocol
+    transport: AnthropicTransport
+
+    def __init__(self, transport: AnthropicTransport, **unknown: object) -> None: ...
+    @property
+    def provider_id(self) -> str: ...  # always "anthropic"
+    def generate(self, request: StructuredRequest) -> ProviderResponse: ...
+```
+
+**Value contracts.**
+
+- **`AnthropicResponse(status, body)`.**
+  - It takes exactly these two arguments, positionally or by keyword, with no defaults. An extra
+    argument is Python's own `TypeError`, a programming error that names no submitted value.
+  - `status` must be exactly `int` (so `bool` is refused) and 100–599. `body` must be exactly
+    `bytes` (not `bytearray`, `memoryview` or `str`) and at most `MAX_RESPONSE_BYTES` long, for
+    every status. A type or range failure is `malformed_response`; a longer body is
+    `response_too_large`.
+  - Unlike M4f's `VoyageResponse`, a non-200 response may carry a non-empty body (M5h-G).
+  - `repr` and `str` are `AnthropicResponse(status=<status>, body_bytes=<length>)` and never show
+    the bytes. `repr=False` is required, because the default dataclass representation would
+    print `body`. Equality compares both fields without exposing them.
+- **`AnthropicProvider(transport, **unknown)`.**
+  - `unknown` must be empty, and `transport.post` must be callable. An attribute read that raises
+    an ordinary exception counts as "not callable". Any failure is `configuration`. Process
+    control raised while reading the attribute propagates as the same object.
+  - It stores the transport only: no clock, key, model, setting or other state.
+  - `provider_id` is always `"anthropic"`. `repr` and `str` are `AnthropicProvider()`.
+- **`build_request_body(request)`** revalidates `request` exactly as `generate` step 1 does
+  (M5h-C), then returns the canonical body (M5h-D). It raises `invalid_request` or
+  `request_too_large`.
+- **`parse_response(response)`** runs the ordered algorithms of M5h-G and M5h-H. It returns a
+  `ProviderResponse` or raises `ModelCallTimeout` or a fixed `AnthropicError`.
+- **`AnthropicError(code)`** is specified in M5h-I.
+
+**HTTPS transport module `evidenceguard_worker.anthropic_http`** (accepted in Prompt 227; informed by
+`HttpsVoyageTransport`):
+
+```python
+PIECE = 64 * 1024
+MAX_CONNECT_SECONDS = 120
+MAX_KEY_LENGTH = 256
+USER_AGENT = "evidenceguard-anthropic-http-v1"
+
+ConnectionFactory = Callable[[str, float, ssl.SSLContext], http.client.HTTPSConnection]
+Clock = Callable[[], float]
+
+
+def _https_connection(
+    host: str, timeout: float, context: ssl.SSLContext
+) -> http.client.HTTPSConnection:
+    return http.client.HTTPSConnection(host, 443, timeout=timeout, context=context)
+
+
+class HttpsAnthropicTransport:
+    def __init__(
+        self,
+        api_key: SecretStr,
+        *,
+        connect_timeout: float = 10.0,
+        max_response_bytes: int = MAX_RESPONSE_BYTES,
+        connection_factory: ConnectionFactory = _https_connection,
+        clock: Clock = time.monotonic,
+        **unknown: object,
+    ) -> None: ...
+
+    def post(self, body: bytes, *, timeout_ms: int, **unknown: object) -> AnthropicResponse: ...
+```
+
+**Constructor bounds.** Any failure is `configuration`, raised before any state is kept.
+
+- **`api_key`.** Exactly a `SecretStr`. Its secret must be exactly a `str` of 1–256 characters,
+  each U+0021–U+007E: printable ASCII without space, which is M4f's rule. Validation reads the
+  secret with `get_secret_value()`.
+- **`connect_timeout`.** Exactly an `int` or a finite `float` (not `bool`), with
+  0 < value ≤ 120 seconds.
+- **`max_response_bytes`.** Exactly an `int`, 1 ≤ value ≤ `MAX_RESPONSE_BYTES`.
+- **Callables.** `connection_factory` and `clock` must be callable.
+- **Unknown arguments.** `unknown` must be empty.
+- **TLS.** [POLICY] The context is built once, in the constructor, with
+  `ssl.create_default_context()`: certificate verification (`CERT_REQUIRED`), host-name checking
+  and the system trust store. Its minimum version is set to TLS 1.2. An ordinary exception while
+  building the context becomes a fresh `configuration` error, raised outside the handler.
+  Process control propagates as the same object. The connection factory is never called during
+  construction.
+- **Default factory.** It returns an unconnected `http.client.HTTPSConnection` to port 443.
+- **Representation.** `repr` and `str` are `HttpsAnthropicTransport()`.
+
+##### M5h-C. Provider and transport responsibilities
+
+**Adapter `generate(request)`, in order.**
+
+1. **Request revalidation.** `request` must be exactly a `StructuredRequest`. It is rebuilt
+   through its constructor (`dataclasses.replace`), and the rebuilt `output_schema` and
+   `request_sha256` must equal the stored ones. This is M5a's `_revalidated_request` rule, so a
+   bypass-built or altered value fails. Failure is `invalid_request`, with zero transport calls.
+   Later steps use only the rebuilt value.
+2. **Body.** `build_request_body(rebuilt)` (M5h-D). A body longer than `MAX_REQUEST_BYTES` is
+   `request_too_large`, with zero transport calls. For a valid request this cannot happen
+   (M5h-F).
+3. **Dispatch.** `transport.post(body, timeout_ms=rebuilt.timeout_ms)` is called **exactly
+   once**.
+4. **Transport failure.** An exception from `post` is classified by its own type only, never by
+   its chain:
+   - **process control** (a non-`Exception` `BaseException`) propagates as the same object;
+   - **`ModelCallTimeout`**, or an `AnthropicError` whose `code` reads as exactly
+     `AnthropicErrorCode.TIMEOUT`, becomes a fresh `ModelCallTimeout()`;
+   - **an `AnthropicError` with a kept transport code** (`configuration`, `clock_failed`,
+     `transport_failed`, `malformed_response` or `response_too_large`) becomes a fresh
+     `AnthropicError` with that code;
+   - **any other ordinary exception**, including another code or a `code` that cannot be read,
+     becomes `transport_failed`.
+
+   The original exception is dropped first, and the new one is raised outside the handler, so it
+   has no cause, context or notes.
+5. **Result.** `parse_response(returned)` (M5h-G and M5h-H).
+
+The adapter keeps no state between calls, logs nothing and never retries. Every failure ends in
+`ModelCallTimeout` or a fixed `AnthropicError`, which `call_validated` maps to `timeout` and
+`provider_failed` (M5a unchanged).
+
+**Transport calls.** A failure in steps 1–2 makes zero transport calls. A valid dispatch makes
+exactly one. No path makes two.
+
+**HTTPS transport `post(body, *, timeout_ms)`, phases.** These mirror `HttpsVoyageTransport`
+except where stated.
+
+0. **Arguments, before any clock reading or network activity.** `unknown` must be empty; `body`
+   must be exactly `bytes`, 1 ≤ length ≤ `MAX_REQUEST_BYTES`; `timeout_ms` must be exactly an
+   `int` of 1,000–120,000. Failure is `configuration`, and the factory is never called.
+1. **Start.** One clock reading starts the budget (M5h-F).
+2. **Connection and TLS.** A spent budget is `timeout`. The transport calls
+   `factory(ANTHROPIC_HOST, min(connect_timeout, remaining), context)`, then `connect()`. It then
+   sets `auto_open = 0` on the connection, so that `http.client` cannot reconnect on its own.
+   Elapsed time is rechecked.
+3. **Request sending.** The budget is checked first. The socket is required: a missing
+   `connection.sock` is `transport_failed` (no implicit connect). Its timeout is set to the
+   remaining budget. The transport calls `request("POST", ANTHROPIC_PATH, body=body,
+   headers=<the six application headers>)` (M5h-D). Elapsed time is rechecked.
+4. **Response headers.** The budget is checked, the socket is required and its timeout set as in
+   phase 3, and then `getresponse()` is called.
+5. **Status, before the post-header elapsed check (clarification B).** `response.status` is read
+   first and must be exactly an `int` of 100–599, otherwise `malformed_response`. A malformed
+   status line is refused inside `http.client`, as an ordinary exception (`transport_failed`).
+   Only then is the post-header elapsed check made, with consequences that depend on the status.
+6. **Branch on the status.**
+   - **200.** In the post-header elapsed check, a spent budget is `timeout`, and an unusable,
+     backwards or ordinarily raising clock is `clock_failed`. Then the framing rules and bounded reads of
+     M5h-D apply, with the cap `max_response_bytes`. A framing refusal is `malformed_response`;
+     a declared or actual excess is `response_too_large`; a read failure or early end of data is
+     `transport_failed`; a `TimeoutError` or a spent budget between reads is `timeout`. A final
+     elapsed check (`timeout`) precedes the return of `AnthropicResponse(200, body)`.
+   - **Any other status (error path).** The status is now **known and preserved**. In the
+     post-header elapsed check, nothing is read if the budget is spent or if the clock reading is
+     unusable, backwards or raises an ordinary exception. The result is then
+     `AnthropicResponse(status, b"")`.
+     Otherwise the same framing rules and bounded reads apply, with the cap
+     `min(max_response_bytes, MAX_ERROR_BODY_BYTES)`. **Any** ordinary failure while framing or
+     reading the error body raises nothing: the result is again
+     `AnthropicResponse(status, b"")`. That includes a refusal, an excess, a `TimeoutError`, an
+     early end of data, a chunk error, a budget spent between reads and an ordinary clock
+     failure. A complete body within
+     the cap is returned as `AnthropicResponse(status, body)`.
+7. **Cleanup** always runs, as described below.
+
+**Status-preservation rule (R1).**
+
+- **Inside the real transport, a valid non-200 status, once obtained, is never replaced** by a
+  later ordinary failure, including an ordinary clock failure. At worst, the transport returns a
+  newly constructed `AnthropicResponse(status, b"")`.
+- **Admission still applies (clarification A).** That returned value, like any transport's, is
+  admitted first by `parse_response` (M5h-G step 1). Preservation never lets an invalid injected
+  value bypass admission.
+- **A 200 status is always replaced** by a later failure, because a 200 without its complete body
+  has no usable result.
+- **Failures before a valid status** (phases 0–5) raise.
+- **Process control** always propagates.
+
+**Classification of ordinary phase failures.** These are classified by their own type only:
+
+- this module's internal refusal keeps its fixed code;
+- `TimeoutError`, including `socket.timeout`, is `timeout`;
+- anything else is `transport_failed`: `OSError`, `ssl.SSLError`, `http.client.HTTPException`, or
+  a fake's `RuntimeError`.
+
+The failure is raised as a fresh `AnthropicError` outside every handler, after cleanup.
+
+**Cleanup (R4).**
+
+- **Separate closes.** The response is closed if `getresponse()` returned, and then the
+  connection if the factory returned. Each close is its own attempt, made at most once. The
+  invocation counts are:
+  - **the factory fails:** no close;
+  - **`connect` or `request` fails:** one connection close and no response close;
+  - **any failure after `getresponse()` returned, or a success:** one close of each.
+- **Ordinary cleanup failures** never change the outcome, whether that outcome is a 200 result, a
+  returned error response or a raised code.
+- **The first process-control object** is re-raised as the same object, after both closes have
+  been attempted. It may come from a phase or from either close. A later process-control object
+  from cleanup is suppressed when an earlier one exists.
+- **Limitations.**
+  - When `http.client` or `ssl` replaces an exception internally (for example while closing a
+    socket), the original object cannot be recovered.
+  - An interrupt delivered inside a standard-library call can leave that call partly done.
+- **No disposal claim.** Nothing about socket disposal, TLS shutdown, cancellation on the server
+  side, or whether the request was processed or billed follows from cleanup. Nothing about
+  rollback or commit outcomes follows either: M5h persists nothing, and M5g's commit-outcome
+  rules are unchanged.
+
+**What `http.client` must not do.**
+
+- **Redirects.** It follows none; a 3xx status is `unexpected_status`.
+- **Proxies.** It reads no proxy environment variable, and the transport never calls
+  `set_tunnel`.
+- **Cookies.** It keeps none.
+- **Decompression.** It is never attempted.
+- **Retries and reconnects.** There are none: `auto_open` is off, and a missing socket is refused
+  before sending.
+- **Debug output.** `set_debuglevel` is never called, so the default level 0 prints nothing. This
+  matters because the key is in the header mapping.
+
+##### M5h-D. Request mapping and structured-response handling
+
+**[POLICY] Request body.** Canonical JSON (`sort_keys`, compact separators, `ensure_ascii=True`,
+`allow_nan=False`, encoded as ASCII) containing exactly:
+
+```text
+{"max_tokens": <max_output_tokens>,
+ "messages": [{"content": <user_text>, "role": "user"}],
+ "model": <model_id>,
+ "system": <system_text>}
+```
+
+**Omitted:** `temperature`, `top_p` and `top_k` (removed in `2026-10-21`), `stream`, `tools`,
+`tool_choice`, `thinking`, `output_config`, `metadata`, `stop_sequences`, `cache_control`, beta
+headers and `fallbacks`.
+
+- **Texts.** `system_text` and `user_text` are sent exactly as assembled by M5c: never trimmed,
+  templated or split. The adapter adds no instruction.
+- **Structured output.** It is obtained from the M5c prompt and parsed only by M5a's strict
+  `parse_output`; the adapter never parses or repairs JSON output (decision H4). The adapter
+  extracts text, and M5a decides `completed` or `invalid_output`.
+
+**[POLICY] Application headers.** Exactly these six are passed to `connection.request`:
+
+| Header | Value |
+| --- | --- |
+| `x-api-key` | the key (transport only) |
+| `anthropic-version` | `ANTHROPIC_API_VERSION` |
+| `content-type` | `application/json` |
+| `accept` | `application/json` |
+| `accept-encoding` | `identity` |
+| `user-agent` | `evidenceguard-anthropic-http-v1` |
+
+**Framing headers.** `http.client` itself generates two headers for this call:
+
+- `Host: api.anthropic.com`;
+- `Content-Length`, set to the body length. The body is `bytes`, so the request is never
+  chunked.
+
+Because `accept-encoding` is supplied, `http.client` adds no second one. No other header is
+sent. The Prompt 225 wording "no other header" meant application headers only.
+
+**[POLICY] Response framing.** The same rules apply to 200 and to error responses; only the
+consequence of a refusal differs (M5h-C phase 6).
+
+- **`Content-Encoding`.** It must be absent, or exactly one header whose trimmed, case-insensitive
+  value is `identity`. Anything else is refused: `gzip`, a list, or a duplicate header. No
+  decompression is attempted.
+- **`Transfer-Encoding`.** If present, it must be exactly one header whose trimmed,
+  case-insensitive value is `chunked`, with no `Content-Length` at all; `http.client` then
+  decodes the chunks. Refused: a list (`gzip, chunked`), a duplicate header, any other value, and
+  a `Content-Length` alongside it.
+- **`Content-Length`.** Otherwise exactly one is required: trimmed of space and tab, 1–20 ASCII
+  digits, and no larger than the cap. Refused:
+  - an absent header, so no read-to-close body is accepted;
+  - a duplicate header, even with equal values;
+  - a sign, an inner space or any non-digit;
+  - a value over the cap, which is `response_too_large` for a 200.
+- **Reads.**
+  - Each read requests at most 64 KiB, and never more than the remaining declared length.
+  - With chunked framing, at most the cap plus one byte is read in total. An excess is therefore
+    detected after at most one byte past the cap.
+  - A read that returns something other than `bytes`, or more than requested, is
+    `transport_failed`.
+  - An empty read before the declared length (early end of data) is `transport_failed`. With
+    chunked framing, an empty read is the end of the body.
+  - A malformed chunk size or a truncated chunk raises inside `http.client` (`transport_failed`).
+- **Refusal results.** For a 200, framing refusals are `malformed_response`, size refusals
+  `response_too_large`, and read failures `transport_failed` or `timeout`. For an error
+  response, every refusal yields `AnthropicResponse(status, b"")`.
+
+##### M5h-E. Model, API version and where they are supplied
+
+- **Model.** [POLICY] `model_id` comes only from the `StructuredRequest`, which carries the model
+  pinned in the review's stored model configuration (M5d). The adapter has no default model,
+  allowlist or alias table.
+- **Model echo.** `model_used` is the response `model` string **verbatim**, so W-A4's exact
+  equality and W13's terminal mismatch apply unchanged (decision H2).
+- **API version.** [POLICY] A module constant, changed only by a reviewed edit; never from
+  settings, environment or the request (decision H3).
+- **Host.** Fixed; there is no `base_url` override.
+
+##### M5h-F. Timeout, cancellation, bounds and retry ownership
+
+- **Timeout budget.** [POLICY] The budget is `B = request.timeout_ms / 1000` seconds from the
+  transport's start reading.
+  - **Before each phase and each body read,** remaining = B − (now − start). If remaining ≤ 0, the
+    phase is not started. That is `timeout` for phases 2–4 and on the 200 path, and a status-only
+    result for an error body.
+  - **Socket timeouts.** Connect uses `min(connect_timeout, remaining)`. Sending, headers and each
+    read use `remaining`.
+  - **Where timeouts are applied.** Through `connection.sock.settimeout`, and only while that
+    socket exists.
+  - **A missing socket.** Before sending or reading headers, it is refused (M5h-C). After the
+    headers it is accepted, because `http.client` may hand the socket to the response; the last
+    applied timeout then stays on the underlying socket.
+  - **Rechecks.** Elapsed time is checked again after each phase and before a 200 is returned.
+- **Clock.** Every reading must be usable under M5a's `usable_reading` rule: exactly an `int` or a
+  finite `float`, not `bool`, within ±2^53.
+  - It must not be earlier than the previous reading of the same call.
+  - **The consequence depends on the phase (clarification B).**
+    - **Before a valid status is obtained (phases 1–5), and on the 200 path,** an unusable or
+      backwards reading, or an ordinary exception from the clock, is `clock_failed`
+      (`provider_failed`), never a timeout.
+    - **Once a valid non-200 status is known,** the same failure during the post-header check
+      or error-body processing is an ordinary failure on that path. The transport returns
+      `AnthropicResponse(status, b"")`, and the status decides.
+    - **So not every clock failure surfaces as `clock_failed`.**
+  - Process control from the clock propagates as the same object.
+- **No hard wall-clock bound (R4; corrects Prompt 225).** The budget is cooperative, and an
+  overrun is **not** bounded by one socket timeout:
+  - DNS resolution (`getaddrinfo`) is not covered by socket timeouts;
+  - `socket.create_connection` may try several addresses, each with its own timeout;
+  - the TLS handshake, header parsing and `http.client`'s internal loops (line reads, chunked
+    decoding) each perform several socket operations, and a slow server can keep each one just
+    under the timeout;
+  - cleanup (closing the response and the connection, TLS shutdown) has no deadline.
+
+  No hard wall-clock maximum is established for `post`, `generate` or `call_validated`. M5a's
+  `latency_ms` records what happened.
+- **Cancellation.** It is not interruptible during a call. M5g's `ctx.check()` before and after
+  each provider call is unchanged, so cancellation or lease loss is acted on after the call
+  returns or times out, as accepted for M5g.
+- **Request bound (R5).** The bound of the whole serialized request follows from M5a's limits:
+  - **Fixed skeleton.**
+    `{"max_tokens":,"messages":[{"content":"","role":"user"}],"model":"","system":""}` is 80
+    bytes.
+  - **`max_tokens`.** At most 4 digits (8,192).
+  - **`model_id`.** At most 64 bytes from `[a-z0-9.-]`, which never needs escaping.
+  - **Texts.** Each UTF-8 byte of text escapes to at most 6 ASCII bytes under `ensure_ascii=True`:
+    - a one-byte control character, U+0001–U+001F, becomes `\u00XX` (6 bytes);
+      `StructuredRequest` refuses NUL;
+    - two-, three- and four-byte characters become at most 6, 6 and 12 bytes, ratios of 3, 2
+      and 3;
+    - lone surrogates cannot occur, because the texts must be strict UTF-8.
+
+    So `system` is at most 6 × 64,000 = 384,000 bytes and `user` at most 6 × 400,000 = 2,400,000
+    bytes.
+  - **Total.** At most 80 + 4 + 64 + 384,000 + 2,400,000 = **2,784,148 bytes**. A constructed
+    worst case serializes to exactly that: a 64-character model ID, both texts made of U+0001,
+    and `max_tokens` 8,192. It was computed locally in Prompt 226 with Python's `json` and no
+    network (`.local/p226/request_bound.py`), which also checked every code point's escape
+    ratio.
+  - **Where the cap is checked.** `MAX_REQUEST_BYTES = 4_194_304` keeps a margin above that bound.
+    It is checked on the serialized bytes before dispatch, in the adapter (step 2) and again in
+    the transport (phase 0). A valid request cannot fail it. The check guards against a later
+    change to the M5a limits or to the body shape.
+  - **API limit.** The cap is far below the [API] 128 MB request limit.
+- **Response bound.** `MAX_RESPONSE_BYTES = 1_048_576` applies to every status. An excess is
+  handled differently at each point:
+  - **200 in the real transport:** `response_too_large`.
+  - **A known non-200 in the real transport:** a status-only response, so the status decides.
+  - **Any `AnthropicResponse` value at admission:** `response_too_large`, whatever its status,
+    including 504.
+
+  It is enforced at three points:
+  - the transport's reads (`max_response_bytes`, never above it);
+  - the `AnthropicResponse` constructor;
+  - `parse_response`, before any decoding.
+
+  An injected transport therefore cannot bypass it. Error-envelope inspection only considers
+  bodies of at most `MAX_ERROR_BODY_BYTES = 65_536`. The rationale for the size: end-turn text is
+  at most 65,536 bytes, or 393,216 escaped, and `max_tokens` ≤ 8,192 bounds all output,
+  including thinking. 1 MiB leaves a margin for thinking blocks and envelope fields.
+- **Output bound.** Output text over 65,536 UTF-8 bytes (M5a's `MAX_OUTPUT_TEXT_BYTES`) is
+  `output_too_large`.
+- **Engineering limits, not guarantees (R5).** These caps are project engineering limits. They
+  are not API limits, and not performance, latency, cost or capacity guarantees. A response over
+  a cap fails as `provider_failed`, even if the API considers it valid.
+- **Retry ownership.** There is none in the adapter or the transport. Retries remain exclusively
+  the accepted M5e reservations (three per stage, one repair), driven by M5a outcomes. The SDK's
+  automatic retries (two by default, per the [API] errors page) would conflict with this, which
+  is one reason for H1.
+
+##### M5h-G. Status and error classification into M5a outcomes
+
+**Phases (R1).** An injected transport has already read whatever body it returns, so
+classification happens in two places:
+
+- **The HTTPS transport** decides whether an error body exists (M5h-C phase 6). It never
+  classifies a non-200 status.
+- **`parse_response`** receives an `AnthropicResponse` from any transport, real or injected, and
+  applies the rules below. No rule depends on whether, or how lazily, the body was read, and an
+  invalid injected response does not bypass admission.
+
+**Ordered algorithm in `parse_response(response)`.**
+
+1. **Revalidate.** `type(response)` must be exactly `AnthropicResponse`. The value is rebuilt from
+   `status` and `body` through the constructor:
+   - a failed attribute read or a wrong type or range is `malformed_response`;
+   - a body over `MAX_RESPONSE_BYTES` is `response_too_large`;
+   - process control propagates as the same object.
+
+   Admission applies to every status, including 504 (clarification A).
+2. **An admitted HTTP 504** becomes `ModelCallTimeout`, without JSON inspection. A bypass-built
+   504 with an oversized body has already failed step 1 as `response_too_large`. One with a
+   wrong-type or unreadable body has failed it as `malformed_response`.
+3. **Any other non-200 status.**
+   1. **Envelope inspection** happens only when 1 ≤ body length ≤ `MAX_ERROR_BODY_BYTES`. The
+      body must decode under the strict JSON rules J2–J7 (M5h-H) to an object whose `type` is
+      exactly the string `"error"`, and whose `error` is an object whose `type` is a string
+      matching `^[a-z_]{1,64}$`. Any failure means "no envelope", which is not an error in
+      itself. An admitted body above `MAX_ERROR_BODY_BYTES` but within `MAX_RESPONSE_BYTES` is
+      not inspected; the status decides.
+   2. **An envelope whose `error.type` is `timeout_error`** becomes `ModelCallTimeout`.
+   3. **Otherwise**, for an ordinary envelope or none, the result is the status's code from the
+      table below: the status is preserved. If the status and the error type disagree (for
+      example 429 with `api_error`), the status wins.
+
+   Only `type` and `error.type` are inspected. `error.message`, `request_id` and every other
+   field are decoded transiently, and must still pass the strict rules, but they are never
+   inspected or retained. `error.type` itself is not retained either; it only decides between
+   timeout and the status code.
+4. **200** continues in M5h-H.
+
+**Status codes.** The "M5a outcome" column is what `call_validated` records.
+
+| Status | Code | M5a outcome |
+| --- | --- | --- |
+| 504, once admitted (its body is not inspected) | none (`ModelCallTimeout`) | `timeout` |
+| Any other non-200 with a valid `timeout_error` envelope | none (`ModelCallTimeout`) | `timeout` |
+| 400 | `request_rejected` | `provider_failed` |
+| 401 | `authentication` | `provider_failed` |
+| 402 | `billing` | `provider_failed` |
+| 403 | `permission` | `provider_failed` |
+| 404 | `not_found` | `provider_failed` |
+| 409 | `conflict` | `provider_failed` |
+| 413 | `payload_too_large` | `provider_failed` |
+| 429 | `rate_limited` | `provider_failed` |
+| 500, 529 and any other 5xx except 504 | `server_error` | `provider_failed` |
+| Any other non-200 (1xx, 2xx other than 200, 3xx, other 4xx) | `unexpected_status` | `provider_failed` |
+
+**Decision table (R1).** "Preserved" means the non-200 status still decides the code.
+
+| Case | Condition | Result |
+| --- | --- | --- |
+| G1 | Process control from the transport, in any phase or in cleanup | propagates as the same object; no outcome |
+| G2 | Budget spent before connecting, sending or reading headers, or a `TimeoutError` in those phases | the transport raises `timeout`, which becomes `ModelCallTimeout` |
+| G3 | A connection, TLS, sending or header failure, or a malformed status line | `transport_failed` |
+| G4 | `response.status` not exactly an `int` of 100–599 | `malformed_response` |
+| G5 | The transport returns something other than an `AnthropicResponse`: a subclass, a bypass-built instance with invalid fields, a `bool` status, or a `bytearray`, `memoryview`, `str` or unreadable body. This applies whatever the status, including 504 | `malformed_response` (admission) |
+| G6 | A body over `MAX_RESPONSE_BYTES`, whatever the status, including 504. Construction refuses it, and a bypass-built value fails admission | `response_too_large` (admission) |
+| G7 | An admitted 504: an empty body, malformed JSON, a body above `MAX_ERROR_BODY_BYTES` but within `MAX_RESPONSE_BYTES`, or a valid envelope of any type. A real 504 whose body read failed or exceeded a cap arrives here as the transport's status-only response | `timeout` |
+| G8 | Another non-200 with a valid `timeout_error` envelope | `timeout` |
+| G9 | Another non-200 with a valid ordinary envelope, including an unknown `error.type` | the status's code; preserved |
+| G10 | Another admitted non-200 whose body is empty or fails the envelope rules: not UTF-8, a BOM, malformed JSON, a duplicate key at any depth, a named non-finite constant, a float that converts to infinity (`1e999`), an over-long integer, too deep, trailing data, not an object, `type` not `"error"`, `error` absent or not an object, `error.type` absent or not matching | no usable envelope: the status's code; preserved |
+| G11 | Another admitted non-200 with a body above `MAX_ERROR_BODY_BYTES` but within `MAX_RESPONSE_BYTES` (only an injected transport can return one) | the status's code; not inspected; preserved |
+| G12 | A real non-200 with a failure while reading its body: a framing refusal, an excess, a `TimeoutError`, an early end of data, a chunk error or an ordinary clock failure | the transport returns a new status-only response, which is admitted: the status's code (`timeout` for 504); preserved |
+| G13 | A real non-200, with the budget spent after the headers or between error-body reads, or with an unusable, backwards or raising clock reading there | as G12; preserved |
+| G14 | A non-200, and an ordinary failure closing the response or the connection | ignored; the result follows G7–G13 |
+| G15 | A 200, and the budget spent after the headers, between reads or at the final check | `timeout`; the status is replaced |
+| G16 | A 200, with a framing refusal, a declared or actual excess, or a read failure or early end of data | `malformed_response`, `response_too_large` or `transport_failed`; the status is replaced |
+| G17 | A 200, and an ordinary failure while closing after a complete body | ignored; M5h-H proceeds |
+| G18 | A 200 whose body is an error envelope | `malformed_response` (M5h-H, V3) |
+| G19 | An unusable, backwards or ordinarily raising clock reading before a valid status (phases 1–5), or on the 200 path | `clock_failed` (clarification B) |
+
+**Why a known status is preserved.**
+
+- **What the status alone decides.** It carries everything M5a needs: every non-200 is
+  `provider_failed`, except 504 and `timeout_error`.
+- **What the body can change.** It can only turn another status into `timeout`.
+- **The boundary (clarification A).** Preservation covers statuses that the real transport has
+  obtained, and the status-only values it builds. It never exempts a returned value from
+  admission.
+- **The cost.** When an error body cannot be read, a server timeout reported under another status
+  is classified as `provider_failed`. This is a documented limitation.
+- **The difference from M4f (R1).** M4f never reads a non-200 body. M5h reads one, bounded, only
+  for H6, so M4f's rule is deliberately not copied.
+
+##### M5h-H. Malformed, truncated, refused and unexpected responses; strict parsing
+
+**[POLICY] Strict JSON rules.** They apply to 200 bodies and to error envelopes.
+
+| Rule | Requirement | Mechanism |
+| --- | --- | --- |
+| J1 Size | Checked before anything else: `MAX_RESPONSE_BYTES`, or `MAX_ERROR_BODY_BYTES` for an envelope. A longer body is never decoded. | length check |
+| J2 Encoding | Strict UTF-8. A leading UTF-8 byte-order mark is refused (no `utf-8-sig`). Invalid sequences, overlong forms and encoded surrogates are refused by the decoder. | `bytes.decode("utf-8", errors="strict")` plus an explicit BOM check |
+| J3 Depth | The outermost container is depth 1, and each nested array or object adds one. Deeper than `MAX_JSON_DEPTH` (16) is refused. The message envelope needs 5 (object, content, block, citations, citation), and 16 matches M5f's accepted F8 cap. | a linear pre-scan before decoding, counting `[` and `{` outside strings and tracking quotes and backslash escapes, so the recursive decoder never sees an over-deep input |
+| J4 Duplicate keys | Refused in every object at every depth, including fields that are later ignored. | `object_pairs_hook` |
+| J5 Non-finite values | The named constants `NaN`, `Infinity` and `-Infinity` are refused. So is any float literal whose conversion is not finite, such as `1e999` and `-1e999`, even inside ignored fields: Python's `json.loads` otherwise decodes `1e999` to infinity even when `parse_constant` refuses the named constants (clarification C). | `parse_constant`, plus a guarded `parse_float` that converts with `float()` and refuses a non-finite result |
+| J6 Numbers | An integer literal with more than `MAX_JSON_INTEGER_DIGITS` (20) digits, sign excluded, is refused before conversion. Python's own 4,300-digit limit is therefore never reached. Finite floats decode as `float` and stay allowed in ignored fields. Any float, finite or not, is refused wherever an exact integer is required, because only exactly `int` passes. | `parse_int`; the J5 `parse_float` |
+| J7 One document | Leading and trailing JSON whitespace is allowed; any other trailing data is refused. | `json.loads` ("Extra data") |
+
+Any decoder exception (`UnicodeDecodeError`, `ValueError` or `RecursionError`) becomes the fixed
+code, raised outside the handler. A 200 body failing J1–J7 is `malformed_response`. An error
+envelope failing them is no usable envelope, so its HTTP status decides (M5h-G, G10).
+
+**What is decoded, inspected and retained (R2).**
+
+- **Decoded.** The whole body: every byte becomes transient Python objects during
+  `parse_response`. That includes thinking text, signatures, partial text under other stop
+  reasons, `stop_details`, `id` and unknown fields. J1–J7 therefore apply to them too.
+- **Inspected.** Only the fields named in V1–V9 below.
+- **Retained.** Only the five `ProviderResponse` values: `stop_kind`, `output_text` (non-empty
+  only for `end_turn`), `model_used`, `input_tokens` and `output_tokens`.
+- **Dropped.** The body and the decoded document are dropped when `parse_response` returns or
+  raises, and no error carries any of them.
+
+"Ignored" or "skipped" below means not inspected and not retained. It never means "not decoded",
+which corrects the Prompt 225 phrase "discarded unread".
+
+**Ordered validation for status 200 (R2).**
+
+1. **V1 Revalidate and size.** M5h-G step 1, then J1.
+2. **V2 Decode** under J2–J7; any failure is `malformed_response`.
+3. **V3 Envelope, for every stop reason.** Each check failure is `malformed_response`:
+   - the document is exactly a `dict`;
+   - `type` is exactly the string `"message"` (so an error envelope with status 200 fails here);
+   - `role` is exactly `"assistant"`;
+   - `model` is exactly a `str` matching `MODEL_ID_PATTERN` (at most 64 characters);
+   - `stop_reason` is exactly a `str` matching `^[a-z_]{1,64}$`. Null, absent and other types
+     fail; the [API] says it is non-null in non-streaming mode;
+   - `content` is exactly a `list` of 0–`MAX_CONTENT_BLOCKS` (64) elements. Each element is
+     exactly a `dict` whose `type` is exactly a `str` matching `^[a-z_]{1,64}$`;
+   - `usage` is exactly a `dict`, whose `input_tokens` and `output_tokens` are each exactly an
+     `int` (not `bool`) of 0–10,000,000 (M5a's `MAX_USAGE_TOKENS`).
+
+   **Ignored, for every stop reason:** `id`, `stop_sequence`, `stop_details`, every other
+   top-level field, and every other `usage` field (cache counters, service tier, server-tool
+   usage). None of them is required, inspected or retained, because the API may add output
+   fields within a version.
+4. **V4 Stop mapping.** By the table below; an unknown `stop_reason` maps to `OTHER`.
+5. **V5 Other stop reasons** (`refusal`, `max_tokens` and `OTHER`).
+   - **Output.** `output_text` is `""`.
+   - **Block payloads** beyond V3's block shape are not inspected. No text extraction, citation,
+     count or block-type rule applies, so a `tool_use` block, an unknown block or a `text` block
+     without `text` is accepted under these stops.
+   - **V3 still wins.** A malformed envelope or content shape under `refusal` or `max_tokens` is
+     `malformed_response`, not `refusal`, `max_tokens` or `unexpected_stop`.
+6. **V6 Blocks, `end_turn` only,** in order:
+   - **`thinking` and `redacted_thinking`** are skipped; their payload is not inspected.
+   - **`text`.** Its `text` must be exactly a `str`. Its `citations` must be absent, `null` or
+     `[]`; a non-empty list or any other value is malformed. Other text-block fields are ignored.
+     [POLICY] The adapter sends no documents and no citation setting, so a non-empty
+     `citations` signals a feature the project did not request. This is a project choice, not an
+     API requirement.
+   - **Any other type** is malformed, failing closed: `tool_use`, `server_tool_use`, server-tool
+     result blocks and unknown types.
+   - **Count.** Exactly one `text` block must remain; zero or several is malformed.
+7. **V7 Text.**
+   - **Encoding.** The text must be strict-UTF-8 encodable. A JSON escape such as `\ud800`
+     decodes to a lone surrogate, which is refused here as malformed.
+   - **Size.** Its UTF-8 length must be at most 65,536 bytes, otherwise `output_too_large`.
+   - **Passed through.** Empty text and NUL characters reach M5a's `parse_output`, which judges
+     them (`invalid_output`).
+8. **V8 Precedence within V6–V7.** Block-type, text-shape and citation violations (in block
+   order) and the count rule are all `malformed_response`. They win over `output_too_large`,
+   which is checked only on the single valid `text` block.
+9. **V9 Build.** `ProviderResponse(stop_kind=..., output_text=..., model_used=model,
+   usage=ModelUsage(...))`. A constructor failure is `malformed_response`.
+
+**Stop mapping.**
+
+| `stop_reason` | `StopKind` | M5a outcome |
+| --- | --- | --- |
+| `end_turn` | `END_TURN` | `completed` or `invalid_output` |
+| `refusal` | `REFUSAL` | `refusal` (`stop_details` ignored, never retained) |
+| `max_tokens` | `MAX_TOKENS` | `max_tokens` (a truncated response) |
+| `model_context_window_exceeded`, `stop_sequence`, `tool_use`, `pause_turn`, any unknown value | `OTHER` | `unexpected_stop` |
+
+**Usage.** `ModelUsage(input_tokens, output_tokens)` takes the two fields as returned. Cache
+counters are ignored, because no caching is requested (decision H5).
+
+**Model-mismatch precedence (R2).**
+
+- **Valid responses.** For a valid `ProviderResponse`, M5a still applies a model mismatch before
+  every stop kind, so a `refusal` from another model is `model_mismatch`.
+- **Malformed responses.** A malformed envelope fails in V1–V8, before any `ProviderResponse`
+  exists. It is therefore `provider_failed` even when `model` differs from the requested model.
+- **Malformed model strings.** A `model` that does not match `MODEL_ID_PATTERN` is malformed, not
+  a mismatch.
+
+##### M5h-I. Secret handling and fixed, text-free failures
+
+**Error codes (R3).** `AnthropicErrorCode(StrEnum)`. Each value is also the error's fixed message.
+
+| Member | Value | Raised when | M5a outcome |
+| --- | --- | --- | --- |
+| `CONFIGURATION` | `anthropic_configuration` | invalid provider or transport constructor arguments, unknown keyword arguments, invalid `post` arguments (before any network activity) | `provider_failed` |
+| `INVALID_REQUEST` | `anthropic_invalid_request` | the request is not exactly a valid `StructuredRequest` (M5h-C step 1) | `provider_failed` |
+| `REQUEST_TOO_LARGE` | `anthropic_request_too_large` | the serialized body is over `MAX_REQUEST_BYTES`, before dispatch | `provider_failed` |
+| `CLOCK_FAILED` | `anthropic_clock_failed` | an unusable, backwards or ordinarily raising transport clock reading, before a valid status or on the 200 path. After a valid non-200 status it yields a status-only response instead (clarification B) | `provider_failed` |
+| `TIMEOUT` | `anthropic_timeout` | raised by the transport only; the adapter converts it to `ModelCallTimeout`, so it never leaves `generate` | `timeout` |
+| `TRANSPORT_FAILED` | `anthropic_transport_failed` | a connection, TLS, sending, header or 200 read failure, or an unrecognized transport exception | `provider_failed` |
+| `MALFORMED_RESPONSE` | `anthropic_malformed_response` | an `AnthropicResponse` value failing admission (whatever its status), an invalid status, a 200 framing refusal, or an invalid 200 body | `provider_failed` |
+| `RESPONSE_TOO_LARGE` | `anthropic_response_too_large` | a 200 body declared or read over the cap in the real transport, or any `AnthropicResponse` body over `MAX_RESPONSE_BYTES` at admission, whatever its status. Never raised for an over-cap body after a valid non-200 status in the real transport, which yields a status-only response | `provider_failed` |
+| `OUTPUT_TOO_LARGE` | `anthropic_output_too_large` | `end_turn` text over 65,536 UTF-8 bytes | `provider_failed` |
+| `REQUEST_REJECTED` | `anthropic_request_rejected` | status 400 | `provider_failed` |
+| `AUTHENTICATION` | `anthropic_authentication` | status 401 | `provider_failed` |
+| `BILLING` | `anthropic_billing` | status 402 | `provider_failed` |
+| `PERMISSION` | `anthropic_permission` | status 403 | `provider_failed` |
+| `NOT_FOUND` | `anthropic_not_found` | status 404 | `provider_failed` |
+| `CONFLICT` | `anthropic_conflict` | status 409 | `provider_failed` |
+| `PAYLOAD_TOO_LARGE` | `anthropic_payload_too_large` | status 413 | `provider_failed` |
+| `RATE_LIMITED` | `anthropic_rate_limited` | status 429 | `provider_failed` |
+| `SERVER_ERROR` | `anthropic_server_error` | status 500, 529 or another 5xx except 504 | `provider_failed` |
+| `UNEXPECTED_STATUS` | `anthropic_unexpected_status` | any other non-200 status | `provider_failed` |
+
+**No retry hint (R3).** There is no `RETRYABLE_CODES`, `retryable` property or other retry hint.
+M5a's outcomes and M5e's reservations are the only retry policy. `call_validated` keeps no
+exception, so no code is stored; the codes exist for tests and diagnosis by trusted code.
+
+**`AnthropicError(code)`.**
+
+- **Argument.** `code` must be exactly an `AnthropicErrorCode` member. A `str` equal to a value,
+  another enum's member or anything else raises `TypeError("code must be an
+  AnthropicErrorCode")`, whose message names no submitted value.
+- **Message.** `str(error)` is the code string `code.value`, and `error.args` is the one-element
+  tuple `(code.value,)`. `error.code` is the member. There is no other attribute.
+- **No chain.** Errors are raised outside every `except` block, so `__cause__` and `__context__`
+  are `None`, and no `__notes__` are added.
+
+**Process control during validation (R3).** Every validation step catches only ordinary
+`Exception` subclasses. The steps are:
+
+- attribute reads and `callable` checks;
+- constructor rebuilds;
+- `SecretStr.get_secret_value`;
+- clock and factory calls.
+
+`KeyboardInterrupt`, `SystemExit` and other non-`Exception` `BaseException` subclasses propagate
+as the same object, from the adapter and from the transport. The adapter never converts them. In
+the transport the first such object is kept across cleanup (M5h-C).
+
+**Safe representations (R3).**
+
+| Value | `repr` and `str` | Never shown |
+| --- | --- | --- |
+| `AnthropicProvider` | `AnthropicProvider()` | the transport |
+| `HttpsAnthropicTransport` | `HttpsAnthropicTransport()` | the key, factory and clock |
+| `AnthropicResponse` | `AnthropicResponse(status=<status>, body_bytes=<length>)` | the body |
+| `AnthropicError` | `str`: the code string; `repr`: the default exception form, `AnthropicError('<code value>')` | anything submitted or received |
+| `ModelCallTimeout` (existing M5a, unchanged) | `str`: `model_call_timeout`; `repr`: the default exception form, `ModelCallTimeout('model_call_timeout')` | nothing to show |
+
+`StructuredRequest` and `ProviderResponse` keep their M5a representations, which omit texts.
+
+**The key.**
+
+- **Rule.** The printable-ASCII rule of M5h-B.
+- **Supply.** It is given only to the transport constructor; there is no environment or settings
+  read.
+- **Use.** It is held as a `SecretStr`. `get_secret_value()` is called only for constructor
+  validation (M5h-B) and to build the header mapping for one `request` call.
+- **Never in** a `repr`, an error, a request digest or the adapter.
+
+**Transient versus retained (R3).**
+
+- **Transient.** Held in memory during one call only: the request body (and so the texts), the key
+  string in the header mapping, `http.client` buffers, the response body and the decoded
+  document. Trusted code inspecting frames or memory could see them; that is out of scope, as in
+  M4f.
+- **Prohibited from retention.**
+  - public error messages, arguments, causes, contexts and notes;
+  - M5a accounting (`StructuredResult` keeps only M5a fields) and M5e stage rows;
+  - logs (the adapter and the transport log nothing);
+  - any stored state (M5h persists nothing).
+- **Never retained.** Provider messages, `request_id`, headers, bodies, `error.type`, and model
+  text beyond M5a's output text.
+
+**Test fixtures.** They use an obviously fake placeholder key, never a real credential.
+
+##### M5h-J. Injectable offline transport and deterministic tests (planned; not written or run)
+
+**Adapter (no network).** A scripted `AnthropicTransport` returns synthetic, hand-written bodies;
+captured live responses are not used. The table-driven cases are:
+
+- **Request.**
+  - the exact request bytes (golden), including every omitted field;
+  - the worst-case serialized length of exactly 2,784,148 bytes;
+  - wrong-type, subclass, bypass-built and altered-digest requests: `invalid_request`, with zero
+    `post` calls;
+  - a forced oversize body, using a patched cap: `request_too_large`, with zero calls;
+  - exactly one `post`, whose `timeout_ms` equals the request's.
+- **Transport outcomes (G1–G3).**
+  - process-control identity for `KeyboardInterrupt`, `SystemExit` and a custom `BaseException`;
+  - `ModelCallTimeout` and `AnthropicError(TIMEOUT)` both becoming `ModelCallTimeout`;
+  - each kept transport code;
+  - other codes, an unreadable `code` and a `RuntimeError`, all becoming `transport_failed`;
+  - no cause or context on any of them.
+- **Response values (G4–G6).**
+  - wrong type and subclass;
+  - bypass-built instances with a `bool` status, 99, 600, or a `bytearray`, `memoryview` or `str`
+    body;
+  - a body over `MAX_RESPONSE_BYTES`.
+- **Statuses (G7–G11).**
+  - every row of the status table;
+  - an admitted 504 with an empty body, and with malformed JSON: `timeout`;
+  - a bypass-built 504 with an oversized body: `response_too_large`;
+  - a bypass-built 504 with a wrong-type body: `malformed_response`;
+  - 429 with a body between `MAX_ERROR_BODY_BYTES` and `MAX_RESPONSE_BYTES`: `rate_limited`,
+    not inspected;
+  - `timeout_error` with 400, 429, 500 and 529;
+  - ordinary and unknown error types;
+  - each G10 envelope defect, under 429 and under 500;
+  - an envelope over `MAX_ERROR_BODY_BYTES`;
+  - status and type disagreeing: 429 with `api_error` is `rate_limited`.
+- **Status 200, in order (V1–V9).** One case per rule, plus these conflicting pairs:
+
+  | Conflicting conditions | Expected result |
+  | --- | --- |
+  | Malformed envelope with `refusal` | `malformed_response` |
+  | Malformed content shape with `max_tokens` | `malformed_response` |
+  | A `tool_use` block with `max_tokens` | `max_tokens` |
+  | A `text` block without `text`, with `refusal` | `refusal` |
+  | Two `text` blocks, one oversized | `malformed_response` |
+  | An unknown block and oversized text | `malformed_response` |
+
+  Further cases:
+  - citations absent, `null` and `[]` accepted, and non-empty refused, under `end_turn` only;
+  - a lone-surrogate escape;
+  - text of 65,536 bytes accepted and 65,537 refused;
+  - empty text reaching `invalid_output`;
+  - thinking and redacted-thinking blocks skipped;
+  - an unknown `stop_reason` giving `unexpected_stop`;
+  - ignored fields accepted: `id` absent, any `stop_details`, unknown usage fields;
+  - bad usage refused: a `bool`, a float, a negative value, 10,000,001.
+- **Strict JSON (J1–J7).**
+  - a BOM;
+  - invalid UTF-8;
+  - depth 16 accepted, and 17 refused;
+  - a deeply nested 1 MiB body refused by the pre-scan, without reaching the decoder;
+  - duplicate keys at the top level, nested, and inside ignored fields;
+  - `NaN`, `Infinity` and `-Infinity`;
+  - `1e999` and `-1e999` refused, including inside ignored fields;
+  - finite floats accepted in ignored fields, and refused in `input_tokens`;
+  - a 429 envelope containing `1e999`: no usable envelope, so `rate_limited`;
+  - 20-digit and 21-digit integers;
+  - trailing data, as opposed to trailing whitespace.
+- **Mismatch precedence.**
+  - a valid response from another valid model, under each stop kind: `model_mismatch` through
+    `call_validated`;
+  - the same response with malformed content: `provider_failed`.
+- **Errors and representations.**
+  - sentinel text placed in bodies, messages, `request_id` and the key never appears in the
+    `str`, `repr`, arguments, cause or context of any raised error or value;
+  - `AnthropicError` with a `str` code raises `TypeError`.
+
+**HTTPS transport (no network).** A fake connection factory over local buffers and an injected
+clock are used, as in M4f. The cases are:
+
+- **Constructor.**
+  - each parameter at and beyond its limits;
+  - a TLS-context construction failure: `configuration`, with process control preserved and no
+    factory call;
+  - `bool`, `NaN` and infinity values;
+  - unknown keyword arguments;
+  - a key that is not a `SecretStr`, or contains a space or non-ASCII;
+  - the TLS context (`CERT_REQUIRED`, host-name checking, a TLS 1.2 minimum).
+- **`post` arguments.** Each refusal, with zero factory calls.
+- **Headers.**
+  - the exact six application headers;
+  - the generated `Host` and `Content-Length`, recorded through an `http.client.HTTPSConnection`
+    subclass whose socket is a local buffer.
+- **Sockets.**
+  - a missing socket before sending or headers is `transport_failed`, with no implicit connect;
+  - `auto_open` is off;
+  - a missing socket after headers is accepted.
+- **Timing.**
+  - the socket timeout for each phase, from the injected clock;
+  - a budget spent before each phase;
+  - expiry after headers, for a 200 and for a non-200;
+  - expiry between reads, and at the final check;
+  - unusable (`bool`, `NaN`), backwards and raising clock readings, by phase (clarification B):
+    - before any valid status: `clock_failed`;
+    - after a 200 status: `clock_failed`;
+    - after a 429 status: `AnthropicResponse(429, b"")`, so `rate_limited`;
+    - after a 504 status: a status-only response, so `timeout`.
+- **Framing,** once for a 200 and once for an error status:
+  - duplicate, absent and conflicting `Content-Length` and `Transfer-Encoding`;
+  - `chunked` (accepted) and `gzip, chunked`;
+  - `Content-Encoding: gzip`, and a duplicate `identity`;
+  - malformed lengths (`+5`, `5 5`, 21 digits, `-1`);
+  - early end of data;
+  - the exact cap and cap + 1, declared and chunked;
+  - oversized pieces and non-`bytes` reads.
+- **Status and body failures together.**
+  - 429 with a read failure, an early end of data, an excess, a timeout during the body, or a
+    framing refusal: `AnthropicResponse(429, b"")`;
+  - a real 504 with an oversized body or a failing read: a newly constructed status-only response,
+    then `timeout` through `parse_response`;
+  - 200 with each of them: the status is replaced.
+- **Cleanup.**
+  - invocation counts for failures at the factory, `connect`, `request`, `getresponse`, the status,
+    framing and a read;
+  - ordinary close failures ignored, on success and on failure;
+  - process control from a phase, from the response close and from the connection close: the
+    first object preserved by identity, later ones suppressed, and both closes attempted.
+- **Privacy.** `repr`; no `set_debuglevel` call; a sentinel key absent from every error.
+
+**Composition.** One M5g handler test over a scripted transport proves the adapter composes with
+`make_run_review_handler`; it is not a registration. No PostgreSQL test is needed, because M5h
+persists nothing.
+
+**Structure tests.**
+
+- The adapter imports neither the worker, the network nor the environment.
+- Nothing in production code constructs `AnthropicProvider` or `HttpsAnthropicTransport`.
+- `production_registry` is unchanged.
+
+##### M5h-K. Dependency, packaging and installed-wheel implications
+
+- **Dependencies.** With H1's recommendation there is **no new runtime dependency**: `http.client`,
+  `ssl` and `json` only, under the dependency-age policy (ADR-0004).
+- **Packages.** No new top-level package. The adapter ships inside the existing
+  `evidenceguard_agents` and `evidenceguard_worker` packages, so the wheel package list is
+  unchanged.
+- **Installed-wheel guard.** One additive offline line, from the installed wheel outside the
+  checkout: import the adapter and run one scripted-transport call through `call_validated`. The
+  twelve existing lines and the production-registry line stay unchanged.
+- **No changes to** settings, Compose or the container image, and no migration.
+
+##### M5h-L. Handover
+
+- **M5g.** No change; `make_run_review_handler(provider, ...)` already takes any `ModelProvider`.
+  M5h supplies a provider class only and builds nothing.
+- **M6.** No dependency; approval and export are unaffected.
+- **Live evaluation (M7 or a separately reviewed slice).** This is where the following belong:
+  - production registration, settings and credential sourcing;
+  - the first live call;
+  - the observed model-echo and alias behaviour (W-A4 and W13 remain fail-closed until then);
+  - refusal, `max_tokens` and `invalid_output` rates under adaptive thinking;
+  - latency against `timeout_ms`;
+  - cost;
+  - live canary and injection behaviour.
+
+  None is claimed by M5h.
+
+##### M5h-M. Decisions for review
+
+**Status (Prompt 227).** **Accepted** with binding clarifications A–C ([acceptance](#m5h-acceptance-prompt-227));
+no specification decision remains open. The [REC] labels record the recommendations as
+proposed. In Prompt 226 these were supported directions subject to the completed contracts;
+that state is historical.
+
+1. **H1 Transport: standard library or SDK (W9).** [REC] A standard-library HTTPS transport in the
+   worker, mirroring M4f. *Tradeoff:*
+   - for: no new dependency, exact control of bounds, headers, timing, retries (none) and error
+     text, and the M4f review pattern;
+   - against: the project owns wire-format drift, and loses the SDK's typed errors and API
+     tracking.
+
+   The `anthropic` SDK would need its retries disabled, its default timeout overridden and its
+   exception text excluded, and it would add its HTTP-client dependency tree.
+2. **H2 Model echo and alias policy (W-A4, W13).** [REC] Keep exact equality between the response
+   `model` and the requested `model_id`; no normalization or alias table. Pin full model IDs in
+   the M5d model configuration. *Tradeoff:* a live API that echoes a different string for an alias
+   becomes a terminal `model_mismatch` (fail closed) instead of silently accepting another model.
+   The consulted pages do not state an echo guarantee, so this is unverified until a live run.
+3. **H3 API version.** [REC] Pin `2026-10-21`, the latest listed version; nothing the adapter
+   sends is affected by its removals. *Tradeoff:* `2023-06-01` is older and stable, but not
+   recommended by the docs.
+4. **H4 Structured output mechanism.** [REC] Keep M5a's text-JSON contract, parsed only by
+   `parse_output`, and do not send `output_config.format` in M5h. *Tradeoff:* a likely higher
+   live `invalid_output` rate, versus schema-constrained decoding, which would derive a JSON
+   Schema from the output models and change M5c's request contract and digest. Revisit it as its
+   own reviewed slice with live evidence.
+5. **H5 Usage accounting.** [REC] Record `input_tokens` and `output_tokens` as returned, and send
+   no caching. *Tradeoff:* if caching is later enabled, input accounting must add the cache
+   counters, which is a reviewed change.
+6. **H6 Server-reported timeouts.** [REC] Map an admitted HTTP 504, without inspecting its body,
+   and a valid `timeout_error` envelope on any other admitted non-200 status to `timeout`, like a
+   transport timeout (M5h-G; response admission comes first, clarification A). *Tradeoff:* the outcome conflates client and server time limits, and reading error
+   bodies adds a bounded parse that M4f avoids; the alternative treats them as
+   `provider_failed`.
+7. **H7 `model_context_window_exceeded`.** [REC] Map it to `OTHER` (`unexpected_stop`).
+   *Tradeoff:* `max_tokens` would better describe "too long", but it would imply an output-budget
+   truncation the request did not make. M5c's 400,000-byte cap makes it unlikely.
+8. **H8 Thinking and effort parameters.** [REC] Send neither `thinking` nor `output_config.effort`,
+   and skip returned thinking blocks. *Tradeoff:* the model's default thinking may consume
+   `max_tokens` (at most 8,192) and raise `max_tokens` stops. Changing that changes the request
+   contract and the per-model behaviour, so it is deferred to live evaluation.
+9. **H9 Non-streaming.** [REC] Non-streaming requests with a ≤120 s timeout. *Tradeoff:* the docs
+   recommend streaming only for long requests; streaming adds incremental parsing and mid-stream
+   error events.
+10. **H10 No fallbacks, tools or betas.** [REC] Never send `fallbacks`, tools or beta headers.
+    *Tradeoff:* a refusal is final for that call, rather than served by another model (which would
+    be a `model_mismatch` in any case).
+
+**Also supported as directions (Prompt 226) and accepted (Prompt 227):** the model-echo policy, the pinned API version, no
+default model, the prompt-only structured-output mechanism, the non-streaming scope, no caching,
+fallbacks, tools or betas, and no retries inside the adapter or the transport.
+
+**Not authorized:** M5h implementation (it needs the next authorization), production
+registration, settings, credentials, endpoints, a default live provider, any live call, M6 and
+overall M5 acceptance.
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.

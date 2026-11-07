@@ -542,8 +542,11 @@ PostgreSQL integration ([evidence](decisions/0025-review-orchestration.md#featur
 Claude Code saw conclusions only. The external reviewer's retrieved logs show all 439
 selected integration tests passing, including the 54 M5g positions, and the reviewer
 accepted that evidence in Prompt 224 ([reviewer logs](decisions/0025-review-orchestration.md#reviewer-retrieved-3d41f435-logs-and-acceptance-prompt-224)).
-M5g is feature-CI verified but not merged; main publication is authorized only through new
-CI gates.
+M5g is now **reviewed, verified in CI and on main at `bebd2f75`** (Prompt 224; feature and
+separate main CI passed, conclusions only;
+[main publication](decisions/0025-review-orchestration.md#main-publication-at-bebd2f75-prompt-224)). The reviewer
+independently retrieved all ten `bebd2f75` logs and accepted that evidence in Prompt 225
+([reviewer logs](decisions/0025-review-orchestration.md#reviewer-retrieved-bebd2f75-logs-and-acceptance-prompt-225)).
 
 - **Process control on fenced paths:** `transaction()` now keeps the first process-control
   object by identity across body, commit, rollback and close (G15). Its non-database tests
@@ -557,18 +560,36 @@ CI gates.
 
 None of this operates in an application review path: no endpoint, command or production
 registration builds the handler, no live provider is configured, and `run_review` remains
-unregistered. The M4d trusted-snapshot limitation is not closed: the snapshot-only retrieval
-mechanism was reviewed and accepted with the implementation for a local commit, but its
-replacement-activation database test is among the passing positions of the green `3d41f435`
-integration job (not separately named in the log), and the implementation is not merged. Scripted canary tests do not
+unregistered.
+
+**M4d and E7 (Prompt 226).** The external reviewer accepted the M4d trusted-snapshot
+requirement and E7's deferred output-persistence and atomic-finish requirement as **satisfied
+for the internal `run_review` handler composition at `bebd2f75`**
+([scoped acceptance](plan.md#m4d-and-e7-closure-assessment-scoped-acceptance-prompt-226)).
+
+- **Basis.** Source inspection and the complete passing PostgreSQL module results. The logs
+  print positions, not names, so the replacement-activation result is inferred from the source.
+  That is an evidence-granularity limitation, not an implementation gap.
+- **Not accepted.** Production wiring and overall M5.
+- **Retrieval APIs.** Explicit-snapshot retrieval (`search_snapshot`) still relies on a trusted
+  caller. `capture_snapshot` and `capture_in_transaction` capture snapshots rather than accept
+  one, and `search_current` intentionally selects current state. The internal handler uses only
+  its trusted persisted snapshot, and any future production registration needs its own
+  composition review.
+- **Unchanged.** U4's discarded evidence, database trust, the M3 lease/commit window, unknown
+  outcomes, M6's approval and export obligations, and the provenance-versus-semantic limits.
+
+The [M5h specification](plan.md#m5h-anthropic-adapter-specification-accepted-at-review-prompt-227-implementation-pending) is ACCEPTED at review (Prompt 227;
+implementation pending). No M5h control operates yet. It adds no live provider and claims no
+model quality or injection resistance. Scripted canary tests do not
 establish live-model injection resistance. Prompt 219 added tests of the real persistence
 boundaries over scripted sessions (read process control, fixed database errors, writer
 precedence and ownership) and corrected the constraint-test attribution; no production byte
-changed. None of these controls operates in an application review path, their database
-evidence is limited to that feature-CI job conclusion, and the M4d limitation and E7 are not
-declared closed. M5e is reviewed,
+changed. None of these controls operates in an application review path. Their database
+evidence is the reviewer-retrieved PostgreSQL module results, and M4d and E7 are accepted only
+for the internal composition (above). M5e is reviewed,
 CI verified and on main at `14f510e`; its publication evidence was independently accepted
-in Prompt 207. M5g–M5h and overall M5 acceptance remain pending.
+in Prompt 207. M5h implementation, M6 and overall M5 acceptance remain pending.
 
 Its five-job feature gate passed before the authorized fast-forward and manual main push;
 all five separate main jobs passed, including PostgreSQL (385 passed). The terse logs show

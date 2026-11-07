@@ -54453,3 +54453,1180 @@ A new section records the reviewer's acceptance and the gated publication author
 - **Ruff:** format reported 240 files already formatted, and lint passed.
 
 No application tests, builds or wheel checks were run.
+
+## Prompt 224 publication record and main-CI note
+
+**Push reports (transcribed).** Mathew pasted the output of two manual pushes into the session: `3d41f43..bebd2f7  feat/review-orchestration -> feat/review-orchestration` and `e7dd3be..bebd2f7  main -> main`. Claude Code did not push. Its record is a summary, not a byte copy.
+
+**Note.** Source: Claude Code. It lists only observations and checks completed before it was written. The final staged checks and the export are reported in the Prompt 224 handoff and the `.local/p224/` records.
+
+**Feature gate.**
+
+- **Commit:** evidence commit `bebd2f7593af6459b25182adab2c3ddee17b9e31` (parent `3d41f435`, tree `e986d9d0…`). Commit verification and full-history Gitleaks (98 commits, no leaks) passed.
+- **Preflight:** remote feature `3d41f435` and remote main `e7dd3be3`; the unpublished range exactly `bebd2f75`; range Gitleaks 1 commit with no leaks.
+- **CI:** after the feature push, ci run 42212944954 and secret-scan run 42212945069 (push, attempt 1) succeeded, with all five jobs successful.
+
+**Main preflight and fast-forward.**
+
+- **Checks:** remote main `e7dd3be3`, an ancestor of the target; remote feature `bebd2f75`; a clean tree; the range exactly `ebcc2df9`, `5d97acbc`, `f0d4ce92`, `3d41f435`, `bebd2f75`; the same 28 reviewed paths; accepted non-documentation bytes unchanged apart from the accepted corrected test; privacy 0 hits; range Gitleaks 5 commits with no leaks.
+- **Fast-forward:** `git merge --ff-only` moved local main to `bebd2f75`, with no merge commit.
+- **After the push:** remote main, local main, origin/main and the feature branch all equal `bebd2f75`.
+
+**Main gate.** ci run 42215467281 and secret-scan run 42215467335 (push, attempt 1, branch main) succeeded, with all five jobs successful and the integration step "Run integration tests" succeeding.
+
+**Access limitation.** Anonymous log downloads failed for all ten jobs (HTTP 000 or 403), so only conclusions were observed. No `3d41f435` counts are reused.
+
+**Documents.** README, plan, threat model and ADR-0025 now record M5g as reviewed, verified in CI and on main at `bebd2f75` within its accepted scope, with the publication evidence awaiting review. Links, anchors and tables passed (612 links and 152 tables, zero problems).
+
+## Prompt 224 handoff (saved file, byte-copied)
+
+Source: `.local/p224/handoff.md`, the handoff file Claude Code saved in Prompt 224. Its bytes are inserted unchanged between the two marker lines below and were compared byte-for-byte against that file after insertion. Claude Code's Prompt 224 chat replies are not reproduced. Its HTTP 000/403 statements are its own historical access limitation; the reviewer retrieved the logs separately (Prompt 225).
+
+-----BEGIN SAVED PROMPT 224 HANDOFF-----
+# Prompt 224 handoff: M5g published to main at `bebd2f75`; feature and main CI passed (Claude Code)
+
+M5g is **reviewed, verified in CI and on main at `bebd2f7593af6459b25182adab2c3ddee17b9e31`**,
+within its accepted scope. The main-publication evidence is **staged and uncommitted** and awaits
+review.
+
+**What Claude Code did not do:** push (both pushes were Mathew's), force anything, rewrite
+history, rerun CI, change authentication, delete a branch, register `run_review` or start M5h.
+
+## 1. Recovery and checkpoint
+
+- **Refs:** HEAD and upstream `3d41f435aa5cb65128751e7bee9c9ba163ae1626` (parent `f0d4ce92`,
+  tree `6e927bf5cdc1599f0507d7d74bbe69e0e295ef98`); main and stored origin/main `e7dd3be3`.
+- **Staged tree:** `a7217bd0e9ff5d516ba7a56a43ea9d6e746d44bb` with exactly five evidence
+  documents; nothing unstaged or untracked.
+- **Test blob:** `837136d61e1ec815a1fa2324ff596e83dc55d591`.
+- **Prompt 223 exports:** both byte-identical to fresh Git output:
+  - A: 4 files, +42/−5, 6,531 bytes, 95 lines, `02ac0099…4d12`;
+  - B: 4 files, +94/−26, 14,141 bytes, 182 lines, `5b655b2a…9fc9`.
+- **Checkpoint (`.local/p224/checkpoint/`):** a nonempty 265-entry listing and the prompts.md
+  prefix (2,896,633 bytes, SHA-256 `1326fd79…2809`).
+
+## 2. Evidence commit `bebd2f75`
+
+- **Content:** the reviewer's `3d41f435` log figures under each existing job link in ADR-0025:
+  - Ubuntu `4999 passed, 439 skipped in 77.31s`;
+  - Windows `4998 passed, 440 skipped in 164.74s`;
+  - PostgreSQL `439 passed, 4999 deselected in 394.31s`, with 7, 44 and 3 M5g positions;
+  - container smoke and cleanup;
+  - Gitleaks, 97 commits and no leaks;
+  - both verify logs printing the registry line and all twelve wheel lines.
+- **New section:** acceptance and the gated authorization. The corrected test is not claimed as
+  individually named, and no separate migration output is claimed.
+- **Marked historical:** Claude Code's 403 statements and the `f0d4ce92` failure. The README,
+  plan and threat model are consistent.
+- **Checks:**
+  - only 5 documentation and history files changed, and 260 entries are identical to
+    `3d41f435`;
+  - 607 links with 0 problems; encoding, whitespace, prefix (the Prompt 223 handoff
+    byte-compared) and privacy (0) clean;
+  - Ruff format (240) and lint pass; staged Gitleaks clean.
+- **Commit:** `bebd2f7593af6459b25182adab2c3ddee17b9e31`, parent `3d41f435`, tree
+  `e986d9d012406e869e42471814b42b26a855e8ce`, subject `docs: record verified M5g feature CI
+  evidence`, noreply identity, message file `.local/p224/commit-message.txt`. The tree was clean
+  afterwards, main was unchanged at that point, and full-history Gitleaks scanned 98 commits with
+  no leaks.
+
+**Export:**
+
+| Property | Value |
+| --- | --- |
+| Path | `.local/p224/m5g-feature-evidence-acceptance.diff` |
+| Baseline / destination | `a7217bd0e9ff5d516ba7a56a43ea9d6e746d44bb` → `bebd2f75` |
+| Options | full indexes, prompts.md excluded (prompts.md: +453/−0) |
+| Paths | `README.md` (+7/−3), ADR-0025 (+66/−11), `docs/plan.md` (+6/−3), `docs/threat-model.md` (+9/−6) |
+| Statistics | 4 files, +88/−23 |
+| Size | 14,445 bytes; 191 lines |
+| SHA-256 | `b1565e059161c8f6d4fb4ab90b080c7e7cccf0ee585938c43adf342fa8a196f8` |
+| Identity | byte-identical to fresh Git output |
+
+## 3. Feature publication and the feature gate
+
+- **Preflight (`fetch --no-tags`):** remote feature `3d41f435` and main `e7dd3be3`; the
+  unpublished range exactly `bebd2f75`; clean; implementation, tests and workflows unchanged;
+  five jobs and push triggers present; privacy 0; range Gitleaks 1 commit, no leaks.
+- **Push:** Mathew pushed manually, `3d41f43..bebd2f7`. `ls-remote` then showed the remote
+  feature, HEAD and upstream all at `bebd2f75`, and main at `e7dd3be3`.
+- **CI:** push event, attempt 1, branch `feat/review-orchestration`, monitored from 11:48:52Z
+  with a 25-minute bound and completed by 11:56:38Z:
+  - [ci 42212944954](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42212944954)
+    **success**:
+    [verify ubuntu](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42212944954/job/127875803580),
+    [verify windows](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42212944954/job/127875803595),
+    [integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42212944954/job/127875803606)
+    ("Run integration tests" success) and
+    [container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42212944954/job/127875803328);
+  - [secret-scan 42212945069](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42212945069)
+    **success**:
+    [Gitleaks](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42212945069/job/127875803321).
+
+## 4. Main preflight and fast-forward
+
+- **Preflight (`fetch --no-tags`):**
+  - remote main `e7dd3be3`, equal to local main and an ancestor of the target; remote feature
+    `bebd2f75`; clean tree;
+  - the range above main exactly `ebcc2df9`, `5d97acbc`, `f0d4ce92`, `3d41f435`, `bebd2f75`,
+    with the path union equal to the same **28 reviewed paths**;
+  - against the accepted implementation tree `9217e545`, the only non-documentation change is
+    the accepted corrected test `837136d6…`; 265 entries, all mode 100644;
+  - privacy 0 hits; range Gitleaks 5 commits, no leaks.
+- **Fast-forward:** `git switch main`, then `git merge --ff-only bebd2f75…`, giving "Fast-forward
+  e7dd3be..bebd2f7" with no merge commit. HEAD's single parent is `3d41f435`. Remote main was
+  rechecked at `e7dd3be3` immediately before the handover.
+- **Push:** Mathew pushed main manually, `e7dd3be..bebd2f7`. After a fetch, remote main, local
+  main and origin/main all equal `bebd2f75`, and the feature branch is still `bebd2f75`.
+
+## 5. Separate main CI
+
+Push event, attempt 1, branch `main`, SHA `bebd2f75`, monitored from 12:09:29Z with a fresh
+25-minute bound and completed by 12:16:27Z:
+
+| Run | Job | Conclusion |
+| --- | --- | --- |
+| [ci 42215467281](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42215467281) — success | [verify ubuntu-24.04](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42215467281/job/127884250650) | success |
+| | [verify windows-2025](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42215467281/job/127884250669) | success |
+| | [integration PostgreSQL](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42215467281/job/127884250666) | success ("Run integration tests" success) |
+| | [container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42215467281/job/127884250260) | success |
+| [secret-scan 42215467335](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42215467335) — success | [Gitleaks](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42215467335/job/127884250609) | success |
+
+**Unavailable evidence.** Anonymous log downloads failed for all ten feature and main jobs (HTTP
+000, or 403 "Must have admin rights to Repository"), and no authentication was changed. For
+either `bebd2f75` run there are **no** counts, per-module results, migration, wheel, container or
+Gitleaks output. Neither feature counts nor `3d41f435` counts are reused as main results.
+
+**Saved evidence.** `.local/p224/ci-feature/` and `.local/p224/ci-main/`, each holding
+`runs.json`, `jobs-*.json`, `poll.log`, `summary.txt` and the failed-log response bodies.
+
+## 6. Staged main-publication evidence (uncommitted)
+
+- **ADR-0025:**
+  - the status bullet now reads "reviewed, verified in CI and on main at `bebd2f75`", with the
+    sequence extended to Prompt 224;
+  - a new section, "Main publication at `bebd2f75` (Prompt 224)", records the target, the
+    operations (manual pushes and `--ff-only`), the separate feature and main run and job links,
+    the access limitation and the status;
+  - the Prompt 223 status bullet is labelled historical.
+- **Plan, README and threat model:** consistent sentences. The heading's "PostgreSQL and CI
+  pending" wording is noted as historical, and the heading and anchors are unchanged. M4d closure
+  "still needs an explicit assessment".
+- **`prompts.md`:** the transcribed push reports and a publication and main-CI note.
+- **Checks:**
+  - only the 5 documentation and history files differ from `bebd2f75`, and 260 entries are
+    identical;
+  - 612 links and 152 tables with 0 problems; encoding and whitespace (working and staged) clean;
+  - the pre-evidence prompts.md equals the committed one, and the prefix is identical;
+  - privacy 0; Ruff format (240) and lint pass; staged Gitleaks: no leaks.
+
+**Export:**
+
+| Property | Value |
+| --- | --- |
+| Path | `.local/p224/m5g-main-publication-evidence.diff` |
+| Baseline | published target `bebd2f7593af6459b25182adab2c3ddee17b9e31` |
+| Destination | final staged tree `c6c497629f253bdd711e05fc6e20211c7672febb` |
+| Options | full indexes, prompts.md excluded (prompts.md: +24/−0) |
+| Paths | `README.md` (+5/−2), ADR-0025 (+76/−5), `docs/plan.md` (+9/−2), `docs/threat-model.md` (+6/−3) |
+| Statistics | 4 files, +96/−12 |
+| Size | 13,172 bytes; 176 lines |
+| SHA-256 | `7c88e8f89d49d7565b517dce7d8476abebf22b796cd11c0c83660bbf27628955` |
+| Identity | byte-identical to fresh tree-to-tree and `--cached` Git output |
+
+## Final state
+
+| | Value |
+| --- | --- |
+| Current branch | `main` (switched for the fast-forward) |
+| Local main / origin/main / remote main | `bebd2f7593af6459b25182adab2c3ddee17b9e31` |
+| `feat/review-orchestration` (local, upstream, remote) | `bebd2f75…` |
+| Index | staged evidence tree `c6c49762…` (5 documentation files); nothing unstaged or untracked |
+| Branches | none deleted |
+
+## Remaining limitations
+
+- **Pending review:** the main-publication evidence awaits the external reviewer's review, and
+  its commit needs a separate authorization. Claude Code observed no log-level evidence for
+  `bebd2f75`.
+- **No production path:** no `run_review` registration, live provider or application review
+  path.
+- **No quality claims:** no model-quality, entailment, authenticity or injection-resistance
+  claim. The container smoke covers ingestion and indexing only.
+- **Still open:** M4d and E7 closure each need an explicit assessment. M5h, M6 and overall M5
+  acceptance remain pending.
+
+Mathew: return this complete handoff plus `.local/p224/m5g-feature-evidence-acceptance.diff` and
+`.local/p224/m5g-main-publication-evidence.diff` to the external reviewer.
+-----END SAVED PROMPT 224 HANDOFF-----
+
+## Prompt 225 reviewer acceptance, log evidence, M4d/E7 assessment and proposed M5h (transcribed)
+
+Source: Mathew's Prompt 225 instruction to Claude Code. It carries the external reviewer's acceptance of the M5g publication evidence and the reviewer's log-retrieved observations for `bebd2f75` (the reviewer's, not Claude Code's). Claude Code extracted the pasted prompt text from its own session transcript into `.local/p225/prompt225.txt`, removing only the paste wrapper lines and leading blank lines, and inserted that file's bytes unchanged below. The transcription was not compared against an independently saved original.
+
+Prompt 225 — Record M5g exact-commit log evidence, assess M4d/E7, and propose M5h
+
+Written for: Mathew and the external reviewer.
+
+This authorizes documentation work only, staged and uncommitted for external review. Do not implement M5h, register run_review, configure a live provider, commit, fetch, push, merge, rerun CI or change authentication.
+
+1. Recover and verify
+
+Read the governing repository instructions and .local/p224/handoff.md.
+
+Expected state:
+- Current branch: main.
+- HEAD, local main and stored origin/main:
+  bebd2f7593af6459b25182adab2c3ddee17b9e31
+- Five staged documentation/history paths:
+  README.md
+  docs/decisions/0025-review-orchestration.md
+  docs/plan.md
+  docs/threat-model.md
+  prompts.md
+- Staged tree:
+  c6c497629f253bdd711e05fc6e20211c7672febb
+- Nothing unstaged or unexpectedly untracked.
+- Corrected PostgreSQL test blob:
+  837136d61e1ec815a1fa2324ff596e83dc55d591
+
+Verify both Prompt 224 exports against their recorded Git comparisons:
+- m5g-feature-evidence-acceptance.diff:
+  14,445 bytes, 191 lines;
+  SHA-256 b1565e059161c8f6d4fb4ab90b080c7e7cccf0ee585938c43adf342fa8a196f8
+- m5g-main-publication-evidence.diff:
+  13,172 bytes, 176 lines;
+  SHA-256 7c88e8f89d49d7565b517dce7d8476abebf22b796cd11c0c83660bbf27628955
+
+Save a checkpoint under .local/p225/, including a nonempty full-tree listing, staged paths/blob identities and prompt-history prefix.
+
+If the state differs materially, report the discrepancy before dependent edits. Preserve existing work.
+
+Create docs/model-provider-plan from HEAD, carrying the staged evidence. If that branch already exists, inspect it rather than resetting or overwriting it.
+
+2. Record the review decision and independently retrieved logs
+
+The external reviewer checked the uploaded Prompt 224 handoff and both exports and accepts the M5g publication evidence. The exports match their recorded sizes, line counts and hashes.
+
+Correct the stale README phrase “merge, M5h and overall M5 acceptance remain pending”: M5g is already on main. Check the authorized documents for equivalent current-status contradictions while preserving dated historical statements.
+
+The following are the external reviewer’s independently retrieved log observations, not Claude Code’s observations. All runs are for exact SHA:
+bebd2f7593af6459b25182adab2c3ddee17b9e31
+event push, attempt 1.
+
+Feature branch feat/review-orchestration:
+- ci run 42212944954:
+  - Ubuntu job 127875803580:
+    4999 passed, 439 skipped in 93.65s.
+  - Windows job 127875803595:
+    4998 passed, 440 skipped in 133.04s.
+  - PostgreSQL job 127875803606:
+    439 passed, 4999 deselected in 423.97s.
+  - Container job 127875803328:
+    smoke and cleanup succeeded.
+- secret-scan run 42212945069:
+  - Gitleaks job 127875803321:
+    98 commits scanned, no leaks.
+
+Separate main push:
+- ci run 42215467281:
+  - Ubuntu job 127884250650:
+    4999 passed, 439 skipped in 94.60s.
+  - Windows job 127884250669:
+    4998 passed, 440 skipped in 173.69s.
+  - PostgreSQL job 127884250666:
+    439 passed, 4999 deselected in 375.22s.
+  - Container job 127884250260:
+    smoke and cleanup succeeded.
+- secret-scan run 42215467335:
+  - Gitleaks job 127884250609:
+    98 commits scanned, no leaks.
+
+Every step of all ten jobs succeeded.
+
+All four verify logs printed the production registry line:
+production registry: ingest_revision, index_revision
+
+They also printed all twelve installed-wheel result lines, including:
+review orchestration imported and migration 0008 rendered offline from the installed wheel
+
+Both PostgreSQL logs show:
+- test_review_handler_postgres.py: 7 passing positions.
+- test_review_outputs_postgres.py: 44 passing positions.
+- test_review_canary_postgres.py: 3 passing positions.
+
+The logs print module positions, not individual test names. Do not describe the corrected retry case as individually named in the logs. Do not invent separate migration or alembic-check output.
+
+Record the results under their existing run and job links in ADR-0025, keeping feature and main evidence separate. Keep Claude Code’s HTTP 000/403 statements as historical access limitations attributable to Claude Code; they no longer describe all evidence available to the project.
+
+Keep the earlier failed f0d4ce92 evidence and the separate 3d41f435 evidence unchanged.
+
+The container smoke exercises ingestion/indexing, not review orchestration. Offline SQL rendering is not PostgreSQL execution; Recall is arithmetic and Voyage is mocked. None of this establishes live-model quality, entailment, authenticity or semantic injection resistance.
+
+3. Prepare an explicit M4d and E7 assessment for review
+
+Read the accepted contracts, final implementation and relevant tests at the current source. Do not infer closure from green jobs alone.
+
+Add a clearly labelled assessment in the plan, linked from ADR-0025 and the threat model. For each obligation, identify:
+- the original requirement;
+- the precise implementation and tests addressing it;
+- the observed CI evidence;
+- the scope that could be considered satisfied;
+- what remains outside that scope;
+- your recommendation and any unresolved gap.
+
+For M4d, examine the trusted review snapshot and stage reloads, retrieval against the captured bindings, replacement activation, evidence rechecking, and the final source-bound report construction. Distinguish the internal handler composition from production registration and from general retrieval APIs.
+
+For E7, examine migration 0008, output persistence, replay/conflict behavior, lifecycle-aware reads, and output plus job success in the same fenced finish transaction. Distinguish these from M6 approval/export obligations.
+
+These are assessment recommendations awaiting external review. Do not mark M4d or E7 closed in this prompt. If a requirement is not satisfied, explain the concrete gap without changing production code.
+
+Preserve the U4 discarded-evidence limitation, the M3 lease/commit window, unknown-outcome limits and all provenance-versus-semantic limits.
+
+4. Write the proposed M5h specification
+
+Read the existing M5 sequence and source before defining this slice, including:
+- M5a model-call contracts and error classification;
+- M5c request assembly;
+- M5e budgets and persistence;
+- M5g handler/provider composition;
+- the existing embedding adapter and transport patterns;
+- packaging and installed-wheel guards.
+
+Write a proposed M5h specification in docs/plan.md that follows the existing milestone allocation. Label it proposed, unaccepted, unimplemented and untested.
+
+Define reviewable contracts rather than leaving material behavior to implementation:
+- scope, module placement and public signatures;
+- provider and transport responsibilities;
+- request mapping and structured-response handling;
+- supported model/API-version choices and where those choices are supplied;
+- timeout, cancellation, request/response bounds and retry ownership;
+- status/error classification into the accepted M5a outcomes;
+- malformed, truncated, refused and unexpected responses;
+- strict parsing and content-block handling;
+- secret handling and fixed, text-free failure reporting;
+- injectable offline transport and deterministic tests;
+- dependency, packaging and installed-wheel implications;
+- handover to M5g, M6 and later live evaluation.
+
+Identify decisions explicitly, with a recommendation and tradeoff for each. Do not silently change accepted M5a–M5g contracts.
+
+If provider-specific details require current documentation, consult official provider documentation only, record the sources and distinguish external API facts from proposed project policy. Do not make provider calls or use credentials.
+
+Do not introduce production registration, endpoints, settings, credentials or a default live provider. Do not claim that the adapter alone establishes model quality or injection resistance.
+
+5. Authorized paths and preservation
+
+Only these five tracked paths may change:
+- README.md
+- docs/decisions/0025-review-orchestration.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Do not create an implementation ADR, source module, migration or test.
+
+Preserve accepted specification text and stable anchors. Add assessment/proposal sections and status summaries without rewriting historical evidence.
+
+Append this prompt and the Prompt 224 handoff to history according to the repository’s fidelity rules. Use saved originals where available; otherwise label transcription or summary honestly. Preserve the previous bytes as an identical prefix.
+
+6. Verification and delivery
+
+Run the applicable documentation checks:
+- authorized-path scope and protected blob/mode identity;
+- links, anchors and tables;
+- UTF-8 without BOM, LF-only encoding and whitespace;
+- history-prefix fidelity;
+- privacy and unsuppressed staged Gitleaks;
+- repository-required formatting/lint checks.
+
+Application tests, builds, wheel checks, database tests and CI need not be repeated for these documentation-only edits.
+
+Stage the five authorized files, but do not commit.
+
+Export:
+.local/p225/m5g-main-evidence-assessment-and-m5h-spec.diff
+
+Use git diff --full-index from bebd2f7593af6459b25182adab2c3ddee17b9e31 to the final staged tree, excluding prompts.md. Verify it is byte-identical to the cached and tree comparisons. Record full baseline/final identities, file statistics, bytes, lines, SHA-256 and encoding.
+
+Return a complete handoff and the diff. Separate:
+- accepted M5g publication evidence;
+- proposed M4d/E7 assessment recommendations;
+- proposed M5h contracts and open decisions.
+
+M5h implementation, closure acceptance, M6 and overall M5 acceptance remain unauthorized and pending.
+
+## Prompt 225 outcome note
+
+**Note.** Source: Claude Code. Documentation only, staged and **uncommitted**, pending external review.
+
+- **Recorded:** the reviewer's acceptance and retrieved `bebd2f75` logs under the existing ADR-0025 job links, feature and main separately; stale README and threat-model status sentences corrected.
+- **Proposed, not accepted:** an M4d and E7 closure assessment (recommending each as satisfied for the internal handler composition only; neither closed) and an M5h Anthropic adapter specification (unaccepted, unimplemented, untested; no provider call or credential used; sources are official Anthropic documentation pages read in Prompt 225).
+- **Checks:** the documentation checks and the export are reported in the Prompt 225 handoff and `.local/p225/`; no application test, build, wheel check, database test or CI was run.
+
+## Prompt 225 handoff (saved file, byte-copied)
+
+Source: `.local/p225/handoff.md`, the handoff file Claude Code saved in Prompt 225. Its bytes are inserted unchanged between the two marker lines below and were compared byte-for-byte against that file after insertion. Claude Code's Prompt 225 chat reply is not reproduced.
+
+-----BEGIN SAVED PROMPT 225 HANDOFF-----
+# Prompt 225 handoff: M5g publication evidence recorded, M4d/E7 assessment and M5h specification proposed (Claude Code)
+
+Written for: Mathew and the external reviewer.
+
+Documentation only. The five authorized files are **staged and uncommitted**. Claude Code did not
+commit, fetch, push, merge, rerun CI or change authentication. It did not implement M5h, register
+`run_review` or configure a provider, and it made no provider call and used no credential.
+
+## 1. Recovery and checkpoint
+
+- **State matched the prompt.** On main, HEAD, local main and stored origin/main were all
+  `bebd2f7593af6459b25182adab2c3ddee17b9e31`. The staged tree was
+  `c6c497629f253bdd711e05fc6e20211c7672febb`, with exactly the five paths. Nothing was unstaged
+  or untracked, and the test blob was `837136d61e1ec815a1fa2324ff596e83dc55d591`.
+- **Both Prompt 224 exports matched** their recorded bytes, lines and SHA-256:
+  - 14,445 bytes, 191 lines, `b1565e05…96f8`;
+  - 13,172 bytes, 176 lines, `7c88e8f8…8955`.
+- **Checkpoint** (`.local/p225/checkpoint/`): refs, status, staged tree, a nonempty 265-entry
+  full-tree listing, staged blobs, and the prompts.md prefix (2,921,933 bytes, `530b36c5…0094`).
+- **Branch:** `docs/model-provider-plan` was created from `bebd2f75`, carrying the staged
+  evidence. It did not exist before.
+
+## 2. Accepted M5g publication evidence (the reviewer's)
+
+- **ADR-0025, main-publication section.** The reviewer's figures sit under each existing job
+  link, feature and main separately:
+
+  | Run | Ubuntu | Windows | PostgreSQL |
+  | --- | --- | --- | --- |
+  | Feature (ci 42212944954) | `4999 passed, 439 skipped in 93.65s` | `4998 passed, 440 skipped in 133.04s` | `439 passed, 4999 deselected in 423.97s` |
+  | Main (ci 42215467281) | `4999 passed, 439 skipped in 94.60s` | `4998 passed, 440 skipped in 173.69s` | `439 passed, 4999 deselected in 375.22s` |
+
+  - **Container:** the smoke and cleanup succeeded in both runs.
+  - **Gitleaks:** 98 commits and no leaks in both runs.
+  - **Verify logs:** the registry line and all twelve wheel lines.
+  - **PostgreSQL positions:** 7, 44 and 3.
+- **New section:** "Reviewer-retrieved `bebd2f75` logs and acceptance (Prompt 225)" records the
+  acceptance and the limits:
+  - the logs give positions, not names, so neither the corrected retry case nor the replacement
+    case is individually named;
+  - there is no migration or `alembic check` output;
+  - the container covers ingestion and indexing only;
+  - offline SQL rendering is not PostgreSQL execution, Recall is arithmetic and Voyage is mocked;
+  - no live-model, entailment, authenticity or injection-resistance claim follows.
+- **Kept as history:** Claude Code's HTTP 000/403 statements are relabelled as its own historical
+  access limitation. The `f0d4ce92` and `3d41f435` evidence is unchanged.
+- **Status fixes:**
+  - **README:** the stale "merge, M5h and overall M5 acceptance remain pending" is replaced, and
+    the duplicate "M5g–M5h … remain pending" is removed.
+  - **Threat model:** "awaits review" is replaced with the acceptance, and its "M5g–M5h" sentence
+    is corrected.
+  - **Plan:** the M5g status subsection gains a Prompt 225 sentence.
+  - **Dated history:** older statements are unchanged.
+
+## 3. Proposed M4d/E7 assessment (recommendations awaiting review; neither closed)
+
+The new plan section is "M4d and E7 closure assessment (proposed, Prompt 225; awaiting review,
+neither closed)". It is linked from ADR-0025, the threat model and the README. For each
+obligation it gives the requirement, the implementation and tests (named functions), the CI
+evidence, the satisfiable scope, what lies outside that scope and a recommendation.
+
+- **M4d.** Recommended as **satisfied for the internal `run_review` handler composition at
+  `bebd2f75`** only. The evidence:
+  - `load_trusted_review` is the sole snapshot source;
+  - `search_snapshot` is the sole retrieval, shown by the AST structure test;
+  - the replacement-activation PostgreSQL test;
+  - the evidence binding and the source-bound M5f recheck.
+
+  It stays open for any production registration and for the general APIs (`capture_snapshot`,
+  `capture_in_transaction`, `search_current`).
+- **E7.** Recommended as **satisfied for the internal composition**:
+  - the migration `0008` table;
+  - the writer, with its completeness checks;
+  - replay and conflict;
+  - lifecycle-aware reads;
+  - output and success in one `fenced(finish=True)`.
+
+  M6's approval and export obligations are explicitly separate and pending.
+- **Gap (both).** The evidence is position-level only. Claude Code's source inference is that the
+  handler and canary modules have exactly 7 and 3 unparametrized functions. No implementation gap
+  was found.
+- **Unchanged limits:** U4, the M3 lease/commit window, unknown outcome, database trust and
+  provenance versus semantics.
+
+## 4. Proposed M5h contracts and open decisions (unaccepted, unimplemented, untested)
+
+The new plan section is "M5h Anthropic adapter specification (proposed, Prompt 225; unaccepted,
+unimplemented, untested)", subsections M5h-A to M5h-M.
+
+- **Sources:** official Anthropic pages only (Messages create, Errors, Versions), read
+  2026-11-07, with **[API]** facts separated from **[POLICY]** choices.
+- **Contracts:**
+  - `evidenceguard_agents.anthropic`, providing `AnthropicProvider` and an `AnthropicTransport`
+    protocol;
+  - a standard-library `HttpsAnthropicTransport` in the worker;
+  - an exact request body (model, max_tokens, system, one user message; no sampling, thinking,
+    tools, fallbacks or betas);
+  - `anthropic-version` pinned as a constant; no default model; verbatim model echo;
+  - per-call `timeout_ms`, with no hard deadline; size bounds of 4 MiB per request and 1 MiB per
+    response;
+  - no retries (M5e owns them);
+  - a status table into `timeout` or `provider_failed`;
+  - strict JSON parsing; thinking blocks skipped; exactly one text block;
+  - a stop-reason table;
+  - SecretStr-only key and fixed text-free errors;
+  - offline deterministic tests;
+  - no new dependency, and one additive wheel line;
+  - handover: none to M5g or M6, and live work to M7.
+- **Decisions H1–H10:** transport choice (stdlib recommended over the SDK), alias policy (exact
+  echo), API version, the structured-output mechanism, usage accounting, server timeouts,
+  `model_context_window_exceeded`, thinking and effort, non-streaming, and no fallbacks or betas.
+  Each has a recommendation and a tradeoff.
+
+## 5. Verification actually run (this session)
+
+| Check | Result (record in `.local/p225/checks/`) |
+| --- | --- |
+| Scope and protected identity | 265 entries; 260 identical to `bebd2f75`; only the 5 authorized paths differ; test blob `837136d6…` unchanged; all modes 100644; nothing unstaged or untracked |
+| Links, anchors and tables (`.local/p208/check_links.py`, 46 tracked `.md`) | 641 links, 0 bad; 238 tables, 0 problems |
+| Encoding and whitespace (working and staged) | UTF-8, no BOM, LF only, final newline, no trailing whitespace; `git diff --cached --check` clean |
+| History prefix | the staged prompts.md starts with the checkpoint prefix and with the committed `bebd2f75` prompts.md; the Prompt 224 handoff is byte-identical; the Prompt 225 transcription is present |
+| Privacy (added lines) | 0 hits |
+| Gitleaks `git --staged` 8.30.1 | no leaks, exit 0; no allow comments in the edited docs |
+| Ruff format and lint (`uv run --locked`) | format check exit 0 (240 files); lint "All checks passed!" |
+
+The first format check failed on the new Python signature block in `docs/plan.md`. It was fixed
+with `ruff format docs/plan.md`, which changed only that block; all checks were then rerun on the
+final tree. No application test, build, wheel check, database test or CI was run (not required).
+
+**History fidelity.**
+
+- The Prompt 224 handoff is **byte-copied** from `.local/p224/handoff.md`.
+- Prompt 225 is **transcribed**: it was extracted from the session transcript, with the paste
+  wrapper and leading blank lines removed, and was not compared with an independent original.
+- A Prompt 225 outcome note marks the work pending review.
+
+## 6. Export
+
+| Property | Value |
+| --- | --- |
+| Path | `.local/p225/m5g-main-evidence-assessment-and-m5h-spec.diff` |
+| Baseline | `bebd2f7593af6459b25182adab2c3ddee17b9e31` (committed; includes the Prompt 224 staged evidence in the diff) |
+| Final | staged tree `f685542c3d7476d1de098abc461f46fe4b164684` |
+| Options | `git diff --full-index`, prompts.md excluded (prompts.md: +410/−0) |
+| Paths | `README.md` +14/−5; ADR-0025 +161/−5; `docs/plan.md` +509/−2; `docs/threat-model.md` +11/−4 |
+| Statistics | 4 files, +695/−16 |
+| Size | 55,379 bytes; 795 lines |
+| SHA-256 | `7b89b7c662292db41df954dfc2e4363ee7f74666801ac52be2ec3c315f5cd082` |
+| Encoding | UTF-8, no BOM, LF only |
+| Identity | byte-identical to fresh tree-to-tree and `--cached` Git output |
+
+The Prompt 225 increment alone (`c6c49762` → `f685542c`, not exported) is: README +10/−4,
+ADR +111/−26, plan +500/−0, threat model +8/−4, prompts.md +386/−0.
+
+## Final state
+
+| | Value |
+| --- | --- |
+| Branch | `docs/model-provider-plan` (local only, no upstream) |
+| HEAD / main / origin/main | `bebd2f75…` (unchanged) |
+| Index | staged tree `f685542c…`, 5 files; nothing unstaged or untracked |
+
+## Remaining limitations
+
+- **Pending review:** all of this awaits review, and a commit needs separate authorization.
+- **M4d and E7:** recommendations only, not closed.
+- **M5h:** a specification only. The model-echo, alias and thinking behaviour is unverified
+  without a live run.
+- **No production path:** no registration, live provider or quality claim.
+- **Still pending:** M5h implementation, M6 and overall M5 acceptance.
+
+Mathew: return the complete handoff plus the diff to the external reviewer
+(`.local/p225/handoff.md` and `.local/p225/m5g-main-evidence-assessment-and-m5h-spec.diff`).
+-----END SAVED PROMPT 225 HANDOFF-----
+
+## Prompt 226 scoped M4d/E7 acceptance and M5h contract corrections (transcribed)
+
+Source: Mathew's Prompt 226 instruction to Claude Code. It carries the external reviewer's decisions: acceptance of the Prompt 225 evidence recording, the scoped M4d/E7 acceptance, and the M5h corrections R1-R5 (the reviewer's, not Claude Code's). Claude Code extracted the pasted prompt text from its own session transcript into `.local/p226/prompt226.txt`, removing only the paste wrapper and leading blank lines, and inserted that file's bytes unchanged below. The transcription was not compared against an independently saved original.
+
+Prompt 226 — Record scoped M4d/E7 acceptance and complete the M5h contracts
+
+Written for: Mathew and the external reviewer.
+
+Documentation only. Preserve the staged work. Do not implement, commit, fetch, push, merge, rerun CI, change authentication, register run_review, configure credentials or make a provider call.
+
+1. Recovery
+
+Read the governing instructions and .local/p225/handoff.md.
+
+Expected:
+- Branch docs/model-provider-plan.
+- HEAD, local main and stored origin/main:
+  bebd2f7593af6459b25182adab2c3ddee17b9e31
+- Staged tree:
+  f685542c3d7476d1de098abc461f46fe4b164684
+- Exactly the five authorized documentation/history files staged.
+- Nothing unstaged or unexpectedly untracked.
+- Protected PostgreSQL test blob:
+  837136d61e1ec815a1fa2324ff596e83dc55d591
+
+Verify the Prompt 225 export:
+.local/p225/m5g-main-evidence-assessment-and-m5h-spec.diff
+55,379 bytes; 795 lines; four files; +695/-16.
+SHA-256:
+7b89b7c662292db41df954dfc2e4363ee7f74666801ac52be2ec3c315f5cd082
+
+Verify its recorded tree and cached comparisons, excluding prompts.md. Save a checkpoint under .local/p226/, including a nonempty full-tree listing and history prefix. Report material discrepancies before dependent edits.
+
+2. External review disposition
+
+Record these decisions separately:
+
+A. Accepted: the Prompt 225 M5g publication-evidence recording.
+
+B. Accepted, with the scope clarification below:
+- M4d's trusted-snapshot requirement is satisfied for the internal run_review handler composition at bebd2f75.
+- E7's deferred output-persistence and atomic-finish requirement is satisfied for that internal composition at bebd2f75.
+
+This accepts the assessed requirements, not production wiring or overall M5.
+
+The source inspection and complete passing PostgreSQL module results are sufficient evidence for this scoped decision. Keep the distinction between directly printed module results and inference about named tests. The absence of individually printed names is an evidence-granularity limitation, not an outstanding implementation gap or a requirement for another CI run.
+
+Clarify the general retrieval API discussion:
+- Explicit-snapshot retrieval still relies on a trusted caller.
+- capture_snapshot and capture_in_transaction capture snapshots; do not describe them as accepting an arbitrary caller-supplied snapshot.
+- search_current intentionally selects current state.
+- The internal review handler exclusively uses its trusted persisted snapshot.
+- Any future production registration needs its own composition review.
+
+Preserve U4's discarded-evidence limitation, database trust assumptions, M3's lease/commit window, unknown outcomes, M6 approval/export obligations and all provenance-versus-semantic limits.
+
+Update current status summaries consistently while keeping earlier decisions historical. Preserve existing anchors or retain compatibility anchors when headings change.
+
+C. M5h remains proposed and unaccepted. H1–H10 are supported directions subject to the completed contracts below, not accepted implementation decisions.
+
+3. M5h correction R1: HTTP-status and error-body precedence
+
+The specification currently classifies status before reading the body but also allows error.type == timeout_error to override the status. The injected transport returns an already-read body. Define these phases accurately.
+
+Provide an ordered algorithm and decision table covering:
+- HTTP 504 with an empty, malformed, oversized or unreadable body;
+- another non-200 status with a valid timeout_error envelope;
+- another non-200 status with an ordinary error envelope;
+- absent, malformed, duplicate-key, over-depth or oversized error bodies;
+- failure while reading or closing an error response;
+- elapsed-budget expiry after headers;
+- invalid transport response values.
+
+The same contract must be implementable through the real HTTPS transport and an injected transport. Decide explicitly when a known HTTP status is preserved and when a later failure replaces it. Do not silently copy M4f's “never read a non-200 body” rule while also requiring timeout_error inspection.
+
+Define minimal error-envelope checks. Messages, request IDs and unknown error fields must not enter public errors, logs or stored results.
+
+Keep M5a unchanged: ModelCallTimeout maps to timeout; ordinary adapter failures map to provider_failed. No retry occurs inside the adapter or transport.
+
+4. M5h correction R2: response-validation order
+
+Replace the conflicting content rules with one ordered algorithm.
+
+Specify:
+- exact types and bounds of the required envelope fields;
+- whether id, stop_sequence and stop_details are ignored, optional or validated;
+- which validations apply to every stop reason;
+- which apply only to end_turn;
+- whether non-end_turn block payloads are ignored after envelope decoding;
+- how malformed content affects refusal, max_tokens and unexpected_stop;
+- handling of missing/null/empty/nonempty citations;
+- handling of thinking, redacted_thinking, unknown blocks and malformed blocks;
+- text UTF-8 validity, lone surrogates and output-size limits.
+
+“Discarded unread” must not imply that a JSON decoder never decoded those bytes. State precisely what is decoded, inspected and retained.
+
+For a valid mapped ProviderResponse, preserve M5a's model-mismatch precedence. Explain that malformed provider envelopes fail before that precedence can apply.
+
+Enforce the response byte bound at the adapter/parser boundary too, so an injected transport cannot bypass it.
+
+Define strict JSON rules explicitly rather than only referring to M4f: UTF-8/BOM policy, duplicate keys, non-finite numbers, trailing data, integer bounds and depth counting. Bound parsing before unbounded processing.
+
+Add planned table-driven cases for each branch and conflicting-condition precedence.
+
+5. M5h correction R3: complete public values and errors
+
+Finish the public API contracts:
+- exact constructor signatures, defaults and parameter bounds;
+- unknown-argument policy;
+- exact-type requirements and rebuilding of bypass-built dataclasses;
+- adapter transport validation;
+- request revalidation, including its stored derived digest/schema;
+- complete AnthropicErrorCode members and fixed messages;
+- behavior for an invalid error-code argument;
+- which failures use configuration, malformed_response or other codes;
+- process-control propagation during validation.
+
+AnthropicResponse must have a safe repr and str that never expose body bytes. Its default dataclass representation would expose them.
+
+Define safe representations for every new public value carrying sensitive content. Distinguish transient in-memory processing from prohibited retention in public errors, accounting, logs or stored state.
+
+Remove RETRYABLE_CODES from the public proposal unless it has a concrete requirement in this slice. It must not suggest a second retry policy.
+
+6. M5h correction R4: HTTPS transport contract
+
+Replace the ellipsis-based transport signature with an implementable contract, informed by the existing HttpsVoyageTransport source.
+
+Specify:
+- TLS verification and minimum version;
+- connection-factory and clock signatures;
+- exact key admission, preferably the existing printable-ASCII rule;
+- request validation before network activity;
+- per-phase timeout calculation using timeout_ms and connect_timeout;
+- usable/backwards clock readings;
+- when a missing socket is accepted or refused;
+- prevention of implicit reconnects;
+- framing and bounded-read behavior.
+
+Cover:
+- duplicate, absent or conflicting Content-Length/Transfer-Encoding;
+- chunked responses;
+- unsupported Content-Encoding;
+- malformed lengths, early EOF and cap-plus-one reads;
+- whether the same framing rules apply to error responses.
+
+Distinguish application headers from automatically generated HTTP framing headers. “No other header” cannot literally exclude Host and Content-Length. State the Accept-Encoding/decompression policy and ensure keys cannot enter debug output.
+
+Correct the timeout claim. Do not promise that an overrun is bounded by one socket timeout. DNS, multiple connection attempts and internal standard-library loops can exceed a cooperative budget; cleanup has no hard deadline. No hard wall-clock bound is established.
+
+Define cleanup:
+- response and connection closed separately;
+- invocation counts when construction or a phase fails;
+- ordinary cleanup failure precedence;
+- first process-control object preserved by identity;
+- later cleanup interrupts suppressed when an earlier control object exists;
+- limitations when a library internally replaces an exception.
+
+No disposal, successful rollback or commit-outcome claim follows from cleanup behavior.
+
+Add planned fake-connection tests for each branch, including status/body-failure combinations.
+
+7. M5h correction R5: request size and policy wording
+
+Keep the proposed caps if justified, but derive an explicit upper bound for the entire serialized request: both escaped texts, model ID, integer and JSON overhead.
+
+Clarify:
+- serialized request bytes are checked before dispatch;
+- adapter validation failures can cause zero transport calls;
+- one valid dispatch makes exactly one transport call;
+- these caps are engineering limits, not performance guarantees;
+- strict rejection choices such as citations handling are project policy, not API requirements.
+
+Preserve the model-echo policy, pinned API version, no default model, prompt-only structured-output mechanism, non-streaming scope, no caching/fallbacks/tools/betas and no internal retries as supported directions.
+
+Keep source citations and distinguish official API facts from project policy. Consult official documentation if needed; no provider calls or credentials.
+
+8. Scope and verification
+
+Only these five tracked files may change:
+- README.md
+- docs/decisions/0025-review-orchestration.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Preserve accepted M5a–M5g contracts and the separately attributed CI evidence. Do not create an implementation ADR, source, migration or test.
+
+Append the Prompt 225 handoff and Prompt 226 honestly under the history-fidelity rules, preserving the earlier bytes.
+
+Run documentation scope/blob/mode checks, links/anchors/tables, encoding, whitespace, history-prefix fidelity, privacy, unsuppressed staged Gitleaks and required formatting/lint checks. No application suite, build, database or CI rerun is required.
+
+Stage the result, uncommitted.
+
+Export:
+.local/p226/m5h-contract-corrections-and-scoped-closure.diff
+
+Compare the starting staged tree f685542c3d7476d1de098abc461f46fe4b164684 with the final staged tree, using full indexes and excluding prompts.md. Verify byte identity against Git and report full tree identities, statistics, bytes, lines, encoding and SHA-256.
+
+Return the complete handoff plus the diff.
+
+M5h remains proposed, unaccepted, unimplemented and untested. Its implementation, production wiring, live calls, M6 and overall M5 acceptance remain unauthorized.
+
+## Prompt 226 outcome note
+
+**Note.** Source: Claude Code. Documentation only, staged and **uncommitted**, pending external review.
+
+- **Recorded:** the reviewer's three separate decisions. (A) The Prompt 225 evidence recording is accepted. (B) M4d and E7 are accepted as satisfied for the internal `run_review` handler composition at `bebd2f75` only, with the retrieval-API scope clarification. (C) M5h remains proposed and unaccepted.
+- **Proposed, not accepted:** the completed M5h contracts (R1-R5) in `docs/plan.md`. They are unaccepted, unimplemented and untested. No provider call, credential or new documentation page was used; the request bound was computed locally.
+- **Corrected Prompt 225 claims:** the one-socket-timeout overrun bound, and the statement that M4f refuses JSON depth over 8.
+- **Checks:** the documentation checks and the export are reported in the Prompt 226 handoff and `.local/p226/`. No application test, build, database test or CI was run.
+
+## Prompt 226 handoff (saved file, byte-copied)
+
+Source: `.local/p226/handoff.md`, the handoff file Claude Code saved in Prompt 226. Its bytes are inserted unchanged between the two marker lines below and were compared byte-for-byte against that file after insertion. Claude Code's Prompt 226 chat reply is not reproduced.
+
+-----BEGIN SAVED PROMPT 226 HANDOFF-----
+# Prompt 226 handoff: scoped M4d/E7 acceptance recorded, M5h contracts completed (Claude Code)
+
+Written for: Mathew and the external reviewer.
+
+Documentation only. The five authorized files are **staged and uncommitted**. Claude Code did not
+commit, fetch, push, merge, rerun CI or change authentication. It did not implement M5h, register
+`run_review` or configure credentials. It made no provider call and consulted no new
+documentation page.
+
+## 1. Recovery and checkpoint
+
+- **State matched the prompt.**
+  - Branch `docs/model-provider-plan`.
+  - HEAD, local main and stored origin/main: `bebd2f7593af6459b25182adab2c3ddee17b9e31`.
+  - Staged tree `f685542c3d7476d1de098abc461f46fe4b164684`, with exactly the five paths.
+  - Nothing unstaged or untracked; test blob `837136d61e1ec815a1fa2324ff596e83dc55d591`.
+- **The Prompt 225 export matched:** 55,379 bytes, 795 lines, four files, +695/−16, SHA-256
+  `7b89b7c6…5cd082`. It was byte-identical to fresh `--cached` and tree-to-tree
+  (`bebd2f75` → `f685542c`) output, with `prompts.md` excluded.
+- **Checkpoint** (`.local/p226/checkpoint/`): refs, status, staged tree, a nonempty 265-entry
+  full-tree listing, the four staged documents, and the `prompts.md` prefix (2,944,248 bytes,
+  `469a6615…e6ab`).
+- **No material discrepancy** was found.
+
+## 2. Review disposition recorded (three separate decisions)
+
+- **A. Accepted: the Prompt 225 publication-evidence recording.** It is recorded in a new
+  ADR-0025 section, "Scoped M4d and E7 acceptance and M5h disposition (Prompt 226)".
+- **B. Accepted, scoped: M4d and E7 for the internal `run_review` handler composition at
+  `bebd2f75`.**
+  - **Plan.** The assessment heading is now "(scoped acceptance, Prompt 226)". A compatibility
+    anchor keeps the Prompt 225 links valid. A new subsection, "M4d and E7 review disposition
+    (Prompt 226)", records the decision.
+  - **Scope.** The decision accepts the assessed requirements only: not production wiring, and
+    not overall M5.
+  - **Evidence.** Directly printed module results are kept separate from the source inference
+    about named tests. The missing names are recorded as an evidence-granularity limitation, not
+    an implementation gap and not a need for another CI run.
+  - **Retrieval APIs.** The wording is corrected:
+    - explicit-snapshot retrieval (`search_snapshot`) relies on a trusted caller;
+    - `capture_snapshot` and `capture_in_transaction` capture snapshots and accept none;
+    - `search_current` intentionally selects current state;
+    - the handler uses only its trusted persisted snapshot;
+    - a future production registration needs its own review.
+  - **Unchanged:** U4, database trust, M3's lease/commit window, unknown outcomes, M6, and the
+    provenance-versus-semantic limits.
+  - **Status summaries.** README, the threat model and ADR-0025 were updated. Earlier statements
+    are marked historical rather than rewritten.
+  - **README heading.** Its stale tail ("M5e … staged … M5f–M5h implementation pending") was
+    corrected. No link targets that heading.
+- **C. M5h remains proposed and unaccepted.** H1–H10 are labelled supported directions, subject
+  to the completed contracts, not accepted decisions.
+
+## 3. M5h corrections (in `docs/plan.md`; unaccepted, unimplemented, untested)
+
+The heading is unchanged, so existing anchors still work. A new M5h-R table maps each finding to
+the subsection that corrects it.
+
+- **R1, status and error-body precedence (M5h-C, M5h-G).**
+  - **Two phases.** The HTTPS transport only decides whether an error body exists.
+    `parse_response(AnthropicResponse)` classifies the result identically for real and injected
+    transports.
+  - **Order.** Revalidate; 504 is `timeout` whatever its body; for another non-200, a minimal
+    envelope check (`type == "error"`, `error.type` matching `^[a-z_]{1,64}$`) detects
+    `timeout_error`; otherwise the status code applies.
+  - **Status preservation.** A known non-200 status is never replaced: a failure while reading or
+    framing its body yields `AnthropicResponse(status, b"")`. A 200 is always replaced by a later
+    failure.
+  - **Decision table.** Cases G1–G18.
+  - **Difference from M4f** (which never reads a non-200 body): stated explicitly.
+- **R2, response-validation order (M5h-H).**
+  - **Strict JSON rules J1–J7:** size first; strict UTF-8 with no BOM; a depth pre-scan at most
+    16; duplicate keys refused at every depth; no NaN or Infinity; integers of at most 20 digits;
+    no trailing data.
+  - **Ordered checks V1–V9.** The envelope applies to every stop reason. `id`, `stop_sequence` and
+    `stop_details` are ignored. Block payloads are ignored outside `end_turn`. `end_turn` needs
+    exactly one text block, with citations absent, null or `[]`. Thinking blocks are skipped and
+    unknown blocks fail closed. Lone surrogates are malformed, and the size limit is checked last.
+  - **Decoded, inspected and retained** are now stated precisely.
+  - **Precedence.** Mismatch precedence applies only to a valid `ProviderResponse`.
+  - **Byte bound.** It is enforced in the transport, the constructor and the parser.
+- **R3, public values and errors (M5h-B, M5h-I).**
+  - Exact signatures and bounds, and the unknown-argument policy.
+  - Exact-type rebuilds and request revalidation, including the stored schema and digest.
+  - All 19 `AnthropicErrorCode` members, each with its fixed value; an invalid code argument
+    raises `TypeError`.
+  - Process control propagates during validation.
+  - Safe representations, including `AnthropicResponse(status=…, body_bytes=…)`.
+  - Transient processing is distinguished from prohibited retention.
+  - `RETRYABLE_CODES` is removed.
+- **R4, HTTPS transport (M5h-B, M5h-C, M5h-D, M5h-F).**
+  - The full constructor and `post` signatures.
+  - TLS: the default context, CERT_REQUIRED, and a TLS 1.2 minimum.
+  - The printable-ASCII key rule.
+  - Argument checks before any network activity.
+  - Timeouts for each phase.
+  - `clock_failed` for an unusable or backwards clock.
+  - The socket rule before sending and headers, with `auto_open` off.
+  - Framing (Content-Length, Transfer-Encoding, Content-Encoding) applied to error responses too.
+  - Six application headers, separate from the generated `Host` and `Content-Length`.
+  - Cleanup counts and process-control precedence.
+- **R5, request size and policy wording (M5h-F, M5h-H).**
+  - **Request bound.** Serialized requests are at most **2,784,148 bytes**: 80 skeleton + 4 + 64
+    + 6 × 64,000 + 6 × 400,000. It was computed locally (`.local/p226/request_bound.py`), which
+    also checked every code point's escape ratio and constructed a worst case of exactly that
+    length.
+  - **The 4 MiB cap is kept** and checked before dispatch.
+  - **Transport calls.** Zero on a validation failure, and exactly one on a valid dispatch.
+  - **Labels.** The caps are engineering limits, and the citations rule is project policy.
+- **Two Prompt 225 claims withdrawn:**
+  - "an overrun is bounded by one socket timeout": no hard wall-clock bound exists;
+  - "M4f refuses JSON depth over 8": M4f has no explicit depth limit, and only maps
+    `RecursionError`.
+
+## 4. Verification actually run (this session)
+
+| Check | Result (record in `.local/p226/checks/`) |
+| --- | --- |
+| Scope and protected identity | 265 entries; the same path set as `bebd2f75`; only the 5 authorized paths differ from `bebd2f75` and from `f685542c`; test blob `837136d6…` unchanged; all modes 100644; nothing unstaged or untracked |
+| Links, anchors and tables (`.local/p208/check_links.py` over 46 tracked `.md` files) | 652 links, 0 bad; 247 tables, 0 problems |
+| Encoding and whitespace (working and staged) | UTF-8, no BOM, LF only, final newline, no trailing whitespace; `git diff --cached --check` clean |
+| History prefix | the staged `prompts.md` starts with the checkpoint prefix and with the committed `bebd2f75` file; the Prompt 225 handoff is byte-identical; the Prompt 226 transcription is present |
+| Privacy (1,329 added lines) | 0 hits |
+| Gitleaks `git --staged` 8.30.1 | no leaks, exit 0; no allow comments |
+| Ruff format and lint (`uv run --locked`) | format exit 0 (240 files); lint "All checks passed!" |
+
+- **Link checker.** Its first run was given no file arguments and reported 0 links. It was rerun
+  correctly over the tracked Markdown files.
+- **Not run.** No application test, build, database test or CI (none was required).
+
+**History fidelity.**
+
+- The Prompt 225 handoff is **byte-copied** from `.local/p225/handoff.md`.
+- Prompt 226 is **transcribed**: extracted from the session transcript, with the paste wrapper and
+  leading blank lines removed, and not compared with an independent original.
+- An outcome note marks the work as pending review.
+
+## 5. Export
+
+| Property | Value |
+| --- | --- |
+| Path | `.local/p226/m5h-contract-corrections-and-scoped-closure.diff` |
+| Baseline | staged tree `f685542c3d7476d1de098abc461f46fe4b164684` (Prompt 225, reviewed) |
+| Final | staged tree `195de4fdc293376626a2bdae4c277fdfd7c8b58f` |
+| Options | `git diff --full-index`, `prompts.md` excluded (`prompts.md`: +391/−0) |
+| Paths | `README.md` +8/−5; ADR-0025 +52/−3; `docs/plan.md` +853/−154; `docs/threat-model.md` +25/−11 |
+| Statistics | 4 files, +938/−173 |
+| Size | 94,352 bytes; 1,349 lines |
+| SHA-256 | `c7657e8d4838be7ea3626258ad88d5865d9f5402f8fba47735cd429f595006c8` |
+| Encoding | UTF-8, no BOM, LF only |
+| Identity | byte-identical to fresh tree-to-tree and `--cached` Git output |
+
+## Final state
+
+| | Value |
+| --- | --- |
+| Branch | `docs/model-provider-plan` (local only, no upstream) |
+| HEAD / main / origin/main | `bebd2f75…` (unchanged) |
+| Index | staged tree `195de4fd…`, 5 files; nothing unstaged or untracked |
+
+## Remaining limitations
+
+- **Pending review.** All of this awaits review, and a commit needs separate authorization.
+- **M5h** is a specification only: unaccepted, unimplemented and untested. Its echo, alias,
+  thinking and server-timeout behaviour is unverified without a live run.
+- **The M5h source basis** is the Prompt 225 reading of the official pages; nothing was
+  re-checked in Prompt 226.
+- **Still unauthorized:** production wiring, live calls, M6 and overall M5 acceptance.
+
+Mathew: return the complete handoff plus the diff to the external reviewer
+(`.local/p226/handoff.md` and `.local/p226/m5h-contract-corrections-and-scoped-closure.diff`).
+-----END SAVED PROMPT 226 HANDOFF-----
+
+## Prompt 227 M5h specification acceptance and local documentation commit (transcribed)
+
+Source: Mathew's Prompt 227 instruction to Claude Code. It carries the external reviewer's acceptance of the corrected M5h specification and H1-H10, with binding clarifications A-C, and the reviewer's own isolated standard-library checks (the reviewer's, not Claude Code's). No separately saved original of the acceptance exists, so it is recorded only through this prompt. Claude Code extracted the pasted prompt text from its own session transcript into `.local/p227/prompt227.txt`, removing only the paste wrapper and leading blank lines, and inserted that file's bytes unchanged below. The transcription was not compared against an independently saved original.
+
+Prompt 227 — Record M5h specification acceptance and commit the documentation locally
+
+Written for: Mathew and the external reviewer.
+
+The external reviewer accepts the corrected M5h specification and H1–H10, subject to binding clarifications A–C below.
+
+This authorizes documentation changes and one local documentation commit only. Do not implement M5h, fetch, push, merge, rerun CI, change authentication, register run_review, configure credentials or make provider calls.
+
+1. Recover and verify
+
+Read the governing instructions and .local/p226/handoff.md.
+
+Expected:
+- Branch docs/model-provider-plan.
+- HEAD, local main and stored origin/main:
+  bebd2f7593af6459b25182adab2c3ddee17b9e31
+- Staged tree:
+  195de4fdc293376626a2bdae4c277fdfd7c8b58f
+- Exactly five staged documentation/history paths.
+- Nothing unstaged or unexpectedly untracked.
+- Protected PostgreSQL test blob:
+  837136d61e1ec815a1fa2324ff596e83dc55d591
+
+Verify the Prompt 226 export:
+.local/p226/m5h-contract-corrections-and-scoped-closure.diff
+94,352 bytes; 1,349 lines; four files; +938/-173.
+SHA-256:
+c7657e8d4838be7ea3626258ad88d5865d9f5402f8fba47735cd429f595006c8
+
+Verify its recorded Git comparison, excluding prompts.md. Save a checkpoint under .local/p227/, including a nonempty full-tree listing, staged blob identities and prompt-history prefix.
+
+Report material discrepancies before dependent edits. Preserve the staged work.
+
+2. Acceptance and evidence scope
+
+Record:
+- The corrected M5h specification is accepted at external review in Prompt 227, with clarifications A–C.
+- H1–H10 are accepted; no specification decision remains open.
+- Implementation, implementation tests, builds, publication and exact-version CI remain pending.
+- No M5h control operates yet.
+- The existing scoped M4d/E7 acceptance remains unchanged.
+
+The reviewer verified the uploaded export’s SHA-256, bytes, lines, statistics and encoding and inspected its contracts.
+
+The reviewer independently constructed the maximal request with standard-library json and reproduced 2,784,148 serialized bytes. A separate isolated probe demonstrated that Python json.loads decodes 1e999 to positive infinity even when parse_constant rejects NaN/Infinity tokens.
+
+These were isolated standard-library checks. They were not project-suite, installed-wheel, PostgreSQL or provider tests.
+
+3. Binding clarification A — response admission precedes status classification
+
+The ordered admission algorithm already checks the response value before HTTP status classification. Make every table and summary agree with it:
+
+- First require an exact AnthropicResponse, valid exact field types, a status of 100–599, and a body within MAX_RESPONSE_BYTES.
+- A bypass-built response whose body exceeds MAX_RESPONSE_BYTES is response_too_large, including when its status is 504.
+- A wrong-type or unreadable body is malformed_response, including when its status is 504.
+- Only after response admission succeeds does status 504 become ModelCallTimeout without JSON inspection.
+- For another admitted non-200 response, a body above MAX_ERROR_BODY_BYTES but within MAX_RESPONSE_BYTES is not inspected; the status decides the result.
+
+Distinguish this from a real HTTPS read:
+- If the real transport has obtained a valid non-200 status and its body read exceeds a cap or fails, it returns a newly constructed status-only AnthropicResponse(status, b"").
+- Consequently a real 504 whose body read fails still becomes timeout.
+- An invalid injected response does not bypass response admission.
+
+Narrow “504 whatever its body” and “a known status is never replaced” accordingly. Correct G6/G7, the status table, H6, summaries and planned tests together.
+
+Add explicit planned cases for:
+- admitted 504 with empty or malformed JSON;
+- bypass-built 504 with an oversized body;
+- bypass-built 504 with a wrong-type body;
+- real 504 with an oversized/read-failing body;
+- 429 with a body between the error-inspection cap and the global response cap.
+
+4. Binding clarification B — clock failures and known error statuses
+
+Keep the chosen status-preservation policy, with this exact boundary:
+
+- Before a valid HTTP status has been obtained, an unusable, backwards or ordinarily raising clock produces clock_failed.
+- After getresponse returns, read and validate response.status before the post-header elapsed check.
+- On the 200 path, an unusable/backwards/raising clock remains clock_failed; valid elapsed-budget expiry is timeout.
+- Once a valid non-200 status is known, an ordinary clock failure during the post-header budget check or error-body processing produces a status-only response, just like another ordinary failure on that path.
+- Process control always propagates according to the accepted first-object rule.
+
+Qualify the current blanket clock statement and the phase ordering, tables, error-code descriptions and planned tests. Do not claim every clock failure is exposed as clock_failed regardless of phase.
+
+Include planned cases for unusable, backwards and raising clocks:
+- before any valid status;
+- after a 200 status;
+- after a 429 status;
+- after a 504 status.
+
+5. Binding clarification C — finite JSON floats
+
+The strict JSON policy must reject numeric overflow as well as named non-finite constants.
+
+- Keep parse_constant rejection of NaN, Infinity and -Infinity.
+- Use a guarded parse_float conversion that refuses a non-finite result.
+- Thus 1e999 and -1e999 are refused even inside otherwise ignored fields.
+- Finite floats remain allowed in ignored fields.
+- Any float, finite or otherwise, is still refused where an exact integer is required.
+- A malformed 200 body produces malformed_response.
+- An error envelope failing these rules is treated as no usable envelope, preserving its HTTP status under M5h-G.
+
+Update J5/J6, G10 and the planned tests together.
+
+6. Small consistency corrections
+
+While recording acceptance:
+- Distinguish str(error), which is the code string, from error.args, which is the one-element tuple.
+- Describe the existing M5a ModelCallTimeout representation accurately; do not authorize changing M5a to make a documentation table true.
+- Allow SecretStr.get_secret_value during constructor validation as well as header construction; the current “only to build the header” wording contradicts key validation.
+- State that ordinary TLS-context construction failures become fresh configuration errors, with process control preserved and no connection-factory call.
+- Qualify response_too_large descriptions by the accepted non-200 status-preservation rule.
+
+These are consistency corrections, not additional implementation scope.
+
+7. Record acceptance consistently
+
+Update the M5h heading and linked summaries to:
+“ACCEPTED at review, Prompt 227; implementation pending”.
+
+Preserve the previous heading’s anchor with a compatibility anchor or update all links safely. Add an acceptance subsection recording:
+- proposal and correction history;
+- H1–H10 acceptance;
+- clarifications A–C;
+- reviewer evidence and limits;
+- the implementation contract;
+- pending implementation and runtime obligations.
+
+Mark earlier proposed/supported states historical where necessary. Do not present specification acceptance as implementation or CI acceptance.
+
+Keep the separately attributed M5g logs, scoped M4d/E7 acceptance and all remaining limitations.
+
+8. Scope, checks and local commit
+
+Only these five tracked paths may change:
+- README.md
+- docs/decisions/0025-review-orchestration.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+No implementation ADR, source, dependency, migration, workflow or test change.
+
+Append the Prompt 226 handoff, this acceptance and Prompt 227 under the history-fidelity rules. Byte-copy saved originals where possible; label transcription honestly. Preserve the previous bytes as an identical prefix.
+
+Run:
+- authorized-path and protected blob/mode checks;
+- links, anchors and tables;
+- encoding and whitespace;
+- history-prefix fidelity;
+- privacy;
+- required formatting/lint;
+- unsuppressed staged Gitleaks.
+
+Do not repeat application tests, builds, wheel checks or database tests for documentation-only changes.
+
+After those checks pass, create one normal local commit on the current branch. No amend or history rewrite.
+
+Suggested subject:
+docs: record accepted M5h Anthropic adapter specification
+
+The message must accurately cover the cumulative documentation since bebd2f75: M5g publication evidence, scoped M4d/E7 acceptance and the accepted M5h specification. Use the established noreply author/committer identity and truthful assistance attribution. Write the message from a file.
+
+Verify:
+- parent is bebd2f7593af6459b25182adab2c3ddee17b9e31;
+- exactly the five authorized paths changed;
+- every protected blob and mode remains identical;
+- working tree is clean;
+- main and origin/main remain unchanged.
+
+Run the unsuppressed full-history Gitleaks check after the commit.
+
+9. Deliverables
+
+Export:
+.local/p227/m5h-spec-acceptance.diff
+
+Compare starting staged tree
+195de4fdc293376626a2bdae4c277fdfd7c8b58f
+with the new commit, using full indexes and excluding prompts.md.
+
+Verify byte identity against fresh Git output. Report complete commit/parent/tree identities, changed paths, statistics, bytes, lines, encoding and SHA-256.
+
+Return the complete handoff plus the diff.
+
+Nothing is to be pushed. M5h implementation needs the next authorization. Production wiring, live calls, M6 and overall M5 acceptance remain pending.
+
+## Prompt 227 outcome note
+
+**Note.** Source: Claude Code. Documentation only, committed **locally** on `docs/model-provider-plan` as authorized; not pushed.
+
+- **Recorded:** the M5h specification is ACCEPTED at review (Prompt 227). Clarifications A-C are applied to the M5h subsections, and H1-H10 are accepted. Implementation, tests, builds, publication and exact-version CI are pending, and no M5h control operates. The scoped M4d/E7 acceptance and the M5g evidence attribution are unchanged.
+- **Checks:** the documentation checks, the commit verification and the export are reported in the Prompt 227 handoff and `.local/p227/`. No application test, build, wheel check, database test or CI was run.

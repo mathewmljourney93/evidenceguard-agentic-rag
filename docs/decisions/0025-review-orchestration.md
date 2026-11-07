@@ -1,8 +1,11 @@
 # ADR-0025: Review orchestration and atomic output
 
-- **Status:** M5g is **feature-CI verified at `3d41f435`, not merged**
-  ([evidence](#feature-ci-at-3d41f435-prompt-223)), and main publication is not authorized.
-  The sequence was:
+- **Status:** M5g is **reviewed, verified in CI and on main at `bebd2f75`** within its
+  accepted scope ([main publication](#main-publication-at-bebd2f75-prompt-224)). Feature and main exact-commit CI passed;
+  the reviewer retrieved all ten logs and accepted the publication evidence in Prompt 225
+  ([reviewer logs](#reviewer-retrieved-bebd2f75-logs-and-acceptance-prompt-225)). Earlier it was feature-CI verified at `3d41f435`
+  ([evidence](#feature-ci-at-3d41f435-prompt-223)), which is now historical. The sequence
+  was:
   - **Prompt 218:** implemented by Claude Code.
   - **Prompt 219:** tests corrected.
   - **Prompt 220:** accepted at external review for a local commit only
@@ -17,7 +20,19 @@
     then passed all five required jobs. Claude Code saw conclusions only; the reviewer later
     retrieved the logs and accepted the evidence in Prompt 224 ([reviewer logs](#reviewer-retrieved-3d41f435-logs-and-acceptance-prompt-224)).
 
-  Merge, M5h, M6 and overall M5 acceptance are pending. Statements below that M5g is staged,
+  - **Prompt 224:** evidence commit `bebd2f75`; feature CI, the `--ff-only` main
+    fast-forward, the manual main push and main CI all passed ([main publication](#main-publication-at-bebd2f75-prompt-224)).
+  - **Prompt 225:** the reviewer's retrieved `bebd2f75` logs recorded and the publication
+    evidence accepted ([reviewer logs](#reviewer-retrieved-bebd2f75-logs-and-acceptance-prompt-225)); an M4d/E7 closure assessment and a
+    proposed M5h specification added for review, neither accepted.
+  - **Prompt 226:** M4d and E7 accepted as satisfied for the internal handler composition at
+    `bebd2f75`; M5h left proposed, with its contracts completed ([disposition](#scoped-m4d-and-e7-acceptance-and-m5h-disposition-prompt-226)).
+
+  - **Prompt 227:** the corrected M5h specification accepted at review, with clarifications
+    A–C ([record](#m5h-specification-acceptance-prompt-227)); its implementation is pending.
+
+  M5h implementation, M6 and overall M5 acceptance are pending, and production wiring is not
+  authorized. Statements below that M5g is staged,
   unaccepted, unexecuted or blocked describe the state at the time and are historical.
 - **Specification:** [accepted M5g specification](../plan.md#m5g-review-orchestration-and-atomic-output-specification-accepted-at-review-prompt-217-implementation-pending),
   G1–G15 and G17–G24 with binding clarifications A and B
@@ -188,6 +203,10 @@ codes and hashes are in the handoff):
   live-model injection resistance, and there is no production denylist.
 
 ## Remaining limitations
+
+**Prompt 226 update.** M4d and E7 are now accepted as satisfied for the internal handler
+composition at `bebd2f75` ([disposition](#scoped-m4d-and-e7-acceptance-and-m5h-disposition-prompt-226)). The M4d and
+E7 bullets below record their Prompt 218 state and are historical; the other limits stand.
 
 - **No live provider and no production review path.** `run_review` is unregistered; no endpoint,
   command, setting or enqueue path exists. M5h, M6 and overall M5 acceptance are pending.
@@ -502,7 +521,8 @@ logs ([Prompt 224](#reviewer-retrieved-3d41f435-logs-and-acceptance-prompt-224))
 
 **Status.**
 
-- **Feature CI:** M5g is **feature-CI verified at `3d41f435`, not merged**. At Prompt 223 main
+- **Feature CI (historical, Prompt 223):** M5g was **feature-CI verified at `3d41f435`, not merged**
+  (now on main; see [main publication](#main-publication-at-bebd2f75-prompt-224)). At Prompt 223 main
   publication was not authorized; Prompt 224 authorizes it subject to new gates
   ([acceptance and authorization](#reviewer-retrieved-3d41f435-logs-and-acceptance-prompt-224)).
 - **Not authorized:** a production review registration or live provider.
@@ -552,3 +572,215 @@ happened.
 
 **Unchanged.** There is no production `run_review` registration or live provider. M4d and E7
 closure and overall M5 acceptance remain pending. The failed `f0d4ce92` gate stays historical.
+
+## Main publication at `bebd2f75` (Prompt 224)
+
+**Target.** Evidence commit `bebd2f7593af6459b25182adab2c3ddee17b9e31` (parent `3d41f435`, tree
+`e986d9d012406e869e42471814b42b26a855e8ce`, subject "docs: record verified M5g feature CI
+evidence"). It changes only documentation and history; the implementation and tests are those of
+`3d41f435`, including the corrected test blob `837136d61e1ec815a1fa2324ff596e83dc55d591`.
+
+**Operations.**
+
+1. Mathew pushed the feature branch manually: `3d41f43..bebd2f7`.
+2. Feature CI for `bebd2f75` passed all five jobs (below).
+3. The main preflight passed. Remote main was `e7dd3be3`, an ancestor of the target. The range
+   above main was exactly `ebcc2df9`, `5d97acbc`, `f0d4ce92`, `3d41f435` and `bebd2f75`, over
+   the same 28 reviewed paths. The accepted non-documentation bytes were unchanged apart from
+   the accepted corrected test. The range privacy scan and Gitleaks (5 commits, no leaks)
+   passed.
+4. Claude Code fast-forwarded local main with `git merge --ff-only` (no merge commit).
+5. Mathew pushed main manually: `e7dd3be..bebd2f7`.
+6. Separate main CI for `bebd2f75` passed all five jobs (below).
+
+Claude Code pushed nothing.
+
+**Exact-SHA CI.** The conclusions are Claude Code's observations through the anonymous public
+API: run, job and step conclusions only. The figures marked "Reviewer's log" were added in
+Prompt 225 and are the external reviewer's observations ([reviewer logs](#reviewer-retrieved-bebd2f75-logs-and-acceptance-prompt-225)). All runs
+are for push event, attempt 1, at SHA `bebd2f75`.
+
+- **Feature branch `feat/review-orchestration`**, monitored from 11:48:52Z and completed by
+  11:56:38Z:
+  - [ci run 42212944954](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42212944954): **success**.
+    - [verify ubuntu-24.04](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42212944954/job/127875803580): success. Reviewer's log (Prompt 225):
+      `4999 passed, 439 skipped in 93.65s`.
+    - [verify windows-2025](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42212944954/job/127875803595): success. Reviewer's log:
+      `4998 passed, 440 skipped in 133.04s`.
+    - Both verify logs (reviewer's) printed
+      `production registry: ingest_revision, index_revision` and all twelve installed-wheel
+      result lines, including "review orchestration imported and migration 0008 rendered
+      offline from the installed wheel".
+    - [integration PostgreSQL](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42212944954/job/127875803606): success (step "Run integration tests"
+      success). Reviewer's log: `439 passed, 4999 deselected in 423.97s`, including
+      `test_review_handler_postgres.py` 7 passing positions, `test_review_outputs_postgres.py`
+      44 and `test_review_canary_postgres.py` 3.
+    - [container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42212944954/job/127875803328): success. Reviewer's log: the smoke and cleanup
+      succeeded (ingestion and indexing only).
+  - [secret-scan run 42212945069](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42212945069): **success**.
+    - [Gitleaks](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42212945069/job/127875803321): success. Reviewer's log: 98 commits scanned, no
+      leaks.
+- **Main**, monitored from 12:09:29Z and completed by 12:16:27Z:
+  - [ci run 42215467281](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42215467281): **success**.
+    - [verify ubuntu-24.04](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42215467281/job/127884250650): success. Reviewer's log (Prompt 225):
+      `4999 passed, 439 skipped in 94.60s`.
+    - [verify windows-2025](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42215467281/job/127884250669): success. Reviewer's log:
+      `4998 passed, 440 skipped in 173.69s`.
+    - Both verify logs (reviewer's) printed
+      `production registry: ingest_revision, index_revision` and all twelve installed-wheel
+      result lines, including "review orchestration imported and migration 0008 rendered
+      offline from the installed wheel".
+    - [integration PostgreSQL](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42215467281/job/127884250666): success (step "Run integration tests"
+      success). Reviewer's log: `439 passed, 4999 deselected in 375.22s`, including
+      `test_review_handler_postgres.py` 7 passing positions, `test_review_outputs_postgres.py`
+      44 and `test_review_canary_postgres.py` 3.
+    - [container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42215467281/job/127884250260): success. Reviewer's log: the smoke and cleanup
+      succeeded (ingestion and indexing only).
+  - [secret-scan run 42215467335](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42215467335): **success**.
+    - [Gitleaks](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42215467335/job/127884250609): success. Reviewer's log: 98 commits scanned, no
+      leaks.
+
+**Access limitation (Claude Code's, historical).** Claude Code's anonymous job-log downloads
+failed for all ten jobs:
+HTTP 000, or 403 "Must have admin rights to Repository". No authentication was changed. **Claude Code
+itself observed no counts, per-module results, migration output, installed-wheel lines,
+container output or Gitleaks output for `bebd2f75`.** The reviewer's retrieved logs, added
+under each job above in Prompt 225, now supply the counts and lines; they contain no separate
+migration output. The reviewer-retrieved `3d41f435` counts are **not** reused
+for either `bebd2f75` run, and the main results are not taken from the feature results.
+
+**Status.** M5g is **reviewed, verified in CI and on main at `bebd2f75`**, within its accepted
+scope.
+
+- **Implementation:** accepted in Prompt 220, with the test correction accepted in Prompt 223.
+- **Exact-commit CI:** feature and main CI passed for `bebd2f75`.
+- **Evidence on file:** the reviewer-retrieved logs for `3d41f435`, accepted in Prompt 224.
+
+At Prompt 224 this publication evidence awaited review; the reviewer accepted it in Prompt 225
+([reviewer logs](#reviewer-retrieved-bebd2f75-logs-and-acceptance-prompt-225)). **Still not claimed or authorized:**
+
+- no production `run_review` registration or live provider;
+- no model-quality, entailment, authenticity or injection-resistance claim;
+- the container smoke covers ingestion and indexing only;
+- M4d and E7 closure each need an explicit assessment (proposed for review in Prompt 225,
+  [assessment](../plan.md#m4d-and-e7-closure-assessment-proposed-prompt-225-awaiting-review-neither-closed); neither is closed). *Later:* both
+  were accepted for the internal composition in Prompt 226 ([disposition](#scoped-m4d-and-e7-acceptance-and-m5h-disposition-prompt-226));
+- M5h, M6 and overall M5 acceptance remain pending.
+
+## Reviewer-retrieved `bebd2f75` logs and acceptance (Prompt 225)
+
+**Evidence (the external reviewer's observations, from logs the reviewer retrieved; separate from
+Claude Code's anonymous API observations).** All are for the exact SHA
+`bebd2f7593af6459b25182adab2c3ddee17b9e31`, push event, attempt 1. The per-job figures are
+recorded under each job link in the [main publication section](#main-publication-at-bebd2f75-prompt-224),
+feature and main separately:
+
+| Run | verify Ubuntu | verify Windows | PostgreSQL | Container | Gitleaks |
+| --- | --- | --- | --- | --- | --- |
+| Feature `feat/review-orchestration` (ci 42212944954, secret-scan 42212945069) | `4999 passed, 439 skipped in 93.65s` | `4998 passed, 440 skipped in 133.04s` | `439 passed, 4999 deselected in 423.97s` | smoke and cleanup succeeded | 98 commits, no leaks |
+| Main (ci 42215467281, secret-scan 42215467335) | `4999 passed, 439 skipped in 94.60s` | `4998 passed, 440 skipped in 173.69s` | `439 passed, 4999 deselected in 375.22s` | smoke and cleanup succeeded | 98 commits, no leaks |
+
+- **Every step** of all ten jobs succeeded.
+- **All four verify logs** printed `production registry: ingest_revision, index_revision` and all
+  twelve installed-wheel result lines, including "review orchestration imported and migration
+  0008 rendered offline from the installed wheel".
+- **Both PostgreSQL logs** show `test_review_handler_postgres.py` 7 passing positions,
+  `test_review_outputs_postgres.py` 44 and `test_review_canary_postgres.py` 3.
+
+**Limits of this evidence.**
+
+- **Positions, not names.** The logs print module positions, not individual test names. The
+  corrected `test_a_reservation_abandoned_before_dispatch_is_retried_on_the_next_attempt` and
+  `test_a_replacement_activated_after_creation_is_outside_the_snapshot` results are **not**
+  individually named. *Claude Code's inference from the source, not log content:* at this tree
+  `test_review_handler_postgres.py` defines exactly seven test functions and no parametrize mark,
+  so seven passing positions are consistent with each of them passing.
+- **No separate migration output.** No migration or `alembic check` output line is recorded; the
+  migration test is one of the passing positions.
+- **What the passing jobs do not cover.** The container smoke exercises ingestion and indexing,
+  not review orchestration. The wheel's offline SQL rendering is not PostgreSQL execution, its
+  Recall line is arithmetic and its Voyage line is mocked. Nothing here establishes live-model
+  quality, entailment, authenticity or semantic injection resistance.
+- **Claude Code's access limitation stays historical.** Its HTTP 000/403 statements describe what
+  Claude Code itself could observe; they no longer describe all evidence available to the
+  project.
+
+**Acceptance (Prompt 225).** The external reviewer checked the uploaded Prompt 224 handoff and both
+exports, which match their recorded sizes, line counts and hashes, and **accepts the M5g
+publication evidence**.
+
+**Status.** M5g is **reviewed, verified in CI and on main at `bebd2f75`**, within its accepted
+scope, with reviewer-retrieved logs for both the feature and the main run.
+
+- **Not authorized:** production `run_review` registration, a live provider, settings or
+  credentials.
+- **M4d and E7:** an explicit [closure assessment](../plan.md#m4d-and-e7-closure-assessment-proposed-prompt-225-awaiting-review-neither-closed) is proposed for review;
+  neither is closed. *Later:* accepted for the internal composition in Prompt 226 ([below](#scoped-m4d-and-e7-acceptance-and-m5h-disposition-prompt-226)).
+- **M5h:** a [proposed specification](../plan.md#m5h-anthropic-adapter-specification-proposed-prompt-225-unaccepted-unimplemented-untested) is unaccepted, unimplemented and untested. *Later:* accepted at review in Prompt 227 ([record](#m5h-specification-acceptance-prompt-227)).
+- **Pending:** M5h, M6 and overall M5 acceptance.
+- **Historical and unchanged:** the failed `f0d4ce92` gate and the separate `3d41f435` evidence.
+
+## Scoped M4d and E7 acceptance and M5h disposition (Prompt 226)
+
+The external reviewer recorded three separate decisions.
+
+**A. Accepted: the Prompt 225 recording of the M5g publication evidence**
+([reviewer logs](#reviewer-retrieved-bebd2f75-logs-and-acceptance-prompt-225)). The separately
+attributed `f0d4ce92`, `3d41f435` and `bebd2f75` evidence is unchanged.
+
+**B. Accepted, with a scope clarification: M4d and E7 for the internal handler composition.**
+
+- **M4d.** The trusted-snapshot requirement is satisfied for the internal `run_review` handler
+  composition at `bebd2f75`.
+- **E7.** The deferred output-persistence and atomic-finish requirement is satisfied for that
+  internal composition at `bebd2f75`.
+- **Scope.** This accepts the assessed requirements, not production wiring or overall M5.
+- **Evidence.** The source inspection and the complete passing PostgreSQL module results are
+  sufficient for this scoped decision. The module results are printed directly in the
+  reviewer-retrieved logs; that the named tests are among them is Claude Code's inference from
+  the source. The absence of individually printed names is an evidence-granularity limitation,
+  not an outstanding implementation gap or a requirement for another CI run.
+- **Retrieval APIs.** Explicit-snapshot retrieval still relies on a trusted caller.
+  `capture_snapshot` and `capture_in_transaction` capture snapshots, and `search_current`
+  intentionally selects current state. The internal review handler uses only its trusted
+  persisted snapshot. Any future production registration needs its own composition review.
+- **Unchanged.**
+  - U4's discarded-evidence limitation;
+  - the database trust assumptions;
+  - M3's lease/commit window and unknown outcomes;
+  - M6's approval and export obligations;
+  - every provenance-versus-semantic limit.
+
+Details: [scoped acceptance](../plan.md#m4d-and-e7-closure-assessment-scoped-acceptance-prompt-226).
+
+**C. Not accepted: M5h.** M5h remains proposed and unaccepted. H1–H10 are supported directions,
+subject to the completed contracts, not accepted implementation decisions. Claude Code
+completed the contracts in Prompt 226 (R1–R5:
+[M5h-R](../plan.md#m5h-r-prompt-226-review-disposition-and-corrections)). M5h is unimplemented
+and untested. *Later:* the corrected specification was accepted at review in Prompt 227
+([record](#m5h-specification-acceptance-prompt-227)).
+
+**Still not authorized:** M5h implementation, production wiring or `run_review` registration,
+live calls, credentials, M6 and overall M5 acceptance.
+
+## M5h specification acceptance (Prompt 227)
+
+The external reviewer **accepted the corrected M5h specification and H1–H10** at review, with
+binding clarifications:
+
+- **A.** Response admission precedes status classification.
+- **B.** Clock failures depend on the phase, before or after a valid non-200 status.
+- **C.** Finite JSON floats only (`1e999` refused).
+
+No specification decision remains open
+([acceptance](../plan.md#m5h-acceptance-prompt-227)).
+
+- **Evidence (the reviewer's).** The reviewer verified the Prompt 226 export and inspected its
+  contracts, reproduced the 2,784,148-byte maximal request with the standard-library `json`
+  module, and probed `json.loads` decoding `1e999` to infinity. These were isolated
+  standard-library checks, not project-suite, installed-wheel, PostgreSQL or provider tests.
+- **Scope.** This is specification acceptance only. Implementation, implementation tests,
+  builds, publication and exact-version CI are pending, and no M5h control operates.
+- **Unchanged.** The M5g evidence and its attribution, and the scoped M4d/E7 acceptance.
+- **Not authorized:** M5h implementation until the next authorization, production wiring,
+  live calls, M6 and overall M5 acceptance.
