@@ -579,8 +579,17 @@ for the internal `run_review` handler composition at `bebd2f75`**
 - **Unchanged.** U4's discarded evidence, database trust, the M3 lease/commit window, unknown
   outcomes, M6's approval and export obligations, and the provenance-versus-semantic limits.
 
-The [M5h specification](plan.md#m5h-anthropic-adapter-specification-accepted-at-review-prompt-227-implementation-pending) is ACCEPTED at review (Prompt 227;
-implementation pending). No M5h control operates yet. It adds no live provider and claims no
+The [M5h specification](plan.md#m5h-anthropic-adapter-specification-accepted-at-review-prompt-227-implementation-pending) was accepted at review in Prompt 227.
+Its implementation by Claude Code in Prompt 228 is **accepted for a local commit, Prompt 229; CI pending**
+([ADR-0026 acceptance and evidence limits](decisions/0026-anthropic-adapter.md#external-review-and-implementation-acceptance-prompt-229));
+all nine implementation choices are accepted. Publication, Linux verification and exact-version
+CI remain pending. The reviewer's 73 passing isolated synthetic probes establish no real
+HTTP/DNS/TLS or live compatibility. Recovery supports the saved functional/build records,
+but exact-final-source mutation coverage and universal historical absence of network activity
+were not independently established; the mutation runner lacks `--offline`, which does not
+demonstrate network activity. Recovery did not rerun the saved checks.
+Its HTTPS transport tests used fake connections and an in-memory socket,
+and no M5h control operates in an application path. It adds no live provider and claims no
 model quality or injection resistance. Scripted canary tests do not
 establish live-model injection resistance. Prompt 219 added tests of the real persistence
 boundaries over scripted sessions (read process control, fixed database errors, writer
@@ -589,7 +598,7 @@ changed. None of these controls operates in an application review path. Their da
 evidence is the reviewer-retrieved PostgreSQL module results, and M4d and E7 are accepted only
 for the internal composition (above). M5e is reviewed,
 CI verified and on main at `14f510e`; its publication evidence was independently accepted
-in Prompt 207. M5h implementation, M6 and overall M5 acceptance remain pending.
+in Prompt 207. M6 and overall M5 acceptance remain pending.
 
 Its five-job feature gate passed before the authorized fast-forward and manual main push;
 all five separate main jobs passed, including PostgreSQL (385 passed). The terse logs show

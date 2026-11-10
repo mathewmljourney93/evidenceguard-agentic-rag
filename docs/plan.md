@@ -15220,6 +15220,42 @@ fallbacks, tools or betas, and no retries inside the adapter or the transport.
 registration, settings, credentials, endpoints, a default live provider, any live call, M6 and
 overall M5 acceptance.
 
+<a id="m5h-implementation-status-prompt-228-staged-for-review-unaccepted"></a>
+
+#### M5h implementation status (accepted for a local commit, Prompt 229; CI pending)
+
+**State.** Claude Code implemented the accepted specification in Prompt 228, on
+`feat/anthropic-adapter` from `f919d69c`. The implementation is **accepted for a local commit,
+Prompt 229; CI pending**. The external reviewer accepts all nine implementation choices and
+requests no production, test, packaging or workflow correction. Publication, Linux verification
+and exact-version CI remain pending. The specification above is unchanged; decisions,
+implementation choices and evidence limits are in
+[ADR-0026](decisions/0026-anthropic-adapter.md#external-review-and-implementation-acceptance-prompt-229).
+
+- **Code.** `evidenceguard_agents/anthropic.py`, `evidenceguard_worker/anthropic_http.py`, three
+  new test modules, narrow packaging-guard additions and one additive installed-wheel line in CI.
+- **Claude Code's saved Prompt 228 local evidence (Windows).**
+  - Records support clean Ruff and strict mypy results.
+  - Records support the new tests (558 passed) and full suite (5,560 passed, 441 skipped: 439 integration
+    tests without a database and 2 platform skips).
+  - Records support the build comparison and complete installed-wheel assertion body with
+    offline setup adaptations. These are historical results, not checks rerun during recovery.
+- **External reviewer (Prompt 229).** Verified the export and exact production blobs and reports
+  73 passing isolated checks with Python 3.12.14 and Pydantic 2.13.4. Synthetic inputs and fake
+  connections establish no project-suite, installed-wheel, PostgreSQL, real HTTP/DNS/TLS,
+  live-provider or exact-commit CI result, and no live compatibility or model-quality claim.
+- **Codex recovery.** Saved records support the functional checks and builds; executable
+  sources were unchanged since those checks. The six-mutation record binds to an earlier HTTP
+  source hash, so exact-final-source mutation coverage was not independently established.
+  The mutation runner lacks `--offline`; that alone does not demonstrate network activity,
+  but universal historical absence of network activity was not independently established.
+  Recovery did not rerun the saved checks. No mutation rerun is required for acceptance.
+- **Not established.**
+  - No live-test evidence exists; Claude Code reported no endpoint contact, and the recorded
+    HTTPS tests used fake connections and an in-memory `http.client` socket only.
+  - No exact-version CI ran.
+  - No M5h control operates in an application path, and `run_review` stays unregistered.
+
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.
 - *Acceptance:*

@@ -264,7 +264,7 @@ def test_m5a_domain_modules_keep_the_accepted_imports(module: str, allowed: set[
     assert not imported & M5A_FORBIDDEN_MODULES
 
 
-@pytest.mark.parametrize("module", ["__init__.py", "providers.py", "scripted.py"])
+@pytest.mark.parametrize("module", ["__init__.py", "providers.py", "scripted.py", "anthropic.py"])
 def test_m5a_agents_modules_use_only_the_domain_and_the_standard_library(module: str) -> None:
     """M5a: the provider boundary and the scripted fake cannot reach files, the environment,
     the network or the ground truth through these imports, and use no third-party package."""
@@ -288,6 +288,7 @@ def test_m5a_agents_package_contains_only_the_accepted_modules() -> None:
         "providers.py",
         "scripted.py",
         "report.py",  # M5f: only the accepted pure builder/renderer is added.
+        "anthropic.py",  # M5h: the accepted pure Anthropic adapter (ADR-0026).
         *M5C_MODULES,
         "data",
     }
@@ -311,12 +312,17 @@ def test_m5a_is_not_imported_by_other_packages_or_registered() -> None:
         for source in Path(package.__file__).parent.rglob("*.py"):
             if package is evidenceguard_worker and source.name in M5G_AGENT_IMPORTERS:
                 continue  # M5d composition (D2) and M5g orchestration (G12)
+            if package is evidenceguard_worker and source.name == M5H_TRANSPORT:
+                continue  # M5h: the HTTPS transport imports only the adapter module (below)
             assert "evidenceguard_agents" not in _module_imports(source), source.name
     assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
 
 
 M5G_AGENT_IMPORTERS = {"review_seams.py", "review.py"}
 """The only worker modules that import ``evidenceguard_agents``: M5d (D2) and M5g (G12)."""
+
+M5H_TRANSPORT = "anthropic_http.py"
+"""M5h (ADR-0026): the HTTPS transport, which imports only ``evidenceguard_agents.anthropic``."""
 
 
 # --- M5b (ADR-0020) ------------------------------------------------------------------------------
@@ -493,7 +499,8 @@ def test_m5d_review_seams_are_the_only_worker_module_importing_agents() -> None:
         for source in _source(evidenceguard_worker, "__init__.py").parent.rglob("*.py")
         if "evidenceguard_agents" in _module_imports(source)
     }
-    assert importing == M5G_AGENT_IMPORTERS  # M5d's D2 module plus M5g's G12 module
+    # M5d's D2 module, M5g's G12 module and M5h's transport (restricted below).
+    assert importing == M5G_AGENT_IMPORTERS | {M5H_TRANSPORT}
     imported = _module_imports(_source(evidenceguard_worker, "review_seams.py"))
     assert imported - set(sys.stdlib_module_names) == {
         "evidenceguard_agents",
@@ -737,4 +744,84 @@ def test_m5g_is_not_wired_into_any_route_command_setting_or_production_registry(
             assert "from evidenceguard_worker.review import" not in text, source.name
             if package is not evidenceguard_persistence and package is not evidenceguard_domain:
                 assert "review_outputs" not in text, source.name
+    assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
+
+
+# --- M5h (ADR-0026) ------------------------------------------------------------------------------
+
+
+def _agents_modules(path: Path) -> set[str]:
+    """Every ``evidenceguard_agents`` module imported anywhere in ``path``."""
+    return {
+        node.module
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8")))
+        if isinstance(node, ast.ImportFrom)
+        and node.module
+        and node.module.startswith("evidenceguard_agents")
+    } | {
+        alias.name
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8")))
+        if isinstance(node, ast.Import)
+        for alias in node.names
+        if alias.name.startswith("evidenceguard_agents")
+    }
+
+
+def test_m5h_modules_are_packaged() -> None:
+    assert _source(evidenceguard_agents, "anthropic.py").is_file()
+    assert _source(evidenceguard_worker, M5H_TRANSPORT).is_file()
+
+
+def test_m5h_adapter_is_pure_and_network_free() -> None:
+    path = _source(evidenceguard_agents, "anthropic.py")
+    imported = _module_imports(path)
+    assert imported - set(sys.stdlib_module_names) == {
+        "evidenceguard_agents",
+        "evidenceguard_domain",
+    }
+    assert not imported & (M5A_FORBIDDEN_MODULES | {"logging", "time", "anthropic", "pydantic"})
+    assert _agents_modules(path) == {"evidenceguard_agents.providers"}
+
+
+def test_m5h_transport_imports_only_the_adapter_module_and_the_standard_library() -> None:
+    """The one new worker-to-agents relationship: the transport uses the adapter's values only."""
+    path = _source(evidenceguard_worker, M5H_TRANSPORT)
+    imported = _module_imports(path)
+    assert imported - set(sys.stdlib_module_names) == {
+        "evidenceguard_agents",
+        "evidenceguard_domain",
+        "pydantic",
+    }
+    assert _agents_modules(path) == {"evidenceguard_agents.anthropic"}
+    assert not imported & {"os", "logging", "requests", "httpx", "aiohttp", "urllib3", "anthropic"}
+    assert {"http", "ssl"} <= imported
+
+
+def test_m5h_is_not_constructed_registered_or_configured_in_production() -> None:
+    """W9: nothing outside tests builds the adapter or the transport; no setting, route,
+    command or registry entry mentions them."""
+    from evidenceguard_worker.handlers import production_registry
+
+    definitions = {
+        (evidenceguard_agents, "anthropic.py"),
+        (evidenceguard_worker, M5H_TRANSPORT),
+    }
+    for package in (
+        evidenceguard_api,
+        evidenceguard_agents,
+        evidenceguard_domain,
+        evidenceguard_observability,
+        evidenceguard_persistence,
+        evidenceguard_retrieval,
+        evidenceguard_worker,
+    ):
+        assert package.__file__ is not None
+        for source in Path(package.__file__).parent.rglob("*.py"):
+            if (package, source.name) in definitions:
+                continue
+            text = source.read_text(encoding="utf-8")
+            assert "AnthropicProvider" not in text, source.name
+            assert "HttpsAnthropicTransport" not in text, source.name
+            assert "anthropic_http" not in text, source.name
+            assert "evidenceguard_agents.anthropic" not in text, source.name
     assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})

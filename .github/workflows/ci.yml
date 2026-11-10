@@ -388,6 +388,42 @@ jobs:
           print("review orchestration imported and migration 0008 rendered offline from the installed wheel")
           PY
 
+          # M5h (ADR-0026): import the Anthropic adapter and HTTPS transport from the installed
+          # wheel and classify one synthetic response through call_validated over an injected
+          # transport. No network, key, provider or database is used; this check does not
+          # establish live Anthropic compatibility, and nothing registers the adapter.
+          "${bin}/python" -I - <<'PY'
+          import json
+          from pydantic import SecretStr
+          import evidenceguard_agents.anthropic as anthropic
+          import evidenceguard_agents.providers as providers
+          import evidenceguard_domain.agent_outputs as outputs
+          import evidenceguard_domain.model_calls as calls
+          import evidenceguard_worker.anthropic_http as https
+          from evidenceguard_worker.handlers import production_registry
+          for module in (anthropic, https):
+              assert "site-packages" in (module.__file__ or ""), module.__name__
+          prompt = calls.PromptRef(prompt_id="verifier", version=1, sha256="1" * 64)
+          request = calls.StructuredRequest(purpose=calls.ModelPurpose.VERIFIER, prompt=prompt, model_id="claude-wheel-check", question_id="RET-01", system_text="system", user_text="user", max_output_tokens=2048)
+          expected = b'{"max_tokens":2048,"messages":[{"content":"user","role":"user"}],"model":"claude-wheel-check","system":"system"}'
+          document = {"verdict": "supported", "claims": [{"text": "c", "citations": [{"chunk_id": "00000000-0000-0000-0000-000000000001", "quote": "q"}]}], "rationale": "r"}
+          message = {"type": "message", "role": "assistant", "model": "claude-wheel-check", "content": [{"type": "text", "text": json.dumps(document)}], "stop_reason": "end_turn", "usage": {"input_tokens": 3, "output_tokens": 4}}
+          class FakeTransport:
+              def __init__(self):
+                  self.calls = []
+              def post(self, body, *, timeout_ms):
+                  self.calls.append((body, timeout_ms))
+                  return anthropic.AnthropicResponse(200, json.dumps(message).encode())
+          fake = FakeTransport()
+          result = providers.call_validated(anthropic.AnthropicProvider(fake), request, clock=iter((1.0, 1.25)).__next__)
+          assert fake.calls == [(expected, 60000)]
+          assert result.outcome is calls.CallOutcome.COMPLETED and result.latency_ms == 250
+          assert type(result.output) is outputs.VerifierOutput and result.usage == calls.ModelUsage(3, 4)
+          assert repr(https.HttpsAnthropicTransport(SecretStr("wheel-check-placeholder"))) == "HttpsAnthropicTransport()"
+          assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
+          print("Anthropic adapter classified a synthetic response through call_validated from the installed wheel")
+          PY
+
   integration:
     # PostgreSQL integration tests. Service containers run only on Linux runners, so this job
     # is Ubuntu-only; the verify job keeps the database-independent checks on both systems.
