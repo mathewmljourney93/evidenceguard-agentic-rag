@@ -1,9 +1,13 @@
 # ADR-0026: Anthropic adapter and HTTPS transport
 
-- **Status:** M5h is **accepted for a local commit, Prompt 229; CI pending**. Claude Code
-  implemented it in Prompt 228. The external reviewer accepts the implementation and all nine
-  choices below for a local commit only; publication, Linux verification and exact-version CI
-  remain pending.
+- **Status:** M5h is **feature-CI verified, not merged** at
+  `c785ee58dfe8398cf58cbbd54f8d5705743e1949` (Prompt 230). Claude Code implemented it in
+  Prompt 228; the external reviewer accepted the implementation and all nine choices in
+  Prompt 229. Mathew manually published the feature; Codex observed all five required jobs
+  succeed for that exact SHA, `push` event, attempt 1. The external reviewer independently
+  confirmed and accepted that evidence in Prompt 231. A new evidence commit must pass its own
+  feature gate before the authorized main preflight and local fast-forward; Mathew must make
+  both new pushes manually. No new-target or main CI result is claimed yet.
 - **Specification:** the [accepted M5h specification](../plan.md#m5h-anthropic-adapter-specification-accepted-at-review-prompt-227-implementation-pending),
   accepted in Prompt 227 with H1–H10 and binding clarifications A–C
   ([acceptance](../plan.md#m5h-acceptance-prompt-227)). The specification binds this
@@ -213,12 +217,119 @@ paths changed afterward. Recovery did not rerun those checks.
   adaptations, using the tested wheel. The accepted final wheel has identical Python members
   and differs only in `METADATA` and `RECORD`; it was not separately installed in that check.
 
-**Boundary.** Acceptance authorizes one local implementation commit. Publication, Linux
-verification and exact-version CI remain pending. No application review path, `run_review`
+**Boundary at Prompt 229 (historical).** Acceptance authorized one local implementation commit;
+publication, Linux verification and exact-version CI were then pending. Prompt 230's separate
+feature publication and CI evidence follows below. No application review path, `run_review`
 registration or live provider configuration is added. M5g's evidence and attribution and the
 scoped M4d/E7 acceptance remain unchanged, as do U4, the M3 lease/commit-window and
 unknown-outcome limits. M6 and overall M5 acceptance remain pending. No live compatibility,
 model-quality, entailment, authenticity or injection-resistance claim follows.
+
+## Feature publication and exact-commit CI (Prompt 230)
+
+**State: feature-CI verified, not merged.** Mathew manually pushed
+`feat/anthropic-adapter` at **`c785ee58dfe8398cf58cbbd54f8d5705743e1949`**. The history-only
+authorization commit has parent `6e0ad2b714c3cd70d398f674fe9e1934106357a0` and tree
+`76a4401ba0dd3cd33c9089c11cc5dca6636dba51`; all executable blobs and modes are unchanged
+from the accepted implementation. Codex verified remote feature, local HEAD and upstream
+equal that target, with local main, stored origin/main and remote main still
+`bebd2f7593af6459b25182adab2c3ddee17b9e31`. Codex did not push or merge.
+
+**Current observations by OpenAI Codex.** These are retrieved GitHub run/job metadata and
+decoded logs, separate from Claude Code's historical Prompt 228 local checks, the external
+reviewer's isolated checks and Codex's recovery observations. Both workflows were triggered
+by **`push`**, on **`feat/anthropic-adapter`**, for the exact SHA above, **attempt 1**:
+
+- [CI run 42857388059](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059): completed, success.
+- [Secret-scan run 42857388153](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388153): completed, success.
+
+| Required job | Observed conclusion and log evidence |
+| --- | --- |
+| [Ubuntu verify, job 129974038029](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059/job/129974038029) | Success; **5,562 passed, 439 skipped**. Formatting, lint, strict mypy (199 source files), tests, distribution build and the clean installed-wheel step succeeded. |
+| [Windows verify, job 129974037996](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059/job/129974037996) | Success; **5,561 passed, 440 skipped**. Formatting, lint, strict mypy (199 source files), tests, distribution build and the clean installed-wheel step succeeded. |
+| [PostgreSQL integration, job 129974037718](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059/job/129974037718) | Success; **439 passed, 5,562 deselected**. The database-ready check, integration test step and container cleanup steps succeeded. |
+| [Container, job 129974037493](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059/job/129974037493) | Success; configuration, context, image build/check, Compose smoke and cleanup succeeded; logs print `smoke: ok` and `cleanup: ok`. |
+| [Gitleaks full history, job 129974027878](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388153/job/129974027878) | Success; version 8.30.1, **101 commits scanned**, no leaks found. |
+
+**M5h module output.** Both verify logs print all-passing progress for
+`test_anthropic_http.py` (185 passing positions), `test_anthropic_provider.py` (372), and
+`test_review_anthropic_composition.py` (1): 558 passing positions in each runner. These are
+counts of the printed progress positions, not individually named test results. Each log prints
+successful wheel and sdist builds and the production-registry line plus all twelve existing
+installed-wheel result lines and the new M5h line:
+
+```text
+Anthropic adapter classified a synthetic response through call_validated from the installed wheel
+```
+
+The registry output is `ingest_revision, index_revision`. The installed-wheel M5h check uses a
+synthetic response and injected transport. The existing Recall@5 line is fixture arithmetic,
+and the Voyage line is mocked. None is a live provider or model-quality result.
+
+**Container scope.** Logs show the stack healthy, an accepted upload, successful ingestion,
+two verified chunks, duplicate-upload reuse, one offline backfill-indexing job, a ready index
+with two embeddings, an idle worker exiting with code 0, and successful cleanup. This is
+ingestion/indexing smoke evidence; it does not establish an application review path or a live
+model call.
+
+**Recording and limits.** Codex began the bounded monitor at 16:43:38 UTC and observed all five
+jobs successful at 16:51:44 UTC on 2026-11-10, within the 25-minute bound. Attempt-1 run/job
+metadata and decoded logs for all five jobs are saved under `.local/p230/evidence/`. No CI
+rerun, fix, additional commit or push was made in response in Prompt 230. That evidence was
+staged for external review and was not itself part of the published SHA or CI-verified.
+It was accepted in Prompt 231 below; main publication remains pending behind new CI gates
+and manual pushes. Previous local results remain historical;
+the earlier-source mutation and historical network-evidence qualifications above are unchanged.
+There is no production `run_review` registration, live provider configuration or live-provider
+evidence. U4, M3 lease/commit-window and unknown outcomes, M6 and overall M5 acceptance remain
+unchanged. No live compatibility, model-quality, entailment, authenticity or injection-resistance
+claim follows.
+
+## External acceptance of feature evidence and gated publication (Prompt 231)
+
+**Decision.** The external reviewer accepts the Prompt 230 feature-CI evidence and documentation,
+including the uploaded export's hash, statistics and encoding. The reviewer independently
+retrieved main and feature refs, both workflow-run records, and metadata and decoded logs for
+all five jobs. The reviewer confirmed remote feature
+`c785ee58dfe8398cf58cbbd54f8d5705743e1949` and main
+`bebd2f7593af6459b25182adab2c3ddee17b9e31`; both runs identified the exact feature SHA,
+`feat/anthropic-adapter`, `push`, attempt 1, completed/success, with every step of every required
+job successful. These are the reviewer's independent observations supplied in Mathew's
+Prompt 231; they confirm, rather than replace, Codex's original observations above.
+
+**Reviewer-confirmed logs.** The [CI run 42857388059](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059)
+and [secret-scan run 42857388153](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388153)
+and their linked jobs above show:
+
+- Ubuntu job `129974038029`: 5,562 passed, 439 skipped in 141.58 seconds.
+- Windows job `129974037996`: 5,561 passed, 440 skipped in 205.63 seconds.
+- PostgreSQL job `129974037718`: 439 passed, 5,562 deselected in 455.63 seconds.
+- Container job `129974037493`: `smoke: ok`, `cleanup: ok`.
+- Gitleaks job `129974027878`: 101 commits scanned, no leaks.
+
+In both verify logs the reviewer confirmed strict mypy success in 199 source files; 185
+passing HTTP-test positions, 372 provider-test positions and one composition-test position;
+the `ingest_revision, index_revision` production registry; all twelve prior installed-wheel
+result lines; and the new synthetic M5h installed-wheel line. The positions are not individually
+printed test names. The earlier isolated reviewer probes, Claude Code's local results and
+Codex's recovery qualifications remain separate from these CI observations.
+
+**Authorization and outstanding gates.** Prompt 231 authorizes one local evidence commit with
+parent `c785ee58`, a manual feature push by Mathew, and a fresh exact-commit feature gate.
+Only after all five required feature jobs pass may Codex perform main preflight and a local
+`--ff-only` fast-forward. Mathew must then manually push main, whose separate exact-commit
+attempt-1 push workflows must pass all five jobs before main-publication evidence is staged.
+No automatic push, merge commit, force push, rewrite, branch deletion, CI rerun or production
+correction is authorized. Results at `c785ee58` are not results for the new evidence commit.
+
+**Limits unchanged.** The M5h transport and installed-wheel inputs are synthetic; container
+smoke covers ingestion/indexing only. No live compatibility, model-quality, entailment,
+authenticity or injection-resistance claim follows. No production review path, `run_review`
+registration or live provider configuration is added. The accepted specification and all
+implementation/test/packaging/workflow blobs and modes remain unchanged. Recovery did not
+rerun saved functional checks; the earlier-source mutation and historical network-evidence
+qualifications remain binding. U4, M3 lease/commit-window and unknown-outcome limits, M6 and
+overall M5 acceptance are unchanged.
 
 ## Remaining limitations
 
@@ -236,6 +347,7 @@ model-quality, entailment, authenticity or injection-resistance claim follows.
   - M6 approval and export;
   - the provenance-versus-semantic limits;
   - no model-quality, entailment or injection-resistance claim.
-- **Pending:** publication, Linux verification and exact-version CI; implementation is accepted
-  for a local commit in Prompt 229.
+- **Pending:** the new evidence commit's feature gate and gated main publication. The
+  implementation is accepted (Prompt 229), feature-CI verified at the exact Prompt 230 target,
+  and its feature evidence accepted in Prompt 231; it is not merged.
   Production wiring, credentials, live calls, M6 and overall M5 acceptance remain unauthorized.

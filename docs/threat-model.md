@@ -580,10 +580,20 @@ for the internal `run_review` handler composition at `bebd2f75`**
   outcomes, M6's approval and export obligations, and the provenance-versus-semantic limits.
 
 The [M5h specification](plan.md#m5h-anthropic-adapter-specification-accepted-at-review-prompt-227-implementation-pending) was accepted at review in Prompt 227.
-Its implementation by Claude Code in Prompt 228 is **accepted for a local commit, Prompt 229; CI pending**
-([ADR-0026 acceptance and evidence limits](decisions/0026-anthropic-adapter.md#external-review-and-implementation-acceptance-prompt-229));
-all nine implementation choices are accepted. Publication, Linux verification and exact-version
-CI remain pending. The reviewer's 73 passing isolated synthetic probes establish no real
+Its implementation by Claude Code in Prompt 228 and all nine choices were accepted in Prompt 229.
+It is **feature-CI verified, not merged** at `c785ee58dfe8398cf58cbbd54f8d5705743e1949`
+([ADR-0026 exact feature CI evidence](decisions/0026-anthropic-adapter.md#feature-publication-and-exact-commit-ci-prompt-230)).
+After Mathew's manual push, Codex observed all five jobs pass for that exact SHA, `push`,
+attempt 1: Ubuntu 5,562 passed / 439 skipped, Windows 5,561 passed / 440 skipped, PostgreSQL
+439 passed / 5,562 deselected, successful container smoke/cleanup and Gitleaks 101 commits
+with no leaks. Both verify logs print the new synthetic M5h installed-wheel success line.
+Container smoke covers ingestion/indexing only. The external reviewer independently confirmed
+and accepted this evidence in Prompt 231
+([acceptance and gated publication](decisions/0026-anthropic-adapter.md#external-acceptance-of-feature-evidence-and-gated-publication-prompt-231)).
+The evidence was not part of the earlier CI target. Main publication remains pending behind
+fresh feature CI for the new evidence commit, local fast-forward, Mathew's manual main push
+and separate main CI. No new-target or main result is claimed yet.
+The reviewer's 73 isolated probes and the CI synthetic tests establish no real provider
 HTTP/DNS/TLS or live compatibility. Recovery supports the saved functional/build records,
 but exact-final-source mutation coverage and universal historical absence of network activity
 were not independently established; the mutation runner lacks `--offline`, which does not

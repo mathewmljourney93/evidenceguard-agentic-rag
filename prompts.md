@@ -56850,3 +56850,426 @@ The authorized git fetch --no-tags origin and ls-remote both succeeded using ano
 Static inspection confirmed both workflows still trigger on push and the five required jobs remain present: Ubuntu and Windows verify, PostgreSQL integration, container and Gitleaks. Integration retains EG_REQUIRE_INTEGRATION=1 and pytest -m integration. The only CI difference is the reviewed additive 36-line M5h installed-wheel block; the production registry still contains ingest_revision and index_revision only. Range privacy covered 7,238 added lines and found only three public noreply metadata hits. Unsuppressed range Gitleaks 8.30.1 passed across two commits with no leaks (about 388,032 bytes scanned). No application test or build was repeated.
 
 The saved functional checks and builds remain historical evidence supported by recovery, with executable inputs unchanged. The six-mutation record binds to an earlier HTTP-source hash, so exact-final-source mutation coverage was not independently established. Its runner lacks --offline, which does not demonstrate network activity; recovery did not independently establish universal historical absence of network activity or rerun those checks. The reviewer's 73 isolated synthetic checks are the reviewer's evidence, not project-suite, wheel, PostgreSQL, real HTTP/DNS/TLS, live-provider or exact-commit CI execution. No feature CI result is claimed by this note. No push, main change, provider call, run_review registration, M6 work or CI rerun was performed.
+
+
+### Prompt 230 continuation - Mathew reports the manual feature push
+
+Source: Mathew's push-result message in this conversation, transcribed into .local/p230/manual-push-report.txt with trailing-space normalization; no independent-original byte verification is claimed. Codex did not execute this push.
+
+-----BEGIN MANUAL PUSH REPORT TRANSCRIPTION-----
+```text
+(evidenceguard) PS D:\Claude\evidenceguard_agentic_rag> git -C 'D:\Claude\evidenceguard_agentic_rag' push --set-upstream origin refs/heads/feat/anthropic-adapter:refs/heads/feat/anthropic-adapter
+Enumerating objects: 56, done.
+Counting objects: 100% (56/56), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (34/34), done.
+Writing objects: 100% (37/37), 126.11 KiB | 1.36 MiB/s, done.
+Total 37 (delta 21), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (21/21), completed with 13 local objects.
+remote:
+remote: Create a pull request for 'feat/anthropic-adapter' on GitHub by visiting:
+remote:      https://github.com/mathewmljourney93/evidenceguard-agentic-rag/pull/new/feat/anthropic-adapter
+remote:
+To https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+ * [new branch]      feat/anthropic-adapter -> feat/anthropic-adapter
+branch 'feat/anthropic-adapter' set up to track 'origin/feat/anthropic-adapter'.
+(evidenceguard) PS D:\Claude\evidenceguard_agentic_rag>
+```
+-----END MANUAL PUSH REPORT TRANSCRIPTION-----
+
+### Prompt 230 exact-target feature CI observations (OpenAI Codex)
+
+After the reported manual push, Codex verified remote feat/anthropic-adapter, local HEAD and upstream at c785ee58dfe8398cf58cbbd54f8d5705743e1949, with remote main, local main and stored origin/main still bebd2f7593af6459b25182adab2c3ddee17b9e31 and a clean working tree. Monitoring began at 2026-11-10 16:43:38 UTC, with a 17:08:38 UTC deadline. All five required jobs were observed successful by 16:51:44 UTC, within the bound. Only the target branch and SHA, push event and attempt 1 were monitored. No rerun, fix, additional commit, push, authentication change or main update occurred.
+
+The following is this session's evidence summary from retrieved GitHub run/job metadata and decoded logs, separately attributed from Claude Code's saved local results, the external reviewer's isolated checks and Codex's recovery observations. Full metadata, decoded logs for all five jobs and parsed summaries survive under .local/p230/evidence/. This is not a claim of independently executing CI locally.
+
+## Feature publication and exact-commit CI (Prompt 230)
+
+**State: feature-CI verified, not merged.** Mathew manually pushed
+`feat/anthropic-adapter` at **`c785ee58dfe8398cf58cbbd54f8d5705743e1949`**. The history-only
+authorization commit has parent `6e0ad2b714c3cd70d398f674fe9e1934106357a0` and tree
+`76a4401ba0dd3cd33c9089c11cc5dca6636dba51`; all executable blobs and modes are unchanged
+from the accepted implementation. Codex verified remote feature, local HEAD and upstream
+equal that target, with local main, stored origin/main and remote main still
+`bebd2f7593af6459b25182adab2c3ddee17b9e31`. Codex did not push or merge.
+
+**Current observations by OpenAI Codex.** These are retrieved GitHub run/job metadata and
+decoded logs, separate from Claude Code's historical Prompt 228 local checks, the external
+reviewer's isolated checks and Codex's recovery observations. Both workflows were triggered
+by **`push`**, on **`feat/anthropic-adapter`**, for the exact SHA above, **attempt 1**:
+
+- [CI run 42857388059](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059): completed, success.
+- [Secret-scan run 42857388153](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388153): completed, success.
+
+| Required job | Observed conclusion and log evidence |
+| --- | --- |
+| [Ubuntu verify, job 129974038029](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059/job/129974038029) | Success; **5,562 passed, 439 skipped**. Formatting, lint, strict mypy (199 source files), tests, distribution build and the clean installed-wheel step succeeded. |
+| [Windows verify, job 129974037996](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059/job/129974037996) | Success; **5,561 passed, 440 skipped**. Formatting, lint, strict mypy (199 source files), tests, distribution build and the clean installed-wheel step succeeded. |
+| [PostgreSQL integration, job 129974037718](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059/job/129974037718) | Success; **439 passed, 5,562 deselected**. The database-ready check, integration test step and container cleanup steps succeeded. |
+| [Container, job 129974037493](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059/job/129974037493) | Success; configuration, context, image build/check, Compose smoke and cleanup succeeded; logs print `smoke: ok` and `cleanup: ok`. |
+| [Gitleaks full history, job 129974027878](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388153/job/129974027878) | Success; version 8.30.1, **101 commits scanned**, no leaks found. |
+
+**M5h module output.** Both verify logs print all-passing progress for
+`test_anthropic_http.py` (185 passing positions), `test_anthropic_provider.py` (372), and
+`test_review_anthropic_composition.py` (1): 558 passing positions in each runner. These are
+counts of the printed progress positions, not individually named test results. Each log prints
+successful wheel and sdist builds and the production-registry line plus all twelve existing
+installed-wheel result lines and the new M5h line:
+
+```text
+Anthropic adapter classified a synthetic response through call_validated from the installed wheel
+```
+
+The registry output is `ingest_revision, index_revision`. The installed-wheel M5h check uses a
+synthetic response and injected transport. The existing Recall@5 line is fixture arithmetic,
+and the Voyage line is mocked. None is a live provider or model-quality result.
+
+**Container scope.** Logs show the stack healthy, an accepted upload, successful ingestion,
+two verified chunks, duplicate-upload reuse, one offline backfill-indexing job, a ready index
+with two embeddings, an idle worker exiting with code 0, and successful cleanup. This is
+ingestion/indexing smoke evidence; it does not establish an application review path or a live
+model call.
+
+**Recording and limits.** Codex began the bounded monitor at 16:43:38 UTC and observed all five
+jobs successful at 16:51:44 UTC on 2026-11-10, within the 25-minute bound. Attempt-1 run/job
+metadata and decoded logs for all five jobs are saved under `.local/p230/evidence/`. No CI
+rerun, fix, additional commit or push was made in response. This evidence documentation is
+staged for external review and is not itself part of the published SHA or CI-verified.
+Main publication remains pending and unauthorized. Previous local results remain historical;
+the earlier-source mutation and historical network-evidence qualifications above are unchanged.
+There is no production `run_review` registration, live provider configuration or live-provider
+evidence. U4, M3 lease/commit-window and unknown outcomes, M6 and overall M5 acceptance remain
+unchanged. No live compatibility, model-quality, entailment, authenticity or injection-resistance
+claim follows.
+
+
+### Prompt 230 evidence boundary
+
+Only after all five required jobs succeeded did Codex update README.md, ADR-0026, docs/plan.md, docs/threat-model.md and this append-only history. Evidence is to remain staged and uncommitted for external review. The published target has been feature-CI verified, not merged; these new evidence bytes were not part of that target and have no CI result. The accepted specification and executable blobs/modes remain unchanged. Main publication, CI reruns, production wiring, live calls, M6 and overall M5 acceptance remain unauthorized. Previous local results remain historical. Recovery did not rerun them; exact-final-source mutation coverage and universal historical absence of network activity were not independently established. The mutation runner's missing --offline flag does not demonstrate network activity.
+
+### Prompt 230 staged evidence checks (Codex; completed results)
+
+After all five exact-target push-attempt-1 jobs passed, the five authorized evidence paths were staged. The evidence checker passed scope/protected identity (266 unchanged entries; all seven reviewed blobs/modes preserved), accepted-specification byte identity, published-history prefix fidelity (3,065,248 bytes; SHA-256 e2991c985869cfab216a06e58bf904237eab4f60a7f4f79f36f881b2a57c6139), UTF-8/no-BOM/LF and whitespace, exact five-job metadata and observed-log assertions, and privacy (207 added lines, no pattern hits before this note). Links/anchors/tables passed: 670 local links, 263 tables, zero problems. Installed Ruff formatting passed (246 files already formatted) and lint passed. Unsuppressed staged Gitleaks 8.30.1 passed with no leaks. No application tests, mypy, builds, installed-wheel or database checks were run locally for this evidence-only change. This records checks completed before appending this note; the published SHA remains unchanged, and the evidence is staged/uncommitted for review.
+
+
+## Prompt 231 - accepted feature evidence and gated manual main publication
+
+Source: Mathew's current user message, carrying the external reviewer's independent confirmation and acceptance of Prompt 230 evidence and the new publication authorization. Codex transcribed it into .local/p231/prompt231.txt; there is no independently saved original against which to claim byte verification. Reviewer observations remain separately attributed from Codex's prior observations, historical Claude Code checks and the earlier isolated reviewer probes.
+
+-----BEGIN PROMPT 231 TRANSCRIPTION-----
+Prompt 231 — Accept M5h feature evidence and publish to main through manual pushes and CI gates
+
+Written for: Mathew and the external reviewer.
+
+The external reviewer accepts the Prompt 230 feature-CI evidence and documentation.
+
+Authorize:
+- one local evidence commit;
+- manual feature publication by Mathew;
+- exact-commit feature CI monitoring;
+- only after that passes, main preflight and local --ff-only fast-forward;
+- manual main publication by Mathew;
+- separate exact-commit main CI monitoring;
+- staged, uncommitted main-publication evidence after all five main jobs pass.
+
+Do not push automatically. No force push, history rewrite, branch deletion, CI rerun, production correction, authentication change, provider call, production registration or M6 work.
+
+1. Recover and verify
+
+Read the governing instructions and .local/p230/handoff.md.
+
+Expected:
+- Branch feat/anthropic-adapter.
+- HEAD, upstream and published feature:
+  c785ee58dfe8398cf58cbbd54f8d5705743e1949
+- Parent:
+  6e0ad2b714c3cd70d398f674fe9e1934106357a0
+- HEAD tree:
+  76a4401ba0dd3cd33c9089c11cc5dca6636dba51
+- Staged evidence tree:
+  21c7c4e1aa9427faf4cd2e76e6e6d5b86ae374d1
+- Exactly five evidence/history paths staged.
+- Nothing unstaged or unexpectedly untracked.
+- Local main and stored origin/main:
+  bebd2f7593af6459b25182adab2c3ddee17b9e31
+
+Verify .local/p230/m5h-feature-ci-evidence.diff:
+- Four files, +111/-27.
+- 25,751 bytes; 217 lines.
+- Full indexes; prompts.md excluded.
+- SHA-256:
+  d9f860e42b30625e8410340dabf7d3cee417f160bfb3e5962e047ea06ecdd728
+
+Verify byte identity against cached and tree comparisons. Check all protected blob/mode identities.
+
+Save .local/p231/checkpoint/, including a nonempty full-tree listing and history prefix. Report material discrepancies before dependent work.
+
+2. Record external review
+
+The reviewer independently retrieved:
+- main and feature refs;
+- both workflow-run records;
+- metadata and decoded logs for all five jobs.
+
+Confirmed:
+- remote feature: c785ee58dfe8398cf58cbbd54f8d5705743e1949;
+- remote main: bebd2f7593af6459b25182adab2c3ddee17b9e31;
+- both runs: exact feature SHA, feat/anthropic-adapter, push, attempt 1, completed/success;
+- every step of every required job succeeded.
+
+CI run 42857388059:
+- Ubuntu job 129974038029:
+  5562 passed, 439 skipped in 141.58s.
+- Windows job 129974037996:
+  5561 passed, 440 skipped in 205.63s.
+- PostgreSQL job 129974037718:
+  439 passed, 5562 deselected in 455.63s.
+- Container job 129974037493:
+  smoke: ok; cleanup: ok.
+
+Secret-scan run 42857388153:
+- Gitleaks job 129974027878:
+  101 commits scanned; no leaks.
+
+Both verify logs show:
+- strict mypy success in 199 source files;
+- 185 passing HTTP-test positions;
+- 372 passing provider-test positions;
+- one passing composition-test position;
+- production registry: ingest_revision, index_revision;
+- all twelve prior installed-wheel result lines;
+- the new synthetic M5h installed-wheel line.
+
+These independently confirm Codex’s observations. Preserve Codex’s attribution rather than replacing it with the reviewer’s.
+
+The reviewer also verified the uploaded export’s hash, statistics and encoding and accepts the evidence documentation.
+
+Record that acceptance in ADR-0026 with a short linked summary where appropriate. Keep the local results, recovery qualifications and isolated reviewer probes separate from CI evidence. Positions are not individually printed test names.
+
+Preserve all limits: synthetic transport, ingestion/indexing-only container smoke, no live compatibility or quality claim, no production review registration.
+
+3. Evidence commit
+
+Only these five files may change:
+- README.md
+- docs/decisions/0026-anthropic-adapter.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+No accepted executable, test, packaging, workflow or specification bytes may change.
+
+Append the saved Prompt 230 handoff, this review/authorization and Prompt 231 using the history-fidelity rules. Preserve the earlier bytes and label transcription honestly.
+
+Run scope/protected-identity, links/anchors/tables, encoding, whitespace, history fidelity, privacy, required formatting/lint and unsuppressed staged Gitleaks checks.
+
+Do not repeat application tests, mypy, builds or wheel checks.
+
+Create one normal local evidence commit, parent c785ee58, using the established noreply identity and truthful assistance attribution. Write the message from a file.
+
+Suggested subject:
+docs: record verified M5h feature CI evidence
+
+Verify exactly five changed paths, protected identities, message, clean status and unchanged main. Run unsuppressed full-history Gitleaks.
+
+Export:
+.local/p231/m5h-feature-evidence-acceptance.diff
+
+Compare starting staged tree 21c7c4e1aa9427faf4cd2e76e6e6d5b86ae374d1 to the evidence commit, full indexes, prompts.md excluded. Verify byte identity and record statistics, bytes, lines, encoding and SHA-256.
+
+4. Manual feature push and fresh feature gate
+
+Read-only fetch --no-tags and ls-remote are authorized.
+
+Require remote feature still at c785ee58 and remote main still at bebd2f75. The unpublished feature range must be exactly the new evidence commit, a direct child of c785ee58. Worktree clean; accepted executable blobs and workflows unchanged.
+
+Save .local/p231/resume-note.md with the full target SHA.
+
+Give Mathew the target and this PowerShell command, then wait:
+
+git -C 'D:\Claude\evidenceguard_agentic_rag' push origin refs/heads/feat/anthropic-adapter:refs/heads/feat/anthropic-adapter
+
+Do not execute it.
+
+After Mathew reports success, verify remote feature, HEAD and upstream equal the target. Do not push again.
+
+Monitor only the push-triggered ci and secret-scan runs for that exact SHA, branch and attempt 1, for up to 25 minutes.
+
+Require all five jobs:
+- Ubuntu verify;
+- Windows verify;
+- PostgreSQL integration;
+- container;
+- Gitleaks.
+
+Retrieve available logs through existing read access. Do not change authentication. Do not reuse c785ee58 results as results for the new commit.
+
+On failure or an unresolved gate at the bound: stop without correction, rerun, merge or main change.
+
+5. Main preflight and local fast-forward
+
+Only after the new feature gate passes:
+
+Perform read-only fetch and remote checks. Require:
+- remote main remains bebd2f75;
+- local main equals origin/main;
+- main is an ancestor of the verified target;
+- remote feature equals the verified target;
+- working tree clean.
+
+Verify the range above main is exactly:
+- f919d69c;
+- 6e0ad2b;
+- c785ee58;
+- the new evidence commit.
+
+The path union must remain the thirteen reviewed paths: the twelve M5h paths plus ADR-0025.
+
+Confirm accepted implementation/test/packaging/workflow blobs and modes are unchanged, including PostgreSQL test blob:
+837136d61e1ec815a1fa2324ff596e83dc55d591
+
+Run range privacy and unsuppressed range Gitleaks checks.
+
+Switch to main and fast-forward with:
+git merge --ff-only <full verified target SHA>
+
+No merge commit.
+
+Recheck remote main immediately before handover. Give Mathew the full target and this command, then wait:
+
+git -C 'D:\Claude\evidenceguard_agentic_rag' push origin refs/heads/main:refs/heads/main
+
+Do not execute it. Save the resume note.
+
+6. Separate main CI
+
+After Mathew reports the main push:
+- verify remote main, local main and origin/main equal the verified target;
+- verify the feature ref remains at that target;
+- do not push again.
+
+Monitor the separate main push runs for that exact SHA, attempt 1, with a fresh 25-minute bound. Require all five jobs.
+
+Keep feature and main observations separate. Record actual counts and output only when retrieved from that run’s logs.
+
+Stop on failure or an unresolved gate without rerun, repair or green-status documentation.
+
+7. Main-publication evidence
+
+Only after all five main jobs pass, stage the five authorized evidence/history files.
+
+Record:
+- M5h reviewed, verified in CI and on main at the exact target, within its accepted scope;
+- Mathew’s two manual pushes;
+- the --ff-only operation;
+- separate feature and main run/job links and observations;
+- available logs and any access limitations;
+- unchanged accepted implementation identities.
+
+Preserve the accepted specification, historical evidence and recovery qualifications.
+
+M5h publication does not itself accept overall M5 or authorize production registration, live calls or M6.
+
+Run the applicable documentation, scope, fidelity, privacy, formatting/lint and unsuppressed staged Gitleaks checks.
+
+Leave this evidence staged and uncommitted.
+
+Export:
+.local/p231/m5h-main-publication-evidence.diff
+
+Compare the published target with the final staged tree, using full indexes and excluding prompts.md. Verify byte identity and record statistics, bytes, lines, encoding and SHA-256.
+
+Return .local/p231/handoff.md and both diff files. If stopped before main publication, return the precise stopping point and available evidence.
+
+No further commit, push, branch deletion, CI rerun, M6 work or overall M5 acceptance is authorized.
+-----END PROMPT 231 TRANSCRIPTION-----
+
+### Saved Prompt 230 handoff (historical Codex report)
+
+Byte-copied from .local/p230/handoff.md; its then-pending evidence review and unauthorized main-publication statements describe Prompt 230. Prompt 231 accepts the evidence and separately authorizes only the specified manual pushes and CI-gated main fast-forward.
+
+-----BEGIN SAVED PROMPT 230 HANDOFF-----
+# Prompt 230 handoff: M5h feature-CI verified, not merged
+
+Written for: Mathew and the external reviewer.
+
+Mathew manually published feat/anthropic-adapter. OpenAI Codex verified the exact refs, monitored only the two attempt-1 push workflows for the publication target, retrieved run/job metadata and decoded logs for all five required jobs, and staged evidence only after every required job passed. No automatic push, main change, CI rerun, repair, additional post-push commit, provider call, production registration or M6 work was performed.
+
+## Target, refs and staged state
+
+- Published target / local HEAD / upstream / remote feature: `c785ee58dfe8398cf58cbbd54f8d5705743e1949`.
+- Target parent: `6e0ad2b714c3cd70d398f674fe9e1934106357a0`.
+- Target tree: `76a4401ba0dd3cd33c9089c11cc5dca6636dba51`.
+- This history-only authorization commit changed prompts.md only (+311/-0); all 270 other blobs/modes are identical to its parent. Its normal commit used the established noreply author/committer and message file, with truthful Codex assistance/trailer.
+- Local main, stored origin/main and remote main remain `bebd2f7593af6459b25182adab2c3ddee17b9e31`. Final ls-remote reconfirmed both feature and main refs.
+- Final staged evidence tree: `21c7c4e1aa9427faf4cd2e76e6e6d5b86ae374d1`. Evidence is staged and uncommitted, with no unstaged or unexpected untracked work. HEAD remains the published target.
+- Exactly five staged paths: README.md, docs/decisions/0026-anthropic-adapter.md, docs/plan.md, docs/threat-model.md and prompts.md. All 266 other entries retain target blob/mode identities. All seven reviewed implementation/test/packaging/workflow blobs/modes remain accepted; protected PostgreSQL test blob remains `837136d61e1ec815a1fa2324ff596e83dc55d591` (100644). No accepted M5h specification byte, heading or anchor changed, and old implementation-status compatibility anchors are preserved.
+- The staged evidence bytes are not part of the published SHA and have no CI result. No evidence commit was authorized or made.
+
+## Exact-target CI observations
+
+Monitoring began at 2026-11-10 16:43:38 UTC (23:43:38 Bangkok), with a 17:08:38 UTC deadline. All five required jobs were observed successful at 16:51:44 UTC (23:51:44 Bangkok), within the 25-minute bound. Both runs identify the exact target SHA, feat/anthropic-adapter, event push and attempt 1. These are Codex-retrieved metadata/log observations, separate from prior Claude Code local checks, reviewer probes and recovery analysis.
+
+- [ci run 42857388059](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059): completed, success.
+- [secret-scan run 42857388153](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388153): completed, success.
+
+| Required job | Observed result |
+| --- | --- |
+| [Ubuntu verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059/job/129974038029) | Success; 5,562 passed, 439 skipped. Formatting/lint/mypy, test, build and clean installed-wheel steps succeeded. |
+| [Windows verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059/job/129974037996) | Success; 5,561 passed, 440 skipped. Formatting/lint/mypy, test, build and clean installed-wheel steps succeeded. |
+| [PostgreSQL integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059/job/129974037718) | Success; 439 passed, 5,562 deselected. Database-ready, tests and cleanup steps succeeded. |
+| [Container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388059/job/129974037493) | Success; configuration/context/build/image/smoke/cleanup succeeded, smoke: ok and cleanup: ok. |
+| [Gitleaks full history](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42857388153/job/129974027878) | Success; 8.30.1, 101 commits scanned, no leaks. |
+
+Both verify logs print 185 passing positions in test_anthropic_http.py, 372 in test_anthropic_provider.py and 1 in test_review_anthropic_composition.py (558 each). These are counts of printed progress dots, not individually named results. Both show mypy success for 199 source files, successful wheel/sdist builds, the production-registry line, all twelve prior installed-wheel result lines and the new line:
+
+```text
+Anthropic adapter classified a synthetic response through call_validated from the installed wheel
+```
+
+The printed registry remains ingest_revision, index_revision. The wheel probe uses a fake transport; the existing Recall@5 output is arithmetic and Voyage is mocked. Container logs show the healthy stack, accepted upload, ingestion, two verified chunks, duplicate-upload reuse, offline backfill, a ready index/two embeddings, idle worker exit 0 and successful cleanup. Container scope is ingestion/indexing, not application reviews or live models.
+
+All five decoded job logs are available under .local/p230/evidence/job-<id>.log, alongside initial/final run/job metadata, the bounded monitoring window and parsed verify summaries. No inaccessible-log limitation was encountered. No old count was substituted for this target.
+
+## Checks actually run during Prompt 230
+
+- Pre-push recovery/export/checkpoint, range/scope/protected identities, static workflow/registry inspection, anonymous fetch and ls-remote, and range privacy passed. The range was exactly f919d69c and 6e0ad2b above main; its union was the twelve reviewed M5h paths plus ADR-0025. No dependency, lockfile, migration, settings/environment, corpus, Docker or Compose changes, tracked .local files or new binary/build artifacts.
+- Pre-push history fidelity/encoding/whitespace/privacy checks passed. Unsuppressed Gitleaks range, staged and full-history scans passed; the full-history scan after the authorization commit covered 101 commits with no leaks. Those results and checkpoint are saved under .local/p230/.
+- Post-push read-only checks established local HEAD/upstream/remote feature equality with the target, unchanged main, and initially clean state. The final remote check reconfirmed both refs. No credential helper was started by Codex; no authentication/configuration change was made to gain log access. GitHub connector read access retrieved metadata and logs.
+- `.venv/Scripts/python.exe -I .local/p230/check-evidence.py` passed on the final staged evidence: exact five-path scope, all 266 protected blob/mode identities and seven reviewed identities, unchanged accepted specification, source/log/count assertions, history-prefix fidelity, UTF-8/no BOM/LF/final newline/trailing-whitespace checks, cached diff whitespace, links/anchors/tables and privacy.
+- Documentation: 47 tracked Markdown files, links 670 bad 0 tables 263 table problems 0. Final privacy: 211 added lines, no pattern hits.
+- Published-history prefix is byte-identical: 3,065,248 bytes; SHA-256 `e2991c985869cfab216a06e58bf904237eab4f60a7f4f79f36f881b2a57c6139`. Prompt 229 handoff remains byte-copied in committed history. The manual-push report is honestly labelled a transcription with trailing-space normalization, not an independently byte-verified original.
+- Installed `.venv/Scripts/ruff.exe format --check .`: exit 0, 246 files already formatted. `.venv/Scripts/ruff.exe check .`: exit 0, All checks passed.
+- Unsuppressed final staged `gitleaks git --pre-commit --staged --redact --verbose .`: exit 0, no leaks (about 22,955 bytes scanned). No suppression added. PowerShell NativeCommandError rendering reflects native stderr output; actual scanner exit status was zero.
+- Final export verified byte-identical to fresh cached and target-to-staged-tree Git comparisons, with full indexes and history excluded.
+- Application tests, mypy, mutations, builds, installed-wheel and database checks were not rerun locally. GitHub CI performed its own configured checks; those observations are listed separately above.
+
+## Export for external review
+
+- File: `.local/p230/m5h-feature-ci-evidence.diff`.
+- Baseline: published commit `c785ee58dfe8398cf58cbbd54f8d5705743e1949`.
+- Destination: final staged tree `21c7c4e1aa9427faf4cd2e76e6e6d5b86ae374d1`.
+- Statistics: 4 files changed, 111 insertions(+), 27 deletions(-).
+- Size: 25,751 bytes; 217 lines.
+- Encoding: UTF-8, no BOM, LF only; full 40-character indexes; prompts.md excluded.
+- SHA-256: `d9f860e42b30625e8410340dabf7d3cee417f160bfb3e5962e047ea06ecdd728`.
+- The four exported paths are README.md, ADR-0026, docs/plan.md and docs/threat-model.md; prompts.md is staged with them and excluded from the export.
+
+## Remaining limits
+
+Feature-CI verified, not merged. Evidence review and main publication remain pending. The earlier local Windows results and 73 isolated external-reviewer probes remain separately attributed and historical. Recovery did not rerun saved functional/build checks; the six-mutation record binds to an earlier HTTP-source hash, so exact-final-source mutation coverage was not independently established. Its missing --offline flag does not demonstrate network activity, and recovery did not independently establish universal historical absence of network activity. All those qualifications remain in the staged documentation and history.
+
+No real provider, model-quality, entailment, authenticity or injection-resistance claim follows. No production run_review registration/application review path or live provider configuration is added. M5g/scoped M4d-E7 evidence, U4, M3 lease/commit-window and unknown outcomes remain unchanged. Main publication, CI reruns, production wiring, credentials/live calls, M6 and overall M5 acceptance remain unauthorized.
+
+Mathew: return output plus `.local/p230/m5h-feature-ci-evidence.diff` and `.local/p230/handoff.md` to the external reviewer. Evidence is staged and uncommitted; do not treat this handoff as main-publication authorization.
+-----END SAVED PROMPT 230 HANDOFF-----
+
+### Prompt 231 acceptance and recovery
+
+The external reviewer independently retrieved the refs, both workflow-run records and metadata/decoded logs for all five required jobs at c785ee58dfe8398cf58cbbd54f8d5705743e1949 and independently confirmed Codex's observations, exact target/branch/push/attempt-1 identity and successful steps. The reviewer also verified the export hash/statistics/encoding and accepts the Prompt 230 documentation. This confirmation does not replace Codex's original attribution or convert printed passing positions into individually named tests.
+
+Codex recovered the expected staged tree 21c7c4e1aa9427faf4cd2e76e6e6d5b86ae374d1 on feat/anthropic-adapter at c785ee58, without unstaged or untracked work. The existing export matches fresh cached and tree comparisons: four files, +111/-27, 25,751 bytes, 217 lines, SHA-256 d9f860e42b30625e8410340dabf7d3cee417f160bfb3e5962e047ea06ecdd728, full indexes and history excluded. All 266 protected entries and seven reviewed implementation/test/packaging/workflow identities match. The checkpoint contains a nonempty 271-entry full-tree listing and the exact previous history prefix. Local main and stored origin/main remain bebd2f75. No application checks were rerun. A new evidence commit and fresh feature gate are required before main preflight or fast-forward; no new-target CI or main result is claimed here.
+
+### Prompt 231 pre-commit check note (Codex; completed checks only)
+
+The recovered state/export/checkpoint matched. Only the five authorized documentation/history files differ from both the starting staged tree and c785ee58; all 266 protected entries and seven reviewed blobs/modes are identical. The accepted M5h specification bytes and historical local/reviewer sections are unchanged. History-prefix and saved Prompt 230 handoff fidelity passed; Prompt 231 is labelled a transcription without an independent-original claim. Encoding and whitespace, privacy (395 added lines versus the starting staged tree, no pattern hits), and links/anchors/tables passed (673 local links, 264 tables, no problems). Installed Ruff format --check . passed (246 files already formatted) and Ruff check . passed. Unsuppressed staged Gitleaks 8.30.1 passed with no leaks. The documentation diff and staged scope were inspected. These checks completed before this note was appended. No application tests, mypy, builds, installed-wheel or database checks were repeated. No new feature/main CI result, main fast-forward or automatic push is claimed.

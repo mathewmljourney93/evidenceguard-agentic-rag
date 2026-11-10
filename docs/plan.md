@@ -15222,15 +15222,24 @@ overall M5 acceptance.
 
 <a id="m5h-implementation-status-prompt-228-staged-for-review-unaccepted"></a>
 
-#### M5h implementation status (accepted for a local commit, Prompt 229; CI pending)
+<a id="m5h-implementation-status-accepted-for-a-local-commit-prompt-229-ci-pending"></a>
+
+#### M5h implementation status (feature-CI verified, not merged; Prompt 230)
 
 **State.** Claude Code implemented the accepted specification in Prompt 228, on
-`feat/anthropic-adapter` from `f919d69c`. The implementation is **accepted for a local commit,
-Prompt 229; CI pending**. The external reviewer accepts all nine implementation choices and
-requests no production, test, packaging or workflow correction. Publication, Linux verification
-and exact-version CI remain pending. The specification above is unchanged; decisions,
-implementation choices and evidence limits are in
-[ADR-0026](decisions/0026-anthropic-adapter.md#external-review-and-implementation-acceptance-prompt-229).
+`feat/anthropic-adapter` from `f919d69c`. The external reviewer accepted the implementation
+and all nine choices in Prompt 229 without requesting production, test, packaging or workflow
+corrections. M5h is **feature-CI verified, not merged** at
+`c785ee58dfe8398cf58cbbd54f8d5705743e1949` (Prompt 230). Mathew manually pushed; Codex
+observed all five required jobs succeed for that exact SHA, `push`, attempt 1. Main publication
+remains pending. The external reviewer independently confirmed and accepted the Prompt 230
+evidence in Prompt 231; it was not included in the earlier CI target. A new evidence commit
+requires its own fresh feature CI before main preflight and a local fast-forward, then Mathew's
+manual main push and separate main CI
+([acceptance and gates](decisions/0026-anthropic-adapter.md#external-acceptance-of-feature-evidence-and-gated-publication-prompt-231)).
+The specification above is unchanged;
+[ADR-0026](decisions/0026-anthropic-adapter.md#feature-publication-and-exact-commit-ci-prompt-230)
+records the exact run/job links, observations and limits.
 
 - **Code.** `evidenceguard_agents/anthropic.py`, `evidenceguard_worker/anthropic_http.py`, three
   new test modules, narrow packaging-guard additions and one additive installed-wheel line in CI.
@@ -15250,10 +15259,16 @@ implementation choices and evidence limits are in
   The mutation runner lacks `--offline`; that alone does not demonstrate network activity,
   but universal historical absence of network activity was not independently established.
   Recovery did not rerun the saved checks. No mutation rerun is required for acceptance.
+- **Codex-observed feature CI (Prompt 230; exact target above).** Ubuntu: 5,562 passed,
+  439 skipped. Windows: 5,561 passed, 440 skipped. Both logs print 558 passing M5h module
+  positions and the new synthetic installed-wheel success line. PostgreSQL: 439 passed,
+  5,562 deselected. Container smoke/cleanup succeeded within ingestion/indexing scope.
+  Gitleaks: 101 commits, no leaks. All are `push` attempt-1 results for the recorded target;
+  historical local and isolated-reviewer evidence is separate.
 - **Not established.**
   - No live-test evidence exists; Claude Code reported no endpoint contact, and the recorded
     HTTPS tests used fake connections and an in-memory `http.client` socket only.
-  - No exact-version CI ran.
+  - The new evidence commit has no CI result yet; main publication is gated as above.
   - No M5h control operates in an application path, and `run_review` stays unregistered.
 
 **M6 – Approval gate and export**
