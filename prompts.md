@@ -56539,3 +56539,314 @@ The five authorized documentation/history files alone differ from the accepted t
 Completed checks: .venv/Scripts/python.exe -I .local/p229/checks.py passed scope/protected identity, links/anchors/tables (47 tracked Markdown files; 670 local links, 260 tables, zero problems), UTF-8/no-BOM/LF/final-newline and whitespace, history-prefix/source fidelity, and privacy (603 added lines versus the accepted tree; one public noreply-identity hit). git diff --cached --check was clean. Direct installed Ruff format --check . passed (246 files already formatted), and Ruff check . passed. The attempted uv run --locked --offline Ruff commands were blocked before execution by sandbox access; no install or environment change was made. Gitleaks 8.30.1 git --pre-commit --staged --redact --verbose . passed unsuppressed with no leaks. The installed scanner and git index staging required sandbox escalation, which succeeded. The documentation diff and full staged path/stat listing were inspected.
 
 These are current documentation/security checks, separate from Claude Code's saved Prompt 228 functional/build evidence and the external reviewer's reported 73 isolated checks. Application tests, mypy, mutations, builds, installed-wheel and database checks were not repeated; the executable inputs remain unchanged. Recovery did not rerun those checks. The mutation record is earlier-source evidence, and its missing --offline flag does not demonstrate network activity; recovery did not independently establish universal historical absence of network activity. Acceptance is for one local commit only, with publication, Linux verification and exact-version CI pending. No live-provider, live compatibility or model-quality evidence is added; no run_review registration or M6 work occurred. M5g/scoped M4d-E7 evidence, U4, M3 lease/commit-window and unknown-outcome limits, M6 and overall M5 acceptance remain unchanged.
+
+
+## Prompt 230 - manual M5h feature publication authorization
+
+Source: Mathew's current message, carrying the external reviewer's acceptance of the Prompt 229 documentation and incremental export. Codex transcribed the message into .local/p230/prompt230.txt; there is no independently saved original against which to claim byte verification. The external reviewer's acceptance is separately attributed.
+
+-----BEGIN PROMPT 230 TRANSCRIPTION-----
+Prompt 230 — Prepare manual M5h feature publication and monitor exact-commit CI
+
+Written for: Mathew and the external reviewer.
+
+The external reviewer accepts the Prompt 229 documentation and incremental export.
+
+Authorize feature-publication preparation, one history-only local commit, read-only remote checks, and monitoring after Mathew manually pushes.
+
+Do not push automatically. Do not merge, fast-forward or push main. Do not change production code, tests, packaging, workflows, authentication or credentials. No provider calls, production registration, M6 work or CI reruns.
+
+1. Recovery and checkpoint
+
+Read the governing repository instructions and .local/p229/handoff.md.
+
+Expected:
+- Branch feat/anthropic-adapter.
+- HEAD:
+  6e0ad2b714c3cd70d398f674fe9e1934106357a0
+- Parent:
+  f919d69c7b93ab36d03f0def2396f4c980cd1a77
+- HEAD tree:
+  304ee3d441748da8c55554510f35deed21a67603
+- Clean index and working tree.
+- Local main and stored origin/main:
+  bebd2f7593af6459b25182adab2c3ddee17b9e31
+- Established origin and noreply identity unchanged.
+
+Verify:
+.local/p229/m5h-commit-incremental.diff
+
+Expected:
+- Baseline accepted tree:
+  3a474c7d8f067cbed261ab2fcdcedec052ca65c6
+- Destination: HEAD.
+- Full indexes; prompts.md excluded.
+- Four files, +129/-32.
+- 27,983 bytes; 261 lines.
+- SHA-256:
+  76e9f70669b0d9f78500aa6592058a5114fea500875f9ac018f3cb03fc035e6e
+
+Verify byte identity against fresh Git output.
+
+Check the seven implementation/test/packaging/workflow blobs and modes against the accepted tree and the Prompt 229 handoff. Preserve all of them exactly.
+
+Save .local/p230/checkpoint/ with refs, status, a nonempty full-tree listing, protected identities and the history prefix.
+
+Report material discrepancies before dependent operations.
+
+2. Publication preflight
+
+Read-only remote operations are authorized:
+- git fetch --no-tags origin;
+- ls-remote for main and feat/anthropic-adapter.
+
+Require:
+- remote main remains bebd2f7593af6459b25182adab2c3ddee17b9e31;
+- local main equals origin/main and is an ancestor of HEAD;
+- remote feat/anthropic-adapter is absent.
+
+If the feature branch already exists, inspect its exact ref and explain the state before deciding whether this task is already partly complete. Never overwrite or force it.
+
+The unpublished range above main should be exactly:
+- f919d69c7b93ab36d03f0def2396f4c980cd1a77
+- 6e0ad2b714c3cd70d398f674fe9e1934106357a0
+
+Check that its path union is exactly the twelve M5h reviewed paths plus ADR-0025, carried by the documentation parent.
+
+Confirm:
+- no dependency, lockfile, migration, settings, environment, corpus, Docker or Compose change;
+- no tracked .local files, binaries or build artifacts;
+- accepted executable blobs/modes unchanged;
+- protected PostgreSQL test blob remains:
+  837136d61e1ec815a1fa2324ff596e83dc55d591;
+- both workflows still trigger on push;
+- all five required jobs remain present;
+- integration retains EG_REQUIRE_INTEGRATION=1 and pytest -m integration;
+- the CI change is only the reviewed additive M5h installed-wheel block;
+- production_registry remains ingest_revision and index_revision.
+
+Run range privacy and unsuppressed range Gitleaks checks. Do not repeat application tests or builds.
+
+3. History-only authorization commit
+
+Only prompts.md may change before publication.
+
+Append:
+- the saved Prompt 229 handoff, byte-copied and compared;
+- the reviewer’s acceptance of that documentation;
+- this feature-publication authorization and Prompt 230;
+- a preflight note containing completed checks only.
+
+Preserve the previous bytes as an identical prefix. Label transcription honestly. Keep the recovery and mutation/network-evidence qualifications.
+
+Run history fidelity, encoding, whitespace, privacy and unsuppressed staged Gitleaks checks.
+
+Create one normal history-only local commit, with the established noreply identity and truthful assistance attribution. Write its message from a file.
+
+Suggested subject:
+docs: record M5h feature publication authorization
+
+Verify:
+- its parent is 6e0ad2b714c3cd70d398f674fe9e1934106357a0;
+- only prompts.md changed;
+- every other blob and mode is identical;
+- working tree is clean;
+- main remains unchanged.
+
+Run unsuppressed full-history Gitleaks. Record the resulting full SHA as the publication target.
+
+4. Manual feature-push handover
+
+Recheck remote main and feature refs immediately before handover.
+
+Save .local/p230/resume-note.md with the exact target and completed steps.
+
+Give Mathew the full target SHA and this PowerShell command:
+
+git -C 'D:\Claude\evidenceguard_agentic_rag' push --set-upstream origin refs/heads/feat/anthropic-adapter:refs/heads/feat/anthropic-adapter
+
+Stop and wait for Mathew’s push result. Do not execute the push yourself, start Git Credential Manager or change authentication.
+
+5. After Mathew reports the push
+
+Verify read-only that:
+- remote feature, local HEAD and upstream equal the recorded publication target;
+- remote main remains bebd2f7593af6459b25182adab2c3ddee17b9e31.
+
+Do not push again.
+
+Monitor only push-triggered ci and secret-scan runs for that exact SHA, feature branch and attempt 1, for up to 25 minutes.
+
+Required jobs:
+- verify Ubuntu;
+- verify Windows;
+- PostgreSQL integration;
+- container;
+- Gitleaks full history.
+
+Keep communication responsive. Stop on a failed gate or when the bound expires. Do not rerun, fix, commit or push in response.
+
+Save run/job metadata and retrieve logs using already available read access where possible. Do not change authentication to obtain logs.
+
+Record only observed results:
+- conclusions and step states;
+- actual test counts if logs are accessible;
+- M5h module results as printed;
+- installed-wheel output, including the new M5h line;
+- PostgreSQL counts;
+- container smoke/cleanup;
+- Gitleaks output.
+
+If logs are unavailable, record that limitation. Do not infer counts or reuse older results.
+
+6. Evidence only after all five jobs pass
+
+Only after all five jobs pass, stage evidence in:
+- README.md
+- docs/decisions/0026-anthropic-adapter.md
+- docs/plan.md
+- docs/threat-model.md
+- prompts.md
+
+Record “feature-CI verified, not merged” with exact SHA, run/job links, event and attempt. Attribute observations accurately.
+
+Keep:
+- previous local results historical;
+- recovery qualifications;
+- no production run_review registration or live-provider evidence;
+- container smoke scope limited to ingestion/indexing;
+- M6 and overall M5 acceptance pending.
+
+Do not alter the accepted specification or executable files.
+
+Run scope/protected-identity, documentation, history, encoding, whitespace, privacy, formatting/lint and unsuppressed staged Gitleaks checks.
+
+Export:
+.local/p230/m5h-feature-ci-evidence.diff
+
+Compare the published target with the final staged tree, using full indexes and excluding prompts.md. Verify byte identity and report statistics, bytes, lines, encoding and SHA-256.
+
+Leave evidence staged and uncommitted for external review.
+
+7. Delivery
+
+Before the manual push: return the target SHA, command and resume note.
+
+After monitoring: return .local/p230/handoff.md and, only if produced, the feature-CI evidence diff.
+
+If a job fails, return the observed failure and available log excerpt without edits or green-status documentation.
+
+Main publication, CI reruns, production wiring, live calls, M6 and overall M5 acceptance remain unauthorized.
+-----END PROMPT 230 TRANSCRIPTION-----
+
+### Saved Prompt 229 handoff
+
+Byte-copied from .local/p229/handoff.md and compared with that saved file. It records the accepted local implementation commit, historical evidence and recovery qualifications.
+
+-----BEGIN SAVED PROMPT 229 HANDOFF-----
+# Prompt 229 handoff: M5h accepted and committed locally
+
+Written for: Mathew and the external reviewer.
+
+M5h implementation and all nine ADR-0026 choices are accepted at external review in Prompt 229 for a local commit only. No production, test, packaging or workflow correction was requested. OpenAI Codex recorded the acceptance and created one normal local commit; no fetch, push, merge, CI rerun, authentication change, credential use, provider call, run_review registration or M6 work occurred.
+
+## Verified local state
+
+- Branch: `feat/anthropic-adapter`.
+- Commit: `6e0ad2b714c3cd70d398f674fe9e1934106357a0`.
+- Parent: `f919d69c7b93ab36d03f0def2396f4c980cd1a77`.
+- Commit tree: `304ee3d441748da8c55554510f35deed21a67603`.
+- Accepted baseline tree: `3a474c7d8f067cbed261ab2fcdcedec052ca65c6`.
+- Subject: `feat: add Anthropic adapter and bounded HTTPS transport`.
+- Author and committer: `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>`.
+- Commit message read from `.local/p229/commit-message.txt`; committed message verified byte-identical. Assistance paragraph separates Claude Code implementation/checks, Codex recovery/documentation/checks, and external reviewer evidence. Trailers credit Claude Code and OpenAI Codex using public noreply addresses.
+- Exactly one new commit since f919d69c; no amend or history rewrite.
+- Working tree and index clean. Only the feature ref changed from the checkpoint; every other stored ref is identical.
+- Local main and stored origin/main remain `bebd2f7593af6459b25182adab2c3ddee17b9e31`.
+- Origin fetch/push URL remains `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`; no remote operation was performed. Established configured and effective noreply identity unchanged.
+- Checkpoint: `.local/p229/checkpoint/` contains all refs, status, the nonempty 271-entry accepted full-tree listing, twelve staged blob/mode identities, accepted tree, origin/identity, index hash and complete history prefix (3,010,804 bytes; SHA-256 `98664e553ddc132c47bac6b7bee9b3804af6f41128c48bcea9dcd64932e9ecda`).
+
+## Paths and protected identity
+
+Against the parent: 12 files changed, 4454 insertions(+), 9 deletions(-). Exactly the twelve reviewed paths:
+
+- `.github/workflows/ci.yml`
+- `README.md`
+- `apps/worker/evidenceguard_worker/anthropic_http.py`
+- `docs/decisions/0026-anthropic-adapter.md`
+- `docs/plan.md`
+- `docs/threat-model.md`
+- `packages/agents/evidenceguard_agents/anthropic.py`
+- `prompts.md`
+- `tests/test_anthropic_http.py`
+- `tests/test_anthropic_provider.py`
+- `tests/test_packaging.py`
+- `tests/test_review_anthropic_composition.py`
+
+Against the accepted tree, only README.md, ADR-0026, docs/plan.md, docs/threat-model.md and prompts.md changed. All 266 other accepted-tree entries retain their blob/mode identities; all 259 entries outside the twelve paths retain their parent identities. No removal or mode change. The accepted M5h specification text, heading and anchors are byte-identical; compatibility anchors preserve the former implementation-status and implementation-choices links. M5g evidence/attribution and scoped M4d/E7 acceptance are untouched.
+
+The seven reviewed implementation/test/packaging/workflow entries are identical to the accepted tree:
+
+| Path | Mode | Blob |
+| --- | --- | --- |
+| `.github/workflows/ci.yml` | `100644` | `b4694056c2a5919fab235c1a02139d54b4e8aab0` |
+| `apps/worker/evidenceguard_worker/anthropic_http.py` | `100644` | `b56b47e87be1328609c57d246ddd6c2165e322b6` |
+| `packages/agents/evidenceguard_agents/anthropic.py` | `100644` | `962f0a73a212d49d5b2d12e1ad9a65b4acb36e56` |
+| `tests/test_anthropic_http.py` | `100644` | `837d203f46ea2b2075bc5779949e91ba4e236342` |
+| `tests/test_anthropic_provider.py` | `100644` | `f22608da4c895c46a9ab7bc2fd32494b6d93209f` |
+| `tests/test_packaging.py` | `100644` | `84a4f73e6210ca08def3dc9e79e84c6d2d3ad70e` |
+| `tests/test_review_anthropic_composition.py` | `100644` | `c64e23cd5bde5b427b8008ab100eb5a015af6782` |
+
+- Protected `tests/test_review_handler_postgres.py`: mode `100644`, blob `837136d61e1ec815a1fa2324ff596e83dc55d591`.
+
+## Checks actually run by Codex in Prompt 229
+
+- Initial state, origin/identity, staged and working-byte identity, parent/main refs and Prompt 228 export checks passed. The existing export matches fresh cached and tree comparisons: 159,566 bytes, 3,579 lines, eleven files +3,444/-5, SHA-256 `a1633b0cca48471a12819584d719892f2f26c23596bd6db72e997d7996a6ce01`.
+- `.venv/Scripts/python.exe -I .local/p229/checks.py` passed before and after the completed-checks note: authorized scope and protected blob/mode identities; UTF-8, no BOM, LF/final-newline/trailing-whitespace checks for all twelve staged/working paths; cached whitespace; history prefix; byte-copied handoff/recovery content; unchanged accepted specification; privacy; links/anchors/tables.
+- Final Markdown result: 47 tracked files, 670 local links, 260 tables; zero broken links/anchors or table problems. External links were checked structurally as references, not fetched.
+- Final incremental privacy review: 613 added lines versus accepted tree; one public GitHub noreply-identity pattern hit. No suppression added.
+- `.venv/Scripts/ruff.exe format --check .`: exit 0, 246 files already formatted. `.venv/Scripts/ruff.exe check .`: exit 0, All checks passed. Attempts through `uv run --locked --offline` were blocked before execution; direct installed Ruff was used without installation or environment changes.
+- Gitleaks 8.30.1 staged: `gitleaks git --pre-commit --staged --redact --verbose .`, exit 0, no leaks. The final scan included the completed-checks note (about 205,937 bytes scanned).
+- Post-commit full history: `gitleaks git --redact --verbose .`, exit 0; 100 commits and about 9,501,077 bytes scanned, no leaks. Output was unsuppressed and saved. PowerShell rendered scanner stderr as NativeCommandError text while the process exited successfully; that wrapper rendering is not a scanner finding.
+- Post-commit verification passed: parent/tree/path scope, protected identities, author/committer, message bytes, one-commit count, clean status, unchanged other refs/origin/configured identity, and incremental export bytes.
+- Saved records under `.local/p229/checks/`; no application tests, mypy, mutations, builds, installed-wheel checks or database tests were repeated. All executable inputs remain unchanged. No real service was contacted by this work.
+- Process-name inspection before checks listed no matching test/build task; none was terminated. Git warned that the global ignore file was inaccessible; repository .local ignoring worked, and no configuration was changed. Git staging/commit and execution of the installed scanner needed sandbox escalation, which succeeded.
+
+## Evidence attribution and remaining limits
+
+Claude Code implemented M5h in Prompt 228. Saved records support its reported Ruff/mypy, 558 new tests, 1,286 focused regressions, full suite 5,560 passed/441 skipped, builds and installed-wheel results. Of the skips, 439 integration cases were collected but not executed because no database was configured; two were platform skips. Codex recovery verified the 213 bound source/config blobs, seven before/after SHA-256 values and surviving artifacts; executable sources were unchanged since the functional checks. These are historical results, not executions witnessed or repeated in recovery/Prompt 229.
+
+The six-mutation record binds to an earlier HTTP-source hash (`21b05b1553dcbdf0` prefix versus final `e0dcb325b911df8e`). Exact-final-source mutation coverage was not independently established; no mutation rerun was required or performed. The runner lacks --offline. This does not demonstrate network activity, but universal historical absence of network activity was not independently established by recovery. The original handoff is byte-copied with its claims labelled historical. Installed-wheel records support the complete assertion body with offline setup adaptations on the tested wheel; accepted-final wheel Python members are identical, with only METADATA/RECORD differing. No newly built wheel is claimed for this documentation update.
+
+The external reviewer, as reported in Mathew's Prompt 229, verified the uploaded export and exact production blobs, reviewed source/tests/workflow/packaging/ADR, checked supporting M5a/domain blobs against published bebd2f75, and passed 73 independent isolated checks on Python 3.12.14/Pydantic 2.13.4. The cases cover parsing/statuses, timeout envelopes, admission of bypass-built 504 values, strict numbers, non-end_turn blocks, phase-dependent clocks/expiry, cleanup counts/first-interrupt identity and the maximal 2,784,148-byte request. Codex did not run or witness these probes. They used synthetic inputs and fake connections and establish no project-suite, installed-wheel, PostgreSQL, real HTTP/DNS/TLS, live-provider or exact-commit CI result.
+
+Publication, Linux verification and exact-version CI remain pending and require the next authorization. No live compatibility, model quality, entailment, authenticity or injection resistance follows. There is no application review path, run_review remains unregistered and no live provider configuration is added. U4, the M3 lease/commit-window and unknown-outcome limits, no exactly-once claim, M6 and overall M5 acceptance remain unchanged.
+
+## Incremental export
+
+- Path: `.local/p229/m5h-commit-incremental.diff`.
+- Baseline: accepted tree `3a474c7d8f067cbed261ab2fcdcedec052ca65c6`.
+- Destination: commit `6e0ad2b714c3cd70d398f674fe9e1934106357a0` (tree `304ee3d441748da8c55554510f35deed21a67603`).
+- Options: `git diff --full-index`; prompts.md excluded.
+- Statistics: 4 files changed, 129 insertions(+), 32 deletions(-).
+- Size: 27,983 bytes; 261 lines.
+- Encoding: UTF-8, no BOM, LF only; full 40-character indexes.
+- SHA-256: `76e9f70669b0d9f78500aa6592058a5114fea500875f9ac018f3cb03fc035e6e`.
+- Byte-identical to fresh baseline-to-commit and baseline-to-tree Git comparisons. The four paths are README.md, ADR-0026, docs/plan.md and docs/threat-model.md. The append-only history is committed but excluded from this review export.
+
+Mathew: return output plus `.local/p229/m5h-commit-incremental.diff` and this `.local/p229/handoff.md` to the external reviewer. Nothing has been pushed.
+-----END SAVED PROMPT 229 HANDOFF-----
+
+### External review acceptance and publication boundary (Prompt 230)
+
+The external reviewer accepts the Prompt 229 documentation and incremental export. Mathew authorizes feature-publication preparation, one history-only local commit, read-only remote checks and monitoring after Mathew manually pushes. This does not authorize an automatic feature push, main publication, reruns, implementation changes, production registration, provider calls, M6 or overall M5 acceptance. The original implementation and isolated checks retain their separate attribution.
+
+### Prompt 230 preflight note (Codex; completed checks only)
+
+Codex read the repository instructions and saved Prompt 229 handoff; verified the clean feat/anthropic-adapter branch at 6e0ad2b714c3cd70d398f674fe9e1934106357a0, parent f919d69c7b93ab36d03f0def2396f4c980cd1a77 and tree 304ee3d441748da8c55554510f35deed21a67603; verified the origin URL and established noreply identities; and checked the existing Prompt 229 export against fresh full-index Git output. It is 27,983 bytes, 261 lines, four files +129/-32, SHA-256 76e9f70669b0d9f78500aa6592058a5114fea500875f9ac018f3cb03fc035e6e, excluding prompts.md. No discrepancy was found. The checkpoint contains refs, clean status, a nonempty 271-entry full tree, all 270 protected identities, the seven reviewed identities and the complete history prefix.
+
+The authorized git fetch --no-tags origin and ls-remote both succeeded using anonymous read access with credential helpers and prompting disabled for those invocations; no persistent authentication or Git configuration changed. Remote main, local main and stored origin/main all remain bebd2f7593af6459b25182adab2c3ddee17b9e31, an ancestor of HEAD. Remote feat/anthropic-adapter is absent. The initial unpublished range consists exactly of f919d69c and 6e0ad2b. Its union is the twelve reviewed M5h paths plus ADR-0025 from the documentation parent, without dependency, lockfile, migration, settings, environment, corpus, Docker or Compose changes. No tracked .local file, binary or build artifact was found. All seven accepted implementation/test/packaging/workflow blobs and modes match the accepted tree and saved handoff; the protected PostgreSQL test blob is 837136d61e1ec815a1fa2324ff596e83dc55d591.
+
+Static inspection confirmed both workflows still trigger on push and the five required jobs remain present: Ubuntu and Windows verify, PostgreSQL integration, container and Gitleaks. Integration retains EG_REQUIRE_INTEGRATION=1 and pytest -m integration. The only CI difference is the reviewed additive 36-line M5h installed-wheel block; the production registry still contains ingest_revision and index_revision only. Range privacy covered 7,238 added lines and found only three public noreply metadata hits. Unsuppressed range Gitleaks 8.30.1 passed across two commits with no leaks (about 388,032 bytes scanned). No application test or build was repeated.
+
+The saved functional checks and builds remain historical evidence supported by recovery, with executable inputs unchanged. The six-mutation record binds to an earlier HTTP-source hash, so exact-final-source mutation coverage was not independently established. Its runner lacks --offline, which does not demonstrate network activity; recovery did not independently establish universal historical absence of network activity or rerun those checks. The reviewer's 73 isolated synthetic checks are the reviewer's evidence, not project-suite, wheel, PostgreSQL, real HTTP/DNS/TLS, live-provider or exact-commit CI execution. No feature CI result is claimed by this note. No push, main change, provider call, run_review registration, M6 work or CI rerun was performed.
