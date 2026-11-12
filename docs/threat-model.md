@@ -581,18 +581,36 @@ for the internal `run_review` handler composition at `bebd2f75`**
 
 The [M5h specification](plan.md#m5h-anthropic-adapter-specification-accepted-at-review-prompt-227-implementation-pending) was accepted at review in Prompt 227.
 Its implementation by Claude Code in Prompt 228 and all nine choices were accepted in Prompt 229.
-It is **feature-CI verified, not merged** at `c785ee58dfe8398cf58cbbd54f8d5705743e1949`
-([ADR-0026 exact feature CI evidence](decisions/0026-anthropic-adapter.md#feature-publication-and-exact-commit-ci-prompt-230)).
-After Mathew's manual push, Codex observed all five jobs pass for that exact SHA, `push`,
-attempt 1: Ubuntu 5,562 passed / 439 skipped, Windows 5,561 passed / 440 skipped, PostgreSQL
-439 passed / 5,562 deselected, successful container smoke/cleanup and Gitleaks 101 commits
-with no leaks. Both verify logs print the new synthetic M5h installed-wheel success line.
-Container smoke covers ingestion/indexing only. The external reviewer independently confirmed
-and accepted this evidence in Prompt 231
-([acceptance and gated publication](decisions/0026-anthropic-adapter.md#external-acceptance-of-feature-evidence-and-gated-publication-prompt-231)).
-The evidence was not part of the earlier CI target. Main publication remains pending behind
-fresh feature CI for the new evidence commit, local fast-forward, Mathew's manual main push
-and separate main CI. No new-target or main result is claimed yet.
+It is **reviewed, verified in CI and on main** at `e050da3e3415d73f83db86763617d5b5f0874aeb`,
+within its accepted scope (Prompt 231)
+([ADR-0026 main publication and separate CI evidence](decisions/0026-anthropic-adapter.md#main-publication-and-separate-exact-commit-ci-prompt-231)).
+Mathew manually pushed the feature, all five fresh feature jobs passed, Codex fast-forwarded
+local main with `--ff-only`, and Mathew manually pushed main. All five separate main jobs
+passed for the exact SHA, `push`, attempt 1. Each branch's retrieved logs show Ubuntu
+5,562 passed / 439 skipped, Windows 5,561 passed / 440 skipped, PostgreSQL 439 passed /
+5,562 deselected, successful container smoke/cleanup and Gitleaks 102 commits with no leaks.
+Each verify log prints the new synthetic M5h installed-wheel line. Container smoke covers
+ingestion/indexing only. Earlier `c785ee58` evidence and the reviewer's independent acceptance
+remain historical. The external reviewer accepted both Prompt 231 exports and independently
+confirmed all four exact-target runs and all ten jobs in Prompt 232
+([publication acceptance](decisions/0026-anthropic-adapter.md#publication-evidence-acceptance-prompt-232)).
+The publication-evidence documentation was not itself CI-tested. The separate
+[M5 acceptance assessment](plan.md#m5-acceptance-assessment-proposed-prompt-232-awaiting-external-review)
+and its hold recommendation were accepted externally in Prompt 233. The reviewer independently
+confirmed the three completion gaps: provider-call spans, the controlled post-response/
+pre-commit crash proof, and the parts-assembled canary acceptance fixtures. These do not
+establish a production recovery defect or revoke individual slice/scoped M4d/E7 acceptance.
+The [bounded follow-up](plan.md#m5-bounded-completion-follow-up-proposed-prompt-233-implementation-unauthorized)
+was accepted with binding timing/JSON clarifications in Prompt 234; its
+[implementation was accepted for one local commit only in Prompt 235](plan.md#m5-completion-implementation-status-prompt-234-staged-for-review).
+The reviewer's 694 passing isolated standard-library checks are separate from Codex's Prompt 234
+local verification; they are not full handler/database, installed-wheel or CI evidence. G1-G3
+remain open: PostgreSQL post-response/reclaim and assembled/literal behavior, database mutations,
+Linux/exact-commit CI, publication and renewed assessment are pending. The ephemeral metadata-only
+spans prove neither provider receipt nor committed
+results; synchronous logging adds no hard wall-clock guarantee. Default span logs contain only
+the closed validated correlation/timing/outcome object, never evidence, responses or exception
+text. No telemetry-driven retry or compensating database write is introduced. Overall M5 remains on hold. No live-provider evidence or application review path follows.
 The reviewer's 73 isolated probes and the CI synthetic tests establish no real provider
 HTTP/DNS/TLS or live compatibility. Recovery supports the saved functional/build records,
 but exact-final-source mutation coverage and universal historical absence of network activity

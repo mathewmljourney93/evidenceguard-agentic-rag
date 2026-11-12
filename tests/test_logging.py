@@ -2,6 +2,7 @@ import json
 import logging
 from collections.abc import Iterator
 from typing import Any
+from uuid import UUID
 
 import pytest
 import uvicorn
@@ -18,10 +19,109 @@ from evidenceguard_observability.jsonlog import (
     log_event,
     logging_config,
 )
+from evidenceguard_observability.provider_spans import ProviderCallSpan, provider_call_ids
 
 # Obviously fake marker standing in for sensitive submitted input; not a credential.
 SUBMITTED_MARKER = "submitted-marker-value"
 EXCEPTION_TEXT = "internal failure detail that must stay private"
+
+
+def _provider_span(**changes: Any) -> ProviderCallSpan:
+    identity: dict[str, Any] = dict(
+        tenant_id=UUID(int=1),
+        review_id=UUID(int=2),
+        job_id=UUID(int=3),
+        question_id="SEC-01",
+        stage="verification",
+        sequence=1,
+        job_attempt=1,
+    )
+    trace, span = provider_call_ids(**identity)
+    return ProviderCallSpan(
+        **(
+            identity
+            | dict(
+                trace_id=trace,
+                span_id=span,
+                request_sha256="a" * 64,
+                started_ns=None,
+                ended_ns=12,
+                duration_ns=None,
+                timing_status="start_unavailable",
+                call_outcome=None,
+                exit_kind="process_control",
+            )
+            | changes
+        )
+    )
+
+
+@pytest.mark.usefixtures("restore_loggers")
+def test_default_span_sink_delivers_exact_typed_json(capsys: pytest.CaptureFixture[str]) -> None:
+    from evidenceguard_observability.jsonlog import LoggingSpanSink
+
+    configure_logging()
+    span = _provider_span()
+    LoggingSpanSink().emit(span)
+    (line,) = capsys.readouterr().err.splitlines()
+    record = json.loads(line)
+    assert set(record) == {"timestamp", "level", "logger", "event", "span"}
+    assert (
+        record["event"] == "provider.call_span"
+        and record["logger"] == "evidenceguard.provider_calls"
+    )
+    assert record["span"] == {
+        "schema_version": "evidenceguard.provider-call-span.v1",
+        "trace_id": str(span.trace_id),
+        "span_id": str(span.span_id),
+        "tenant_id": str(UUID(int=1)),
+        "review_id": str(UUID(int=2)),
+        "job_id": str(UUID(int=3)),
+        "question_id": "SEC-01",
+        "stage": "verification",
+        "sequence": 1,
+        "job_attempt": 1,
+        "request_sha256": "a" * 64,
+        "started_ns": None,
+        "ended_ns": 12,
+        "duration_ns": None,
+        "timing_status": "start_unavailable",
+        "call_outcome": None,
+        "exit_kind": "process_control",
+    }
+    assert type(record["span"]["ended_ns"]) is int and len(record["span"]) == 17
+
+
+@pytest.mark.parametrize(
+    "payload", [None, {"prompt": SUBMITTED_MARKER}, SUBMITTED_MARKER, RuntimeError(EXCEPTION_TEXT)]
+)
+def test_span_event_drops_untyped_payload_and_all_generic_extras(payload: object) -> None:
+    record = logging.LogRecord(
+        "evidenceguard.provider_calls", logging.INFO, "", 0, "provider.call_span", (), None
+    )
+    record.evidenceguard_fields = {
+        "span": payload,
+        "request_id": SUBMITTED_MARKER,
+        "error_type": EXCEPTION_TEXT,
+        "prompt": SUBMITTED_MARKER,
+    }
+    encoded = JsonFormatter().format(record)
+    assert set(json.loads(encoded)) == {"timestamp", "level", "logger", "event"}
+    assert SUBMITTED_MARKER not in encoded and EXCEPTION_TEXT not in encoded
+
+
+def test_bypass_mutated_span_is_dropped_and_sink_rejects_it() -> None:
+    from evidenceguard_observability.jsonlog import LoggingSpanSink
+
+    span = _provider_span()
+    object.__setattr__(span, "tenant_id", SUBMITTED_MARKER)
+    record = logging.LogRecord(
+        "evidenceguard.provider_calls", logging.INFO, "", 0, "provider.call_span", (), None
+    )
+    record.evidenceguard_fields = {"span": span}
+    assert "span" not in json.loads(JsonFormatter().format(record))
+    with pytest.raises(ValueError, match=r"^invalid_provider_call_span$"):
+        LoggingSpanSink().emit(span)
 
 
 def _app() -> FastAPI:

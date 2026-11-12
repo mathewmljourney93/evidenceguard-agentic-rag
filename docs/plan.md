@@ -15224,22 +15224,24 @@ overall M5 acceptance.
 
 <a id="m5h-implementation-status-accepted-for-a-local-commit-prompt-229-ci-pending"></a>
 
-#### M5h implementation status (feature-CI verified, not merged; Prompt 230)
+<a id="m5h-implementation-status-feature-ci-verified-not-merged-prompt-230"></a>
+
+#### M5h implementation status (reviewed, verified in CI and on main at e050da3e; Prompt 231)
 
 **State.** Claude Code implemented the accepted specification in Prompt 228, on
 `feat/anthropic-adapter` from `f919d69c`. The external reviewer accepted the implementation
 and all nine choices in Prompt 229 without requesting production, test, packaging or workflow
-corrections. M5h is **feature-CI verified, not merged** at
-`c785ee58dfe8398cf58cbbd54f8d5705743e1949` (Prompt 230). Mathew manually pushed; Codex
-observed all five required jobs succeed for that exact SHA, `push`, attempt 1. Main publication
-remains pending. The external reviewer independently confirmed and accepted the Prompt 230
-evidence in Prompt 231; it was not included in the earlier CI target. A new evidence commit
-requires its own fresh feature CI before main preflight and a local fast-forward, then Mathew's
-manual main push and separate main CI
-([acceptance and gates](decisions/0026-anthropic-adapter.md#external-acceptance-of-feature-evidence-and-gated-publication-prompt-231)).
-The specification above is unchanged;
-[ADR-0026](decisions/0026-anthropic-adapter.md#feature-publication-and-exact-commit-ci-prompt-230)
-records the exact run/job links, observations and limits.
+corrections. M5h is **reviewed, verified in CI and on main** at
+`e050da3e3415d73f83db86763617d5b5f0874aeb`, within its accepted scope (Prompt 231).
+The reviewer independently confirmed and accepted the earlier `c785ee58` feature evidence.
+Mathew manually pushed the new evidence commit to the feature; after all five fresh feature
+jobs passed, Codex performed preflight and a local `--ff-only` fast-forward, and Mathew manually
+pushed main. All five separate main jobs then passed for the same exact SHA, `push`, attempt 1.
+This publication evidence was accepted at external review in Prompt 232 and is not part of that CI target.
+See the [independent confirmation](decisions/0026-anthropic-adapter.md#publication-evidence-acceptance-prompt-232)
+and the separate [proposed overall M5 assessment](#m5-acceptance-assessment-proposed-prompt-232-awaiting-external-review).
+The specification above is unchanged; [ADR-0026](decisions/0026-anthropic-adapter.md#main-publication-and-separate-exact-commit-ci-prompt-231)
+records the separate feature/main run/job links, observations and limits.
 
 - **Code.** `evidenceguard_agents/anthropic.py`, `evidenceguard_worker/anthropic_http.py`, three
   new test modules, narrow packaging-guard additions and one additive installed-wheel line in CI.
@@ -15259,17 +15261,782 @@ records the exact run/job links, observations and limits.
   The mutation runner lacks `--offline`; that alone does not demonstrate network activity,
   but universal historical absence of network activity was not independently established.
   Recovery did not rerun the saved checks. No mutation rerun is required for acceptance.
-- **Codex-observed feature CI (Prompt 230; exact target above).** Ubuntu: 5,562 passed,
+- **Codex-observed feature CI (Prompt 230; historical `c785ee58`).** Ubuntu: 5,562 passed,
   439 skipped. Windows: 5,561 passed, 440 skipped. Both logs print 558 passing M5h module
   positions and the new synthetic installed-wheel success line. PostgreSQL: 439 passed,
   5,562 deselected. Container smoke/cleanup succeeded within ingestion/indexing scope.
   Gitleaks: 101 commits, no leaks. All are `push` attempt-1 results for the recorded target;
   historical local and isolated-reviewer evidence is separate.
+- **Codex-observed separate feature/main CI (Prompt 231; `e050da3e`).** Each branch's
+  `push`, attempt-1 gate passed all five jobs: Ubuntu 5,562 passed / 439 skipped; Windows
+  5,561 passed / 440 skipped; PostgreSQL 439 passed / 5,562 deselected; container smoke/cleanup
+  successful within ingestion/indexing scope; Gitleaks 102 commits, no leaks. Each verify log
+  prints 558 passing M5h positions and the new synthetic installed-wheel line. No older count
+  was substituted; retrieved logs support both observations independently.
 - **Not established.**
   - No live-test evidence exists; Claude Code reported no endpoint contact, and the recorded
     HTTPS tests used fake connections and an in-memory `http.client` socket only.
-  - The new evidence commit has no CI result yet; main publication is gated as above.
+  - The publication-evidence documentation has no separate CI result; its acceptance in Prompt 232
+    does not accept overall M5. The proposed assessment below identifies three unresolved requirements.
   - No M5h control operates in an application path, and `run_review` stays unregistered.
+
+#### M5 acceptance assessment (PROPOSED, Prompt 232; awaiting external review)
+
+**Subsequent review:** this assessment and its hold recommendation were accepted in Prompt 233;
+see the [review disposition](#m5-assessment-review-disposition-accepted-assessment-prompt-233-overall-m5-on-hold).
+The original heading/anchor and assessment below are preserved as the historical Prompt 232 proposal.
+The [bounded completion follow-up](#m5-bounded-completion-follow-up-proposed-prompt-233-implementation-unauthorized)
+is a separate, unaccepted specification. Overall M5 is not accepted.
+
+**Decision requested, not granted.** This is OpenAI Codex's assessment of the original M5
+milestone, the [accepted sequence and amendments](#m5-implementation-sequence-accepted-at-review-prompt-170)
+and the implemented M5a–M5h contracts. M5h publication evidence was **accepted externally in
+Prompt 232** ([ADR-0026](decisions/0026-anthropic-adapter.md#publication-evidence-acceptance-prompt-232));
+that decision does not accept overall M5. Codex recommends **holding overall M5 acceptance**
+until the three unresolved items below have been reviewed and resolved. The original milestone,
+accepted specifications and their anchors are unchanged.
+
+**Evidence basis.** Source and test inspection is of
+`e050da3e3415d73f83db86763617d5b5f0874aeb` (tree
+`a622f25c285d6aed2082865124fbe9b6c0daa387`). All executable inputs retain that version.
+The saved [separate feature/main CI records](decisions/0026-anthropic-adapter.md#main-publication-and-separate-exact-commit-ci-prompt-231)
+were observed by Codex in Prompt 231 and independently confirmed by the external reviewer in
+Prompt 232. For **each** branch: Ubuntu 5,562 passed / 439 skipped, Windows 5,561 passed /
+440 skipped, PostgreSQL 439 passed / 5,562 deselected; all five jobs passed, `push`, attempt 1.
+The tables in ADR-0026 retain each run/job link, duration and observation separately. Below,
+**V** means the saved Ubuntu/Windows suite evidence at this exact commit and **PG** the saved
+PostgreSQL suite evidence at the same commit, separately on feature and main. Named tests are
+source-inspected coverage, not individually printed names in those CI logs. No application
+tests, mypy, builds, wheel checks, database tests or CI were rerun for this assessment.
+
+Paths in the module column name packages by their Python import namespace. Test filenames
+are under `tests/`; the linked ADRs preserve slice acceptance, historical versions and limits.
+The first six rows account for every original acceptance criterion; later rows account for
+the milestone's components and accepted amendments, rather than replacing those criteria.
+
+| Requirement and accepted source | Implementation/module | Relevant tests (source inspection) | Verification evidence / version | Status | Limitation or obligation |
+| --- | --- | --- | --- | --- | --- |
+| Invalid output, refusal, timeout and forged chunk ID end unresolved or rejected: [original-criteria mapping](#m5-acceptance-criteria-mapped-to-slices-and-tests), Correction D | `domain.agent_outputs`, `agents.providers`, `domain.provenance`, `worker.review` | `test_agent_outputs.py`, `test_model_calls.py`, `test_provenance.py`; handler U1/retry/repair cases; PostgreSQL timeout-exhaustion case | V + PG at `e050da3e`; [ADRs 0019](decisions/0019-model-call-contracts.md), [0020](decisions/0020-provenance-validation.md), [0025](decisions/0025-review-orchestration.md) | satisfied | Rejection is syntactic/provenance classification, not a quality judgment. Persisted budget bounds retries; refusal is terminal. |
+| Later revision excluded, including resume: [criteria mapping](#m5-acceptance-criteria-mapped-to-slices-and-tests), [M4d acceptance](decisions/0025-review-orchestration.md#scoped-m4d-and-e7-acceptance-and-m5h-disposition-prompt-226) | `persistence.reviews`, `worker.review` trusted snapshot retrieval/reload | `test_reviews_postgres.py`, `test_review_handler.py` trusted-snapshot path and reload cases, `test_review_handler_postgres.py` replacement-revision case | V + PG at `e050da3e`; Prompt 226 acceptance of internal composition at `bebd2f75`, unchanged protected handler/test blobs | satisfied within an explicitly accepted scope | Carries forward M4d acceptance for the internal `run_review` composition only. No new combined-case or individually printed test-name claim. Database trust and discarded U4 evidence remain. |
+| Resume after committed stage without duplicates: [criteria mapping](#m5-acceptance-criteria-mapped-to-slices-and-tests), W5/W6 | `persistence.review_stages`, `worker.review` skip/replay | `test_review_stages_postgres.py`; `test_review_handler_postgres.py::test_an_uncommitted_finish_is_retried_and_reuses_every_stage_with_zero_calls`; unit replay cases | V + PG at `e050da3e`; [ADR-0023](decisions/0023-review-stage-persistence.md), [ADR-0025](decisions/0025-review-orchestration.md) | satisfied within an explicitly accepted scope | Controlled interruption/rollback/reclaim evidence and unique-key/replay invariants, not proof of every physical process-kill timing or exactly-once calls. |
+| Controlled crash after response, before stage commit: [criteria mapping](#m5-acceptance-criteria-mapped-to-slices-and-tests), W5 | `_dispatch` in `worker.review`; persisted reservations | `test_review_handler_postgres.py::test_a_reservation_abandoned_before_dispatch_is_retried_on_the_next_attempt` is a different boundary | V + PG at `e050da3e` do not establish the required two-dispatch scenario; see G2 | unresolved | First attempt in the present test makes zero provider calls. Add the specified controlled post-response PostgreSQL proof in a separately authorized task. |
+| Stale-worker stage writes rejected: [criteria mapping](#m5-acceptance-criteria-mapped-to-slices-and-tests), [Correction D](#call-budgets-repair-and-terminal-state-correction-d) | `JobContext.fenced`, stage/output persistence, `worker.review` | `test_review_stages_postgres.py`, `test_review_outputs_postgres.py`; handler stale-token/final-ownership and lease-loss cases | V + PG at `e050da3e`; [ADR-0023](decisions/0023-review-stage-persistence.md), [ADR-0025](decisions/0025-review-orchestration.md) | satisfied within an explicitly accepted scope | M3 fence semantics, explicit cancellation checks and final ownership test; M3 lease/commit window and uncertain commit outcomes are not eliminated. |
+| Injection canary absent from output under the three-part contract: [Correction E](#canary-and-prompt-boundary-coverage-correction-e), W10 | Safe assembly, provenance, hash-covered report; test-only surface checker | `test_review_handler.py` canary cases; three `test_review_canary_postgres.py` cases | V + PG at `e050da3e`; negative control and quotation limitation present, but acceptance setup differs; see G3 | unresolved | Both current acceptance documents contain the complete token verbatim. Required instruction-assembled token absent from documents needs its dedicated fixture; no production denylist is requested. |
+| M5a strict values, JSON admission and provider-call classification: [ADR-0019](decisions/0019-model-call-contracts.md) | `domain.model_calls`, `domain.agent_outputs`, `agents.providers`, scripted fake | `test_model_calls.py`, `test_agent_outputs.py`, `test_scripted_provider.py` | V at `e050da3e`; accepted M5a contract, historical main `f04e0957` | satisfied | Bounded strict parsing, safe outcomes and process-control propagation; no hidden provider retry or semantic validation. |
+| M5b quote provenance and derived status: [ADR-0020](decisions/0020-provenance-validation.md) | `domain.provenance` and trusted evidence values | `test_provenance.py`, `test_quote_matching.py`; owner/shared-citation and documentary-rule cases | V + PG at `e050da3e`; accepted owner-binding correction, historical main `90295717` | satisfied | Source authorization, quote matching/offsets and deterministic status do not establish entailment, authenticity or semantic injection resistance. |
+| Pinned template, planner and prompt/request assembly: W3, [ADR-0021](decisions/0021-review-request-assembly.md) | `agents.templates`, `agents.prompts`, packaged TOML/Markdown, request assembly | `test_review_templates.py`, `test_prompts.py`, `test_request_assembly.py` | V at `e050da3e`; packaged-resource wheel checks in each verify job | satisfied | Digests bind the pinned versions; closed JSON evidence encoding and byte caps do not prove model obedience. Ground truth is not a request input. |
+| Tenant-bound creation, persisted configuration/snapshot and canonical job linkage: [Correction A](#composable-capture-and-review-creation-correction-a), [ADR-0022](decisions/0022-review-creation.md) | `domain.reviews`, `persistence.reviews`, retrieval transaction seam, worker review seam | `test_review_values.py`, `test_review_creation.py`, `test_reviews_postgres.py` | V + PG at `e050da3e`; historical accepted M5d main `1efe3ed3` | satisfied within an explicitly accepted scope | Atomic creation, idempotency, trusted digest/job reload and tenant checks are internal seams; database writers remain trusted. No application endpoint follows. |
+| Stage fencing, identical replay, repair and persisted call budgets: [Correction D](#call-budgets-repair-and-terminal-state-correction-d), W4–W6, [ADR-0023](decisions/0023-review-stage-persistence.md) | `domain.review_stages`, `persistence.review_stages`, migration 0007, `worker.review` | `test_review_stage_values.py`, `test_review_stage_planner.py`, `test_review_stage_persistence.py`, `test_review_stages_postgres.py`; handler repair/budget cases | V + PG at `e050da3e`; historical M5e main `14f510e` | satisfied | Three reservations/stage over all attempts, one lifetime repair; abandoned reservations consume budget. This does not close G2 or guarantee one retry/exactly-once dispatch. |
+| Trusted evidence/stage reload; owner-bound analysis and documentary finding: [ADRs 0020](decisions/0020-provenance-validation.md), [0023](decisions/0023-review-stage-persistence.md), [0025](decisions/0025-review-orchestration.md) | Trusted loaders, provenance revalidation, verification then analysis using owner evidence | `test_review_stages_postgres.py`, `test_review_stage_persistence.py`; handler tamper/owner/analysis-failure/P11 cases | V + PG at `e050da3e` | satisfied within an explicitly accepted scope | Owner/shared full citation equality is checked. U4 deliberately discarded evidence cannot be re-proved or reopened; database trust remains. Analysis failure preserves verification and required documentary finding. |
+| Report completeness, source binding and hash-covered substantive content: [report-integrity invariant](#report-integrity-prompt-169), [ADR-0024](decisions/0024-review-report-content.md) | `domain.report_content`, `agents.report`, trusted report builder | `test_report_content.py`, `test_report_builder.py`; output binding/reload tests | V + PG at `e050da3e`; historical M5f main `e7dd3be3` | satisfied | Versioned M5 wrapper covers displayed content and bound sources; legacy M1 report hash remains unchanged. No enrichment from unhashed rows; M6 must bind approval/export to the wrapper digest. |
+| Deterministic rendering of the hash-covered report: [report integrity](#report-integrity-prompt-169), [ADR-0024](decisions/0024-review-report-content.md) | `agents.report`, renderer version and bounded Markdown | `test_report_renderer.py`, `test_report_builder.py` | V at `e050da3e`; installed-wheel report line in both platforms and branches | satisfied | Literal escaping and deterministic text are not browser-sanitization or semantic-safety evidence. No approval/export is implemented here. |
+| Orchestration, cancellation and lease/process-control boundaries: W7, [ADR-0025](decisions/0025-review-orchestration.md) | `worker.review` `_step`, `_fenced`, `_Attempt`; transaction cleanup | `test_review_handler.py`, `test_review_handler_postgres.py`; process-control/cleanup and persistence-boundary cases | V + PG at `e050da3e`; Prompt 219 corrections and accepted M5g at `bebd2f75` | satisfied within an explicitly accepted scope | Checks before/after synchronous work; first process-control identity preserved. No preemption of an in-flight call, no compensating write after fence loss and no claim that uncertain finish failed to commit. |
+| Output persistence and atomic completion: Correction D, E7, [Prompt 226 acceptance](decisions/0025-review-orchestration.md#scoped-m4d-and-e7-acceptance-and-m5h-disposition-prompt-226) | `domain.review_outputs`, `persistence.review_outputs`, migration 0008, `ctx.fenced(finish=True)` | `test_review_output_values.py`, `test_review_output_persistence.py`, `test_review_outputs_postgres.py`; handler finish rollback/replay cases | V + PG at `e050da3e`; unchanged accepted internal composition at `bebd2f75` | satisfied within an explicitly accepted scope | E7 allocation to M5f/M5g is fulfilled, not deferred. Output and job success share the fence/transaction; unknown database commit outcomes and DB trust remain. |
+| Provider-call records **and spans**: original M5 and [accepted M5e allocation](#proposed-slices-dependency-ordered) | Persisted `CallRecord` has reservations/outcomes/digests/usage/latency; no provider-call span implementation found | Call-record/stage tests cover records; no provider-call span test found | Source inspection at `e050da3e`; V/PG cannot establish an absent span contract; see G1 | unresolved | A latency field and citation `SourceSpan` are not call spans. E6 full OpenTelemetry is later enhancement wording, not an explicit waiver of basic M5 spans. |
+| M5h offline adapter, bounded HTTPS transport and composition: [accepted M5h specification](#m5h-anthropic-adapter-specification-accepted-at-review-prompt-227-implementation-pending), [ADR-0026](decisions/0026-anthropic-adapter.md) | `agents.anthropic`, `worker.anthropic_http` | `test_anthropic_provider.py`, `test_anthropic_http.py`, `test_review_anthropic_composition.py` | V at `e050da3e`: each verify log prints 372 / 185 / 1 passing positions; implementation/nine choices accepted Prompt 229, publication accepted Prompt 232 | satisfied within an explicitly accepted scope | Synthetic responses, fake connections and in-memory socket. Real HTTP/DNS/TLS, alias compatibility and model quality unverified; cooperative elapsed checks are not a hard wall-clock bound. |
+| Packaged resources/import guards, installed wheels and current-version CI: accepted slice verification and [ADR-0026 evidence](decisions/0026-anthropic-adapter.md#main-publication-and-separate-exact-commit-ci-prompt-231) | Package data, narrow import guards, unchanged reviewed workflows | `test_packaging.py`; clean installed-wheel assertion body | Separate feature/main `e050da3e` gates: four verify logs with strict mypy in 199 files, all twelve prior wheel result lines plus synthetic M5h line; PG and Gitleaks green separately | satisfied within an explicitly accepted scope | Current-version CI is established; container smoke is ingestion/indexing only. Neither installed-wheel nor container evidence is a live-provider/application-review test. |
+| Privacy-safe failures and process-control behavior across seams: W7, [ADRs 0019](decisions/0019-model-call-contracts.md), [0025](decisions/0025-review-orchestration.md), [0026](decisions/0026-anthropic-adapter.md) | Fixed error codes; no raw content in call records/errors; process-control-preserving cleanup | Model-call/handler/HTTP/provider tests, captured canary log/error surfaces and transaction tests | V + PG at `e050da3e`; separate full-history secret scans, 102 commits/no leaks per gate | satisfied within an explicitly accepted scope | Secret scanning and captured synthetic surfaces are bounded evidence, not proof of universal confidentiality or every historical network action. |
+| Production enqueue/registration and application review path: [W8 reconciliation](#production-dispatch-and-enqueue-w8-reconciled), [accepted W8 decision](#sequence-level-design-decisions) | Explicit-provider internal factory; `production_registry` remains `ingest_revision, index_revision` | Registry/handler tests; printed installed-wheel registry output | V + PG at `e050da3e`; W8 accepted Prompts 169–170 | deferred by a cited accepted decision | Enable enqueue, registration and a configured real provider together in a later reviewed unit; no `run_review` registration or application review path exists now. |
+| Live compatibility, model choice, measured evaluation and semantic injection evidence: W9/W10 in [accepted sequence decisions](#sequence-level-design-decisions) | Offline adapter and scripted fixtures only | Contract/canary/negative-control tests, not live evaluation | Accepted sequence Prompts 169–170, M5h acceptance Prompt 227; no live evidence | deferred by a cited accepted decision | First live wiring/call and paired evaluation belong to M7 under those decisions; do not substitute synthetic output for measured quality. G3's contract fixture remains M5 work. |
+| Approval, revision/finalize/export and audit obligations: W14 in [accepted sequence decisions](#sequence-level-design-decisions), [ADR-0024](decisions/0024-review-report-content.md) | Versioned content/digest ready for later lifecycle composition | M5 hash/render tests only, not approval/export tests | Accepted M5 sequence and M5f wrapper decision; no M6 implementation evidence | deferred by a cited accepted decision | M6 must review wrapper-hash approval compatibility, permissions, revision invalidation, finalization/export and audit; no full M6 specification or implementation is authorized here. |
+
+##### Unresolved requirements and smallest next actions
+
+**G1 — Provider-call spans.** The original milestone names “provider-call records and spans”;
+the accepted sequence also allocates them to M5e. At the inspected version, `CallRecord`
+records reservations, outcomes, digests, usage and latency, but `agents.providers.call_validated`
+and `worker.review._dispatch` have no call-span creation/recording boundary. The observability
+package supplies request-ID context and JSON logging, not provider-call spans. Citation
+`SourceSpan` values are unrelated. No explicit accepted decision deferring this basic requirement
+was found; the later E6 full-OpenTelemetry enhancement does not itself defer it. **Next action:**
+external review should settle the smallest provider-call span/trace contract and authorize a
+bounded implementation/test follow-up, or explicitly amend the milestone. This assessment
+does not invent a new tracing dependency, schema or acceptance standard, or infer a waiver.
+
+**G2 — Required response/commit crash proof.** The original criterion and its accepted mapping
+require one controlled PostgreSQL interruption **after the fake returns and before stage commit**:
+two calls for the same key, first reservation `started`, second completed, one stage row.
+The current abandoned-reservation test interrupts after reservation **before dispatch** and
+asserts an empty first provider-call list. Its next attempt proves budget/retry behavior, not a
+repeated response-bearing call. The uncommitted-finish test reuses already committed stages
+with zero calls; the abandoned-repair unit case also interrupts before that dispatch. These
+are useful distinct tests, not the specified scenario. No surviving exact-scenario test was
+found by source inspection. **Next action:** a separately authorized controlled PostgreSQL
+regression at the required boundary, using the existing fake/fence seams and the specified
+counts. This is a coverage gap, not evidence that dispatch/recovery is defective; rerunning
+the unchanged suite would not close it. W5 limits the claim but expressly retains this test.
+
+**G3 — Canary acceptance-fixture setup.** Correction E and W10 require an injected document
+that instructs construction of the synthetic token from parts, with the complete token absent
+verbatim from every document. The actual unit `_canary_world` and PostgreSQL `BODY` interpolate
+the full token into the injected document; the PostgreSQL test also asserts its presence in
+the captured request. Thus the ordinary-output checker, emitting negative control and genuine
+quotation limitation probe exist, but the dedicated acceptance setup is not the specified one.
+M5g-J says the three-part contract is preserved; it does not explicitly waive the parts-assembled
+fixture. **Next action:** separately authorize that dedicated fixture and its token-absent-from-
+documents / injected-chunk-in-request assertions, retaining the same output-surface checker,
+negative control and separately labelled quotation probe. Do not add a production token denylist
+or claim that a scripted pass proves semantic injection resistance.
+
+##### Recommendation, limits and handover
+
+**Codex recommendation:** do not accept overall M5 yet. Individual slice acceptances, M5h
+publication acceptance and the **scoped M4d/E7 acceptance at `bebd2f75` remain intact**.
+The intended eventual acceptance scope is the internal, tenant-bound, snapshot-pinned review
+composition with scripted providers and the offline Anthropic adapter, including fenced
+stage/output persistence and deterministic hash-covered reports, under the accepted W8/W9
+limits. G1–G3 block an unqualified recommendation against the still-controlling requirements;
+they need explicit external disposition, not silent reclassification as future-milestone work.
+No remedy, test rerun or acceptance amendment has been made by this prompt.
+
+Within the accepted slice scopes, the following limits are non-blocking **as already recorded**:
+U4 discards evidence and cannot later re-prove it; trusted database writers can alter trusted
+rows; the M3 lease/commit window and unknown outcomes remain; abandoned responses can cost
+another call and there is no exactly-once provider-call guarantee. Provenance establishes
+neither entailment nor authenticity nor semantic injection resistance. The genuine authorized
+quotation probe deliberately permits a literal canary in the stored/rendered report; the
+negative control demonstrates detection, not a production filter. No application review path,
+production `run_review` registration, live provider configuration or real API evidence exists.
+Container smoke remains ingestion/indexing only.
+
+Historical evidence retains its authorship and version. Claude Code's saved Prompt 228
+functional/build records are supported, with executable sources unchanged since those checks
+as established in recovery. Recovery did not rerun them. The six-mutation record binds to an
+earlier HTTP-source hash, so exact-final-source mutation coverage was not independently
+established. Its runner lacks `--offline`; that does not demonstrate network activity, while
+universal historical absence of network activity was not independently established either.
+The external reviewer's 73 isolated synthetic probes, Codex's recovery observations, prior
+local results and exact-commit CI remain separate evidence classes. No mutation rerun is needed
+for the accepted M5h implementation/publication decision.
+
+Future work must carry the cited W8 production-composition review, W9/M7 live compatibility
+and paired evaluation, and W14/M6 wrapper-hash approval/revision/finalize/export obligations.
+These accepted allocations do not dispose of G1–G3. Overall M5 acceptance, production wiring,
+live calls and M6 implementation remain unauthorized pending further review.
+
+
+#### M5 assessment review disposition (ACCEPTED assessment, Prompt 233; overall M5 on hold)
+
+The external reviewer accepts the [Prompt 232 assessment and recommendation](#m5-acceptance-assessment-proposed-prompt-232-awaiting-external-review)
+to hold overall M5 acceptance for G1–G3. The reviewer independently checked the submitted diff,
+original requirements and current source and agrees: provider-call records exist but spans
+are missing; the abandoned-reservation test interrupts before dispatch, not after a returned
+response; both current canary acceptance documents contain the complete token. These are
+completion gaps, not evidence of a production recovery defect or grounds to revoke individual
+M5a–M5h acceptances. Scoped M4d/E7 acceptance for the internal composition at `bebd2f75` remains
+intact. **Assessment accepted does not mean overall M5 accepted.**
+
+The Prompt 232 heading/anchor and its assessment remain as the historical proposal reviewed
+here. The following specification is **new, proposed and awaiting external review**. Prompt 233
+authorizes documentation only, not implementation, new verification runs or acceptance of
+this contract. Historical evidence and all earlier recovery/semantic/runtime qualifications
+remain in force.
+
+<a id="m5-bounded-completion-follow-up-proposed-prompt-233-implementation-unauthorized"></a>
+
+#### M5 bounded completion follow-up (ACCEPTED at review, Prompt 234)
+
+**Acceptance:** the external reviewer accepted F1-F8 in Prompt 234 with binding clarifications A/B
+recorded below. The original proposal wording is retained as reviewed; it no longer describes
+the current authorization. This accepts the specification, not its implementation or overall M5.
+The additive `span_sink` signature, default LoggingSpanSink, worker/observability import amendment
+and best-effort ephemeral spans are accepted. No new dependency or database schema is authorized.
+
+
+**Purpose and baseline.** One bounded slice supplies genuine provider-call spans (G1), adds the
+specified post-response interruption proof (G2), and corrects the two acceptance fixtures (G3).
+It completes, rather than waives, the original [M5 criteria](#m5-acceptance-criteria-mapped-to-slices-and-tests),
+[Correction D](#call-budgets-repair-and-terminal-state-correction-d) and
+[Correction E/W10](#canary-and-prompt-boundary-coverage-correction-e). Source inspection is of
+`e050da3e3415d73f83db86763617d5b5f0874aeb`; this proposal is separate from all accepted
+specifications. Full OpenTelemetry remains E6, not a substitute for basic spans.
+
+##### F1. Placement and public interfaces (proposed decisions)
+
+Actual placement matters: `agents.providers.call_validated` validates and classifies without
+job knowledge or logging; `worker.review._dispatch` commits a reservation, checks the context,
+then calls it inside `_step`; `_step` checks cancellation/lease state before acting on the
+result. Existing observability supplies request-ID context and a closed JSON formatter, but
+no call spans. **Recommendation:** instrument the worker composition with a private transparent
+provider wrapper, and keep the generic span value/collector in observability. Do not move
+or duplicate classification, wrap a transaction around dispatch, or instrument the Anthropic
+transport separately. A transport operation is not another M5 provider-call span.
+
+Exact proposed placement and signatures (Python 3.12 annotations; declarations, not implemented code):
+
+```python
+# packages/observability/evidenceguard_observability/provider_spans.py
+@dataclass(frozen=True, slots=True, kw_only=True, init=False, repr=False)
+class ProviderCallSpan: ...  # exact closed fields and validation in F2
+
+
+def provider_call_ids(
+    *,
+    tenant_id: UUID,
+    review_id: UUID,
+    job_id: UUID,
+    question_id: str,
+    stage: Literal["verification", "analysis"],
+    sequence: int,
+    job_attempt: int,
+) -> tuple[UUID, UUID]: ...  # (trace_id, span_id)
+
+
+class SpanSink(Protocol):
+    def emit(self, span: ProviderCallSpan) -> None: ...
+
+
+class BoundedSpanCollector:
+    def __init__(self, *, capacity: int = 256) -> None: ...
+    def emit(self, span: ProviderCallSpan) -> None: ...
+    def snapshot(self) -> tuple[ProviderCallSpan, ...]: ...
+    @property
+    def dropped_count(self) -> int: ...
+
+
+# packages/observability/evidenceguard_observability/jsonlog.py
+class LoggingSpanSink:
+    def emit(self, span: ProviderCallSpan) -> None: ...
+
+
+# apps/worker/evidenceguard_worker/review.py
+def make_run_review_handler(
+    provider: ModelProvider,
+    *,
+    session_factory: sessionmaker[Session],
+    embedding_providers: Mapping[str, Callable[[], EmbeddingProvider]] = SUPPORTED_PROVIDERS,
+    clock: Callable[[], float] = time.monotonic,
+    span_sink: SpanSink | None = None,
+) -> JobHandler: ...
+```
+
+The **only accepted public signature proposed to change** is the M5g factory: additive
+keyword-only `span_sink`, default `None` selecting `LoggingSpanSink`. All existing callers
+remain valid. Review must explicitly approve this amendment and the worker's observability
+import allowance; it is not already authorized by M5g acceptance. `ModelProvider`,
+`call_validated`, its `clock`, request/result values, domain/persistence APIs and schemas stay
+unchanged. An explicit sink must have a callable `emit`; ordinary accessor/configuration
+failure at factory construction gives fresh `TypeError("span_sink must provide emit")`,
+without cause/context or submitted values. Process control propagates by identity. Resolve
+that callable once at construction, with no property lookups during dispatch finalization.
+
+**Tradeoff for review:** this keeps M5a pure and avoids a new observer argument or dependency
+in agents, at the cost of worker-local wrapper/lifecycle code and a narrow packaging-guard
+amendment. The facility covers this internal review composition, not arbitrary direct callers
+of `call_validated`. Default structured log emission gives an actual observable span without
+requiring a custom collector; it is best-effort ephemeral telemetry, not a durable audit table.
+
+##### F2. Exact span value, identity and privacy contract
+
+`ProviderCallSpan` is one immutable, completed leaf span, not a renamed `CallRecord` or latency
+field. It records a begin/end interval plus identity, correlation and terminal observations.
+No arbitrary attributes, text tags, exception objects or payload dictionaries are accepted.
+Its fields are exactly the following; all are also the complete nested JSON privacy allowlist:
+
+| Field | Exact type / admissible value | Source / meaning |
+| --- | --- | --- |
+| `schema_version` | `Literal["evidenceguard.provider-call-span.v1"]`, default that literal | Fixed version |
+| `trace_id`, `span_id` | exact `UUID` | Deterministic internal correlation below, not client request IDs |
+| `tenant_id`, `review_id`, `job_id` | exact `UUID` | Trusted review/canonical job, never inferred from provider text |
+| `question_id` | exact `str`, ASCII full match `^[A-Z][A-Z0-9]{1,9}-[0-9]{2,3}$` | Trusted planned question |
+| `stage` | `Literal["verification", "analysis"]` | Current reserved stage, not free-form step name |
+| `sequence` | exact `int` in 1..3, excluding bool | Persisted reservation sequence |
+| `job_attempt` | exact `int` in 1..3, excluding bool | Canonical review-job attempt under the accepted cap |
+| `request_sha256` | exact `str`, 64 lowercase ASCII hex characters | Reserved digest; no request content |
+| `started_ns`, `ended_ns`, `duration_ns` | exact `int` in 0..`2**63-1`, or `None`, excluding bool | Independent monotonic interval in F3; duration is never fabricated |
+| `timing_status` | `Literal["ok", "start_unavailable", "end_unavailable", "invalid_interval"]` | Fixed diagnosis only |
+| `call_outcome` | `Literal["completed", "refusal", "timeout", "invalid_output", "provider_failed", "model_mismatch", "max_tokens", "unexpected_stop"]` or `None` | The result returned by the existing validating boundary, if observed |
+| `exit_kind` | `Literal["returned", "cancelled", "lease_lost", "fence_closed", "process_control", "local_error"]` | Boundary result after existing `_step` context check, before emission |
+
+Use an explicit keyword-only constructor with the F2 fields and `**unknown: object`, so
+unknown names enter the same validation guard instead of the generated dataclass initializer.
+Reject unknown fields, subclasses and invalid combinations with a fixed, content-free
+`ValueError("invalid_provider_call_span")`; no coercion or `str`/`repr` fallback. Rebuild/revalidate
+at sink/serialization boundaries to reject bypass-mutated instances. For `ok`, both readings
+and exact nonnegative difference must exist; otherwise duration is `None`. `returned` requires
+a non-null outcome; interrupted exits may carry a classified outcome only if the validating
+boundary actually returned it before the context check. `local_error` can have no outcome.
+
+Use fixed UUID namespaces `30000000-0000-4000-8000-000000000001` (trace) and
+`30000000-0000-4000-8000-000000000002` (span). `trace_id` is UUID5 of the ASCII name
+`tenant_id.hex + ":" + review_id.hex`. `span_id` is UUID5 of the colon-separated ASCII
+`tenant_id.hex`, `review_id.hex`, `job_id.hex`, `question_id`, `stage`, decimal `sequence`,
+decimal `job_attempt`. No locale, whitespace or Python repr enters either name.
+`provider_call_ids` validates its inputs under the same fixed-error rules; value validation
+recomputes both IDs and rejects a mismatch rather than trusting supplied correlation identifiers.
+The reserved
+call has a compound identity, not a new database span column. Same review correlates across
+attempts; retried reservations get different span IDs even when request digests are equal.
+There is no invented parent span: these are correlated leaf spans, not a claim of complete
+distributed tracing. IDs provide neither authentication nor tenant authorization.
+
+**Privacy exclusions:** no prompt/system/user text, evidence, quotations, source titles or
+URLs, raw/parsed provider output, model/provider strings, token usage, credentials, headers,
+worker identifiers, client idempotency keys, exception text/class/traceback, request-ID header,
+or arbitrary application attributes. Existing persisted usage/accounting remains unchanged;
+it is not copied into spans. UUIDs/question IDs/digests are metadata, not anonymous data; use
+only validated internal values and keep existing access/retention controls. The logging
+envelope may additionally contain only its existing timestamp/level/logger/fixed event fields.
+
+##### F3. One dispatch, begin/end boundaries and outcomes
+
+Keep `_dispatch`'s reserve/commit → existing pre-dispatch `ctx.check()` → `_step` ordering.
+Construct a private wrapper per reservation, never a shared active span on the provider.
+Its `provider_id` property returns the underlying value unchanged (no `str`, caching or extra
+read); existing M5a validation still reads it exactly once. Its `generate` delegates once,
+with the same validated request object. It does not inspect/rebuild the response, catch and
+translate provider errors, retry, repair, change settings or reassemble canonical bytes.
+
+**Actual dispatch for this facility** means attempting the configured provider's `generate`
+expression once after M5a request/clock/provider-ID admission, with no persistence transaction
+open. Mark entry immediately before evaluating/invoking that expression in the wrapper.
+This matches the accepted M5a `dispatched` meaning: even a raising `generate` descriptor or
+provider failure before network I/O is an attempted dispatch, not proof of an HTTP request.
+It does not mean network contact or server acceptance. The wrapper is not itself an extra call.
+
+Sample `time.monotonic_ns()` immediately before marking entry and immediately after the
+delegate returns/raises (in a first-interrupt-preserving cleanup boundary). Start/end measure
+the synchronous provider expression, **not** parsing, provenance, database work or `_step`'s
+post-call context check. Store the bounded valid readings and their exact difference only
+when valid; ordinary clock failures or invalid readings yield absent timing and a fixed
+`timing_status`. If start is unusable, status is `start_unavailable` regardless of end;
+otherwise unusable end gives `end_unavailable`; backward/out-of-bound interval gives
+`invalid_interval`. Valid end may be retained when start is absent, and vice versa.
+The observation clock is separate from the accepted M5a/factory `clock`: no additional reads
+of the latter and no replacement/recomputation of result latency, deadlines or timeout
+classification. Ordinary instrumentation overhead can affect elapsed readings on real clocks;
+no numerical latency equality or identical real-time scheduling is claimed across separate
+instrumented/uninstrumented runs. Existing timeout/check/fence algorithms remain unchanged.
+No wall-clock alignment across processes, hard deadline, preemption or physical-kill guarantee follows.
+
+Record only the enum outcome after `call_validated` returns; return its original result
+unchanged to the existing `_step`, so latched cancellation/lease/fence closure retains its
+current precedence. In the surrounding completion/unwind boundary, finalize and attempt
+one immutable span emission **after `_step` has returned or raised, before any stage/outcome
+write**. No output text need be retained for instrumentation. Span end timestamp is the saved
+delegate-exit reading even though emission occurs after classification/context checking.
+
+| Existing boundary observation | Span `call_outcome` / `exit_kind` | Persisted/control behavior |
+| --- | --- | --- |
+| Classified success, refusal, timeout, invalid output or provider failure, post-call check passes | Exact existing outcome / `returned` | Existing handler classification/repair/budget rules only |
+| Model mismatch, max tokens or unexpected stop | Exact existing outcome / `returned` | Existing terminal rules only |
+| A returned result is superseded by latched shutdown cancellation | Preserve observed outcome / `cancelled` | Original JobCancelledError object propagates; no new stage/outcome write |
+| A returned result is superseded by lease loss or fence closure | Preserve observed outcome / `lease_lost` or `fence_closed` | Original control-flow object propagates; no compensating write |
+| Process control after dispatch, including from the provider or M5a post-call clock | Outcome if already observed, otherwise `None` / `process_control` | First process-control object propagates unchanged |
+| Ordinary post-dispatch local/classification failure escaping `_step` | Observed outcome if any / `local_error` | Existing fixed step error is preserved; never relabel it provider failure for telemetry |
+| Admission/pre-dispatch failure; cancellation before dispatch; reused stage; U4/no-call stage | **No span**, not a zero-duration fictitious call | Existing reservation/budget behavior retained, including abandoned started row if already reserved |
+
+There is at most one emission attempt per entered provider expression. A span with outcome
+`completed` says parsing succeeded, not that provenance or stage/output persistence succeeded.
+If the later stage transaction fails or is uncertain, retain the already emitted span and do
+not amend it, complete a reservation for telemetry, add a compensating write or emit a second
+provider span. On a later actual retry, emit a new span for its new reservation. Abrupt death
+can lose the un-emitted span; CallRecord remains the durable reservation evidence, not a span.
+
+##### F4. Collector, default logging and failure precedence
+
+`BoundedSpanCollector` retains valid immutable records in emission order under a standard-library
+lock. Capacity must be exact int in 1..4096; invalid configuration raises fixed ValueError.
+At capacity it drops the **new** record and increments `dropped_count`; it never blocks on
+backpressure or evicts the existing prefix. `snapshot()` returns an immutable tuple;
+collector data is process-local and not persisted. The lock still has ordinary scheduling
+limits; this is a memory bound, not a real-time guarantee. Share an explicit collector only
+when desired; active per-call lifecycle state remains local, including under concurrent handlers.
+
+Default `LoggingSpanSink` uses `logging.getLogger("evidenceguard.provider_calls")`, INFO and
+the fixed event `provider.call_span`, one record carrying a typed span. Add that event to
+`jsonlog.REVIEWED_EVENTS`. `JsonFormatter` must have an **event-specific** `span` branch: only
+an exact, revalidated ProviderCallSpan is serialized to the F2 closed nested dictionary;
+unknown/malformed/subclass payloads produce no span field, no text fallback. Do not expand
+the global arbitrary-field allowlist, change other event formatting, attach handlers in the
+factory, or use raw logging arguments/exception details. This event's branch ignores all
+generic structured extras and returns only the standard logging envelope plus its validated
+span field. Other events keep their existing allowlist behavior. Existing logging configuration/
+level controls delivery; no configured handler or disabled INFO can discard the record. Tests must
+capture a correctly configured default sink, not infer delivery from method invocation.
+
+No sink has network/export/storage behavior supplied by this slice. External log collection
+is outside its scope. Default emission is ephemeral structured logging, not durable/exactly-once
+tracing, proof that a provider received a request, or evidence of a committed stage.
+
+**Failure policy proposed for review:** ordinary instrumentation failures (timing, building a
+span, sink/formatter/handler emission) are contained, retain no exception object/text and
+never retry or alter the existing result/exception. A sink may partially emit before raising;
+delivery is then unknown, with no retry or second diagnostic log. A process-control exception
+from instrumentation is not swallowed: if a process-control exception is already unwinding,
+preserve that **first object** despite later timing/sink failures; otherwise propagate the new
+process-control object unchanged, ahead of ordinary errors or returned results. Finalization
+gets one bounded pass, not recursive cleanup; if a start-reading process-control prevents
+entry to the delegate, no dispatch/span is claimed. The underlying provider is not skipped
+for an ordinary instrumentation failure. Do not add a post-fence `ctx.check()` or reclassify
+uncertain commit exits. A sink's own process control after emission is not retroactively
+described by that record's pre-emission `exit_kind`; no re-emission is permitted.
+
+**Tradeoffs:** synchronous default logging is small and works with existing configuration,
+but arbitrary externally installed logging handlers can block; no hard time bound or isolation
+from hostile sinks is claimed. Sinks are trusted composition inputs, never provider- or
+document-selected plugins. Best-effort drop protects workflow semantics at the cost of missing
+telemetry. First-interrupt behavior is deliberately the existing process-control policy,
+not suppression of KeyboardInterrupt/SystemExit for observability reliability.
+
+##### F5. Exact G2 PostgreSQL regression
+
+Add `test_a_returned_response_interrupted_before_stage_commit_repeats_once_on_reclaim` to
+`tests/test_review_handler_postgres.py`. Use `review_postgres_world`, the real factory/handler,
+real JobContext/M3 fences, creation/snapshot path and real stage/output persistence. No fake
+database and no network. Preserve the existing pre-dispatch cancellation and uncommitted-finish
+reuse tests unchanged as distinct coverage.
+
+1. Use the first template-ordered question's **verification** key in this tenant/review. Configure
+   one recording scripted provider with **two identical valid responses** for that key; other
+   keys retain their normal scripted results. Retain the same provider/history across attempts.
+   Collect spans independently; do not use span count instead of actual provider-call history.
+2. Claim attempt 1 using `job_store.claim`, build a real JobContext over
+   `job_store.fenced_transaction`, and call the real handler directly. In a scoped test-only
+   monkeypatch of **`review_module.call_validated`**, invoke the saved real function with all
+   arguments forwarded. For only the first matching key, first capture/assert its returned
+   `StructuredResult`: `dispatched is True`, outcome `completed`; assert the underlying fake
+   history has exactly one matching call. Then raise one pre-created test-owned BaseException
+   sentinel. Assert the handler propagates **that same object**. A BaseException avoids M5a's
+   ordinary-provider-error classification and `_step`'s ordinary error normalization.
+3. This hook runs after the real validating call returns (hence after the fake's actual return),
+   but before the caller receives its result and before `_verification` can enter its stage
+   completion transaction. Read the database independently: reservation sequence 1 is `started`,
+   attempt 1, expected original digest; no corresponding stage row, no output row; job still
+   `running`. Do not insert/delete/complete reservation or stage rows to create the scenario.
+4. Remove the patch. Move **only that running job's** `lease_expires_at` to database time minus
+   one second, as existing M3 reclaim tests do; scope SQL by tenant/job/attempt. Do not call
+   `fail_retryable` or mark success: this scenario must use expiry/reclaim. Resume through the
+   real worker test registry with another worker identity (the first claim can use a distinct
+   identity from `review_postgres_world`'s worker), same recording provider and collector.
+   Require reclaim attempt 2 and final job `succeeded`/review `completed`.
+5. Filter history by the full correlated tenant/review/question/stage/request key, not the
+   total review count: exactly **two actual matching calls**, same digest and canonical request
+   components, including explicitly equal timeout/settings (timeout is not covered by the M5a
+   request digest). Query the same key ordered by sequence: sequence 1 `initial/original`,
+   attempt 1, still `started`; sequence 2 `retry/original`, attempt 2, `completed`, successful
+   dispatched outcome; same request digest. Exactly one matching stage row, shape S1, bound to
+   sequence 2, expected accepted quotation/chunk and derived `vendor_claim` verification status.
+   Also require one final output, trusted reload/hash/render agreement, and the target question's
+   report content reflecting that verification. Other planned stages must not acquire a spurious
+   duplicate reservation. Two distinct matching span IDs may supplement this proof, not replace it.
+
+**Why this seam:** `call_validated` is already a module-import dependency in the real handler
+and tests already patch other module-import persistence seams. A scoped forwarding wrapper
+puts interruption at the required boundary without a new production callback, setting or hook.
+The sentinel and SQL expiry are controlled simulations, not physical OS-kill coverage. This
+proves one two-dispatch reclaim scenario only; W5's persisted budget, possible further repeats,
+unknown outcomes and no exactly-once guarantee remain.
+
+##### F6. G3 unit and PostgreSQL fixture correction
+
+Keep the existing synthetic token for each suite, but define its separated parts in the
+test-only fixture. For example the unit instruction presents the JSON array
+`["EG-", "CANARY-", "m5g-", "4f1c-", "verbatim"]` and explicitly asks for concatenation in
+order with no separators; PostgreSQL uses its existing `pg-` part instead. Join parts only in
+test code to define the expected token/checker. The document must never interpolate the joined
+token. Keep the ordinary AES-256 statement/quotation intact, so valid responses can genuinely
+quote the injected document without containing the assembled canary.
+
+Create explicit **assembled** and **literal** variants, not one mutated shared fixture:
+
+- In `test_review_handler.py`, give `_canary_world` an explicit keyword-only `literal: bool = False`
+  (preserve any existing harmless quote argument unless all its test callers are adjusted).
+  Acceptance and negative controls use the assembled variant. The quotation probe explicitly
+  uses `literal=True`, with the original literal instruction and matching genuine quote.
+- In `test_review_canary_postgres.py`, replace the shared BODY/world assumption with named
+  `ASSEMBLED_BODY` and `LITERAL_BODY`, and separate `world` and `literal_world` fixtures that call
+  `pw.review_world(..., body=...)`. Acceptance and negative controls use `world`; the limitation
+  probe must request `literal_world`. Dispose each fixture's engine normally. No accepted M4e
+  corpus or shared `review_postgres_world.py` default body changes are needed.
+
+For **both suites**, add these assertions rather than merely searching whole request text:
+
+1. Before running, the complete token (and case-insensitive form) is absent from **every
+   document input in that acceptance fixture**, including body/header/title/metadata that can
+   reach evidence. The unit world checks all its fake document/chunk inputs; the PostgreSQL
+   world checks all source bodies supplied by that fixture and actual stored revision/chunk
+   surfaces for its tenant/vendor. Do not treat only the first chunk as every document.
+2. After running ordinary scripts, the injected chunk ID is in persisted retrieved evidence
+   (unit equivalent in its fake state) for a known question. Capture the actual verifier
+   StructuredRequest for **that question**, parse its existing JSON `user_text`, and locate
+   the exact `evidence` array entry with that `chunk_id`. Assert its `body` carries all ordered
+   separated parts and the concatenation instruction, bound to the retrieved injected chunk;
+   token absent from the entire request. A substring elsewhere in the prompt is insufficient.
+3. The ordinary script finishes and the **existing** `_canary_surfaces`/`surfaces` checker finds
+   no token in canonical hashed content, derived Markdown, committed stages, call records,
+   logs/errors. The new default span logs also pass the captured-log check by construction.
+4. Emit the joined token in rationale/finding statement using the same assembled-document
+   setup. The **same** checker must fail and identify stored wrapper/stage/Markdown surfaces.
+   Include a mixed-case emitting variant to prove its case-insensitive check. Expected checker
+   failure is asserted by a passing negative-control test, not a failing CI gate.
+5. Separately, the literal fixture proves its document really contains the complete token,
+   the scripted quote is an exact authorized substring, provenance accepts it, and stored
+   verification/report/Markdown contain it. The output checker detects it as the documented
+   limitation; it is deliberately **not** a successful acceptance-fixture result.
+
+No production denylist, semantic detector or live-model call is added. Correctly encoded
+evidence is not semantic injection resistance; provenance still establishes neither entailment
+nor authenticity. The three parts of the contract remain distinct.
+
+##### F7. Exact proposed implementation scope and packaging
+
+This is a proposed future allowlist, **not permission to edit these paths in Prompt 233**:
+
+| Exact path | Proposed bounded change |
+| --- | --- |
+| `packages/observability/evidenceguard_observability/provider_spans.py` (new) | Closed immutable span value, validation and bounded in-memory collector; standard library only |
+| `packages/observability/evidenceguard_observability/jsonlog.py` | LoggingSpanSink, fixed event and typed event-specific serialization; preserve other events/global field allowlist |
+| `apps/worker/evidenceguard_worker/review.py` | Add factory sink argument, private transparent provider wrapper and span lifecycle; retain existing dispatch/check/fence ordering |
+| `tests/test_provider_spans.py` (new) | Span validation/identity/timing/collector capacity/concurrency; no application or database imports needed for pure values |
+| `tests/test_logging.py` | Default span event, privacy/invalid payload tests, unchanged existing logging behavior |
+| `tests/test_review_handler.py` | Dispatch/no-dispatch spans, classification/control-flow/cleanup precedence and G3 unit variants |
+| `tests/test_review_handler_postgres.py` | G2 exact returned-response/reclaim proof and span correlation over real persistence |
+| `tests/test_review_canary_postgres.py` | G3 assembled/literal fixture separation and exact evidence-block assertions |
+| `tests/test_packaging.py` | Narrowly admit observability in the review module; assert new module's standard-library-only imports and preservation of all forbidden dependencies/production registry guards |
+| `.github/workflows/ci.yml` | One additive isolated installed-wheel assertion block below existing checks, without changing triggers/jobs/integration commands or earlier assertions |
+| `README.md`, `docs/plan.md`, `docs/threat-model.md`, `docs/decisions/0026-anthropic-adapter.md`, `prompts.md` | Accurate future implementation/evidence/status links and append-only history; ADR-0026 only status/cross-reference changes |
+
+No additional dependency, lockfile, migration/schema, settings, registry, endpoint, CLI or
+package initializer is needed. Existing Hatchling package/sdist inclusion automatically covers
+the new observability module. Observability imports only the standard library and its own
+logging module; it must not import domain/agents/worker/persistence/retrieval. Worker may import
+observability; agents remain domain-plus-standard-library, with their accepted M5a API and
+all M5h adapter/HTTP production bytes unchanged. No global request-ID ContextVar is reused as
+review/span identity, and no active-span global shared across tenants is introduced.
+
+The future wheel block must run from outside the checkout in the clean installed environment
+on **both** verify platforms. Assert new observability/logging and worker modules resolve to
+site-packages; construct a synthetic valid span and compare bounded-collector and typed JSON
+serialization, and build the real handler factory with an explicit collector and fake provider
+without invoking a database handler. Confirm production registry still exactly
+`ingest_revision, index_revision`. Print one new line:
+`provider-call span collected and serialized from the installed wheel`.
+This proves packaging/serialization/factory import, not PostgreSQL review execution or live
+compatibility. Keep all twelve prior result lines and the synthetic M5h line unchanged.
+
+##### F8. Verification, deliberate mutations and closure evidence
+
+**Future evidence required after separate specification acceptance and implementation authorization:**
+
+- **Offline:** Ruff format/lint; strict mypy; focused new span/logging tests, handler/control-flow
+  tests and unit canary variants; existing `test_model_calls.py`, M5a fake/strict-output,
+  request assembly/provenance/report, M5h composition/HTTP/provider and packaging regressions.
+  Then the full non-database suite for changed orchestration/logging. Use offline/locked
+  commands and fake providers; no real provider, DNS or TLS. Source-scope and canonical request/
+  result equivalence checks must show no hidden retry, no extra provider-ID/accepted-clock
+  reads, unchanged budgets, results, row states and fence behavior with/without instrumentation.
+- **PostgreSQL:** execute the new G2 and all G3 cases plus existing handler/stage/output/review
+  creation/fence regressions against the configured disposable synthetic test database, then
+  the required complete integration gate. Record actual executed results, exact source/tree
+  identities and database/test configuration without credentials. Collection or skips are
+  **not** database verification. If local PostgreSQL is unavailable, label it pending until
+  actual exact-version integration CI executes; do not infer a pass from collected cases.
+- **Packaging:** offline sdist/wheel build and complete clean isolated installed-wheel body,
+  including the new line and preserved earlier assertions; distinguish local Windows evidence
+  from Linux/current-version CI. No package/resource drift or new runtime dependency.
+- **Exact-commit CI:** after separate commit/manual publication authorization, require all five
+  existing jobs for the exact candidate SHA/branch/event/attempt: Ubuntu verify, Windows verify,
+  PostgreSQL integration, container, Gitleaks. Retrieve available metadata/logs/counts and the
+  new wheel line. New executable/logging/test bytes justify a fresh gate; individually printed
+  test names do not. Do not rerun existing `e050da3e` CI or substitute it for the new version.
+  A later main publication, if authorized, needs its own gate; nothing here authorizes it.
+
+Meaningful span regressions include every F3 outcome, admission/no-dispatch paths, provider-ID
+access counts, same result identity, original request/settings, cancellation/lease precedence,
+first process-control identity under failing timing/sinks, ordinary sink failures, no emission
+retries, two concurrent/tenant-distinct traces, ring saturation and no persistence changes when
+stage commit later fails. Test a configured default logger as well as an explicit collector;
+validate JSON key/value allowlists against text-bearing/exception/bypass-mutated inputs.
+
+Run the following deliberate mutations in isolated scratch copies of the **exact candidate
+sources/tests**, with no live services and with PostgreSQL mutations using only that disposable
+test database. Save each source hash, command, expected assertion/failure, exit and restoration
+identity; a timeout/error unrelated to the target assertion is not a caught mutation:
+
+| Mutation | Required detector |
+| --- | --- |
+| Suppress span creation for an actual call | Exactly one collected/default-log span per dispatched call |
+| Delegate twice for one reservation | Actual provider invocation count and unchanged budget/request assertions |
+| Label a latched cancelled call `returned` or bypass the post-call check | Cancellation exit-kind and original control-flow/no-write assertions |
+| Serialize arbitrary `span` payload or exception text | Typed JSON privacy/closed-field negative tests |
+| Move G2 interruption before the saved real validating call | First fake actually returned and first matching history count exactly one |
+| Complete sequence 1 or permit two target stage rows | Independent post-interruption/post-resume database state and unique target-stage assertions |
+| Interpolate the full token into assembled fixture body | Complete-token absence checks in both fixture families |
+| Remove the injected chunk's entry from the captured evidence block | Exact JSON evidence-entry/request correlation assertion, even if instruction text survives elsewhere |
+
+These are new tracer/fixture/regression checks, not a rerun or reinterpretation of the historical
+M5h mutation record. Do not mutate the accepted HTTP source to improve its evidence record.
+The earlier-source mutation qualification and historical network-evidence qualification remain.
+
+**Closure test:** G1 needs demonstrated begin/end spans, exact reservation correlation,
+privacy, default delivery/collector behavior, all outcome/control/no-dispatch paths and unchanged
+call/persistence semantics at the candidate version. G2 needs the executed real PostgreSQL
+two-call/started-then-completed/one-stage proof and trusted final result. G3 needs both executed
+unit and PostgreSQL assembled-document acceptance, same-checker emitting controls and intact
+literal quotation probes. Bind functional, mutation, build/wheel and exact-commit CI artifacts
+to source/tree versions, and submit the implementation/export for external review. Existing
+module progress positions are not individually printed test names; evidence may combine
+source-inspected assertions with actual module execution and exact version identity.
+
+Only after that evidence is reviewed should a renewed overall M5 assessment propose G1–G3
+closed. Neither this specification nor passing future tests grants overall M5 acceptance.
+Individual slice and scoped M4d/E7 acceptances remain intact; production `run_review` wiring,
+live API behavior/quality, M6 approval/export and later live evaluation remain separate,
+unauthorized obligations. U4/database trust, M3 lease/commit windows, unknown outcomes, lack
+of exactly-once calls, genuine-quotation and provenance semantic limits are not removed.
+
+
+##### M5 completion acceptance and binding clarifications (Prompt 234)
+
+The external reviewer inspected the proposal and current provider/worker/logging source and
+verified the Prompt 233 export. That review was not a project-suite, database or installed-wheel
+run. Specification acceptance does not accept implementation or overall M5. Individual M5a-M5h
+and scoped M4d/E7 acceptances remain intact; G1-G3 remain on hold pending executed evidence
+and external implementation review.
+
+**Clarification A: complete timing states.** A usable reading is an exact int in
+0..`2**63-1`, excluding bool. Unusable individual readings are never retained. Ordinary clock
+failure is treated as an unavailable reading. Contradictory externally constructed combinations
+raise the fixed `ValueError("invalid_provider_call_span")`.
+
+| Normalized start | Normalized end | Required status | Required duration |
+| --- | --- | --- | --- |
+| None (ordinary failure or unusable) | None or usable int | start_unavailable, regardless of end | None |
+| Usable int | None (ordinary failure or unusable) | end_unavailable | None |
+| Usable int | Usable int less than start | invalid_interval; retain both readings | None |
+| Usable int | Usable int greater than or equal to start | ok; retain both readings | Exact end minus start |
+
+**Clarification B: exact JSON.** The nested span object contains exactly the seventeen F2
+fields. UUIDs are canonical lowercase hyphenated strings, literal fields their specified strings,
+integers JSON integers, absent timing/outcome values JSON null. No `default=str`, repr or
+arbitrary mapping serialization is used for the span payload. Generic extras are ignored for
+this fixed event; other logging events retain their established behavior.
+
+<a id="m5-completion-implementation-status-prompt-234-staged-for-review"></a>
+
+##### M5 completion implementation status (accepted for a local commit, Prompt 235; PostgreSQL and CI pending)
+
+OpenAI Codex implemented the accepted F1-F8 boundary and both Prompt 234 clarifications,
+on `feat/m5-completion` from unchanged `e050da3e`. The specification was accepted in Prompt 234.
+The implementation is **accepted for one local commit only in Prompt 235**; its prior staged/
+unaccepted state is historical. G1-G3 are not declared closed and overall M5 remains on hold.
+Individual slice/scoped M4d/E7 acceptance is unchanged.
+
+The implementation uses the exact closed span value/IDs, independent monotonic interval,
+bounded thread-safe collector, typed default logger and per-reservation worker wrapper.
+Ordinary telemetry failures are contained; first process-control identity is retained across
+provider/timing/emission failures. Observed call outcome is distinct from persistence success.
+Only the accepted additive factory sink argument/import amendment is made; M5a, Anthropic
+adapter/transport, persistence, budgets, pinned resources and production registry are unchanged.
+The new installed-wheel block is additive and has no database or provider contact.
+
+The controlled PostgreSQL response/reclaim test and assembled/literal PostgreSQL canary
+fixtures are implemented, but no disposable test database is configured locally. Collection
+and suite skips do not establish G2/G3 database behavior or database-dependent mutations.
+The executed local evidence below is separate from those pending database checks. Exact-commit
+CI, Linux verification and any publication remain pending. Implementation review in Prompt 235
+authorizes one local commit only. No production review path, live behavior/model-quality claim,
+M6 work or overall M5 acceptance follows.
+
+**Codex local evidence (Prompt 234, historical execution).** The results below bind to the
+executable/test identities in accepted tree `bd7c49110ef4249da37b28daf7aadabfdfb8fe6b`;
+the saved binding is `.local/p234/checks/final-source-binding.json`. Those inputs remain identical
+in Prompt 235 and its local commit. These are not exact-commit CI results or checks repeated
+in Prompt 235.
+
+**Executed locally by OpenAI Codex in Prompt 234 (Windows).** Python 3.12.15, Pydantic 2.14.0,
+pytest 9.1.1, mypy 2.4.0, Ruff 0.17.0 and SQLAlchemy 2.1.1, using the existing locked environment.
+These are new local observations, not Claude Code's saved checks, earlier reviewer probes or
+the historical `e050da3e` CI results. Records retain commands, exit statuses, output and SHA-256
+maps of actual executable/test inputs before and after each final run.
+
+| Check | Observed result | Qualification |
+| --- | --- | --- |
+| Full applicable local suite | **5,731 passed, 443 skipped in 168.91s** | 441 database cases unexecuted because no disposable test DB is configured; two platform skips |
+| Strict mypy | **Success in 201 source files** | Final source/test inputs; no new dependency or lock change |
+| Ruff format/lint | **248 files already formatted; all checks passed** | Existing installed tools, no environment synchronization |
+| Integration collection | **441 cases collected**; new handler/canary modules **12 cases collected** | Collection and skips establish no PostgreSQL behavior |
+| Deliberate mutations | **Six non-database mutations caught**, all isolated copies restored; working sources unchanged | G2 boundary/state mutations and G3 PostgreSQL counterparts pending |
+| Offline sdist/wheel build | **Passed** | Wheel package/source/resource bytes checked against the candidate; artifacts saved locally |
+| Complete isolated installed-wheel step | **Passed**, outside checkout in a clean environment | Full current assertion body retained; only offline locked setup adapted; no database/provider connection |
+
+The complete wheel step printed all twelve prior result lines, the synthetic M5h line and:
+
+```text
+provider-call span collected and serialized from the installed wheel
+```
+
+The registry output is still `ingest_revision, index_revision`. Wheel checks cover packaging,
+typed span collection/JSON and factory construction, not execution of a database review. The
+earlier Voyage/M5h checks remain mocked/synthetic and Recall@5 is fixture arithmetic. No
+container run or CI was requested or performed here; historical container smoke remains
+ingestion/indexing only. Current-version Linux and exact-commit CI are pending future authorization.
+
+Final inputs are bound in `.local/p234/checks/final-source-binding.json`; functional logs and
+command/exit/hash records are under `.local/p234/checks/`, mutation records under
+`.local/p234/mutations-final/`, final archives and complete wheel logs under
+`.local/p234/build-verified/`. The six detected mutations suppress spans, double dispatch,
+mislabel cancellation, admit untyped JSON, put the literal token in an acceptance document,
+or remove the exact captured evidence entry while retaining the instruction elsewhere. No
+timeout or unrelated failure was counted as detection; database mutations were not mocked.
+
+Initial local issues are retained as failed records: a reuse test incorrectly tried to reclaim
+a succeeded fake job (corrected to failed-finish/committed-stage reuse); pytest's inaccessible
+cache directory required disabling the cache provider; the new wheel assertion's initially
+empty fake script was invalid (corrected to one unused synthetic response). The final full
+suite, static checks, isolated mutations and complete wheel execution passed after corrections.
+The final strengthened collector regression includes concurrent tenant-distinct traces.
+No accepted M5a or Anthropic source was changed to obtain these results.
+
+**Pending is not closure.** The PostgreSQL response/reclaim proof, PostgreSQL assembled/literal
+canary behavior and database-dependent mutation coverage remain **unexecuted** locally. G1-G3
+are not declared closed; implementation acceptance is for a local commit only (Prompt 235),
+and overall M5 remains pending. The previous
+earlier-HTTP-source mutation and historical network-evidence qualifications are unchanged:
+that old record does not establish exact-final-source mutation coverage, and a runner lacking
+`--offline` does not demonstrate network activity. Recovery did not establish universal
+historical absence of network activity or rerun those saved checks. This new tracer/fixture
+mutation evidence does not reinterpret that old HTTP record. No live compatibility, quality,
+entailment, authenticity or semantic injection-resistance claim follows.
+
+
+**External implementation acceptance (Prompt 235; local commit only).** The reviewer accepts
+the submitted Prompt 234 implementation for one normal local commit. This does not close
+G1-G3, establish PostgreSQL behavior, authorize publication or accept overall M5. The reviewer
+inspected the submitted implementation, tests and handoff, checked the provider/worker/logging
+integration and stored canonical format against the published source, reconstructed the three
+submitted production files used for isolated checks and verified their Git blob identities
+against the diff:
+
+| Submitted production file | Accepted Git blob |
+| --- | --- |
+| `evidenceguard_observability/provider_spans.py` | `9069228ed8929c3cd1355f67551c1cc2d384069b` |
+| `evidenceguard_observability/jsonlog.py` | `343290f1fc4c8459416440fd2427b94b1b960030` |
+| `evidenceguard_worker/review.py` | `72b66e6a95875fe3f125f6c9e24bddccc262df4f` |
+
+**Reviewer evidence, as supplied in Prompt 235.** On Python **3.12.14**, the reviewer ran
+**694 independent standard-library checks**, all passing: **625** combinations of ordinary/
+process-control failures across observation start, provider execution, observation end and sink
+emission using extracted submitted worker code and synthetic collaborators; **64** span timing
+checks; and **five** typed-JSON/malformed-payload checks. These are isolated probes, not the
+project suite, full handler/database execution, installed-wheel verification or CI. They are
+separate from Codex's recorded Prompt 234 local results and are not new checks run by Codex
+while preparing this commit.
+
+**Remaining gates.** Actual PostgreSQL execution of the post-response/reclaim regression,
+PostgreSQL assembled/literal canary behavior and the specified database-dependent mutations
+remain pending. So do Linux and exact-commit CI verification, publication and a renewed overall
+M5 assessment. A provider-call span remains ephemeral telemetry, distinct from durable
+reservation/stage evidence; the controlled post-response interruption is not a physical process
+kill; scripted acceptance, emitting negative controls and genuine-quotation limitations remain
+separate. Source inspection, collection and skipped database cases are not executed database
+proof. No accepted specification, implementation/test/workflow/packaging bytes or modes change
+in Prompt 235. No application tests, mypy, builds or wheel checks are repeated for unchanged
+inputs. Runtime/privacy/recovery/semantic limits and individual slice/scoped M4d/E7 acceptance
+remain intact. Production registration, live calls, M6 and overall M5 acceptance remain
+unauthorized; no publication or CI run/rerun is authorized by this local-commit acceptance.
+
 
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.

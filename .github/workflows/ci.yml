@@ -423,6 +423,43 @@ jobs:
           assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
           print("Anthropic adapter classified a synthetic response through call_validated from the installed wheel")
           PY
+          # M5 completion (Prompt 234): closed ephemeral spans, without database/provider I/O.
+          "${bin}/python" -I - <<'PY'
+          import json
+          import logging
+          import uuid
+          from sqlalchemy.orm import sessionmaker
+          import evidenceguard_observability.provider_spans as spans
+          import evidenceguard_observability.jsonlog as logs
+          import evidenceguard_worker.review as review
+          from evidenceguard_agents.scripted import Respond, ScriptedFakeProvider
+          from evidenceguard_worker.handlers import production_registry
+          for module in (spans, logs, review):
+              assert "site-packages" in (module.__file__ or ""), module.__name__
+          identity = dict(tenant_id=uuid.UUID(int=1), review_id=uuid.UUID(int=2),
+                          job_id=uuid.UUID(int=3), question_id="SEC-01", stage="verification",
+                          sequence=1, job_attempt=1)
+          trace_id, span_id = spans.provider_call_ids(**identity)
+          span = spans.ProviderCallSpan(**identity, trace_id=trace_id, span_id=span_id,
+              request_sha256="a" * 64, started_ns=10, ended_ns=12, duration_ns=2,
+              timing_status="ok", call_outcome="completed", exit_kind="returned")
+          collector = spans.BoundedSpanCollector(capacity=1)
+          collector.emit(span)
+          assert collector.snapshot() == (span,) and collector.dropped_count == 0
+          record = logging.LogRecord("evidenceguard.provider_calls", logging.INFO, "", 0,
+                                     logs.PROVIDER_CALL_SPAN, (), None)
+          setattr(record, logs.FIELDS_ATTRIBUTE, {"span": collector.snapshot()[0]})
+          payload = json.loads(logs.JsonFormatter().format(record))
+          assert payload["span"]["trace_id"] == str(trace_id)
+          assert payload["span"]["span_id"] == str(span_id)
+          assert payload["span"]["duration_ns"] == 2 and len(payload["span"]) == 17
+          assert payload["span"]["call_outcome"] == "completed"
+          fake = ScriptedFakeProvider(scripts={("verifier", "SEC-01"): (Respond("{}"),)})
+          assert callable(review.make_run_review_handler(fake,
+                          session_factory=sessionmaker(), span_sink=collector))
+          assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
+          print("provider-call span collected and serialized from the installed wheel")
+          PY
 
   integration:
     # PostgreSQL integration tests. Service containers run only on Linux runners, so this job

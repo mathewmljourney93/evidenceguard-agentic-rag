@@ -1,13 +1,17 @@
 # ADR-0026: Anthropic adapter and HTTPS transport
 
-- **Status:** M5h is **feature-CI verified, not merged** at
-  `c785ee58dfe8398cf58cbbd54f8d5705743e1949` (Prompt 230). Claude Code implemented it in
-  Prompt 228; the external reviewer accepted the implementation and all nine choices in
-  Prompt 229. Mathew manually published the feature; Codex observed all five required jobs
-  succeed for that exact SHA, `push` event, attempt 1. The external reviewer independently
-  confirmed and accepted that evidence in Prompt 231. A new evidence commit must pass its own
-  feature gate before the authorized main preflight and local fast-forward; Mathew must make
-  both new pushes manually. No new-target or main CI result is claimed yet.
+- **Status:** M5h is **reviewed, verified in CI and on main** at
+  `e050da3e3415d73f83db86763617d5b5f0874aeb`, within its accepted scope (Prompt 231).
+  Claude Code implemented it in Prompt 228; the external reviewer accepted the implementation
+  and all nine choices in Prompt 229 and the Prompt 230 feature evidence in Prompt 231.
+  Mathew manually pushed the evidence commit to the feature, all five fresh feature jobs passed,
+  Codex fast-forwarded local main with `--ff-only`, and Mathew manually pushed main. All five
+  separate main jobs then passed for the same exact SHA, `push`, attempt 1. This publication
+  evidence was accepted externally in Prompt 232; it was not in that CI target. The separate
+  overall M5 assessment/hold recommendation was accepted in Prompt 233; overall M5 is still
+  unaccepted. Its bounded completion specification was accepted in Prompt 234; the
+  implementation was accepted for one local commit only in Prompt 235, with separately
+  attributed evidence and PostgreSQL/CI/publication/overall-M5 gates still pending.
 - **Specification:** the [accepted M5h specification](../plan.md#m5h-anthropic-adapter-specification-accepted-at-review-prompt-227-implementation-pending),
   accepted in Prompt 227 with H1–H10 and binding clarifications A–C
   ([acceptance](../plan.md#m5h-acceptance-prompt-227)). The specification binds this
@@ -227,7 +231,7 @@ model-quality, entailment, authenticity or injection-resistance claim follows.
 
 ## Feature publication and exact-commit CI (Prompt 230)
 
-**State: feature-CI verified, not merged.** Mathew manually pushed
+**State at Prompt 230 (historical): feature-CI verified, not merged.** Mathew manually pushed
 `feat/anthropic-adapter` at **`c785ee58dfe8398cf58cbbd54f8d5705743e1949`**. The history-only
 authorization commit has parent `6e0ad2b714c3cd70d398f674fe9e1934106357a0` and tree
 `76a4401ba0dd3cd33c9089c11cc5dca6636dba51`; all executable blobs and modes are unchanged
@@ -277,8 +281,8 @@ jobs successful at 16:51:44 UTC on 2026-11-10, within the 25-minute bound. Attem
 metadata and decoded logs for all five jobs are saved under `.local/p230/evidence/`. No CI
 rerun, fix, additional commit or push was made in response in Prompt 230. That evidence was
 staged for external review and was not itself part of the published SHA or CI-verified.
-It was accepted in Prompt 231 below; main publication remains pending behind new CI gates
-and manual pushes. Previous local results remain historical;
+It was accepted in Prompt 231 below; main publication was then pending behind new CI gates
+and manual pushes, completed in the later Prompt 231 record below. Previous local results remain historical;
 the earlier-source mutation and historical network-evidence qualifications above are unchanged.
 There is no production `run_review` registration, live provider configuration or live-provider
 evidence. U4, M3 lease/commit-window and unknown outcomes, M6 and overall M5 acceptance remain
@@ -314,13 +318,14 @@ result lines; and the new synthetic M5h installed-wheel line. The positions are 
 printed test names. The earlier isolated reviewer probes, Claude Code's local results and
 Codex's recovery qualifications remain separate from these CI observations.
 
-**Authorization and outstanding gates.** Prompt 231 authorizes one local evidence commit with
+**Authorization and gates (as recorded before publication).** Prompt 231 authorizes one local evidence commit with
 parent `c785ee58`, a manual feature push by Mathew, and a fresh exact-commit feature gate.
 Only after all five required feature jobs pass may Codex perform main preflight and a local
 `--ff-only` fast-forward. Mathew must then manually push main, whose separate exact-commit
 attempt-1 push workflows must pass all five jobs before main-publication evidence is staged.
 No automatic push, merge commit, force push, rewrite, branch deletion, CI rerun or production
 correction is authorized. Results at `c785ee58` are not results for the new evidence commit.
+The separately observed completion of these gates is recorded below.
 
 **Limits unchanged.** The M5h transport and installed-wheel inputs are synthetic; container
 smoke covers ingestion/indexing only. No live compatibility, model-quality, entailment,
@@ -330,6 +335,136 @@ implementation/test/packaging/workflow blobs and modes remain unchanged. Recover
 rerun saved functional checks; the earlier-source mutation and historical network-evidence
 qualifications remain binding. U4, M3 lease/commit-window and unknown-outcome limits, M6 and
 overall M5 acceptance are unchanged.
+
+## Main publication and separate exact-commit CI (Prompt 231)
+
+**Publication.** M5h is **reviewed, verified in CI and on main** at
+**`e050da3e3415d73f83db86763617d5b5f0874aeb`**, within the accepted M5h scope. The evidence
+commit has parent `c785ee58dfe8398cf58cbbd54f8d5705743e1949` and tree
+`a622f25c285d6aed2082865124fbe9b6c0daa387`. Mathew reported both manual pushes; Codex
+independently verified the remote refs after each. Codex executed neither push.
+
+1. Mathew manually pushed `feat/anthropic-adapter` from `c785ee58` to `e050da3e`.
+2. After all five fresh feature jobs passed, Codex fetched and rechecked the exact refs, clean
+   worktree, main ancestry, four-commit range and thirteen-path union. All seven accepted
+   implementation/test/packaging/workflow blobs and modes were unchanged, including the
+   protected PostgreSQL test blob `837136d61e1ec815a1fa2324ff596e83dc55d591`. Range privacy
+   and unsuppressed range Gitleaks passed.
+3. Codex ran `git switch main` and
+   `git merge --ff-only e050da3e3415d73f83db86763617d5b5f0874aeb`, advancing local main from
+   `bebd2f7593af6459b25182adab2c3ddee17b9e31`. Git and the main reflog record a fast-forward;
+   no merge commit was created. Remote main was rechecked unchanged immediately before handover.
+4. Mathew manually pushed main from `bebd2f75` to `e050da3e`. Codex verified remote main,
+   local main and origin/main equal the target, with the feature ref still equal to it, then
+   monitored the separate main workflows. All five main jobs passed before this evidence update.
+
+**Observed by OpenAI Codex through GitHub read access.** All four workflow runs below identify
+the same exact target SHA, event **`push`**, attempt **1**, completed/success. Feature and main
+are separate observations; no counts from `c785ee58` were reused as new-target results.
+
+- **Feature `feat/anthropic-adapter`:** [CI run 42864151197](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42864151197),
+  [secret-scan run 42864151124](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42864151124).
+  Monitor: 2026-11-10 17:22:02–17:28:40 UTC, within its 25-minute bound.
+- **Main:** [CI run 42866526228](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42866526228),
+  [secret-scan run 42866526185](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42866526185).
+  Separate monitor: 2026-11-10 17:35:53–17:43:25 UTC, within its fresh 25-minute bound.
+
+| Gate | Feature job and observed log result | Main job and observed log result |
+| --- | --- | --- |
+| Ubuntu verify | [129997856877](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42864151197/job/129997856877): **5,562 passed, 439 skipped in 120.19s** | [130006223437](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42866526228/job/130006223437): **5,562 passed, 439 skipped in 136.11s** |
+| Windows verify | [129997856913](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42864151197/job/129997856913): **5,561 passed, 440 skipped in 220.02s** | [130006223302](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42866526228/job/130006223302): **5,561 passed, 440 skipped in 208.10s** |
+| PostgreSQL integration | [129997856721](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42864151197/job/129997856721): **439 passed, 5,562 deselected in 375.99s** | [130006222657](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42866526228/job/130006222657): **439 passed, 5,562 deselected in 390.12s** |
+| Container | [129997857008](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42864151197/job/129997857008): `smoke: ok`, `cleanup: ok` | [130006223271](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42866526228/job/130006223271): `smoke: ok`, `cleanup: ok` |
+| Gitleaks full history | [129997857233](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42864151124/job/129997857233): **102 commits scanned, no leaks** | [130006219933](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42866526185/job/130006219933): **102 commits scanned, no leaks** |
+
+All ten jobs succeeded. Each of the four verify jobs succeeded through formatting, lint,
+strict mypy (199 source files), tests, distribution build and clean installed-wheel execution.
+Each log prints 185 passing HTTP positions, 372 provider positions and one composition
+position (558 total), the production-registry line, all twelve prior installed-wheel result
+lines and the new line:
+
+```text
+Anthropic adapter classified a synthetic response through call_validated from the installed wheel
+```
+
+The positions are printed progress, not individually printed test names. Registry output remains
+`ingest_revision, index_revision`. The M5h wheel check uses a synthetic response and injected
+transport; the existing Recall@5 result is fixture arithmetic and the Voyage check is mocked.
+Both container jobs succeeded through config/context/image checks, ingestion/indexing smoke
+and cleanup. They do not exercise application reviews, live models or M6.
+
+**Evidence and limits.** Codex saved initial/final metadata, verified refs, all ten decoded job
+logs and parsed verify summaries separately in `.local/p231/feature-evidence/` and
+`.local/p231/main-evidence/`. No log-access limitation was encountered; existing read access
+was used without authentication changes. No CI rerun, correction or extra commit was made.
+The accepted specification and all executable/test/packaging/workflow identities remain
+unchanged. At the end of Prompt 231 this five-file publication-evidence update was staged and
+uncommitted for external review; it is not part of the CI-verified target. Its external
+acceptance is recorded separately in Prompt 232 below. Historical local checks, the isolated reviewer
+probes, reviewer confirmation of `c785ee58`, and recovery observations retain their separate
+attribution. The earlier HTTP-source mutation and historical network-evidence qualifications
+remain unchanged. Publication does not accept overall M5 or authorize production review
+registration, live provider configuration or calls, or M6. U4, M3 lease/commit-window and
+unknown-outcome limits remain.
+
+## Publication-evidence acceptance (Prompt 232)
+
+**External decision.** The external reviewer accepts both Prompt 231 exports and the M5h
+main-publication evidence. M5h remains reviewed, verified in CI and on main at
+`e050da3e3415d73f83db86763617d5b5f0874aeb`, within its accepted scope. This acceptance
+confirms the publication record; **it does not accept overall M5**. The separate
+[M5 acceptance assessment](../plan.md#m5-acceptance-assessment-proposed-prompt-232-awaiting-external-review)
+was authored by Codex in Prompt 232; the reviewer accepted that assessment and its hold
+recommendation in Prompt 233 after independently checking the diff, original requirements and
+source. This does not accept overall M5 or revoke individual slice/scoped M4d/E7 acceptance.
+The [G1-G3 completion follow-up](../plan.md#m5-bounded-completion-follow-up-proposed-prompt-233-implementation-unauthorized)
+is a separate specification accepted with binding clarifications in Prompt 234.
+Its [implementation status](../plan.md#m5-completion-implementation-status-prompt-234-staged-for-review)
+is accepted for one local commit only in Prompt 235. The reviewer's isolated evidence is
+recorded there separately from Codex's local results; G1-G3 remain open. This does not change
+M5h publication acceptance or accept overall M5.
+
+**Independent reviewer evidence, supplied in Prompt 232.** The reviewer independently retrieved
+remote main and `feat/anthropic-adapter`, both at the exact target; all four workflow-run
+records; and metadata and decoded logs for all ten jobs. Every run identifies this SHA,
+event `push`, attempt 1 and the correct branch. Every step of every required job succeeded.
+These independently confirm **Codex's original Prompt 231 observations**, which remain
+attributed to Codex in the [separate publication record](#main-publication-and-separate-exact-commit-ci-prompt-231)
+above; the new confirmation does not replace them.
+
+| Reviewer-confirmed gate | Feature: CI 42864151197 / secret-scan 42864151124 | Separate main: CI 42866526228 / secret-scan 42866526185 |
+| --- | --- | --- |
+| Ubuntu | [129997856877](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42864151197/job/129997856877): 5,562 passed, 439 skipped in 120.19s | [130006223437](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42866526228/job/130006223437): 5,562 passed, 439 skipped in 136.11s |
+| Windows | [129997856913](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42864151197/job/129997856913): 5,561 passed, 440 skipped in 220.02s | [130006223302](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42866526228/job/130006223302): 5,561 passed, 440 skipped in 208.10s |
+| PostgreSQL | [129997856721](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42864151197/job/129997856721): 439 passed, 5,562 deselected in 375.99s | [130006222657](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42866526228/job/130006222657): 439 passed, 5,562 deselected in 390.12s |
+| Container | [129997857008](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42864151197/job/129997857008): smoke and cleanup succeeded | [130006223271](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42866526228/job/130006223271): smoke and cleanup succeeded |
+| Gitleaks | [129997857233](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42864151124/job/129997857233): 102 commits, no leaks | [130006219933](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/42866526185/job/130006219933): 102 commits, no leaks |
+
+The reviewer confirmed that each of the four verify logs shows strict mypy success in
+199 source files; 185 passing HTTP-test positions, 372 provider-test positions and one
+composition-test position; the unchanged production registry (`ingest_revision, index_revision`);
+and all twelve prior installed-wheel result lines plus the new synthetic M5h line. These
+positions are progress output, not individually printed test names. The reviewer also verified
+both uploaded exports' hashes, sizes, line counts, statistics and UTF-8 encoding:
+
+- Feature-evidence acceptance: four files, +76/-14, 11,948 bytes, 159 lines; SHA-256
+  `a5def34c933a0b598e84396e043f8bcc382d0fdbdd3fd30535ebfd0d4b57c9ce`.
+- Main-publication evidence: four files, +130/-54, 32,836 bytes, 292 lines; SHA-256
+  `165f6bfbe5338ea38d3688470698756a2394036033d54dc25bf99035edbca785`.
+
+**Qualifications retained.** Current Prompt 232 recovery independently matched the saved
+exports to fresh Git comparisons and verified protected source/mode identities; it did not
+repeat application checks or retrieve fresh remote evidence. The saved local results,
+73 isolated reviewer probes, recovery observations, earlier-source mutation qualification
+and historical network-evidence qualification remain separate and unchanged. Synthetic
+transport/wheel tests establish no real API behavior or model quality. Container smoke covers
+ingestion/indexing only. Provenance establishes neither entailment nor authenticity nor semantic
+injection resistance. Scoped M4d/E7 acceptance, U4 discarded evidence, database trust, M3's
+lease/commit window, unknown outcomes and lack of exactly-once provider calls remain.
+No production `run_review` registration or application review path exists. M6 approval/export,
+later live evaluation and overall M5 acceptance remain separate obligations. The new
+acceptance/assessment documentation is staged and uncommitted and has no new CI result.
+
 
 ## Remaining limitations
 
@@ -347,7 +482,7 @@ overall M5 acceptance are unchanged.
   - M6 approval and export;
   - the provenance-versus-semantic limits;
   - no model-quality, entailment or injection-resistance claim.
-- **Pending:** the new evidence commit's feature gate and gated main publication. The
-  implementation is accepted (Prompt 229), feature-CI verified at the exact Prompt 230 target,
-  and its feature evidence accepted in Prompt 231; it is not merged.
+- **Publication evidence accepted:** external review in Prompt 232. M5h is reviewed,
+  verified in separate feature/main CI and on main at the exact Prompt 231 target, within
+  its accepted scope. Overall M5 acceptance remains pending.
   Production wiring, credentials, live calls, M6 and overall M5 acceptance remain unauthorized.

@@ -713,6 +713,7 @@ def test_m5g_orchestration_keeps_the_accepted_boundaries() -> None:
     assert imported - set(sys.stdlib_module_names) == {
         "evidenceguard_agents",
         "evidenceguard_domain",
+        "evidenceguard_observability",
         "evidenceguard_persistence",
         "evidenceguard_retrieval",
         "evidenceguard_worker",
@@ -825,3 +826,9 @@ def test_m5h_is_not_constructed_registered_or_configured_in_production() -> None
             assert "anthropic_http" not in text, source.name
             assert "evidenceguard_agents.anthropic" not in text, source.name
     assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
+
+
+def test_completion_span_values_use_only_standard_library_and_are_packaged() -> None:
+    path = _source(evidenceguard_observability, "provider_spans.py")
+    assert path.is_file()
+    assert not (_module_imports(path) - set(sys.stdlib_module_names))

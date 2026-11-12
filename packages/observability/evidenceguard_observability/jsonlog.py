@@ -24,9 +24,12 @@ import json
 import logging
 import logging.config
 from collections.abc import Mapping
+from contextlib import suppress
 from datetime import UTC, datetime
 from types import MappingProxyType
 from typing import Any
+
+from evidenceguard_observability.provider_spans import ProviderCallSpan, _rebuilt_span
 
 LOGGER_NAMESPACE = "evidenceguard"
 FIELDS_ATTRIBUTE = "evidenceguard_fields"
@@ -49,6 +52,7 @@ ALLOWED_FIELDS = frozenset(
 )
 
 REQUEST_COMPLETED = "request.completed"
+PROVIDER_CALL_SPAN = "provider.call_span"
 # Fixed API events. Each carries no submitted value (ADR-0011).
 DOCUMENT_UPLOAD_INCONSISTENT = "document.upload_inconsistent"
 UNREVIEWED_EVENT = "log.unreviewed_message"
@@ -80,6 +84,7 @@ WORKER_EVENTS = (
 REVIEWED_EVENTS: Mapping[str, str] = MappingProxyType(
     {
         REQUEST_COMPLETED: REQUEST_COMPLETED,
+        PROVIDER_CALL_SPAN: PROVIDER_CALL_SPAN,
         DOCUMENT_UPLOAD_INCONSISTENT: DOCUMENT_UPLOAD_INCONSISTENT,
         # Uvicorn 0.54 (uvicorn/server.py, config.py, lifespan/on.py, protocols/http/*).
         "Started server process [%d]": "server.process_started",
@@ -118,6 +123,33 @@ class JsonFormatter(logging.Formatter):
             "event": event_identifier(record),
         }
         fields = getattr(record, FIELDS_ATTRIBUTE, None)
+        if payload["event"] == PROVIDER_CALL_SPAN:
+            # A closed typed payload, never generic extras, repr, or default=str.
+            if type(fields) is dict:
+                span: ProviderCallSpan | None = None
+                with suppress(Exception):
+                    span = _rebuilt_span(fields.get("span"))
+                if span is not None:
+                    payload["span"] = {
+                        "schema_version": span.schema_version,
+                        "trace_id": str(span.trace_id),
+                        "span_id": str(span.span_id),
+                        "tenant_id": str(span.tenant_id),
+                        "review_id": str(span.review_id),
+                        "job_id": str(span.job_id),
+                        "question_id": span.question_id,
+                        "stage": span.stage,
+                        "sequence": span.sequence,
+                        "job_attempt": span.job_attempt,
+                        "request_sha256": span.request_sha256,
+                        "started_ns": span.started_ns,
+                        "ended_ns": span.ended_ns,
+                        "duration_ns": span.duration_ns,
+                        "timing_status": span.timing_status,
+                        "call_outcome": span.call_outcome,
+                        "exit_kind": span.exit_kind,
+                    }
+            return json.dumps(payload, separators=(",", ":"))
         if isinstance(fields, Mapping):
             for key in sorted(ALLOWED_FIELDS & fields.keys()):
                 payload[key] = fields[key]
@@ -131,6 +163,17 @@ def log_event(logger: logging.Logger, event: str, level: int = logging.INFO, **f
     ``UNREVIEWED_EVENT``. Fields outside ``ALLOWED_FIELDS`` are dropped.
     """
     logger.log(level, event, extra={FIELDS_ATTRIBUTE: fields})
+
+
+class LoggingSpanSink:
+    """Best-effort structured logging; delivery/retention depend on existing configuration."""
+
+    def emit(self, span: ProviderCallSpan) -> None:
+        log_event(
+            logging.getLogger("evidenceguard.provider_calls"),
+            PROVIDER_CALL_SPAN,
+            span=_rebuilt_span(span),
+        )
 
 
 def logging_config(level: str = "INFO") -> dict[str, Any]:

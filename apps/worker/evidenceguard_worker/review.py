@@ -36,7 +36,8 @@ classified by class only after ``ctx.check()`` (M5g-E). Inside fenced blocks onl
 object that **is** the body's own fixed error is classified, after leaving the context and after
 ``ctx.check()`` (G17); every other ordinary failure leaving the context is replaced by the fixed
 ``ReviewFenceExitError`` (G22), which the runtime records as ``unexpected_error``. Errors raised
-here are fresh, outside every handler, with no cause or context; nothing logs.
+here are fresh, outside every handler, with no cause or context. Prompt 234 adds only closed
+provider-call metadata spans; no request, response or exception text is logged.
 """
 
 import hashlib
@@ -78,6 +79,7 @@ from evidenceguard_domain.model_calls import (
     InvalidModelValueError,
     ModelClockError,
     PromptRef,
+    ProviderResponse,
     StructuredRequest,
     StructuredResult,
 )
@@ -141,6 +143,16 @@ from evidenceguard_domain.reviews import (
     ReviewDatabaseError,
     ReviewNotFoundError,
     ReviewRecordInconsistentError,
+)
+from evidenceguard_observability.jsonlog import LoggingSpanSink
+from evidenceguard_observability.provider_spans import (
+    ExitKind,
+    ProviderCallSpan,
+    SpanOutcome,
+    SpanSink,
+    Stage,
+    TimingStatus,
+    provider_call_ids,
 )
 from evidenceguard_persistence.jobs import FenceClosedError
 from evidenceguard_persistence.review_outputs import (
@@ -450,6 +462,68 @@ class _Dependencies:
     session_factory: sessionmaker[Session]
     embedding_providers: Mapping[str, ProviderFactory]
     clock: Callable[[], float]
+    emit_span: Callable[[ProviderCallSpan], None]
+
+
+def _span_emitter(sink: SpanSink | None) -> Callable[[ProviderCallSpan], None]:
+    emitter: object = None
+    with suppress(Exception):
+        emitter = getattr(LoggingSpanSink() if sink is None else sink, "emit", None)
+    if not callable(emitter):
+        raise TypeError("span_sink must provide emit")
+    return cast(Callable[[ProviderCallSpan], None], emitter)
+
+
+def _span_reading() -> int | None:
+    try:
+        value = time.monotonic_ns()
+        if type(value) is int and 0 <= value <= 2**63 - 1:
+            return value
+    except Exception:
+        pass
+    return None
+
+
+class _ObservedProvider:
+    """A per-reservation leaf interval, never a classifier, retry or persistence boundary."""
+
+    def __init__(self, provider: ModelProvider) -> None:
+        self.provider = provider
+        self.entered = False
+        self.started: int | None = None
+        self.ended: int | None = None
+        self.outcome: SpanOutcome | None = None
+
+    @property
+    def provider_id(self) -> str:
+        return self.provider.provider_id
+
+    def generate(self, request: StructuredRequest) -> ProviderResponse:
+        self.started = _span_reading()
+        self.entered = True  # immediately before the underlying provider expression
+        try:
+            response = self.provider.generate(request)
+        except BaseException as primary:
+            try:
+                self.ended = _span_reading()
+            except BaseException:
+                if isinstance(primary, Exception):
+                    raise  # a new process-control exception wins over ordinary failure
+            raise  # preserve the first process-control object, even if timing failed
+        self.ended = _span_reading()
+        return response
+
+
+def _span_exit(error: BaseException) -> ExitKind:
+    if not isinstance(error, Exception):
+        return "process_control"
+    if isinstance(error, JobCancelledError):
+        return "cancelled"
+    if isinstance(error, LeaseLostError):
+        return "lease_lost"
+    if isinstance(error, FenceClosedError):
+        return "fence_closed"
+    return "local_error"
 
 
 def make_run_review_handler(
@@ -458,6 +532,7 @@ def make_run_review_handler(
     session_factory: sessionmaker[Session],
     embedding_providers: Mapping[str, Callable[[], EmbeddingProvider]] = SUPPORTED_PROVIDERS,
     clock: Callable[[], float] = time.monotonic,
+    span_sink: SpanSink | None = None,
 ) -> JobHandler:
     """Build the ``run_review`` handler (M5g-A). Every argument is checked now, before a handler
     exists; a failure is a fresh ``TypeError`` with a fixed message and no cause or context. The
@@ -471,7 +546,9 @@ def make_run_review_handler(
         raise TypeError("embedding_providers must map fingerprints to provider factories")
     if not callable(clock):
         raise TypeError("clock must be callable")
-    dependencies = _Dependencies(provider, session_factory, providers, clock)
+    dependencies = _Dependencies(
+        provider, session_factory, providers, clock, _span_emitter(span_sink)
+    )
 
     def run_review(ctx: JobContext) -> None:
         """Run one review attempt (see the module docstring)."""
@@ -1018,7 +1095,80 @@ class _Attempt:
         )
         ctx.check()  # R1: the last boundary before the provider
         provider, clock = self._deps.provider, self._deps.clock
-        return _step(ctx, lambda: call_validated(provider, request, clock=clock))
+        observed = _ObservedProvider(provider)
+
+        def call() -> StructuredResult:
+            result = call_validated(observed, request, clock=clock)
+            observed.outcome = result.outcome.value
+            return result
+
+        try:
+            result = _step(ctx, call)
+        except BaseException as primary:
+            try:
+                self._emit_span(observed, item, kind, plan, request, _span_exit(primary))
+            except BaseException:
+                if isinstance(primary, Exception):
+                    raise
+            raise
+        self._emit_span(observed, item, kind, plan, request, "returned")
+        return result
+
+    def _emit_span(
+        self,
+        observed: _ObservedProvider,
+        item: _Question,
+        kind: StageKind,
+        plan: PlanDispatch,
+        request: StructuredRequest,
+        exit_kind: ExitKind,
+    ) -> None:
+        if not observed.entered:
+            return
+        try:
+            stage: Stage = kind.value
+            trace_id, span_id = provider_call_ids(
+                tenant_id=self._actor.tenant_id,
+                review_id=self._review_id,
+                job_id=self._ctx.job.id,
+                question_id=item.question_id,
+                stage=stage,
+                sequence=plan.sequence,
+                job_attempt=self._ctx.job.attempt,
+            )
+            start, end = observed.started, observed.ended
+            status: TimingStatus
+            duration: int | None = None
+            if start is None:
+                status = "start_unavailable"
+            elif end is None:
+                status = "end_unavailable"
+            elif end < start:
+                status = "invalid_interval"
+            else:
+                status, duration = "ok", end - start
+            self._deps.emit_span(
+                ProviderCallSpan(
+                    trace_id=trace_id,
+                    span_id=span_id,
+                    tenant_id=self._actor.tenant_id,
+                    review_id=self._review_id,
+                    job_id=self._ctx.job.id,
+                    question_id=item.question_id,
+                    stage=stage,
+                    sequence=plan.sequence,
+                    job_attempt=self._ctx.job.attempt,
+                    request_sha256=request.request_sha256,
+                    started_ns=start,
+                    ended_ns=end,
+                    duration_ns=duration,
+                    timing_status=status,
+                    call_outcome=observed.outcome,
+                    exit_kind=exit_kind,
+                )
+            )
+        except Exception:
+            pass  # no object, text, fallback log or emission retry; process control escapes
 
     # fenced operations --------------------------------------------------------------------------
 
