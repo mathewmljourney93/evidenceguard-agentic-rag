@@ -605,8 +605,27 @@ was accepted with binding timing/JSON clarifications in Prompt 234; its
 [implementation was accepted for one local commit only in Prompt 235](plan.md#m5-completion-implementation-status-prompt-234-staged-for-review).
 The reviewer's 694 passing isolated standard-library checks are separate from Codex's Prompt 234
 local verification; they are not full handler/database, installed-wheel or CI evidence. G1-G3
-remain open: PostgreSQL post-response/reclaim and assembled/literal behavior, database mutations,
-Linux/exact-commit CI, publication and renewed assessment are pending. The ephemeral metadata-only
+remain open. After Mathew's manual push, the completion is
+**feature-CI verified, not merged** at `2a388dc324950d9feb46dbba3ffb75222f2a938e`
+([Codex's exact-commit observations](plan.md#m5-completion-feature-ci-evidence-prompt-236)).
+All five feature push/attempt-1 jobs passed; retrieved PostgreSQL logs show eight handler and
+four canary passing positions, with the exact-target source inventory identifying the new
+post-response/reclaim and assembled/literal cases. These are module positions, not individually
+printed names. Both wheel logs print the new collected/serialized span line. The controlled
+interruption is not a physical process kill. The reviewer independently confirmed and accepted
+the feature evidence in Prompt 237, preserving Codex's original attribution
+([decision and local blocker](plan.md#m5-completion-feature-evidence-acceptance-and-database-mutation-status-prompt-237)).
+Docker tooling was unavailable locally; no disposable database, control or mutation ran, and
+no task container/storage was created. Prompt 238 accepts that blocker documentation and
+permits execution of the same mutations in the existing disposable CI PostgreSQL service
+([separate amendment and runner preparation](plan.md#m5-completion-ci-mutation-preparation-prompt-238-staged-for-review)).
+The isolated-copy runner/additive step was accepted for one local commit and manual feature
+publication in Prompt 239 ([acceptance and pending proof gate](plan.md#m5-completion-ci-mutation-runner-acceptance-prompt-239)).
+The reviewer reports 95 isolated standard-library checks, separate from Codex checks and
+PostgreSQL/CI execution. Source/import/oracle/restoration checks and bounded subprocesses
+remain unchanged; database mutation execution is pending and none is claimed caught. No
+accepted production/test contract is changed. Database mutations, renewed assessment and main
+publication remain pending; G1-G3 are not closed. The ephemeral metadata-only
 spans prove neither provider receipt nor committed
 results; synchronous logging adds no hard wall-clock guarantee. Default span logs contain only
 the closed validated correlation/timing/outcome object, never evidence, responses or exception

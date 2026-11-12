@@ -58487,3 +58487,1499 @@ Recorded the supplied external reviewer's acceptance for one local commit only a
 Completed before this note: exact five-path documentation delta against accepted tree and fifteen-path commit scope against HEAD; all 268 non-documentation blob/mode identities unchanged; saved Prompt 234 source-binding hashes verified without rerunning functional checks; accepted specifications/anchors, original local result block, historical recovery/network qualifications and M6-and-later bytes preserved. All tracked Markdown checks passed (736 links, zero bad; 282 tables, zero problems), encoding/whitespace and git diff --cached --check passed; privacy patterns found zero hits in the incremental additions. The original 3,188,350-byte history prefix is identical (SHA-256 d5db4ed949351b62cf23a04393eb6392fedd31e713cef19edca936baf55337fd), the saved Prompt 234 handoff is byte-copied/compared, and this prompt is labelled normalized transcription rather than a byte-verified original message. Installed Ruff format --check . passed (248 files already formatted) and Ruff check . passed. Unsuppressed staged Gitleaks exited 0 and found no leaks (268,762 bytes at that checkpoint). No active prior test/build task or active non-sample commit hook was found; signing is not configured. Final fidelity/privacy/secret checks will cover this appended note before the normal commit. No commit or post-commit full-history scan is preclaimed in this pre-commit note.
 
 Only the five authorized documentation/history files differ from the accepted implementation tree; no application test, mypy, build, wheel, database or mutation check was repeated. The message is to be written from a file using the existing assistance/trailer convention, crediting Codex's implementation/local verification and the external review separately. One normal commit is authorized; no amend or history rewrite. PostgreSQL response/reclaim and assembled/literal canary execution, database-dependent mutations, Linux/exact-commit CI, publication and renewed overall M5 assessment remain pending. Span versus durable evidence, controlled interruption versus physical kill, and the three-part canary distinction remain. All runtime/privacy/recovery/semantic limits and individual slice/scoped M4d/E7 acceptances remain intact; production registration, live calls, M6 and overall M5 acceptance remain unauthorized.
+
+
+## Prompt 236: saved Prompt 235 handoff (byte-copied historical record)
+
+The following saved handoff is copied byte-for-byte from `.local/p235/handoff.md`. Its local-only/pending statements describe Prompt 235, before the separately authorized feature push and CI.
+
+# Prompt 235 handoff: M5 completion accepted and committed locally
+
+Written for: Mathew and the external reviewer.
+
+The reviewer accepts the Prompt 234 implementation for **one local commit only**. That commit has been created and verified. **G1–G3 are not declared closed; PostgreSQL behavior is unverified; publication and overall M5 acceptance remain pending.** Individual M5a–M5h and scoped M4d/E7 acceptances remain intact.
+
+## Commit and repository state
+
+- Branch: `feat/m5-completion`.
+- Commit / HEAD: `2a388dc324950d9feb46dbba3ffb75222f2a938e`.
+- Subject: `feat: complete review call spans and recovery coverage`.
+- Parent: `e050da3e3415d73f83db86763617d5b5f0874aeb`.
+- Parent tree: `a622f25c285d6aed2082865124fbe9b6c0daa387`.
+- Commit tree: `ea88ddc30f22b2f44a6075ef9ef3a38c8af52112`, exactly the verified pre-commit staged tree.
+- Accepted implementation tree: `bd7c49110ef4249da37b28daf7aadabfdfb8fe6b`.
+- Author and committer: `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>`.
+- Local main and stored origin/main remain `e050da3e3415d73f83db86763617d5b5f0874aeb`. Origin URL and configured identity are unchanged. No remote operation was performed; these are stored-ref observations, not fresh remote evidence.
+- Exactly one normal commit was created above the parent. No amend/rewrite, merge or additional commit. Index and working tree are clean, with no unexpected untracked work. No `.local` file is tracked.
+
+The message came from `.local/p235/commit-message.txt` and its committed body is byte-identical to that file. It separately credits Codex's Prompt 234 implementation/local verification, the external reviewer's inspection/acceptance/isolated checks and Codex's Prompt 235 recovery/documentation/security work, using the existing Assistance paragraph and `Co-Authored-By: OpenAI Codex <noreply@openai.com>` convention. No signing or authentication operation occurred.
+
+## Recovery and preservation
+
+Recovery matched every expected identity: the feature branch, HEAD/main/stored origin-main, accepted staged tree, fifteen-path stage set and absence of unstaged/unexpected untracked work. No material discrepancy or prior active matching test/build task was found; no unrelated process was terminated.
+
+`.local/p235/checkpoint/` contains refs/status, a complete nonempty **273-entry** tree listing, every staged identity, the exact history prefix and recent history. The existing `.local/p234/m5-completion-implementation.diff` matched fresh cached and tree comparisons from `44deb14889000cb5ad76c46b28c8ddf045d8ca7f` to `bd7c49110ef4249da37b28daf7aadabfdfb8fe6b`: full indexes excluding prompts.md; **14 files, +1,673/-45; 94,162 bytes; 2,189 lines; UTF-8 without BOM/LF**; SHA-256 `7414b09a0fe88f9bf6fa221af5220c3d4f9e26b03037024e0a264ad058c58e4c`. The saved export was preserved, not reconstructed.
+
+Only README.md, docs/plan.md, docs/threat-model.md, docs/decisions/0026-anthropic-adapter.md and prompts.md differ from the accepted implementation tree. All **268 non-documentation entries**, including every implementation, test, workflow, packaging, dependency, resource and other protected blob/mode, remain identical to that tree. The saved Prompt 234 source-binding hashes were checked against those unchanged sources; application checks were not rerun. Accepted specifications/anchors and historical evidence remain intact, with compatibility support for the renamed implementation-status heading. ADR-0026 changes are status/cross-references only.
+
+## Exactly fifteen paths in the commit against its parent
+
+- .github/workflows/ci.yml
+- README.md
+- apps/worker/evidenceguard_worker/review.py
+- docs/decisions/0026-anthropic-adapter.md
+- docs/plan.md
+- docs/threat-model.md
+- packages/observability/evidenceguard_observability/jsonlog.py
+- packages/observability/evidenceguard_observability/provider_spans.py
+- prompts.md
+- tests/test_logging.py
+- tests/test_packaging.py
+- tests/test_provider_spans.py
+- tests/test_review_canary_postgres.py
+- tests/test_review_handler.py
+- tests/test_review_handler_postgres.py
+
+The commit contains the accepted implementation and carried documentation/history against `e050da3e`: **15 files, +3,748/-91**. The Prompt 235 increment against the accepted tree is solely five documentation/history paths: **+357/-15**, including prompts.md (+283/-0).
+
+## Reviewer decision and evidence recorded
+
+The supplied Prompt 235 decision records that the reviewer inspected the implementation, tests and handoff; checked provider/worker/logging integration and stored canonical format against published source; reconstructed the three submitted production files used for isolated checks; and verified their Git blob identities against the diff:
+
+| Production file | Accepted and committed Git blob |
+| --- | --- |
+| provider_spans.py | `9069228ed8929c3cd1355f67551c1cc2d384069b` |
+| jsonlog.py | `343290f1fc4c8459416440fd2427b94b1b960030` |
+| worker/review.py | `72b66e6a95875fe3f125f6c9e24bddccc262df4f` |
+
+The reviewer reports **694 passing independent standard-library checks on Python 3.12.14**:
+
+- **625** combinations of ordinary/process-control failures across observation start, provider execution, observation end and sink emission, using extracted submitted worker code and synthetic collaborators.
+- **64** span timing checks.
+- **Five** typed-JSON/malformed-payload checks.
+
+These are **isolated reviewer probes**, not the project suite, full handler/database execution, installed-wheel verification or CI. Codex did not run those probes in Prompt 235. They remain separate from Codex's Prompt 234 local results and their source version.
+
+Codex's recorded Prompt 234 evidence is preserved and tied to the executable/test identities of `bd7c4911`: Windows/Python 3.12.15, full suite 5,731 passed/443 skipped (441 integration cases and two platform skips), strict mypy, Ruff, six non-database mutations, offline builds and complete isolated installed-wheel verification. Those were earlier local executions, not new checks in Prompt 235 and not exact-commit CI. No result was relabelled as PostgreSQL or CI proof.
+
+## Checks actually performed in Prompt 235
+
+- Recovery/export verification, origin/identity checks and complete checkpoint.
+- `.venv\Scripts\python.exe -I .local/p235/check-precommit.py`: scope, fifteen-path parent delta/five-path accepted-tree delta, all 268 protected identities, original accepted specifications/anchors, historical result/recovery blocks, source-binding continuity, no tracked `.local`, history fidelity, encoding/whitespace and privacy passed.
+- Exact original history prefix: **3,188,350 bytes**, SHA-256 `d5db4ed949351b62cf23a04393eb6392fedd31e713cef19edca936baf55337fd`. Saved Prompt 234 handoff was byte-copied and compared. Prompt 235 is explicitly labelled a normalized transcription of UI backslash/HTML-space escapes, not an independently byte-verified original message. The pre-commit note records completed checks only and preclaims neither commit nor post-commit scan.
+- All tracked Markdown: **736 links, zero bad; 282 tables, zero problems**. UTF-8/no-BOM/LF/final-newline/whitespace and `git diff --cached --check` passed. Privacy patterns found **zero hits across 357 incremental additions**.
+- Installed Ruff `format --check .`: **248 files already formatted**, exit 0; `ruff check .`: **All checks passed**, exit 0. Records under `.local/p235/checks/ruff-*`.
+- Unsuppressed staged Gitleaks: final exit 0, **272,575 bytes scanned, no leaks**, saved in `checks/gitleaks-staged-final.txt`.
+- Post-commit verification: exact parent/tree/path set, accepted protected blobs/modes, author/committer, message-file equality/trailer, clean status, unchanged main/stored origin-main and absence of tracked `.local` files. Records: `checks/postcommit.json`, `commit.txt`, `commit-tree-listing.txt` and post-commit refs/status files.
+- Unsuppressed **full-history Gitleaks after the commit**: exit 0, **103 commits scanned; approximately 9,845,760 bytes; no leaks**, saved in `checks/gitleaks-full-history.txt`.
+- Incremental export verified against fresh accepted-tree-to-commit and accepted-tree-to-commit-tree Git bytes, including statistics/full indexes/encoding/length/hash.
+
+PowerShell's rendering of native Gitleaks stderr did not change its successful native exit codes. No application tests, mypy, builds, wheel checks, database tests or mutations were repeated. No disposable database was configured, credential/authentication operation performed or provider contacted. No fetch, push, merge, CI run/rerun, production registration or M6 work occurred.
+
+## Incremental export
+
+- File: `.local/p235/m5-completion-commit-incremental.diff`.
+- Baseline accepted tree: `bd7c49110ef4249da37b28daf7aadabfdfb8fe6b`.
+- Destination commit: `2a388dc324950d9feb46dbba3ffb75222f2a938e`.
+- Destination tree: `ea88ddc30f22b2f44a6075ef9ef3a38c8af52112`.
+- Full indexes; prompts.md excluded; four exported paths: README.md (+8/-4), ADR-0026 (+5/-2), docs/plan.md (+55/-7), docs/threat-model.md (+6/-2).
+- **4 files, +74/-15; 27,790 bytes; 167 lines; UTF-8 without BOM, LF, final newline.**
+- SHA-256: `605bca81c6f3ab4c4d391d40e1c4838eb22a9a23f7109588c1fdc4b691ebe50d`.
+- Saved bytes match fresh Git output. `.local/p235/export-metadata.json` contains complete identities, per-file statistics and the commit's fifteen-path list.
+
+## Boundaries still in force
+
+Actual PostgreSQL execution of the new post-response/reclaim regression, PostgreSQL assembled/literal canary behavior and specified database-dependent mutations remain pending. Collection/skips and isolated probes do not verify database behavior. Linux/exact-commit CI, publication and renewed overall M5 assessment also remain pending; the new local commit has no CI result. Historical `e050da3e` feature/main results do not apply to this commit.
+
+A provider-call span is ephemeral telemetry, not durable reservation/stage evidence. Controlled post-response interruption is not a physical process kill. Scripted canary acceptance, emitting controls and genuine authorized-quotation limitations remain distinct. No provenance entailment/authenticity/semantic-injection-resistance or live compatibility/model-quality claim follows. Container smoke remains historically ingestion/indexing only. No production run_review registration or application review path exists.
+
+U4 discarded evidence, database trust, the M3 lease/commit window, unknown outcomes and lack of exactly-once provider calls remain. The old mutation record binds to an earlier HTTP source; it does not independently establish exact-final-source coverage. A runner lacking --offline does not demonstrate network activity; recovery did not independently establish universal historical absence of network activity or rerun saved checks. New tracer/fixture mutations do not reinterpret that older evidence. M6 approval/export and later live evaluation remain separate obligations. Overall M5 acceptance is not granted.
+
+Mathew: return **output plus the complete handoff and incremental diff file** `.local/p235/handoff.md` and `.local/p235/m5-completion-commit-incremental.diff` to the external reviewer. The commit is local only; no publication or further work is authorized.
+
+
+## Prompt 236 authorization (Normalized transcription)
+
+The following capture normalizes UI backslash and HTML-space escapes. It is not an independently byte-verified original user message.
+
+Prompt 236 — Prepare manual M5 completion feature publication and monitor exact-commit CI
+
+Written for: Mathew and the external reviewer.
+
+The reviewer accepts the Prompt 235 incremental documentation export and authorizes feature publication of the existing commit, subject to preflight.
+
+Publication target:
+2a388dc324950d9feb46dbba3ffb75222f2a938e
+
+Mathew must perform the push manually. Do not push automatically or create another commit.
+
+1. Recover and verify
+
+Read the governing repository instructions and .local/p235/handoff.md.
+
+Expected:
+- Branch: feat/m5-completion.
+- HEAD: 2a388dc324950d9feb46dbba3ffb75222f2a938e.
+- Parent: e050da3e3415d73f83db86763617d5b5f0874aeb.
+- Tree: ea88ddc30f22b2f44a6075ef9ef3a38c8af52112.
+- Local main and stored origin/main at the parent.
+- Clean index/worktree, no unexpected untracked work.
+- Existing origin URL and noreply identity unchanged.
+
+Verify .local/p235/m5-completion-commit-incremental.diff:
+- Baseline tree: bd7c49110ef4249da37b28daf7aadabfdfb8fe6b.
+- Destination: the target commit.
+- Full indexes; prompts.md excluded.
+- 4 files, +74/-15; 27,790 bytes; 167 lines.
+- SHA-256:
+  605bca81c6f3ab4c4d391d40e1c4838eb22a9a23f7109588c1fdc4b691ebe50d.
+
+Check all implementation/test/workflow/packaging blobs and modes against the accepted tree. Do not rerun unchanged application checks.
+
+Save a complete checkpoint and resume note under .local/p236/.
+
+2. Read-only remote preflight
+
+A read-only git fetch --no-tags origin and exact ls-remote checks are authorized.
+
+Require:
+- Remote main remains e050da3e3415d73f83db86763617d5b5f0874aeb.
+- Local main equals origin/main and is an ancestor of the target.
+- The unpublished range is exactly the single reviewed target commit.
+- Its path set is exactly the fifteen reviewed paths.
+- No tracked .local files, binaries, artifacts or unauthorized changes.
+- Both workflows still trigger on push.
+- All five required jobs remain present.
+- Integration still requires actual database tests through EG_REQUIRE_INTEGRATION=1 and its existing pytest command.
+- Workflow changes remain only the reviewed additive wheel block.
+- Range privacy and unsuppressed Gitleaks checks pass.
+
+If the feature branch is absent remotely, proceed to the manual handoff below.
+
+If the remote feature already equals the target, do not push again; verify refs and resume monitoring the matching existing push runs.
+
+If remote main or feature differs unexpectedly, report the exact discrepancy before any dependent action. Do not force, reset, rewrite or change authentication.
+
+3. Manual push handoff
+
+After preflight passes, give Mathew this PowerShell command:
+
+git -C 'D:\Claude\evidenceguard_agentic_rag' push --set-upstream origin refs/heads/feat/m5-completion:refs/heads/feat/m5-completion
+
+State the exact target SHA and wait for his result.
+
+Do not run the push, initiate Git Credential Manager, create another commit or change Git configuration.
+
+After Mathew reports success, verify remote feature, local HEAD and upstream all equal the target, and remote main remains at the baseline. Do not push again.
+
+4. Bounded exact-commit monitoring
+
+Monitor only push-triggered ci and secret-scan runs for:
+- SHA 2a388dc324950d9feb46dbba3ffb75222f2a938e.
+- Branch feat/m5-completion.
+- Attempt 1.
+
+Use a maximum 25-minute bound. Keep progress updates concise. Save run/job/step metadata and retrieve logs through existing access when available.
+
+Require all five:
+- Ubuntu verify.
+- Windows verify.
+- PostgreSQL integration.
+- Container.
+- Gitleaks.
+
+Check available logs for actual test counts, module execution, build/wheel results and:
+provider-call span collected and serialized from the installed wheel
+
+Keep job/step conclusions separate from log observations. If logs are inaccessible, report the access limitation; infer no counts or named-test results. Do not change authentication to retrieve logs.
+
+Stop on a failed/cancelled gate or at the monitoring bound. Save evidence and a resume note. No correction, rerun, further commit or push is authorized.
+
+5. Evidence documents only after all five jobs pass
+
+Only after the exact-target feature gate passes, update and stage:
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- docs/decisions/0026-anthropic-adapter.md
+- prompts.md
+
+ADR-0026 changes remain limited to status/cross-references. Put detailed completion CI evidence in the plan’s completion-status section.
+
+Record:
+- Mathew’s manual push and verified refs.
+- Exact SHA, branch, event, attempt and run/job links.
+- Actual observed results with attribution.
+- Whether the new G2/G3 PostgreSQL tests executed, to the granularity the evidence supports.
+- Historical local and isolated-reviewer evidence separately.
+
+Use “feature-CI verified, not merged” only after the gate passes.
+
+The specified database-dependent mutations remain pending unless independently executed and reviewed. A green suite does not execute those mutations or automatically close G1–G3.
+
+Do not accept overall M5, publish main or claim live-provider/production readiness.
+
+Append the saved Prompt 235 handoff byte-for-byte and label any transcription honestly. Record this authorization and actual outcomes in history at this stage; no separate history-only commit is required.
+
+6. Final verification and deliverables
+
+Keep every non-documentation blob/mode identical to the published target. Preserve accepted specifications and historical evidence.
+
+Run appropriate scope/protected-identity, history fidelity, links/anchors/tables, encoding, whitespace, privacy, Ruff and unsuppressed staged Gitleaks checks.
+
+Leave evidence staged and uncommitted.
+
+Save:
+- .local/p236/handoff.md
+- .local/p236/m5-completion-feature-ci-evidence.diff
+
+Export from the published target to the final staged tree, with full indexes and prompts.md excluded. Verify fresh Git byte identity and report statistics, bytes, lines, trees and SHA-256.
+
+If the gate fails or times out, produce the handoff and failure/status evidence instead; do not manufacture a green evidence diff.
+
+No main fast-forward/push, merge, branch deletion, history rewrite, CI rerun, production registration, live provider call, M6 work or overall M5 acceptance is authorized.
+
+Return output plus the handoff and any produced evidence diff for external review.
+
+
+# Mathew's manual feature-push report (Prompt 236)
+
+Normalized transcription of the relevant user-reported PowerShell output; UI backslash and
+HTML-space escapes were normalized. This is not a byte-verified original terminal record.
+The environment activation/execution-policy prelude is omitted because it is not publication evidence.
+
+```text
+git -C 'D:\Claude\evidenceguard_agentic_rag' push --set-upstream origin refs/heads/feat/m5-completion:refs/heads/feat/m5-completion
+Enumerating objects: 53, done.
+Counting objects: 100% (53/53), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (26/26), done.
+Writing objects: 100% (28/28), 86.37 KiB | 971.00 KiB/s, done.
+Total 28 (delta 18), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (18/18), completed with 18 local objects.
+To https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git
+ * [new branch]      feat/m5-completion -> feat/m5-completion
+branch 'feat/m5-completion' set up to track 'origin/feat/m5-completion'.
+```
+
+Codex independently verified remote feature, local HEAD and configured/stored upstream at
+2a388dc324950d9feb46dbba3ffb75222f2a938e, with main unchanged at e050da3e3415d73f83db86763617d5b5f0874aeb.
+Codex did not execute the push.
+
+
+## Prompt 236 observed feature-CI outcome (OpenAI Codex)
+
+The reviewer accepted the Prompt 235 incremental documentation export and authorized the existing commit for manual feature publication, not another commit. Mathew reported the manual push; fresh read-only refs confirmed target 2a388dc324950d9feb46dbba3ffb75222f2a938e, upstream/HEAD agreement and unchanged main e050da3e3415d73f83db86763617d5b5f0874aeb.
+
+Codex retrieved exact-target feat/m5-completion push attempt-1 run records, all five jobs/steps and decoded logs. CI 43193020087 and secret-scan 43193020092 completed successfully; every recorded step of every required job succeeded. Ubuntu job 131096838717: 5733 passed, 441 skipped in 135.45s. Windows 131096838829: 5732 passed, 442 skipped in 226.46s. PostgreSQL 131096838774: 441 passed, 5733 deselected in 362.45s; handler/canary modules printed eight/four passing positions. The exact-source inventory includes the new G2 and G3 cases, but logs do not individually print their names. Container 131096838293: smoke: ok; cleanup: ok (ingestion/indexing only). Gitleaks 131096837954: 103 commits, no leaks. Both verify logs show strict mypy success in 201 files, successful builds, unchanged production registry and fourteen installed-wheel result lines, including provider-call span collected and serialized from the installed wheel. Full links, counts, metadata and limits are in the plan and `.local/p236/feature-evidence/`.
+
+These are Codex observations of new push-triggered CI, separate from Codex's source-bound Prompt 234 local checks and the reviewer's 694 isolated probes. No application tests, mypy, builds, wheel checks or database tests were repeated locally. The specified database-dependent mutations remain pending; green CI does not run them or close G1-G3. Overall M5 remains on hold. Controlled interruption is not a physical process kill; ephemeral spans are not durable persistence proof. Genuine quotation, provenance/semantic limits and the earlier-source HTTP mutation/historical network-evidence qualifications remain. No main promotion, new commit, assistant push, CI rerun, authentication/credential change, provider call, production registration or M6 work occurred. Only after the five-job gate passed were the five authorized evidence/history files updated for staged external review.
+
+
+### Prompt 236 completed documentation checks (before final scan/export)
+
+OpenAI Codex verified exactly the five authorized staged files, all 268 unchanged non-documentation blobs/modes against the published target and accepted implementation tree, unchanged HEAD/main/upstream and no unstaged/unexpected untracked work. Accepted specification bytes/anchors, historical local/reviewer evidence and recovery qualifications are preserved; ADR-0026 changes are status/cross-references only. The original prompts.md prefix (3,214,466 bytes, SHA-256 f1e3e31504785f45b91c95b723831bed4d1ba8ef5e4dd319147be1e6c49745d7) and saved Prompt 235 handoff byte copy were checked. Prompt/push captures are labelled normalized transcriptions. UTF-8/no-BOM/LF/final-newline/whitespace checks passed. All tracked Markdown: 740 links, zero bad; 284 tables, zero problems. Privacy scan: 436 additions, zero sensitive-pattern hits, allowing only existing public noreply metadata. Installed Ruff format --check: 248 files already formatted; Ruff lint: All checks passed; both exit 0. Exact-target run/job/step identity and five-job success metadata were checked.
+
+This note records completed checks only. Its addition will be included in final scope/history/privacy/whitespace verification; final unsuppressed staged Gitleaks and export identity/statistics are reported in the saved handoff after execution. Evidence remains staged and uncommitted for external review, not CI-verified documentation. No additional commit, assistant push, main promotion, CI rerun, implementation edit, local application-test/build/wheel/database rerun, provider call, authentication change, production registration or M6 work is authorized.
+
+
+## Prompt 237: saved Prompt 236 handoff (byte-copied historical record)
+
+The following handoff is copied byte-for-byte from `.local/p236/handoff.md`; its pending external feature-evidence review status describes Prompt 236, before the supplied Prompt 237 acceptance.
+
+# Prompt 236 handoff: M5 completion feature-CI verified, not merged
+
+Written for: Mathew and the external reviewer.
+
+Mathew manually published the existing reviewed commit. All five required exact-target feature
+push jobs passed on attempt 1. Codex retrieved run/job/step metadata and decoded logs through
+existing read access. The five authorized evidence/history files are now staged and uncommitted
+for external review. No new commit, assistant push or main promotion occurred.
+
+**G1-G3 are not declared closed. Database-dependent mutations, evidence review, main publication
+and a renewed overall M5 assessment remain pending. Overall M5 is not accepted.**
+
+## Identities and preserved state
+
+- Branch: `feat/m5-completion`.
+- Published target / HEAD / local feature / stored feature ref / configured upstream / remote feature:
+  **`2a388dc324950d9feb46dbba3ffb75222f2a938e`**.
+- Target parent / local main / stored origin/main / remote main:
+  **`e050da3e3415d73f83db86763617d5b5f0874aeb`**.
+- Published target tree: **`ea88ddc30f22b2f44a6075ef9ef3a38c8af52112`**.
+- Accepted implementation tree: **`bd7c49110ef4249da37b28daf7aadabfdfb8fe6b`**.
+- Final staged evidence tree: **`d7ab8c90f24a04a47d26bb839f9503660b073134`**.
+- Origin remains `https://github.com/mathewmljourney93/evidenceguard-agentic-rag.git`.
+- Established author/committer identity remains
+  `mathewmljourney93 <257921624+mathewmljourney93@users.noreply.github.com>`.
+- Exactly five staged paths: README.md, docs/decisions/0026-anthropic-adapter.md, docs/plan.md,
+  docs/threat-model.md and prompts.md. No unstaged or unexpected untracked work.
+- All **268 non-documentation blobs and modes** are identical to both the published target and
+  accepted implementation tree. All implementation, tests, packaging, workflows, dependencies,
+  settings, pinned prompts/templates, sample data and other protected entries are unchanged.
+  No `.local` file is tracked. Final full-tree listing has **273 entries**.
+
+## Recovery and publication preflight actually completed
+
+Governing repository instructions and `.local/p235/handoff.md` were read. The expected branch,
+HEAD/parent/tree, main refs, clean state, origin and identity matched. The checkpoint under
+`.local/p236/checkpoint/` contains complete refs/status, a nonempty full-tree listing, all staged
+identities, history prefix and commit/path records. No material recovery discrepancy occurred.
+No prior matching active test/build task required action; no unrelated editor/extension was stopped.
+
+The existing `.local/p235/m5-completion-commit-incremental.diff` matched fresh Git output from
+accepted tree `bd7c4911` to target `2a388dc3`: full indexes, prompts.md excluded, four files,
++74/-15, **27,790 bytes; 167 lines; UTF-8 without BOM/LF**; SHA-256
+`605bca81c6f3ab4c4d391d40e1c4838eb22a9a23f7109588c1fdc4b691ebe50d`.
+
+The authorized read-only fetch --no-tags and exact ls-remote checks initially found remote main
+at `e050da3e` and the feature absent. The unpublished range was exactly the target commit and
+the fifteen reviewed paths, with no tracked .local, binary, artifact, dependency, lockfile,
+migration, settings or other unauthorized change. Both workflows retain push triggers and all
+five required jobs. Integration retains `EG_REQUIRE_INTEGRATION=1` and the existing
+`uv run --locked pytest -m integration` command. The workflow change is only the reviewed
+37-line additive installed-wheel block. Range privacy found zero hits over 3,748 additions;
+unsuppressed range Gitleaks passed (one commit, 272,575 bytes, no leaks).
+
+Mathew then supplied the successful manual push report. It is saved as a **normalized
+transcription**, not a byte-verified terminal original, in `.local/p236/manual-push-report.md`.
+Codex independently verified remote feature/HEAD/upstream at the target and remote main at
+the baseline. A final exact remote-ref read confirmed the same refs. Read-only Git network
+commands disabled credential helpers/prompts for that command only; no persistent Git/auth
+configuration or credentials were changed. The assistant never pushed.
+
+## Exact-target feature CI: observations by Codex
+
+Both runs identify **`2a388dc324950d9feb46dbba3ffb75222f2a938e`**, branch **`feat/m5-completion`**,
+event **`push`**, attempt **1**, completed/success. All five jobs and every recorded step
+concluded success. Monitoring started **2026-11-12 09:39:42 UTC**, deadline **10:04:42 UTC**;
+all-five success was observed by **09:47:11 UTC**, within the bound. No CI run or rerun was started.
+
+| Job | Run/job link | Actual decoded-log observations |
+| --- | --- | --- |
+| Ubuntu verify, Python 3.12 | [CI 43193020087 / 131096838717](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43193020087/job/131096838717) | **5733 passed, 441 skipped in 135.45s**; strict mypy success in 201 files; Ruff, build and installed-wheel steps succeeded |
+| Windows verify, Python 3.12 | [CI 43193020087 / 131096838829](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43193020087/job/131096838829) | **5732 passed, 442 skipped in 226.46s**; strict mypy success in 201 files; Ruff, build and installed-wheel steps succeeded |
+| PostgreSQL 17 + pgvector | [CI 43193020087 / 131096838774](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43193020087/job/131096838774) | **441 passed, 5733 deselected in 362.45s**; handler module eight passing positions, canary module four |
+| Container | [CI 43193020087 / 131096838293](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43193020087/job/131096838293) | `smoke: ok`; `cleanup: ok`; offline ingestion/indexing only |
+| Gitleaks full history | [secret-scan 43193020092 / 131096837954](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43193020092/job/131096837954) | **103 commits scanned; no leaks found** |
+
+Both verify logs show 118 passing positions for test_provider_spans.py, 23 for test_logging.py,
+159 for test_review_handler.py and 62 for test_packaging.py. Both skipped the 441 database cases;
+Windows has one additional platform skip. The separate PostgreSQL job executed those database
+cases. Its eight handler positions and four canary positions, combined with exact-target source
+inspection, cover the new post-response/reclaim test and the assembled acceptance, ordinary/
+mixed-case negative controls and separate literal genuine-quotation probe. The source inventory
+contains eight unparametrized handler functions and three canary functions (one parametrized
+over two cases). **These are progress positions, not individually printed test names.**
+The existing before-dispatch cancellation and committed-stage reuse coverage remains distinct.
+
+Both verify logs show successful sdist/wheel builds, unchanged
+`production registry: ingest_revision, index_revision`, all twelve earlier wheel result lines,
+the synthetic M5h line and the new actual output:
+
+```text
+provider-call span collected and serialized from the installed wheel
+```
+
+The plan records all fourteen actual wheel result lines. No log-access limitation occurred.
+Decoded logs are saved as `feature-evidence/job-<id>.log`, with connector-response JSON,
+initial/final run/job/step metadata, log hashes and parsed observations/source inventory.
+They are decoded tool-returned logs, not byte-verified original GitHub log archives.
+
+## Documentation and final checks actually run
+
+Detailed CI evidence is in the plan's completion implementation-status section, linked from
+README, threat model and ADR-0026. ADR changes are limited to accurate status/cross-references.
+Accepted specification text and stable/compatibility anchors are preserved. Historical local,
+isolated reviewer and older feature/main evidence keep their original attribution.
+
+- `.venv\Scripts\python.exe -I .local/p236/check-evidence.py`: exact five-path scope, all
+  268 protected identities, accepted specifications/anchors, historical local/reviewer blocks,
+  recovery/network qualifications, unchanged refs/origin/identity, no tracked .local,
+  no unstaged/unexpected untracked work and successful exact-SHA gate metadata verified.
+- Original prompts.md prefix: **3,214,466 bytes**, SHA-256
+  `f1e3e31504785f45b91c95b723831bed4d1ba8ef5e4dd319147be1e6c49745d7`. Earlier bytes are identical. Saved Prompt 235 handoff
+  is appended byte-for-byte and compared with its saved file. Prompt 236 and the push report
+  are honestly labelled normalized transcriptions of UI escapes, not original-byte evidence.
+- All tracked Markdown: **740 links, zero bad; 284 tables, zero problems**. UTF-8/no-BOM/LF,
+  final newline, whitespace and `git diff --cached --check` passed.
+- Privacy patterns: **443 staged additions; zero sensitive-pattern hits**. Only the existing
+  public noreply identity metadata in the copied handoff is allowed as email metadata.
+- Installed `.venv\Scripts\ruff.exe format --check .`: **248 files already formatted**,
+  exit 0. `.venv\Scripts\ruff.exe check .`: **All checks passed**, exit 0.
+- Unsuppressed `gitleaks git --pre-commit --staged --redact --verbose .`: exit 0,
+  approximately **35,836 bytes scanned; no leaks found**. Saved in
+  `.local/p236/checks/gitleaks-staged-final.txt`. PowerShell's native-stderr error-style display
+  did not change the successful native exit status.
+- Export matches fresh cached and target-to-staged-tree Git bytes, full indexes and encoding.
+  `checks/final-*`, `export-metadata.json` and `resume-state.json` retain final state/evidence.
+
+No application suite, strict mypy, builds, wheel checks, database tests or mutations were
+repeated locally. Those CI observations come from the new push-triggered runs. No test was
+rerun merely to get a fresh timestamp or individually printed name. No unchanged implementation
+input was modified. The five staged evidence documents are **not part of the verified CI target**.
+
+## Export for external review
+
+- File: `.local/p236/m5-completion-feature-ci-evidence.diff`.
+- Baseline published commit: **`2a388dc324950d9feb46dbba3ffb75222f2a938e`**.
+- Baseline tree: **`ea88ddc30f22b2f44a6075ef9ef3a38c8af52112`**.
+- Destination final staged tree: **`d7ab8c90f24a04a47d26bb839f9503660b073134`**.
+- Full indexes; prompts.md excluded. Four exported files: README.md (+12/-7), ADR-0026 (+11/-5),
+  docs/plan.md (+117/-11), docs/threat-model.md (+9/-2).
+- **4 files, +149/-25; 35,979 bytes; 263 lines; UTF-8 without BOM, LF, final newline.**
+- SHA-256: **`3e99af5eddb3496a03d3c8346379f5acd7294957e00709cc605762ab91ef4581`**.
+- Including prompts.md, the five staged files are **+443/-25**. Saved export bytes match fresh
+  cached and tree comparisons; no truncation or omitted documentation outside prompts.md.
+
+## Limits and next authorized boundary
+
+Codex's Prompt 234 local checks remain historical, tied to accepted executable identities;
+the reviewer's 694 passing standard-library probes remain isolated reviewer evidence, not full
+handler/database execution, installed-wheel proof or CI. Current feature CI supplies its own
+executed PostgreSQL/Linux/Windows/build/wheel evidence, not retroactive local database execution.
+The specified database-dependent mutations are still unexecuted/pending. A green suite does not
+execute them or automatically close G1-G3. Evidence acceptance and renewed overall M5 assessment
+remain pending. No main publication is authorized by Prompt 236.
+
+Spans are ephemeral telemetry, not durable reservation/stage evidence or proof of provider
+receipt. Controlled post-response interruption is not a physical process kill. Scripted canary
+acceptance, emitting/mixed-case controls and genuine authorized-quotation limitations remain
+distinct. Provenance establishes neither entailment nor authenticity nor semantic injection
+resistance. Fake transport/provider and wheel probes supply no live API, HTTP/DNS/TLS-handshake,
+compatibility or model-quality evidence. Container smoke remains ingestion/indexing only.
+There is no production run_review registration or application review path. U4 discarded evidence,
+database trust, M3 lease/commit window, unknown outcomes and no exactly-once provider calls remain.
+
+The older HTTP mutation record binds to an earlier source, not independently established
+exact-final-source coverage. Its runner lacking --offline does not demonstrate network activity;
+recovery did not establish universal historical absence of network activity or rerun saved checks.
+This completion evidence does not reinterpret that qualification. Individual M5a-M5h and scoped
+M4d/E7 acceptance remain intact. Production registration, credentials, provider calls, M6 and
+overall M5 acceptance remain unauthorized. No additional commit/push/merge, main fast-forward,
+branch deletion, history rewrite, CI rerun, production correction or authentication change occurred.
+
+Mathew: return **output plus the complete handoff and diff file** `.local/p236/handoff.md` and
+`.local/p236/m5-completion-feature-ci-evidence.diff` to the external reviewer. Leave the evidence
+staged and uncommitted; no further publication or main promotion is authorized.
+
+
+## Prompt 237 authorization (normalized transcription)
+
+The following capture normalizes UI backslash escapes and list/number formatting. It is an honestly labelled transcription, not independently byte-verified original-message evidence.
+
+Prompt 237 — Record feature-evidence acceptance and complete database mutation verification
+
+Written for: Mathew and the external reviewer.
+
+The reviewer accepts the Prompt 236 feature-CI evidence. They independently retrieved:
+- Remote feature at 2a388dc324950d9feb46dbba3ffb75222f2a938e.
+- Remote main at e050da3e3415d73f83db86763617d5b5f0874aeb.
+- CI run 43193020087 and secret-scan run 43193020092.
+- Both runs: exact target, feat/m5-completion, push, attempt 1, completed/success.
+- All five jobs and their successful steps.
+- All five decoded job logs.
+
+Their observations match the recorded counts, times, container smoke/cleanup, Gitleaks 103 commits/no leaks and the new installed-wheel span line on both platforms.
+
+They also inspected both PostgreSQL modules at the exact target: eight handler functions and four canary cases, matching the passing module positions. Names were not individually printed.
+
+This accepts feature evidence, not overall M5 or main publication.
+
+1. Recover and checkpoint
+
+Read the governing instructions and .local/p236/handoff.md.
+
+Expected:
+- Branch feat/m5-completion.
+- HEAD/upstream: 2a388dc324950d9feb46dbba3ffb75222f2a938e.
+- Local main/stored origin/main: e050da3e3415d73f83db86763617d5b5f0874aeb.
+- Staged tree: d7ab8c90f24a04a47d26bb839f9503660b073134.
+- Exactly five evidence/history paths staged.
+- Nothing unstaged or unexpectedly untracked.
+
+Verify the Prompt 236 export:
+.local/p236/m5-completion-feature-ci-evidence.diff
+4 files, +149/-25; 35,979 bytes; 263 lines.
+SHA-256:
+3e99af5eddb3496a03d3c8346379f5acd7294957e00709cc605762ab91ef4581
+
+Save a checkpoint under .local/p237/. Preserve all staged work. Do not fetch or make another remote operation.
+
+2. Establish a disposable local test environment
+
+The remaining database mutations are authorized against a fresh, isolated, synthetic PostgreSQL test database only.
+
+First inspect existing local Docker/test tooling and the repository’s documented database safety requirements.
+
+If Docker is available:
+- Use the PostgreSQL/pgvector image specified by the current integration workflow.
+- Create a uniquely task-named disposable container/database.
+- Bind any published port to loopback only.
+- Use synthetic task-only authentication values and task-local environment variables.
+- Do not connect to an existing application database or reuse its data.
+- Do not alter tracked Compose/settings/env files, install system software, change authentication or start unrelated services.
+- An anonymous image pull is authorized if necessary.
+- Record image identity, PostgreSQL/extension versions and test-database identity without printing connection secrets.
+
+Follow existing database guards; do not weaken them.
+
+If the required tooling/daemon is unavailable, or the locked environment cannot run against that database, stop the database work and report the concrete blocker. Do not improvise with a remote database, credentials, altered guards or a new CI workflow.
+
+Independent documentation work may continue.
+
+3. Run the exact-version controls
+
+In an isolated scratch checkout/copy, use the exact committed executable and test inputs at 2a388dc3. Record their hashes and imported module paths.
+
+Execute the twelve handler/canary PostgreSQL cases against the disposable database before mutations. Set the repository’s required integration enforcement.
+
+This targeted execution establishes mutation controls; do not repeat the full integration suite merely to duplicate existing CI evidence.
+
+If the unmodified control fails, preserve its output and report it. Do not correct production or tracked test code in this task.
+
+4. Complete the four pending mutation scenarios
+
+Use isolated copies, one deliberate change at a time. Never mutate the working checkout or accepted committed sources.
+
+A. G2 boundary:
+Move the interruption before the saved real validating call returns.
+Require failure of the assertion proving the first fake actually returned/made its matching call.
+
+B. G2 persisted state:
+Introduce the specific forbidden completion of sequence 1, with a structurally valid mutation setup.
+Require the independent started/completed history or stage-linkage oracle to detect it.
+Do not count a setup constraint failure, unrelated exception or timeout as detection.
+
+C. G3 PostgreSQL document setup:
+Place the complete token in the acceptance document.
+Require the document-absence assertion to detect it.
+
+D. G3 PostgreSQL request binding:
+Remove the exact injected chunk entry from the captured evidence array while retaining instruction text elsewhere.
+Require the exact evidence-entry/request-correlation assertion to detect it.
+
+Preserve the separation between mutations of test-owned setup/captured observations and production-code mutations. Describe exactly what each changes and what its detector proves.
+
+For each:
+- Save baseline/mutant/restored hashes.
+- Record command, exit code, imported paths and relevant assertion failure.
+- Confirm the intended detector failed.
+- Restore byte-for-byte before the next scenario.
+- Do not count collection/setup failures as caught mutations.
+
+After restoration, rerun the targeted unmodified controls to confirm they pass.
+
+These are controlled test-sensitivity checks, not physical process-kill, live-model or exactly-once proofs.
+
+5. Documentation scope
+
+Only the existing five paths may change:
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- docs/decisions/0026-anthropic-adapter.md
+- prompts.md
+
+Record the reviewer’s feature-evidence acceptance separately from Codex’s original observations.
+
+Record actual local database controls/mutations, or the precise blocker, with source identities and honest limitations. ADR-0026 changes remain status/cross-references only.
+
+Preserve every other blob and mode, accepted specifications, anchors and historical evidence.
+
+Do not declare G1–G3 closed or overall M5 accepted. If all required checks pass, state that the remaining mutation evidence is ready for external review.
+
+Append the saved Prompt 236 handoff byte-for-byte. Label transcriptions honestly.
+
+6. Cleanup, checks and deliverables
+
+Remove only the task-created disposable container/storage after saving evidence. Verify cleanup; leave unrelated containers/services untouched.
+
+Run scope/protected-identity, documentation links/anchors/tables, encoding, whitespace, history fidelity, privacy, Ruff and unsuppressed staged Gitleaks checks.
+
+No unchanged application-wide suite, build or installed-wheel rerun is needed.
+
+Leave the five documents staged and uncommitted.
+
+Save:
+- .local/p237/handoff.md
+- .local/p237/m5-completion-database-mutation-evidence.diff
+
+Export incrementally from staged tree d7ab8c90f24a04a47d26bb839f9503660b073134 to the final staged tree, full indexes, prompts.md excluded. Verify fresh Git byte identity and report statistics, trees, bytes, lines, encoding and SHA-256.
+
+No commit, fetch, push, main fast-forward, merge, CI run/rerun, production correction, live provider call, production registration, M6 work or overall M5 acceptance is authorized.
+
+Return output plus the complete handoff and incremental diff for external review.
+
+
+## Prompt 237 outcome and completed checks (OpenAI Codex)
+
+The reviewer supplied acceptance of Prompt 236 feature-CI evidence after independent retrieval of remote refs, both exact-target push/attempt-1 runs, five successful jobs/steps and all five decoded logs. Their counts/times, container smoke/cleanup, Gitleaks 103 commits/no leaks and both installed-wheel span lines match Codex's earlier observations, which retain their original attribution. They inspected the exact-target eight handler functions and four canary cases; names were not individually printed. This acceptance is not overall M5 acceptance or main-publication authorization. Codex made no remote operation in Prompt 237.
+
+Recovery matched branch feat/m5-completion, HEAD/upstream 2a388dc324950d9feb46dbba3ffb75222f2a938e, local main/stored origin-main e050da3e3415d73f83db86763617d5b5f0874aeb and starting staged tree d7ab8c90f24a04a47d26bb839f9503660b073134, with exactly five staged paths and nothing unstaged/unexpected untracked. The prior export matched fresh cached/tree Git bytes, statistics, length, encoding and SHA-256. Checkpoint saved complete 273-entry tree/index identities, refs/status and exact history prefix.
+
+Database work stopped before setup under the authorized tooling-unavailable rule. Docker CLI is absent from PATH and checked standard Desktop/legacy locations; no matching Docker or test/build process was observed in an elevated read-only inspection. The first sandbox CIM query was denied; the elevated query succeeded. No Docker daemon connection was probed because no CLI was available. README, fixture integration enforcement and the disposable-database safety helper were read; guards remain intact. No image pull, task container/storage/database creation, authentication value generation, database connection, scratch test checkout, test import, twelve-case control or mutation A-D occurred. There are no execution/import-path/mutant/restoration/intentional-failure records to claim. No application test failure or caught mutation is reported. Source blobs/SHA-256/lengths were inspected against the exact target and saved in .local/p237/database-status.json; this is source evidence only. Cleanup is not applicable because no task resource was created; unrelated containers/services were untouched.
+
+Completed documentation checks before this outcome-note addition: exact five-path scope, all 268 unchanged non-documentation blobs/modes, accepted specifications/anchors and historical local/reviewer/CI/recovery blocks preserved, ADR status/cross-references only, no unstaged/unexpected untracked work; exact earlier prompts.md prefix (3,237,751 bytes, SHA-256 4528616e37bd4544962bdb648849c301d03f60b72602985108eb7bcd70154268) and byte-copied saved Prompt 236 handoff verified. Prompt 237 is labelled a normalized transcription, not original-byte evidence. Encoding/whitespace passed. All tracked Markdown: 746 links/zero bad, 286 tables/zero problems. Privacy: 435 incremental additions/zero sensitive-pattern hits, allowing only public existing noreply attribution metadata. Ruff format --check: 248 files already formatted; Ruff lint: All checks passed; both exit 0. This note's addition will receive final scope/history/privacy/whitespace verification; the final unsuppressed staged Gitleaks result and export identity/statistics will be recorded in the handoff after execution.
+
+Feature evidence is accepted; local mutation verification is blocked and unexecuted, not ready for external acceptance. G1-G3 remain open and overall M5 remains on hold. No application-wide suite, build, wheel check, database test, mutation or CI run/rerun was executed. No commit, fetch, push, main fast-forward, merge, production correction, authentication change, provider call, production registration or M6 work occurred. The five evidence/history files remain staged and uncommitted for external review; all existing runtime/privacy/semantic/recovery limits and individual slice/scoped M4d/E7 acceptances remain intact.
+
+
+## Prompt 238: saved Prompt 237 handoff (byte-copied historical record)
+
+# Prompt 237 handoff: feature evidence accepted; database mutation work blocked
+
+Written for: Mathew and the external reviewer.
+
+**The reviewer accepts Prompt 236 feature-CI evidence. Local database controls/mutations did
+not run: required Docker tooling was unavailable.** Independent documentation work is complete
+and staged, uncommitted. G1-G3 are not closed; overall M5 remains on hold. No main publication
+or additional implementation is authorized. This export records acceptance and a blocker, not
+completed database mutation evidence or a caught mutation.
+
+## Recovery and final identities
+
+- Branch: `feat/m5-completion`.
+- Unchanged HEAD / configured upstream / stored feature ref:
+  **`2a388dc324950d9feb46dbba3ffb75222f2a938e`**.
+- HEAD parent / unchanged local main / stored origin/main:
+  **`e050da3e3415d73f83db86763617d5b5f0874aeb`**.
+- Published HEAD tree: `ea88ddc30f22b2f44a6075ef9ef3a38c8af52112`.
+- Starting staged tree: **`d7ab8c90f24a04a47d26bb839f9503660b073134`**.
+- Final staged tree: **`ddcc15afd48ddfbc29e55e1b405ce347d1efbe31`**.
+- Exactly five staged paths: README.md, docs/decisions/0026-anthropic-adapter.md, docs/plan.md,
+  docs/threat-model.md, prompts.md. Nothing unstaged or unexpectedly untracked.
+- Complete tree: **273 entries**. All **268 non-documentation blobs/modes** are unchanged
+  against starting staged tree, exact target and accepted implementation tree `bd7c4911`.
+  No source, test, packaging, workflow, dependency, settings, resource or other protected change.
+- No commit, fetch, remote-ref read, other remote operation, push, main fast-forward or merge
+  occurred in Prompt 237. Remote observations below belong to the supplied reviewer decision
+  or historical Prompt 236 evidence; no fresh remote equality is claimed by Codex here.
+
+Governing instructions, saved Prompt 236 handoff, README database requirements, conftest
+integration enforcement, persistence safety helper and current workflow image were read.
+Expected recovery identities and stage set matched, with no material discrepancy. The existing
+Prompt 236 export was preserved and verified against fresh cached and tree comparisons:
+**4 files +149/-25; 35,979 bytes; 263 lines**, full indexes excluding prompts.md, UTF-8/no BOM/LF;
+SHA-256 `3e99af5eddb3496a03d3c8346379f5acd7294957e00709cc605762ab91ef4581`.
+`.local/p237/checkpoint/` saves refs/status, a nonempty complete 273-entry tree listing, all
+staged identities, recent history and exact history prefix. Prior staged work was carried forward.
+
+## External feature-evidence acceptance: supplied reviewer evidence
+
+The reviewer independently retrieved remote feature at `2a388dc3`, remote main at `e050da3e`,
+[CI run 43193020087](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43193020087)
+and [secret-scan run 43193020092](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43193020092).
+Both runs identify the exact full target SHA, `feat/m5-completion`, `push`, attempt 1,
+completed/success. They retrieved all five jobs, successful steps and decoded logs, confirming
+the existing counts/times, container smoke/cleanup, 103-commit no-leak scan and the new installed-
+wheel span line on both platforms. They inspected the exact-target PostgreSQL modules: eight
+handler functions and four canary cases correspond to passing module positions; names were
+not individually printed.
+
+The accepted historical Prompt 236 observations remain attributed to Codex: Ubuntu
+5733 passed/441 skipped in 135.45s; Windows 5732 passed/442 skipped in 226.46s; PostgreSQL
+441 passed/5733 deselected in 362.45s; container smoke/cleanup succeeded; Gitleaks 103 commits,
+no leaks. The independent reviewer confirmation is recorded separately, not substituted for
+Codex's original observations. Acceptance concerns feature evidence, not overall M5 or main
+publication. No suite, logs or remote resources were retrieved again for this documentation task.
+
+## Concrete local tooling blocker and safety boundary
+
+Docker CLI was not found on PATH. Checked paths were absent:
+
+- `C:\Program Files\Docker\Docker\resources\bin\docker.exe`
+- `C:\Program Files\Docker\Docker\Docker Desktop.exe`
+- `C:\ProgramData\DockerDesktop\version-bin\docker.exe`
+
+An elevated **read-only** tooling/process inspection confirmed those observations and found
+no matching Docker/python/pytest/uv processes. The initial sandbox CIM query was access-denied;
+the elevated retry succeeded (exit 0). This was a sandbox read restriction, not an automatic
+approval-review rejection. No matching task was active; no unrelated editor/extension or other
+process was terminated. `tooling-probe.json` and `checks/executed-commands.json` preserve results.
+The absence is limited to PATH/checked standard locations and matching observed processes;
+daemon connectivity was not probed without a CLI. No software installation or service start
+was attempted. Per Prompt 237's explicit stop rule, database work stopped at this point.
+
+Expected workflow image, inspected but **not pulled or run**:
+`pgvector/pgvector:0.8.7-pg17@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d`.
+There is no actual image/container/database identity, PostgreSQL version or vector-extension
+version to report. No task container, storage, port binding, synthetic authentication value,
+task database, database connection or test environment variable was created. No existing
+application database/data/credentials were used; no alternate remote database was considered.
+The locked environment was not exercised against a database. No scratch checkout/copy was
+created and no test imports, collection, control or mutation were executed.
+
+Guards were preserved: valid PostgreSQL URL; `_test` suffix; valid application URL if supplied;
+refusal of the same normalized host/port/database as the application; destructive `public`
+schema reset limited to the validated disposable target. URL comparison cannot resolve DNS
+alias equivalence. `EG_REQUIRE_INTEGRATION=1` requires a URL, integration collection and actual
+passing execution. No guard was weakened, bypassed or replaced with mocked database behavior.
+
+## Exact-source inspection, not executed controls
+
+The following committed test bytes were compared with the unchanged working checkout:
+
+| Path | Git blob at exact target | SHA-256 |
+| --- | --- | --- |
+| `tests/test_review_handler_postgres.py` | `162bdd2a43cb818ef14f415738636fb2eba96d00` | `6031b1d4d4b6322f0cf05547fa8e0b102c13e9333ffad7da596d0e313a4b9463` |
+| `tests/test_review_canary_postgres.py` | `482d422dd36be757e7d43685c437ac6a27437fe5` | `faaf85c6aca18e9f3b590370d6ae126a72bec64c00ee34a257d05df367a2f5a7` |
+
+`database-status.json` additionally records Git blob/SHA-256/byte counts for the worker,
+provider span/logger modules, conftest, safety helper, workflow, lockfile and project metadata.
+All are inspected target identities, not a tested scratch version or imported-module-path
+record. Imported paths are unavailable because no import/execution occurred.
+
+| Required local evidence | Actual Prompt 237 state |
+| --- | --- |
+| Twelve-case unmodified controls before mutations | **Not run**; no disposable environment |
+| A: pre-return interruption, first-return/matching-call detector | **Not attempted** |
+| B: structurally valid forbidden sequence-1 completion, history/stage-linkage detector | **Not attempted**; no constraint/setup failure counted as detection |
+| C: literal token in acceptance document, absence detector | **Not attempted** |
+| D: remove exact captured evidence entry while retaining other instruction text, request-binding detector | **Not attempted** |
+| Baseline/mutant/restored hashes, mutation command/exit/import paths/assertion failures | **No execution record exists**; none was reconstructed or inferred |
+| Byte restoration and final twelve-case controls | **Not run**; no source/copy was mutated |
+
+The requested A-D changes are controlled test-owned setup/observation sensitivity probes, not
+production-code mutations. Existing green PostgreSQL CI does not execute them. No detector is
+claimed caught, and neither collection/setup failure nor timeout was substituted. The remaining
+mutation evidence is **not ready for external acceptance**. A future authorized attempt needs
+available local Docker tooling, then fresh isolated synthetic database setup, exact-version
+controls, the four intended-detector failures, byte restoration, restored controls and cleanup.
+
+## Cleanup
+
+No task container or storage was created, so no task resource remained to remove. Cleanup is
+not applicable; no Docker cleanup command or global resource enumeration was possible without
+the CLI. Unrelated containers/services were untouched. No existing database was contacted.
+
+## Documentation and checks actually completed
+
+Only the five authorized documentation/history files changed. The plan records the independent
+acceptance and blocker; README/threat model summarize it; ADR-0026 changes are status/cross-
+references only. Accepted specifications/anchors, historical local/reviewer/CI evidence and
+recovery qualifications remain intact. Prior Prompt 236 CI observations were preserved verbatim
+as a historical record; the subsequent Prompt 237 section supplies the current disposition.
+
+- Scope/protected identity/history/documentation checker:
+  `.venv\Scripts\python.exe -I .local/p237/check-evidence.py`, exit 0.
+- Original prompts.md prefix: **3,237,751 bytes**, SHA-256
+  `4528616e37bd4544962bdb648849c301d03f60b72602985108eb7bcd70154268`. Saved Prompt 236 handoff appended byte-for-byte and verified;
+  Prompt 237 is labelled a normalized transcription, not independently verified original bytes.
+- Links/anchors/tables: **746 links, zero bad; 286 tables, zero problems**, across tracked Markdown.
+- UTF-8/no BOM/LF/final-newline/whitespace and `git diff --cached --check` passed.
+- Privacy: **448 incremental additions**, zero sensitive-pattern hits; only existing public
+  noreply attribution metadata is allowed as email metadata.
+- Installed Ruff `format --check .`: **248 files already formatted**, exit 0; Ruff `check .`:
+  **All checks passed**, exit 0. Commands/output saved under `checks/ruff-*.txt`.
+- Unsuppressed `gitleaks git --pre-commit --staged --redact --verbose .`: exit 0,
+  approximately **69,153 bytes scanned; no leaks found**. Output saved in
+  `checks/gitleaks-staged-final.txt`; native stderr's PowerShell error-style rendering does not
+  change its successful exit status. This scanned the complete staged documentation delta.
+- Final local refs, five-path stage set, no unstaged/unexpected untracked work, all 268 protected
+  identities and fresh Git export-byte equality verified. Final full-tree/index/refs/status
+  records are saved under `checks/final-*`.
+
+No application-wide suite, targeted/database suite, mutation, mypy, build, installed-wheel or
+CI run/rerun was performed. There is no new project-runtime or database evidence. Local source
+and documentation checks are not relabelled as exact-commit CI or isolated reviewer probes.
+
+## Incremental export
+
+- File: `.local/p237/m5-completion-database-mutation-evidence.diff`.
+- Baseline starting staged tree: **`d7ab8c90f24a04a47d26bb839f9503660b073134`**.
+- Destination final staged tree: **`ddcc15afd48ddfbc29e55e1b405ce347d1efbe31`**.
+- Full indexes, prompts.md excluded, fresh cached and tree Git bytes identical.
+- Four exported paths: README.md (+8/-4), ADR-0026 (+8/-4), docs/plan.md (+84/-1),
+  docs/threat-model.md (+6/-2).
+- **4 files, +106/-11; 29,897 bytes; 182 lines; UTF-8 without BOM, LF, final newline.**
+- SHA-256: **`f2e761765870f658e4239411a3867a481eef45156da6ea9a9f3dbc67b59dadfa`**.
+- Including history, Prompt 237 adds **5 files +448/-11** against the starting staged tree.
+  Carried plus new staged evidence against HEAD: **5 files +881/-26**. No commit was created.
+
+## Remaining boundaries
+
+G1-G3 are not closed; overall M5 is not accepted. Individual M5a-M5h and scoped M4d/E7 acceptance
+remain intact. Ephemeral spans are distinct from durable reservations/stages and provider
+receipt. Controlled post-response interruption is not physical process-kill coverage or exactly-
+once proof. Scripted canary acceptance, ordinary/mixed-case negative controls and genuine
+quotation limitations remain distinct; provenance proves neither entailment, authenticity nor
+semantic injection resistance. No live API/HTTP/DNS/TLS/model-quality claim follows. Container
+smoke remains ingestion/indexing only. U4 discarded evidence, database trust, M3 lease/commit
+window, unknown outcomes and lack of exactly-once calls remain.
+
+Earlier HTTP mutation evidence still binds to earlier source, not independently established
+exact-final-source coverage. A runner lacking --offline does not show network activity;
+recovery did not establish universal historical absence of network activity or rerun saved
+checks. This task does not reinterpret those qualifications. Main publication, production
+registration/application review wiring, authentication changes, provider calls, M6 and overall
+M5 acceptance remain unauthorized. No commit, fetch, push, fast-forward, merge or CI action occurred.
+
+Mathew: return **output plus the complete handoff and incremental diff file**
+`.local/p237/handoff.md` and `.local/p237/m5-completion-database-mutation-evidence.diff`
+to the external reviewer. Leave the five documents staged and uncommitted.
+
+
+## Prompt 238 authorization (normalized transcription)
+
+The following capture normalizes UI backslash escapes and numbering/list formatting; it is not independently byte-verified original-message evidence.
+
+Prompt 238 — Prepare CI execution of the four pending database mutations
+
+Written for: Mathew and the external reviewer.
+
+The reviewer accepts Prompt 237’s documentation of feature-evidence acceptance and the local tooling blocker. No database controls or mutations ran, and none is claimed.
+
+Execution-location amendment: the four pending mutations may run against the existing disposable PostgreSQL service in the GitHub integration job instead of requiring local Docker. Their assertions, source binding and evidence requirements remain unchanged.
+
+This prompt authorizes preparation and offline verification only. Leave changes staged for review. No commit, push, CI dispatch/rerun or main promotion.
+
+1. Recover and checkpoint
+
+Read governing instructions and .local/p237/handoff.md.
+
+Expected:
+- Branch feat/m5-completion.
+- HEAD/upstream: 2a388dc324950d9feb46dbba3ffb75222f2a938e.
+- Local main/stored origin/main: e050da3e3415d73f83db86763617d5b5f0874aeb.
+- Staged tree: ddcc15afd48ddfbc29e55e1b405ce347d1efbe31.
+- Five documentation/history paths staged.
+- Nothing unstaged or unexpectedly untracked.
+
+Verify .local/p237/m5-completion-database-mutation-evidence.diff:
+4 files, +106/-11; 29,897 bytes; 182 lines.
+SHA-256:
+f2e761765870f658e4239411a3867a481eef45156da6ea9a9f3dbc67b59dadfa
+
+Save a complete checkpoint under .local/p238/. Preserve existing staged work. Do not fetch.
+
+2. Add a bounded CI mutation runner
+
+Create infra/ci/review_mutations.py using only the standard library and existing installed test tools.
+
+Its purpose is to execute:
+- The twelve unmodified handler/canary PostgreSQL controls.
+- Four isolated mutations A–D from Prompt 237.
+- Restored unmodified controls.
+
+Use the existing CI disposable database and unchanged safety fixtures. Require EG_REQUIRE_INTEGRATION=1 and a configured test URL. Never weaken guards or access application databases.
+
+Run database subprocesses sequentially; fixtures reset the same disposable schema.
+
+The runner must:
+- Work in temporary isolated source copies.
+- Leave the checked-out executable/test files untouched.
+- Bind each copy to the candidate source hashes.
+- Exclude unrelated local files, credentials, build output and environments from copies.
+- Ensure application/test imports resolve from the isolated copy, not the original checkout’s editable-install paths.
+- Record actual imported module paths.
+- Use the existing locked environment without installing or synchronizing dependencies.
+- Enforce subprocess and overall bounds within the existing integration job’s 15-minute limit.
+- Clean up only its temporary resources in a finally path.
+
+Do not claim successful execution when no database is available.
+
+3. Preserve the exact four detectors
+
+A — G2 interruption boundary:
+Move the test-owned interruption before the real validating call returns. Detect the failed first-return/actual matching-call assertion.
+
+B — G2 persisted state:
+Introduce a structurally valid forbidden completion of sequence 1. Detect the independent history or stage-linkage assertion. A constraint/setup failure is not detection.
+
+C — G3 document setup:
+Put the complete token into the acceptance document. Detect its document-absence assertion.
+
+D — G3 request binding:
+Remove the exact injected evidence entry from the captured request while retaining instruction text elsewhere. Detect the exact evidence-entry/correlation assertion.
+
+These are test-owned setup/observation mutations. Do not describe them as mutations of production behavior.
+
+Use independent copies or byte restoration between cases. Each mutation must have a distinct explicit record of:
+- Baseline, mutant and restored source hashes.
+- Exact controlled edit.
+- Command and imported module paths.
+- Exit code and intended failing assertion.
+- Restoration identity.
+
+Treat a mutation as caught only when pytest ran the intended case and failed at its intended detector. Exit code 1 alone is insufficient.
+
+Use structured pytest results, such as JUnit XML, plus the relevant failure details to reject collection errors, setup failures, skipped cases, timeouts and unrelated failures.
+
+The runner itself must exit nonzero if:
+- Unmodified controls fail or skip required cases.
+- A mutation survives.
+- The wrong assertion fails.
+- Setup/collection fails.
+- Source/import/restoration checks fail.
+- A timeout occurs.
+- Final restored controls fail.
+
+Expected mutant failures should produce a successful runner result only after all these checks pass.
+
+Print concise summaries and save machine-readable records plus relevant outputs in a task-specific ignored location. Do not print environment dumps or connection secrets.
+
+4. Add offline runner tests
+
+Create tests/test_review_mutation_runner.py.
+
+Exercise meaningful runner behavior without PostgreSQL, Docker, provider calls or network access:
+- Valid intended assertion failure accepted.
+- Surviving mutation rejected.
+- Unrelated failure rejected.
+- Collection/setup failure rejected.
+- Skipped or missing target case rejected.
+- Timeout rejected.
+- Source/import mismatch rejected.
+- Failed restoration rejected.
+- Failing baseline/final controls rejected.
+- Temporary cleanup and unchanged checkout verified.
+- Each mutation transformation targets exactly the intended source fragment and refuses missing/ambiguous matches.
+
+Use synthetic subprocess/XML fixtures. Label these as runner tests, not executed database mutation evidence.
+
+5. Wire into the existing integration job
+
+Add one step immediately after “Run integration tests” in .github/workflows/ci.yml to invoke the runner using the existing locked environment.
+
+Preserve:
+- Existing complete integration command.
+- EG_REQUIRE_INTEGRATION and test URL.
+- Pinned PostgreSQL/pgvector image and service configuration.
+- Job timeout.
+- All five existing jobs and workflow triggers.
+- Installed-wheel checks and other job steps.
+- Existing permissions and secret-scan workflow.
+
+No new action dependency, job, database, secret, live service, manual workflow or runtime package dependency.
+
+The original suite must pass before mutation execution. A runner failure must fail the integration job.
+
+6. Authorized paths
+
+Only these eight paths may change:
+- infra/ci/review_mutations.py (new)
+- tests/test_review_mutation_runner.py (new)
+- .github/workflows/ci.yml
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- docs/decisions/0026-anthropic-adapter.md
+- prompts.md
+
+All production modules, accepted application tests, migrations, models, dependencies, lockfile, settings, resources and registry remain byte/mode-identical to HEAD.
+
+ADR-0026 changes remain limited to status/cross-references.
+
+Document the execution-location amendment separately from accepted runtime contracts. Keep Prompt 237’s blocker historical and accurate.
+
+7. Verification and status
+
+Run the new offline runner tests, relevant CI/tooling/packaging regressions, Ruff, applicable strict mypy and the normal scope/documentation/history/privacy/Gitleaks checks.
+
+No application-wide suite, builds, wheel checks or old CI reruns are needed for unchanged application inputs.
+
+Without local PostgreSQL:
+- Do not run the runner against a substitute database.
+- Report database execution as pending future authorized CI.
+- Do not mark any mutation caught based on offline runner tests.
+- Preserve all existing evidence attribution and limitations.
+
+G1–G3 remain open and overall M5 remains on hold. Production wiring, live calls, M6 and main publication remain unauthorized.
+
+8. Deliverables
+
+Leave the eight authorized paths staged and uncommitted.
+
+Save:
+- .local/p238/handoff.md
+- .local/p238/m5-completion-ci-mutation-runner.diff
+
+Export incrementally from starting staged tree ddcc15afd48ddfbc29e55e1b405ce347d1efbe31 to the final staged tree, using full indexes and excluding prompts.md.
+
+Verify fresh Git byte identity and report trees, paths, statistics, bytes, lines, encoding and SHA-256.
+
+Return output plus the complete handoff and diff for review before any commit or publication.
+
+
+## Prompt 238 outcome and completed offline checks (OpenAI Codex)
+
+The reviewer accepted Prompt 237's documentation of feature-evidence acceptance and the tooling blocker. The execution-location amendment permits the same four mutation scenarios in the existing disposable CI PostgreSQL service; assertions/source binding/evidence obligations are unchanged. No PostgreSQL controls or mutations ran in this task, and none is claimed caught. G1-G3 remain open and overall M5 remains on hold.
+
+Recovery matched feat/m5-completion, HEAD/upstream 2a388dc324950d9feb46dbba3ffb75222f2a938e, local main/stored origin-main e050da3e3415d73f83db86763617d5b5f0874aeb, starting staged tree ddcc15afd48ddfbc29e55e1b405ce347d1efbe31 and the five carried staged paths with no unstaged/unexpected untracked work. Prior export statistics, 29,897 bytes/182 lines and SHA-256 f2e761765870f658e4239411a3867a481eef45156da6ea9a9f3dbc67b59dadfa matched fresh Git output. A complete 273-entry checkpoint and exact history prefix were saved. The Prompt 237 handoff was appended byte-for-byte; this prompt is an honestly labelled normalized transcription of UI escapes, not original-byte evidence. No fetch or other remote operation occurred.
+
+Prepared infra/ci/review_mutations.py, its offline harness tests and one additive integration step after the unchanged complete suite. Six bounded sequential isolated-copy invocations are planned: baseline twelve cases, A-D, restored twelve cases. The driver requires the existing database enforcement/URL and leaves safety fixtures unchanged. It binds candidate/index/HEAD/source/import identities; records exact edits, commands, JUnit/phase assertion details and baseline/mutant/restored hashes; validates restoration and checkout preservation; cleans only owned temporary copies. It uses existing Python/pytest without install/sync and records privacy-safe concise proof summaries plus ignored machine records. The process cap is 75 seconds, overall runner deadline 240 seconds, existing job limit 15 minutes. Timeouts or insufficient budget fail rather than retry.
+
+A relocates the same first-call cardinality assertion after the sentinel catch, so pre-return interruption fails its actual-call oracle rather than leaving it unreachable inside the callback. B commits the structurally valid full-key sequence-1 completion and requires the independent reloaded started-state oracle. C puts the token in the acceptance-only document and requires its absence assertion. D removes the exact injected captured evidence entry while retaining the instruction elsewhere; the original singleton unpacking requirement becomes an equivalent explicit cardinality assertion. These are isolated test-owned setup/observation edits, not production mutations or accepted application-test changes. Actual database sensitivity remains unverified.
+
+Executed offline: 44 runner tests passed in 66.05s; CI/tooling/packaging regressions 183 passed, 3 deliberately socket-using tests deselected in 14.52s. Three inert-stub pytest subprocess probes exercise pass/failure/multiline assertion and import binding. A separate actual-source-copy import/collection probe collected twelve cases only; no fixtures, database variables or test bodies ran and its phase-report list was empty. The CLI with database environment removed returned the expected exit 1 before copies/test imports, reporting required_disposable_database_not_configured. These are runner/collection/gate checks, not executed database controls or caught mutations.
+
+Explicit strict mypy for the two new Python files passed for Windows and Linux targets, two source files each; Linux target typing is not Linux runtime proof. Ruff format --check: 250 files already formatted; Ruff lint: All checks passed. Source hashes and outputs are saved under .local/p238/. Preparation iterations corrected an offline multiline-assertion test assumption and JUnit's optional failure-type representation; actual copied imports and trace type/line remain required. A Windows collection probe needed OS support variables retained in its test launcher; database variables remained absent. The initial run hit an existing pytest-cache access restriction, so later invocations disabled cacheprovider without changing project configuration. Final assertions were not weakened, and no application code was corrected.
+
+Completed scope/documentation checks before this outcome-note addition: exactly eight authorized staged paths, all 267 pre-existing protected entries outside the five documents and additive workflow change identical to HEAD, accepted specs/anchors and historical evidence/blocker/recovery blocks preserved, standard-library-only runner, workflow exactly one additive step, unchanged application tests/dependencies/resources. History prefix 3,262,550 bytes, SHA-256 a1897d49dd22e9e44d322536122aadad738d375b8fbb55829c6636d8a931efdf, and saved handoff byte copy verified. Encoding/whitespace passed. All tracked Markdown: 752 links/zero bad, 289 tables/zero problems. Privacy: 1,755 incremental additions/zero sensitive-pattern hits, with only public existing noreply attribution metadata allowed. This outcome-note addition will receive final scope/history/privacy/whitespace checks; unsuppressed staged Gitleaks and export results will be recorded in the saved handoff after execution.
+
+Eight paths remain staged and uncommitted for external review. No application-wide suite, build, installed-wheel or old CI rerun was needed or performed. No commit, push, CI dispatch/rerun, main promotion/merge, authentication change, dependency installation, provider call, production registration or M6 work occurred. Runtime contracts, individual slice/scoped M4d/E7 acceptance, original CI observations, local/reviewer attribution and all privacy/semantic/recovery limitations remain intact. Database execution awaits future authorized CI, not this preparation prompt.
+
+
+### Prompt 238 final source-binding refinement and verification
+
+Before handoff, Codex corrected the offline workflow guard to pin the reviewed pre-step workflow SHA-256 rather than compare against mutable HEAD, so it remains valid after commit and with shallow CI history. Source/import checks were also tightened to reject a wrong module mapped to another valid file inside the same copy, in addition to outside-copy paths and hash drift. These changes affect only the new runner/test files; accepted application inputs and the additive CI step are unchanged. The final unchanged sources then passed 45 offline runner tests in 68.30s and explicit strict mypy for Windows and Linux targets (two source files each). The earlier 44-test result above is historical preparation evidence. Final source hashes and actual commands are in .local/p238/checks/final-source-binding.json and executed-commands.json. No PostgreSQL controls or mutations ran; all remain pending future authorized CI. The post-staging tracked-file Docker-context assertion passed once (0.10s), specifically because staging the new paths changed that assertion's Git file-list input. Final scope/privacy/whitespace and staged secret scan are repeated only because the new source/history inputs changed.
+
+
+## Saved Prompt 238 handoff (byte-for-byte copy; Prompt 239 recovery)
+
+# Prompt 238 handoff: CI mutation preparation staged for review
+
+Written for: Mathew and the external reviewer.
+
+The bounded standard-library runner, offline tests and single additive integration step are
+implemented and staged, **uncommitted and awaiting review**. The reviewer accepted Prompt 237's
+blocker documentation and amended execution location to the existing disposable CI PostgreSQL
+service. Assertions, source binding and evidence obligations are unchanged.
+
+**No PostgreSQL controls or mutations ran. No database mutation is claimed caught.** Offline
+harness/collection/gate checks are separate from future database execution. G1-G3 remain open;
+overall M5 remains on hold. No commit, fetch, push, CI dispatch/rerun or main promotion occurred.
+
+## Recovery, checkpoint and final Git state
+
+- Branch: `feat/m5-completion`.
+- Unchanged HEAD/configured upstream/stored feature ref:
+  **`2a388dc324950d9feb46dbba3ffb75222f2a938e`**.
+- HEAD parent / unchanged local main / stored origin/main:
+  **`e050da3e3415d73f83db86763617d5b5f0874aeb`**.
+- HEAD tree: `ea88ddc30f22b2f44a6075ef9ef3a38c8af52112`.
+- Starting staged tree: **`ddcc15afd48ddfbc29e55e1b405ce347d1efbe31`**.
+- Final staged tree: **`48d222e04ea11ad7fdf651071844463032806867`**.
+- Exactly eight staged paths, listed below. No unstaged or unexpectedly untracked work.
+- Complete final tree: **275 entries**, including the two new files. All **267 pre-existing
+  protected blob/mode entries**, excluding the five documents and authorized workflow change,
+  remain identical to both starting staged tree and HEAD. Every production module, accepted
+  application test, migration/model, dependency/lockfile, setting, pinned resource/template,
+  sample-data and registry entry is preserved. No `.local` file is tracked.
+
+Governing instructions and saved Prompt 237 handoff were read. Recovery matched the expected
+branch/refs, staged tree and five-path stage set with no material discrepancy. No earlier
+matching active test/build task required intervention; no unrelated process was terminated.
+`.local/p238/checkpoint/` contains complete refs/status, a nonempty 273-entry starting tree
+listing, every starting staged identity, recent history and exact history prefix.
+
+The original Prompt 237 export was preserved and matched its recorded tree comparison:
+**4 files +106/-11; 29,897 bytes; 182 lines**, full indexes excluding prompts.md, UTF-8/no BOM/LF;
+SHA-256 `f2e761765870f658e4239411a3867a481eef45156da6ea9a9f3dbc67b59dadfa`.
+All source/state comparisons were local. No fresh remote observation or CI result is claimed.
+Origin, author/committer identity, branch history and stored main refs were not changed.
+
+## Exactly eight authorized paths
+
+- infra/ci/review_mutations.py (new)
+- tests/test_review_mutation_runner.py (new)
+- .github/workflows/ci.yml
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- docs/decisions/0026-anthropic-adapter.md
+- prompts.md
+
+ADR-0026 changes are limited to status/cross-references. Accepted specification text, headings,
+anchors and historical local/reviewer/CI/recovery/blocker records are preserved. The new
+execution-location amendment is separate from runtime contracts and explains precisely how
+Prompt 237's future-local-Docker requirement is superseded as to location only.
+
+## Runner behavior prepared for future CI
+
+The driver requires `EG_REQUIRE_INTEGRATION=1` and a configured test URL before copies/imports.
+The existing destructive-test URL guards and fixtures remain unchanged; no application database
+is selected. Six sequential subprocess invocations use independent temporary copies: twelve
+unmodified baseline cases, A, B, C, D, twelve restored unmodified cases. No parallel database
+subprocess, retry, new service, secret or dependency is introduced.
+
+Only Git-tracked application/package/test source and pyproject/alembic configuration enters
+the copy. Local/untracked files, environments, credentials, caches, build output and symlinks
+are excluded. Bytes must match Git index and candidate HEAD; the running script must equal
+its committed candidate version. Records include candidate commit, runner/workflow/lockfile
+hashes, Python executable/version and the copied-source manifest. The eventual candidate SHA
+does not exist yet; current runtime/accepted-test inputs remain those of `2a388dc3`.
+
+`python -I`, explicit copy package roots and disabled plugin autoload prevent editable-install
+paths or unrelated environment inputs from selecting application code. Bootstrap checks run
+before test calls and at session finish. Actual imported project/test module names, paths and
+hashes must correspond to their proper files inside the copy, including rejection of a wrong
+module mapped to another valid copied file. Parent checks revalidate imports and all source bytes.
+
+Every case records baseline/mutant/restored hashes, exact replacement fragments and description,
+command/exit, actual imported modules, JUnit/phase data, relevant assertion details and stdout/
+stderr. All copied source bytes are restored and compared before the copy is removed in a
+finally path; the checkout is checked unchanged. A cleanup/restoration/source/import failure
+fails the runner. Only generated temporary resources are removed; records remain ignored.
+
+| Scenario | Exact test-owned edit | Required detector; execution status |
+| --- | --- | --- |
+| A | Interrupt before saved real validation; move the existing first-call cardinality oracle immediately after the sentinel catch so it remains reachable | `p238_detector_A`: same actual-call/first-return cardinality must fail; **database execution pending** |
+| B | Commit forbidden full-key sequence-1 completion with valid completed-at/outcome/dispatched/matching-model/usage fields | `p238_detector_B`: independently reloaded first-call history must still require started; **database execution pending**, no constraint failure accepted |
+| C | Add complete token to assembled acceptance document only | `p238_detector_C`: existing case-insensitive document-absence assertion; **database execution pending** |
+| D | Replace copied captured request observation, removing exact injected chunk evidence while retaining instruction in another JSON field | `p238_detector_D`: equivalent explicit singleton-entry cardinality before original unpack; **database execution pending** |
+
+A's relocation and D's explicit cardinality express the original detectors at the deliberate
+fault; they do not weaken them or change accepted tests in the checkout. B's setup is
+structurally valid by inspected schema constraints, but has not executed against PostgreSQL.
+C preserves the separate literal quotation variant. These mutate test-owned setup/observations,
+not production behavior. All fragments must occur exactly once; missing/ambiguous matches fail.
+
+Exit 1 alone is not detection. JUnit must contain precisely the expected cases with no errors,
+skips or omissions; baseline/final controls must pass all twelve. A mutant must fail only at
+its labelled assertion, with successful setup/teardown, matching actual `AssertionError` type,
+exact imported file/line and JUnit assertion message. The optional JUnit type is checked when
+present; pytest 9.1.1 omits it, so independently recorded exception type is required.
+Survivors, unrelated/collection/setup failures, missing phases/cases/imports, drift and timeouts
+fail the runner. Expected mutant failures produce exit 0 only after every control and restoration
+check passes. A positive synthetic protocol fixture is not database mutation evidence.
+
+Each subprocess is capped at **75 seconds**, further limited by the remaining **240-second
+overall runner deadline**. Existing job timeout stays **15 minutes**. Timeout handling kills
+only the owned subprocess/group and waits for it; finally cleanup is attempted. An external
+hard process/job kill cannot guarantee Python finally execution. CI runtime of these probes
+is unmeasured; insufficient budget must fail rather than be treated as detection.
+
+## Integration workflow preservation
+
+Exactly one three-line additive step follows the unchanged complete integration command:
+
+```text
+Run review database mutation controls
+uv run --locked --no-sync --offline python infra/ci/review_mutations.py
+```
+
+Default step gating requires the original suite to pass first, and runner failure fails the
+integration job. Removing only this step reproduces the exact reviewed workflow. Existing
+push triggers, all five jobs, permissions, service image/configuration, integration environment,
+original `uv run --locked pytest -m integration`, timeout, installed-wheel blocks and every
+other step remain identical. Secret-scan workflow is untouched. No installation/sync occurs
+in the new step; no action dependency/manual workflow/job/database/secret is added.
+
+Full records are written to `.local/review-mutations/p238-<unique-id>/` on the ephemeral CI
+runner. Concise candidate/case proof summaries also print decisive hashes, actual imports,
+exit/detector details and restoration identity into job logs. Full records require separate
+retention before the ephemeral runner disappears; no artifact-upload action was added.
+Known database URLs/passwords are redacted and the driver prints no environment dump or raw
+unexpected exception text. This is preparation; those future execution records do not exist now.
+
+## Offline checks actually run on the final inputs
+
+Environment: Windows / Python **3.12.15**, pytest **9.1.1**, mypy
+**2.4.0**, Ruff **0.17.0**. Existing locked environment was used directly;
+no install/sync, Docker, provider, DNS/TLS request or substitute database was used.
+
+- **45 runner tests passed in 68.30s**, final JUnit/output at `runner-offline.xml` /
+  `runner-offline.txt`. Intended protocol assertion acceptance, survivors, unrelated/type/line
+  failures, setup/collection/skip/missing target/phase, timeout, source/import/name mismatch,
+  restoration failure, baseline/final-control failure, cleanup, exact transformations and
+  candidate/index binding are covered with synthetic subprocess/XML fixtures.
+- Three real pytest subprocesses use **inert stub modules** to check passing/failing/multiline
+  assertion metadata and isolation. A separate actual-source-copy probe imports and **collects
+  twelve cases only** without database variables, fixtures or test bodies; phase reports are
+  empty. `checks/offline-collection-imports.json` and `offline-collection-manifest.json` retain
+  actual paths/hashes from that copy. Collection is not executed database control evidence.
+- Relevant CI/tooling/packaging regressions: **183 passed, 3 deselected in 14.52s**. The three
+  socket-using HTTP cases were excluded to preserve offline scope. After staging new paths,
+  the Git-tracked build-context assertion passed again (**1 passed in 0.10s**), justified by
+  its changed file-list input. This is static context evidence, not Docker execution.
+- Explicit strict mypy of **the two new Python files** passed for Windows and Linux targets,
+  **two source files each**, exit 0. Linux target typing is not Linux runtime verification;
+  project-wide mypy was not repeated.
+- Ruff format --check: **250 files already formatted**; Ruff lint: **All checks passed**;
+  both exit 0. No unrelated file was reformatted.
+- Actual CLI invocation with database environment removed: expected **exit 1**,
+  `required_disposable_database_not_configured`, before source copies/test imports. This is a
+  refusal-gate probe, not a failed database control. No URL or credentials were supplied.
+- Final scope/protected identity/specification/anchor/history/documentation/encoding/whitespace/
+  privacy checks passed. **752 links, zero bad; 289 tables, zero problems** across tracked
+  Markdown; `git diff --cached --check` passed. **1,798 incremental additions**, zero sensitive-
+  pattern hits, allowing only existing public noreply attribution metadata from the handoff.
+- Unsuppressed staged Gitleaks: **exit 0; approximately 159,816 bytes; no leaks found**.
+  `checks/gitleaks-staged-final.txt` retains output. PowerShell native-stderr error-style
+  rendering did not alter the successful native exit code. No new full-history scan is claimed.
+
+Commands/exits and relevant output files are indexed in `checks/executed-commands.json`.
+Preparatory iterations corrected a multiline-assertion test assumption, optional JUnit type
+handling, Windows OS support variables in the collection-test launcher, stable post-commit/
+shallow-checkout workflow guarding and inside-copy wrong-module binding. An initial pytest
+cache permission error was avoided with invocation-only `-p no:cacheprovider`; no project
+configuration was changed. Earlier 44-case results are historical preparation observations,
+not results for the final refined inputs. The final source bindings above/below supersede them.
+
+## Final source binding and history fidelity
+
+| Path | Final staged Git blob (mode 100644) | SHA-256 of final tested bytes |
+| --- | --- | --- |
+| `infra/ci/review_mutations.py` | `f0bbcf532f75cf39993e643246c855bd01c308ef` | `255f138cf7648ad3c3a18761c4e0607cb8978e705fb09a7ebbdf6c84ee035b55` |
+| `tests/test_review_mutation_runner.py` | `fbc7566ece6ad2dc058d225a299c677a0e5f8682` | `8d9598c93c80a6fb16ccf9d9a534981b51ca2987925888dd0f2fb1b39ff15dc9` |
+| `.github/workflows/ci.yml` | `d7e068fcf30341016e254464be0efb69fb2e47b7` | `96fec19193ba674fadfdde50b817ec15351e59ee85b661fdfb7efc2e9910b79c` |
+
+`checks/final-source-binding.json` also binds unchanged tooling/packaging regression inputs,
+the two accepted PostgreSQL modules, project metadata and lockfile. Final hashes/index identities
+were compared after testing; no executable/test/workflow byte changed after the final checks.
+All other protected entries are proven by full-tree blob/mode comparison, not inferred from
+test counts. Machine records/ignored scripts do not enter the index.
+
+The earlier prompts.md prefix is preserved identically: **3,262,550 bytes**,
+SHA-256 `a1897d49dd22e9e44d322536122aadad738d375b8fbb55829c6636d8a931efdf`. The saved Prompt 237 handoff is byte-copied and compared
+with its actual file. Prompt 238 is labelled a normalized transcription of UI escapes, not
+independently byte-verified original-message evidence. Outcome/refinement notes distinguish
+completed checks, earlier preparation and pending database execution. No hidden instructions,
+environment dump or credentials were recorded in tracked history.
+
+## Incremental export
+
+- File: `.local/p238/m5-completion-ci-mutation-runner.diff`.
+- Baseline starting staged tree: **`ddcc15afd48ddfbc29e55e1b405ce347d1efbe31`**.
+- Destination final staged tree: **`48d222e04ea11ad7fdf651071844463032806867`**.
+- Full indexes, prompts.md excluded; fresh cached and tree Git bytes are identical.
+- Seven exported paths: workflow (+3/-0), README (+7/-3), ADR-0026 (+8/-3), plan (+116/-0),
+  threat model (+7/-2), new runner (+776/-0), new tests (+480/-0).
+- **7 files, +1,397/-8; 85,099 bytes; 1,493 lines; UTF-8 without BOM, LF, final newline.**
+- SHA-256: **`c376b9d33e82a83213406fb90f20ddac9e07e7c246c4f436960f81ab7927ccf3`**.
+- Including history: **8 files +1,798/-8** against starting tree. Including carried evidence
+  against unchanged HEAD: **8 files +2,671/-26**. Final refs/status/tree/index records are under
+  `checks/final-*`; no commit was created.
+
+## Pending execution and limits
+
+Future authorized CI must actually run unmodified controls, all four intended-detector failures,
+restoration checks and final controls for the eventual exact candidate commit. The current
+offline XML/protocol fixtures are not that evidence; no mutation is marked caught on their
+basis. Runtime/time-budget viability against PostgreSQL remains unverified. The runner and
+workflow preparation itself still await external review before any commit or publication.
+
+Feature evidence acceptance, individual M5a-M5h and scoped M4d/E7 acceptance remain intact.
+G1-G3 remain open; overall M5 is not accepted. Spans remain ephemeral, not durable persistence
+or provider-receipt proof. Controlled interruption is not a physical process kill or exactly-
+once guarantee. Scripted canary acceptance, emitting/mixed-case negative controls and genuine
+quotation limits remain distinct. Provenance proves neither entailment, authenticity nor
+semantic injection resistance. U4 discarded evidence, database trust, M3 lease/commit window,
+unknown outcomes and no exactly-once calls remain. Container smoke covers ingestion/indexing,
+not reviews. There is no production run_review registration or application review path.
+
+Historical local, isolated reviewer, feature/main CI and earlier HTTP mutation/network-evidence
+attributions/qualifications remain unchanged; a missing --offline flag does not prove historical
+network activity, and recovery did not establish universal historical absence or rerun saved
+checks. No live API/compatibility/model-quality claim follows. No application-wide suite,
+build, wheel check, database test/mutation or CI dispatch/rerun was performed. No commit,
+fetch/other remote operation, push, fast-forward/merge, authentication/credential change,
+production correction/registration, provider call or M6 work occurred.
+
+Mathew: return **output plus the complete handoff and diff file** `.local/p238/handoff.md`
+and `.local/p238/m5-completion-ci-mutation-runner.diff` for external review. Leave all eight
+paths staged and uncommitted; no commit or publication is authorized yet.
+
+
+## Prompt 239 (normalized transcription)
+
+The supplied UI backslash line escapes are normalized to plain newlines. This is not independently byte-verified original-message evidence.
+
+Continue EvidenceGuard in this fresh session. This is Prompt 239: recover the reviewed CI mutation-runner work, commit it locally, then prepare Mathew’s manual feature push and monitor its exact-commit CI.
+
+Repository:
+D:\Claude\evidenceguard_agentic_rag
+
+Read governing repository instructions first. Do not assume this session has prior context.
+
+BACKGROUND AND REVIEW DECISION
+
+M5a–M5h are individually accepted and published. Overall M5 remains on hold for completion evidence covering:
+G1 provider-call spans;
+G2 post-response/pre-stage-commit interruption and reclaim;
+G3 parts-assembled canary acceptance fixtures.
+
+The completion implementation is committed and feature-published at:
+2a388dc324950d9feb46dbba3ffb75222f2a938e
+
+All five feature CI jobs passed for that commit. The external reviewer independently confirmed the logs and accepted that evidence.
+
+Four additional database mutation checks remain pending. Local Docker is unavailable, so an isolated runner and one additive step in the existing PostgreSQL integration job were prepared. They are staged, not committed.
+
+The reviewer has now accepted that runner for one local commit and manual feature publication. Their 95 isolated standard-library checks passed. These were not PostgreSQL or CI execution.
+
+RECOVERY SOURCES
+
+Read:
+- .local/p238/handoff.md
+- .local/p238/m5-completion-ci-mutation-runner.diff
+- Relevant accepted completion specification/status sections in docs/plan.md
+
+Use earlier .local/p234–p237 records only as needed. Do not read the entire prompts.md history; verify its preserved prefix using checkpoints and inspect relevant appended sections.
+
+EXPECTED STARTING STATE
+
+Branch:
+feat/m5-completion
+
+HEAD and stored feature upstream:
+2a388dc324950d9feb46dbba3ffb75222f2a938e
+
+Local main and stored origin/main:
+e050da3e3415d73f83db86763617d5b5f0874aeb
+
+Staged tree:
+48d222e04ea11ad7fdf651071844463032806867
+
+Exactly eight staged paths:
+- infra/ci/review_mutations.py
+- tests/test_review_mutation_runner.py
+- .github/workflows/ci.yml
+- README.md
+- docs/plan.md
+- docs/threat-model.md
+- docs/decisions/0026-anthropic-adapter.md
+- prompts.md
+
+Nothing unstaged or unexpectedly untracked.
+
+Verify the existing export:
+.local/p238/m5-completion-ci-mutation-runner.diff
+
+Baseline tree:
+ddcc15afd48ddfbc29e55e1b405ce347d1efbe31
+
+Destination tree:
+48d222e04ea11ad7fdf651071844463032806867
+
+7 files, +1,397/-8; 85,099 bytes; 1,493 lines.
+Full indexes, UTF-8/LF, prompts.md excluded.
+SHA-256:
+c376b9d33e82a83213406fb90f20ddac9e07e7c246c4f436960f81ab7927ccf3
+
+RECOVERY RULE
+
+Inspect actual state before editing. If Prompt 239 already started, identify its first unfinished step and continue from there.
+
+Do not create a duplicate commit, overwrite work, repeat a completed push or restart monitoring unnecessarily. If a material identity differs without explanation in saved records, report the discrepancy before dependent actions.
+
+Save a complete checkpoint/resume note under .local/p239/.
+
+AUTHORIZED WORK
+
+1. Record acceptance
+
+Only the five documentation/history files may change from the reviewed staged tree.
+
+Record acceptance for commit and feature execution, keeping reviewer evidence separate from Codex’s local checks.
+
+Preserve these reviewed blobs/modes exactly:
+- Runner: f0bbcf532f75cf39993e643246c855bd01c308ef
+- Runner tests: fbc7566ece6ad2dc058d225a299c677a0e5f8682
+- Workflow: d7e068fcf30341016e254464be0efb69fb2e47b7
+
+Every other protected entry must remain unchanged. ADR-0026 changes remain status/cross-references only.
+
+Append the saved Prompt 238 handoff byte-for-byte. Label this prompt’s transcription honestly.
+
+No PostgreSQL mutation is yet claimed caught. G1–G3 and overall M5 remain open.
+
+2. Check and commit once
+
+Run appropriate scope/protected-identity, documentation, history, encoding, whitespace, privacy, Ruff and unsuppressed staged Gitleaks checks.
+
+Do not repeat unchanged application tests, builds or offline runner checks unless a concrete discrepancy warrants it.
+
+Create one normal local commit containing exactly the eight reviewed paths, including carried documentation/history.
+
+Suggested subject:
+ci: verify review database mutation detectors
+
+Parent:
+2a388dc324950d9feb46dbba3ffb75222f2a938e
+
+Use the established noreply identity, a message file and repository attribution conventions.
+
+Verify parent/tree/path scope, protected identities, clean worktree and unchanged main refs. Run unsuppressed full-history Gitleaks.
+
+No amend, rewrite or extra history-only commit.
+
+Save:
+.local/p239/m5-ci-mutation-runner-acceptance.diff
+
+Compare reviewed tree 48d222e04ea11ad7fdf651071844463032806867 to the new commit, using full indexes and excluding prompts.md. Verify fresh Git byte identity and report metadata.
+
+3. Preflight the manual feature push
+
+Read-only fetch --no-tags and exact ls-remote checks are authorized.
+
+Require:
+- Remote feature remains 2a388dc3.
+- Remote main remains e050da3e.
+- The new target is the sole direct child above feature upstream.
+- Clean worktree and reviewed path scope.
+- Accepted production/application-test identities unchanged.
+- Existing integration suite, guards, pinned service, timeout, five jobs and triggers preserved.
+- Only the reviewed mutation step added.
+- Range privacy and Gitleaks pass.
+
+If remote feature already equals the new target, do not push again: verify it and resume matching CI.
+
+Otherwise, after preflight passes, give Mathew the exact new target SHA and this PowerShell command:
+
+git -C 'D:\Claude\evidenceguard_agentic_rag' push origin refs/heads/feat/m5-completion:refs/heads/feat/m5-completion
+
+STOP AND WAIT for Mathew’s push result. Do not push or initiate authentication yourself.
+
+4. Resume after Mathew reports success
+
+Verify remote feature, HEAD and upstream equal the new target; remote main must remain unchanged.
+
+Monitor only that exact target’s feature push, attempt-1 ci and secret-scan runs, within 25 minutes.
+
+Require all five jobs. In the PostgreSQL job verify:
+- Full integration suite passed first.
+- “Run review database mutation controls” executed successfully.
+- Baseline and restored controls passed.
+- A, B, C and D each report caught.
+- Proofs identify intended assertions, exit codes, source hashes, isolated imports and restoration identity.
+- No setup/collection error, skip, timeout or unrelated assertion counted as detection.
+- Checkout preservation is confirmed.
+
+Retrieve available logs and save decisive proof JSON and metadata. Do not claim possession of full ephemeral .local records unless actually retained/retrieved.
+
+A green job conclusion alone is insufficient for a mutation-evidence claim.
+
+If the gate fails, is cancelled, lacks required proof or exceeds the bound, save the evidence and stop. No correction, rerun or further push is authorized.
+
+5. Evidence after success only
+
+If all five jobs and required proofs pass, update and stage only the five evidence/history documents.
+
+Keep old and new SHA results separate, offline harness checks distinct from executed database mutations, and reviewer evidence separate from Codex observations.
+
+State:
+“feature-CI verified, not merged; mutation evidence ready for external review.”
+
+Do not close G1–G3 or accept overall M5.
+
+Run appropriate final documentation/scope/history/privacy/Ruff/staged Gitleaks checks. Leave evidence staged and uncommitted.
+
+DELIVERABLES
+
+Save:
+- .local/p239/handoff.md
+- .local/p239/m5-ci-mutation-runner-acceptance.diff
+- .local/p239/m5-completion-ci-mutation-results.diff — only after the successful gate.
+
+Results export: new published commit to final staged evidence tree, full indexes, prompts.md excluded.
+
+Report commit/tree identities, scope, statistics, bytes, lines, encoding and SHA-256; verify fresh Git byte identity.
+
+If CI fails, return the handoff, acceptance export and failure evidence instead of a green results diff.
+
+LIMITS
+
+No automatic push, main fast-forward/push, merge, branch deletion, rewrite, CI rerun, production correction/registration, authentication change, live provider call, M6 work or overall M5 acceptance.
+
+Continue autonomously through authorized preparation. The manual-push handoff is the required pause.
+
+## Prompt 239 acceptance and preparation
+
+The external reviewer accepts the reviewed runner for one local commit and manual feature publication; their reported 95 isolated standard-library checks passed. Those checks are neither Codex observations nor PostgreSQL/CI execution. Codex recovered the exact reviewed tree/export and history checkpoints. Only five documentation/history files change from the reviewed tree; the runner, tests, workflow and all other protected blob/mode identities are preserved. No database mutation is claimed caught. G1-G3 remain open and overall M5 remains on hold. This record authorizes a single local commit and preflight, followed by the mandatory pause for Mathew to push manually. Exact-commit CI proof and any subsequent staged evidence are pending; no main promotion, rerun or correction is authorized.
+
+### Prompt 239 pre-commit verification (Codex current session)
+
+Scope/protected identities, accepted specification and ADR-body preservation, exact history prefix/handoff copy, UTF-8/LF/whitespace and acceptance/publication-range privacy checks passed. Tracked Markdown checks passed: 756 links, zero bad; 291 tables, zero problems. Ruff format --check reported 250 files already formatted; Ruff check passed, both exit 0. Unsuppressed staged Gitleaks passed, exit 0, no leaks; the final staged history addition is scanned again before commit. Sandbox restrictions initially blocked Git index-lock writes and execution of the installed scanner; authorized escalated staging/scanning succeeded without changing configuration or authentication. Application tests, builds, offline runner checks and PostgreSQL mutations were not repeated. The single authorized commit, full-history scan and read-only remote preflight follow these checks; their completed identities/results belong in the ignored Prompt 239 handoff. No push or CI result is claimed here.

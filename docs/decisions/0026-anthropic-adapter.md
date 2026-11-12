@@ -10,8 +10,18 @@
   evidence was accepted externally in Prompt 232; it was not in that CI target. The separate
   overall M5 assessment/hold recommendation was accepted in Prompt 233; overall M5 is still
   unaccepted. Its bounded completion specification was accepted in Prompt 234; the
-  implementation was accepted for one local commit only in Prompt 235, with separately
-  attributed evidence and PostgreSQL/CI/publication/overall-M5 gates still pending.
+  implementation was accepted for one local commit only in Prompt 235. After separately
+  authorized manual feature publication, it is [feature-CI verified, not merged](../plan.md#m5-completion-feature-ci-evidence-prompt-236)
+  at `2a388dc324950d9feb46dbba3ffb75222f2a938e` (Prompt 236). The reviewer accepted that
+  [feature evidence in Prompt 237](../plan.md#m5-completion-feature-evidence-acceptance-and-database-mutation-status-prompt-237);
+  local database mutation work was blocked by unavailable Docker tooling. Database-dependent
+  mutations, main publication and renewed overall M5 assessment remain pending. Prompt 238
+  accepts the blocker record and permits the same probes in existing CI PostgreSQL; the
+  [runner preparation](../plan.md#m5-completion-ci-mutation-preparation-prompt-238-staged-for-review)
+  was accepted for one local commit and manual feature publication in Prompt 239
+  ([decision and pending exact-commit gate](../plan.md#m5-completion-ci-mutation-runner-acceptance-prompt-239)). The reviewer reports
+  95 isolated standard-library checks; these are not PostgreSQL or CI execution. Database
+  mutation execution remains pending; G1-G3 and overall M5 remain open.
 - **Specification:** the [accepted M5h specification](../plan.md#m5h-anthropic-adapter-specification-accepted-at-review-prompt-227-implementation-pending),
   accepted in Prompt 227 with H1–H10 and binding clarifications A–C
   ([acceptance](../plan.md#m5h-acceptance-prompt-227)). The specification binds this
@@ -420,9 +430,17 @@ source. This does not accept overall M5 or revoke individual slice/scoped M4d/E7
 The [G1-G3 completion follow-up](../plan.md#m5-bounded-completion-follow-up-proposed-prompt-233-implementation-unauthorized)
 is a separate specification accepted with binding clarifications in Prompt 234.
 Its [implementation status](../plan.md#m5-completion-implementation-status-prompt-234-staged-for-review)
-is accepted for one local commit only in Prompt 235. The reviewer's isolated evidence is
-recorded there separately from Codex's local results; G1-G3 remain open. This does not change
-M5h publication acceptance or accept overall M5.
+was accepted for one local commit only in Prompt 235 and is now
+[feature-CI verified, not merged](../plan.md#m5-completion-feature-ci-evidence-prompt-236) at
+`2a388dc324950d9feb46dbba3ffb75222f2a938e` after Mathew's separately authorized manual push
+(Prompt 236). Codex's CI observations, historical local results and reviewer probes remain
+separate. The [feature evidence was accepted in Prompt 237](../plan.md#m5-completion-feature-evidence-acceptance-and-database-mutation-status-prompt-237);
+local mutation verification stopped before setup because Docker tooling was unavailable.
+G1-G3 remain open; database-dependent mutations, main publication and renewed overall assessment
+are pending. Prompt 238 accepts that blocker documentation and amends execution location to
+the existing CI service; [runner preparation](../plan.md#m5-completion-ci-mutation-preparation-prompt-238-staged-for-review)
+is staged for review, without a database execution claim. This does not change M5h publication
+acceptance or accept overall M5.
 
 **Independent reviewer evidence, supplied in Prompt 232.** The reviewer independently retrieved
 remote main and `feat/anthropic-adapter`, both at the exact target; all four workflow-run

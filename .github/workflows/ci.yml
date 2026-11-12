@@ -510,6 +510,9 @@ jobs:
       - name: Run integration tests
         run: uv run --locked pytest -m integration
 
+      - name: Run review database mutation controls
+        run: uv run --locked --no-sync --offline python infra/ci/review_mutations.py
+
   container:
     # M3f (ADR-0012): image build, effective build-context check, image checks and a Compose smoke
     # test. Linux containers need an Ubuntu runner. Development stack only; nothing is published.
