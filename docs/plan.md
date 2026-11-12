@@ -15415,6 +15415,104 @@ These accepted allocations do not dispose of G1–G3. Overall M5 acceptance, pro
 live calls and M6 implementation remain unauthorized pending further review.
 
 
+##### M5 dated reassessment 2026-11-12 (Prompt 240; proposed)
+
+**Status (Prompt 241): accepted at external review**, including the scoped overall M5
+recommendation at implementation baseline `205c987e` ([distinct acceptance decision](#overall-m5-scoped-acceptance-prompt-241)).
+The original heading/anchor is retained for compatibility; its proposed wording is historical.
+
+**Historical Prompt 240 recommendation, accepted in Prompt 241.** Following the
+successful [main publication and separate exact-target CI gate](#m5-main-publication-and-separate-ci-evidence-prompt-240), Codex
+recommends **overall M5 acceptance within the accepted internal, tenant-bound, snapshot-pinned,
+fenced review workflow scope at `205c987eaeea54a9ce2f70e6d1c105a0bc14145f`**. No remaining blocking gap was found within
+the original criteria and accepted amendments. **Overall M5 is now accepted within the
+reviewed scope by the explicit Prompt 241 decision.** This does not implement or authorize M6.
+
+This is the dated successor to the original Prompt 232 assessment matrix above, whose
+historical evidence, three unresolved rows and accepted Prompt 233 hold decision remain
+verbatim. Every original matrix requirement is reassessed below in the same order; the first
+six rows still account for all [original criteria](#m5-acceptance-criteria-mapped-to-slices-and-tests).
+No original requirement is invented, removed or silently waived. The reviewer explicitly
+satisfied G1-G3 and accepted required mutation evidence at `52071373` in Prompt 240; all
+270 protected executable/test/workflow identities carry that scoped closure to published
+`205c987e`. Fresh feature and separate main gates execute that version. The reviewer
+subsequently accepted those run records and the 23-row reassessment in Prompt 241; later
+acceptance-record publication evidence remains separate.
+
+**Evidence notation.** V_main means separately retrieved Ubuntu/Windows main verify evidence;
+PG_main means separately retrieved complete main PostgreSQL integration evidence. Both are
+the `main`, `push`, attempt-1 jobs at exact `205c987e`, not copied feature counts. Main has
+5,778/441 Ubuntu passed/skipped, 5,777/442 Windows passed/skipped, 441 PostgreSQL passed/
+5,778 deselected, plus successful baseline/restored/A-D sensitivity proofs. Named tests in
+this matrix are source-inspected coverage coupled to module/suite execution and exact source
+identity; they were not individually printed test names. Previous slice acceptance and
+historical results retain their original authorship/version and are not fresh local reruns.
+
+| Requirement and accepted source | Implementation/module | Relevant tests (source inspection) | Current evidence / version | Reviewed reassessment status | Retained limitation or obligation |
+| --- | --- | --- | --- | --- | --- |
+| Invalid output, refusal, timeout and forged chunk ID end unresolved or rejected: [original-criteria mapping](#m5-acceptance-criteria-mapped-to-slices-and-tests), Correction D | `domain.agent_outputs`, `agents.providers`, `domain.provenance`, `worker.review` | `test_agent_outputs.py`, `test_model_calls.py`, `test_provenance.py`; handler U1/retry/repair cases; PostgreSQL timeout-exhaustion case | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied | Rejection is syntactic/provenance classification, not a quality judgment. Persisted budget bounds retries; refusal is terminal. |
+| Later revision excluded, including resume: [criteria mapping](#m5-acceptance-criteria-mapped-to-slices-and-tests), [M4d acceptance](decisions/0025-review-orchestration.md#scoped-m4d-and-e7-acceptance-and-m5h-disposition-prompt-226) | `persistence.reviews`, `worker.review` trusted snapshot retrieval/reload | `test_reviews_postgres.py`, `test_review_handler.py` trusted-snapshot path and reload cases, `test_review_handler_postgres.py` replacement-revision case | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied within an explicitly accepted scope | Carries forward M4d acceptance for the internal `run_review` composition only. No new combined-case or individually printed test-name claim. Database trust and discarded U4 evidence remain. |
+| Resume after committed stage without duplicates: [criteria mapping](#m5-acceptance-criteria-mapped-to-slices-and-tests), W5/W6 | `persistence.review_stages`, `worker.review` skip/replay | `test_review_stages_postgres.py`; `test_review_handler_postgres.py::test_an_uncommitted_finish_is_retried_and_reuses_every_stage_with_zero_calls`; unit replay cases | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied within an explicitly accepted scope | Controlled interruption/rollback/reclaim evidence and unique-key/replay invariants, not proof of every physical process-kill timing or exactly-once calls. |
+| Controlled crash after response, before stage commit: [criteria mapping](#m5-acceptance-criteria-mapped-to-slices-and-tests), W5 | `_dispatch` in `worker.review`; persisted reservations | `test_review_handler_postgres.py::test_a_returned_response_interrupted_before_stage_commit_repeats_once_on_reclaim`; earlier before-dispatch and committed-stage reuse tests remain distinct | G2 externally satisfied at `52071373`; protected test/handler identity at `205c987e`; V_main + PG_main and A/B sensitivity proofs | satisfied within accepted internal scope (G2) | Controlled response-bearing interruption/reclaim: two actual matching calls, first reservation started, second completed, one stage; not physical-kill, one-retry or exactly-once proof. |
+| Stale-worker stage writes rejected: [criteria mapping](#m5-acceptance-criteria-mapped-to-slices-and-tests), [Correction D](#call-budgets-repair-and-terminal-state-correction-d) | `JobContext.fenced`, stage/output persistence, `worker.review` | `test_review_stages_postgres.py`, `test_review_outputs_postgres.py`; handler stale-token/final-ownership and lease-loss cases | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied within an explicitly accepted scope | M3 fence semantics, explicit cancellation checks and final ownership test; M3 lease/commit window and uncertain commit outcomes are not eliminated. |
+| Injection canary absent from output under the three-part contract: [Correction E](#canary-and-prompt-boundary-coverage-correction-e), W10 | Safe assembly, provenance, hash-covered report; test-only surface checker | `test_review_handler.py` assembled/literal and emitting/mixed-case cases; four `test_review_canary_postgres.py` positions with the same checker | G3 externally satisfied at `52071373`; protected fixture/checker identity at `205c987e`; V_main + PG_main and C/D sensitivity proofs | satisfied within accepted contract-fixture scope (G3) | Assembled token absent from documents/request, injected entry bound to persisted evidence; ordinary acceptance passes, emitting/mixed-case checker controls detect it, genuine authorized quotation remains a separate limitation. No live-model injection-resistance claim. |
+| M5a strict values, JSON admission and provider-call classification: [ADR-0019](decisions/0019-model-call-contracts.md) | `domain.model_calls`, `domain.agent_outputs`, `agents.providers`, scripted fake | `test_model_calls.py`, `test_agent_outputs.py`, `test_scripted_provider.py` | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied | Bounded strict parsing, safe outcomes and process-control propagation; no hidden provider retry or semantic validation. |
+| M5b quote provenance and derived status: [ADR-0020](decisions/0020-provenance-validation.md) | `domain.provenance` and trusted evidence values | `test_provenance.py`, `test_quote_matching.py`; owner/shared-citation and documentary-rule cases | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied | Source authorization, quote matching/offsets and deterministic status do not establish entailment, authenticity or semantic injection resistance. |
+| Pinned template, planner and prompt/request assembly: W3, [ADR-0021](decisions/0021-review-request-assembly.md) | `agents.templates`, `agents.prompts`, packaged TOML/Markdown, request assembly | `test_review_templates.py`, `test_prompts.py`, `test_request_assembly.py` | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied | Digests bind the pinned versions; closed JSON evidence encoding and byte caps do not prove model obedience. Ground truth is not a request input. |
+| Tenant-bound creation, persisted configuration/snapshot and canonical job linkage: [Correction A](#composable-capture-and-review-creation-correction-a), [ADR-0022](decisions/0022-review-creation.md) | `domain.reviews`, `persistence.reviews`, retrieval transaction seam, worker review seam | `test_review_values.py`, `test_review_creation.py`, `test_reviews_postgres.py` | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied within an explicitly accepted scope | Atomic creation, idempotency, trusted digest/job reload and tenant checks are internal seams; database writers remain trusted. No application endpoint follows. |
+| Stage fencing, identical replay, repair and persisted call budgets: [Correction D](#call-budgets-repair-and-terminal-state-correction-d), W4–W6, [ADR-0023](decisions/0023-review-stage-persistence.md) | `domain.review_stages`, `persistence.review_stages`, migration 0007, `worker.review` | `test_review_stage_values.py`, `test_review_stage_planner.py`, `test_review_stage_persistence.py`, `test_review_stages_postgres.py`; handler repair/budget cases | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied | Three reservations/stage over all attempts, one lifetime repair; abandoned reservations consume budget. G2 is satisfied separately; budgets do not guarantee one retry or exactly-once dispatch. |
+| Trusted evidence/stage reload; owner-bound analysis and documentary finding: [ADRs 0020](decisions/0020-provenance-validation.md), [0023](decisions/0023-review-stage-persistence.md), [0025](decisions/0025-review-orchestration.md) | Trusted loaders, provenance revalidation, verification then analysis using owner evidence | `test_review_stages_postgres.py`, `test_review_stage_persistence.py`; handler tamper/owner/analysis-failure/P11 cases | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied within an explicitly accepted scope | Owner/shared full citation equality is checked. U4 deliberately discarded evidence cannot be re-proved or reopened; database trust remains. Analysis failure preserves verification and required documentary finding. |
+| Report completeness, source binding and hash-covered substantive content: [report-integrity invariant](#report-integrity-prompt-169), [ADR-0024](decisions/0024-review-report-content.md) | `domain.report_content`, `agents.report`, trusted report builder | `test_report_content.py`, `test_report_builder.py`; output binding/reload tests | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied | Versioned M5 wrapper covers displayed content and bound sources; legacy M1 report hash remains unchanged. No enrichment from unhashed rows; M6 must bind approval/export to the wrapper digest. |
+| Deterministic rendering of the hash-covered report: [report integrity](#report-integrity-prompt-169), [ADR-0024](decisions/0024-review-report-content.md) | `agents.report`, renderer version and bounded Markdown | `test_report_renderer.py`, `test_report_builder.py` | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied | Literal escaping and deterministic text are not browser-sanitization or semantic-safety evidence. No approval/export is implemented here. |
+| Orchestration, cancellation and lease/process-control boundaries: W7, [ADR-0025](decisions/0025-review-orchestration.md) | `worker.review` `_step`, `_fenced`, `_Attempt`; transaction cleanup | `test_review_handler.py`, `test_review_handler_postgres.py`; process-control/cleanup and persistence-boundary cases | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied within an explicitly accepted scope | Checks before/after synchronous work; first process-control identity preserved. No preemption of an in-flight call, no compensating write after fence loss and no claim that uncertain finish failed to commit. |
+| Output persistence and atomic completion: Correction D, E7, [Prompt 226 acceptance](decisions/0025-review-orchestration.md#scoped-m4d-and-e7-acceptance-and-m5h-disposition-prompt-226) | `domain.review_outputs`, `persistence.review_outputs`, migration 0008, `ctx.fenced(finish=True)` | `test_review_output_values.py`, `test_review_output_persistence.py`, `test_review_outputs_postgres.py`; handler finish rollback/replay cases | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied within an explicitly accepted scope | E7 allocation to M5f/M5g is fulfilled, not deferred. Output and job success share the fence/transaction; unknown database commit outcomes and DB trust remain. |
+| Provider-call records **and spans**: original M5 and [accepted M5e allocation](#proposed-slices-dependency-ordered) | Persisted reservations/outcomes in `CallRecord`; closed `observability.provider_spans`, typed `jsonlog` sink/serialization and worker composition | `test_provider_spans.py`, `test_logging.py`, handler dispatch/no-dispatch/control/privacy cases and PostgreSQL reclaim span correlation | G1 externally satisfied at `52071373`; protected source/test identity at `205c987e`; V_main + PG_main and both main wheel span lines | satisfied within tested internal composition (G1) | Correlated best-effort ephemeral begin/end spans with privacy-bounded fields. No durable telemetry, provider-receipt, hard wall-clock or complete OpenTelemetry claim; later E6 remains separate. |
+| M5h offline adapter, bounded HTTPS transport and composition: [accepted M5h specification](#m5h-anthropic-adapter-specification-accepted-at-review-prompt-227-implementation-pending), [ADR-0026](decisions/0026-anthropic-adapter.md) | `agents.anthropic`, `worker.anthropic_http` | `test_anthropic_provider.py`, `test_anthropic_http.py`, `test_review_anthropic_composition.py` | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied within an explicitly accepted scope | Synthetic responses, fake connections and in-memory socket. Real HTTP/DNS/TLS, alias compatibility and model quality unverified; cooperative elapsed checks are not a hard wall-clock bound. |
+| Packaged resources/import guards, installed wheels and current-version CI: accepted slice verification and [ADR-0026 evidence](decisions/0026-anthropic-adapter.md#main-publication-and-separate-exact-commit-ci-prompt-231) | Packaged resources, reviewed import guards and accepted workflow including the single additive mutation step | `test_packaging.py`; clean installed-wheel assertion body | Separate exact-target feature/main V/PG gates, strict mypy in 202 source files; retained wheel result lines and new span line; current database/mutation/container/Gitleaks observations recorded separately | satisfied within an explicitly accepted scope | Current-version CI is established; container smoke is ingestion/indexing only. Neither installed-wheel nor container evidence is a live-provider/application-review test. |
+| Privacy-safe failures and process-control behavior across seams: W7, [ADRs 0019](decisions/0019-model-call-contracts.md), [0025](decisions/0025-review-orchestration.md), [0026](decisions/0026-anthropic-adapter.md) | Fixed error codes; no raw content in call records/errors; process-control-preserving cleanup | Model-call/handler/HTTP/provider tests, captured canary log/error surfaces and transaction tests | V_main + PG_main at `205c987e`; named coverage is source-inspected, not individually printed CI test names; earlier slice acceptance retained | satisfied within an explicitly accepted scope | Secret scanning and captured synthetic surfaces are bounded evidence, not proof of universal confidentiality or every historical network action. |
+| Production enqueue/registration and application review path: [W8 reconciliation](#production-dispatch-and-enqueue-w8-reconciled), [accepted W8 decision](#sequence-level-design-decisions) | Explicit-provider internal factory; `production_registry` remains `ingest_revision, index_revision` | Registry/handler tests; printed installed-wheel registry output | Accepted W8/W9/W14 allocations retained; unchanged registry/offline scope at `205c987e`, V_main/PG_main; no live or M6 evidence claimed | deferred by a cited accepted decision | Enable enqueue, registration and a configured real provider together in a later reviewed unit; no `run_review` registration or application review path exists now. |
+| Live compatibility, model choice, measured evaluation and semantic injection evidence: W9/W10 in [accepted sequence decisions](#sequence-level-design-decisions) | Offline adapter and scripted fixtures only | Contract/canary/negative-control tests, not live evaluation | Accepted W8/W9/W14 allocations retained; unchanged registry/offline scope at `205c987e`, V_main/PG_main; no live or M6 evidence claimed | deferred by a cited accepted decision | First live wiring/call and paired evaluation belong to M7 under those decisions; do not substitute synthetic output for measured quality. G3's contract fixture remains M5 work. |
+| Approval, revision/finalize/export and audit obligations: W14 in [accepted sequence decisions](#sequence-level-design-decisions), [ADR-0024](decisions/0024-review-report-content.md) | Versioned content/digest ready for later lifecycle composition | M5 hash/render tests only, not approval/export tests | Accepted W8/W9/W14 allocations retained; unchanged registry/offline scope at `205c987e`, V_main/PG_main; no live or M6 evidence claimed | deferred by a cited accepted decision | M6 must review wrapper-hash approval compatibility, permissions, revision invalidation, finalization/export and audit; no full M6 specification or implementation is authorized here. |
+
+**Accepted amendments reconciled.** Corrections A/B retain atomic tenant-bound creation,
+captured authorization/configuration and trusted snapshot reload; W2/W3 retain placement,
+pinned packaged template/prompts and deterministic planning/assembly. Correction D and
+W4-W7/W13/W15 retain persisted reservation budgets, one lifetime repair, terminal model
+mismatch/refusal rules, fenced writes, cancellation/lease/process-control precedence and
+read-time status/atomic completion. W11/W12 retain the accepted value contracts and exact
+authorized original-quote matching. Report integrity and W14 are satisfied for M5 through
+the versioned hash-covered wrapper and deterministic rendering; **M6 approval/revision/
+finalize/export compatibility remains a future obligation**. Correction E/W10's three-part
+scripted canary contract is executed with the assembled fixture, emitting/mixed-case controls
+and separate quotation limitation. F1-F8 and binding timing/JSON clarifications implement
+the previously unwaived spans/G2/G3 requirements; scoped M4d/E7 acceptance stays intact.
+
+**Accepted allocations still pending, not new waivers.** W8 defers production enqueue,
+registration and application review endpoints/CLI to a later reviewed composition with a
+configured provider; production registry still has only ingestion/indexing. W9 allocates
+first live wiring/calls, compatibility/model choice/quality and measured paired evaluation
+to M7; offline Anthropic adapter and scripted evidence do not supply them. W14 allocates
+approval/revision invalidation/finalize/export/audit lifecycle to M6; none is specified or
+implemented by this reassessment. Later E6 full OpenTelemetry remains separate from the
+accepted basic provider-call spans now present. These accepted allocations do not substitute
+for G1-G3; those requirements are now explicitly satisfied within their reviewed scope.
+
+**Non-blocking recorded limits remain.** Best-effort spans can be lost and do not prove
+provider receipt or committed stage output; synchronous logging adds no hard wall-clock
+guarantee. Controlled interruption is not every physical-kill timing or exactly-once proof.
+Genuine authorized quotation may carry a canary; provenance establishes neither entailment,
+authenticity nor semantic injection resistance. U4 discards evidence that cannot later be
+re-proved/reopened; database writers remain trusted. M3 lease/commit windows, uncertain
+outcomes, abandoned-call cost and at-least-once calls remain bounded, not eliminated.
+Container smoke is ingestion/indexing only. Historical M5h HTTP-source mutation and network-
+evidence qualifications remain; no new live-provider or universal confidentiality claim follows.
+
+**Review disposition (Prompt 241).** The external reviewer accepts this dated reassessment
+and overall M5 within the explicitly reviewed internal scope at `205c987e`. Later publication
+of the acceptance record is separately authorized through the documentation-branch/main gates;
+no new production behavior, live calls, M6/M7 acceptance or release readiness follows.
+
+
 #### M5 assessment review disposition (ACCEPTED assessment, Prompt 233; overall M5 on hold)
 
 The external reviewer accepts the [Prompt 232 assessment and recommendation](#m5-acceptance-assessment-proposed-prompt-232-awaiting-external-review)
@@ -16573,6 +16671,194 @@ injection resistance. U4/database trust, M3 lease/commit windows, unknown outcom
 at-least-once calls remain. Individual M5a-M5h/scoped M4d/E7 acceptance and historical HTTP
 mutation/network-evidence qualifications are unchanged. No M6 specification or implementation,
 live call, production correction, authentication change or overall M5 acceptance is authorized.
+
+
+##### M5 main publication and separate CI evidence (Prompt 240)
+
+**Published on main and separately CI-verified at `205c987eaeea54a9ce2f70e6d1c105a0bc14145f`**, tree
+`5d00820b99f6971ebd041982645da1cd8eaa128a`. This records publication evidence, not overall
+M5 acceptance. Mathew manually pushed the feature and, after Codex's guarded local
+`--ff-only` fast-forward, manually pushed main. Codex performed no push or authentication
+operation. HEAD, local/stored/remote main and feature refs were independently checked equal
+to the exact target. The main range was exactly `2a388dc3`, `52071373`, this documentation
+commit; its 17-path union matched the accepted completion/application and runner sets.
+All **270 protected blob/mode entries** match accepted `52071373`, carrying the external
+G1-G3 closure to this published version without new executable/test/workflow changes.
+
+**Fresh feature gate observed by Codex, separately from old `52071373` evidence.** Target
+`205c987e`, `feat/m5-completion`, `push`, attempt 1:
+[ci 43245456976](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43245456976),
+[secret-scan 43245457315](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43245457315).
+All five jobs passed with these actual retained log results:
+
+| Feature job | Observed feature result |
+| --- | --- |
+| [Gitleaks (full history)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43245457315/job/131276770917) | 105 commits, no leaks |
+| [integration (ubuntu-24.04, PostgreSQL 17 + pgvector)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43245456976/job/131276769769) | 441 passed, 5778 deselected in 315.80s (0:05:15) |
+| [container (ubuntu-24.04, image build and Compose smoke)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43245456976/job/131276770243) | Build/image/Compose smoke and cleanup passed |
+| [verify (windows-2025, Python 3.12)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43245456976/job/131276770408) | 5777 passed, 442 skipped in 191.71s (0:03:11) |
+| [verify (ubuntu-24.04, Python 3.12)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43245456976/job/131276770926) | 5778 passed, 441 skipped in 82.27s (0:01:22) |
+
+Feature PostgreSQL passed the original full suite first (315.80s), then baseline/restored
+controls and intended A-D detections passed. Both platform logs print the installed-wheel
+span line; strict mypy passed for 202 source files, builds and isolated wheel checks passed.
+Feature monitoring started 2026-11-12T15:14:23.039222+00:00, deadline
+2026-11-12T15:39:23.039222+00:00; jobs and detailed proofs verified 2026-11-12T15:21:47.545986+00:00.
+
+**Separate main gate observed by Codex; no feature counts reused as main observations.**
+Target `205c987e`, branch `main`, `push`, attempt 1:
+[ci 43249986463](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43249986463),
+[secret-scan 43249986098](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43249986098).
+All five jobs passed with these separately retrieved log results:
+
+| Main job | Observed main result |
+| --- | --- |
+| [Gitleaks (full history)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43249986098/job/131292831288) | 105 commits, no leaks |
+| [verify (windows-2025, Python 3.12)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43249986463/job/131292834157) | 5777 passed, 442 skipped in 240.45s (0:04:00) |
+| [container (ubuntu-24.04, image build and Compose smoke)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43249986463/job/131292834387) | Build/image/Compose smoke and cleanup passed |
+| [integration (ubuntu-24.04, PostgreSQL 17 + pgvector)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43249986463/job/131292834509) | 441 passed, 5778 deselected in 474.90s (0:07:54) |
+| [verify (ubuntu-24.04, Python 3.12)](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43249986463/job/131292834635) | 5778 passed, 441 skipped in 138.52s (0:02:18) |
+
+Main PostgreSQL completed **441 passed, 5,778 deselected in 474.90s** before the successful
+`Run review database mutation controls` step. Both main verify logs separately print
+`provider-call span collected and serialized from the installed wheel`; mypy passed for
+202 source files, sdist/wheel builds and clean installed-wheel checks passed. Container
+logs print `smoke: ok` and `cleanup: ok`; that remains ingestion/indexing smoke, not review
+execution. Verify skips are separate from the actually executed PostgreSQL integration.
+Main monitoring started 2026-11-12T15:39:17.905759+00:00, separate deadline
+2026-11-12T16:04:17.905759+00:00; all jobs/proofs verified 2026-11-12T15:49:29.276175+00:00, within the fresh bound.
+Neither monitoring window was restarted, extended or substituted for the other.
+
+**Repeated database sensitivity evidence at the exact published target.** In **each** new
+gate the complete integration suite passed first, followed by baseline and restored control
+proofs with exit 0, and A-D caught with exit 1 at the intended labelled AssertionError:
+
+| Case | Required detector / observed failure | Mutated assertion line | Both new gates |
+| --- | --- | --- | --- |
+| Baseline | Twelve unmodified cases enforced by exact reviewed runner inventory/JUnit/phase checks | Not applicable | Passed, exit 0 |
+| A | `p238_detector_A`: zero actual first calls fails cardinality | Handler test 103 | Caught, exit 1 |
+| B | `p238_detector_B`: independent first-call reload is completed, expected started | Handler test 141 | Caught, exit 1 |
+| C | `p238_detector_C`: complete token present in assembled acceptance document | Canary test 110 | Caught, exit 1 |
+| D | `p238_detector_D`: removed exact request evidence entry leaves zero entries | Canary test 200 | Caught, exit 1 |
+| Restored | Twelve original control cases under the same strict checks | Not applicable | Passed, exit 0 |
+
+Codex independently matched each run's candidate SHA, runner/workflow/lockfile hashes and
+full copied-source manifest; reconstructed exact mutant hashes and assertion lines as data;
+checked observed module names/paths/hashes under isolated copy roots; matched original/restored
+hashes; and confirmed every `checkout_unchanged: true`. A green job or exit 1 alone was not
+accepted. The unchanged reviewed runner enforces exact test/phase/JUnit inventories, actual
+AssertionError/file/line/marker, successful setup/teardown, no skips/errors/timeouts/unrelated
+assertions, full source/import binding and restoration. No local test/mutation was rerun.
+A's relocated unchanged first-call oracle and D's explicit cardinality remain **test-owned
+sensitivity mutations, not production fault injection**.
+
+**Retention and attribution.** Ten decoded logs plus connector response strings, separate
+run/job/step metadata, log byte identities, candidate/case proof JSON and gate verifications
+are retained under `.local/p240/feature-evidence/` and `.local/p240/main-evidence/`. The old
+`52071373` evidence remains under `.local/p239/feature-evidence/`. Candidate source-manifest
+SHA-256 is `50158d5fcd06b87d1fdf5bd4cd6c196f79d82d7417071b5b8174daf67f7443c1`;
+runner is `255f138cf7648ad3c3a18761c4e0607cb8978e705fb09a7ebbdf6c84ee035b55`,
+workflow `96fec19193ba674fadfdde50b817ec15351e59ee85b661fdfb7efc2e9910b79c`, lockfile
+`43b73c6c32c7d5f4faded10c45df5515a181f28986dc56b6a022e4328fe60810` in both new proofs.
+The logged ephemeral full directories are `p238-65809b4f7c9946448a510d1eb1c77ee9` (feature)
+and `p238-90f4536971864fa9ad89eb3bcd01b819` (main) under `.local/review-mutations/`.
+Their full manifests/JUnit/phase/import/edit/command/stdout/stderr records were **not retrieved**;
+both artifact queries returned none. Retained decisive JSON plus source-bound successful
+runner execution is the evidence; no unavailable archive is claimed. The external reviewer's
+Prompt 240 acceptance of `52071373` evidence is carried through protected identity, not
+re-attributed as independent review of these fresh runs or the proposed overall assessment.
+
+**Historical Prompt 240 handoff boundary.** At that point five documentation/history files
+were staged uncommitted and the [dated reassessment](#m5-dated-reassessment-2026-11-12-prompt-240-proposed)
+proposed overall acceptance. Prompt 241 subsequently accepts the evidence/reassessment and
+overall M5 within the reviewed baseline scope ([decision](#overall-m5-scoped-acceptance-prompt-241)). No new application
+tests/builds/wheel/database checks ran locally, no extra commit/push or CI rerun occurred,
+and no production wiring, live call or M6 work is authorized. All recorded telemetry,
+quotation/provenance, U4/database-trust, lease/commit-window, unknown-outcome and at-least-once
+limitations remain. Earlier pending main-publication/reassessment wording is historical.
+
+
+##### Overall M5 scoped acceptance (Prompt 241)
+
+**External decision supplied by Mathew, 2026-11-12: overall M5 is accepted within the reviewed
+scope at implementation baseline `205c987eaeea54a9ce2f70e6d1c105a0bc14145f`**, tree
+`5d00820b99f6971ebd041982645da1cd8eaa128a`. The reviewer accepts both Prompt 240 exports,
+main-publication and separate exact-commit CI evidence, and the
+[dated reassessment covering all 23 matrix rows](#m5-dated-reassessment-2026-11-12-prompt-240-proposed).
+The reassessment's original anchor is preserved for compatibility. The original Prompt 232
+assessment and Prompt 233 hold decision remain historical, as do earlier open/proposed states;
+this explicit decision supersedes them only within the accepted scope below.
+
+**Exact accepted scope.** The internal, tenant-bound, snapshot-pinned, fenced review composition,
+with scripted providers, persisted call budgets/stages/outputs, privacy-bounded call spans,
+trusted reload, deterministic hash-covered reports and the offline Anthropic adapter.
+Individual M5a-M5h and scoped M4d/E7 acceptances remain intact; no accepted specification,
+runtime contract, criterion or deferred allocation is rewritten.
+
+| Completion item | Accepted disposition carried to implementation baseline 205c987e |
+| --- | --- |
+| G1 | Satisfied: correlated, privacy-bounded provider-call spans in the tested internal composition |
+| G2 | Satisfied: executed controlled post-response/pre-stage-commit interruption/reclaim proof, with two matching calls, first reservation started, second completed and one stage |
+| G3 | Satisfied: executed assembled-document acceptance, emitting/mixed-case controls and separate genuine-quotation limitation |
+| Required database sensitivity | Baseline/restored controls and intended A-D detections accepted, including source/import/assertion/restoration and checkout-preservation proofs |
+
+**Independent reviewer evidence, supplied in Prompt 241.** The reviewer retrieved both remote
+main and feature refs at exact `205c987e`, that documentation commit's parent/tree and exact
+five-path scope, and all four successful exact-target `push`, attempt-1 runs:
+[feature ci 43245456976](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43245456976),
+[feature secret-scan 43245457315](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43245457315),
+[main ci 43249986463](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43249986463),
+[main secret-scan 43249986098](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43249986098).
+They independently inspected all ten jobs, successful steps and decoded logs, confirming
+the branch observations separately:
+
+| Baseline gate | Ubuntu passed/skipped | Windows passed/skipped | PostgreSQL passed/deselected |
+| --- | --- | --- | --- |
+| Feature at 205c987e | 5,778 / 441; 82.27s | 5,777 / 442; 191.71s | 441 / 5,778; 315.80s |
+| Main at 205c987e | 5,778 / 441; 138.52s | 5,777 / 442; 240.45s | 441 / 5,778; 474.90s |
+
+For both gates they confirmed both platform installed-wheel span lines, container smoke/
+cleanup, Gitleaks 105 commits/no leaks, baseline/restored controls passing and A-D caught
+at intended assertions. Candidate, mutant/restored hashes and isolated import-root proofs
+match; source-manifest hash remains
+`50158d5fcd06b87d1fdf5bd4cd6c196f79d82d7417071b5b8174daf67f7443c1`, unchanged from the
+accepted executable version. This was **independent log/source/proof inspection, not a new
+local test or database run**. It is separately attributed from Codex's Prompt 240 observations,
+historical local checks and isolated offline reviewer/harness results. These exact baseline
+counts do not describe the later acceptance-document publication commit or its future gates.
+
+**Mutation and retention qualifications.** A retains its relocated unchanged first-call
+cardinality oracle; D retains explicit singleton cardinality equivalent to unpacking. These
+are test-owned sensitivity mutations, not production fault injection. Full ephemeral records
+were **not retrieved**. The reviewer accepts retained decisive proofs plus exact reviewed
+runner execution as sufficient evidence; no unavailable archives or new rerun are claimed.
+The ten decoded logs, separate metadata and decisive proofs retained under `.local/p240/`
+remain the actual baseline evidence. No new local application/database test ran for this decision.
+
+**Implementation versus acceptance-record publication.** `205c987e` remains the immutable
+accepted M5 implementation baseline. The later `docs/m5-acceptance` commit carries reviewed
+documentation/history and publishes this acceptance record; it changes no executable behavior.
+Only README, plan, threat model, ADR-0026 status/cross-references and append-only history may
+change; all 270 other blob/mode entries remain exact. Fresh documentation-branch CI and
+conditional main-publication CI must each observe the eventual documentation target separately,
+with all five jobs/full integration/mutation proofs. They are publication evidence, not a
+new implementation baseline. Current preparation/verification identities and the acceptance
+export are saved under `.local/p241/`; publication results are pending Mathew's manual pushes.
+
+**Accepted future allocations and retained limits.** W8 production registration/enqueue and
+application wiring remain pending a later reviewed composition. W9/M7 live wiring/calls,
+compatibility, model choice/quality and measured evaluation remain pending. W14/M6 approval,
+revision/finalize/export and audit obligations remain pending. This decision neither accepts
+M6/M7 nor establishes release readiness; it authorizes no production registration/application
+wiring, live provider call, model-quality claim, M6 specification/implementation or M7 work.
+
+Best-effort ephemeral spans are not durable persistence, provider receipt or committed-stage
+proof; synchronous logging adds no hard wall-clock guarantee. Controlled interruption is not
+every physical process-kill timing or exactly-once proof. Genuine authorized quotations can
+carry the canary; provenance establishes neither entailment, authenticity nor semantic injection
+resistance. U4 discarded evidence, trusted database writers, M3 lease/commit windows, unknown
+outcomes, abandoned-call cost and at-least-once calls remain. Container smoke stays ingestion/
+indexing only. Historical HTTP-source mutation/network-evidence qualifications are unchanged.
 
 
 **M6 – Approval gate and export**

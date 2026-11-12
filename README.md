@@ -20,7 +20,7 @@ It is evidence-based decision support, not legal advice or compliance certificat
 [accepted at external review](docs/decisions/0026-anthropic-adapter.md#publication-evidence-acceptance-prompt-232).
 The separate [overall M5 acceptance assessment](docs/plan.md#m5-acceptance-assessment-proposed-prompt-232-awaiting-external-review)
 and Codex's recommendation to hold overall acceptance for G1-G3 were accepted at external review
-in Prompt 233; overall M5 is not accepted. The [bounded completion follow-up](docs/plan.md#m5-bounded-completion-follow-up-proposed-prompt-233-implementation-unauthorized)
+in Prompt 233; overall M5 was not then accepted (historical). The [bounded completion follow-up](docs/plan.md#m5-bounded-completion-follow-up-proposed-prompt-233-implementation-unauthorized)
 was accepted in Prompt 234 with binding timing/JSON clarifications. Its implementation was
 accepted in Prompt 235 for **one local commit only**: provider-call spans, the specified
 post-response/pre-commit crash regression and separate assembled/literal canary fixtures.
@@ -52,8 +52,16 @@ scope at `52071373`** ([separate closure decision](docs/plan.md#m5-completion-ex
 The reviewer independently inspected the exact-target logs/proofs and reconstructed hashes;
 this was not local database execution. Full ephemeral records were not retrieved and the
 retained evidence was accepted as sufficient. Earlier open/review-pending states above are
-historical. Main publication and renewed overall M5 assessment remain pending; overall M5
-acceptance has not been granted. No production review path, live-provider evidence or
+historical. Completion evidence is now **published on main and separately CI-verified at
+`205c987e`** ([actual feature/main gates](docs/plan.md#m5-main-publication-and-separate-ci-evidence-prompt-240)).
+**Overall M5 is accepted at external review in Prompt 241**, including both Prompt 240
+exports, separate feature/main evidence and the 23-row reassessment
+([scoped acceptance](docs/plan.md#overall-m5-scoped-acceptance-prompt-241)). The accepted implementation baseline
+remains `205c987eaeea54a9ce2f70e6d1c105a0bc14145f`: the internal, tenant-bound, snapshot-pinned,
+fenced review composition with scripted providers, persisted budgets/stages/outputs, privacy-
+bounded spans, trusted reload, deterministic hash-covered reports and the offline Anthropic
+adapter. Later documentation publication records this decision without changing behavior.
+W8, W9/M7 and W14/M6 remain pending; this is not M6/M7 acceptance or release readiness. No production review path, live-provider evidence or
 M6 authorization follows.
 
 **Historical correction acceptance (Prompt 150):** the external reviewer accepted Claude Code's Prompt 149

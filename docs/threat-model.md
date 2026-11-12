@@ -637,12 +637,21 @@ Their log/proof inspection and hash reconstruction was not local database execut
 accept retained decisive proofs plus exact runner execution despite unavailable full ephemeral
 records. A's relocated oracle and D's explicit cardinality remain test-owned sensitivity
 mutations, not production fault injection. Earlier open/review-pending states are historical.
-No accepted production/test contract is changed. Main publication and renewed overall M5
-assessment remain pending; overall M5 acceptance is not granted. The ephemeral metadata-only
+No accepted production/test contract is changed. Completion evidence is now published on
+main at `205c987e` with [separate successful feature/main gates](plan.md#m5-main-publication-and-separate-ci-evidence-prompt-240),
+including repeated intended database sensitivity proofs. All 270 protected identities carry
+G1-G3 closure to that version. In Prompt 241 the reviewer accepts the exports, separate
+feature/main evidence, 23-row reassessment and **overall M5 within the reviewed scope at
+implementation baseline `205c987e`** ([decision and retained limits](plan.md#overall-m5-scoped-acceptance-prompt-241)).
+The accepted scope is internal, tenant-bound, snapshot-pinned and fenced, with scripted
+providers, persisted budgets/stages/outputs, privacy-bounded spans, trusted reload, deterministic
+hash-covered reports and the offline Anthropic adapter. Later acceptance-document publication
+changes no executable behavior. W8, W9/M7 and W14/M6 remain pending; no M6/M7 acceptance or
+release-readiness claim follows. The ephemeral metadata-only
 spans prove neither provider receipt nor committed
 results; synchronous logging adds no hard wall-clock guarantee. Default span logs contain only
 the closed validated correlation/timing/outcome object, never evidence, responses or exception
-text. No telemetry-driven retry or compensating database write is introduced. Overall M5 remains on hold. No live-provider evidence or application review path follows.
+text. No telemetry-driven retry or compensating database write is introduced. Overall M5 is accepted only within the reviewed internal scope at implementation baseline `205c987e`. No live-provider evidence or application review path follows.
 The reviewer's 73 isolated probes and the CI synthetic tests establish no real provider
 HTTP/DNS/TLS or live compatibility. Recovery supports the saved functional/build records,
 but exact-final-source mutation coverage and universal historical absence of network activity

@@ -8,8 +8,8 @@
   Codex fast-forwarded local main with `--ff-only`, and Mathew manually pushed main. All five
   separate main jobs then passed for the same exact SHA, `push`, attempt 1. This publication
   evidence was accepted externally in Prompt 232; it was not in that CI target. The separate
-  overall M5 assessment/hold recommendation was accepted in Prompt 233; overall M5 is still
-  unaccepted. Its bounded completion specification was accepted in Prompt 234; the
+  overall M5 assessment/hold recommendation was accepted in Prompt 233; overall M5 was then
+  unaccepted (historical). Its bounded completion specification was accepted in Prompt 234; the
   implementation was accepted for one local commit only in Prompt 235. After separately
   authorized manual feature publication, it is [feature-CI verified, not merged](../plan.md#m5-completion-feature-ci-evidence-prompt-236)
   at `2a388dc324950d9feb46dbba3ffb75222f2a938e` (Prompt 236). The reviewer accepted that
@@ -29,8 +29,14 @@
   ([closure decision and publication gates](../plan.md#m5-completion-external-evidence-acceptance-and-g1-g3-closure-prompt-240)).
   Their independent log/proof inspection and hash reconstruction was not local database
   execution. Full ephemeral records were not retrieved; retained evidence was accepted as
-  sufficient. Earlier open states are historical. Main publication and renewed assessment
-  remain pending; overall M5 acceptance is not granted.
+  sufficient. Earlier open states are historical. Completion evidence is now published on
+  main and separately CI-verified at `205c987e` ([actual gates](../plan.md#m5-main-publication-and-separate-ci-evidence-prompt-240));
+  protected executable identities carry scoped G1-G3 closure to that version. Prompt 241
+  accepts both exports, separate feature/main evidence, the 23-row reassessment and
+  **overall M5 within the reviewed scope at implementation baseline `205c987e`**
+  ([distinct acceptance decision](../plan.md#overall-m5-scoped-acceptance-prompt-241)). Later documentation publication
+  records that acceptance without changing executable behavior. W8, W9/M7 and W14/M6
+  remain pending; this neither accepts M6/M7 nor establishes release readiness.
 - **Specification:** the [accepted M5h specification](../plan.md#m5h-anthropic-adapter-specification-accepted-at-review-prompt-227-implementation-pending),
   accepted in Prompt 227 with H1–H10 and binding clarifications A–C
   ([acceptance](../plan.md#m5h-acceptance-prompt-227)). The specification binds this
