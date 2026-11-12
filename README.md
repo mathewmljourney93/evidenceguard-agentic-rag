@@ -43,9 +43,17 @@ existing disposable CI PostgreSQL service. The [bounded runner and additive inte
 were accepted for one local commit and manual feature publication in Prompt 239
 ([review decision and pending exact-commit gate](docs/plan.md#m5-completion-ci-mutation-runner-acceptance-prompt-239)).
 The reviewer reports 95 isolated standard-library checks, separate from Codex local checks;
-these are neither PostgreSQL nor CI execution. Database execution is pending; no mutation is claimed
-caught. CI execution awaits Mathew's manual feature push. G1-G3 are not closed; main publication and renewed
-overall M5 assessment remain pending. No production review path, live-provider evidence or
+those checks are neither PostgreSQL nor CI execution. After Mathew manually pushed `52071373`,
+all five exact-target feature jobs passed and the retained PostgreSQL proofs verified baseline/restored
+controls and intended A-D detections ([executed mutation evidence](docs/plan.md#m5-completion-ci-database-mutation-evidence-prompt-239)).
+**Prompt 240 external decision:** the reviewer accepts both Prompt 239 exports and the
+executed mutation evidence. **G1-G3 are satisfied within the accepted internal review-handler
+scope at `52071373`** ([separate closure decision](docs/plan.md#m5-completion-external-evidence-acceptance-and-g1-g3-closure-prompt-240)).
+The reviewer independently inspected the exact-target logs/proofs and reconstructed hashes;
+this was not local database execution. Full ephemeral records were not retrieved and the
+retained evidence was accepted as sufficient. Earlier open/review-pending states above are
+historical. Main publication and renewed overall M5 assessment remain pending; overall M5
+acceptance has not been granted. No production review path, live-provider evidence or
 M6 authorization follows.
 
 **Historical correction acceptance (Prompt 150):** the external reviewer accepted Claude Code's Prompt 149

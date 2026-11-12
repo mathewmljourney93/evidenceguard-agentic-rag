@@ -623,9 +623,22 @@ The isolated-copy runner/additive step was accepted for one local commit and man
 publication in Prompt 239 ([acceptance and pending proof gate](plan.md#m5-completion-ci-mutation-runner-acceptance-prompt-239)).
 The reviewer reports 95 isolated standard-library checks, separate from Codex checks and
 PostgreSQL/CI execution. Source/import/oracle/restoration checks and bounded subprocesses
-remain unchanged; database mutation execution is pending and none is claimed caught. No
-accepted production/test contract is changed. Database mutations, renewed assessment and main
-publication remain pending; G1-G3 are not closed. The ephemeral metadata-only
+remain unchanged. After Mathew's manual push of `52071373`, Codex verified all five exact-target
+feature jobs, the full PostgreSQL suite first, baseline/restored controls and intended A-D
+detections with source/import/assertion/restoration and checkout-preservation proofs
+([executed evidence and retention limits](plan.md#m5-completion-ci-database-mutation-evidence-prompt-239)).
+Status: **feature-CI verified, not merged; mutation evidence ready for external review.**
+Decoded logs and decisive JSON were retained; full ephemeral phase/JUnit/command records were
+not retrieved. Strict phase/error/skip rejection is enforced by the exact successful reviewed
+runner. In Prompt 240 the reviewer independently accepted both exports and this evidence:
+G1-G3 are satisfied within the tested internal review-handler scope at `52071373`
+([separate closure decision](plan.md#m5-completion-external-evidence-acceptance-and-g1-g3-closure-prompt-240)).
+Their log/proof inspection and hash reconstruction was not local database execution. They
+accept retained decisive proofs plus exact runner execution despite unavailable full ephemeral
+records. A's relocated oracle and D's explicit cardinality remain test-owned sensitivity
+mutations, not production fault injection. Earlier open/review-pending states are historical.
+No accepted production/test contract is changed. Main publication and renewed overall M5
+assessment remain pending; overall M5 acceptance is not granted. The ephemeral metadata-only
 spans prove neither provider receipt nor committed
 results; synchronous logging adds no hard wall-clock guarantee. Default span logs contain only
 the closed validated correlation/timing/outcome object, never evidence, responses or exception

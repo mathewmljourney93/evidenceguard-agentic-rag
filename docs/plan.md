@@ -16390,6 +16390,191 @@ acceptances and all recorded semantic, telemetry, database-trust, unknown-outcom
 at-least-once limitations remain unchanged.
 
 
+##### M5 completion CI database mutation evidence (Prompt 239)
+
+**Disposition: feature-CI verified, not merged; mutation evidence ready for external review.**
+Mathew manually pushed **`52071373a911e53d1631f33dafe07aad8408d3e5`**, tree
+`fba726015317f3007542ce2878e39288726eecb2`, the sole child of
+`2a388dc324950d9feb46dbba3ffb75222f2a938e`. Codex independently verified remote feature,
+HEAD and stored upstream equal that target; local/stored/remote main remain
+`e050da3e3415d73f83db86763617d5b5f0874aeb`. No merge or main publication occurred.
+This evidence is prepared for external review, not yet externally accepted. G1-G3 remain
+open and overall M5 remains on hold.
+
+**Exact-target CI observed by Codex.** The feature `push`, attempt-1
+[ci run 43239291039](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43239291039)
+and [secret-scan run 43239291066](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43239291066)
+both passed. All five jobs and their available decoded logs were retrieved:
+
+| Exact-target job | Observed result |
+| --- | --- |
+| [Ubuntu verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43239291039/job/131255006801) | 5,778 passed, 441 skipped in 81.12s; strict mypy passed for 202 source files; sdist/wheel build and isolated installed-wheel checks passed |
+| [Windows verify](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43239291039/job/131255006226) | 5,777 passed, 442 skipped in 144.77s; strict mypy passed for 202 source files; sdist/wheel build and isolated installed-wheel checks passed |
+| [PostgreSQL integration](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43239291039/job/131255007035) | Complete original suite: 441 passed, 5,778 deselected in 463.85s; then review database mutation controls succeeded |
+| [Container](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43239291039/job/131255006714) | Build, image checks and Compose smoke passed; logs print `smoke: ok` and `cleanup: ok` |
+| [Gitleaks](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43239291066/job/131255004716) | 104 commits scanned, no leaks |
+
+Both platform logs print `provider-call span collected and serialized from the installed wheel`.
+Those isolated installed-wheel assertions do not execute review persistence. The skipped
+database cases in verify are separate from the executed integration job. Container evidence
+remains ingestion/indexing smoke, not review execution. The earlier accepted five-job result
+for `2a388dc3` remains SHA-specific historical evidence; it is not relabelled as this runner run.
+
+**Executed database sensitivity checks.** Step metadata confirms the original full integration
+suite succeeded before `Run review database mutation controls`, which ran from
+14:46:37 to 14:48:01 UTC on 2026-11-12. Codex retained the candidate proof and six sequential
+case proofs from the successful PostgreSQL log. The unchanged reviewed runner enforces twelve
+exact cases and all successful setup/call/teardown phases for each unmodified control, and one
+intended assertion failure with successful setup/teardown for each mutant. The retained log
+proofs show baseline and restored controls passed with exit 0; A-D each report caught with
+exit 1, the intended labelled AssertionError message, matching source hashes and detector line:
+
+| Case | Executed intended detector and observed assertion | Result |
+| --- | --- | --- |
+| Baseline | Twelve original control cases, enforced by source-bound runner inventory/JUnit/phase checks | Passed, exit 0 |
+| A | `p238_detector_A`, mutated handler-test line 103: zero actual first calls fails `0 == 1` | Caught, exit 1 |
+| B | `p238_detector_B`, mutated handler-test line 141: independently reloaded sequence-1 state is `completed`, expected `started` | Caught, exit 1; SQL/setup failure was not detection |
+| C | `p238_detector_C`, mutated canary-test line 110: complete token is present in assembled acceptance document | Caught, exit 1 |
+| D | `p238_detector_D`, mutated canary-test line 200: removed exact evidence entry leaves zero entries, fails `0 == 1` | Caught, exit 1 |
+| Restored | Twelve unmodified control cases, enforced by the same strict checks | Passed, exit 0 |
+
+These are isolated test-owned setup/observation sensitivity checks against the existing
+disposable PostgreSQL service, not production corrections or live-provider experiments.
+A and D retain the reviewed oracle relocation/explicit cardinality qualifications. The
+reviewed successful runner rejects collection/setup/teardown errors, skips, missing cases,
+wrong exception/file/line/marker, unrelated failures, timeouts and source/import drift;
+exit 1 alone was not accepted. No correction, retry, extra push or CI rerun occurred.
+
+**Source and restoration binding.** Candidate proof identifies `52071373a911e53d1631f33dafe07aad8408d3e5`,
+Python 3.12.3 in the CI virtual environment, runner SHA-256
+`255f138cf7648ad3c3a18761c4e0607cb8978e705fb09a7ebbdf6c84ee035b55`, workflow
+`96fec19193ba674fadfdde50b817ec15351e59ee85b661fdfb7efc2e9910b79c`, lockfile
+`43b73c6c32c7d5f4faded10c45df5515a181f28986dc56b6a022e4328fe60810` and copied-source
+manifest `50158d5fcd06b87d1fdf5bd4cd6c196f79d82d7417071b5b8174daf67f7443c1`.
+Codex recomputed these against the exact published Git bytes. Each proof's observed imports
+resolve under its own `.local/review-mutations/p238-.../copy-.../` directory and have the
+expected module-relative names and source hashes. They cover the actual worker, span/logging,
+database-safety and fixture modules plus the relevant test module(s), not a global/installed
+application import. Every proof reports `checkout_unchanged: true`.
+
+For every case, baseline and restored handler/canary hashes match the published originals:
+`6031b1d4d4b6322f0cf05547fa8e0b102c13e9333ffad7da596d0e313a4b9463` and
+`faaf85c6aca18e9f3b590370d6ae126a72bec64c00ee34a257d05df367a2f5a7`.
+The observed changed-file hashes for A/B/C/D respectively are
+`d5a25dea436a63ba84b567b5b90ab88800d998cb62382c86adeb90978477ccb0`,
+`f122c82a133406143a4502071a470fccb27b241af09e035c82f57b0f7debf573`,
+`bdfe0e6cf96995e9bcd7b44dff8185150711e1ed20eb28dcc63676de03ff3c4b` and
+`73253e28182f9a752704da231990a01471615ef0b0d87a3952abede2558854f3`.
+Codex independently reconstructed the reviewed edit bytes as data, checking these hashes
+and assertion lines without running tests/mutations locally. Restored identities and actual
+import hashes also match. Accepted checkout source/test/workflow blobs remain unchanged.
+
+**Retained evidence and limits.** All five decoded logs, connector response strings,
+run/job/step metadata, extracted `decisive-mutation-proofs.json`, log hashes and
+`gate-verification.json` are retained under `.local/p239/feature-evidence/`. The log names
+ephemeral `.local/review-mutations/p238-55c89f2de82247fbb8f2d2e47c4f240a/`; its full manifests,
+JUnit, phase/import reports, edit/command records and stdout/stderr files were **not retrieved**.
+The artifacts query returned no artifacts. Detailed phase/JUnit enforcement is established
+by the exact reviewed runner source and its successful execution, not a claim to possess
+those ephemeral files. The retained log contains the decisive candidate/per-case JSON.
+
+Monitoring began 14:39:11 UTC; all jobs and proofs were verified by 14:49:10 UTC, within
+the unchanged 15:04:11 UTC deadline. The gate is complete; monitoring was not restarted.
+The reviewer's 95 isolated standard-library checks and Codex's historical Prompt 238 offline
+harness results remain separate from these newly executed PostgreSQL sensitivity checks.
+No external reviewer has yet accepted this new evidence. Only five evidence/history documents
+are staged uncommitted after the published target; their evidence export/checks are local.
+No new application tests, builds, wheel checks, database probes or provider calls ran locally.
+
+**Open review boundary.** G1-G3 remain open; overall M5 is not accepted. Individual M5a-M5h
+and scoped M4d/E7 acceptance remains intact. Ephemeral spans are not durable persistence or
+provider-receipt proof; controlled interruption is not physical process-kill or exactly-once
+proof. Assembled acceptance, emitting/mixed-case controls and genuine quotation remain distinct.
+Provenance does not prove entailment/authenticity/semantic injection resistance. U4/database
+trust, M3 lease/commit windows, unknown outcomes and at-least-once calls remain. There is no
+production run_review registration, live compatibility/quality claim, main promotion or M6 work.
+
+
+##### M5 completion external evidence acceptance and G1-G3 closure (Prompt 240)
+
+**External decision supplied by Mathew, 2026-11-12.** The reviewer accepts both Prompt 239
+exports and the executed mutation evidence. **G1-G3 are satisfied within the accepted internal
+review-handler scope at `52071373a911e53d1631f33dafe07aad8408d3e5`**, published tree
+`fba726015317f3007542ce2878e39288726eecb2`. Overall M5 acceptance remains pending.
+The earlier [hold assessment](#m5-assessment-review-disposition-accepted-assessment-prompt-233-overall-m5-on-hold)
+and open/awaiting-review states in Prompts 233-239 are historical records, superseded only
+as to G1-G3 and acceptance of the [Prompt 239 evidence](#m5-completion-ci-database-mutation-evidence-prompt-239).
+This is not an overall M5 acceptance, main-publication observation or new runtime contract.
+
+**Independent reviewer evidence.** The reviewer independently retrieved remote feature
+`52071373` and remote main `e050da3e`; [ci 43239291039](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43239291039)
+and [secret-scan 43239291066](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/43239291066);
+both exact-target feature `push`, attempt-1 runs, all five successful jobs/steps and decoded
+logs. They confirmed Ubuntu **5,778 passed, 441 skipped**; Windows **5,777 passed, 442 skipped**;
+PostgreSQL **441 passed, 5,778 deselected**, followed by the successful mutation step; both
+installed-wheel span lines; container smoke/cleanup; and Gitleaks **104 commits, no leaks**.
+These independent review observations are separate from Codex's Prompt 239 retrieval and
+local checks. No counts are attributed to a future documentation commit or main run.
+
+The reviewer inspected baseline/restored and A-D proof JSON; independently matched runner,
+workflow and lockfile hashes, reconstructed mutant hashes/assertion lines, checked logged
+import hashes/isolated roots, and confirmed restoration/checkout preservation. This was
+**independent evidence inspection and hash reconstruction, not local database execution**.
+The earlier 95 isolated standard-library reviewer checks and Codex's offline runner checks
+remain distinct from executed CI PostgreSQL sensitivity evidence.
+
+| Requirement | Accepted disposition within the tested internal composition |
+| --- | --- |
+| G1 | **Satisfied:** correlated, privacy-bounded provider-call spans, with accepted timing/outcome/control behavior and installed-wheel evidence |
+| G2 | **Satisfied:** executed controlled post-response/pre-stage-commit interruption and reclaim proof |
+| G3 | **Satisfied:** executed assembled-document acceptance, emitting/mixed-case controls and a separate genuine-quotation limitation probe |
+| Required database mutation sensitivity | **Accepted:** baseline/restored controls and intended A-D detections with source/import/assertion/restoration and checkout-preservation proofs |
+
+**Mutation and retention qualifications.** A retains the relocated unchanged first-call
+cardinality oracle after the sentinel catch; D retains the explicit singleton cardinality
+equivalent to the original unpacking requirement. These are **test-owned sensitivity
+mutations, not production fault injection**. Full ephemeral records were not retrieved.
+The reviewer explicitly accepts the retained decisive logs/proofs plus exact reviewed runner
+execution as sufficient evidence. No unavailable archive is claimed and no CI rerun is
+authorized to recover it. The stored Prompt 239 logs/proofs remain the actual retained evidence.
+
+**Codex recovery and authorized publication sequence.** Codex verified the expected staged
+tree `2b14ad390d56922f92adcac842235d941e2c57a8`, refs, five-path scope and both saved exports
+against fresh Git bytes. The saved Prompt 239 handoff is appended byte-for-byte; Prompt 240
+is labelled a normalized transcription. Only the five documentation/history files change;
+all 270 other blob/mode entries, including accepted application code/tests, runner/tests and
+workflow, remain identical. No unchanged application tests, builds or database checks are
+repeated locally. Current verification and commit/export identities are saved in `.local/p240/`.
+
+One documentation commit and Mathew's manual feature push are authorized, followed by a
+**fresh exact-target feature push/attempt-1 gate within 25 minutes**, requiring all five jobs,
+full integration first and baseline/restored/A-D proofs. Old `52071373` results do not satisfy
+that new gate. Only after success may Codex verify the exact three-commit range from
+`e050da3e` (`2a388dc3`, `52071373`, the new documentation commit), reviewed path union,
+protected executable identity, clean worktree and privacy/Gitleaks, then switch to main and
+fast-forward locally with `--ff-only`. Mathew alone pushes main after another remote-main
+recheck. Separate exact-target main `push`, attempt-1 CI needs its own 25-minute bound,
+all five jobs and mutation proofs; feature counts cannot be reused as main observations.
+Any failure, cancellation, missing proof or timeout requires evidence preservation and a stop,
+without correction, rerun or further push.
+
+Only after successful main CI may the same five evidence/history documents be staged
+uncommitted with actual main evidence and a dated renewed overall M5 assessment mapping
+the original criteria and accepted amendments. A gap-free assessment may recommend scoped
+overall M5 acceptance for external review; it must not grant it. **That reassessment remains
+pending the publication gates.** The original historical hold decision/matrix is preserved.
+
+**Unchanged limits.** Production review registration, live compatibility/quality, M6 approval/
+export and later evaluation remain separate and pending. Ephemeral spans are neither durable
+persistence nor provider-receipt proof. Controlled interruption is not physical-kill or
+exactly-once proof. Assembled acceptance, emitting/mixed-case controls and genuine quotation
+limitations remain distinct. Provenance proves neither entailment, authenticity nor semantic
+injection resistance. U4/database trust, M3 lease/commit windows, unknown outcomes and
+at-least-once calls remain. Individual M5a-M5h/scoped M4d/E7 acceptance and historical HTTP
+mutation/network-evidence qualifications are unchanged. No M6 specification or implementation,
+live call, production correction, authentication change or overall M5 acceptance is authorized.
+
+
 **M6 – Approval gate and export**
 - Revisions, approval, finalize, export, ETags, approver role, audit events.
 - *Acceptance:*

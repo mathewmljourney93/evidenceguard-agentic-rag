@@ -21,7 +21,16 @@
   was accepted for one local commit and manual feature publication in Prompt 239
   ([decision and pending exact-commit gate](../plan.md#m5-completion-ci-mutation-runner-acceptance-prompt-239)). The reviewer reports
   95 isolated standard-library checks; these are not PostgreSQL or CI execution. Database
-  mutation execution remains pending; G1-G3 and overall M5 remain open.
+  mutations subsequently executed in exact-target feature CI at `52071373` after Mathew's
+  manual push: all five jobs passed, baseline/restored controls passed and A-D were caught
+  with decisive retained log proofs ([evidence and retention limits](../plan.md#m5-completion-ci-database-mutation-evidence-prompt-239)).
+  In Prompt 240 the reviewer accepts both exports and the executed mutation evidence;
+  **G1-G3 are satisfied within the accepted internal review-handler scope at `52071373`**
+  ([closure decision and publication gates](../plan.md#m5-completion-external-evidence-acceptance-and-g1-g3-closure-prompt-240)).
+  Their independent log/proof inspection and hash reconstruction was not local database
+  execution. Full ephemeral records were not retrieved; retained evidence was accepted as
+  sufficient. Earlier open states are historical. Main publication and renewed assessment
+  remain pending; overall M5 acceptance is not granted.
 - **Specification:** the [accepted M5h specification](../plan.md#m5h-anthropic-adapter-specification-accepted-at-review-prompt-227-implementation-pending),
   accepted in Prompt 227 with H1–H10 and binding clarifications A–C
   ([acceptance](../plan.md#m5h-acceptance-prompt-227)). The specification binds this
