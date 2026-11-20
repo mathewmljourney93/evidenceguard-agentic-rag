@@ -142,6 +142,50 @@ Unset provider: worker never claims `run_review`; POST 503. Partial or invalid c
 - A live alias returns a dated model and every stage ends as model_mismatch: require a dated id; the first live run in M7 is supervised.
 - A text pin was loosened too broadly and a later change wires a fake: allowlists name exact files, plus the scripted-provider packaging test.
 
+## Changes from the plan (2026-11-20)
+
+Recorded after the first independent review. Each item is a deliberate difference between the
+approach above and the branch.
+
+- **Settings errors.** `load_review_settings` and `load_anthropic_settings` raise
+  `ReviewConfigurationError` after leaving the `except` block, so the error has no cause and no
+  context (the plan said a `from None` wrapper). `load_review_provider` does the same for an
+  `AnthropicError`.
+- **POST reply status.** `ReviewAccepted.status` is the current status from
+  `load_review_status`, read after `create_review` and `load_review`, so a replay reports the
+  review's real progress rather than always `queued`.
+- **Error mapping additions.** `ReviewJobConflictError` maps to 500 (an unexpected stored job
+  for a new review). In the API, `ReviewConfigurationError` from the settings loader maps to 503
+  `REVIEWS_NOT_CONFIGURED`, like unset settings.
+- **Strict `template_version`.** `ReviewCreate.template_version` is a strict integer, so `"1"`
+  or `1.0` is a 422 rather than coerced.
+- **Worker registry.** The review registry is built only on a `DatabaseJobStore` (any other
+  store is a `TypeError`), because the handler needs its session factory. `review_wiring.py`
+  exports the type aliases `ReviewProviderLoader` and `ReviewHandlerFactory` used by
+  `__main__.py`. When reviews are on, `run_review` is appended to the entries of the registry
+  from `registry_factory` (injected or production), never replacing it.
+- **Mutation runner pin.** `tests/test_review_mutation_runner.py` cuts the single W8 wheel block
+  out of `ci.yml` before hashing the rest against the reviewed baseline; the cut block is pinned
+  by its own SHA-256.
+- **Compose anchors.** `docker-compose.yml` shares the review variables through a YAML anchor
+  (`x-review-env`) merged into the api and worker services, instead of repeating them.
+- **CHANGELOG.** `CHANGELOG.md` was created on this branch because the base did not have one;
+  the merge of `main` combined it with the agreement PR's copy.
+- **Per-tenant in-flight cap.** `EG_REVIEW_MAX_IN_FLIGHT` (integer 1 to 20, default 2, empty
+  counts as unset) in `ReviewSettings`, read by the API only and named in `.env.example` and the
+  Compose api service. `create_review` takes `max_in_flight`; inside the creation transaction,
+  after the replay lookup and before the snapshot capture, it serialises creation per tenant and
+  counts the tenant's `run_review` jobs that are `queued` or `running`. At the cap it refuses
+  with `ReviewLimitReachedError`, mapped to 429 `REVIEW_LIMIT_REACHED` with `Retry-After: 60`.
+  A replay of an existing key returns before the check, so it is never refused. Serialisation
+  is a no-op `UPDATE` of the tenant's row: creation runs at `REPEATABLE READ`, where an advisory
+  lock or `SELECT ... FOR UPDATE` taken after the snapshot would still count from the old
+  snapshot; the row update instead makes a concurrent creator fail with `40001`, which the
+  existing retry turns into a fresh attempt that sees the committed job. Tests: settings
+  validation, API mapping and the OpenAPI 429 entry; PostgreSQL tests for the cap, the replay,
+  two concurrent POSTs at one below the cap (one 202, one 429), tenant scoping and finished
+  reviews not counting. ADR 0027 records it.
+
 ## ADR 0027 draft: Production review path wiring
 
 - **Status:** proposed (W8).
