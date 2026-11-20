@@ -65,6 +65,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     ForeignKeyConstraint,
+    Identity,
     Index,
     Integer,
     MetaData,
@@ -1361,6 +1362,7 @@ class ReviewOutputRow(Base):
             name="fk_review_outputs_review_job",
         ),
         *(CheckConstraint(check, name=name) for name, check in REVIEW_OUTPUT_CHECKS),
+        UniqueConstraint("tenant_id", "review_id", "wrapper_sha256"),  # M6 reports reference it
     )
 
     tenant_id: Mapped[UUID] = mapped_column(Uuid)
@@ -1382,5 +1384,237 @@ class ReviewOutputRow(Base):
     markdown_bytes: Mapped[int] = mapped_column(Integer)
     job_attempt: Mapped[int] = mapped_column(SmallInteger)
     created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.clock_timestamp()
+    )
+
+
+# --- reports, approval history and audit (M6, ADR-0028; migration 0009) --------------------------
+
+REPORT_STATUSES = ("approved", "changes_requested", "draft", "finalized")
+REPORT_CHECKS: tuple[tuple[str, str], ...] = (
+    ("id_is_review", "id = review_id"),
+    ("base_schema_id", "base_schema_id = 'evidenceguard.review-report-content.v1'"),
+    ("base_renderer_id", "base_renderer_id = 'evidenceguard.review-report-markdown.v1'"),
+    _hex("base_wrapper_sha256"),
+    ("status", _in("status", REPORT_STATUSES)),
+    ("current_revision_no", "current_revision_no BETWEEN 1 AND 100"),
+    _hex("current_content_sha256"),
+)
+REPORT_REVISION_CHECKS: tuple[tuple[str, str], ...] = (
+    ("schema_id", "schema_id = 'evidenceguard.review-report-revision.v1'"),
+    ("revision_no", "revision_no BETWEEN 1 AND 100"),
+    ("origin", _in("origin", ("generated", "revised"))),
+    ("generated_author", "(origin = 'generated') = (created_by IS NULL)"),
+    ("generated_first", "(origin = 'generated') = (revision_no = 1)"),
+    ("content_ascii", "octet_length(content_canonical) = char_length(content_canonical)"),
+    ("content_printable", "content_canonical !~ '[^ -~]'"),
+    ("content_size", "octet_length(content_canonical) BETWEEN 1 AND 1048576"),
+    _hex("content_sha256"),
+    _hex("base_wrapper_sha256"),
+    ("reason", "reason IS NULL OR char_length(reason) BETWEEN 1 AND 500"),
+)
+REPORT_DECISION_CHECKS: tuple[tuple[str, str], ...] = (
+    ("decision_no", "decision_no BETWEEN 1 AND 1000"),
+    ("revision_no", "revision_no BETWEEN 1 AND 100"),
+    _hex("content_sha256"),
+    ("decision", _in("decision", ("approve", "reject"))),
+    ("comment", "comment IS NULL OR char_length(comment) BETWEEN 1 AND 2000"),
+    ("reject_comment", "decision <> 'reject' OR (comment IS NOT NULL AND btrim(comment) <> '')"),
+)
+REPORT_FINALIZATION_CHECKS: tuple[tuple[str, str], ...] = (
+    ("decision_no", "decision_no BETWEEN 1 AND 1000"),
+    ("revision_no", "revision_no BETWEEN 1 AND 100"),
+    _hex("content_sha256"),
+)
+AUDIT_ACTIONS = ("approve", "export", "finalize", "reject", "revise")
+AUDIT_EVENT_CHECKS: tuple[tuple[str, str], ...] = (
+    ("action", _in("action", AUDIT_ACTIONS)),
+    ("revision_no", "revision_no BETWEEN 1 AND 100"),
+    _hex("content_sha256"),
+    (
+        "export_pairing",
+        "(action = 'export') = (export_format IS NOT NULL AND export_sha256 IS NOT NULL)",
+    ),
+    ("export_format", "export_format IS NULL OR export_format IN ('json', 'md')"),
+    _hex("export_sha256", nullable=True),
+)
+
+
+class ReportRow(Base):
+    """One report per stored review output (``id`` equals ``review_id``), created lazily from the
+    write-once output. Its status and current-revision pointers change; the database rejects
+    DELETE and TRUNCATE (trigger in migration 0009)."""
+
+    __tablename__ = "reports"
+    __table_args__ = (
+        PrimaryKeyConstraint("tenant_id", "id"),
+        UniqueConstraint("tenant_id", "id", "base_wrapper_sha256"),
+        ForeignKeyConstraint(
+            ["tenant_id", "review_id", "base_wrapper_sha256"],
+            [
+                "review_outputs.tenant_id",
+                "review_outputs.review_id",
+                "review_outputs.wrapper_sha256",
+            ],
+            name="fk_reports_review_output",
+        ),
+        *(CheckConstraint(check, name=name) for name, check in REPORT_CHECKS),
+    )
+
+    tenant_id: Mapped[UUID] = mapped_column(Uuid)
+    id: Mapped[UUID] = mapped_column(Uuid)
+    review_id: Mapped[UUID] = mapped_column(Uuid)
+    base_schema_id: Mapped[str] = mapped_column(String(64))
+    base_renderer_id: Mapped[str] = mapped_column(String(64))
+    base_wrapper_sha256: Mapped[str] = mapped_column(String(64))
+    status: Mapped[str] = mapped_column(String(32))
+    current_revision_no: Mapped[int] = mapped_column(SmallInteger)
+    current_content_sha256: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.clock_timestamp()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.clock_timestamp()
+    )
+
+
+class ReportRevisionRow(Base):
+    """An immutable revision: canonical ``RevisionContent`` bytes and their digest. Append-only
+    (a trigger rejects UPDATE, DELETE and TRUNCATE)."""
+
+    __tablename__ = "report_revisions"
+    __table_args__ = (
+        PrimaryKeyConstraint("tenant_id", "report_id", "revision_no"),
+        UniqueConstraint(
+            "tenant_id",
+            "report_id",
+            "revision_no",
+            "content_sha256",
+            name="uq_report_revisions_revision_hash",
+        ),
+        ForeignKeyConstraint(
+            ["tenant_id", "report_id", "base_wrapper_sha256"],
+            ["reports.tenant_id", "reports.id", "reports.base_wrapper_sha256"],
+            name="fk_report_revisions_report",
+        ),
+        *(CheckConstraint(check, name=name) for name, check in REPORT_REVISION_CHECKS),
+    )
+
+    tenant_id: Mapped[UUID] = mapped_column(Uuid)
+    report_id: Mapped[UUID] = mapped_column(Uuid)
+    revision_no: Mapped[int] = mapped_column(SmallInteger)
+    schema_id: Mapped[str] = mapped_column(String(64))
+    base_wrapper_sha256: Mapped[str] = mapped_column(String(64))
+    content_canonical: Mapped[str] = mapped_column(Text)
+    content_sha256: Mapped[str] = mapped_column(String(64))
+    origin: Mapped[str] = mapped_column(String(16))
+    created_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.clock_timestamp()
+    )
+
+
+class ReportDecisionRow(Base):
+    """An approve or reject decision bound to one exact revision and hash. Append-only."""
+
+    __tablename__ = "report_decisions"
+    __table_args__ = (
+        PrimaryKeyConstraint("tenant_id", "report_id", "decision_no"),
+        UniqueConstraint(
+            "tenant_id",
+            "report_id",
+            "decision_no",
+            "revision_no",
+            "content_sha256",
+            name="uq_report_decisions_decision_hash",
+        ),
+        ForeignKeyConstraint(
+            ["tenant_id", "report_id", "revision_no", "content_sha256"],
+            [
+                "report_revisions.tenant_id",
+                "report_revisions.report_id",
+                "report_revisions.revision_no",
+                "report_revisions.content_sha256",
+            ],
+            name="fk_report_decisions_revision",
+        ),
+        *(CheckConstraint(check, name=name) for name, check in REPORT_DECISION_CHECKS),
+    )
+
+    tenant_id: Mapped[UUID] = mapped_column(Uuid)
+    report_id: Mapped[UUID] = mapped_column(Uuid)
+    decision_no: Mapped[int] = mapped_column(SmallInteger)
+    revision_no: Mapped[int] = mapped_column(SmallInteger)
+    content_sha256: Mapped[str] = mapped_column(String(64))
+    decision: Mapped[str] = mapped_column(String(16))
+    decided_by: Mapped[UUID] = mapped_column(Uuid)
+    comment: Mapped[str | None] = mapped_column(Text, nullable=True)
+    decided_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.clock_timestamp()
+    )
+
+
+class ReportFinalizationRow(Base):
+    """The single finalization of a report, bound to its approving decision. Append-only."""
+
+    __tablename__ = "report_finalizations"
+    __table_args__ = (
+        PrimaryKeyConstraint("tenant_id", "report_id"),
+        ForeignKeyConstraint(
+            ["tenant_id", "report_id", "decision_no", "revision_no", "content_sha256"],
+            [
+                "report_decisions.tenant_id",
+                "report_decisions.report_id",
+                "report_decisions.decision_no",
+                "report_decisions.revision_no",
+                "report_decisions.content_sha256",
+            ],
+            name="fk_report_finalizations_decision",
+        ),
+        *(CheckConstraint(check, name=name) for name, check in REPORT_FINALIZATION_CHECKS),
+    )
+
+    tenant_id: Mapped[UUID] = mapped_column(Uuid)
+    report_id: Mapped[UUID] = mapped_column(Uuid)
+    revision_no: Mapped[int] = mapped_column(SmallInteger)
+    content_sha256: Mapped[str] = mapped_column(String(64))
+    decision_no: Mapped[int] = mapped_column(SmallInteger)
+    finalized_by: Mapped[UUID] = mapped_column(Uuid)
+    finalized_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.clock_timestamp()
+    )
+
+
+class AuditEvent(Base):
+    """One report action (revise, approve, reject, finalize, export) by one actor on one exact
+    revision and hash; an export also records its format and body digest. Append-only."""
+
+    __tablename__ = "audit_events"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["tenant_id", "report_id", "revision_no", "content_sha256"],
+            [
+                "report_revisions.tenant_id",
+                "report_revisions.report_id",
+                "report_revisions.revision_no",
+                "report_revisions.content_sha256",
+            ],
+            name="fk_audit_events_revision",
+        ),
+        Index("ix_audit_events_report_order", "tenant_id", "report_id", "id"),
+        *(CheckConstraint(check, name=name) for name, check in AUDIT_EVENT_CHECKS),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True)
+    tenant_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("tenants.id"))
+    report_id: Mapped[UUID] = mapped_column(Uuid)
+    action: Mapped[str] = mapped_column(String(16))
+    actor_id: Mapped[UUID] = mapped_column(Uuid)
+    revision_no: Mapped[int] = mapped_column(SmallInteger)
+    content_sha256: Mapped[str] = mapped_column(String(64))
+    export_format: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    export_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    occurred_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.clock_timestamp()
     )
