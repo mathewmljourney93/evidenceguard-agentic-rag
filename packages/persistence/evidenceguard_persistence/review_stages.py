@@ -2,8 +2,9 @@
 
 Implements the persistence half of the M5e specification accepted in Prompt 199 (``docs/plan.md``,
 M5e-E to M5e-K, with clarifications A and B). These are **trusted internal programming
-interfaces**: no endpoint, command, production handler or registry entry calls them (W8), and
-``run_review`` stays unregistered.
+interfaces**: no endpoint or command calls them. Since W8 (ADR-0027) their only application
+caller is the ``run_review`` handler (``evidenceguard_worker/review.py``), which ``eg-worker``
+registers only with a fully valid review configuration.
 
 **Transaction ownership.** Every write API composes into the **caller's** fenced transaction. Its
 first argument is a ``StageFence`` (structurally the worker's ``HandlerFence`` or the M3 ``Fence``:
