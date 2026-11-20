@@ -310,6 +310,54 @@ def test_configured_worker_claims_run_review(
     assert "worker.review_disabled" not in err
 
 
+def test_configured_worker_adds_run_review_to_an_injected_registry(
+    reviews_off: None, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = RecordingDatabaseStore()
+    provider = _TestProvider()
+
+    def handler(ctx: JobContext) -> None:
+        raise AssertionError("no job is claimed")
+
+    @contextmanager
+    def store_factory() -> Iterator[JobStore]:
+        yield store
+
+    code = cli.main(
+        ["--once"],
+        registry_factory=_registry,
+        store_factory=store_factory,
+        review_provider_loader=lambda: provider,
+        review_handler_factory=lambda given, factory: handler,
+    )
+
+    assert code == 0
+    assert store.kinds == [frozenset({"test_job", "run_review"})]
+    assert '"event":"worker.review_enabled"' in capsys.readouterr().err
+
+
+def test_an_injected_registry_that_already_has_run_review_is_never_replaced(
+    reviews_off: None, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = RecordingDatabaseStore()
+
+    @contextmanager
+    def store_factory() -> Iterator[JobStore]:
+        yield store
+
+    code = cli.main(
+        ["--once"],
+        registry_factory=lambda: HandlerRegistry([("run_review", lambda ctx: None)]),
+        store_factory=store_factory,
+        review_provider_loader=_TestProvider,
+        review_handler_factory=lambda given, factory: lambda ctx: None,
+    )
+
+    assert code == 1
+    assert store.kinds == []
+    assert "eg-worker: error: unexpected DuplicateHandlerError" in capsys.readouterr().err
+
+
 @pytest.mark.parametrize(
     ("values", "message"),
     [

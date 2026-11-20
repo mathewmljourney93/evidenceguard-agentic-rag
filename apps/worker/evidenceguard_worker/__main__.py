@@ -21,7 +21,8 @@ exception text:
 
 With reviews off (both review variables unset) the worker logs ``worker.review_disabled`` and
 never claims a review job; with a valid configuration it logs ``worker.review_enabled`` and
-registers the review handler next to ingestion and indexing (ADR-0027).
+adds the review handler to the registry from ``registry_factory`` (ingestion and indexing in
+production), keeping every handler it already has (ADR-0027).
 
 ``--help`` needs no settings and no database. Signal handlers only set flags: the first SIGINT
 or SIGTERM (or SIGBREAK on Windows) requests a graceful stop, a second an immediate one.
@@ -44,7 +45,7 @@ from evidenceguard_persistence.settings import (
     ReviewConfigurationError,
     load_database_settings,
 )
-from evidenceguard_worker.handlers import production_registry
+from evidenceguard_worker.handlers import production_registry, with_review_handler
 from evidenceguard_worker.registry import HandlerRegistry
 from evidenceguard_worker.review_wiring import (
     ModelProvider,
@@ -122,12 +123,16 @@ def database_store() -> Iterator[JobStore]:
 
 
 def _review_registry(
-    provider: ModelProvider, store: JobStore, review_handler_factory: ReviewHandlerFactory
+    registry: HandlerRegistry,
+    provider: ModelProvider,
+    store: JobStore,
+    review_handler_factory: ReviewHandlerFactory,
 ) -> HandlerRegistry:
-    """The production registry with the review handler on the store's session factory."""
+    """``registry`` (from ``registry_factory``) plus the review handler on the store's session
+    factory. The given registry's handlers are kept, never replaced."""
     if not isinstance(store, DatabaseJobStore):
         raise TypeError("the review handler needs a database job store")
-    return production_registry(review_handler_factory(provider, store.session_factory))
+    return with_review_handler(registry, review_handler_factory(provider, store.session_factory))
 
 
 def _fail(code: int, message: str) -> int:
@@ -185,7 +190,7 @@ def main(
         try:
             with store_factory() as store:
                 if provider is not None:
-                    registry = _review_registry(provider, store, review_handler_factory)
+                    registry = _review_registry(registry, provider, store, review_handler_factory)
                 result = run_worker(store, registry, stop=stop, timings=timings, once=args.once)
         finally:
             restore_signals()

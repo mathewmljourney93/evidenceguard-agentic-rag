@@ -3,7 +3,9 @@
 M3d registers the first production handler, ``ingest_revision`` (ADR-0010); M4c adds
 ``index_revision`` (ADR-0015). W8 (ADR-0027) adds the review job kind, but only when the caller
 passes a review handler: ``eg-worker`` builds one only from a fully valid review configuration,
-so ``production_registry()`` without an argument still has exactly the two kinds. An empty
+so ``production_registry()`` without an argument still has exactly the two kinds.
+``with_review_handler`` adds the review kind to an existing registry (``eg-worker`` uses it on the
+registry from its ``registry_factory``, so an injected registry keeps its handlers). An empty
 registry still makes ``eg-worker`` exit with code 4 before reading database settings, but only
 when one is injected (tests). Test-only handlers live under ``tests/`` and are never packaged or
 registered here.
@@ -23,3 +25,9 @@ def production_registry(review_handler: JobHandler | None = None) -> HandlerRegi
     if review_handler is not None:
         handlers.append((REVIEW_JOB_KIND, review_handler))
     return HandlerRegistry(handlers)
+
+
+def with_review_handler(registry: HandlerRegistry, review_handler: JobHandler) -> HandlerRegistry:
+    """``registry``'s entries in order, then the review job kind. A registry that already has the
+    review kind raises ``DuplicateHandlerError``; nothing is replaced silently."""
+    return HandlerRegistry([*registry.items(), (REVIEW_JOB_KIND, review_handler)])
