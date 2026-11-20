@@ -25,7 +25,7 @@ htmlcov/
 
 # --- Local runtime data (uploads, databases, logs) ---
 # Synthetic fixtures live under sample_data/ and are tracked; these are local-only.
-# /.local/ is also where session exports and scratch files go (see CLAUDE.md).
+# /.local/ is also where session exports and scratch files go (see AGENTS.md).
 /.local/
 /uploads/
 /pgdata/
