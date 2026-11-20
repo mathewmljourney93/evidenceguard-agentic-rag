@@ -1,7 +1,8 @@
 """Atomic review creation and trusted reload (M5d, ADR-0022).
 
-Both seams are **trusted internal programming interfaces**: no endpoint, command, production
-worker path or handler calls them (W8). The tenant comes only from the validated
+Both seams are **trusted internal programming interfaces**. Since W8 (ADR-0027) the review API
+(``evidenceguard_api/reviews.py``) calls both; the worker reaches ``load_review`` only through
+its composition seams, and no command calls them. The tenant comes only from the validated
 ``ActorContext``, whose role must be reviewer or approver.
 
 **Creation** (``create_review``) runs at most three attempts. Each attempt is one fresh session

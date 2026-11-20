@@ -1,8 +1,9 @@
 """Review-creation composition seams with the pinned M5c artifacts (M5d, ADR-0022).
 
-Internal and test-only: no runtime path, command, API route or registry imports this module, and
-``run_review`` is not registered in production (W8). It is the only worker module that imports
-``evidenceguard_agents`` (D2); persistence never does.
+Internal: no command, API route or registry imports this module. ``run_review`` uses
+``load_trusted_review``; ``create_review_with_artifacts`` is test-only, because the W8 review API
+(ADR-0027) creates reviews through persistence and may not import the worker. It was the first
+worker module to import ``evidenceguard_agents`` (D2); persistence never does.
 
 - ``create_review_with_artifacts`` checks the actor and request, then the role, then loads the
   pinned template and both prompts through the M5c loaders **before any database work**, and only
