@@ -22,9 +22,13 @@ database clock (``clock_timestamp()``).
 Reads
 -----
 ``load_report`` reads in one REPEATABLE READ, READ ONLY snapshot after the optional creation.
-``export_report`` reads only report, revision, decision, finalization and output rows, calls the
-supplied ``render`` callback (the persistence package may not import the renderers) and records
-the export's format and body digest in the same transaction, committed before it returns.
+``export_report`` takes ``FOR SHARE`` on the report row before reading anything else, so a
+finalize committing meanwhile is either fully visible (it held the row first) or fully invisible
+(it waits for the export to commit); it never sees the report row from before a finalize and the
+finalization row from after it. It reads only report, revision, decision, finalization and output
+rows, calls the supplied ``render`` callback (the persistence package may not import the
+renderers) and records the export's format and body digest in the same transaction, committed
+before it returns.
 
 Every operation checks the actor's role against ``READ_ROLES`` before any SQL and filters every
 query by the actor's tenant. Rows that do not rebuild into a valid report raise
@@ -51,6 +55,7 @@ from evidenceguard_domain.review_report_approval import (
     ExportInput,
     ExportResult,
     FindingDisposition,
+    InvalidRevisionContentError,
     WrapperApprovalDecision,
     WrapperFinalization,
     WrapperReport,
@@ -104,6 +109,7 @@ STATEMENT_TIMEOUT_MS = 30_000
 """Per statement, transaction-local (as in ``review_outputs``), including row-lock waits."""
 
 ExportFormat = Literal["md", "json"]
+RowLock = Literal["update", "share"]
 
 
 class ReportNotFoundError(Exception):
@@ -230,10 +236,15 @@ def _scope(table: Table, tenant_id: UUID, report_id: UUID) -> Any:
     return (table.c.tenant_id == tenant_id) & (table.c.report_id == report_id)
 
 
-def _rebuild(session: Session, tenant_id: UUID, report_id: UUID, *, lock: bool) -> ReportState:
-    """The report rebuilt from its rows (``FOR UPDATE`` on the report row when ``lock``)."""
+def _rebuild(
+    session: Session, tenant_id: UUID, report_id: UUID, *, lock: RowLock | None
+) -> ReportState:
+    """The report rebuilt from its rows, first locking the report row ``FOR UPDATE`` or
+    ``FOR SHARE`` when ``lock`` says so (``None`` only inside a read-only snapshot)."""
     statement = select(REPORTS).where(REPORTS.c.tenant_id == tenant_id, REPORTS.c.id == report_id)
-    row = session.execute(statement.with_for_update() if lock else statement).first()
+    if lock is not None:
+        statement = statement.with_for_update(read=lock == "share")
+    row = session.execute(statement).first()
     if row is None:
         raise ReportNotFoundError()
     output = session.execute(
@@ -327,6 +338,15 @@ def _rebuild(session: Session, tenant_id: UUID, report_id: UUID, *, lock: bool) 
     except ValueError:  # includes validation, decoding and encoding failures
         raise ReportRecordInconsistentError() from None
     return ReportState(report=report, wrapper=wrapper, wrapper_sha256=row.base_wrapper_sha256)
+
+
+def _checked_export_digest(result: ExportResult) -> str:
+    """The SHA-256 of the rendered body; ``ReportRecordInconsistentError`` when the renderer's
+    declared digest differs (nothing is recorded or returned for such an export)."""
+    digest = hashlib.sha256(result.body).hexdigest()
+    if digest != result.export_sha256:
+        raise ReportRecordInconsistentError()
+    return digest
 
 
 def _audit(
@@ -423,7 +443,7 @@ def _mutate(
         _timeout(session)
         if stored is not None:
             _create_if_absent(session, stored)
-        state = _rebuild(session, actor.tenant_id, report_id, lock=True)
+        state = _rebuild(session, actor.tenant_id, report_id, lock="update")
         now = _now(session)
         new = change(state.report, now)
         if new is state.report:  # an identical retry: nothing is written
@@ -457,7 +477,7 @@ def load_report(
             _create_if_absent(session, stored)
     with read_snapshot(session_factory) as (session, _now_unused):
         _timeout(session)
-        return _rebuild(session, actor.tenant_id, report_id, lock=False)
+        return _rebuild(session, actor.tenant_id, report_id, lock=None)
 
 
 def revise_report(
@@ -497,7 +517,11 @@ def decide_report(
     decision: Decision,
     comment: str | None,
 ) -> ReportState:
-    """Approve or reject the exact current revision."""
+    """Approve or reject the exact current revision. A rejection without a comment raises
+    ``InvalidRevisionContentError`` before any SQL."""
+    _require_reader(actor)
+    if decision is Decision.REJECT and comment is None:
+        raise InvalidRevisionContentError("a rejection requires a comment")
 
     def change(report: WrapperReport, now: datetime) -> WrapperReport:
         if decision is Decision.APPROVE:
@@ -509,8 +533,7 @@ def decide_report(
                 now=now,
                 comment=comment,
             )
-        if comment is None:
-            raise ValueError("a rejection requires a comment")
+        assert comment is not None  # checked above, before any SQL
         return reject(
             report,
             actor,
@@ -559,7 +582,7 @@ def export_report(
         _timeout(session)
         if stored is not None:
             _create_if_absent(session, stored)
-        state = _rebuild(session, actor.tenant_id, report_id, lock=False)
+        state = _rebuild(session, actor.tenant_id, report_id, lock="share")
         report = state.report
         revision = exportable_revision(report, actor)
         approval = report.effective_approval
@@ -576,9 +599,7 @@ def export_report(
                 finalization=finalization,
             )
         )
-        digest = hashlib.sha256(result.body).hexdigest()
-        if digest != result.export_sha256:
-            raise ValueError("the rendered export digest does not match its body")
+        digest = _checked_export_digest(result)
         _audit(
             session,
             actor,

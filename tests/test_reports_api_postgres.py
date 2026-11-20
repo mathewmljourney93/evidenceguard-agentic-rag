@@ -10,8 +10,9 @@ every hook is removed in ``finally`` and every test asserts that its hook fired.
 import hashlib
 import json
 import threading
+import time
 from collections.abc import Callable, Iterator
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any
 from uuid import UUID, uuid4
@@ -23,11 +24,14 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, event, select, text
 from sqlalchemy.engine import URL
 from sqlalchemy.exc import DBAPIError
+from sqlalchemy.orm import Session, sessionmaker
 
 from evidenceguard_agents.report_export import EXPORT_DISCLAIMER
 from evidenceguard_api.app import create_app
 from evidenceguard_api.database import AppDatabase
 from evidenceguard_domain.context import ActorContext, Role
+from evidenceguard_domain.review_report_approval import ExportInput, ExportResult
+from evidenceguard_persistence import reports as report_store
 from evidenceguard_persistence.credentials import generate_api_key
 from evidenceguard_persistence.models import (
     AuditEvent,
@@ -166,20 +170,46 @@ def api(migrated: Engine, test_database_url: URL) -> Iterator[Api]:
 
 @contextmanager
 def on_statement(
-    engine: Engine, match: Callable[[str], bool], action: Callable[[], object]
+    engine: Engine,
+    match: Callable[[str], bool],
+    action: Callable[[], object],
+    *,
+    after: bool = False,
 ) -> Iterator[list[str]]:
+    """Run ``action`` before (or, with ``after``, once it has executed) each matching statement."""
     fired: list[str] = []
+    identifier = "after_cursor_execute" if after else "before_cursor_execute"
 
     def hook(_conn: Any, _cursor: Any, statement: str, *_: Any) -> None:
         if match(statement):
             fired.append(statement)
             action()
 
-    event.listen(engine, "before_cursor_execute", hook)
+    event.listen(engine, identifier, hook)
     try:
         yield fired
     finally:
-        event.remove(engine, "before_cursor_execute", hook)
+        event.remove(engine, identifier, hook)
+
+
+def wait_until_blocked_or_done(engine: Engine, future: Future[Any]) -> None:
+    """Return once ``future`` has finished or another session in this database waits on a lock
+    (bounded by ``BARRIER_TIMEOUT``). Either outcome is a state, not a timing assumption."""
+    deadline = time.monotonic() + BARRIER_TIMEOUT
+    while time.monotonic() < deadline:
+        if future.done():
+            return
+        with engine.connect() as connection:
+            waiting = connection.execute(
+                text(
+                    "SELECT count(*) FROM pg_stat_activity WHERE datname = current_database() "
+                    "AND wait_event_type = 'Lock' AND pid <> pg_backend_pid()"
+                )
+            ).scalar_one()
+        if waiting:
+            return
+        time.sleep(0.01)
+    raise AssertionError("the other request neither finished nor waited on a lock")
 
 
 def _sqlstate(error: DBAPIError) -> str | None:
@@ -502,6 +532,96 @@ def test_export_reads_no_stage_or_plan_rows(api: Api) -> None:
     for statement in fired:
         assert "review_stage_results" not in statement
         assert "review_plan_questions" not in statement
+
+
+def _is_export_report_read(statement: str) -> bool:
+    """The rebuild's read of the report row outside a mutation (export or GET), not the
+    ``FOR UPDATE`` read of a mutation and not the existence probe."""
+    head = statement.lstrip()
+    return head.startswith("SELECT reports.tenant_id") and "FOR UPDATE" not in head
+
+
+def test_an_export_that_read_the_report_first_makes_a_racing_finalize_wait(api: Api) -> None:
+    """Export reads the report row, then a finalize runs: the export must not combine the report
+    row from before the finalize with the finalization row from after it (409, never 503)."""
+    number, sha, _ = api.current()
+    assert api.decide(api.approver, number, sha).status_code == 200
+    finalizer = TestClient(api.app)
+    body = {"revision_no": number, "content_sha256": sha}
+    started: list[Future[Any]] = []
+    with ThreadPoolExecutor(max_workers=1) as pool:
+
+        def start_finalize() -> None:
+            if started:
+                return
+            started.append(
+                pool.submit(
+                    finalizer.post,
+                    api.base + "/finalize",
+                    headers=api.second_approver[1],
+                    json=body,
+                )
+            )
+            wait_until_blocked_or_done(api.engine, started[0])
+
+        with on_statement(api.engine, _is_export_report_read, start_finalize, after=True) as fired:
+            exported = api.export(api.reviewer, "md")
+        finalized = started[0].result(timeout=BARRIER_TIMEOUT)
+    assert len(fired) == 1
+    assert exported.status_code == 409  # the export saw the report before the finalize
+    assert finalized.status_code == 200  # the finalize waited for the export, then committed
+    assert api.export(api.reviewer, "md").status_code == 200
+    assert [e.action for e in api.audit()] == ["approve", "finalize", "export"]
+
+
+def test_an_export_racing_a_finalize_that_holds_the_report_waits_and_exports(api: Api) -> None:
+    """A finalize holds the report row and has written its rows; an export arriving then waits
+    for its commit and exports the finalized revision (200, never 503)."""
+    number, sha, _ = api.current()
+    assert api.decide(api.approver, number, sha).status_code == 200
+    exporter = TestClient(api.app)
+    started: list[Future[Any]] = []
+    with ThreadPoolExecutor(max_workers=1) as pool:
+
+        def start_export() -> None:
+            if started:
+                return
+            started.append(
+                pool.submit(
+                    exporter.get,
+                    api.base + "/export",
+                    headers=api.reviewer[1],
+                    params={"format": "md"},
+                )
+            )
+            wait_until_blocked_or_done(api.engine, started[0])
+
+        with on_statement(
+            api.engine, lambda s: s.lstrip().startswith("INSERT INTO audit_events"), start_export
+        ) as fired:
+            finalized = api.finalize(api.second_approver, number, sha)
+        exported = started[0].result(timeout=BARRIER_TIMEOUT)
+    assert fired  # the finalize's audit row (the export's may follow after the hook is removed)
+    assert finalized.status_code == 200
+    assert exported.status_code == 200  # it waited for the finalize to commit
+    assert [e.action for e in api.audit()] == ["approve", "finalize", "export"]
+
+
+def test_an_export_whose_rendered_digest_differs_is_inconsistent_and_not_recorded(
+    api: Api,
+) -> None:
+    api.finalized()
+    before = len(api.audit())
+
+    def lying_render(_i: ExportInput) -> ExportResult:
+        return ExportResult(body=b"# body\n", media_type="text/markdown", export_sha256="0" * 64)
+
+    factory: sessionmaker[Session] = sessionmaker(bind=api.engine)
+    with pytest.raises(report_store.ReportRecordInconsistentError):
+        report_store.export_report(
+            factory, api.reviewer[0], api.report_id, export_format="md", render=lying_render
+        )
+    assert len(api.audit()) == before  # the export transaction rolled back
 
 
 # --- audit and append-only history ---------------------------------------------------------------
