@@ -24,6 +24,10 @@ def test_openapi_lists_every_route() -> None:
         "/v1/documents/{document_id}/revisions",
         "/v1/documents/{document_id}/revisions/{revision_no}/chunks",
         "/v1/jobs/{job_id}",
+        "/v1/reviews",
+        "/v1/reviews/{review_id}",
+        "/v1/reviews/{review_id}/result",
+        "/v1/review-templates",
     ]
 
 
@@ -138,3 +142,39 @@ def test_openapi_documents_document_routes() -> None:
     )
     for name in ("RevisionOut", "JobViewOut", "ChunkOut", "UploadResultOut", "DocumentDetailOut"):
         assert components[name]["additionalProperties"] is False
+
+
+def test_review_routes_document_auth_and_errors() -> None:
+    """W8 (ADR-0027): every review route needs the API key; POST documents the key header,
+    replay, conflicts and the not-configured 503; bodies forbid extra fields."""
+    schema = _openapi()
+    paths = schema["paths"]
+
+    create = paths["/v1/reviews"]["post"]
+    assert {"200", "202", "401", "403", "404", "409", "422", "500", "503"} <= set(
+        create["responses"]
+    )
+    header = next(p for p in create["parameters"] if p["in"] == "header")
+    assert header["name"] == "Idempotency-Key" and header["required"] is True
+    assert header["schema"]["pattern"] == "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+    assert "Reviews are not configured" in create["responses"]["503"]["description"]
+    detail = paths["/v1/reviews/{review_id}"]["get"]
+    result = paths["/v1/reviews/{review_id}/result"]["get"]
+    templates = paths["/v1/review-templates"]["get"]
+    assert {"401", "403", "404", "422"} <= set(detail["responses"])
+    assert {"401", "403", "404", "409"} <= set(result["responses"])
+    for operation in (create, detail, result, templates):
+        assert operation["security"] == [{"ApiKey": []}]
+        assert operation["tags"] == ["reviews"]
+    assert paths["/v1/jobs/{job_id}"]["get"]["summary"] == "Get a job"
+
+    components = schema["components"]["schemas"]
+    assert set(components["ReviewCreate"]["properties"]) == {
+        "vendor_id",
+        "template_id",
+        "template_version",
+    }
+    assert components["ReviewCreate"]["required"] == ["vendor_id"]
+    for name in ("ReviewCreate", "ReviewAccepted", "ReviewDetail", "ReviewResult"):
+        assert components[name]["additionalProperties"] is False
+        assert not {"tenant_id", "idempotency_key"} & set(components[name]["properties"])

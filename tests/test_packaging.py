@@ -902,6 +902,22 @@ def test_production_paths_never_construct_the_scripted_provider() -> None:
             assert "ScriptedFakeProvider" not in source.read_text(encoding="utf-8"), source.name
 
 
+def test_review_api_imports_only_templates_and_prompts_from_agents() -> None:
+    importing = {
+        source.name
+        for source in _source(evidenceguard_api, "__init__.py").parent.rglob("*.py")
+        if "evidenceguard_agents" in _module_imports(source)
+    }
+    assert importing == {W8_REVIEW_API}
+    path = _source(evidenceguard_api, W8_REVIEW_API)
+    assert _agents_modules(path) == W8_REVIEW_API_AGENT_MODULES
+    imported = _module_imports(path)
+    assert not imported & {"evidenceguard_worker", "os", "socket", "ssl", "http", "urllib"}
+    text = path.read_text(encoding="utf-8")
+    assert "review_seams" not in text and "ANTHROPIC_API_KEY" not in text
+    assert "load_anthropic_settings" not in text and "AnthropicSettings" not in text
+
+
 def test_review_wiring_keeps_the_accepted_imports() -> None:
     path = _source(evidenceguard_worker, W8_WIRING)
     imported = _module_imports(path)

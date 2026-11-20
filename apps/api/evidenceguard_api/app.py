@@ -15,6 +15,8 @@ from evidenceguard_api.middleware import RequestContextMiddleware
 from evidenceguard_api.problems import install_problem_handlers
 from evidenceguard_api.readiness import DatabaseReadiness, Readiness
 from evidenceguard_api.readiness import router as readiness_router
+from evidenceguard_api.reviews import DatabaseReviewService, ReviewService
+from evidenceguard_api.reviews import router as reviews_router
 from evidenceguard_api.vendors import DatabaseVendorStore, VendorStore
 from evidenceguard_api.vendors import router as vendors_router
 from evidenceguard_domain.health import HealthStatus
@@ -27,17 +29,19 @@ def create_app(
     document_store: DocumentStore | None = None,
     readiness: Readiness | None = None,
     database: AppDatabase | None = None,
+    review_service: ReviewService | None = None,
 ) -> FastAPI:
     """Build the API application. Importing this module does not start a server.
 
     The factory adds request-ID middleware and problem+json error handlers. It does not
     configure logging handlers; ``eg-api`` does that once per process.
 
-    Injection seams: ``authenticator``, ``vendor_store``, ``document_store`` and ``readiness``
-    replace the database-backed defaults (tests pass doubles). Any default that is used shares
-    one ``AppDatabase``: the ``database`` passed in, which the caller owns and closes, or else
-    one the app creates and disposes on shutdown. The database starts lazily, so building the app,
-    starting it and serving ``/healthz`` never read settings or connect.
+    Injection seams: ``authenticator``, ``vendor_store``, ``document_store``, ``readiness`` and
+    ``review_service`` replace the database-backed defaults (tests pass doubles). Any default
+    that is used shares one ``AppDatabase``: the ``database`` passed in, which the caller owns
+    and closes, or else one the app creates and disposes on shutdown. The database starts
+    lazily, so building the app, starting it and serving ``/healthz`` never read settings or
+    connect. Review settings are read per review request, never here.
     """
     shared = database if database is not None else AppDatabase()
     owns_database = database is None
@@ -68,6 +72,9 @@ def create_app(
         document_store if document_store is not None else DatabaseDocumentStore(shared)
     )
     app.state.readiness = readiness if readiness is not None else DatabaseReadiness(shared)
+    app.state.review_service = (
+        review_service if review_service is not None else DatabaseReviewService(shared)
+    )
     app.add_middleware(RequestContextMiddleware)
     install_problem_handlers(app)
 
@@ -88,4 +95,5 @@ def create_app(
     app.include_router(me_router)
     app.include_router(vendors_router)
     app.include_router(documents_router)
+    app.include_router(reviews_router)
     return app

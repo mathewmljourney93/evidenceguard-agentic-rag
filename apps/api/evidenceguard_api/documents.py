@@ -7,7 +7,7 @@
 - ``GET /v1/documents/{document_id}`` returns one document with its active and latest revisions.
 - ``GET /v1/documents/{document_id}/revisions`` lists its revisions, newest first.
 - ``GET /v1/documents/{document_id}/revisions/{revision_no}/chunks`` lists a revision's chunks.
-- ``GET /v1/jobs/{job_id}`` returns an ingestion job's reviewed fields.
+- ``GET /v1/jobs/{job_id}`` returns an ingestion or review job's reviewed fields.
 
 The tenant always comes from the API key; reviewers and approvers may use these routes and
 administrators get a generic 403. Objects of another tenant are not found (404).
@@ -697,9 +697,10 @@ def list_chunks(
     "/v1/jobs/{job_id}",
     tags=["jobs"],
     response_model=JobViewOut,
-    summary="Get an ingestion job",
+    summary="Get a job",
     description=(
-        "The reviewed fields of an ingestion job: never its payload, idempotency key or worker."
+        "The reviewed fields of an ingestion or review job: never its payload, idempotency key "
+        "or worker."
     ),
 )
 def get_job(
