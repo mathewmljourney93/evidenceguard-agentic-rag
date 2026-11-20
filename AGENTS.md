@@ -29,10 +29,10 @@ People:
 
 | Rule | Mechanism | In force since | Status |
 | ---- | --------- | -------------- | ------ |
-| Nothing lands on `main` directly | branch protection: pull request required, required checks below, no force push, no deletion | 2026-11-20 | on |
+| Nothing lands on `main` directly | merges only through pull requests with the merge-commit method; checked at every merge with `git log --first-parent --no-merges <last merge>..origin/main` (must print nothing). Branch protection cannot be set from the agent session; it is set by Mathew on the public repository at republish | 2026-11-20 | rule on; protection planned |
 | Suites run on every PR | `.github/workflows/ci.yml` (verify on Ubuntu and Windows, PostgreSQL integration, container build and Compose smoke) | before this agreement | on |
 | Secret scan over the whole history | `.github/workflows/secret-scan.yml` (Gitleaks) | before this agreement | on |
-| Merge commits only | merges done with the merge-commit method; squash and rebase merging disabled in settings | 2026-11-20 | on |
+| Merge commits only | the orchestrator merges with `merge_method=merge` only; disabling squash and rebase in settings is planned with the protection above | 2026-11-20 | rule on; setting planned |
 | Agents never deploy | there is no deploy path in this repository | always | n/a |
 
 ## How work flows

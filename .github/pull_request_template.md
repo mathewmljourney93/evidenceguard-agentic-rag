@@ -4,6 +4,7 @@
 
 **Tier:** standard | critical (why)
 **Plan:** `docs/plans/<branch>.md`
+**Plan author / model:** <who>, <model and effort>
 
 ## Reuse
 
