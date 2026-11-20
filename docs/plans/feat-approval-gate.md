@@ -40,6 +40,55 @@ Expose the stored review output as a report with immutable hash-bound revisions,
 - Revision cap: 100 per report; the 101st is 409.
 - Separation of duties as in Approach 8.
 
+## Changes from the plan (2026-11-20)
+
+Recorded after the first independent review. Each item is what the build does where it differs
+from the sections below.
+
+- **`ExportInput` and `ExportResult` live in the domain module** (`review_report_approval.py`),
+  not in persistence. The agents renderers need them, and the agents package may not import
+  persistence (`tests/test_packaging.py`). Persistence re-exports both names.
+- **Two errors added beyond the plan's list.** `ReportRecordInconsistentError` (persistence)
+  is raised when stored report rows do not rebuild into a valid report bound to their output, or
+  when a rendered export's declared digest differs from its body; the API maps it to 503.
+  `InvalidRevisionContentError` (domain) is raised when requested dispositions or notes do not
+  form a valid revision, and by `decide_report` for a rejection without a comment (checked before
+  any SQL); the API maps it to 422. No persistence path raises a bare `ValueError` to the API.
+- **Unqualified `ON CONFLICT DO NOTHING`** on the `reports` insert (no conflict target). Both
+  unique constraints on `reports`, the primary key `(tenant_id, id)` and
+  `(tenant_id, id, base_wrapper_sha256)`, contain `(tenant_id, id)`, so any conflict either can
+  raise means the same report already exists, which is exactly the case to skip. A simultaneous
+  creator may meet either constraint first, so naming one target could still raise on the other.
+  Proven by `test_concurrent_first_reads_create_one_report` (two creators meet at a barrier on
+  the insert; one report, one revision).
+- **Explicit short trigger names.** Row triggers `eg_<table>_append_only` (BEFORE UPDATE OR
+  DELETE) on the four history tables; statement triggers `eg_<table>_no_truncate`; on `reports`,
+  `eg_reports_no_delete` and `eg_reports_no_truncate`. Ten triggers in total, one function.
+- **Offline migration tests.** The existing offline tests for 0003 and 0005 in
+  `tests/test_persistence.py` now render up to `0008` instead of head, because 0009 adds
+  triggers and a function that those assertions do not describe. 0009 has its own offline tests
+  in `tests/test_report_migration.py`.
+- **Head pins moved to 0009** in the existing tests that pin it (`test_persistence.py`,
+  `test_persistence_postgres.py`, `test_readiness.py`, `test_review_stages_postgres.py`); the
+  0008 model-constraint test in `test_review_output_values.py` allows the one unique 0009 adds
+  to `ReviewOutputRow`.
+- **`approval` in the response** is the latest decision (approve or reject) when it is on the
+  current revision, otherwise `null`. A revision after a decision therefore shows no approval.
+- **`format` is required** on `GET /{report_id}/export` (`md` or `json`); a missing or other
+  value is 422. The plan did not say whether it had a default.
+- **Export reads under a share lock** (review fix). `export_report` locks the `reports` row
+  `FOR SHARE` before rebuilding, so a finalize committing meanwhile is either fully visible or
+  waits for the export. Without it, a READ COMMITTED export could read the report row from before
+  a finalize and the finalization row from after its commit and return 503. Tests:
+  `test_an_export_that_read_the_report_first_makes_a_racing_finalize_wait` (409, then the
+  finalize commits) and `test_an_export_racing_a_finalize_that_holds_the_report_waits_and_exports`
+  (200).
+- **Export digest check** (review fix). A rendered export whose declared digest differs from its
+  body raises `ReportRecordInconsistentError` (503) and records nothing; tested in
+  `tests/test_reports_persistence.py` and
+  `test_an_export_whose_rendered_digest_differs_is_inconsistent_and_not_recorded`.
+- **Threat model** (review fix): one limit line on audit growth per export.
+
 ## Migration 0009 (`migrations/versions/v0009_report_approval.py`, revision "0009", down_revision "0008")
 
 Plain DDL; check text spelled out as in 0008. If W8 adds a migration first, renumber to the next free number and set down_revision accordingly.

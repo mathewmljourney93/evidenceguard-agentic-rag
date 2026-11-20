@@ -744,7 +744,8 @@ or superuser can disable or drop them, so this guard depends on the runtime role
 tables, which the deployment does not yet enforce. A GET can write (the first access creates
 revision 1). Exports are not signed, so a downloaded file proves nothing on its own; its digest
 can be compared with the audit row. Downgrading migration 0009 deletes all report and audit data.
-There is no rate limiting on these routes.
+There is no rate limiting on these routes. Each export appends an append-only audit row, so audit
+growth is bounded only by request volume; rate limiting is out of scope for v0.1.
 
 ## Not implemented yet
 
