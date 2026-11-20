@@ -329,6 +329,12 @@ def test_workflow_only_adds_one_step_after_original_suite() -> None:
     )
     assert workflow.count(block) == 1
     assert "run: uv run --locked pytest -m integration\n\n" + block in workflow
+    # W8 (ADR-0027): the plan adds one wheel check block; it is cut out exactly (once, ending at
+    # its own heredoc terminator) so the rest of the workflow stays pinned to the reviewed bytes.
+    w8_start = workflow.index("          # W8 (ADR-0027): from the installed wheel")
+    w8_end = workflow.index("\n          PY\n", w8_start) + len("\n          PY\n")
+    assert workflow.count("# W8 (ADR-0027)") == 1
+    workflow = workflow[:w8_start] + workflow[w8_end:]
     # Stable at candidate HEAD too; CI checkouts need not contain historical commit objects.
     baseline = workflow.replace("\n" + block, "").encode()
     assert runner.hashes({"workflow": baseline})["workflow"] == (

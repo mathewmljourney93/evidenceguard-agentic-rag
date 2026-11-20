@@ -16,12 +16,20 @@
 # The application image is selected by EG_IMAGE (default evidenceguard:dev) and is never pulled
 # from a registry (pull_policy: never): build it first. CI sets EG_IMAGE to a per-run tag.
 
+x-database-env: &database-env
+  EG_DATABASE_URL: postgresql+psycopg://evidenceguard:evidenceguard-local-dev@postgres:5432/evidenceguard_dev
+
+# Reviews (W8, ADR-0027) are off unless EG_REVIEW_PROVIDER and EG_REVIEW_MODEL are set in the
+# shell, on both services. EG_ANTHROPIC_API_KEY reaches the worker only, never the API.
+x-review-env: &review-env
+  EG_REVIEW_PROVIDER: ${EG_REVIEW_PROVIDER:-}
+  EG_REVIEW_MODEL: ${EG_REVIEW_MODEL:-}
+
 x-app: &app
   build: .
   image: ${EG_IMAGE:-evidenceguard:dev}
   pull_policy: never
-  environment:
-    EG_DATABASE_URL: postgresql+psycopg://evidenceguard:evidenceguard-local-dev@postgres:5432/evidenceguard_dev
+  environment: *database-env
   read_only: true
   tmpfs:
     - /tmp
@@ -67,6 +75,8 @@ services:
   api:
     <<: *app
     command: ["eg-api", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      <<: [*database-env, *review-env]
     ports:
       - "127.0.0.1:8000:8000"
     depends_on: *after-migration
@@ -87,6 +97,9 @@ services:
   worker:
     <<: *app
     command: ["eg-worker"]
+    environment:
+      <<: [*database-env, *review-env]
+      EG_ANTHROPIC_API_KEY: ${EG_ANTHROPIC_API_KEY:-}
     depends_on: *after-migration
     stop_signal: SIGTERM
     stop_grace_period: 60s
