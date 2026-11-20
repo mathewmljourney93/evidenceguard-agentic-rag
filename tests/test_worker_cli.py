@@ -220,7 +220,7 @@ REVIEW_MODEL = "claude-example-20990101"  # synthetic
 KEY_CANARY = "sk-test-obviously-fake-cli-canary"  # obviously fake
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def reviews_off(monkeypatch: pytest.MonkeyPatch) -> None:
     for name in (REVIEW_PROVIDER_ENV, REVIEW_MODEL_ENV, ANTHROPIC_API_KEY_ENV):
         monkeypatch.delenv(name, raising=False)

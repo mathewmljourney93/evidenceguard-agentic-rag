@@ -7,8 +7,9 @@ exception text:
 - 1: unexpected failure (class name only), including ``--once`` when its claim hits a
   database error;
 - 2: usage error;
-- 3: review configuration error (W8: a partial or invalid ``EG_REVIEW_PROVIDER`` or
-  ``EG_REVIEW_MODEL``, or a missing or invalid ``EG_ANTHROPIC_API_KEY`` while reviews are on;
+- 3: review configuration error (W8: a partial or invalid ``EG_REVIEW_PROVIDER``,
+  ``EG_REVIEW_MODEL`` or ``EG_REVIEW_MAX_IN_FLIGHT``, or a missing or invalid
+  ``EG_ANTHROPIC_API_KEY`` while reviews are on;
   the message names the variable, never its value), checked after the handler check and
   **before** database settings are read; or a database configuration error (the existing
   URL-free message);

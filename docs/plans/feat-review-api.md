@@ -172,7 +172,7 @@ approach above and the branch.
 - **CHANGELOG.** `CHANGELOG.md` was created on this branch because the base did not have one;
   the merge of `main` combined it with the agreement PR's copy.
 - **Per-tenant in-flight cap.** `EG_REVIEW_MAX_IN_FLIGHT` (integer 1 to 20, default 2, empty
-  counts as unset) in `ReviewSettings`, read by the API only and named in `.env.example` and the
+  counts as unset) in `ReviewSettings`, used by the API (the worker validates it too, so an invalid value fails closed in both processes) and named in `.env.example` and the
   Compose api service. `create_review` takes `max_in_flight`; inside the creation transaction,
   after the replay lookup and before the snapshot capture, it serialises creation per tenant and
   counts the tenant's `run_review` jobs that are `queued` or `running`. At the cap it refuses

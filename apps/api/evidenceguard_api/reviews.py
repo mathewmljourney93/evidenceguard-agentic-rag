@@ -23,10 +23,12 @@ the review through the M5d ``create_review`` seam with the offline embedding pro
 review and its job commit together. Changing ``EG_REVIEW_MODEL`` changes the digest, so replaying
 a key afterwards is a 409.
 
-**Spend bound.** A tenant may have at most ``EG_REVIEW_MAX_IN_FLIGHT`` reviews (default 2) queued
+**In-flight cap.** This bounds concurrency, not total spend: a tenant may have at most
+``EG_REVIEW_MAX_IN_FLIGHT`` reviews (default 2) queued
 or running. ``create_review`` checks the cap in the creation transaction, serialised per tenant;
 over the cap POST is a 429 (``REVIEW_LIMIT_REACHED``) with ``Retry-After: 60``. A replay of an
-existing key is never refused by the cap.
+existing key is never refused by the cap. The overall spend limit that AGENTS.md requires for live
+model calls is the limit the owner sets for evaluation; this cap does not replace it.
 
 Routes are synchronous, so FastAPI runs them, and their database work, in a worker thread. Errors
 are fixed problem responses: the idempotency key, submitted values and exception text are never

@@ -33,8 +33,8 @@ test registries, no route created reviews, and no setting configured the Anthrop
   (202, or 200 for an idempotent replay), `GET /v1/reviews/{review_id}`,
   `GET /v1/reviews/{review_id}/result` (409 until completed) and `GET /v1/review-templates`.
   `GET /v1/jobs/{job_id}` also shows review jobs.
-- Paid work is bounded per tenant: `EG_REVIEW_MAX_IN_FLIGHT` (1 to 20, default 2, read by the
-  API) caps the tenant's `run_review` jobs that are queued or running. `create_review` checks
+- Review concurrency is bounded per tenant: `EG_REVIEW_MAX_IN_FLIGHT` (1 to 20, default 2, used
+  by the API; the worker also validates it at startup and exits 3 on an invalid value) caps the tenant's `run_review` jobs that are queued or running. `create_review` checks
   the cap inside the creation transaction after the replay lookup, serialised per tenant by a
   no-op update of the tenant row (a lock alone would count from the stale `REPEATABLE READ`
   snapshot; the update makes a concurrent creator fail with `40001` and retry). Over the cap,
@@ -67,4 +67,4 @@ test registries, no route created reviews, and no setting configured the Anthrop
 | New agents module for artifact rebuild | Agents module set is pinned; the loaders exist |
 | Anthropic SDK client | ADR-0026 accepted the stdlib transport |
 | Evidence and trace routes now | No stage-row read API exists; spans are logged, not persisted |
-| No cap on reviews in flight | AGENTS.md requires live model calls to run inside a spend limit; without a cap one reviewer key could queue unlimited paid reviews |
+| No cap on reviews in flight | Without a cap one reviewer key could queue unlimited reviews at once. The cap limits concurrency only; it is not a spend limit, which the owner sets separately as AGENTS.md requires |
