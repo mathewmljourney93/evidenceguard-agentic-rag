@@ -481,7 +481,7 @@ docker compose down -v                   # removes the containers and the databa
 
 ## Engineering record
 
-[prompts.md](prompts.md) records, verbatim and in order, every prompt given to the Claude Code implementation session, with a short note on each outcome. [CLAUDE.md](CLAUDE.md) holds the standing development rules.
+[AGENTS.md](AGENTS.md) holds the working agreement. [prompts.md](prompts.md) is the historical prompt record up to 2026-11-20 and is no longer appended to.
 
 ## Secret scanning
 
