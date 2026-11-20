@@ -1,8 +1,9 @@
 """Fenced review-output writer, output reads and the W15 status projection (M5g, ADR-0025).
 
 Implements M5g-F2, F4, G2 and G3 of the specification accepted in Prompt 217 (``docs/plan.md``).
-These are **trusted internal programming interfaces**: no endpoint, command, production handler or
-registry entry calls them, and ``run_review`` stays unregistered.
+These are **trusted internal programming interfaces**. Since W8 (ADR-0027) the review API calls the
+two reads, and the ``run_review`` handler, registered in production only with a valid review
+configuration, calls the writer; no command calls them.
 
 **Writer** (``write_review_output``) composes into the **caller's** fenced transaction (intended:
 the ``finish=True`` fence that records the job's success, so the output and the success are

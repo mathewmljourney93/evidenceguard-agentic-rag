@@ -1221,6 +1221,8 @@ def test_worker_fields_and_events_are_reviewed() -> None:
         "worker.poll_failed",
         "worker.no_handlers",
         "worker.config_invalid",
+        "worker.review_enabled",  # W8 (ADR-0027)
+        "worker.review_disabled",  # W8 (ADR-0027)
         "job.claimed",
         "job.succeeded",
         "job.post_finish_error",

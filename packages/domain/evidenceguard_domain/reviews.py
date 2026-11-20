@@ -93,6 +93,13 @@ class ReviewJobConflictError(ReviewError):
     code = "review_job_conflict"
 
 
+class ReviewLimitReachedError(ReviewError):
+    """The tenant already has the allowed number of reviews queued or running (W8, ADR-0027).
+    Never raised for a replay of an existing key."""
+
+    code = "review_limit_reached"
+
+
 class ReviewConflictRetryableError(ReviewError):
     """An already classified retryable failure after three attempts, or whose normal rollback or
     close failed; a later fresh call may succeed."""

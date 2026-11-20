@@ -50,6 +50,9 @@ class FakeDocker:
         self.overrides: dict[str, Callable[[list[str]], Any]] = {}
         self.worker_state = "exited 0 false"
         self.logs: dict[str, str] = {}
+        # W8: the worker log read by the reviews-disabled step (diagnostics use ``self.logs``).
+        self.review_logs = '{"event":"worker.started"}\n{"event":"worker.review_disabled"}\n'
+        self.review_log_calls = 0
         self.image_ids: dict[str, str] = {}
         self.backfill_output = "pending=1 ready=0 stalled=0 ineligible=0 conflict=0\nnext_after=-\n"
         self.backfill_status = 0
@@ -63,6 +66,9 @@ class FakeDocker:
         command = list(args)
         self.calls.append((command, timeout))
         text = " ".join(command)
+        if command[-3:] == ["logs", "--no-color", "worker"]:  # W8: the reviews-disabled step
+            self.review_log_calls += 1
+            return ci.Result(0, self.review_logs, "")
         for marker, handler in self.overrides.items():
             if marker in text:
                 return handler(command)
@@ -107,6 +113,7 @@ class FakeApi:
         self.uploads = 0
         self.job_statuses = ["queued", "running", "succeeded"]
         self.overrides: dict[str, Any] = {}
+        self.review_status = 503  # W8: reviews are not configured in CI
 
     def __call__(
         self, method: str, url: str, headers: Mapping[str, str], body: bytes | None, timeout: float
@@ -121,6 +128,8 @@ class FakeApi:
                 return value
         if method == "POST" and path == "/v1/vendors":
             return response(201, {"id": "vendor-1"})
+        if method == "POST" and path == "/v1/reviews":
+            return response(self.review_status, None)
         if method == "POST" and path.endswith("/documents"):
             self.uploads += 1
             if self.uploads == 1:
@@ -979,3 +988,83 @@ def test_a_non_uuid_tenant_or_revision_is_never_interpolated_into_sql(
     with pytest.raises(ci.CheckFailed, match="not a UUID"):
         instance.wait_for_indexing(tenant, revision, 3)
     assert docker.calls == []
+
+
+# --- W8 (ADR-0027): reviews off in CI ------------------------------------------------------------
+
+
+def test_validate_config_rejects_key_on_api() -> None:
+    config = good_config()
+    config["services"]["api"]["environment"] = {
+        **config["services"]["api"]["environment"],
+        "EG_REVIEW_PROVIDER": "",
+        "EG_ANTHROPIC_API_KEY": "",
+    }
+    assert "api must not define EG_ANTHROPIC_API_KEY" in ci.validate_config(config, IMAGE)
+
+    config = good_config()
+    config["services"]["worker"]["environment"] = {
+        **config["services"]["worker"]["environment"],
+        "EG_ANTHROPIC_API_KEY": "sk-test-obviously-fake",
+    }
+    assert "worker: EG_ANTHROPIC_API_KEY must be empty in CI" in ci.validate_config(config, IMAGE)
+
+    config = good_config()
+    config["services"]["worker"]["environment"] = {
+        **config["services"]["worker"]["environment"],
+        "EG_REVIEW_PROVIDER": "",
+        "EG_REVIEW_MODEL": "",
+        "EG_ANTHROPIC_API_KEY": "",
+    }
+    assert ci.validate_config(config, IMAGE) == []
+
+
+def test_the_repository_compose_file_keeps_the_key_off_the_api() -> None:
+    compose = (ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+    api = compose[compose.index("\n  api:") : compose.index("\n  worker:")]
+    worker = compose[compose.index("\n  worker:") : compose.index("\nvolumes:")]
+    assert "EG_ANTHROPIC_API_KEY" not in api and "*review-env" in api
+    assert "EG_ANTHROPIC_API_KEY: ${EG_ANTHROPIC_API_KEY:-}" in worker and "*review-env" in worker
+    assert "EG_REVIEW_PROVIDER: ${EG_REVIEW_PROVIDER:-}" in compose
+    assert "EG_REVIEW_MODEL: ${EG_REVIEW_MODEL:-}" in compose
+
+
+def test_smoke_checks_reviews_disabled() -> None:
+    docker, api = FakeDocker(), FakeApi()
+    instance, output = smoke(docker, api)
+
+    assert instance.run() == 0
+    assert "smoke: reviews disabled (POST /v1/reviews 503; worker claimed no review job)" in output
+    (review,) = [call for call in api.calls if call[1] == "/v1/reviews"]
+    assert review[0] == "POST" and review[2]["Idempotency-Key"] == "smoke-review-disabled"
+    assert docker.review_log_calls == 1
+    commands = [" ".join(call) for call, _ in docker.calls]
+    review_logs = next(i for i, c in enumerate(commands) if c.endswith("logs --no-color worker"))
+    stop = next(i for i, c in enumerate(commands) if " stop " in f" {c} ")
+    assert max(i for i, c in enumerate(commands) if "psql" in c) < review_logs < stop
+
+
+@pytest.mark.parametrize(
+    ("status", "logs", "reason"),
+    [
+        (202, None, "create review: HTTP 202, expected 503"),
+        (200, None, "create review: HTTP 200, expected 503"),
+        (503, '{"event":"worker.started"}\n', "reviews: the worker did not log that reviews"),
+        (
+            503,
+            '{"event":"worker.review_disabled"}\n{"event":"job.claimed","job_kind":"run_review"}\n',
+            "reviews: the worker logged a review job",
+        ),
+    ],
+)
+def test_smoke_fails_when_reviews_are_not_disabled(
+    status: int, logs: str | None, reason: str
+) -> None:
+    docker, api = FakeDocker(), FakeApi()
+    api.review_status = status
+    if logs is not None:
+        docker.review_logs = logs
+    instance, output = smoke(docker, api)
+
+    assert instance.run() == 1
+    assert output[-1].startswith(f"smoke: FAILED: {reason}")

@@ -18,18 +18,37 @@ add credentials that URL masking does not hide, or set arbitrary server options.
 - a database name of letters, digits, ``_`` and ``-`` only;
 - query parameters limited to ``sslmode`` (a libpq mode) and ``connect_timeout`` (1 to 600
   seconds), each at most once. Everything else is rejected.
+
+Review settings (W8, ADR-0027) follow the same rules: environment only, no ``.env`` file, and a
+wrapper error (``ReviewConfigurationError``) whose message names the variable but never its
+value, raised with no cause or context. ``EG_REVIEW_PROVIDER`` switches reviews on and
+``EG_REVIEW_MODEL`` names the model; both are set or both are unset (empty counts as unset).
+``EG_ANTHROPIC_API_KEY`` is read only by the worker, through ``load_anthropic_settings``, and is
+held as a ``SecretStr``. ``EG_REVIEW_MAX_IN_FLIGHT`` (an integer from 1 to 20, default 2) caps the
+reviews one tenant may have queued or running; the API enforces it when it creates a review.
 """
 
 import ipaddress
 import re
-from typing import NamedTuple
+from enum import StrEnum
+from typing import NamedTuple, Self
 
-from pydantic import SecretStr, ValidationError, field_validator
+from pydantic import Field, SecretStr, ValidationError, field_validator, model_validator
+from pydantic_core import PydanticCustomError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import URL, make_url
 from sqlalchemy.exc import ArgumentError
 
+from evidenceguard_domain.model_calls import is_model_id
+
 DATABASE_URL_ENV = "EG_DATABASE_URL"
+REVIEW_PROVIDER_ENV = "EG_REVIEW_PROVIDER"
+REVIEW_MODEL_ENV = "EG_REVIEW_MODEL"
+ANTHROPIC_API_KEY_ENV = "EG_ANTHROPIC_API_KEY"
+REVIEW_MAX_IN_FLIGHT_ENV = "EG_REVIEW_MAX_IN_FLIGHT"
+DEFAULT_REVIEW_MAX_IN_FLIGHT = 2
+MAX_REVIEW_MAX_IN_FLIGHT = 20
+MAX_API_KEY_LENGTH = 256
 DRIVER = "postgresql+psycopg"
 DEFAULT_PORT = 5432
 _ACCEPTED_DRIVERS = frozenset({"postgresql", DRIVER})
@@ -157,3 +176,124 @@ def load_database_settings() -> DatabaseSettings:
         missing = any(error["type"] == "missing" for error in exc.errors(include_input=False))
         problem = "is not set" if missing else "is not a valid PostgreSQL URL"
         raise DatabaseConfigurationError(f"{DATABASE_URL_ENV} {problem}") from None
+
+
+# --- review settings (W8, ADR-0027) ---------------------------------------------------------------
+
+
+class ReviewConfigurationError(RuntimeError):
+    """Review settings are partial or invalid. Messages name the variable, never its value."""
+
+
+class ReviewProvider(StrEnum):
+    ANTHROPIC = "anthropic"
+
+
+_PROVIDER_MISSING = "review_provider_missing"
+_MODEL_MISSING = "review_model_missing"
+_SETTINGS_CONFIG = SettingsConfigDict(
+    env_prefix="EG_",
+    env_file=None,
+    env_ignore_empty=True,
+    extra="ignore",
+    frozen=True,
+    hide_input_in_errors=True,
+)
+
+
+class ReviewSettings(BaseSettings):
+    """Whether reviews are on, with which model, and how many reviews one tenant may have
+    queued or running at once. Read by the API and the worker."""
+
+    model_config = _SETTINGS_CONFIG
+
+    review_provider: ReviewProvider | None = None
+    review_model: str | None = None
+    review_max_in_flight: int = Field(
+        default=DEFAULT_REVIEW_MAX_IN_FLIGHT, ge=1, le=MAX_REVIEW_MAX_IN_FLIGHT
+    )
+
+    @field_validator("review_model")
+    @classmethod
+    def _require_model_id(cls, value: str | None) -> str | None:
+        if value is not None and not is_model_id(value):
+            raise ValueError("not a valid model id")
+        return value
+
+    @model_validator(mode="after")
+    def _require_both_or_neither(self) -> Self:
+        if self.review_provider is not None and self.review_model is None:
+            raise PydanticCustomError(_MODEL_MISSING, "the review model is not set")
+        if self.review_provider is None and self.review_model is not None:
+            raise PydanticCustomError(_PROVIDER_MISSING, "the review provider is not set")
+        return self
+
+
+def _is_api_key(value: str) -> bool:
+    return 1 <= len(value) <= MAX_API_KEY_LENGTH and all(
+        0x21 <= ord(character) <= 0x7E for character in value
+    )
+
+
+class AnthropicSettings(BaseSettings):
+    """The worker's Anthropic API key. The API process never reads it."""
+
+    model_config = _SETTINGS_CONFIG
+
+    anthropic_api_key: SecretStr
+
+    @field_validator("anthropic_api_key")
+    @classmethod
+    def _require_printable_ascii(cls, value: SecretStr) -> SecretStr:
+        if not _is_api_key(value.get_secret_value()):
+            raise ValueError("not a valid key")
+        return value
+
+
+def _review_problem(exc: ValidationError) -> str:
+    for error in exc.errors(include_input=False, include_context=False, include_url=False):
+        if error["type"] == _MODEL_MISSING:
+            return f"{REVIEW_MODEL_ENV} is not set"
+        if error["type"] == _PROVIDER_MISSING:
+            return f"{REVIEW_PROVIDER_ENV} is not set"
+        if error["loc"][:1] == ("review_provider",):
+            return f"{REVIEW_PROVIDER_ENV} is not a supported provider"
+        if error["loc"][:1] == ("review_max_in_flight",):
+            return (
+                f"{REVIEW_MAX_IN_FLIGHT_ENV} must be an integer from 1 to "
+                f"{MAX_REVIEW_MAX_IN_FLIGHT}"
+            )
+    return f"{REVIEW_MODEL_ENV} is not a valid model id"
+
+
+def load_review_settings() -> ReviewSettings | None:
+    """Read ``EG_REVIEW_PROVIDER``, ``EG_REVIEW_MODEL`` and ``EG_REVIEW_MAX_IN_FLIGHT``. ``None``
+    when the provider and model are both unset or empty; ``ReviewConfigurationError`` when only
+    one is set or any value is invalid. The error is
+    raised after the handler, so it carries no cause or context (the pydantic error could)."""
+    problem: str | None = None
+    settings: ReviewSettings | None = None
+    try:
+        settings = ReviewSettings()
+    except ValidationError as exc:
+        problem = _review_problem(exc)
+    if problem is not None or settings is None:
+        raise ReviewConfigurationError(problem or f"{REVIEW_PROVIDER_ENV} is not valid")
+    if settings.review_provider is None:
+        return None
+    return settings
+
+
+def load_anthropic_settings() -> AnthropicSettings:
+    """Read ``EG_ANTHROPIC_API_KEY``, or raise ``ReviewConfigurationError`` naming it only,
+    with no cause or context."""
+    problem: str | None = None
+    settings: AnthropicSettings | None = None
+    try:
+        settings = AnthropicSettings()
+    except ValidationError as exc:
+        missing = any(error["type"] == "missing" for error in exc.errors(include_input=False))
+        problem = "is not set" if missing else "is not a valid key"
+    if problem is not None or settings is None:
+        raise ReviewConfigurationError(f"{ANTHROPIC_API_KEY_ENV} {problem or 'is not valid'}")
+    return settings

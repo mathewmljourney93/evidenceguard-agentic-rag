@@ -553,6 +553,10 @@ def test_the_factory_requires_a_provider_and_has_no_default_live_provider() -> N
     with pytest.raises(TypeError):
         make_run_review_handler(session_factory=rw._SESSIONMAKER)  # type: ignore[call-arg]
     assert "run_review" not in production_registry().kinds
+    # W8: only an explicitly passed handler is registered (ADR-0027).
+    provider: Any = _Generate()
+    handler = make_run_review_handler(provider, session_factory=rw._SESSIONMAKER)
+    assert production_registry(review_handler=handler)["run_review"] is handler
 
 
 class _Generate:

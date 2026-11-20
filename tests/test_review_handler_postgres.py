@@ -422,7 +422,9 @@ def test_a_timeout_exhausted_stage_is_u1_and_the_review_still_completes(
     assert stage == "timeout" and world.job().status == "succeeded"
 
 
-def test_the_production_registry_never_claims_the_review_job(world: pw.ReviewWorld) -> None:
+def test_the_production_registry_without_a_configured_provider_never_claims_the_review_job(
+    world: pw.ReviewWorld,
+) -> None:
     assert pw.work(world.factory, production_registry()).exit_code == 0
     assert world.job().status == "queued" and world.job().attempt == 0
 

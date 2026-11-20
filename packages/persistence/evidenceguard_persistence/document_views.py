@@ -41,6 +41,7 @@ from evidenceguard_domain.ingestion import (
     lease_expired,
 )
 from evidenceguard_domain.jobs import JobErrorCode, JobPayload, JobStatus
+from evidenceguard_domain.reviews import REVIEW_JOB_KIND
 from evidenceguard_domain.revisions import (
     MediaType,
     RevisionContent,
@@ -62,8 +63,8 @@ VENDORS = cast(Table, Vendor.__table__)
 
 READ_SNAPSHOT_SQL = "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY"
 REVISION_ID_PAYLOAD_KEY = "revision_id"
-# Job kinds whose status may be shown through the API (reviewed fields only).
-VIEWABLE_JOB_KINDS = frozenset({INGEST_REVISION_KIND})
+# Job kinds whose status may be shown through the API (reviewed fields only). W8 adds reviews.
+VIEWABLE_JOB_KINDS = frozenset({INGEST_REVISION_KIND, REVIEW_JOB_KIND})
 UNSETTLED_STATUSES = frozenset({RevisionStatus.PENDING, RevisionStatus.PROCESSING})
 VERIFIED_SET_STATUSES = frozenset({RevisionStatus.ACTIVE, RevisionStatus.SUPERSEDED})
 

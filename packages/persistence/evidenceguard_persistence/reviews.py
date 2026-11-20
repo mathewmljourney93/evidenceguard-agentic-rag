@@ -1,16 +1,26 @@
 """Atomic review creation and trusted reload (M5d, ADR-0022).
 
-Both seams are **trusted internal programming interfaces**: no endpoint, command, production
-worker path or handler calls them (W8). The tenant comes only from the validated
+Both seams are **trusted internal programming interfaces**. Since W8 (ADR-0027) the review API
+(``evidenceguard_api/reviews.py``) calls both; the worker reaches ``load_review`` only through
+its composition seams, and no command calls them. The tenant comes only from the validated
 ``ActorContext``, whose role must be reviewer or approver.
 
 **Creation** (``create_review``) runs at most three attempts. Each attempt is one fresh session
 and transaction: ``SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ WRITE`` first, then the
 single ``SELECT clock_timestamp()`` that establishes the MVCC snapshot (its value is recorded as
 ``captured_at``; it is not an ordering proof), transaction-local statement and lock timeouts, the
-replay lookup by ``(tenant_id, idempotency_key)``, ``capture_in_transaction``, a fresh review ID,
-the ``run_review`` job (enqueued and validated before the review insert), the review, its
-bindings and exclusions, then ``COMMIT``. Everything commits together or not at all.
+replay lookup by ``(tenant_id, idempotency_key)``, the in-flight cap when one is given,
+``capture_in_transaction``, a fresh review ID, the ``run_review`` job (enqueued and validated
+before the review insert), the review, its bindings and exclusions, then ``COMMIT``. Everything
+commits together or not at all.
+
+**In-flight cap** (W8, ADR-0027). With ``max_in_flight`` set (the API always sets it), a new
+review is refused with ``ReviewLimitReachedError`` when the tenant already has that many
+``run_review`` jobs ``queued`` or ``running``. A matching replay returns before the check, so it
+is never refused. Creation is serialised per tenant by a no-op ``UPDATE`` of the tenant's row
+before the count: at ``REPEATABLE READ`` a lock alone would still count from the snapshot taken
+before it was granted, whereas the row update makes a concurrent creator fail with ``40001``,
+which is retried in a fresh transaction that sees the committed job.
 
 **Commit state and cleanup** (the accepted M5d-B1 contract with the Prompt 188 clarification).
 Each attempt tracks ``not_entered``, ``entered``, ``rejected`` or ``committed`` independently of
@@ -48,7 +58,7 @@ from enum import StrEnum
 from typing import Any, cast
 from uuid import UUID, uuid4
 
-from sqlalchemy import Table, func, insert, select, text
+from sqlalchemy import Table, func, insert, select, text, update
 from sqlalchemy.orm import Session, sessionmaker
 
 from evidenceguard_domain.context import ActorContext
@@ -85,6 +95,7 @@ from evidenceguard_domain.reviews import (
     ReviewDatabaseError,
     ReviewIdempotencyConflictError,
     ReviewJobConflictError,
+    ReviewLimitReachedError,
     ReviewNotFoundError,
     ReviewRecordInconsistentError,
     ReviewRequest,
@@ -100,17 +111,25 @@ from evidenceguard_persistence.database_failures import (
     classify_database_failure,
 )
 from evidenceguard_persistence.document_views import read_snapshot
-from evidenceguard_persistence.models import Review, ReviewBinding, ReviewExcludedRevision
+from evidenceguard_persistence.models import (
+    Review,
+    ReviewBinding,
+    ReviewExcludedRevision,
+    Tenant,
+)
 from evidenceguard_persistence.retrieval import (
     RETRIEVAL_ROLES,
     CaptureFailure,
     SemanticOutcome,
     capture_in_transaction,
 )
+from evidenceguard_persistence.settings import MAX_REVIEW_MAX_IN_FLIGHT
 
 REVIEWS = cast(Table, Review.__table__)
 REVIEW_BINDINGS = cast(Table, ReviewBinding.__table__)
 REVIEW_EXCLUSIONS = cast(Table, ReviewExcludedRevision.__table__)
+TENANTS = cast(Table, Tenant.__table__)
+IN_FLIGHT_STATUSES = (JobStatus.QUEUED.value, JobStatus.RUNNING.value)
 
 CREATE_TRANSACTION_SQL = "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ WRITE"
 STATEMENT_TIMEOUT_MS = 30_000
@@ -166,6 +185,14 @@ def _checked_actor(actor: object) -> ActorContext:
 def _require_role(actor: ActorContext) -> None:
     if actor.role not in RETRIEVAL_ROLES:
         raise PermissionDeniedError()
+
+
+def _checked_cap(max_in_flight: object) -> int | None:
+    if max_in_flight is None:
+        return None
+    if type(max_in_flight) is not int or not 1 <= max_in_flight <= MAX_REVIEW_MAX_IN_FLIGHT:
+        raise InvalidReviewRequestError()
+    return max_in_flight
 
 
 # --- creation steps (module functions so the control flow can be tested with fakes) -----------
@@ -234,6 +261,25 @@ def _replay(
         )
     _require(bool(built), ReviewRecordInconsistentError)
     return built[0]
+
+
+def _require_capacity(session: Session, tenant_id: UUID, max_in_flight: int) -> None:
+    """Step 5 (only with a cap): serialise creation for the tenant, then refuse when it already
+    has ``max_in_flight`` review jobs queued or running. The no-op row update is what makes a
+    concurrent creator fail with ``40001`` (see the module docstring); the count is bounded."""
+    session.execute(update(TENANTS).where(TENANTS.c.id == tenant_id).values(slug=TENANTS.c.slug))
+    in_flight = (
+        select(job_store.JOBS.c.id)
+        .where(
+            job_store.JOBS.c.tenant_id == tenant_id,
+            job_store.JOBS.c.kind == REVIEW_JOB_KIND,
+            job_store.JOBS.c.status.in_(IN_FLIGHT_STATUSES),
+        )
+        .limit(max_in_flight)
+        .subquery()
+    )
+    count: int = session.execute(select(func.count()).select_from(in_flight)).scalar_one()
+    _require(count < max_in_flight, ReviewLimitReachedError)
 
 
 def _create_job(session: Session, actor: ActorContext, review_id: UUID) -> JobSnapshot:
@@ -380,6 +426,8 @@ def _run_body(
     actor: ActorContext,
     request: ReviewRequest,
     digest: str,
+    *,
+    max_in_flight: int | None = None,
 ) -> None:
     """Steps 1-8 of one attempt. Records its result, error or retryability on ``attempt``."""
     captured_at = _begin(session)
@@ -387,6 +435,8 @@ def _run_body(
     if replay is not None:
         attempt.result = replay
         return
+    if max_in_flight is not None:
+        _require_capacity(session, actor.tenant_id, max_in_flight)
     outcome = capture_in_transaction(
         session,
         captured_at,
@@ -477,12 +527,14 @@ def _attempt(
     actor: ActorContext,
     request: ReviewRequest,
     digest: str,
+    *,
+    max_in_flight: int | None = None,
 ) -> _Attempt:
     attempt = _Attempt()
     session: Session | None = None
     try:
         session = session_factory()
-        _run_body(attempt, session, actor, request, digest)
+        _run_body(attempt, session, actor, request, digest, max_in_flight=max_in_flight)
     except _Refusal as refusal:
         attempt.error = refusal.error
     except Exception as error:  # body failure before COMMIT: classified, not retained
@@ -503,18 +555,24 @@ def _attempt(
 
 
 def create_review(
-    session_factory: sessionmaker[Session], actor: ActorContext, request: ReviewRequest
+    session_factory: sessionmaker[Session],
+    actor: ActorContext,
+    request: ReviewRequest,
+    *,
+    max_in_flight: int | None = None,
 ) -> CreatedReview:
     """Create a review atomically, or return a matching replay (see the module docstring).
 
-    Precedence: actor type and request (``InvalidReviewRequestError``), role
+    ``max_in_flight`` (1 to 20, or ``None`` for no cap) is the tenant's in-flight cap.
+    Precedence: actor type, request and cap (``InvalidReviewRequestError``), role
     (``PermissionDeniedError``), then the database attempts."""
     checked_actor = _checked_actor(actor)
     checked = rebuilt_request(request)
+    cap = _checked_cap(max_in_flight)
     _require_role(checked_actor)
     digest = request_sha256(checked, tenant_id=checked_actor.tenant_id)
     for _ in range(MAX_CREATION_ATTEMPTS):
-        attempt = _attempt(session_factory, checked_actor, checked, digest)
+        attempt = _attempt(session_factory, checked_actor, checked, digest, max_in_flight=cap)
         if attempt.control is not None:
             raise attempt.control  # the same object; no further attempt
         if attempt.result is not None:

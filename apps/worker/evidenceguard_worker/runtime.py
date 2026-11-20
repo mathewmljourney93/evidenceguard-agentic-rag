@@ -133,6 +133,11 @@ class DatabaseJobStore:
     def __init__(self, session_factory: sessionmaker[Session]) -> None:
         self._factory = session_factory
 
+    @property
+    def session_factory(self) -> sessionmaker[Session]:
+        """The session factory this store uses (W8: the review handler shares it)."""
+        return self._factory
+
     def claim(self, worker_id: str, kinds: Collection[str]) -> JobSnapshot | None:
         return job_store.claim(self._factory, worker_id, kinds=kinds)
 
