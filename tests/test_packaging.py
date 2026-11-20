@@ -289,6 +289,7 @@ def test_m5a_agents_package_contains_only_the_accepted_modules() -> None:
         "scripted.py",
         "report.py",  # M5f: only the accepted pure builder/renderer is added.
         "anthropic.py",  # M5h: the accepted pure Anthropic adapter (ADR-0026).
+        "report_export.py",  # M6: the finalized-report export renderers (ADR-0028).
         *M5C_MODULES,
         "data",
     }
@@ -314,6 +315,8 @@ def test_m5a_is_not_imported_by_other_packages_or_registered() -> None:
                 continue  # M5d composition (D2) and M5g orchestration (G12)
             if package is evidenceguard_worker and source.name == M5H_TRANSPORT:
                 continue  # M5h: the HTTPS transport imports only the adapter module (below)
+            if package is evidenceguard_api and source.name == M6_API_MODULE:
+                continue  # M6: the report routes use the export renderers (ADR-0028)
             assert "evidenceguard_agents" not in _module_imports(source), source.name
     assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
 
@@ -323,6 +326,11 @@ M5G_AGENT_IMPORTERS = {"review_seams.py", "review.py"}
 
 M5H_TRANSPORT = "anthropic_http.py"
 """M5h (ADR-0026): the HTTPS transport, which imports only ``evidenceguard_agents.anthropic``."""
+
+M6_API_MODULE = "reports.py"
+"""M6 (ADR-0028): the report routes, which use the export renderers and the stored outputs."""
+M6_PERSISTENCE_MODULE = "reports.py"
+"""M6 (ADR-0028): report persistence, which decodes the stored M5f wrapper bytes."""
 
 
 # --- M5b (ADR-0020) ------------------------------------------------------------------------------
@@ -359,6 +367,7 @@ def test_m5b_is_not_wired_into_any_application_or_handler() -> None:
         (evidenceguard_agents, "report.py"),  # M5f's accepted pure provenance rechecks.
         (evidenceguard_persistence, "review_stages.py"),
         (evidenceguard_worker, "review.py"),  # M5g orchestration composes the M5b conversions.
+        (evidenceguard_agents, "report_export.py"),  # M6: the disclaimer's wording only.
     }
     for package in (
         evidenceguard_agents,
@@ -613,6 +622,8 @@ def test_m5f_is_not_wired_into_any_application_or_worker() -> None:
         for path in Path(package.__file__).parent.rglob("*.py"):
             if package is evidenceguard_worker and path.name == "review.py":
                 continue  # M5g: the only consumer of the M5f builder/renderer (G12)
+            if package is evidenceguard_persistence and path.name == M6_PERSISTENCE_MODULE:
+                continue  # M6: decodes the stored wrapper for reports and export (ADR-0028)
             imports = _module_imports(path)
             assert "evidenceguard_agents.report" not in _domain_imports(path)
             assert "evidenceguard_domain.report_content" not in _domain_imports(path)
@@ -743,7 +754,9 @@ def test_m5g_is_not_wired_into_any_route_command_setting_or_production_registry(
             assert "make_run_review_handler" not in text, source.name
             assert "evidenceguard_worker.review " not in text, source.name
             assert "from evidenceguard_worker.review import" not in text, source.name
-            if package is not evidenceguard_persistence and package is not evidenceguard_domain:
+            # M6 (ADR-0028): the report routes map the stored-output read errors.
+            m6_routes = package is evidenceguard_api and source.name == M6_API_MODULE
+            if package not in (evidenceguard_persistence, evidenceguard_domain) and not m6_routes:
                 assert "review_outputs" not in text, source.name
     assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
 
