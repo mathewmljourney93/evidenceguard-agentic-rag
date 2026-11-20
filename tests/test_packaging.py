@@ -314,12 +314,24 @@ def test_m5a_is_not_imported_by_other_packages_or_registered() -> None:
                 continue  # M5d composition (D2) and M5g orchestration (G12)
             if package is evidenceguard_worker and source.name == M5H_TRANSPORT:
                 continue  # M5h: the HTTPS transport imports only the adapter module (below)
+            if package is evidenceguard_api and source.name == W8_REVIEW_API:
+                # W8: the review routes load the pinned artifacts; templates and prompts only.
+                assert _agents_modules(source) == W8_REVIEW_API_AGENT_MODULES, source.name
+                continue
             assert "evidenceguard_agents" not in _module_imports(source), source.name
     assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
 
 
-M5G_AGENT_IMPORTERS = {"review_seams.py", "review.py"}
-"""The only worker modules that import ``evidenceguard_agents``: M5d (D2) and M5g (G12)."""
+# W8: review_wiring.py composes the provider and the handler for the production registry.
+M5G_AGENT_IMPORTERS = {"review_seams.py", "review.py", "review_wiring.py"}
+"""The only worker modules that import ``evidenceguard_agents``: M5d (D2), M5g (G12) and the W8
+production wiring (ADR-0027)."""
+
+W8_REVIEW_API = "reviews.py"
+"""W8 (ADR-0027): the only API module that imports the agents package or creates reviews."""
+W8_REVIEW_API_AGENT_MODULES = {"evidenceguard_agents.templates", "evidenceguard_agents.prompts"}
+W8_WIRING = "review_wiring.py"
+"""W8 (ADR-0027): the only worker module that builds the production provider and handler."""
 
 M5H_TRANSPORT = "anthropic_http.py"
 """M5h (ADR-0026): the HTTPS transport, which imports only ``evidenceguard_agents.anthropic``."""
@@ -510,16 +522,23 @@ def test_m5d_review_seams_are_the_only_worker_module_importing_agents() -> None:
     }
 
 
-def test_m5d_creation_is_not_wired_into_any_route_command_or_runtime_path() -> None:
-    """W8: creation and reload stay internal or test-only; ``run_review`` stays unregistered."""
+# W8: renamed from ``..._is_not_wired_into_any_route_command_or_runtime_path``; creation is now
+# wired only through the review API, and only the wiring module builds the handler.
+def test_m5d_creation_is_wired_only_through_the_review_api() -> None:
+    """W8 (ADR-0027): only the API's ``reviews.py`` creates reviews (never through the worker's
+    seams); in the worker only ``review_wiring.py`` and ``review.py`` mention the review
+    handler, and ``production_registry()`` without a handler never registers it."""
     from evidenceguard_worker.handlers import production_registry
 
     for package in (evidenceguard_api, evidenceguard_observability, evidenceguard_retrieval):
         assert package.__file__ is not None
         for source in Path(package.__file__).parent.rglob("*.py"):
             text = source.read_text(encoding="utf-8")
-            assert "review_seams" not in text and "persistence.reviews" not in text, source.name
+            assert "review_seams" not in text, source.name
             assert "run_review" not in text, source.name
+            if package is evidenceguard_api and source.name == W8_REVIEW_API:
+                continue  # W8: the review routes call create_review and load_review
+            assert "persistence.reviews" not in text, source.name
     assert evidenceguard_worker.__file__ is not None
     for source in Path(evidenceguard_worker.__file__).parent.rglob("*.py"):
         if source.name == "review_seams.py":
@@ -527,8 +546,10 @@ def test_m5d_creation_is_not_wired_into_any_route_command_or_runtime_path() -> N
         text = source.read_text(encoding="utf-8")
         assert "persistence.reviews" not in text, source.name
         if source.name == "review.py":
-            continue  # M5g: the unregistered run_review composition uses the M5d seams (G12)
+            continue  # M5g: the run_review composition uses the M5d seams (G12)
         assert "review_seams" not in text, source.name
+        if source.name == W8_WIRING:
+            continue  # W8: builds the run_review handler for the production registry
         assert "run_review" not in text, source.name
     assert "run_review" not in production_registry().kinds
 
@@ -723,7 +744,9 @@ def test_m5g_orchestration_keeps_the_accepted_boundaries() -> None:
 
 
 def test_m5g_is_not_wired_into_any_route_command_setting_or_production_registry() -> None:
-    """W8: ``run_review`` stays unregistered; nothing outside tests builds the handler."""
+    """W8 (ADR-0027): ``production_registry()`` without a handler never registers ``run_review``;
+    outside tests only ``review_wiring.py`` builds the handler, and only the API's ``reviews.py``
+    reads review outputs."""
     from evidenceguard_worker.handlers import production_registry
 
     for package in (
@@ -740,9 +763,15 @@ def test_m5g_is_not_wired_into_any_route_command_setting_or_production_registry(
             if package is evidenceguard_worker and source.name == "review.py":
                 continue
             text = source.read_text(encoding="utf-8")
+            if package is evidenceguard_worker and source.name == W8_WIRING:
+                # W8: the production wiring builds the handler; it never reads outputs.
+                assert "review_outputs" not in text, source.name
+                continue
             assert "make_run_review_handler" not in text, source.name
             assert "evidenceguard_worker.review " not in text, source.name
             assert "from evidenceguard_worker.review import" not in text, source.name
+            if package is evidenceguard_api and source.name == W8_REVIEW_API:
+                continue  # W8: the review routes read the status and the stored output
             if package is not evidenceguard_persistence and package is not evidenceguard_domain:
                 assert "review_outputs" not in text, source.name
     assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
@@ -799,13 +828,14 @@ def test_m5h_transport_imports_only_the_adapter_module_and_the_standard_library(
 
 
 def test_m5h_is_not_constructed_registered_or_configured_in_production() -> None:
-    """W9: nothing outside tests builds the adapter or the transport; no setting, route,
-    command or registry entry mentions them."""
+    """W9: outside tests only the W8 wiring module (ADR-0027) builds the adapter and the
+    transport; no other setting, route, command or registry entry mentions them."""
     from evidenceguard_worker.handlers import production_registry
 
     definitions = {
         (evidenceguard_agents, "anthropic.py"),
         (evidenceguard_worker, M5H_TRANSPORT),
+        (evidenceguard_worker, W8_WIRING),  # W8: the one production construction (ADR-0027)
     }
     for package in (
         evidenceguard_api,
@@ -832,3 +862,65 @@ def test_completion_span_values_use_only_standard_library_and_are_packaged() -> 
     path = _source(evidenceguard_observability, "provider_spans.py")
     assert path.is_file()
     assert not (_module_imports(path) - set(sys.stdlib_module_names))
+
+
+# --- W8 (ADR-0027) -------------------------------------------------------------------------------
+
+
+def _constructed_names(path: Path) -> set[str]:
+    """Every name called anywhere in ``path`` (``f(...)`` or ``x.f(...)``)."""
+    names: set[str] = set()
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        if isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Name):
+                names.add(node.func.id)
+            elif isinstance(node.func, ast.Attribute):
+                names.add(node.func.attr)
+    return names
+
+
+def test_production_paths_never_construct_the_scripted_provider() -> None:
+    """No packaged module outside the fake's own definition imports, names or calls the scripted
+    provider, so no production path can fall back to fake judgments."""
+    for package in (
+        evidenceguard_api,
+        evidenceguard_agents,
+        evidenceguard_domain,
+        evidenceguard_observability,
+        evidenceguard_persistence,
+        evidenceguard_retrieval,
+        evidenceguard_worker,
+    ):
+        assert package.__file__ is not None
+        for source in Path(package.__file__).parent.rglob("*.py"):
+            if package is evidenceguard_agents and source.name == "scripted.py":
+                continue
+            assert "evidenceguard_agents.scripted" not in _agents_modules(source), source.name
+            assert "ScriptedFakeProvider" not in _constructed_names(source), source.name
+            if package is evidenceguard_agents and source.name == "__init__.py":
+                continue  # its docstring describes the test-owned fake
+            assert "ScriptedFakeProvider" not in source.read_text(encoding="utf-8"), source.name
+
+
+def test_review_wiring_keeps_the_accepted_imports() -> None:
+    path = _source(evidenceguard_worker, W8_WIRING)
+    imported = _module_imports(path)
+    assert imported - set(sys.stdlib_module_names) == {
+        "evidenceguard_agents",
+        "evidenceguard_observability",
+        "evidenceguard_persistence",
+        "evidenceguard_worker",
+        "sqlalchemy",
+    }
+    assert imported & set(sys.stdlib_module_names) <= {"collections"}
+    assert _agents_modules(path) == {
+        "evidenceguard_agents.anthropic",
+        "evidenceguard_agents.providers",
+    }
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    docstring = (ast.get_docstring(tree) or "").lower()
+    assert docstring and "voyage" not in docstring and "provenance" not in docstring
+    assert "ScriptedFakeProvider" not in _constructed_names(path)
+    assert {"AnthropicProvider", "HttpsAnthropicTransport", "LoggingSpanSink"} <= (
+        _constructed_names(path)
+    )

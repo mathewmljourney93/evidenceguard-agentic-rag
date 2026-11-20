@@ -863,7 +863,8 @@ def test_creation_returns_its_pooled_connection_with_default_settings(
     }
 
 
-def test_the_production_registry_never_claims_a_review_job(
+# W8: renamed; production_registry() is the registry without a configured provider.
+def test_the_production_registry_without_a_configured_provider_never_claims_a_review_job(
     factory: sessionmaker[Session],
     engine: Engine,
     actor: ActorContext,
