@@ -1,10 +1,10 @@
 """The ``run_review`` handler factory, bounded stage orchestration and render-consistent output
 reads (M5g, ADR-0025).
 
-Implements M5g-A to M5g-I of the specification accepted in Prompt 217 (``docs/plan.md``). The
-handler is **not registered in production** (``production_registry`` is unchanged, W8); only test
-registries register it. No setting, endpoint, command or enqueue path builds it, and it has no
-default model provider: the caller must pass one.
+Implements M5g-A to M5g-I of the specification accepted in Prompt 217 (``docs/plan.md``). Since W8
+(ADR-0027) the production registry includes the handler only when ``eg-worker`` has a fully valid
+review configuration: ``review_wiring.build_review_handler`` builds it with the configured provider.
+No endpoint or command builds it, and it has no default model provider: the caller must pass one.
 
 One attempt, in order (the first failing step decides):
 

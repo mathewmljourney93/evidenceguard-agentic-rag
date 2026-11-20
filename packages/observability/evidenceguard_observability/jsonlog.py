@@ -66,6 +66,8 @@ WORKER_EVENTS = (
     "worker.poll_failed",
     "worker.no_handlers",
     "worker.config_invalid",
+    "worker.review_enabled",
+    "worker.review_disabled",
     "job.claimed",
     "job.succeeded",
     "job.post_finish_error",

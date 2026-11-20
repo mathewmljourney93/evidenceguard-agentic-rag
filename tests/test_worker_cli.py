@@ -19,16 +19,22 @@ from uuid import uuid4
 
 import pytest
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import Session, sessionmaker
 
 from evidenceguard_domain.jobs import JobPayload, JobSnapshot, JobStatus, LeaseLostError
-from evidenceguard_persistence.settings import DATABASE_URL_ENV
+from evidenceguard_persistence.settings import (
+    ANTHROPIC_API_KEY_ENV,
+    DATABASE_URL_ENV,
+    REVIEW_MODEL_ENV,
+    REVIEW_PROVIDER_ENV,
+)
 from evidenceguard_worker import __main__ as cli
 from evidenceguard_worker.context import JobContext
 from evidenceguard_worker.handlers import production_registry
 from evidenceguard_worker.indexing import INDEX_REVISION_KIND, index_revision
 from evidenceguard_worker.ingest import INGEST_REVISION_KIND, ingest_revision
 from evidenceguard_worker.registry import HandlerRegistry
-from evidenceguard_worker.runtime import JobStore, Timings
+from evidenceguard_worker.runtime import DatabaseJobStore, JobStore, Timings
 from evidenceguard_worker.shutdown import StopController, install_signal_handlers
 
 SUBMITTED_MARKER = "submitted-marker-value"  # obviously fake; stands in for a mistyped secret
@@ -206,6 +212,205 @@ def test_database_configuration_errors_exit_three_without_the_url(
     assert f"eg-worker: error: {DATABASE_URL_ENV} {problem}" in err
     assert '"event":"worker.config_invalid"' in err
     assert SUBMITTED_MARKER not in err
+
+
+# --- review configuration (W8, ADR-0027) ------------------------------------------------------
+
+REVIEW_MODEL = "claude-example-20990101"  # synthetic
+KEY_CANARY = "sk-test-obviously-fake-cli-canary"  # obviously fake
+
+
+@pytest.fixture(autouse=True)
+def reviews_off(monkeypatch: pytest.MonkeyPatch) -> None:
+    for name in (REVIEW_PROVIDER_ENV, REVIEW_MODEL_ENV, ANTHROPIC_API_KEY_ENV):
+        monkeypatch.delenv(name, raising=False)
+
+
+class RecordingStore(ScriptedStore):
+    def __init__(self) -> None:
+        super().__init__()
+        self.kinds: list[frozenset[str]] = []
+
+    def claim(self, worker_id: str, kinds: Any) -> JobSnapshot | None:
+        self.kinds.append(frozenset(kinds))
+        return super().claim(worker_id, kinds)
+
+
+class RecordingDatabaseStore(DatabaseJobStore):
+    """A real ``DatabaseJobStore`` (so the CLI can take its session factory) whose claim is
+    recorded instead of reaching a database."""
+
+    def __init__(self) -> None:
+        super().__init__(sessionmaker())
+        self.kinds: list[frozenset[str]] = []
+
+    def claim(self, worker_id: str, kinds: Any) -> JobSnapshot | None:
+        self.kinds.append(frozenset(kinds))
+        return None
+
+
+class _TestProvider:
+    """A test-only provider; the injected handler factory never calls it."""
+
+    @property
+    def provider_id(self) -> str:
+        return "test-provider"
+
+    def generate(self, request: Any) -> Any:
+        raise AssertionError("the provider must not be called")
+
+
+def test_unconfigured_worker_never_claims_run_review(
+    reviews_off: None, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = RecordingStore()
+
+    def forbidden(*args: Any) -> Any:
+        raise AssertionError("no review handler may be built")
+
+    code = cli.main(["--once"], store_factory=_factory(store), review_handler_factory=forbidden)
+
+    assert code == 0
+    assert store.kinds == [frozenset({"ingest_revision", "index_revision"})]
+    err = capsys.readouterr().err
+    assert '"event":"worker.review_disabled"' in err
+    assert "worker.review_enabled" not in err
+
+
+def test_configured_worker_claims_run_review(
+    reviews_off: None, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = RecordingDatabaseStore()
+    provider = _TestProvider()
+    built: list[tuple[Any, sessionmaker[Session]]] = []
+
+    def handler(ctx: JobContext) -> None:
+        raise AssertionError("no job is claimed")
+
+    def factory(given: Any, session_factory: sessionmaker[Session]) -> Any:
+        built.append((given, session_factory))
+        return handler
+
+    @contextmanager
+    def store_factory() -> Iterator[JobStore]:
+        yield store
+
+    code = cli.main(
+        ["--once"],
+        store_factory=store_factory,
+        review_provider_loader=lambda: provider,
+        review_handler_factory=factory,
+    )
+
+    assert code == 0
+    assert built == [(provider, store.session_factory)]
+    assert store.kinds == [frozenset({"ingest_revision", "index_revision", "run_review"})]
+    err = capsys.readouterr().err
+    assert '"event":"worker.review_enabled"' in err
+    assert "worker.review_disabled" not in err
+
+
+def test_configured_worker_adds_run_review_to_an_injected_registry(
+    reviews_off: None, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = RecordingDatabaseStore()
+    provider = _TestProvider()
+
+    def handler(ctx: JobContext) -> None:
+        raise AssertionError("no job is claimed")
+
+    @contextmanager
+    def store_factory() -> Iterator[JobStore]:
+        yield store
+
+    code = cli.main(
+        ["--once"],
+        registry_factory=_registry,
+        store_factory=store_factory,
+        review_provider_loader=lambda: provider,
+        review_handler_factory=lambda given, factory: handler,
+    )
+
+    assert code == 0
+    assert store.kinds == [frozenset({"test_job", "run_review"})]
+    assert '"event":"worker.review_enabled"' in capsys.readouterr().err
+
+
+def test_an_injected_registry_that_already_has_run_review_is_never_replaced(
+    reviews_off: None, capsys: pytest.CaptureFixture[str]
+) -> None:
+    store = RecordingDatabaseStore()
+
+    @contextmanager
+    def store_factory() -> Iterator[JobStore]:
+        yield store
+
+    code = cli.main(
+        ["--once"],
+        registry_factory=lambda: HandlerRegistry([("run_review", lambda ctx: None)]),
+        store_factory=store_factory,
+        review_provider_loader=_TestProvider,
+        review_handler_factory=lambda given, factory: lambda ctx: None,
+    )
+
+    assert code == 1
+    assert store.kinds == []
+    assert "eg-worker: error: unexpected DuplicateHandlerError" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(
+    ("values", "message"),
+    [
+        ({REVIEW_PROVIDER_ENV: "anthropic"}, "EG_REVIEW_MODEL is not set"),
+        ({REVIEW_MODEL_ENV: REVIEW_MODEL}, "EG_REVIEW_PROVIDER is not set"),
+        (
+            {REVIEW_PROVIDER_ENV: SUBMITTED_MARKER, REVIEW_MODEL_ENV: REVIEW_MODEL},
+            "EG_REVIEW_PROVIDER is not a supported provider",
+        ),
+        (
+            {REVIEW_PROVIDER_ENV: "anthropic", REVIEW_MODEL_ENV: REVIEW_MODEL},
+            "EG_ANTHROPIC_API_KEY is not set",
+        ),
+    ],
+)
+def test_partial_review_configuration_exits_three_before_database_settings(
+    values: dict[str, str],
+    message: str,
+    reviews_off: None,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    def forbidden() -> None:
+        raise AssertionError("database settings must not be read")
+
+    monkeypatch.setattr(cli, "load_database_settings", forbidden)
+    for name, value in values.items():
+        monkeypatch.setenv(name, value)
+
+    assert cli.main(["--once"], store_factory=_no_store) == 3
+    err = capsys.readouterr().err
+    assert f"eg-worker: error: {message}" in err
+    assert '"event":"worker.config_invalid"' in err
+    assert SUBMITTED_MARKER not in err and REVIEW_MODEL not in err
+    assert "worker.review_enabled" not in err and "worker.review_disabled" not in err
+
+
+@pytest.mark.parametrize("key", [f"{KEY_CANARY} with space", KEY_CANARY + "\u00e9", "k" * 257])
+def test_review_configuration_errors_never_print_the_key(
+    key: str,
+    reviews_off: None,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setenv(REVIEW_PROVIDER_ENV, "anthropic")
+    monkeypatch.setenv(REVIEW_MODEL_ENV, REVIEW_MODEL)
+    monkeypatch.setenv(ANTHROPIC_API_KEY_ENV, key)
+
+    assert cli.main(["--once"], store_factory=_no_store) == 3
+    captured = capsys.readouterr()
+    assert "eg-worker: error: EG_ANTHROPIC_API_KEY is not a valid key" in captured.err
+    assert KEY_CANARY not in captured.out + captured.err
+    assert key not in captured.out + captured.err
 
 
 def test_once_with_nothing_claimable_exits_zero() -> None:

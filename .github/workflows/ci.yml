@@ -460,6 +460,32 @@ jobs:
           assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
           print("provider-call span collected and serialized from the installed wheel")
           PY
+          # W8 (ADR-0027): from the installed wheel, with no review variables set, reviews are off;
+          # the registry gains run_review only from an explicitly passed handler (built here over
+          # the scripted test provider, never a live one); the API documents the review routes.
+          # No network, key, provider call or database is used.
+          env -u EG_REVIEW_PROVIDER -u EG_REVIEW_MODEL -u EG_ANTHROPIC_API_KEY "${bin}/python" -I - <<'PY'
+          from sqlalchemy.orm import sessionmaker
+          import evidenceguard_api.reviews as review_api
+          import evidenceguard_worker.review_wiring as wiring
+          from evidenceguard_agents.scripted import Respond, ScriptedFakeProvider
+          from evidenceguard_api.app import create_app
+          from evidenceguard_persistence.settings import load_review_settings
+          from evidenceguard_worker.handlers import production_registry
+          from evidenceguard_worker.review import make_run_review_handler
+          for module in (review_api, wiring):
+              assert "site-packages" in (module.__file__ or ""), module.__name__
+          assert load_review_settings() is None
+          assert wiring.load_review_provider() is None
+          fake = ScriptedFakeProvider(scripts={("verifier", "SEC-01"): (Respond("{}"),)})
+          handler = make_run_review_handler(fake, session_factory=sessionmaker())
+          kinds = production_registry(review_handler=handler).kinds
+          assert kinds == frozenset({"ingest_revision", "index_revision", "run_review"}), kinds
+          assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
+          paths = create_app().openapi()["paths"]
+          assert {"/v1/reviews", "/v1/reviews/{review_id}", "/v1/reviews/{review_id}/result", "/v1/review-templates"} <= set(paths)
+          print("reviews off without settings; run_review registered only with a passed handler; review routes documented")
+          PY
 
   integration:
     # PostgreSQL integration tests. Service containers run only on Linux runners, so this job

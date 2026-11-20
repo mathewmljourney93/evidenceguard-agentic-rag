@@ -77,6 +77,9 @@ DOWN_TIMEOUT = 120
 BUILD_TIMEOUT = 300
 HTTP_TIMEOUT = 10
 INGESTION_DEADLINE = 90
+REVIEW_KEY_ENV = "EG_ANTHROPIC_API_KEY"
+REVIEWS_DISABLED_EVENT = '"event":"worker.review_disabled"'
+REVIEW_JOB_KIND = "run_review"
 INDEXING_DEADLINE = 90
 POLL_INTERVAL = 2
 LOG_TAIL = 200
@@ -340,6 +343,11 @@ def validate_config(config: Mapping[str, Any], image: str) -> list[str]:
     )
     if "/readyz" not in test:
         problems.append("api health check must use /readyz")
+    # W8 (ADR-0027): the model provider key reaches the worker only, and CI never sets it.
+    if REVIEW_KEY_ENV in (services["api"].get("environment") or {}):
+        problems.append(f"api must not define {REVIEW_KEY_ENV}")
+    if (worker.get("environment") or {}).get(REVIEW_KEY_ENV):
+        problems.append(f"worker: {REVIEW_KEY_ENV} must be empty in CI")
     return problems
 
 
@@ -623,12 +631,14 @@ class Smoke:
         path: str,
         body: bytes | None = None,
         content_type: str | None = None,
+        extra_headers: Mapping[str, str] | None = None,
     ) -> Response:
         headers = {"Accept": "application/json"}
         if self._key is not None:
             headers["Authorization"] = f"Bearer {self._key}"
         if content_type is not None:
             headers["Content-Type"] = content_type
+        headers.update(extra_headers or {})
         try:
             return self._http(method, self.base_url + path, headers, body, HTTP_TIMEOUT)
         except CheckFailed as error:
@@ -686,6 +696,7 @@ class Smoke:
         self.emit("smoke: duplicate upload returned the existing revision (200)")
         self.backfill_indexes(tenant)
         self.wait_for_indexing(tenant, revision_id, chunk_count)
+        self.check_reviews_disabled(str(vendor.get("id")))
         self.stop_worker()
 
     def check_image_identity(self) -> None:
@@ -887,6 +898,29 @@ class Smoke:
             if self._clock() >= deadline:
                 raise CheckFailed(f"indexing: not ready within {INDEXING_DEADLINE} s")
             self._sleep(POLL_INTERVAL)
+
+    def check_reviews_disabled(self, vendor_id: str) -> None:
+        """W8 (ADR-0027): with no review settings, POST /v1/reviews is 503 and queues nothing,
+        and the worker logged that reviews are off and never claimed a review job."""
+        response = self.request(
+            "create review",
+            "POST",
+            "/v1/reviews",
+            json.dumps({"vendor_id": vendor_id}).encode(),
+            "application/json",
+            {"Idempotency-Key": "smoke-review-disabled"},
+        )
+        if response.status != 503:
+            raise CheckFailed(f"create review: HTTP {response.status}, expected 503")
+        logs = self.command(
+            "worker logs", self.compose("logs", "--no-color", "worker"), COMMAND_TIMEOUT
+        )
+        text = logs.stdout + logs.stderr
+        if REVIEWS_DISABLED_EVENT not in text:
+            raise CheckFailed("reviews: the worker did not log that reviews are disabled")
+        if REVIEW_JOB_KIND in text:
+            raise CheckFailed("reviews: the worker logged a review job")
+        self.emit("smoke: reviews disabled (POST /v1/reviews 503; worker claimed no review job)")
 
     def stop_worker(self) -> None:
         # This stops an idle worker after ingestion succeeded. It does not test draining an

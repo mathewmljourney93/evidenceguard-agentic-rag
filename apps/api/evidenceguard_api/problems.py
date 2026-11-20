@@ -48,6 +48,13 @@ class PublicMessage(StrEnum):
     """
 
     AUTHENTICATION_REQUIRED = "Authentication is required."
+    # W8 (ADR-0027): review creation and results.
+    REVIEWS_NOT_CONFIGURED = "Reviews are not configured on this server."
+    NO_ACTIVE_REVISIONS = "The vendor has no active document revisions to review."
+    DOCUMENTS_NOT_READY = "The vendor's documents are not ready for review yet."
+    IDEMPOTENCY_KEY_REUSED = "This idempotency key was already used for a different request."
+    RESULT_NOT_READY = "The review result is not available yet."
+    REVIEW_LIMIT_REACHED = "Too many reviews are in progress for this tenant; try again later."
 
 
 class PublicHTTPException(StarletteHTTPException):

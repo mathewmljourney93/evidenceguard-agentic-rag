@@ -7,13 +7,23 @@ exception text:
 - 1: unexpected failure (class name only), including ``--once`` when its claim hits a
   database error;
 - 2: usage error;
-- 3: database configuration error (the existing URL-free message);
-- 4: no job handlers are registered. Checked **before** database settings are read;
+- 3: review configuration error (W8: a partial or invalid ``EG_REVIEW_PROVIDER``,
+  ``EG_REVIEW_MODEL`` or ``EG_REVIEW_MAX_IN_FLIGHT``, or a missing or invalid
+  ``EG_ANTHROPIC_API_KEY`` while reviews are on;
+  the message names the variable, never its value), checked after the handler check and
+  **before** database settings are read; or a database configuration error (the existing
+  URL-free message);
+- 4: no job handlers are registered. Checked **before** review and database settings are read;
 - 5: abnormal shutdown: a handler or heartbeat thread did not stop within its bounded wait.
   The process then ends with ``os._exit(5)``, so interpreter shutdown cannot block on the
   threads that are still alive. Once the runtime has returned an abnormal result, failures in
   later cleanup (engine disposal, signal restoration) or in writing diagnostics never prevent
   or downgrade this exit.
+
+With reviews off (both review variables unset) the worker logs ``worker.review_disabled`` and
+never claims a review job; with a valid configuration it logs ``worker.review_enabled`` and
+adds the review handler to the registry from ``registry_factory`` (ingestion and indexing in
+production), keeping every handler it already has (ADR-0027).
 
 ``--help`` needs no settings and no database. Signal handlers only set flags: the first SIGINT
 or SIGTERM (or SIGBREAK on Windows) requests a graceful stop, a second an immediate one.
@@ -31,9 +41,20 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from evidenceguard_observability.jsonlog import configure_logging, log_event
 from evidenceguard_persistence.db import create_db_engine, create_session_factory, dispose_engine
-from evidenceguard_persistence.settings import DatabaseConfigurationError, load_database_settings
-from evidenceguard_worker.handlers import production_registry
+from evidenceguard_persistence.settings import (
+    DatabaseConfigurationError,
+    ReviewConfigurationError,
+    load_database_settings,
+)
+from evidenceguard_worker.handlers import production_registry, with_review_handler
 from evidenceguard_worker.registry import HandlerRegistry
+from evidenceguard_worker.review_wiring import (
+    ModelProvider,
+    ReviewHandlerFactory,
+    ReviewProviderLoader,
+    build_review_handler,
+    load_review_provider,
+)
 from evidenceguard_worker.runtime import (
     LOGGER,
     DatabaseJobStore,
@@ -102,6 +123,19 @@ def database_store() -> Iterator[JobStore]:
         dispose_engine(engine)
 
 
+def _review_registry(
+    registry: HandlerRegistry,
+    provider: ModelProvider,
+    store: JobStore,
+    review_handler_factory: ReviewHandlerFactory,
+) -> HandlerRegistry:
+    """``registry`` (from ``registry_factory``) plus the review handler on the store's session
+    factory. The given registry's handlers are kept, never replaced."""
+    if not isinstance(store, DatabaseJobStore):
+        raise TypeError("the review handler needs a database job store")
+    return with_review_handler(registry, review_handler_factory(provider, store.session_factory))
+
+
 def _fail(code: int, message: str) -> int:
     print(f"{PROG}: error: {message}", file=sys.stderr)
     return code
@@ -132,6 +166,8 @@ def main(
     store_factory: StoreFactory = database_store,
     timings: Timings | None = None,
     exit_process: Callable[[int], object] = os._exit,
+    review_provider_loader: ReviewProviderLoader = load_review_provider,
+    review_handler_factory: ReviewHandlerFactory = build_review_handler,
 ) -> int:
     args = _parser().parse_args(argv)
     configure_logging(args.log_level)
@@ -141,12 +177,21 @@ def main(
         log_event(LOGGER, "worker.no_handlers", logging.ERROR)
         return _fail(EXIT_NO_HANDLERS, "no job handlers are registered")
 
+    try:
+        provider = review_provider_loader()
+    except ReviewConfigurationError as exc:  # before any database setting is read
+        log_event(LOGGER, "worker.config_invalid", logging.ERROR)
+        return _fail(EXIT_CONFIGURATION, str(exc))  # names the variable, never its value
+    log_event(LOGGER, "worker.review_disabled" if provider is None else "worker.review_enabled")
+
     stop = StopController()
     restore_signals = install_signal_handlers(stop)
     result: WorkerResult | None = None
     try:
         try:
             with store_factory() as store:
+                if provider is not None:
+                    registry = _review_registry(registry, provider, store, review_handler_factory)
                 result = run_worker(store, registry, stop=stop, timings=timings, once=args.once)
         finally:
             restore_signals()
