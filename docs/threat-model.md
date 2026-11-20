@@ -716,7 +716,7 @@ limitation probe), and there is no canary denylist, so canary text a model emits
 fields would be stored and rendered. Model calls stay at least once, bounded by persisted budgets;
 no exactly-once guarantee is made. The M4 limits above are unchanged.
 
-## Reports, approval and audit (M6, implemented on a branch; pending review)
+## Reports, approval and audit (M6)
 
 Routes under `/v1/reports` ([ADR-0028](decisions/0028-approval-gate-and-export.md)) expose a
 completed review's stored output as a report with hash-bound revisions, approval or rejection,

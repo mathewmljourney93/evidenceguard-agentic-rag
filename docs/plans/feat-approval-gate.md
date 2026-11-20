@@ -53,7 +53,9 @@ from the sections below.
   when a rendered export's declared digest differs from its body; the API maps it to 503.
   `InvalidRevisionContentError` (domain) is raised when requested dispositions or notes do not
   form a valid revision, and by `decide_report` for a rejection without a comment (checked before
-  any SQL); the API maps it to 422. No persistence path raises a bare `ValueError` to the API.
+  any SQL); the API maps it to 422. No reachable persistence path raises a bare `ValueError` to the API. The one remaining
+  `ValueError` (unsupported export format in `reports.py`) cannot be reached, because the route
+  accepts only `md` or `json` and answers 422 to anything else.
 - **Unqualified `ON CONFLICT DO NOTHING`** on the `reports` insert (no conflict target). Both
   unique constraints on `reports`, the primary key `(tenant_id, id)` and
   `(tenant_id, id, base_wrapper_sha256)`, contain `(tenant_id, id)`, so any conflict either can
@@ -64,6 +66,12 @@ from the sections below.
 - **Explicit short trigger names.** Row triggers `eg_<table>_append_only` (BEFORE UPDATE OR
   DELETE) on the four history tables; statement triggers `eg_<table>_no_truncate`; on `reports`,
   `eg_reports_no_delete` and `eg_reports_no_truncate`. Ten triggers in total, one function.
+- **Narrow exceptions in the packaging guards** (`tests/test_packaging.py`), each limited to one
+  package and one file name: `agents/report_export.py` (the export renderers) is allowed to
+  exist beside the other agents modules and to carry the disclaimer wording; the API's
+  `reports.py` is exempt from the check that keeps the API off the renderers and from the check
+  on mapping stored-output read errors; persistence's `reports.py` is exempt from the check on
+  decoding stored wrapper bytes.
 - **Offline migration tests.** The existing offline tests for 0003 and 0005 in
   `tests/test_persistence.py` now render up to `0008` instead of head, because 0009 adds
   triggers and a function that those assertions do not describe. 0009 has its own offline tests

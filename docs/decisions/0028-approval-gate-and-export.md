@@ -1,7 +1,7 @@
 # ADR-0028: Approval gate and export
 
-- **Status:** implemented on branch `feat/approval-gate`; pending review. Not merged, not
-  verified in CI.
+- **Status:** implemented on branch `feat/approval-gate`; reviewed and CI-verified on the branch,
+  to be accepted when merged.
 - **Plan:** [`docs/plans/feat-approval-gate.md`](../plans/feat-approval-gate.md) (M6).
 
 ## Context
