@@ -24,7 +24,8 @@ wrapper error (``ReviewConfigurationError``) whose message names the variable bu
 value, raised with no cause or context. ``EG_REVIEW_PROVIDER`` switches reviews on and
 ``EG_REVIEW_MODEL`` names the model; both are set or both are unset (empty counts as unset).
 ``EG_ANTHROPIC_API_KEY`` is read only by the worker, through ``load_anthropic_settings``, and is
-held as a ``SecretStr``.
+held as a ``SecretStr``. ``EG_REVIEW_MAX_IN_FLIGHT`` (an integer from 1 to 20, default 2) caps the
+reviews one tenant may have queued or running; the API enforces it when it creates a review.
 """
 
 import ipaddress
@@ -32,7 +33,7 @@ import re
 from enum import StrEnum
 from typing import NamedTuple, Self
 
-from pydantic import SecretStr, ValidationError, field_validator, model_validator
+from pydantic import Field, SecretStr, ValidationError, field_validator, model_validator
 from pydantic_core import PydanticCustomError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import URL, make_url
@@ -44,6 +45,9 @@ DATABASE_URL_ENV = "EG_DATABASE_URL"
 REVIEW_PROVIDER_ENV = "EG_REVIEW_PROVIDER"
 REVIEW_MODEL_ENV = "EG_REVIEW_MODEL"
 ANTHROPIC_API_KEY_ENV = "EG_ANTHROPIC_API_KEY"
+REVIEW_MAX_IN_FLIGHT_ENV = "EG_REVIEW_MAX_IN_FLIGHT"
+DEFAULT_REVIEW_MAX_IN_FLIGHT = 2
+MAX_REVIEW_MAX_IN_FLIGHT = 20
 MAX_API_KEY_LENGTH = 256
 DRIVER = "postgresql+psycopg"
 DEFAULT_PORT = 5432
@@ -198,12 +202,16 @@ _SETTINGS_CONFIG = SettingsConfigDict(
 
 
 class ReviewSettings(BaseSettings):
-    """Whether reviews are on, and with which model. Read by the API and the worker."""
+    """Whether reviews are on, with which model, and how many reviews one tenant may have
+    queued or running at once. Read by the API and the worker."""
 
     model_config = _SETTINGS_CONFIG
 
     review_provider: ReviewProvider | None = None
     review_model: str | None = None
+    review_max_in_flight: int = Field(
+        default=DEFAULT_REVIEW_MAX_IN_FLIGHT, ge=1, le=MAX_REVIEW_MAX_IN_FLIGHT
+    )
 
     @field_validator("review_model")
     @classmethod
@@ -250,12 +258,18 @@ def _review_problem(exc: ValidationError) -> str:
             return f"{REVIEW_PROVIDER_ENV} is not set"
         if error["loc"][:1] == ("review_provider",):
             return f"{REVIEW_PROVIDER_ENV} is not a supported provider"
+        if error["loc"][:1] == ("review_max_in_flight",):
+            return (
+                f"{REVIEW_MAX_IN_FLIGHT_ENV} must be an integer from 1 to "
+                f"{MAX_REVIEW_MAX_IN_FLIGHT}"
+            )
     return f"{REVIEW_MODEL_ENV} is not a valid model id"
 
 
 def load_review_settings() -> ReviewSettings | None:
-    """Read ``EG_REVIEW_PROVIDER`` and ``EG_REVIEW_MODEL``. ``None`` when both are unset or
-    empty; ``ReviewConfigurationError`` when only one is set or a value is invalid. The error is
+    """Read ``EG_REVIEW_PROVIDER``, ``EG_REVIEW_MODEL`` and ``EG_REVIEW_MAX_IN_FLIGHT``. ``None``
+    when the provider and model are both unset or empty; ``ReviewConfigurationError`` when only
+    one is set or any value is invalid. The error is
     raised after the handler, so it carries no cause or context (the pydantic error could)."""
     problem: str | None = None
     settings: ReviewSettings | None = None

@@ -158,6 +158,11 @@ def test_review_routes_document_auth_and_errors() -> None:
     assert header["name"] == "Idempotency-Key" and header["required"] is True
     assert header["schema"]["pattern"] == "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
     assert "Reviews are not configured" in create["responses"]["503"]["description"]
+    # W8 fix round 1: the per-tenant in-flight cap is a documented 429 with Retry-After.
+    assert "429" in create["responses"]
+    too_many = create["responses"]["429"]
+    assert "application/problem+json" in too_many["content"]
+    assert too_many["headers"]["Retry-After"]["schema"] == {"type": "integer"}
     detail = paths["/v1/reviews/{review_id}"]["get"]
     result = paths["/v1/reviews/{review_id}/result"]["get"]
     templates = paths["/v1/review-templates"]["get"]

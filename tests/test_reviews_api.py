@@ -39,6 +39,7 @@ from evidenceguard_domain.reviews import (
     ReviewCommitOutcomeUnknownError,
     ReviewConflictRetryableError,
     ReviewIdempotencyConflictError,
+    ReviewLimitReachedError,
     ReviewNotFoundError,
 )
 from evidenceguard_persistence.credentials import generate_api_key
@@ -456,6 +457,43 @@ def test_foreign_or_missing_vendor_404(harness: Harness) -> None:
 def test_commit_outcome_unknown_503(harness: Harness) -> None:
     harness.service.error = ReviewCommitOutcomeUnknownError()
     _problem(harness.post(), 503)
+
+
+def test_review_limit_reached_is_429_with_retry_after(harness: Harness) -> None:
+    harness.service.error = ReviewLimitReachedError()
+
+    response = harness.post(key=KEY_MARKER)
+
+    body = _problem(response, 429, PublicMessage.REVIEW_LIMIT_REACHED.value)
+    assert response.headers["Retry-After"] == "60"
+    assert KEY_MARKER not in response.text and "review_limit_reached" not in response.text
+    assert set(body) == {"type", "title", "status", "detail", "request_id"}
+
+
+def test_database_service_passes_the_configured_cap_to_create_review(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    seen: list[Any] = []
+
+    def capped(factory: Any, actor: Any, request: Any, *, max_in_flight: Any) -> Any:
+        seen.append(max_in_flight)
+        raise ReviewLimitReachedError()
+
+    def settings() -> ReviewSettings:
+        return ReviewSettings(
+            review_provider=ReviewProvider.ANTHROPIC, review_model=MODEL, review_max_in_flight=5
+        )
+
+    monkeypatch.setattr(review_api, "create_review", capped)
+    database = AppDatabase()
+    monkeypatch.setattr(database, "session_factory", lambda: None)
+    harness = Harness(DatabaseReviewService(database, settings_loader=settings))
+
+    response = harness.post()
+
+    _problem(response, 429, PublicMessage.REVIEW_LIMIT_REACHED.value)
+    assert response.headers["Retry-After"] == "60"
+    assert seen == [5]
 
 
 # --- GET /v1/reviews/{id} and /result -------------------------------------------------------------

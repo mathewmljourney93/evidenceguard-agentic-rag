@@ -8,14 +8,16 @@ review job runs through ``production_registry`` given a review handler built by 
 ``EG_TEST_DATABASE_URL`` (required in CI).
 """
 
+import threading
 from collections.abc import Iterator
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import Engine, select
+from sqlalchemy import Engine, func, select, update
 from sqlalchemy.engine import URL
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -25,9 +27,11 @@ from evidenceguard_api.database import AppDatabase
 from evidenceguard_api.problems import PublicMessage
 from evidenceguard_api.reviews import DatabaseReviewService
 from evidenceguard_domain.context import ActorContext
+from evidenceguard_domain.reviews import REVIEW_JOB_KIND
+from evidenceguard_persistence import reviews as review_store
 from evidenceguard_persistence.credentials import generate_api_key
 from evidenceguard_persistence.db import create_session_factory
-from evidenceguard_persistence.models import ReviewOutputRow
+from evidenceguard_persistence.models import Job, Review, ReviewOutputRow
 from evidenceguard_persistence.settings import ReviewProvider, ReviewSettings
 from evidenceguard_worker.handlers import production_registry
 from evidenceguard_worker.review_wiring import build_review_handler
@@ -70,19 +74,23 @@ class World:
     settings: list[ReviewSettings]
     client: TestClient
 
-    def post(self, vendor_id: UUID | None = None, key: str = KEY) -> Any:
+    def post(
+        self, vendor_id: UUID | None = None, key: str = KEY, actor: ActorContext | None = None
+    ) -> Any:
         return self.client.post(
             "/v1/reviews",
             json={"vendor_id": str(vendor_id or self.vendor_id)},
-            headers=self.keys.header(self.actor, key),
+            headers=self.keys.header(actor or self.actor, key),
         )
 
     def get(self, path: str) -> Any:
         return self.client.get(path, headers=self.keys.header(self.actor, None))
 
 
-def _settings(model: str = FAKE_MODEL_ID) -> ReviewSettings:
-    return ReviewSettings(review_provider=ReviewProvider.ANTHROPIC, review_model=model)
+def _settings(model: str = FAKE_MODEL_ID, cap: int = 2) -> ReviewSettings:
+    return ReviewSettings(
+        review_provider=ReviewProvider.ANTHROPIC, review_model=model, review_max_in_flight=cap
+    )
 
 
 @pytest.fixture
@@ -204,3 +212,134 @@ def test_job_view_shows_the_run_review_job(world: World) -> None:
         f"/v1/reviews/{body['review_id']}", headers=world.keys.header(other, None)
     )
     assert review.status_code == 404
+
+
+# --- per-tenant in-flight cap (W8 fix round 1, ADR-0027) ----------------------------------------
+
+
+def _counts(engine: Engine, tenant_id: UUID) -> tuple[int, int]:
+    """(reviews, run_review jobs) stored for the tenant."""
+    with engine.connect() as connection:
+        reviews = connection.execute(
+            select(func.count()).select_from(Review).where(Review.tenant_id == tenant_id)
+        ).scalar_one()
+        jobs = connection.execute(
+            select(func.count())
+            .select_from(Job)
+            .where(Job.tenant_id == tenant_id, Job.kind == REVIEW_JOB_KIND)
+        ).scalar_one()
+    return reviews, jobs
+
+
+def _limited(response: Any) -> None:
+    assert response.status_code == 429
+    assert response.headers["content-type"] == "application/problem+json"
+    assert response.headers["Retry-After"] == "60"
+    assert response.json()["detail"] == PublicMessage.REVIEW_LIMIT_REACHED.value
+
+
+def _set_job(engine: Engine, job_id: UUID, **values: Any) -> None:
+    with engine.begin() as connection:
+        connection.execute(update(Job).where(Job.id == job_id).values(**values))
+
+
+def test_cap_reached_is_429_and_a_replay_is_still_200(world: World) -> None:
+    first = world.post(key="w8-cap-1")
+    second = world.post(key="w8-cap-2")
+    assert (first.status_code, second.status_code) == (202, 202)
+
+    refused = world.post(key="w8-cap-3")
+
+    _limited(refused)
+    assert "w8-cap-3" not in refused.text
+    assert _counts(world.engine, world.actor.tenant_id) == (2, 2)
+    replay = world.post(key="w8-cap-1")
+    assert replay.status_code == 200 and replay.json() == first.json()
+    assert world.post(key="w8-cap-2").json() == second.json()
+    assert _counts(world.engine, world.actor.tenant_id) == (2, 2)
+
+
+def test_concurrent_posts_at_one_below_the_cap_yield_one_202_and_one_429(
+    world: World, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    assert world.post(key="w8-race-0").status_code == 202  # cap 2: one below
+    original = review_store._require_capacity
+    barrier = threading.Barrier(2, timeout=30)
+    local = threading.local()
+    calls: list[int] = []
+
+    def held(session: Session, tenant_id: UUID, cap: int) -> None:
+        calls.append(cap)
+        if not getattr(local, "waited", False):
+            local.waited = True
+            barrier.wait()  # both snapshots are taken before either request commits
+        original(session, tenant_id, cap)
+
+    monkeypatch.setattr(review_store, "_require_capacity", held)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        futures = [pool.submit(world.post, None, f"w8-race-{n}") for n in (1, 2)]
+        responses = [future.result(timeout=60) for future in futures]
+
+    statuses = sorted(response.status_code for response in responses)
+    assert statuses == [202, 429]
+    _limited(next(r for r in responses if r.status_code == 429))
+    assert len(calls) == 3  # the refused request retried once, in a fresh transaction
+    assert _counts(world.engine, world.actor.tenant_id) == (2, 2)
+
+
+def test_the_cap_counts_only_the_actors_tenant(world: World) -> None:
+    world.settings.append(_settings(cap=1))
+    other = pw.tenant(world.engine, "w8-cap-other")
+    other_vendor = pw.vendor(world.engine, other.tenant_id, slug="other-cap-vendor")
+    pw.ready_revision(world.factory, other, other_vendor)
+
+    assert world.post(key="w8-tenant-1").status_code == 202
+    _limited(world.post(key="w8-tenant-2"))
+
+    other_first = world.post(vendor_id=other_vendor, key="w8-tenant-1", actor=other)
+    assert other_first.status_code == 202
+    _limited(world.post(vendor_id=other_vendor, key="w8-tenant-2", actor=other))
+    assert _counts(world.engine, world.actor.tenant_id) == (1, 1)
+    assert _counts(world.engine, other.tenant_id) == (1, 1)
+
+
+def test_completed_or_failed_reviews_do_not_count(world: World) -> None:
+    world.settings.append(_settings(cap=1))
+    completed = world.post(key="w8-done-1").json()
+    _limited(world.post(key="w8-done-2"))
+
+    handler = build_review_handler(pw.provider(world.chunk_id), world.factory)
+    assert pw.work(world.factory, production_registry(review_handler=handler)).exit_code == 0
+    assert world.get(f"/v1/reviews/{completed['review_id']}").json()["status"] == "completed"
+
+    running = world.post(key="w8-done-2")
+    assert running.status_code == 202
+    job_id = UUID(running.json()["job_id"])
+    _set_job(
+        world.engine,
+        job_id,
+        status="running",
+        attempt=1,
+        locked_by="w8-cap-test",
+        lease_expires_at=func.clock_timestamp() + func.make_interval(0, 0, 0, 0, 0, 5),
+    )
+    _limited(world.post(key="w8-done-3"))  # a running review counts
+    _set_job(
+        world.engine,
+        job_id,
+        status="failed",
+        locked_by=None,
+        lease_expires_at=None,
+        finished_at=func.clock_timestamp(),
+    )
+    assert world.get(f"/v1/reviews/{running.json()['review_id']}").json()["status"] == "failed"
+
+    third = world.post(key="w8-done-3")
+    assert third.status_code == 202
+    _set_job(
+        world.engine,
+        UUID(third.json()["job_id"]),
+        status="dead",
+        finished_at=func.clock_timestamp(),
+    )
+    assert world.post(key="w8-done-4").status_code == 202

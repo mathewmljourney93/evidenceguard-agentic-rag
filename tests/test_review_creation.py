@@ -45,6 +45,7 @@ from evidenceguard_domain.reviews import (
     ReviewDatabaseError,
     ReviewIdempotencyConflictError,
     ReviewJobConflictError,
+    ReviewLimitReachedError,
     ReviewNotFoundError,
     ReviewRecordInconsistentError,
     ReviewRequest,
@@ -539,11 +540,84 @@ def test_input_then_role_precedence_before_any_session(monkeypatch: pytest.Monke
     assert world.log == [] and world.sessions == 0
 
 
+@pytest.mark.parametrize("cap", [0, 21, -1, True, 2.0, "2"])
+def test_an_invalid_in_flight_cap_is_refused_before_any_session(
+    cap: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    world = World(monkeypatch)
+    with pytest.raises(InvalidReviewRequestError) as caught:
+        reviews.create_review(world.factory, REVIEWER, REQUEST, max_in_flight=cap)  # type: ignore[arg-type]
+    assert_fixed(caught.value, InvalidReviewRequestError)
+    assert world.log == [] and world.sessions == 0
+
+
+def _capacity(world: World, monkeypatch: pytest.MonkeyPatch, seen: list[Any]) -> None:
+    def require(session: Any, tenant: UUID, cap: int) -> None:
+        seen.append((tenant, cap))
+        world._step("capacity", None)
+
+    monkeypatch.setattr(reviews, "_require_capacity", require)
+
+
+def test_the_cap_is_checked_after_the_replay_and_before_the_capture(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    seen: list[Any] = []
+    world = World(monkeypatch)
+    _capacity(world, monkeypatch, seen)
+
+    factory: Any = world.factory
+    created = reviews.create_review(factory, REVIEWER, REQUEST, max_in_flight=3)
+
+    assert created.replayed is False and seen == [(TENANT, 3)]
+    assert world.log == [
+        *["session1", "begin", "replay", "capacity", "capture", "job", "insert"],
+        *["commit", "close"],
+    ]
+
+
+def test_a_replay_is_never_refused_by_the_cap(monkeypatch: pytest.MonkeyPatch) -> None:
+    seen: list[Any] = []
+    replay = SimpleNamespace(replayed=True)
+    world = World(monkeypatch, {"replay": replay, "capacity": ReviewLimitReachedError()})
+    _capacity(world, monkeypatch, seen)
+
+    factory: Any = world.factory
+    result: Any = reviews.create_review(factory, REVIEWER, REQUEST, max_in_flight=1)
+    assert result is replay
+    assert seen == [] and "capacity" not in world.log
+
+
+def test_the_cap_refusal_is_fixed_and_never_retried(monkeypatch: pytest.MonkeyPatch) -> None:
+    seen: list[Any] = []
+    world = World(monkeypatch, {"capacity": reviews._Refusal(ReviewLimitReachedError)})
+    _capacity(world, monkeypatch, seen)
+    factory: Any = world.factory
+
+    with pytest.raises(ReviewLimitReachedError) as caught:
+        reviews.create_review(factory, REVIEWER, REQUEST, max_in_flight=2)
+
+    assert_fixed(caught.value, ReviewLimitReachedError)
+    assert world.sessions == 1 and "capture" not in world.log
+
+
+def test_without_a_cap_no_capacity_step_runs(monkeypatch: pytest.MonkeyPatch) -> None:
+    seen: list[Any] = []
+    world = World(monkeypatch)
+    _capacity(world, monkeypatch, seen)
+
+    world.create()
+
+    assert seen == [] and "capacity" not in world.log
+
+
 def test_the_digest_binds_the_actor_tenant(monkeypatch: pytest.MonkeyPatch) -> None:
     other = ActorContext(tenant_id=UUID(int=99), actor_id=UUID(int=1), role=Role.REVIEWER)
     seen: list[str] = []
 
-    def fake_attempt(factory: Any, actor: Any, request: Any, digest: str) -> Any:
+    def fake_attempt(
+        factory: Any, actor: Any, request: Any, digest: str, *, max_in_flight: Any = None
+    ) -> Any:
         seen.append(digest)
         return reviews._Attempt(error=ReviewDatabaseError)
 

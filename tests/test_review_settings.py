@@ -7,6 +7,8 @@ from pydantic import SecretStr
 
 from evidenceguard_persistence.settings import (
     ANTHROPIC_API_KEY_ENV,
+    DEFAULT_REVIEW_MAX_IN_FLIGHT,
+    REVIEW_MAX_IN_FLIGHT_ENV,
     REVIEW_MODEL_ENV,
     REVIEW_PROVIDER_ENV,
     AnthropicSettings,
@@ -25,7 +27,7 @@ REVIEW_VARIABLES = (REVIEW_PROVIDER_ENV, REVIEW_MODEL_ENV, ANTHROPIC_API_KEY_ENV
 
 @pytest.fixture(autouse=True)
 def clean_environment(monkeypatch: pytest.MonkeyPatch) -> None:
-    for name in REVIEW_VARIABLES:
+    for name in (*REVIEW_VARIABLES, REVIEW_MAX_IN_FLIGHT_ENV):
         monkeypatch.delenv(name, raising=False)
 
 
@@ -135,3 +137,56 @@ def test_review_settings_ignore_dotenv_files(
         load_anthropic_settings()
     assert ReviewSettings.model_config.get("env_file") is None
     assert AnthropicSettings.model_config.get("env_file") is None
+
+
+# --- in-flight cap (W8 fix round 1, ADR-0027) ---------------------------------------------------
+
+
+def _enable(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv(REVIEW_PROVIDER_ENV, "anthropic")
+    monkeypatch.setenv(REVIEW_MODEL_ENV, MODEL)
+
+
+@pytest.mark.parametrize("value", [None, ""])
+def test_in_flight_cap_defaults_to_two_when_unset_or_empty(
+    value: str | None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _enable(monkeypatch)
+    if value is not None:
+        monkeypatch.setenv(REVIEW_MAX_IN_FLIGHT_ENV, value)
+
+    settings = load_review_settings()
+
+    assert settings is not None
+    assert settings.review_max_in_flight == DEFAULT_REVIEW_MAX_IN_FLIGHT == 2
+
+
+@pytest.mark.parametrize(("value", "expected"), [("1", 1), ("7", 7), ("20", 20)])
+def test_in_flight_cap_accepts_one_to_twenty(
+    value: str, expected: int, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _enable(monkeypatch)
+    monkeypatch.setenv(REVIEW_MAX_IN_FLIGHT_ENV, value)
+
+    settings = load_review_settings()
+
+    assert settings is not None and settings.review_max_in_flight == expected
+
+
+@pytest.mark.parametrize("value", ["0", "21", "-1", "2.5", "two", VALUE_MARKER])
+def test_invalid_in_flight_cap_is_a_configuration_error(
+    value: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _enable(monkeypatch)
+
+    message = _error(monkeypatch, EG_REVIEW_MAX_IN_FLIGHT=value)
+
+    assert message == "EG_REVIEW_MAX_IN_FLIGHT must be an integer from 1 to 20"
+    assert VALUE_MARKER not in message and MODEL not in message
+
+
+def test_invalid_in_flight_cap_fails_closed_even_with_reviews_off(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    message = _error(monkeypatch, EG_REVIEW_MAX_IN_FLIGHT="0")
+    assert message == "EG_REVIEW_MAX_IN_FLIGHT must be an integer from 1 to 20"

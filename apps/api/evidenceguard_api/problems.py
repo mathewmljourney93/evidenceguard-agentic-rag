@@ -54,6 +54,7 @@ class PublicMessage(StrEnum):
     DOCUMENTS_NOT_READY = "The vendor's documents are not ready for review yet."
     IDEMPOTENCY_KEY_REUSED = "This idempotency key was already used for a different request."
     RESULT_NOT_READY = "The review result is not available yet."
+    REVIEW_LIMIT_REACHED = "Too many reviews are in progress for this tenant; try again later."
 
 
 class PublicHTTPException(StarletteHTTPException):

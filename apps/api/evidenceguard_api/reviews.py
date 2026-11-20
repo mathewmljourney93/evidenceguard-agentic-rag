@@ -23,6 +23,11 @@ the review through the M5d ``create_review`` seam with the offline embedding pro
 review and its job commit together. Changing ``EG_REVIEW_MODEL`` changes the digest, so replaying
 a key afterwards is a 409.
 
+**Spend bound.** A tenant may have at most ``EG_REVIEW_MAX_IN_FLIGHT`` reviews (default 2) queued
+or running. ``create_review`` checks the cap in the creation transaction, serialised per tenant;
+over the cap POST is a 429 (``REVIEW_LIMIT_REACHED``) with ``Retry-After: 60``. A replay of an
+existing key is never refused by the cap.
+
 Routes are synchronous, so FastAPI runs them, and their database work, in a worker thread. Errors
 are fixed problem responses: the idempotency key, submitted values and exception text are never
 echoed or logged.
@@ -70,6 +75,7 @@ from evidenceguard_domain.reviews import (
     ReviewDatabaseError,
     ReviewIdempotencyConflictError,
     ReviewJobConflictError,
+    ReviewLimitReachedError,
     ReviewNotFoundError,
     ReviewRecordInconsistentError,
     ReviewRequest,
@@ -100,6 +106,8 @@ REVIEW_TEMPLATES: tuple[tuple[str, int], ...] = ((DEFAULT_TEMPLATE_ID, DEFAULT_T
 """The templates a review may use, each with its pinned version."""
 IDEMPOTENCY_KEY_HEADER = "Idempotency-Key"
 MAX_TEMPLATE_ID_LENGTH = 32
+RETRY_AFTER_SECONDS = 60
+"""The ``Retry-After`` value of a 429 when the tenant's in-flight cap is reached."""
 
 _PROBLEM: dict[str, Any] = {"application/problem+json": {}}
 
@@ -308,7 +316,9 @@ class DatabaseReviewService:
             configuration=configuration,
         )
         factory = self._database.session_factory()
-        created = create_review(factory, actor, request)
+        created = create_review(
+            factory, actor, request, max_in_flight=settings.review_max_in_flight
+        )
         review = load_review(factory, actor, created.review_id)
         status = load_review_status(factory, actor, created.review_id)
         accepted = ReviewAccepted(
@@ -396,6 +406,7 @@ _STATUS_ERRORS: dict[type[Exception], int] = {
 _HANDLED: tuple[type[Exception], ...] = (
     *_PUBLIC_ERRORS,
     *_STATUS_ERRORS,
+    ReviewLimitReachedError,
     UnknownReviewTemplateError,
     SQLAlchemyError,
 )
@@ -403,6 +414,12 @@ _HANDLED: tuple[type[Exception], ...] = (
 
 def _problem(error: Exception) -> Exception:
     """The fixed HTTP error for ``error``; its text is never used."""
+    if isinstance(error, ReviewLimitReachedError):
+        return PublicHTTPException(
+            429,
+            PublicMessage.REVIEW_LIMIT_REACHED,
+            headers={"Retry-After": str(RETRY_AFTER_SECONDS)},
+        )
     for kind, (status, message) in _PUBLIC_ERRORS.items():
         if isinstance(error, kind):
             return PublicHTTPException(status, message)
@@ -468,7 +485,8 @@ router = APIRouter(
         "Captures the vendor's active revisions and queues a review with the pinned template "
         "and prompts and the configured model. 202 for a new review; 200 with the original "
         "review when the same Idempotency-Key is replayed with the same request. The tenant "
-        "cannot be supplied."
+        "cannot be supplied. A tenant may have a limited number of reviews queued or running; "
+        "over that limit a new review is a 429, while a replay is still answered."
     ),
     responses={
         200: {"description": "Replay of an earlier request.", "model": ReviewAccepted},
@@ -483,6 +501,16 @@ router = APIRouter(
         422: {
             "description": "Invalid or missing key, fields or template, or too many revisions.",
             "content": _PROBLEM,
+        },
+        429: {
+            "description": "The tenant already has the allowed number of reviews in progress.",
+            "content": _PROBLEM,
+            "headers": {
+                "Retry-After": {
+                    "description": "Seconds to wait before trying again.",
+                    "schema": {"type": "integer"},
+                }
+            },
         },
         503: {
             "description": "Reviews are not configured, or the database is unavailable.",
