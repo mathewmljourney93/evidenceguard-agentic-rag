@@ -80,6 +80,26 @@ def test_a_live_preflight_against_the_committed_selection_exits_4_with_no_provid
     assert FAKE_KEY not in captured.out + captured.err
 
 
+def test_the_committed_cap_refuses_before_the_provider_key_is_read(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """M7: with the committed files, a live run exits 4 without ever reading
+    EG_ANTHROPIC_API_KEY, building a transport or touching a database."""
+    monkeypatch.delenv("EG_ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("EG_EVAL_DATABASE_URL", raising=False)
+
+    def forbidden(*args: object, **kwargs: object) -> Any:
+        raise AssertionError("the provider key path must not be reached")
+
+    monkeypatch.setattr(evaluation_run, "_api_key", forbidden)
+    monkeypatch.setattr(evaluation_run, "load_anthropic_settings", forbidden)
+    monkeypatch.setattr(evaluation_run, "_https_transport", forbidden)
+    monkeypatch.setattr(evaluation_run, "eval_database_url", forbidden)
+    argv = ["run", "--suite", "live", "--model", "m-1", "--runs", "1", "--budget-usd", "5"]
+    assert evaluation_run.main(argv) == EXIT_BUDGET_PREFLIGHT
+    assert "the total spend cap in selection.toml allows no live run" in capsys.readouterr().err
+
+
 def test_a_proposed_selection_refuses_live_runs() -> None:
     selection = parse_selection(VALID.replace(b'"confirmed"', b'"proposed"', 1))
     with pytest.raises(EvaluationRefusal) as refused:

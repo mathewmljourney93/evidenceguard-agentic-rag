@@ -591,12 +591,14 @@ def _plans(run: _Run, pair: _Pair, traps: Mapping[str, str]) -> list[contract.Qu
 def contract_reviews(
     run: _Run, reviews: list[ObservedReview], *, rationale_extra: str | None = None
 ) -> None:
-    """Both contract phases for every pair, appended to ``reviews`` as they finish (a deadline
-    stop keeps the reviews already done for the partial record)."""
+    """Both contract phases for every pair, appended to ``reviews`` as they finish. The overall
+    deadline is checked before each review, as in the live suite; a stop keeps the reviews
+    already done for the partial record."""
     configuration = review_configuration(contract.CONTRACT_MODEL_ID)
     foreign = _foreign_item(run)
     for pair in _pairs(run.suite):
         traps = CONTRACT_TRAPS.get((pair.tenant, pair.vendor), {})
+        run.check_deadline()
         refusal = _review(
             run,
             pair,
@@ -611,6 +613,7 @@ def contract_reviews(
         phase = contract.scripted_provider(
             _plans(run, pair, traps), retrieved, foreign=foreign, rationale_extra=rationale_extra
         )
+        run.check_deadline()
         reviews.append(
             _review(
                 run,

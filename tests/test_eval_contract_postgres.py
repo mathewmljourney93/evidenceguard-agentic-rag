@@ -130,6 +130,24 @@ def test_a_scripted_canary_in_a_rationale_is_reported_as_injected_canary(
     assert "status: hard_failure" in capsys.readouterr().out
 
 
+def test_a_passed_deadline_stops_the_contract_suite_with_a_partial_record(
+    fresh: URL, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """M7: the overall deadline holds for the contract suite too (exit 6, ``deadline_stopped``).
+    The clock reads 0 when the deadline is set and far past it afterwards."""
+    readings = iter([0.0])
+
+    def clock() -> float:
+        return next(readings, 1e12)
+
+    output = tmp_path / "stopped.json"
+    code, record = _contract(fresh, output, clock=clock)
+    assert code == 6
+    assert record["status"] == "deadline_stopped" and record["reviews"] == []
+    assert record["stamp"] == "NOT a quality measurement of Claude or semantic retrieval"
+    assert "status: deadline_stopped" in capsys.readouterr().out
+
+
 def test_a_non_empty_database_is_refused(
     migrated: Engine, test_database_url: URL, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
