@@ -243,12 +243,14 @@ def test_migration_resources_are_packaged() -> None:
     assert (migrations / "versions" / "v0006_reviews.py").is_file()
     assert (migrations / "versions" / "v0007_review_stages.py").is_file()
     assert (migrations / "versions" / "v0008_review_outputs.py").is_file()
+    assert (migrations / "versions" / "v0009_report_approval.py").is_file()
 
 
 def test_migration_history_has_one_head() -> None:
     script = ScriptDirectory.from_config(alembic_config())
 
-    assert script.get_heads() == ["0008"]
+    assert script.get_heads() == ["0009"]
+    assert script.get_revision("0009").down_revision == "0008"
     assert script.get_revision("0008").down_revision == "0007"
     assert script.get_revision("0007").down_revision == "0006"
     assert script.get_revision("0006").down_revision == "0005"
@@ -281,6 +283,11 @@ def test_schema_tables_are_m2a_jobs_documents_chunks_and_embeddings() -> None:
         "review_stage_calls",
         "review_stage_results",
         "review_outputs",
+        "reports",
+        "report_revisions",
+        "report_decisions",
+        "report_finalizations",
+        "audit_events",
     }
     assert {role.value for role in UserRole} == {"reviewer", "approver", "admin"}
 
@@ -374,7 +381,7 @@ def test_offline_upgrade_creates_documents_with_the_model_constraints(
 ) -> None:
     """Migration 0003's literal constraint text must equal the model's (alembic check does not
     compare CHECK constraints or partial-index predicates)."""
-    sql = _offline_sql(monkeypatch, upgrade=True)
+    sql = _offline_sql(monkeypatch, upgrade=True, target="0008")  # 0009 (M6) adds triggers
 
     assert "CREATE TABLE documents (" in sql
     assert "CREATE TABLE document_revisions (" in sql
@@ -500,7 +507,7 @@ def test_offline_upgrade_to_0005_creates_the_extension_and_embedding_schema(
 ) -> None:
     """Migration 0005's literal constraint text must equal the model's (alembic check does not
     compare CHECK constraints or generated-column expressions)."""
-    sql = _offline_sql(monkeypatch, upgrade=True)
+    sql = _offline_sql(monkeypatch, upgrade=True, target="0008")  # 0009 (M6) adds triggers
     upper = sql.upper()
 
     assert upper.count("CREATE EXTENSION") == 1

@@ -289,6 +289,7 @@ def test_m5a_agents_package_contains_only_the_accepted_modules() -> None:
         "scripted.py",
         "report.py",  # M5f: only the accepted pure builder/renderer is added.
         "anthropic.py",  # M5h: the accepted pure Anthropic adapter (ADR-0026).
+        "report_export.py",  # M6: the finalized-report export renderers (ADR-0028).
         *M5C_MODULES,
         "data",
     }
@@ -318,6 +319,8 @@ def test_m5a_is_not_imported_by_other_packages_or_registered() -> None:
                 # W8: the review routes load the pinned artifacts; templates and prompts only.
                 assert _agents_modules(source) == W8_REVIEW_API_AGENT_MODULES, source.name
                 continue
+            if package is evidenceguard_api and source.name == M6_API_MODULE:
+                continue  # M6: the report routes use the export renderers (ADR-0028)
             assert "evidenceguard_agents" not in _module_imports(source), source.name
     assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
 
@@ -335,6 +338,11 @@ W8_WIRING = "review_wiring.py"
 
 M5H_TRANSPORT = "anthropic_http.py"
 """M5h (ADR-0026): the HTTPS transport, which imports only ``evidenceguard_agents.anthropic``."""
+
+M6_API_MODULE = "reports.py"
+"""M6 (ADR-0028): the report routes, which use the export renderers and the stored outputs."""
+M6_PERSISTENCE_MODULE = "reports.py"
+"""M6 (ADR-0028): report persistence, which decodes the stored M5f wrapper bytes."""
 
 
 # --- M5b (ADR-0020) ------------------------------------------------------------------------------
@@ -371,6 +379,7 @@ def test_m5b_is_not_wired_into_any_application_or_handler() -> None:
         (evidenceguard_agents, "report.py"),  # M5f's accepted pure provenance rechecks.
         (evidenceguard_persistence, "review_stages.py"),
         (evidenceguard_worker, "review.py"),  # M5g orchestration composes the M5b conversions.
+        (evidenceguard_agents, "report_export.py"),  # M6: the disclaimer's wording only.
     }
     for package in (
         evidenceguard_agents,
@@ -634,6 +643,8 @@ def test_m5f_is_not_wired_into_any_application_or_worker() -> None:
         for path in Path(package.__file__).parent.rglob("*.py"):
             if package is evidenceguard_worker and path.name == "review.py":
                 continue  # M5g: the only consumer of the M5f builder/renderer (G12)
+            if package is evidenceguard_persistence and path.name == M6_PERSISTENCE_MODULE:
+                continue  # M6: decodes the stored wrapper for reports and export (ADR-0028)
             imports = _module_imports(path)
             assert "evidenceguard_agents.report" not in _domain_imports(path)
             assert "evidenceguard_domain.report_content" not in _domain_imports(path)
@@ -772,7 +783,9 @@ def test_m5g_is_not_wired_into_any_route_command_setting_or_production_registry(
             assert "from evidenceguard_worker.review import" not in text, source.name
             if package is evidenceguard_api and source.name == W8_REVIEW_API:
                 continue  # W8: the review routes read the status and the stored output
-            if package is not evidenceguard_persistence and package is not evidenceguard_domain:
+            # M6 (ADR-0028): the report routes map the stored-output read errors.
+            m6_routes = package is evidenceguard_api and source.name == M6_API_MODULE
+            if package not in (evidenceguard_persistence, evidenceguard_domain) and not m6_routes:
                 assert "review_outputs" not in text, source.name
     assert production_registry().kinds == frozenset({"ingest_revision", "index_revision"})
 
@@ -908,7 +921,11 @@ def test_review_api_imports_only_templates_and_prompts_from_agents() -> None:
         for source in _source(evidenceguard_api, "__init__.py").parent.rglob("*.py")
         if "evidenceguard_agents" in _module_imports(source)
     }
-    assert importing == {W8_REVIEW_API}
+    # M6 (ADR-0028): the report routes import the export renderers, and nothing else from agents.
+    assert importing == {W8_REVIEW_API, M6_API_MODULE}
+    assert _agents_modules(_source(evidenceguard_api, M6_API_MODULE)) == {
+        "evidenceguard_agents.report_export"
+    }
     path = _source(evidenceguard_api, W8_REVIEW_API)
     assert _agents_modules(path) == W8_REVIEW_API_AGENT_MODULES
     imported = _module_imports(path)

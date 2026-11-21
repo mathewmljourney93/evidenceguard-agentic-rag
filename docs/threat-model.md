@@ -716,6 +716,37 @@ limitation probe), and there is no canary denylist, so canary text a model emits
 fields would be stored and rendered. Model calls stay at least once, bounded by persisted budgets;
 no exactly-once guarantee is made. The M4 limits above are unchanged.
 
+## Reports, approval and audit (M6)
+
+Routes under `/v1/reports` ([ADR-0028](decisions/0028-approval-gate-and-export.md)) expose a
+completed review's stored output as a report with hash-bound revisions, approval or rejection,
+finalization and export.
+
+- **Tenant and roles.** The tenant comes only from the API key; every query filters by it, and
+  another tenant's report is indistinguishable from a missing one (404). Reviewers and approvers
+  may read, revise and export; only approvers may approve, reject or finalize; administrators get
+  403 everywhere. An approver may not approve, reject or finalize a revision they authored.
+- **Integrity.** Each revision binds tenant, report, review and the exact wrapper SHA-256, and its
+  hash covers that digest. Approvals and finalization bind the exact revision number and hash by
+  composite foreign keys. Mutations are compare-and-set under a row lock (`If-Match`, ETag
+  `"r{n}-{sha}"`), so a stale request is refused rather than applied.
+- **Export.** Only finalized reports, rendered from the stored, digest-checked revision and
+  wrapper bytes; no stage or plan rows are read. Reviewer-supplied text is emitted as escaped
+  JSON literals. The export carries a fixed disclaimer: AI-assisted, citations show provenance
+  only, not legal advice or certification.
+- **Audit.** Every revise, approve, reject, finalize and export writes one audit row with actor,
+  revision and hash (and, for export, format and body SHA-256) in the same transaction. A trigger
+  rejects UPDATE, DELETE and TRUNCATE on the history and audit tables, and DELETE and TRUNCATE on
+  `reports`.
+
+**Limits.** The triggers protect against application code and ordinary roles only: a table owner
+or superuser can disable or drop them, so this guard depends on the runtime role not owning the
+tables, which the deployment does not yet enforce. A GET can write (the first access creates
+revision 1). Exports are not signed, so a downloaded file proves nothing on its own; its digest
+can be compared with the audit row. Downgrading migration 0009 deletes all report and audit data.
+There is no rate limiting on these routes. Each export appends an append-only audit row, so audit
+growth is bounded only by request volume; rate limiting is out of scope for v0.1.
+
 ## Not implemented yet
 
 - **Rate limiting, lockout, key expiry and usage auditing** for API keys. Direct domain callers (tests, later the worker) still construct `ActorContext` themselves and are trusted.

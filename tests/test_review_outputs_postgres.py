@@ -141,6 +141,13 @@ def test_the_catalogue_records_the_exact_keys_and_foreign_keys(done: pw.ReviewWo
     assert shape == {
         "pk_review_outputs": ("p", ["tenant_id", "review_id"], "-", []),
         "uq_review_outputs_tenant_id_job_id": ("u", ["tenant_id", "job_id"], "-", []),
+        # Added by 0009 (M6): the target of the reports foreign key.
+        "uq_review_outputs_tenant_id_review_id_wrapper_sha256": (
+            "u",
+            ["tenant_id", "review_id", "wrapper_sha256"],
+            "-",
+            [],
+        ),
         "fk_review_outputs_review": (
             "f",
             ["tenant_id", "review_id"],

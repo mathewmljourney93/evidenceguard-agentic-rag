@@ -28,6 +28,11 @@ def test_openapi_lists_every_route() -> None:
         "/v1/reviews/{review_id}",
         "/v1/reviews/{review_id}/result",
         "/v1/review-templates",
+        "/v1/reports/{report_id}",
+        "/v1/reports/{report_id}/revisions",
+        "/v1/reports/{report_id}/approval",
+        "/v1/reports/{report_id}/finalize",
+        "/v1/reports/{report_id}/export",
     ]
 
 
@@ -183,3 +188,38 @@ def test_review_routes_document_auth_and_errors() -> None:
     for name in ("ReviewCreate", "ReviewAccepted", "ReviewDetail", "ReviewResult"):
         assert components[name]["additionalProperties"] is False
         assert not {"tenant_id", "idempotency_key"} & set(components[name]["properties"])
+
+
+def test_openapi_documents_report_routes() -> None:
+    schema = _openapi()
+    paths = schema["paths"]
+    base = "/v1/reports/{report_id}"
+
+    read = paths[base]["get"]
+    assert read["security"] == [{"ApiKey": []}]
+    assert {"200", "401", "403", "404", "422", "503"} <= set(read["responses"])
+    assert "ETag" in read["responses"]["200"]["headers"]
+    revise = paths[base + "/revisions"]["post"]
+    assert {"201", "403", "409", "422", "428"} <= set(revise["responses"])
+    assert "If-Match" in {p["name"] for p in revise["parameters"]}
+    assert "application/problem+json" in revise["responses"]["428"]["content"]
+    for name in ("/approval", "/finalize"):
+        operation = paths[base + name]["post"]
+        assert {"200", "403", "409", "422"} <= set(operation["responses"])
+    export = paths[base + "/export"]["get"]
+    assert {"200", "403", "404", "409", "422"} <= set(export["responses"])
+    fmt = next(p for p in export["parameters"] if p["name"] == "format")
+    assert fmt["required"] is True and fmt["schema"]["enum"] == ["md", "json"]
+
+    components = schema["components"]["schemas"]
+    assert set(components["ReportRevise"]["properties"]) == {"dispositions", "notes", "reason"}
+    assert set(components["ApprovalRequest"]["properties"]) == {
+        "revision_no",
+        "content_sha256",
+        "decision",
+        "comment",
+    }
+    assert set(components["FinalizeRequest"]["properties"]) == {"revision_no", "content_sha256"}
+    for name in ("ReportRevise", "ApprovalRequest", "FinalizeRequest", "DispositionIn"):
+        assert components[name]["additionalProperties"] is False
+    assert "tenant_id" not in components["ReportView"]["properties"]

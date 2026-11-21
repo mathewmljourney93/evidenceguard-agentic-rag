@@ -48,7 +48,14 @@ M5E_TABLES = M5D_TABLES | {
     "review_stage_calls",
     "review_stage_results",
 }
-HEAD_TABLES = M5E_TABLES | {"review_outputs"}
+M5G_TABLES = M5E_TABLES | {"review_outputs"}
+HEAD_TABLES = M5G_TABLES | {
+    "reports",
+    "report_revisions",
+    "report_decisions",
+    "report_finalizations",
+    "audit_events",
+}
 FOREIGN_KEY_VIOLATION = "23503"
 UNIQUE_VIOLATION = "23505"
 CHECK_VIOLATION = "23514"
@@ -115,8 +122,12 @@ def test_upgrade_downgrade_upgrade_on_an_empty_database(
 
     command.upgrade(config, "head")
     assert _tables(empty_database) == HEAD_TABLES | {"alembic_version"}
-    assert _version(empty_database) == "0008"
+    assert _version(empty_database) == "0009"
     assert _extensions(empty_database) == {"plpgsql", "vector"}
+
+    command.downgrade(config, "0008")
+    assert _tables(empty_database) == M5G_TABLES | {"alembic_version"}
+    assert _version(empty_database) == "0008"
 
     command.downgrade(config, "0007")
     assert _tables(empty_database) == M5E_TABLES | {"alembic_version"}
@@ -149,7 +160,7 @@ def test_upgrade_downgrade_upgrade_on_an_empty_database(
 
     command.upgrade(config, "head")
     assert _tables(empty_database) == HEAD_TABLES | {"alembic_version"}
-    assert _version(empty_database) == "0008"
+    assert _version(empty_database) == "0009"
 
 
 def _version(engine: Engine) -> str | None:

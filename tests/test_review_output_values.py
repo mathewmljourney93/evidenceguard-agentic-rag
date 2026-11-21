@@ -453,7 +453,9 @@ def test_offline_0008_renders_the_model_table_constraints_and_the_reviews_unique
     model = str(
         CreateTable(ReviewOutputRow.__table__).compile(dialect=postgresql.dialect())  # type: ignore[arg-type, no-untyped-call]
     )
-    assert set(re.findall(r"CONSTRAINT (\w+)", model)) == CHECK_NAMES | KEY_NAMES
+    # 0009 (M6) later adds exactly one constraint to the model; 0008 itself is unchanged.
+    added_by_0009 = {"uq_review_outputs_tenant_id_review_id_wrapper_sha256"}
+    assert set(re.findall(r"CONSTRAINT (\w+)", model)) == CHECK_NAMES | KEY_NAMES | added_by_0009
     assert "ON DELETE" not in rendered and "ON UPDATE" not in rendered  # NO ACTION, no cascade
     assert "wrapper_canonical !~ '[^ -~]'" in rendered
     assert "unresolved_count BETWEEN 0 AND question_count" in rendered
