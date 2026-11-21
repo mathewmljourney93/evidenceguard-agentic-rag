@@ -340,6 +340,16 @@ def test_workflow_only_adds_one_step_after_original_suite() -> None:
         "c0f225415236b4ad7a583e53c9250b43311dd74ea1430e31dd6c553d462eac15"
     )  # W8: the reviewed wheel block at feat/review-api d52ba09
     workflow = workflow[:w8_start] + workflow[w8_end:]
+    # M7 (ADR-0029): the plan adds the eg-eval wheel help line and the contract-suite steps after
+    # this block; both are cut out exactly (each once) so the rest stays pinned.
+    m7_help = '          "${bin}/eg-eval" --help\n'
+    assert workflow.count(m7_help) == 1
+    workflow = workflow.replace(m7_help, "")
+    m7_start = workflow.index("\n      # M7 (ADR-0029): the evaluation contract suite")
+    m7_end = workflow.index('"${RUNNER_TEMP}/eval-contract-injected.json"\n', m7_start)
+    m7_end += len('"${RUNNER_TEMP}/eval-contract-injected.json"\n')
+    assert workflow.count("# M7 (ADR-0029)") == 1
+    workflow = workflow[:m7_start] + workflow[m7_end:]
     # Stable at candidate HEAD too; CI checkouts need not contain historical commit objects.
     baseline = workflow.replace("\n" + block, "").encode()
     assert runner.hashes({"workflow": baseline})["workflow"] == (

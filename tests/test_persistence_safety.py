@@ -14,6 +14,7 @@ import pytest
 
 from evidenceguard_persistence.safety import (
     TEST_DATABASE_URL_ENV,
+    require_disposable_database,
     require_disposable_test_database,
 )
 from evidenceguard_persistence.settings import (
@@ -269,6 +270,38 @@ def test_guard_accepts_a_distinct_disposable_target(app: str | None) -> None:
 
     assert url.database == "evidenceguard_test"
     assert url.drivername == "postgresql+psycopg"
+
+
+# --- M7: the generalised guard (evaluation databases end in ``_eval``) ----------------------
+
+LOCAL_EVAL = f"postgresql://evidenceguard:{PASSWORD}@127.0.0.1:5433/eg_contract_eval"
+
+
+def test_generalised_guard_accepts_the_named_suffix_and_names_its_variable() -> None:
+    url = require_disposable_database(LOCAL_EVAL, None, "EG_EVAL_DATABASE_URL", "_eval")
+    assert url.database == "eg_contract_eval"
+    with pytest.raises(DatabaseConfigurationError) as exc_info:
+        require_disposable_database(LOCAL_TEST, None, "EG_EVAL_DATABASE_URL", "_eval")
+    assert str(exc_info.value) == "the EG_EVAL_DATABASE_URL database name must end in _eval"
+    _assert_no_markers(repr(exc_info.value))
+    with pytest.raises(DatabaseConfigurationError, match=r"^EG_EVAL_DATABASE_URL is not set$"):
+        require_disposable_database("", None, "EG_EVAL_DATABASE_URL", "_eval")
+
+
+def test_generalised_guard_rejects_the_application_database() -> None:
+    app = f"postgresql://owner:{OTHER_PASSWORD}@localhost:5433/eg_contract_eval"
+    with pytest.raises(DatabaseConfigurationError) as exc_info:
+        require_disposable_database(LOCAL_EVAL, app, "EG_EVAL_DATABASE_URL", "_eval")
+    assert str(exc_info.value) == (
+        f"EG_EVAL_DATABASE_URL targets the same database as {DATABASE_URL_ENV}"
+    )
+    _assert_no_markers(repr(exc_info.value))
+
+
+def test_the_test_guard_keeps_its_behaviour_through_the_generalised_guard() -> None:
+    assert require_disposable_test_database(LOCAL_TEST, None) == require_disposable_database(
+        LOCAL_TEST, None, TEST_DATABASE_URL_ENV, "_test"
+    )
 
 
 # --- the real integration fixtures never reach engine creation for rejected targets -------

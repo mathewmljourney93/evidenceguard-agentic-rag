@@ -1,7 +1,8 @@
-"""Test-only retrieval-evaluation orchestration (M4e, ADR-0017).
+"""Retrieval-evaluation orchestration and corpus loading (M4e, ADR-0017).
 
-There is no installed command: the PostgreSQL tests are the only callers, always against the
-existing guarded disposable test databases. Three contracts:
+Callers: the PostgreSQL tests, always against the existing guarded disposable test databases,
+and since M7 the ``eg-eval`` composition root ``evaluation_run`` (ADR-0029), which loads the
+corpus with ``run_fresh_two_epoch`` into an empty ``_eval`` database. Three contracts:
 
 1. ``run_fresh_two_epoch`` writes, through production seams only, in global phases: validate;
    refuse any existing corpus-tenant state; seed the demo tenants and create vendors; create,

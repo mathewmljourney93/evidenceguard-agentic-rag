@@ -65,6 +65,7 @@ jobs:
           "${bin}/python" -I -c "import evidenceguard_api, evidenceguard_domain; from evidenceguard_api.app import create_app; create_app(); print(evidenceguard_api.__file__); assert 'site-packages' in evidenceguard_api.__file__"
           "${bin}/eg-api" --help
           "${bin}/eg-worker" --help
+          "${bin}/eg-eval" --help
           "${bin}/python" -I -c "from evidenceguard_worker.handlers import production_registry; assert production_registry().kinds == frozenset({'ingest_revision', 'index_revision'}); print('production registry: ingest_revision, index_revision')"
           # M4c (ADR-0015): run the offline embedder and canonical storage from the installed
           # wheel and import the indexing modules. No database is contacted; this check does
@@ -538,6 +539,24 @@ jobs:
 
       - name: Run review database mutation controls
         run: uv run --locked --no-sync --offline python infra/ci/review_mutations.py
+
+      # M7 (ADR-0029): the evaluation contract suite, scripted fake provider only; its records
+      # are NOT a quality measurement and are never committed. Each run needs an empty database
+      # whose name ends in _eval. No provider key exists in CI and the live suite never runs here.
+      - name: Create the evaluation contract databases
+        run: |
+          docker exec "${{ job.services.postgres.id }}" createdb -U evidenceguard evidenceguard_contract_eval
+          docker exec "${{ job.services.postgres.id }}" createdb -U evidenceguard evidenceguard_contract_injected_eval
+
+      - name: Run the evaluation contract suite (clean)
+        env:
+          EG_EVAL_DATABASE_URL: postgresql+psycopg://evidenceguard:evidenceguard-ci-only@localhost:5432/evidenceguard_contract_eval
+        run: uv run --locked --no-sync eg-eval run --suite contract --output "${RUNNER_TEMP}/eval-contract-clean.json"
+
+      - name: Run the evaluation contract suite (injected)
+        env:
+          EG_EVAL_DATABASE_URL: postgresql+psycopg://evidenceguard:evidenceguard-ci-only@localhost:5432/evidenceguard_contract_injected_eval
+        run: uv run --locked --no-sync eg-eval run --suite contract --variant injected --output "${RUNNER_TEMP}/eval-contract-injected.json"
 
   container:
     # M3f (ADR-0012): image build, effective build-context check, image checks and a Compose smoke

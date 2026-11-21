@@ -483,6 +483,8 @@ docker compose down -v                   # removes the containers and the databa
 
 [AGENTS.md](AGENTS.md) holds the working agreement. [prompts.md](prompts.md) is the historical prompt record up to 2026-11-20 and is no longer appended to.
 
+Evaluation: see [docs/evaluation.md](docs/evaluation.md).
+
 ## Secret scanning
 
 A GitHub Actions workflow ([secret-scan.yml](.github/workflows/secret-scan.yml)) runs [Gitleaks](https://github.com/gitleaks/gitleaks) v8.30.1 over the full Git history on every push and pull request. It [passed](https://github.com/mathewmljourney93/evidenceguard-agentic-rag/actions/runs/38142996460) for the published baseline `6d64fb3`.
