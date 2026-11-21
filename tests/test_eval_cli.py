@@ -174,3 +174,22 @@ def test_report_without_records_and_report_errors(
     bad.write_text('{"schema": 1}', encoding="ascii")
     assert _main(["report", str(bad)]) == 3
     assert _main(["report", str(tmp_path / "missing.json")]) == 3
+
+
+def test_report_write_rewrites_only_the_docs_block(tmp_path: Path) -> None:
+    """M7: the generated block lives in docs/evaluation.md; README.md is never rewritten."""
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    (docs / "evaluation.md").write_text(
+        "# Evaluation\n\n<!-- eg-eval:begin -->\nstale\n<!-- eg-eval:end -->\n", encoding="utf-8"
+    )
+    readme = tmp_path / "README.md"
+    readme.write_text("# Readme\n\nEvaluation: see docs.\n", encoding="utf-8")
+    assert (
+        cli.main(["report", "--format", "readme", "--write"], runner=_Runner(), root=tmp_path) == 0
+    )
+    assert (docs / "evaluation.md").read_text(encoding="utf-8") == (
+        "# Evaluation\n\n<!-- eg-eval:begin -->\nNo committed live runs yet.\n"
+        "<!-- eg-eval:end -->\n"
+    )
+    assert readme.read_text(encoding="utf-8") == "# Readme\n\nEvaluation: see docs.\n"

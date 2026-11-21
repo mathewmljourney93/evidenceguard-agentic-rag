@@ -280,10 +280,6 @@ M6 and overall M5 acceptance remain pending. M5e is reviewed,
 CI verified and on main at `14f510e`; its publication evidence was independently accepted
 in Prompt 207.
 
-<!-- eg-eval:begin -->
-No committed live runs yet.
-<!-- eg-eval:end -->
-
 ## Development (Windows, PowerShell)
 
 **Prerequisite:** [uv](https://docs.astral.sh/uv/) 0.13 or later. uv provides Python 3.12; the repository pins it in `.python-version`.
@@ -486,6 +482,8 @@ docker compose down -v                   # removes the containers and the databa
 ## Engineering record
 
 [AGENTS.md](AGENTS.md) holds the working agreement. [prompts.md](prompts.md) is the historical prompt record up to 2026-11-20 and is no longer appended to.
+
+Evaluation: see [docs/evaluation.md](docs/evaluation.md).
 
 ## Secret scanning
 

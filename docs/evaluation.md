@@ -89,8 +89,9 @@ eg-eval run --suite live --model ID --runs N --budget-usd X [--variant injected]
 eg-eval report RUN... [--select] [--format md|readme] [--write]
 ```
 
-`report --format readme --write` regenerates the marker blocks in `README.md` and this file
-from the given committed live runs; a test checks that both blocks equal that regeneration.
+`report --format readme --write` regenerates the marker block in this file from the given
+committed live runs; a test checks that the block equals that regeneration. `README.md` holds no
+block and no evaluation status, only a pointer to this file.
 
 ### Exit codes
 

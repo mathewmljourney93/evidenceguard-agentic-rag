@@ -1,4 +1,4 @@
-"""Deterministic reports over run records, model selection and the README block.
+"""Deterministic reports over run records, model selection and the docs/evaluation.md block.
 
 - ``render_markdown``: one table per record (identity, checks and metrics); the same records
   always give the same bytes. Claim-support precision prints "not measured: no labels" while a
@@ -8,8 +8,9 @@
   the first model that meets all of them (the cheapest, because candidates are listed cheapest
   first), or ``None``.
 - ``readme_block``: the text between ``<!-- eg-eval:begin -->`` and ``<!-- eg-eval:end -->`` in
-  README.md and docs/evaluation.md, generated only from committed live runs; with none it reads
-  "No committed live runs yet."
+  docs/evaluation.md, generated only from committed live runs; with none it reads "No committed
+  live runs yet." README.md holds no block, only a pointer to docs/evaluation.md (AGENTS.md:
+  status never lives in the README).
 """
 
 from collections.abc import Mapping, Sequence

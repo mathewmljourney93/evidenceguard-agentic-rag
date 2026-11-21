@@ -25,7 +25,8 @@ so the live runs, the annotation workflow and the Verifier probe are deferred.
 - **Live suite**: hash embeddings (the shipped W8 path), prices from `pricing.toml` with a
   required `as_of`, and a worst-case `BudgetGuard`. Thresholds, the cap and the annotation mode
   live in a committed `selection.toml`; a zero remaining cap refuses with exit 4 before any other
-  check. Allowlisted records under `docs/evaluation/runs`; README figures only from them.
+  check. Allowlisted records under `docs/evaluation/runs`; the generated block in
+  `docs/evaluation.md` comes only from them, and the README holds only a pointer to that file.
 - **Annotation and probe**: not built in PR A (no live outputs can exist at a $0 cap); the
   metrics they feed exist as pure functions and print "not measured: no labels".
 

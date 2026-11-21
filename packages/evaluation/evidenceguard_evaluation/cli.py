@@ -39,7 +39,9 @@ PROG = "eg-eval"
 USAGE_ERROR_MESSAGE = f"{PROG}: error: invalid arguments; run with --help for usage\n"
 RUNS_DIRECTORY = Path("docs") / "evaluation" / "runs"
 SELECTION_FILE = Path("docs") / "evaluation" / "selection.toml"
-DOCUMENTS_WITH_BLOCK = (Path("README.md"), Path("docs") / "evaluation.md")
+DOCUMENTS_WITH_BLOCK = (Path("docs") / "evaluation.md",)
+"""The documents holding the generated block. README.md only points to docs/evaluation.md:
+status never lives in the README (AGENTS.md)."""
 MAX_RUNS = 20
 MAX_DEADLINE_MINUTES = 24 * 60
 
@@ -118,7 +120,7 @@ def parser() -> argparse.ArgumentParser:
     show.add_argument(
         "--write",
         action="store_true",
-        help="with --format readme: rewrite the marker blocks in README.md and docs/evaluation.md",
+        help="with --format readme: rewrite the marker block in docs/evaluation.md",
     )
     return root
 

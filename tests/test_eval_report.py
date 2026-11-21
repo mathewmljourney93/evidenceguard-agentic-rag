@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from evidenceguard_evaluation import report
+from evidenceguard_evaluation import cli, report
 from evidenceguard_evaluation.config import EvaluationRefusal, parse_selection
 from evidenceguard_evaluation.records import RunContext, build_record, parse_record, sealed
 
@@ -104,13 +104,22 @@ def _committed() -> list[tuple[str, dict[str, Any]]]:
     ]
 
 
-@pytest.mark.parametrize("document", ["README.md", "docs/evaluation.md"])
-def test_the_readme_and_docs_blocks_equal_their_regeneration(document: str) -> None:
+def test_the_docs_block_equals_its_regeneration() -> None:
     expected = report.readme_block(_committed())
-    text = (ROOT / document).read_text(encoding="utf-8")
+    text = (ROOT / "docs" / "evaluation.md").read_text(encoding="utf-8")
     assert report.current_block(text) == expected
     if not _committed():
         assert report.NO_RUNS in expected
+
+
+def test_the_readme_only_points_to_the_evaluation_docs() -> None:
+    """M7: status never lives in the README (AGENTS.md); it holds one pointer line and no block."""
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert report.BEGIN not in text and report.END not in text
+    assert report.NO_RUNS not in text and "eg-eval" not in text
+    lines = [line for line in text.splitlines() if "docs/evaluation.md" in line]
+    assert lines == ["Evaluation: see [docs/evaluation.md](docs/evaluation.md)."]
+    assert [path.as_posix() for path in cli.DOCUMENTS_WITH_BLOCK] == ["docs/evaluation.md"]
 
 
 def test_the_block_lists_live_runs_and_never_contract_runs() -> None:
