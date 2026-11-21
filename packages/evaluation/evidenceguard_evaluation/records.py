@@ -7,7 +7,9 @@ rationale or exception text: there is no field for them.
 
 Canonical JSON follows M4e (sorted keys, compact separators, ASCII, no NaN). ``record_sha256``
 covers the whole record without itself; ``deterministic_sha256`` additionally leaves out the
-run id, the creation time and every latency, so two contract runs on the same tree are equal.
+run id, the creation time and every latency. It is equal for two runs only when retrieval ties
+break the same way: fusion orders equal fused scores by chunk id (ADR-0016), and chunk ids are
+random per seeded database, so tied chunks can reorder between runs on fresh databases.
 """
 
 import hashlib

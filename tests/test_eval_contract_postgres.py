@@ -100,7 +100,31 @@ def _assert_contract_holds(record: dict[str, Any]) -> None:
             assert all(q["finding_count"] == 0 for q in review["questions"])
 
 
-def test_clean_and_injected_contract_suites_pass_and_repeat_deterministically(
+def _outcomes(record: dict[str, Any]) -> list[Any]:
+    """The parts of a record that do not depend on retrieval tie order: fusion orders equal
+    fused scores by chunk id, and chunk ids are random per seeded database (plan revision
+    2026-11-21), so ranked lists, Recall@k and the deterministic digest can differ between runs
+    on fresh databases."""
+    questions = [
+        (
+            r["phase"],
+            r["tenant"],
+            r["vendor"],
+            r["review_status"],
+            q["question_id"],
+            q["status"],
+            q["verification"],
+            q["unresolved_reason"],
+            q["trap"],
+            q["finding_count"],
+        )
+        for r in record["reviews"]
+        for q in r["questions"]
+    ]
+    return [questions, record["checks"], record["hard_failures"], record["contract_failures"]]
+
+
+def test_clean_and_injected_contract_suites_pass_and_repeat_their_outcomes(
     fresh: URL, tmp_path: Path
 ) -> None:
     code, first = _contract(fresh, tmp_path / "first.json")
@@ -108,7 +132,8 @@ def test_clean_and_injected_contract_suites_pass_and_repeat_deterministically(
     _assert_contract_holds(first)
     code, second = _contract(fresh, tmp_path / "second.json")
     assert code == 0
-    assert second["deterministic_sha256"] == first["deterministic_sha256"]
+    _assert_contract_holds(second)
+    assert _outcomes(second) == _outcomes(first)
     assert second["run_id"] != first["run_id"]
     code, injected = _contract(fresh, tmp_path / "injected.json", variant="injected")
     assert code == 0

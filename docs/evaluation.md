@@ -41,8 +41,11 @@ The scripted fake provider answers in two phases per pair:
 The run fails (exit 5) unless both phases' retrieved sets are equal, every trap is unresolved,
 the refusal phase resolved nothing, there are zero provenance violations, isolation holds and no
 injected-canary text appears in any output. The record carries `deterministic_sha256` over
-everything except the run id, the creation time and latencies; two runs on the same tree give
-the same value.
+everything except the run id, the creation time and latencies. It is equal for two runs only
+when retrieval ties break the same way: fusion orders equal fused scores by chunk id, and chunk
+ids are random per seeded database, so two runs on fresh databases can rank tied chunks
+differently, change which chunks are in the top k and change Recall@k. Within one run both
+phases share one snapshot, so their retrieved sets must be equal.
 
 ### Live suite (`--suite live`, by hand only; not run at v0.1)
 
@@ -133,6 +136,7 @@ A live evaluation needs a non-zero cap confirmed in `selection.toml`, the candid
 ## Limits
 
 Synthetic corpus of 13 documents; small n gives wide intervals; hash retrieval is lexical, not
-semantic; model output is nondeterministic; one annotator; English Markdown only. The contract
+semantic; retrieval ties break by seeded chunk id, so Recall@k can differ between runs on fresh
+databases; model output is nondeterministic; one annotator; English Markdown only. The contract
 suite proves wiring, isolation and provenance checks with scripted responses, not model quality
 or injection resistance.
