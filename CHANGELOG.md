@@ -4,6 +4,11 @@ Short record of merged changes, newest first. Details live in each pull request.
 
 ## Unreleased
 
+- M7 PR A (ADR-0029): `eg-eval` evaluation harness with the contract suite in CI (scripted
+  fake, NOT a quality measurement), a budget-guarded live suite and deterministic reports.
+  **Not done:** no live evaluation has been run and no model is chosen (D10 open): the owner's
+  spend cap is $0, so `selection.toml` has `total_usd_cap = 0.0`; annotation and the Verifier
+  probe are deferred with the live runs.
 - M6: report approval gate and export under `/v1/reports` (hash-bound revisions, approve or
   reject, finalize, Markdown and JSON export, append-only history and audit; migration 0009,
   ADR-0028).

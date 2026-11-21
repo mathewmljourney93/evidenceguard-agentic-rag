@@ -280,6 +280,10 @@ M6 and overall M5 acceptance remain pending. M5e is reviewed,
 CI verified and on main at `14f510e`; its publication evidence was independently accepted
 in Prompt 207.
 
+<!-- eg-eval:begin -->
+No committed live runs yet.
+<!-- eg-eval:end -->
+
 ## Development (Windows, PowerShell)
 
 **Prerequisite:** [uv](https://docs.astral.sh/uv/) 0.13 or later. uv provides Python 3.12; the repository pins it in `.python-version`.

@@ -1,0 +1,9 @@
+# Model prices for eg-eval live runs (ADR-0029). US dollars per million tokens, read by hand
+# from the provider's price page. as_of and source_url are required: with as_of empty, as
+# committed, every live run refuses until the owner fills this file. Example entry (not a price):
+#
+#   [models."<full dated model id>"]
+#   input_usd_per_mtok = 1.0
+#   output_usd_per_mtok = 5.0
+as_of = ""
+source_url = ""
