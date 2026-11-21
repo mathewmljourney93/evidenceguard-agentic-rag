@@ -23,6 +23,7 @@ dependencies = [
 eg-api = "evidenceguard_api.__main__:main"
 eg-admin = "evidenceguard_api.admin:main"
 eg-worker = "evidenceguard_worker.__main__:main"
+eg-eval = "evidenceguard_worker.evaluation_run:main"
 
 [dependency-groups]
 dev = [
@@ -48,6 +49,7 @@ packages = [
     "packages/persistence/evidenceguard_persistence",
     "packages/retrieval/evidenceguard_retrieval",
     "packages/agents/evidenceguard_agents",
+    "packages/evaluation/evidenceguard_evaluation",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -59,6 +61,7 @@ include = [
     "/packages/persistence/evidenceguard_persistence",
     "/packages/retrieval/evidenceguard_retrieval",
     "/packages/agents/evidenceguard_agents",
+    "/packages/evaluation/evidenceguard_evaluation",
     "/alembic.ini",
     "/tests",
     "/docs/decisions",
@@ -77,6 +80,7 @@ known-first-party = [
     "evidenceguard_agents",
     "evidenceguard_api",
     "evidenceguard_domain",
+    "evidenceguard_evaluation",
     "evidenceguard_observability",
     "evidenceguard_persistence",
     "evidenceguard_retrieval",
@@ -93,6 +97,7 @@ files = [
     "packages/persistence/evidenceguard_persistence",
     "packages/retrieval/evidenceguard_retrieval",
     "packages/agents/evidenceguard_agents",
+    "packages/evaluation/evidenceguard_evaluation",
     "apps/worker/evidenceguard_worker",
     "infra/ci/container_ci.py",
     "tests",

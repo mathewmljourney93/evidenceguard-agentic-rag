@@ -9,6 +9,7 @@ import pytest
 import evidenceguard_agents
 import evidenceguard_api
 import evidenceguard_domain
+import evidenceguard_evaluation
 import evidenceguard_observability
 import evidenceguard_persistence
 import evidenceguard_retrieval
@@ -101,8 +102,10 @@ def _top_level_imports(package_dir: Path) -> set[str]:
                 "sqlalchemy",
             },
         ),
-        (evidenceguard_api, {"evidenceguard_worker"}),
+        (evidenceguard_api, {"evidenceguard_worker", "evidenceguard_evaluation"}),
         (evidenceguard_worker, {"evidenceguard_api"}),
+        # M7: the evaluation package may import packages, never an application.
+        (evidenceguard_evaluation, {"evidenceguard_api", "evidenceguard_worker"}),
     ],
 )
 def test_package_import_boundaries(package: ModuleType, forbidden: set[str]) -> None:
@@ -180,8 +183,8 @@ def test_m4e_evaluation_modules_are_pure(module: str, allowed: set[str]) -> None
 
 
 def test_m4e_worker_orchestration_keeps_the_accepted_boundaries() -> None:
-    """M4e (ADR-0017): the test-only orchestrator may use persistence, retrieval and SQLAlchemy,
-    never the API."""
+    """M4e (ADR-0017): the corpus loader may use persistence, retrieval and SQLAlchemy, never the
+    API. M7: its callers are the PostgreSQL tests and ``evaluation_run`` (``eg-eval``)."""
     assert evidenceguard_worker.__file__ is not None
     module = Path(evidenceguard_worker.__file__).parent / "evaluation.py"
     third_party = _module_imports(module) - set(sys.stdlib_module_names)
@@ -194,10 +197,13 @@ def test_m4e_worker_orchestration_keeps_the_accepted_boundaries() -> None:
     }
 
 
-def test_no_evaluation_command_is_installed() -> None:
-    """M4e has no installed command; the PostgreSQL tests are the only callers."""
-    names = {script.name for script in entry_points(group="console_scripts")}
-    assert "eg-eval" not in names
+# M7: inverted from ``test_no_evaluation_command_is_installed`` (M4e had no command).
+def test_the_evaluation_command_targets_the_worker_composition_root() -> None:
+    """M7 (ADR-0029): ``eg-eval`` points at the worker's composition root, because packages may
+    not import applications; the pure package holds the parser and the rules."""
+    (script,) = entry_points(group="console_scripts", name="eg-eval")
+    assert script.value == "evidenceguard_worker.evaluation_run:main"
+    assert script.dist is not None and script.dist.name == "evidenceguard"
 
 
 def test_m4f_voyage_adapter_is_pure_and_network_free() -> None:
@@ -233,7 +239,7 @@ def test_m4f_leaves_the_production_providers_registry_and_commands_unchanged() -
         for script in entry_points(group="console_scripts")
         if script.dist is not None and script.dist.name == "evidenceguard"
     }
-    assert names == {"eg-api", "eg-admin", "eg-worker"}
+    assert names == {"eg-api", "eg-admin", "eg-worker", "eg-eval"}  # M7: eg-eval (ADR-0029)
     mentions = set()
     for package in (evidenceguard_api, evidenceguard_persistence, evidenceguard_worker):
         assert package.__file__ is not None
@@ -326,9 +332,16 @@ def test_m5a_is_not_imported_by_other_packages_or_registered() -> None:
 
 
 # W8: review_wiring.py composes the provider and the handler for the production registry.
-M5G_AGENT_IMPORTERS = {"review_seams.py", "review.py", "review_wiring.py"}
-"""The only worker modules that import ``evidenceguard_agents``: M5d (D2), M5g (G12) and the W8
-production wiring (ADR-0027)."""
+# M7: evaluation_run.py is the eg-eval composition root (ADR-0029).
+M5G_AGENT_IMPORTERS = {"review_seams.py", "review.py", "review_wiring.py", "evaluation_run.py"}
+"""The only worker modules that import ``evidenceguard_agents``: M5d (D2), M5g (G12), the W8
+production wiring (ADR-0027) and the M7 evaluation composition root (ADR-0029)."""
+M7_EVAL_RUN = "evaluation_run.py"
+"""M7 (ADR-0029): the worker's eg-eval composition root. It creates reviews, reads their outputs
+and builds the live provider; it never names the scripted fake (the evaluation package's
+``contract.py`` builds it)."""
+M7_EVAL_AGENT_IMPORTERS = {"contract.py", "budget.py"}
+"""M7: the only evaluation-package modules that import ``evidenceguard_agents``."""
 
 W8_REVIEW_API = "reviews.py"
 """W8 (ADR-0027): the only API module that imports the agents package or creates reviews."""
@@ -553,6 +566,10 @@ def test_m5d_creation_is_wired_only_through_the_review_api() -> None:
         if source.name == "review_seams.py":
             continue
         text = source.read_text(encoding="utf-8")
+        if source.name == M7_EVAL_RUN:
+            # M7: eg-eval creates reviews through create_review like the API; never the seams.
+            assert "review_seams" not in text and "run_review" not in text
+            continue
         assert "persistence.reviews" not in text, source.name
         if source.name == "review.py":
             continue  # M5g: the run_review composition uses the M5d seams (G12)
@@ -778,6 +795,8 @@ def test_m5g_is_not_wired_into_any_route_command_setting_or_production_registry(
                 # W8: the production wiring builds the handler; it never reads outputs.
                 assert "review_outputs" not in text, source.name
                 continue
+            if package is evidenceguard_worker and source.name == M7_EVAL_RUN:
+                continue  # M7: eg-eval reads outputs; it uses build_review_handler (checked above)
             assert "make_run_review_handler" not in text, source.name
             assert "evidenceguard_worker.review " not in text, source.name
             assert "from evidenceguard_worker.review import" not in text, source.name
@@ -849,11 +868,13 @@ def test_m5h_is_not_constructed_registered_or_configured_in_production() -> None
         (evidenceguard_agents, "anthropic.py"),
         (evidenceguard_worker, M5H_TRANSPORT),
         (evidenceguard_worker, W8_WIRING),  # W8: the one production construction (ADR-0027)
+        (evidenceguard_worker, M7_EVAL_RUN),  # M7: live eg-eval runs (ADR-0029)
     }
     for package in (
         evidenceguard_api,
         evidenceguard_agents,
         evidenceguard_domain,
+        evidenceguard_evaluation,  # M7: the pure package never builds the adapter
         evidenceguard_observability,
         evidenceguard_persistence,
         evidenceguard_retrieval,
@@ -899,6 +920,7 @@ def test_production_paths_never_construct_the_scripted_provider() -> None:
         evidenceguard_api,
         evidenceguard_agents,
         evidenceguard_domain,
+        evidenceguard_evaluation,  # M7
         evidenceguard_observability,
         evidenceguard_persistence,
         evidenceguard_retrieval,
@@ -908,6 +930,8 @@ def test_production_paths_never_construct_the_scripted_provider() -> None:
         for source in Path(package.__file__).parent.rglob("*.py"):
             if package is evidenceguard_agents and source.name == "scripted.py":
                 continue
+            if package is evidenceguard_evaluation and source.name == "contract.py":
+                continue  # M7: the contract suite's scripts (ADR-0029), never a production path
             assert "evidenceguard_agents.scripted" not in _agents_modules(source), source.name
             assert "ScriptedFakeProvider" not in _constructed_names(source), source.name
             if package is evidenceguard_agents and source.name == "__init__.py":
@@ -957,3 +981,44 @@ def test_review_wiring_keeps_the_accepted_imports() -> None:
     assert {"AnthropicProvider", "HttpsAnthropicTransport", "LoggingSpanSink"} <= (
         _constructed_names(path)
     )
+
+
+# --- M7 (ADR-0029) -------------------------------------------------------------------------------
+
+
+def test_m7_evaluation_package_imports_agents_only_from_the_named_modules() -> None:
+    """The scripted fake is reachable only from ``contract.py``; the budget guard wraps the
+    provider protocol; no other evaluation module imports the agents package."""
+    root = _source(evidenceguard_evaluation, "__init__.py").parent
+    importing = {
+        source.name
+        for source in root.rglob("*.py")
+        if "evidenceguard_agents" in _module_imports(source)
+    }
+    assert importing == M7_EVAL_AGENT_IMPORTERS
+    assert _agents_modules(root / "contract.py") == {"evidenceguard_agents.scripted"}
+    assert _agents_modules(root / "budget.py") == {"evidenceguard_agents.providers"}
+
+
+def test_m7_evaluation_package_has_no_network_or_database_module() -> None:
+    root = _source(evidenceguard_evaluation, "__init__.py").parent
+    for source in root.rglob("*.py"):
+        imported = _module_imports(source)
+        assert not imported & {"sqlalchemy", "psycopg", "socket", "ssl", "http", "urllib"}, (
+            source.name
+        )
+        assert not imported & {"os", "subprocess", "logging"}, source.name
+
+
+def test_m7_eval_run_builds_the_handler_only_through_the_production_wiring() -> None:
+    path = _source(evidenceguard_worker, M7_EVAL_RUN)
+    text = path.read_text(encoding="utf-8")
+    assert "build_review_handler" in _constructed_names(path)
+    assert "ScriptedFakeProvider" not in text and "make_run_review_handler" not in text
+    assert "evidenceguard_agents.scripted" not in _agents_modules(path)
+    assert _agents_modules(path) == {
+        "evidenceguard_agents.anthropic",
+        "evidenceguard_agents.prompts",
+        "evidenceguard_agents.providers",
+        "evidenceguard_agents.templates",
+    }
